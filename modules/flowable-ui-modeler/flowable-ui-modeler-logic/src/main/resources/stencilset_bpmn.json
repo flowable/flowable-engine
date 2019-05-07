@@ -1052,6 +1052,16 @@
         "popular" : true
       } ]
     }, {
+      "name" : "escalationrefpackage",
+      "properties" : [ {
+        "id" : "escalationref",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.ESCALATIONREFPACKAGE.ESCALATIONREF.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.ESCALATIONREFPACKAGE.ESCALATIONREF.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
       "name" : "cancelactivitypackage",
       "properties" : [ {
         "id" : "cancelactivity",
@@ -1176,6 +1186,16 @@
         "popular" : true
       } ]
     }, {
+      "name" : "escalationdefinitionspackage",
+      "properties" : [ {
+        "id" : "escalationdefinitions",
+        "type" : "multiplecomplex",
+        "title" : "BPMN.PROPERTYPACKAGES.ESCALATIONDEFINITIONSPACKAGE.ESCALATIONDEFINITIONS.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.ESCALATIONDEFINITIONSPACKAGE.ESCALATIONDEFINITIONS.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
       "name" : "istransactionpackage",
       "properties" : [ {
         "id" : "istransaction",
@@ -1288,7 +1308,7 @@
     "groups" : [ "BPMN.STENCILS.GROUPS.DIAGRAM" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "process_historylevelpackage", "isexecutablepackage", "datapropertiespackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage", "process_iseagerexecutionfetchpackage" ],
+    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "process_historylevelpackage", "isexecutablepackage", "datapropertiespackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "escalationdefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage", "process_iseagerexecutionfetchpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {
@@ -1344,6 +1364,17 @@
     "icon" : "startevent/error.png",
     "groups" : [ "BPMN.STENCILS.GROUPS.STARTEVENTS" ],
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "errorrefpackage", "interruptingpackage" ],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "sequence_start", "Startevents_all", "StartEventsMorph", "all" ]
+  }, {
+    "type" : "node",
+    "id" : "StartEscalationEvent",
+    "title" : "BPMN.STENCILS.STARTESCALATIONEVENT.TITLE",
+    "description" : "BPMN.STENCILS.STARTESCALATIONEVENT.DESCRIPTION",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n    \n    <path\n         stroke=\"#585858\"\n         style=\"fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10\"\n         d=\"M 16,8.75 L22,23.75 L16,17 L10,23.75z\"\n         id=\"escalationPolygon\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
+    "icon" : "startevent/escalation.png",
+    "groups" : [ "BPMN.STENCILS.GROUPS.STARTEVENTS" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "escalationrefpackage", "interruptingpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "sequence_start", "Startevents_all", "StartEventsMorph", "all" ]
   }, {
@@ -1624,6 +1655,17 @@
       "roles" : [ "sequence_start", "BoundaryEventsMorph", "IntermediateEventOnActivityBoundary" ]
     }, {
       "type" : "node",
+      "id" : "BoundaryEscalationEvent",
+      "title" : "BPMN.STENCILS.BOUNDARYESCALATIONEVENT.TITLE",
+      "description" : "BPMN.STENCILS.BOUNDARYESCALATIONEVENT.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    \n    <path\n         stroke=\"#585858\"\n         style=\"fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10\"\n         d=\"M 16,8.75 L22,23.75 L16,17 L10,23.75z\"\n         id=\"escalationPolygon\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
+      "icon" : "catching/escalation.png",
+      "groups" : [ "BPMN.STENCILS.GROUPS.BOUNDARYEVENTS" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "escalationrefpackage" ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "sequence_start", "BoundaryEventsMorph", "IntermediateEventOnActivityBoundary" ]
+    }, {
+      "type" : "node",
       "id" : "BoundaryTimerEvent",
       "title" : "BPMN.STENCILS.BOUNDARYTIMEREVENT.TITLE",
       "description" : "BPMN.STENCILS.BOUNDARYTIMEREVENT.DESCRIPTION",
@@ -1734,6 +1776,17 @@
       "roles" : [ "ThrowEventsMorph", "sequence_start", "sequence_end", "all" ]
     }, {
       "type" : "node",
+      "id" : "ThrowEscalationEvent",
+      "title" : "BPMN.STENCILS.THROWESCALATIONEVENT.TITLE",
+      "description" : "BPMN.STENCILS.THROWESCALATIONEVENT.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    <path\n\t   id=\"signalThrowing\"\n       d=\"M 16,8.75 L22,23.75 L16,17 L10,23.75z\"\n       fill=\"#585858\"\n       stroke=\"#585858\"\n       style=\"stroke-width:1.4;stroke-miterlimit:4;stroke-dasharray:none\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
+      "icon" : "throwing/escalation.png",
+      "groups" : [ "BPMN.STENCILS.GROUPS.INTERMEDIATETHROWINGEVENTS" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "escalationrefpackage" ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "ThrowEventsMorph", "sequence_start", "sequence_end", "all" ]
+    }, {
+      "type" : "node",
       "id" : "EndNoneEvent",
       "title" : "BPMN.STENCILS.ENDNONEEVENT.TITLE",
       "description" : "BPMN.STENCILS.ENDNONEEVENT.DESCRIPTION",
@@ -1752,6 +1805,17 @@
       "icon" : "endevent/error.png",
       "groups" : [ "BPMN.STENCILS.GROUPS.ENDEVENTS" ],
       "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "errorrefpackage" ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "EndEventsMorph", "sequence_end", "all" ]
+    }, {
+      "type" : "node",
+      "id" : "EndEscalationEvent",
+      "title" : "BPMN.STENCILS.ENDESCALATIONEVENT.TITLE",
+      "description" : "BPMN.STENCILS.ENDESCALATIONEVENT.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"14\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"3\"/>\n    \n    <path\n         fill=\"#585858\"\n         stroke=\"#585858\"\n         style=\"stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10\"\n         d=\"M 16,8.75 L22,23.75 L16,17 L10,23.75z\"\n         id=\"escalationPolygon\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"32\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
+      "icon" : "endevent/escalation.png",
+      "groups" : [ "BPMN.STENCILS.GROUPS.ENDEVENTS" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "escalationrefpackage" ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "EndEventsMorph", "sequence_end", "all" ]
     }, {

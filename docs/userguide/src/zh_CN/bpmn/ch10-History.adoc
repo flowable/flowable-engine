@@ -1,0 +1,243 @@
+[[history]]
+
+== 历史
+
+历史是记录流程执行过程中发生的事情，并将其永久存储的组件。与运行时数据不同，历史数据在流程实例完成以后仍保存在数据库中。
+
+有6个历史实体：
+
+* ++HistoricProcessInstance++保存当前及已结束流程实例的信息。
+* ++HistoricVariableInstance++保存流程变量或任务变量的最新值。
+* ++HistoricActivityInstance++保存活动（流程中的节点）的一次执行的信息。
+* ++HistoricTaskInstance++保存当前与历史（完成及删除的）任务实例的信息。
+* ++HistoricIdentityLink++保存任务及流程实例、当前及历史的身份关联的信息。
+* ++HistoricDetail++保存与历史流程实例、活动实例或任务实例等有关的多种信息。
+
+历史与当前进行中的流程实例都在数据库中保存历史实体，因此可以选择直接查询历史表，以减少对运行时流程实例数据的访问，并提高运行时执行的性能。
+
+[[historyQuery]]
+
+
+=== 查询历史
+
+可以使用HistoryServiceAPI提供的++createHistoricProcessInstanceQuery()++、++createHistoricVariableInstanceQuery()++、++createHistoricActivityInstanceQuery()++、 ++getHistoricIdentityLinksForTask()++、++getHistoricIdentityLinksForProcessInstance()++、++createHistoricDetailQuery()++与++createHistoricTaskInstanceQuery()++方法，查询全部6种历史实体。
+
+下面用一些例子展示历史查询API的部分用法。可以在link:$$http://flowable.org/javadocs/index.html$$[javadoc]的++org.flowable.engine.history++包中找到全部用法。
+
+[[historyQueryProcessInstance]]
+
+
+==== 历史流程实例查询
+
+获取所有流程中，完成所花费时间（持续时间）排名前10的、流程定义为__XXX__的、已完成的++HistoricProcessInstances（历史流程实例）++。
+
+[source,java,linenums]
+----
+historyService.createHistoricProcessInstanceQuery()
+  .finished()
+  .processDefinitionId("XXX")
+  .orderByProcessInstanceDuration().desc()
+  .listPage(0, 10);
+----
+
+
+[[historyQueryVariableInstance]]
+
+
+==== 历史变量实例查询
+
+获取已完成的、id为'XXX'的流程实例中，所有的++HistoricVariableInstances（历史变量实例）++，并以变量名排序。
+
+[source,java,linenums]
+----
+historyService.createHistoricVariableInstanceQuery()
+  .processInstanceId("XXX")
+  .orderByVariableName.desc()
+  .list();
+----
+
+[[historyQueryActivityInstance]]
+
+
+==== 历史活动实例查询
+
+获取最新的、已完成的、流程定义的id为XXX的、服务任务类型的++HistoricActivityInstance（历史活动实例）++。
+
+[source,java,linenums]
+----
+historyService.createHistoricActivityInstanceQuery()
+  .activityType("serviceTask")
+  .processDefinitionId("XXX")
+  .finished()
+  .orderByHistoricActivityInstanceEndTime().desc()
+  .listPage(0, 1);
+----
+
+[[historyQueryDetail]]
+
+
+==== 历史详情查询
+
+下面的的例子获取id为123的流程中所有的变量更新记录。这个查询只会返回++HistoricVariableUpdate（历史变量更新）++。请注意一个变量名可能会有多个++HistoricVariableUpdate++实体，这代表了流程中的每一次变量更新。可以使用++orderByTime（按变量更新的时间）++或++orderByVariableRevision（按变量更新的版本号）++对这些更新记录进行排序。
+
+
+[source,java,linenums]
+----
+historyService.createHistoricDetailQuery()
+  .variableUpdates()
+  .processInstanceId("123")
+  .orderByVariableName().asc()
+  .list()
+----
+
+下面的例子获取流程id为"123"的、启动时提交或任何任务中提交的所有<<formProperties,表单参数>>。这个查询只会返回++HistoricFormProperties（历史表单参数）++。
+
+[source,java,linenums]
+----
+historyService.createHistoricDetailQuery()
+  .formProperties()
+  .processInstanceId("123")
+  .orderByVariableName().asc()
+  .list()
+----
+
+最后一个例子获取id为"123"的任务进行的所有变量更新操作。将返回该任务设置的所有变量（任务局部变量）的++HistoricVariableUpdates++，而**不会**返回流程实例中设置的变量。
+
+[source,java,linenums]
+----
+historyService.createHistoricDetailQuery()
+  .variableUpdates()
+  .taskId("123")
+  .orderByVariableName().asc()
+  .list()
+----
+
+可以在++TaskListener++中使用++TaskService++或++DelegateTask++设置任务局部变量：
+
+[source,java,linenums]
+----
+taskService.setVariableLocal("123", "myVariable", "Variable value");
+----
+
+[source,java,linenums]
+----
+public void notify(DelegateTask delegateTask) {
+  delegateTask.setVariableLocal("myVariable", "Variable value");
+}
+----
+
+[[historyQueryTaskInstance]]
+
+
+==== 历史任务实例查询
+
+获取所有任务中，完成所花费时间（持续时间）排名前10的、已完成的++HistoricTaskInstance（历史任务实例）++。
+
+[source,java,linenums]
+----
+historyService.createHistoricTaskInstanceQuery()
+  .finished()
+  .orderByHistoricTaskInstanceDuration().desc()
+  .listPage(0, 10);
+----
+
+获取删除原因包含"invalid"的、最终指派给__kermit__用户的++HistoricTaskInstance++。
+
+[source,java,linenums]
+----
+historyService.createHistoricTaskInstanceQuery()
+  .finished()
+  .taskDeleteReasonLike("%invalid%")
+  .taskAssignee("kermit")
+  .listPage(0, 10);
+----
+
+
+[[historyConfig]]
+
+=== 配置历史
+
+可以使用org.flowable.engine.impl.history.HistoryLevel枚举（或在5.11之前的版本中，++ProcessEngineConfiguration++中定义的__HISTORY__常量），以编程方式配置历史级别：
+
+
+[source,java,linenums]
+----
+ProcessEngine processEngine = ProcessEngineConfiguration
+  .createProcessEngineConfigurationFromResourceDefault()
+  .setHistory(HistoryLevel.AUDIT.getKey())
+  .buildProcessEngine();
+----
+
+也可以在flowable.cfg.xml或Spring上下文中配置级别：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  <property name="history" value="audit" />
+  ...
+</bean>
+----
+
+可以配置下列历史级别：
+
+* ++none（无）++：跳过所有历史的存档。这是流程执行性能最高的配置，但是不会保存任何历史信息。
+
+* ++activity（活动）++：存档所有流程实例与活动实例。在流程实例结束时，将顶级流程实例变量的最新值复制为历史变量实例。但不会存档细节。
+
+* ++audit（审计）++：默认级别。将存档所有流程实例及活动实例，并保持变量值与提交的表单参数的同步，以保证所有通过表单进行的用户操作都可追踪、可审计。
+
+* ++full（完全）++：历史存档的最高级别，因此也最慢。这个级别存储所有++audit++级别存储的信息，加上所有其他细节（主要是流程变量的更新）。
+
+**在Flowable 5.11版本以前，历史级别保存在数据库中（+$$ACT_GE_PROPERTY$$+ 表，参数名为++historyLevel++）。从5.11开始，这个值不再使用，并从数据库中忽略/删除。现在可以在引擎每次启动时切换历史级别。不会由于前一次启动时修改了级别，而导致本次启动抛出异常。**
+
+[[asyncHistoryConfig]]
+
+=== 配置异步历史
+
+[实验性] Flowable 6.1.0引入了异步历史，使用历史作业执行器异步地进行历史数据的持久化。
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  <property name="asyncHistoryEnabled" value="true" />
+  <property name="asyncHistoryExecutorNumberOfRetries" value="10" />
+  <property name="asyncHistoryExecutorActivate" value="true" />
+  ...
+</bean>
+----
+
+配置++asyncHistoryExecutorActivate++参数后，流程引擎启动时会自动启动历史作业执行器。只有在测试（或不使用异步历史时）才应该设置为false。
+++asyncHistoryExecutorNumberOfRetries++参数用于配置异步历史作业的重试次数。这个参数与普通的异步作业有些不同，因为历史作业可能需要更多周期才能成功完成。比如，首先需要在ACT_HI_TASK_表中创建一个历史的任务，然后才能在另一个历史作业中记录其办理人的更新。流程引擎配置中，这个参数的默认值为10。到达重试次数后，会忽略这个历史作业（且不会写入死信作业表中）。
+
+另外，可以使用++asyncHistoryExecutor++参数配置异步执行器，与普通的异步作业执行器类似。
+
+如果不在默认的历史表中保存历史数据，而是在NoSQL数据库（Elasticsearch、MongoDb、Cassandra等）或其他什么地方保存，可以覆盖处理作业的处理器：
+
+* 使用++historyJobHandlers++参数，配置全部自定义历史作业处理器的map
+* 或者，配置++customHistoryJobHandlers++列表。启动时会将列表中的所有处理器加入++historyJobHandlers++ map中。
+
+另外，也可以使用消息队列，让引擎在产生新的历史作业时发送消息。这样，历史数据就可以在另外的服务器中进行处理。也可以配置引擎及消息队列使用JTA（以及JMS），这样就可以不用在作业中记录历史数据，而可以将所有数据发送至全局事务的消息队列中。
+
+link:$$https://github.com/flowable/flowable-examples/tree/master/async-history$$[Flowable异步历史示例]提供了配置异步历史的不同示例，包括默认方式、JMS队列、JTA，还有使用消息队列，并使用Spring Boot应用作为消息监听器。
+
+[[historyFormAuditPurposes]]
+
+
+=== 用于审计的历史
+
+如果历史至少<<historyConfig,配置>>为++audit++级别，则会记录由++FormService.submitStartFormData(String processDefinitionId, Map<String, String> properties)++与++FormService.submitTaskFormData(String taskId, Map<String, String> properties)++方法提交的所有参数。
+
+表单参数可以像这样通过查询API读取：
+
+[source,java,linenums]
+----
+historyService
+      .createHistoricDetailQuery()
+      .formProperties()
+      ...
+      .list();
+----
+
+这段代码只会返回++HistoricFormProperty++类型的历史详情。
+
+如果在调用提交方法前，使用++IdentityService.setAuthenticatedUserId(String)++设置了认证用户，那么也可以在历史中获取该认证用户信息。使用++HistoricProcessInstance.getStartUserId()++获取启动表单的认证用户信息，任务表单则需使用++HistoricActivityInstance.getAssignee()++。

@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.DataStoreReference;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
@@ -622,6 +623,13 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         String messageRef = getPropertyValueAsString(PROPERTY_MESSAGEREF, objectNode);
         MessageEventDefinition eventDefinition = new MessageEventDefinition();
         eventDefinition.setMessageRef(messageRef);
+        event.getEventDefinitions().add(eventDefinition);
+    }
+    
+    protected void convertJsonToEscalationDefinition(JsonNode objectNode, Event event) {
+        String escalationRef = getPropertyValueAsString(PROPERTY_ESCALATIONREF, objectNode);
+        EscalationEventDefinition eventDefinition = new EscalationEventDefinition();
+        eventDefinition.setEscalationCode(escalationRef);
         event.getEventDefinitions().add(eventDefinition);
     }
 

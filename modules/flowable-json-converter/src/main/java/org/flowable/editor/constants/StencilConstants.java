@@ -23,9 +23,11 @@ public interface StencilConstants {
     final String STENCIL_EVENT_START_MESSAGE = "StartMessageEvent";
     final String STENCIL_EVENT_START_SIGNAL = "StartSignalEvent";
     final String STENCIL_EVENT_START_ERROR = "StartErrorEvent";
+    final String STENCIL_EVENT_START_ESCALATION = "StartEscalationEvent";
 
     final String STENCIL_EVENT_END_NONE = "EndNoneEvent";
     final String STENCIL_EVENT_END_ERROR = "EndErrorEvent";
+    final String STENCIL_EVENT_END_ESCALATION = "EndEscalationEvent";
     final String STENCIL_EVENT_END_CANCEL = "EndCancelEvent";
     final String STENCIL_EVENT_END_TERMINATE = "EndTerminateEvent";
 
@@ -59,6 +61,7 @@ public interface StencilConstants {
 
     final String STENCIL_EVENT_BOUNDARY_TIMER = "BoundaryTimerEvent";
     final String STENCIL_EVENT_BOUNDARY_ERROR = "BoundaryErrorEvent";
+    final String STENCIL_EVENT_BOUNDARY_ESCALATION = "BoundaryEscalationEvent";
     final String STENCIL_EVENT_BOUNDARY_SIGNAL = "BoundarySignalEvent";
     final String STENCIL_EVENT_BOUNDARY_MESSAGE = "BoundaryMessageEvent";
     final String STENCIL_EVENT_BOUNDARY_CANCEL = "BoundaryCancelEvent";
@@ -69,6 +72,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_CATCH_MESSAGE = "CatchMessageEvent";
 
     final String STENCIL_EVENT_THROW_SIGNAL = "ThrowSignalEvent";
+    final String STENCIL_EVENT_THROW_ESCALATION = "ThrowEscalationEvent";
     final String STENCIL_EVENT_THROW_NONE = "ThrowNoneEvent";
 
     final String STENCIL_SEQUENCE_FLOW = "SequenceFlow";
@@ -114,6 +118,11 @@ public interface StencilConstants {
     final String PROPERTY_SIGNALREF = "signalref";
 
     final String PROPERTY_ERRORREF = "errorref";
+    
+    final String PROPERTY_ESCALATION_DEFINITIONS = "escalationdefinitions";
+    final String PROPERTY_ESCALATION_DEFINITION_ID = "id";
+    final String PROPERTY_ESCALATION_DEFINITION_NAME = "name";
+    final String PROPERTY_ESCALATIONREF = "escalationref";
 
     final String PROPERTY_INTERRUPTING = "interrupting";
 
