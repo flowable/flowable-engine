@@ -156,7 +156,7 @@ public class TaskHelper {
         }
     }
 
-    public static void insertTask(TaskEntity taskEntity, ExecutionEntity execution, boolean fireCreateEvent) {
+    public static void insertTask(TaskEntity taskEntity, ExecutionEntity execution, boolean fireCreateEvent, boolean addEntityLinks) {
         // Inherit tenant id (if applicable)
         if (execution != null && execution.getTenantId() != null) {
             taskEntity.setTenantId(execution.getTenantId());
@@ -171,9 +171,18 @@ public class TaskHelper {
 
         insertTask(taskEntity, fireCreateEvent);
 
-        if (execution != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
-            CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
-            countingExecutionEntity.setTaskCount(countingExecutionEntity.getTaskCount() + 1);
+        if (execution != null) {
+
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
+                CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
+                countingExecutionEntity.setTaskCount(countingExecutionEntity.getTaskCount() + 1);
+            }
+
+            if (addEntityLinks) {
+                EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
+                EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
+            }
+
         }
 
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();

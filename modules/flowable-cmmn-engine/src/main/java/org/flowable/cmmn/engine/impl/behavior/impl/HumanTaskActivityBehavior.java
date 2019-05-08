@@ -95,13 +95,13 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
 
-            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
-            
             if (cmmnEngineConfiguration.isEnableEntityLinks()) {
                 EntityLinkUtil.copyExistingEntityLinks(planItemInstanceEntity.getCaseInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
                 EntityLinkUtil.createNewEntityLink(planItemInstanceEntity.getCaseInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
             }
 
+            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
+            
             cmmnEngineConfiguration.getListenerNotificationHelper()
                 .executeTaskListeners(humanTask, taskEntity, TaskListener.EVENTNAME_CREATE);
             
