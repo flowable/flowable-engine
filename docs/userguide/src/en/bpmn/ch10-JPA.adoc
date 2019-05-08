@@ -229,4 +229,4 @@ image::images/jpa.spring.example.process.png[align="center"]
 ----
 
 
-Although the example above is quite simple, it shows the power of using JPA combined with Spring and parametrized method-expressions. The process requires no custom java-code at all (except for the Spring-bean off course) and speeds up development drastically.
+Although the example above is quite simple, it shows the power of using JPA combined with Spring and parametrized method-expressions. The process requires no custom Java code at all (except for the Spring-bean off course) and speeds up development drastically.
