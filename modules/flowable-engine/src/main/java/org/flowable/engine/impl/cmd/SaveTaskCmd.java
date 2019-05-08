@@ -63,7 +63,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
 
         if (task.getRevision() == 0) {
-            TaskHelper.insertTask(task, null, true);
+            TaskHelper.insertTask(task, null, true, false);
 
             FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
