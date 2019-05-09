@@ -184,7 +184,7 @@ public class RuntimeDisplayJsonClientResource {
 
         List<String> breakpoints = new ArrayList<>();
         for (BreakpointRepresentation breakpoint : debuggerService.getBreakpoints()) {
-            breakpoints.add(breakpoint.getActivityId());
+            breakpoints.add(breakpoint.getElementId());
         }
 
         ObjectNode displayNode = processProcessElements(pojoModel, completedElements, currentElements, breakpoints, processInstanceId);

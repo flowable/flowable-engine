@@ -12,6 +12,14 @@
  */
 package org.flowable.ui.task.conf;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.cmmn.api.runtime.CmmnDebugger;
+import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
+import org.flowable.cmmn.engine.impl.agenda.DebugCmmnEngineAgendaFactory;
+import org.flowable.cmmn.engine.impl.job.ActivateCmmnBreakpointJobHandler;
+import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.event.BreakpointJobHandler;
@@ -27,9 +35,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Auto configuration for the process debugger.
  *
@@ -42,9 +47,15 @@ import java.util.List;
 public class FlowableDebuggerConfiguration {
 
     @Bean
-    public FlowableEngineAgendaFactory debuggerAgendaFactory(ProcessDebugger processDebugger) {
+    public FlowableEngineAgendaFactory processDebuggerAgendaFactory(ProcessDebugger processDebugger) {
         DebugFlowableEngineAgendaFactory debugAgendaFactory = new DebugFlowableEngineAgendaFactory();
         debugAgendaFactory.setDebugger(processDebugger);
+        return debugAgendaFactory;
+    }
+
+    @Bean
+    public CmmnEngineAgendaFactory cmmnDebuggerAgendaFactory(CmmnDebugger debugger) {
+        DebugCmmnEngineAgendaFactory debugAgendaFactory = new DebugCmmnEngineAgendaFactory(debugger);
         return debugAgendaFactory;
     }
 
@@ -67,4 +78,14 @@ public class FlowableDebuggerConfiguration {
             processEngineConfiguration.setCustomAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
         };
     }
+
+    @Bean
+    public EngineConfigurationConfigurer<SpringCmmnEngineConfiguration> debuggerCmmnEngineConfigurationConfigurer(
+        CmmnEngineAgendaFactory agendaFactory) {
+        return cmmnEngineConfiguration -> {
+            cmmnEngineConfiguration.setCmmnEngineAgendaFactory(agendaFactory);
+            cmmnEngineConfiguration.addCustomJobHandler(new ActivateCmmnBreakpointJobHandler());
+        };
+    }
+
 }

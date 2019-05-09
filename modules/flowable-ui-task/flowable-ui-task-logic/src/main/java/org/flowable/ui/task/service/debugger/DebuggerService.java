@@ -13,7 +13,12 @@
 package org.flowable.ui.task.service.debugger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.runtime.CmmnDebugger;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
@@ -44,6 +49,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.flowable.cmmn.engine.impl.job.ActivateCmmnBreakpointJobHandler.CMMN_BREAKPOINT;
 import static org.flowable.engine.impl.agenda.DebugContinueProcessOperation.HANDLER_TYPE_BREAK_POINT;
 
 /**
@@ -58,14 +64,14 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
     protected ApplicationContext applicationContext;
 
     public void addBreakpoint(BreakpointRepresentation breakpointRepresentation) {
-        assert breakpointRepresentation != null && isNotBlank(breakpointRepresentation.getActivityId());
+        assert breakpointRepresentation != null && isNotBlank(breakpointRepresentation.getElementId());
         this.breakpoints.add(breakpointRepresentation);
     }
 
     public void removeBreakpoint(BreakpointRepresentation breakpointRepresentation) {
-        assert breakpointRepresentation != null && isNotBlank(breakpointRepresentation.getActivityId());
+        assert breakpointRepresentation != null && isNotBlank(breakpointRepresentation.getElementId());
         if (!this.breakpoints.remove(breakpointRepresentation)) {
-            throw new FlowableException("Breakpoint is not set on the activityId");
+            throw new FlowableException("Breakpoint is not set on the elementId");
         }
     }
 
@@ -112,12 +118,12 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
     @Override
     public boolean isBreakpoint(Execution execution) {
         for (BreakpointRepresentation breakpoint : breakpoints) {
-            if (breakpoint.getActivityId().equals(execution.getActivityId())) {
-                if (StringUtils.isEmpty(breakpoint.getProcessDefinitionId())) {
+            if (breakpoint.getElementId().equals(execution.getActivityId())) {
+                if (StringUtils.isEmpty(breakpoint.getDefinitionId())) {
                     return true;
                 }
 
-                if (Objects.equals(breakpoint.getProcessDefinitionId(), ((ExecutionEntity) execution).getProcessDefinitionId())) {
+                if (Objects.equals(breakpoint.getDefinitionId(), ((ExecutionEntity) execution).getProcessDefinitionId())) {
                     return true;
                 }
             }
@@ -132,7 +138,7 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
     protected RuntimeService getRuntimeService() {
         return this.applicationContext.getBean(RuntimeService.class);
     }
-   
+
     protected HistoryService getHistoricService() {
         return this.applicationContext.getBean(HistoryService.class);
     }
@@ -184,5 +190,9 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
                     return null;
                 }
         );
+    }
+
+    public String getTestProcessTemplate(String processInstanceId) {
+        return null;
     }
 }

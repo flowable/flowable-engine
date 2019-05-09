@@ -43,6 +43,8 @@ public class DebuggerRestVariable {
         processId = variableInstance.getProcessInstanceId();
         taskId = variableInstance.getTaskId();
     }
+    public DebuggerRestVariable(Object o) {
+    }
 
     public String getName() {
         return name;

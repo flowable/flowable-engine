@@ -92,9 +92,19 @@ public interface CmmnManagementService {
     Job moveJobToDeadLetterJob(String jobId);
 
     /**
-     * Moves a job that is in the dead letter job table back to be an executable job, 
-     * and resetting the retries (as the retries were probably 0 when it was put into the dead letter job table).
+     * Moves a job that is in the suspended job table back to be an executable job
      * 
+     * @param jobId
+     *            id of the job to move, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     */
+    Job moveSuspendedJobToExecutableJob(String jobId);
+
+    /**
+     * Moves a job that is in the dead letter job table back to be an executable job,
+     * and resetting the retries (as the retries were probably 0 when it was put into the dead letter job table).
+     *
      * @param jobId
      *            id of the job to move, cannot be null.
      * @param retries

@@ -21,31 +21,35 @@ import org.flowable.ui.common.model.AbstractRepresentation;
  */
 public final class BreakpointRepresentation extends AbstractRepresentation {
     
-    protected String activityId;
-    protected String processDefinitionId;
+    protected String elementId;
+    protected String definitionId;
 
-    public BreakpointRepresentation(String processDefinitionId, String activityId) {
-        this.processDefinitionId = processDefinitionId;
-        this.activityId = activityId;
+    public BreakpointRepresentation(String definitionId, String elementId) {
+        this.definitionId = definitionId;
+        this.elementId = elementId;
     }
 
     public BreakpointRepresentation() {
     }
 
-    public String getActivityId() {
-        return activityId;
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
     }
 
     public void setActivityId(String activityId) {
-        this.activityId = activityId;
+        this.elementId = activityId;
     }
 
-    public String getProcessDefinitionId() {
-        return processDefinitionId;
+    public String getDefinitionId() {
+        return definitionId;
     }
 
-    public void setProcessDefinitionId(String processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
+    public void setDefinitionId(String definitionId) {
+        this.definitionId = definitionId;
     }
 
     @Override
@@ -55,21 +59,21 @@ public final class BreakpointRepresentation extends AbstractRepresentation {
 
         BreakpointRepresentation that = (BreakpointRepresentation) o;
 
-        if (!getActivityId().equals(that.getActivityId())) {
+        if (!getElementId().equals(that.getElementId())) {
             return false;
         }
         
-        if (processDefinitionId == null && that.getProcessDefinitionId() == null) {
+        if (definitionId == null && that.getDefinitionId() == null) {
             return true;
         }
         
-        return getProcessDefinitionId().equals(that.getProcessDefinitionId());
+        return getDefinitionId().equals(that.getDefinitionId());
     }
 
     @Override
     public int hashCode() {
-        int result = getActivityId().hashCode();
-        result = 31 * result + getProcessDefinitionId().hashCode();
+        int result = getElementId().hashCode();
+        result = 31 * result + getDefinitionId().hashCode();
         return result;
     }
 }

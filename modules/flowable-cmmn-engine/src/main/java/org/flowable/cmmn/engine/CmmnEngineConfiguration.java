@@ -2699,6 +2699,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return customJobHandlers;
     }
 
+    public CmmnEngineConfiguration addCustomJobHandler(JobHandler jobHandler) {
+        if (customJobHandlers == null) {
+            customJobHandlers = new ArrayList<>();
+        }
+        customJobHandlers.add(jobHandler);
+        return this;
+    }
+
     public CmmnEngineConfiguration setCustomJobHandlers(List<JobHandler> customJobHandlers) {
         this.customJobHandlers = customJobHandlers;
         return this;

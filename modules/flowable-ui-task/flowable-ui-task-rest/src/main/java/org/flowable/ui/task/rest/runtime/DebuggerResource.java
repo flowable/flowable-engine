@@ -19,6 +19,7 @@ import org.flowable.ui.task.service.debugger.DebuggerRestVariable;
 import org.flowable.ui.task.service.debugger.DebuggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -71,6 +72,30 @@ public class DebuggerResource {
     public List<EventLogEntry> getEventLog(@PathVariable String processInstanceId) {
         assertDebuggerEnabled();
         return debuggerService.getProcessInstanceEventLog(processInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/debugger/test/{processInstanceId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
+    public String getTestProcessTemplate(@PathVariable String processInstanceId) {
+        assertDebuggerEnabled();
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<definitions id=\"definitions\"\n"
+            + "  xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" \n"
+            + "  xmlns:activiti=\"http://activiti.org/bpmn\"\n"
+            + "  targetNamespace=\"Examples\">\n"
+            + "\n"
+            + "  <process id=\"ruleUsage\">\n"
+            + "\n"
+            + "    <startEvent id=\"start\" />\n"
+            + "    <sequenceFlow id=\"flow1\" sourceRef=\"start\" targetRef=\"theTask\" />\n"
+            + "\n"
+            + "    <userTask id=\"theTask\" name=\"My Task\" />\n"
+            + "    <sequenceFlow id=\"flow2\" sourceRef=\"theTask\" targetRef=\"theEnd\" />\n"
+            + "\n"
+            + "    <endEvent id=\"theEnd\" />\n"
+            + "\n"
+            + "  </process>\n"
+            + "\n"
+            + "</definitions>";
     }
 
     @RequestMapping(value = "/rest/debugger/variables/{executionId}", method = RequestMethod.GET)
