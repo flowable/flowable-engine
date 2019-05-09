@@ -463,15 +463,4 @@ function _drawContinueExecution(x, y , executionId, elementId) {
 
 }
 
-var booleanValues = [true, false];
-function _addDebuggerPoints(element) {
-    element.completed = booleanValues[getRandomInt(2)];
-    element.breakpoint = booleanValues[getRandomInt(2)];
-    element.current = booleanValues[getRandomInt(2)];
-}
-
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-}
-
 _showCmmnDiagram();
