@@ -25,6 +25,9 @@ public class DebuggerRestVariable {
     protected String executionId;
     protected String taskId;
     protected String processId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
 
     public DebuggerRestVariable(HistoricVariableInstance historicVariableInstance) {
         type = historicVariableInstance.getVariableTypeName();
@@ -33,6 +36,9 @@ public class DebuggerRestVariable {
         executionId = historicVariableInstance.getProcessInstanceId();
         processId = historicVariableInstance.getProcessInstanceId();
         taskId = historicVariableInstance.getTaskId();
+        scopeId = historicVariableInstance.getScopeId();
+        subScopeId = historicVariableInstance.getSubScopeId();
+        scopeType = historicVariableInstance.getScopeType();
     }
 
     public DebuggerRestVariable(VariableInstance variableInstance) {
@@ -42,7 +48,11 @@ public class DebuggerRestVariable {
         executionId = variableInstance.getExecutionId();
         processId = variableInstance.getProcessInstanceId();
         taskId = variableInstance.getTaskId();
+        scopeId = variableInstance.getScopeId();
+        subScopeId = variableInstance.getSubScopeId();
+        scopeType = variableInstance.getScopeType();
     }
+
     public DebuggerRestVariable(Object o) {
     }
 
@@ -68,5 +78,15 @@ public class DebuggerRestVariable {
 
     public String getProcessId() {
         return processId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+    public String getScopeType() {
+        return scopeType;
     }
 }
