@@ -140,7 +140,8 @@ public class CmmnDebuggerService implements CmmnDebugger, ApplicationContextAwar
     @Override
     public boolean isBreakPoint(String entryCriterionId, PlanItemInstance planItemInstance) {
         for (BreakpointRepresentation breakpoint : breakpoints) {
-            if (breakpoint.getElementId().equals(planItemInstance.getPlanItemDefinitionId())) {
+            if (breakpoint.getElementId().equals(planItemInstance.getPlanItemDefinitionId()) ||
+                breakpoint.getElementId().equals(planItemInstance.getElementId())) {
                 if (StringUtils.isEmpty(breakpoint.getDefinitionId())) {
                     return true;
                 }

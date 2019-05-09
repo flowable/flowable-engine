@@ -254,6 +254,11 @@ angular.module('flowableApp')
                 $scope.cancelCase(true);
             };
 
+            $scope.generateTest = function() {
+                alert('Case test model successfuly created');
+            }
+
+
             $scope.$on('caseinstance-deleted', function (event, data) {
                 $route.reload();
             });
