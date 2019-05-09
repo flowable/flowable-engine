@@ -265,6 +265,9 @@ function _showCmmnDiagram() {
 
         jQuery('#cmmnModel').width(INITIAL_CANVAS_WIDTH);
         jQuery('#cmmnModel').height(INITIAL_CANVAS_HEIGHT);
+        if(paper) {
+            paper.remove();
+        }
         paper = Raphael(document.getElementById('cmmnModel'), canvasWidth, canvasHeight);
         paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
         paper.renderfix();
@@ -429,7 +432,7 @@ function _drawContinueExecution(x, y , executionId, elementId) {
                     angular.element(document.querySelector('#cmmnModel')).scope().model.variables = undefined;
                     angular.element(document.querySelector('#cmmnModel')).scope().loadVariables();
                     angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
-                    _showProcessDiagram();
+                    _showCmmnDiagram();
                 },
                 error: function () {
                     alert("error");

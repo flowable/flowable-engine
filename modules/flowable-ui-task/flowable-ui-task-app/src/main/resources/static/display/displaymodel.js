@@ -563,6 +563,9 @@ function _showProcessDiagram() {
 
         jQuery('#bpmnModel').width(INITIAL_CANVAS_WIDTH);
         jQuery('#bpmnModel').height(INITIAL_CANVAS_HEIGHT);
+        if(paper) {
+            paper.remove();
+        }
         paper = Raphael(document.getElementById('bpmnModel'), canvasWidth, canvasHeight);
         paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
         paper.renderfix();
