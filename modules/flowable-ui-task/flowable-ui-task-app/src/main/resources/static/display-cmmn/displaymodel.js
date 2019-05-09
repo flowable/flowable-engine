@@ -51,6 +51,7 @@ var modelId = modelDiv.attr('data-model-id');
 var historyModelId = modelDiv.attr('data-history-id');
 var caseDefinitionId = modelDiv.attr('data-case-definition-id');
 var modelType = modelDiv.attr('data-model-type');
+var isCmmnDebuggerEnabled = angular.element(document.querySelector('#cmmnModel')).scope().model.isDebuggerEnabled;
 
 var elementsAdded = new Array();
 var elementsRemoved = new Array();
@@ -163,6 +164,26 @@ function _addHoverLogic(element, type, defaultColor)
     topBodyRect.mouseout(function() {
         paper.getById(element.id).attr({"stroke":strokeColor});
     });
+
+    if (isCmmnDebuggerEnabled) {
+        if (element.current || element.brokenExecutions) {
+            topBodyRect.click(function () {
+                if (selectedElement != element.id) {
+                    paper.getById(element.id).attr({"stroke": "green"});
+                    selectedElement = element.id;
+                    paper.getById(element.id).attr({"stroke": "red"});
+                    _executionClicked(element.id);
+                } else {
+                    selectedElement = undefined;
+                    paper.getById(element.id).attr({"stroke": "green"});
+                    var scope = angular.element(document.querySelector('#cmmnModel')).scope();
+                    modelDiv.attr("selected-execution", scope.model.processInstance.id);
+                    scope.model.selectedExecution = scope.model.processInstance.id;
+                    angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
+                }
+            });
+        }
+    }
 }
 
 function _zoom(zoomIn)
@@ -188,87 +209,269 @@ function _zoom(zoomIn)
 }
 
 var modelUrl;
-
 if (modelType == 'runtime') {
-	if (historyModelId) {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/history/' + historyModelId + '/model-json';
-	} else {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + modelId + '/model-json';
-	}
+    if (historyModelId) {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/history/' + historyModelId + '/model-json';
+    } else {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + modelId + '/model-json';
+    }
 } else if (modelType == 'design') {
-	if (historyModelId) {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/history/' + historyModelId + '/model-json';
-	} else {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/model-json';
-	}
+    if (historyModelId) {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/history/' + historyModelId + '/model-json';
+    } else {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/model-json';
+    }
 } else if (modelType == 'case-definition') {
     modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-definitions/' + caseDefinitionId + '/model-json';
 }
 
-var request = jQuery.ajax({
-    type: 'get',
-    url: modelUrl + '?nocaching=' + new Date().getTime()
-});
+function _showCmmnDiagram() {
+    var request = jQuery.ajax({
+        type: 'get',
+        url: modelUrl + '?nocaching=' + new Date().getTime()
+    });
 
-request.success(function(data, textStatus, jqXHR) {
+    request.success(function (data, textStatus, jqXHR) {
 
-    if ((!data.elements || data.elements.length == 0) && (!data.pools || data.pools.length == 0)) return;
+        if ((!data.elements || data.elements.length == 0) && (!data.pools || data.pools.length == 0)) return;
 
-    INITIAL_CANVAS_WIDTH = data.diagramWidth;
-    
-    if (modelType == 'design') {
-    	INITIAL_CANVAS_WIDTH += 20;
-    } else {
-        INITIAL_CANVAS_WIDTH += 30;
-    }
-    
-    INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
-    canvasWidth = INITIAL_CANVAS_WIDTH;
-    canvasHeight = INITIAL_CANVAS_HEIGHT;
-    viewBoxWidth = INITIAL_CANVAS_WIDTH;
-    viewBoxHeight = INITIAL_CANVAS_HEIGHT;
-    
-    if (modelType == 'design') {
-    	var headerBarHeight = 170;
-    	var offsetY = 0;
-    	if (jQuery(window).height() > (canvasHeight + headerBarHeight))
-    	{
-        	offsetY = (jQuery(window).height() - headerBarHeight - canvasHeight) / 2;
-    	}
+        INITIAL_CANVAS_WIDTH = data.diagramWidth;
 
-    	if (offsetY > 50) {
-        	offsetY = 50;
-    	}
+        if (modelType == 'design') {
+            INITIAL_CANVAS_WIDTH += 20;
+        } else {
+            INITIAL_CANVAS_WIDTH += 30;
+        }
 
-    	jQuery('#cmmnModel').css('marginTop', offsetY);
-    }
+        INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
+        canvasWidth = INITIAL_CANVAS_WIDTH;
+        canvasHeight = INITIAL_CANVAS_HEIGHT;
+        viewBoxWidth = INITIAL_CANVAS_WIDTH;
+        viewBoxHeight = INITIAL_CANVAS_HEIGHT;
 
-    jQuery('#cmmnModel').width(INITIAL_CANVAS_WIDTH);
-    jQuery('#cmmnModel').height(INITIAL_CANVAS_HEIGHT);
-    paper = Raphael(document.getElementById('cmmnModel'), canvasWidth, canvasHeight);
-    paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
-    paper.renderfix();
+        if (modelType == 'design') {
+            var headerBarHeight = 170;
+            var offsetY = 0;
+            if (jQuery(window).height() > (canvasHeight + headerBarHeight)) {
+                offsetY = (jQuery(window).height() - headerBarHeight - canvasHeight) / 2;
+            }
 
-    var modelElements = data.elements;
-    for (var i = 0; i < modelElements.length; i++)
-    {
-        var element = modelElements[i];
-        //try {
-        var drawFunction = eval("_draw" + element.type);
-        drawFunction(element);
-        //} catch(err) {console.log(err);}
-    }
+            if (offsetY > 50) {
+                offsetY = 50;
+            }
 
-    if (data.flows)
-    {
-        for (var i = 0; i < data.flows.length; i++)
-        {
-            var flow = data.flows[i];
-            _drawAssociation(flow);
+            jQuery('#cmmnModel').css('marginTop', offsetY);
+        }
+
+        jQuery('#cmmnModel').width(INITIAL_CANVAS_WIDTH);
+        jQuery('#cmmnModel').height(INITIAL_CANVAS_HEIGHT);
+        paper = Raphael(document.getElementById('cmmnModel'), canvasWidth, canvasHeight);
+        paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
+        paper.renderfix();
+
+        var modelElements = data.elements;
+        for (var i = 0; i < modelElements.length; i++) {
+            var element = modelElements[i];
+            //try {
+            var drawFunction = eval("_draw" + element.type);
+            drawFunction(element);
+
+            if (isCmmnDebuggerEnabled) {
+                _drawBreakpoint(element);
+
+                if (element.brokenExecutions) {
+                    for (var j = 0; j < element.brokenExecutions.length; j++) {
+                        _drawContinueExecution(element.x + 25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
+                    }
+                }
+            }
+            //} catch(err) {console.log(err);}
+        }
+
+        if (data.flows) {
+            for (var i = 0; i < data.flows.length; i++) {
+                var flow = data.flows[i];
+                _drawAssociation(flow);
+            }
+        }
+    });
+
+    request.error(function (jqXHR, textStatus, errorThrown) {
+        alert("error");
+    });
+}
+
+function _executionClicked(elementId) {
+    var executions = angular.element(document.querySelector('#cmmnModel')).scope().model.executions;
+    for (var i in executions) {
+        if (executions[i]["elementId"] == elementId) {
+            var activityToUnselect = modelDiv.attr("selected-activity");
+            if (activityToUnselect) {
+                var rectangleToUnselect = paper.getById(activityToUnselect);
+                if (rectangleToUnselect) {
+                    rectangleToUnselect.attr({"stroke": "green"});
+                }
+            }
+            modelDiv.attr("selected-execution", executions[i].id);
+            modelDiv.attr("selected-activity", elementId);
+            if (elementId) {
+                paper.getById(elementId).attr({"stroke": "red"});
+            }
+
+            var scope = angular.element(document.querySelector('#cmmnModel')).scope();
+            if (scope.gridExecutions.data) {
+                for (var j = 0; j < scope.gridExecutions.data.length; j++) {
+                    if (executions[i].id == scope.gridExecutions.data[j].id) {
+                        scope.gridExecutionsApi.selection.selectRow(scope.gridExecutions.data[j]);
+                        j = scope.gridExecutions.data.length;
+                    }
+                }
+            }
+            scope.loadVariables();
+            return;
         }
     }
-});
+}
 
-request.error(function(jqXHR, textStatus, errorThrown) {
-    alert("error");
-});
+function _breakpointRestCall(actionType, elementId) {
+    $.ajax({
+        type: actionType,
+        url: '../app/rest/cmmn-debugger/breakpoints',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({
+            elementId: elementId
+        }),
+        success: function () {
+            paper.clear();
+            //angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
+            _showCmmnDiagram();
+        }
+    })
+}
+
+function _drawBreakpoint(element, breakpoints) {
+
+    var x = element.x;
+    var y = element.y;
+    var radius = 7;
+
+    if(element.type == "EntryCriterion" || element.type == "ExitCriterion") {
+        x -= 2;
+        y -= 2;
+        radius = 5;
+    } else {
+        x += 10;
+        y -= 10;
+    }
+
+    var circle = paper.circle(x, y, radius);
+    var breakpointFillColor = "white";
+    var breakpointStrokeColor = "gray";
+    var breakpointTipText = "Inactive element";
+    if (element.current) {
+        breakpointFillColor = "red";
+        breakpointTipText = "Active execution"
+    }
+
+    if (element.breakpoint) {
+        breakpointTipText = breakpointTipText + "<br/> Click to remove breakpoint";
+        breakpointStrokeColor = "red";
+        circle.click(function () {
+            _breakpointRestCall("DELETE", element.id);
+        });
+
+    } else {
+        breakpointTipText = breakpointTipText + "<br/> Click to add breakpoint";
+        circle.click(function () {
+            _breakpointRestCall("POST", element.id);
+        });
+    }
+
+    circle.attr("stroke", breakpointStrokeColor);
+    circle.attr("stroke-width", "3");
+    circle.attr("fill", breakpointFillColor);
+
+    var circleHtmlNode = jQuery(circle.node);
+    circleHtmlNode.qtip({
+        content: {
+            text: breakpointTipText,
+            button: false
+        },
+        position: {
+            my: 'top left',
+            at: 'bottom center',
+            viewport: jQuery('#cmmnModel')
+        },
+        hide: {
+            fixed: true, delay: 500,
+            event: 'click mouseleave'
+        },
+        style: {
+            classes: 'ui-tooltip-kisbpm-bpmn'
+        }
+    });
+}
+
+function _drawContinueExecution(x, y , executionId, elementId) {
+    var arrow = paper.path("M "+ x +" "+ y + " L "+ (x+8) +" "+ (y+4) +" "+ x +" "+ (y+8) +" z");
+
+    arrow.click(function () {
+            $.ajax({
+                type: 'PUT',
+                url: '../app/rest/cmmn-debugger/breakpoints/' + executionId + '/continue',
+                contentType: 'application/json; charset=utf-8',
+                success: function () {
+                    paper.clear();
+                    var processInstanceId = angular.element(document.querySelector('#cmmnModel')).scope().model.processInstance.id;
+                    modelDiv.attr("selected-execution", processInstanceId);
+                    angular.element(document.querySelector('#cmmnModel')).scope().model.selectedExecution = processInstanceId;
+                    angular.element(document.querySelector('#cmmnModel')).scope().getExecutions();
+                    angular.element(document.querySelector('#cmmnModel')).scope().model.variables = undefined;
+                    angular.element(document.querySelector('#cmmnModel')).scope().loadVariables();
+                    angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
+                    _showProcessDiagram();
+                },
+                error: function () {
+                    alert("error");
+                }
+            })
+        }
+    );
+    arrow.attr("stroke", "green");
+    arrow.attr("stroke-width", "3");
+    arrow.attr("fill", "green");
+
+    var arrowHtmlNode = jQuery(arrow.node);
+    arrowHtmlNode.qtip({
+        content: {
+            text: "Fire execution "+ executionId+", activity " + elementId,
+            button: false
+        },
+        position: {
+            my: 'top left',
+            at: 'bottom center',
+            viewport: jQuery('#cmmnModel')
+        },
+        hide: {
+            fixed: true, delay: 500,
+            event: 'click mouseleave'
+        },
+        style: {
+            classes: 'ui-tooltip-kisbpm-bpmn'
+        }
+    });
+
+}
+
+var booleanValues = [true, false];
+function _addDebuggerPoints(element) {
+    element.completed = booleanValues[getRandomInt(2)];
+    element.breakpoint = booleanValues[getRandomInt(2)];
+    element.current = booleanValues[getRandomInt(2)];
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
+_showCmmnDiagram();
