@@ -322,7 +322,7 @@ public class CaseInstanceDisplayJsonClientResource {
     protected boolean isBreakPointPlanItem(PlanItem planItem) {
         List<BreakpointRepresentation> breakpoints = this.cmmnDebuggerService.getBreakpoints();
         for (BreakpointRepresentation breakpoint : breakpoints) {
-            if (breakpoint.getElementId().equals(planItem.getPlanItemDefinition().getId())) {
+            if (breakpoint.getElementId().equals(planItem.getId())) {
                 return true;
             }
         }
