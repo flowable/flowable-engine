@@ -90,6 +90,23 @@ public class CmmnDebuggerService implements CmmnDebugger, ApplicationContextAwar
         return planItemIds;
     }
 
+    public String getBrokenPlanItemsForModelPlanItem(String modelPlanItemId) {
+        List<Job> brokenJobs = getCmmnManagementService().createSuspendedJobQuery().
+            scopeType(ScopeTypes.CMMN).
+            handlerType(CMMN_BREAKPOINT).
+            list();
+
+        for (Job brokenJob : brokenJobs) {
+            String subScopeId = brokenJob.getSubScopeId();
+            PlanItemInstance planItemInstance = getCmmnRuntimeService().createPlanItemInstanceQuery().planItemInstanceId(subScopeId).singleResult();
+            if (planItemInstance.getElementId().equals(modelPlanItemId)) {
+                return planItemInstance.getId();
+            }
+        }
+        return null;
+    }
+
+
     // todo
 //    public List<EventLogEntry> getCaseInstanceEventLog(String caseInstanceId) {
 //        return getCmmnManagementService().getEventLogEntriesByProcessInstanceId(caseInstanceId);

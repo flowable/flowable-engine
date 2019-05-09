@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -269,6 +270,10 @@ public class CaseInstanceDisplayJsonClientResource {
             elementNode.put("name", planItem.getName());
             elementNode.put("breakpoint", isBreakPointPlanItem(planItem));
             elementNode.put("current", isCurrentElement(planItem));
+            String brokenPlanItem = getBrokenPlanItem(planItem);
+            if (StringUtils.isNotEmpty(brokenPlanItem)) {
+                elementNode.put("brokenPlanItem", brokenPlanItem);
+            }
 
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             String className = planItemDefinition.getClass().getSimpleName();
@@ -314,6 +319,10 @@ public class CaseInstanceDisplayJsonClientResource {
                                 activeElements, availableElements, diagramInfo);
             }
         }
+    }
+
+    private String getBrokenPlanItem(PlanItem planItemId) {
+        return cmmnDebuggerService.getBrokenPlanItemsForModelPlanItem(planItemId.getId());
     }
     private boolean isCurrentElement(PlanItem planItem) {
         return cmmnDebuggerService.getPlanItemInstancesPlanItemsIds().contains(planItem.getPlanItemDefinition().getId());
