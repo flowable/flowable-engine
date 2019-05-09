@@ -423,13 +423,16 @@ function _drawContinueExecution(x, y , executionId, elementId) {
                 contentType: 'application/json; charset=utf-8',
                 success: function () {
                     paper.clear();
-                    var caseInstanceId = angular.element(document.querySelector('#cmmnModel')).scope().model.caseInstance.id;
+                    var scope = angular.element(document.querySelector('#cmmnModel')).scope();
+                    var caseInstanceId = scope.model.caseInstance.id;
                     modelDiv.attr("selected-execution", caseInstanceId);
                     angular.element(document.querySelector('#cmmnModel')).scope().model.selectedExecution = caseInstanceId;
-                    angular.element(document.querySelector('#cmmnModel')).scope().getExecutions();
+                    //angular.element(document.querySelector('#cmmnModel')).scope().getExecutions();
                     angular.element(document.querySelector('#cmmnModel')).scope().model.variables = undefined;
-                    angular.element(document.querySelector('#cmmnModel')).scope().loadVariables();
-                    angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
+                   // angular.element(document.querySelector('#cmmnModel')).scope().loadVariables();
+                    //angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
+
+                    scope.loadCaseTasks();
                     _showCmmnDiagram();
                 },
                 error: function () {
@@ -461,7 +464,6 @@ function _drawContinueExecution(x, y , executionId, elementId) {
             classes: 'ui-tooltip-kisbpm-bpmn'
         }
     });
-
 }
 
 _showCmmnDiagram();
