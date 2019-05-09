@@ -12,10 +12,13 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
 import org.flowable.ui.task.model.debugger.BreakpointRepresentation;
 import org.flowable.ui.task.model.debugger.ExecutionRepresentation;
 import org.flowable.ui.task.model.debugger.PlanItemRepresentation;
@@ -69,11 +72,28 @@ public class CmmnDebuggerResource {
     }
 
     // todo: event log
-//    @RequestMapping(value = "/rest/cmmn-debugger/eventlog/{caseId}", method = RequestMethod.GET)
-//    public List<EventLogEntry> getEventLog(@PathVariable String caseId) {
-//        assertDebuggerEnabled();
-//        return debuggerService.getCaseInstanceEventLog(caseId);
-//    }
+    @RequestMapping(value = "/rest/cmmn-debugger/eventlog/{caseId}", method = RequestMethod.GET)
+    public List<EventLogEntry> getEventLog(@PathVariable String caseId) {
+        assertDebuggerEnabled();
+        List<EventLogEntry> evenlogEntries = new ArrayList<>();
+        EventLogEntryEntityImpl e1 = new EventLogEntryEntityImpl();
+        e1.setData("START CASE INSTANCE".getBytes());
+        e1.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
+        e1.setLogNumber(1);
+        EventLogEntryEntityImpl e2 = new EventLogEntryEntityImpl();
+        e2.setData("COMPLETE HUMAN TASK 1".getBytes());
+        e2.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
+        e2.setLogNumber(2);
+        EventLogEntryEntityImpl e3 = new EventLogEntryEntityImpl();
+        e3.setData("COMPLETE HUMAN TASK 2".getBytes());
+        e3.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
+        e3.setLogNumber(2);
+        evenlogEntries.add(e1);
+        evenlogEntries.add(e2);
+        evenlogEntries.add(e3);
+
+        return evenlogEntries;
+    }
 
     @RequestMapping(value = "/rest/cmmn-debugger/variables/{planItemId}", method = RequestMethod.GET)
     public List<DebuggerRestVariable> getPlanItemVariables(@PathVariable String planItemId) {
