@@ -189,10 +189,14 @@ public class CmmnDebuggerService implements CmmnDebugger, ApplicationContextAwar
                     map(DebuggerRestVariable::new).
                     collect(Collectors.toList());
         }
-        return getCmmnRuntimeService().getVariables(caseInstanceId).
-                entrySet().stream().
-                map(DebuggerRestVariable::new).
-                collect(Collectors.toList());
+        return getCmmnCommandExecutor().execute(commandContext ->
+            ((CaseInstanceEntity)getCmmnRuntimeService().createCaseInstanceQuery()
+                    .caseInstanceId(caseInstanceId).singleResult()).
+                    getVariableInstances().
+                    values().stream().
+                    map(DebuggerRestVariable::new).
+                    collect(Collectors.toList())
+        );
     }
     
     public List<PlanItemRepresentation> getPlanItemInstances(String caseInstanceId) {
