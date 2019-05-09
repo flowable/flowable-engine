@@ -319,6 +319,239 @@ angular.module('flowableApp')
                 $scope.model.isDebuggerEnabled = data;
             });
 
+            $scope.model.isDebuggerEnabled = false;
+            $scope.model.scriptLanguage = 'groovy';
+
+            $http({
+                method: 'GET',
+                url: '../app/rest/cmmn-debugger/',
+                async: false
+            }).success(function (data) {
+                $scope.model.isDebuggerEnabled = data;
+                $scope.getPlanItems();
+                $scope.getEventLog();
+                $scope.getPlanItemVariables();
+            });
+
+            $scope.model.variables = [];
+            $scope.model.planItems = undefined;
+            $scope.model.selectedPlanItem = undefined;//$scope.model.caseInstance.id;//FIXME: does not work because case instances are not plan items
+            $scope.model.displayVariables = true;
+
+            $scope.model.errorMessage = '';
+
+            $scope.tabData = {
+                tabs: [
+                    {id: 'variables', name: 'CASE.TITLE.VARIABLES'},
+                    {id: 'planItems', name: 'CASE.TITLE.PLANITEMS'},
+                    {id: 'log', name: 'CASE.TITLE.LOG'}
+                ],
+                activeTab: 'variables'
+            };
+
+            if (!$scope.model.caseInstance.ended) {
+                $scope.tabData.tabs.push(
+                  {id: 'expression', name: 'CASE.TITLE.EXPRESSION'}
+                );
+                $scope.tabData.tabs.push(
+                  {id: 'script', name: 'CASE.TITLE.SCRIPT'}
+                );
+            }
+
+            // config for plan items grid
+            $scope.gridPlanItems = {
+                data: $scope.model.planItems,
+                columnDefs: [
+                    {field: 'id', displayName: "Id", name: 'id', maxWidth: 15},
+                    {field: 'caseInstanceId', displayName: "Case instance id", name: 'caseInstanceId', maxWidth: 15},
+                    {field: 'stageInstanceId',displayName: "Stage instance id",name: 'stageInstanceId',maxWidth: 80},
+                    //{field: 'elementId',displayName: "Element id",name: 'elementId',maxWidth: 80},
+                    {field: 'completeable', displayName: "Completeable", name: 'completeable', maxWidth: 30},
+                    {field: 'tenantId', displayName: "Tenant id", name: 'tenantId', maxWidth: 80}
+                ],
+                enableRowSelection: true,
+                multiSelect: false,
+                noUnselect: true,
+                enableRowHeaderSelection: false,
+                onRegisterApi: function (gridApi) {
+                    $scope.gridPlanItemsApi = gridApi;
+                    $scope.gridPlanItemsApi.grid.modifyRows($scope.gridPlanItems.data);
+                    if ($scope.gridPlanItems.data) {
+                        $scope.selectRowForSelectedPlanItem();
+                    }
+                    $scope.gridPlanItemsApi.selection.on.rowSelectionChanged($scope, function (row) {
+                        var planItemToUnselect = modelDiv.attr("selected-plan-item");
+                        if (planItemToUnselect) {
+                            var shapeToUnselect = paper.getById(planItemToUnselect);
+                            if (shapeToUnselect) {
+                                shapeToUnselect.attr({"stroke": "green"});
+                            }
+                        }
+                        modelDiv.attr("selected-plan-item", row.entity.id);
+                        $scope.model.selectedPlanItem = row.entity.id;
+
+                        $scope.loadVariables();
+                    });
+                }
+            };
+
+            $scope.executionSelected = function () {//FIXME: needed?
+                jQuery("#cmmnModel").attr("selectedElement", $scope.model.selectedPlanItem);
+                $scope.loadVariables();
+            };
+
+            // Config for variable grid
+            $scope.gridVariables = {
+                data: $scope.model.variables,
+                columnDefs: [
+                    {field: 'scopeId', displayName: "Scope", maxWidth: 10},
+                    {field: 'subScopeId', displayName: "Subscope", maxWidth: 10},
+                    {field: 'type', displayName: "Type", maxWidth: 10},
+                    {field: 'name', displayName: "Name", maxWidth: 10},
+                    {
+                        field: 'value', displayName: "Value",
+                        cellTemplate: '<div><div style="text-align: left" class="ngCellText">{{grid.getCellValue(row, col)}}</div></div>'
+                    }
+                ],
+                onRegisterApi: function (gridApi) {
+                    $scope.gridVariablesApi = gridApi;
+                }
+            };
+
+            // Config for log grid
+            $scope.gridLog = {
+                columnDefs: [
+                    {field: 'id', displayName: "Id", maxWidth: 10},
+                    {field: 'type', displayName: "Type", maxWidth: 10},
+                    {field: 'timeStamp', displayName: "Time Stamp", maxWidth: 90},
+                    {field: 'executionId', displayName: "Execution", maxWidth: 90},//TODO: check if correct/needed
+                ],
+                enableRowSelection: true,
+                multiSelect: false,
+                noUnselect: true,
+                enableRowHeaderSelection: false,
+                onRegisterApi: function (gridApi) {
+                    $scope.gridLogApi = gridApi;
+                }
+            };
+
+            $scope.getPlanItems = function () {
+                if ($scope.model.isDebuggerEnabled) {
+                    $http({
+                        method: 'GET',
+                        url: '../app/rest/cmmn-debugger/planItems/' + $scope.model.caseInstance.id
+                    }).success(function (data) {
+                        $scope.model.planItems = data;
+                        $scope.gridPlanItems.data = data;
+                        if ($scope.gridPlanItemsApi) {
+                            $scope.gridPlanItemsApi.grid.modifyRows($scope.gridPlanItems.data);
+                            $scope.selectRowForSelectedPlanItem();
+                        }
+                        jQuery("#cmmnModel").data($scope.model.planItems);
+                    }).error(function (data, status, headers, config) {
+                        $scope.model.errorMessage = data;
+                    });
+                }
+            };
+
+            $scope.selectRowForSelectedPlanItem = function() {//TODO: check if needed at $scope level
+                if ($scope.model.isDebuggerEnabled && $scope.gridPlanItems.data) {
+                    for (var i = 0; i < $scope.gridPlanItems.data.length; i++) {
+                        if ($scope.model.selectedPlanItem === $scope.gridPlanItems.data[i].id) {
+                            $scope.gridPlanItemsApi.selection.selectRow($scope.gridPlanItems.data[i]);
+                            i = $scope.gridPlanItems.data.length;
+                        }
+                    }
+                }
+            };
+
+            $scope.getPlanItemVariables = function () {
+                if ($scope.model.isDebuggerEnabled) {
+                    $http({
+                        method: 'GET',
+                        url: '../app/rest/cmmn-debugger/variables/' + $scope.model.selectedPlanItem //TODO: check if $scope.model.selectedPlanItem is correct variable to use
+                    }).success(function (data) {
+                        $scope.gridVariables.data = data;
+                        if ($scope.gridVariablesApi) {
+                            $scope.gridVariablesApi.core.refresh();
+                        }
+                    });
+                }
+            };
+
+            $scope.getEventLog = function () {
+                if ($scope.model.isDebuggerEnabled) {
+                    $http({
+                        method: 'GET',
+                        url: '../app/rest/cmmn-debugger/eventlog/' + $scope.model.caseInstance.id
+                    }).success(function (data) {
+                        $scope.gridLog.data = data;
+                        if ($scope.gridLogApi) {
+                            $scope.gridLogApi.core.refresh();
+                        }
+                    });
+                }
+            };
+
+            $scope.loadVariables = function () {
+                if ($scope.model.isDebuggerEnabled) {
+                    var planItem = $scope.findSelectedPlanItem();
+                    $http({
+                        method: 'GET',
+                        url: '../app/rest/cmmn-debugger/variables/' + planItem
+                    }).success(function (data, status, headers, config) {
+                        $scope.model.variables = data;
+                        $scope.gridVariables.data = data;
+                        if ($scope.gridVariablesApi) {
+                            $scope.gridVariablesApi.core.refresh();
+                        }
+                    });
+                }
+            };
+
+            $scope.evaluateExpression = function () {
+                if ($scope.model.isDebuggerEnabled) {
+                    $scope.model.errorMessage = '';
+                    $scope.model.result = '';
+
+                    var planItem = $scope.findSelectedPlanItem();
+                    $http({
+                        method: 'POST',
+                        url: '../app/rest/cmmn-debugger/evaluate/expression/' + planItem,
+                        data: $scope.model.expression
+                    }).success(function (data) {
+                        $scope.model.result = data;
+                    }).error(function (data, status, headers, config) {
+                        $rootScope.addAlert("Execution evaluation failed :" + data, 'error');
+                    });
+                }
+            }
+
+            $scope.evaluateScript = function () {
+                if ($scope.model.isDebuggerEnabled) {
+                    $scope.model.errorMessage = '';
+
+                    var planItem = $scope.findSelectedPlanItem();
+                    $http({
+                        method: 'POST',
+                        url: '../app/rest/cmmn-debugger/evaluate/' + $scope.model.scriptLanguage + '/' + planItem,
+                        data: $scope.model.scriptText
+                    }).success(function (data) {
+                        $rootScope.addAlert("script executed", 'info')
+                    }).error(function (data, status, headers, config) {
+                        $rootScope.addAlert(data, 'error');
+                    });
+                }
+            };
+
+            $scope.findSelectedPlanItem = function() {//TODO: check if needed at $scope level
+                var planItem = jQuery("#cmmnModel").attr("selected-plan-item");
+                /*if (!planItem) {
+                    planItem = $scope.model.caseInstance.id;//FIXME: does not work because case instances are not plan items
+                }*/
+                return planItem;
+            };
+
             $timeout(function () {
                 jQuery("#cmmnModel").attr('data-model-id', $scope.model.caseInstance.id);
                 jQuery("#cmmnModel").attr('data-model-type', 'runtime');
