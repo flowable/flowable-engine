@@ -347,6 +347,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean executeServiceSchemaManagers = true;
 
     protected boolean enableSafeCmmnXml;
+    protected boolean disableCmmnXmlValidation;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
     protected CmmnClassDelegateFactory classDelegateFactory;
     protected CmmnDeployer cmmnDeployer;
@@ -2112,6 +2113,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setEnableSafeCmmnXml(boolean enableSafeCmmnXml) {
         this.enableSafeCmmnXml = enableSafeCmmnXml;
         return this;
+    }
+    
+    public boolean isDisableCmmnXmlValidation() {
+        return disableCmmnXmlValidation;
+    }
+
+    public void setDisableCmmnXmlValidation(boolean disableCmmnXmlValidation) {
+        this.disableCmmnXmlValidation = disableCmmnXmlValidation;
     }
 
     public CmmnParser getCmmnParser() {
