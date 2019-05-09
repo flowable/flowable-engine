@@ -322,21 +322,22 @@ angular.module('flowableApp')
             $scope.model.isDebuggerEnabled = false;
             $scope.model.scriptLanguage = 'groovy';
 
+            $scope.model.variables = [];
+            $scope.model.displayVariables = true;
+
             $http({
                 method: 'GET',
                 url: '../app/rest/cmmn-debugger/',
                 async: false
             }).success(function (data) {
                 $scope.model.isDebuggerEnabled = data;
+                $scope.loadVariables();
                 $scope.getPlanItems();
                 $scope.getEventLog();
-                $scope.getPlanItemVariables();
             });
 
-            $scope.model.variables = [];
             $scope.model.planItems = undefined;
             $scope.model.selectedPlanItem = undefined;//$scope.model.caseInstance.id;//FIXME: does not work because case instances are not plan items
-            $scope.model.displayVariables = true;
 
             $scope.model.errorMessage = '';
 
@@ -371,7 +372,7 @@ angular.module('flowableApp')
                 ],
                 enableRowSelection: true,
                 multiSelect: false,
-                noUnselect: true,
+                noUnselect: false,
                 enableRowHeaderSelection: false,
                 onRegisterApi: function (gridApi) {
                     $scope.gridPlanItemsApi = gridApi;
@@ -380,24 +381,30 @@ angular.module('flowableApp')
                         $scope.selectRowForSelectedPlanItem();
                     }
                     $scope.gridPlanItemsApi.selection.on.rowSelectionChanged($scope, function (row) {
-                        var planItemToUnselect = modelDiv.attr("selected-plan-item");
-                        if (planItemToUnselect) {
-                            var shapeToUnselect = paper.getById(planItemToUnselect);
-                            if (shapeToUnselect) {
-                                shapeToUnselect.attr({"stroke": "green"});
+                        if(row.isSelected) {
+                            var planItemToUnselect = modelDiv.attr("selected-plan-item");
+                            if (planItemToUnselect) {
+                                var shapeToUnselect = paper.getById(planItemToUnselect);
+                                if (shapeToUnselect) {
+                                    shapeToUnselect.attr({"stroke": "green"});
+                                }
                             }
-                        }
-                        modelDiv.attr("selected-plan-item", row.entity.id);
-                        $scope.model.selectedPlanItem = row.entity.id;
+                            modelDiv.attr("selected-plan-item", row.entity.id);
+                            $scope.model.selectedPlanItem = row.entity.id;
 
-                        $scope.loadVariables();
+                            var planItemToSelect = paper.getById(row.entity.id);
+                            if (planItemToSelect) {
+                                planItemToSelect.attr({"stroke": "red"});
+                            }
+                        } else {
+                            $scope.model.selectedPlanItem = undefined;
+                        }
                     });
                 }
             };
 
             $scope.executionSelected = function () {//FIXME: needed?
                 jQuery("#cmmnModel").attr("selectedElement", $scope.model.selectedPlanItem);
-                $scope.loadVariables();
             };
 
             // Config for variable grid
@@ -465,12 +472,13 @@ angular.module('flowableApp')
                 }
             };
 
-            $scope.getPlanItemVariables = function () {
+            $scope.loadVariables = function () {
                 if ($scope.model.isDebuggerEnabled) {
                     $http({
                         method: 'GET',
-                        url: '../app/rest/cmmn-debugger/variables/' + $scope.model.selectedPlanItem //TODO: check if $scope.model.selectedPlanItem is correct variable to use
-                    }).success(function (data) {
+                        url: '../app/rest/cmmn-debugger/variables/' + $scope.model.caseInstance.id
+                    }).success(function (data, status, headers, config) {
+                        $scope.model.variables = data;
                         $scope.gridVariables.data = data;
                         if ($scope.gridVariablesApi) {
                             $scope.gridVariablesApi.core.refresh();
@@ -488,22 +496,6 @@ angular.module('flowableApp')
                         $scope.gridLog.data = data;
                         if ($scope.gridLogApi) {
                             $scope.gridLogApi.core.refresh();
-                        }
-                    });
-                }
-            };
-
-            $scope.loadVariables = function () {
-                if ($scope.model.isDebuggerEnabled) {
-                    var planItem = $scope.findSelectedPlanItem();
-                    $http({
-                        method: 'GET',
-                        url: '../app/rest/cmmn-debugger/variables/' + planItem
-                    }).success(function (data, status, headers, config) {
-                        $scope.model.variables = data;
-                        $scope.gridVariables.data = data;
-                        if ($scope.gridVariablesApi) {
-                            $scope.gridVariablesApi.core.refresh();
                         }
                     });
                 }

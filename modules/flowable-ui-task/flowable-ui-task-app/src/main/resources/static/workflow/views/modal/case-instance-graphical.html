@@ -42,13 +42,7 @@
 
                             <div class="grid-wrapper grid-wrapper-compact"
                                  ng-if="gridVariables && tabData.activeTab == tabData.tabs[0].id">
-                                <div class="pull-left">
-                                    <label for="planItemId">{{'CASE.TITLE.PLANITEM' | translate}}</label>
-                                    <span id="planItemId"
-                                          ng-bind="model.selectedPlanItem">{{model.selectedPlanItem}}</span>
-                                </div>
                                 <div class="ui-grid-contents-wrapper" ng-show="model.displayVariables">
-                                    <label for="variablesUi">{{'CASE.TITLE.VARIABLES' | translate}}</label>
                                     <div id="variablesUi" ui-grid="gridVariables" style="height: 200px; width: 100%"
                                          ui-grid-auto-resize></div>
                                 </div>
@@ -74,6 +68,11 @@
                             </div>
                             <div class="grid-wrapper grid-wrapper-compact"
                                  ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[3].id">
+                                <div class="pull-left" ng-show="model.selectedPlanItem">
+                                    <label for="expressionPlanItemId">{{'CASE.TITLE.PLANITEM' | translate}}</label>
+                                    <span id="expressionPlanItemId"
+                                          ng-bind="model.selectedPlanItem">{{model.selectedPlanItem}}</span>
+                                </div>
                                 <div class="col-xs-12">
                                     <label for="expressionText" class="col-xs-1">{{'CASE.TITLE.EXPRESSION' | translate}}</label>
                                     <div id="expressionText" class="col-xs-7">
@@ -93,6 +92,11 @@
                             </div>
                             <div class="grid-wrapper grid-wrapper-compact"
                                  ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[4].id">
+                                <div class="pull-left" ng-show="model.selectedPlanItem">
+                                    <label for="scriptPlanItemId">{{'CASE.TITLE.PLANITEM' | translate}}</label>
+                                    <span id="scriptPlanItemId"
+                                          ng-bind="model.selectedPlanItem">{{model.selectedPlanItem}}</span>
+                                </div>
                                 <div class="col-xs-12">
                                     <label for="scriptText" class="col-xs-1">{{'CASE.TITLE.SCRIPT' | translate}}</label>
                                     <div id="scriptText" class="col-xs-7">

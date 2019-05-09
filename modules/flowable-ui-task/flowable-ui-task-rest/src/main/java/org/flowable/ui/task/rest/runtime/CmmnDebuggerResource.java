@@ -13,7 +13,6 @@
 package org.flowable.ui.task.rest.runtime;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +21,6 @@ import java.util.UUID;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
 import org.flowable.ui.task.model.debugger.BreakpointRepresentation;
-import org.flowable.ui.task.model.debugger.ExecutionRepresentation;
 import org.flowable.ui.task.model.debugger.PlanItemRepresentation;
 import org.flowable.ui.task.service.debugger.CmmnDebuggerService;
 import org.flowable.ui.task.service.debugger.DebuggerRestVariable;
@@ -115,7 +113,7 @@ public class CmmnDebuggerResource {
     @RequestMapping(value = "/rest/cmmn-debugger/variables/{planItemId}", method = RequestMethod.GET)
     public List<DebuggerRestVariable> getPlanItemVariables(@PathVariable String planItemId) {
         assertDebuggerEnabled();
-        return debuggerService.getPlanItemVariables(planItemId);
+        return debuggerService.getCaseAndPlanItemVariables(planItemId);
     }
 
     @RequestMapping(value = "/rest/cmmn-debugger/planItems/{caseId}", method = RequestMethod.GET)

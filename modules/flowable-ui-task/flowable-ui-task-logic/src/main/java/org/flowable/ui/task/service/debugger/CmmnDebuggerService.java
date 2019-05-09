@@ -25,9 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CmmnDebugger;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -178,14 +180,17 @@ public class CmmnDebuggerService implements CmmnDebugger, ApplicationContextAwar
         this.applicationContext = applicationContext;
     }
 
-    public List<DebuggerRestVariable> getPlanItemVariables(String planItemId) {
-        List<PlanItemInstance> planItemInstances = getCmmnRuntimeService().createPlanItemInstanceQuery().planItemInstanceId(planItemId).list();
-        if (planItemInstances.isEmpty()) {
-            return getCmmnHistoricService().createHistoricVariableInstanceQuery().planItemInstanceId(planItemId).list().stream().
+    public List<DebuggerRestVariable> getCaseAndPlanItemVariables(String caseInstanceId) {
+        List<PlanItemInstance> planItemInstances = getCmmnRuntimeService().createPlanItemInstanceQuery().caseInstanceId(caseInstanceId).list();
+        if (planItemInstances.isEmpty()) {//if case is completed (i.e. no active plan item left)
+            return getCmmnHistoricService().createHistoricVariableInstanceQuery().
+                    caseInstanceId(caseInstanceId).
+                    list().stream().
                     map(DebuggerRestVariable::new).
                     collect(Collectors.toList());
         }
-        return getCmmnRuntimeService().getVariables(planItemId).entrySet().stream().
+        return getCmmnRuntimeService().getVariables(caseInstanceId).
+                entrySet().stream().
                 map(DebuggerRestVariable::new).
                 collect(Collectors.toList());
     }
@@ -210,23 +215,34 @@ public class CmmnDebuggerService implements CmmnDebugger, ApplicationContextAwar
         return planItemIds;
     }
 
-    public Object evaluateExpression(final String planItemInstanceId, final String expressionString) {
+    public Object evaluateExpression(final String planItemInstanceIdOrCaseInstanceId, final String expressionString) {
         final CmmnEngineConfiguration engineConfiguration = this.applicationContext.getBean(CmmnEngineConfiguration.class);
         return engineConfiguration.getCommandExecutor().execute(commandContext -> {
             ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
             Expression expression = expressionManager.createExpression(expressionString);
-            PlanItemInstance planItemInstance = engineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
-            return expression.getValue((VariableScope) planItemInstance);
+
+            PlanItemInstance planItemInstance = engineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceIdOrCaseInstanceId);
+            if(planItemInstance != null) {
+                return expression.getValue((VariableScope) planItemInstance);
+            } else {
+                CaseInstance caseInstance = engineConfiguration.getCaseInstanceEntityManager().findById(planItemInstanceIdOrCaseInstanceId);
+                return expression.getValue((VariableScope) caseInstance);
+            }
         });
     }
 
-    public void evaluateScript(final String planItemInstanceId, final String scriptLanguage, final String script) {
+    public void evaluateScript(final String planItemInstanceIdOrCaseInstanceId, final String scriptLanguage, final String script) {
         getCmmnCommandExecutor().execute(
                 (Command<Void>) commandContext -> {
                     CmmnEngineConfiguration cmmnEngineConfiguration = this.applicationContext.getBean(CmmnEngineConfiguration.class);
                     ScriptingEngines scriptingEngines = cmmnEngineConfiguration.getScriptingEngines();
-                    PlanItemInstanceEntity planItemInstance = cmmnEngineConfiguration .getPlanItemInstanceEntityManager().findById(planItemInstanceId);
-                    scriptingEngines.evaluate(script, scriptLanguage, planItemInstance, false);
+                    PlanItemInstanceEntity planItemInstance = cmmnEngineConfiguration .getPlanItemInstanceEntityManager().findById(planItemInstanceIdOrCaseInstanceId);
+                    if(planItemInstance != null) {
+                        scriptingEngines.evaluate(script, scriptLanguage, planItemInstance, false);
+                    } else {
+                        CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstanceIdOrCaseInstanceId);
+                        scriptingEngines.evaluate(script, scriptLanguage, caseInstance, false);
+                    }
                     return null;
                 }
         );
