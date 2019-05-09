@@ -183,6 +183,15 @@ public class CmmnDebuggerService implements CmmnDebugger, ApplicationContextAwar
         return planItemRepresentations;
     }
 
+    public List<String> getPlanItemInstancesPlanItemsIds() {
+        List<PlanItemInstance> planItemInstances = getCmmnRuntimeService().createPlanItemInstanceQuery().list();
+        List<String> planItemIds= new ArrayList<>(planItemInstances.size());
+        for (PlanItemInstance planItemInstance : planItemInstances) {
+            planItemIds.add(planItemInstance.getPlanItemDefinitionId());
+        }
+        return planItemIds;
+    }
+
     public Object evaluateExpression(final String planItemInstanceId, final String expressionString) {
         final CmmnEngineConfiguration engineConfiguration = this.applicationContext.getBean(CmmnEngineConfiguration.class);
         return engineConfiguration.getCommandExecutor().execute(commandContext -> {

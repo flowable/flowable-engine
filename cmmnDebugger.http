@@ -81,3 +81,8 @@ Content-Type: application/json
 Cookie: FLOWABLE_REMEMBER_ME=dlU4ZnZxTlA1JTJCc0NTTlZjR2t3aFlnJTNEJTNEOlhJQ0hpeXZWRE1LMENkbjBBSENsZWclM0QlM0Q;
 
 ###
+#get model
+GET http://localhost:9999/flowable-task/app/rest/case-instances/78b8b452-7258-11e9-bf20-b46bfcd9c998/model-json?nocaching=1557408596753
+Cookie: FLOWABLE_REMEMBER_ME=dlU4ZnZxTlA1JTJCc0NTTlZjR2t3aFlnJTNEJTNEOlhJQ0hpeXZWRE1LMENkbjBBSENsZWclM0QlM0Q;
+
+###

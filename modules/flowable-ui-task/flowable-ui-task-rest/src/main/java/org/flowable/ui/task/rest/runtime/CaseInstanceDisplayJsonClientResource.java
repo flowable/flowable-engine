@@ -43,6 +43,8 @@ import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
+import org.flowable.ui.task.model.debugger.BreakpointRepresentation;
+import org.flowable.ui.task.service.debugger.CmmnDebuggerService;
 import org.flowable.ui.task.service.editor.mapper.InfoMapper;
 import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,9 @@ public class CaseInstanceDisplayJsonClientResource {
 
     @Autowired
     protected PermissionService permissionService;
+
+    @Autowired
+    protected CmmnDebuggerService cmmnDebuggerService;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
     protected List<String> eventElementTypes = new ArrayList<>();
@@ -262,7 +267,9 @@ public class CaseInstanceDisplayJsonClientResource {
             ObjectNode elementNode = objectMapper.createObjectNode();
             elementNode.put("id", planItem.getId());
             elementNode.put("name", planItem.getName());
-            
+            elementNode.put("breakpoint", isBreakPointPlanItem(planItem));
+            elementNode.put("current", isCurrentElement(planItem));
+
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             String className = planItemDefinition.getClass().getSimpleName();
             elementNode.put("type", className);
@@ -308,13 +315,28 @@ public class CaseInstanceDisplayJsonClientResource {
             }
         }
     }
-    
+    private boolean isCurrentElement(PlanItem planItem) {
+        return cmmnDebuggerService.getPlanItemInstancesPlanItemsIds().contains(planItem.getPlanItemDefinition().getId());
+    }
+
+    protected boolean isBreakPointPlanItem(PlanItem planItem) {
+        List<BreakpointRepresentation> breakpoints = this.cmmnDebuggerService.getBreakpoints();
+        for (BreakpointRepresentation breakpoint : breakpoints) {
+            if (breakpoint.getElementId().equals(planItem.getPlanItemDefinition().getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected void processCriteria(List<Criterion> criteria, String type, CmmnModel model, ArrayNode elementArray) {
         for (Criterion criterion : criteria) {
             ObjectNode criterionNode = objectMapper.createObjectNode();
             criterionNode.put("id", criterion.getId());
             criterionNode.put("name", criterion.getName());
             criterionNode.put("type", type);
+            criterionNode.put("breakpoint", isBreakpointCriterion(criterion));
+            criterionNode.put("current", isCurrentCriterion(criterion));
 
             GraphicInfo criterionGraphicInfo = model.getGraphicInfo(criterion.getId());
             if (criterionGraphicInfo != null) {
@@ -323,6 +345,19 @@ public class CaseInstanceDisplayJsonClientResource {
 
             elementArray.add(criterionNode);
         }
+    }
+    private boolean isCurrentCriterion(Criterion criterion) {
+        return cmmnDebuggerService.getPlanItemInstancesPlanItemsIds().contains(criterion.getId());
+    }
+
+    protected boolean isBreakpointCriterion(Criterion criterion) {
+        List<BreakpointRepresentation> breakpoints = this.cmmnDebuggerService.getBreakpoints();
+        for (BreakpointRepresentation breakpoint : breakpoints) {
+            if (breakpoint.getElementId().equals(criterion.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void fillWaypoints(String id, CmmnModel model, ObjectNode elementNode, GraphicInfo diagramInfo) {
