@@ -13,15 +13,14 @@
 package org.flowable.ui.task.rest.runtime;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
 import org.flowable.ui.task.model.debugger.BreakpointRepresentation;
-import org.flowable.ui.task.model.debugger.ExecutionRepresentation;
 import org.flowable.ui.task.model.debugger.PlanItemRepresentation;
 import org.flowable.ui.task.service.debugger.CmmnDebuggerService;
 import org.flowable.ui.task.service.debugger.DebuggerRestVariable;
@@ -76,34 +75,45 @@ public class CmmnDebuggerResource {
     @RequestMapping(value = "/rest/cmmn-debugger/eventlog/{caseId}", method = RequestMethod.GET)
     public List<EventLogEntry> getEventLog(@PathVariable String caseId) {
         assertDebuggerEnabled();
-        List<EventLogEntry> evenlogEntries = new ArrayList<>();
+
+        //dummy event log entries for demo purposes
+        List<EventLogEntry> eventlogEntries = new ArrayList<>();
+
         EventLogEntryEntityImpl e1 = new EventLogEntryEntityImpl();
-        e1.setLogNumber(1l);
+        e1.setLogNumber(253L);
+        e1.setId(UUID.randomUUID().toString());
         e1.setTimeStamp(new Date());
         e1.setData("START CASE INSTANCE".getBytes());
+        e1.setType("CASE_INSTANCE_START");
         e1.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
-        e1.setLogNumber(1);
+
         EventLogEntryEntityImpl e2 = new EventLogEntryEntityImpl();
-        e1.setLogNumber(2l);
-        e1.setTimeStamp(new Date());
-        e2.setData("COMPLETE HUMAN TASK 1".getBytes());
+        e2.setId(UUID.randomUUID().toString());
+        e2.setLogNumber(236L);
+        e2.setType("COMPLETE HUMAN_TASK");
+        e2.setTimeStamp(new Date());
+        e2.setData("COMPLETE HUMAN_TASK".getBytes());
         e2.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
+
         EventLogEntryEntityImpl e3 = new EventLogEntryEntityImpl();
         e3.setData("COMPLETE HUMAN TASK 2".getBytes());
+        e3.setType("COMPLETE HUMAN_TASK");
         e3.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
-        e1.setLogNumber(3l);
-        e1.setTimeStamp(new Date());
-        evenlogEntries.add(e1);
-        evenlogEntries.add(e2);
-        evenlogEntries.add(e3);
+        e3.setLogNumber(237L);
+        e3.setTimeStamp(new Date());
+        e3.setId(UUID.randomUUID().toString());
 
-        return evenlogEntries;
+        eventlogEntries.add(e1);
+        eventlogEntries.add(e2);
+        eventlogEntries.add(e3);
+
+        return eventlogEntries;
     }
 
     @RequestMapping(value = "/rest/cmmn-debugger/variables/{planItemId}", method = RequestMethod.GET)
     public List<DebuggerRestVariable> getPlanItemVariables(@PathVariable String planItemId) {
         assertDebuggerEnabled();
-        return debuggerService.getPlanItemVariables(planItemId);
+        return debuggerService.getCaseAndPlanItemVariables(planItemId);
     }
 
     @RequestMapping(value = "/rest/cmmn-debugger/planItems/{caseId}", method = RequestMethod.GET)

@@ -291,7 +291,14 @@
             "START-CASE-CONTENT-ADD-FAILED": "Failed to add {{noOfFiles}} file(s) to the case"
         },
         "TITLE": {
-            "DIAGRAM": "Case diagram"
+            "DIAGRAM": "Case diagram",
+            "PLANITEM": "Plan item",
+            "PLANITEMS": "Plan items",
+            "EXPRESSION": "Expression",
+            "SCRIPT": "Script",
+            "RESULT": "Result",
+            "VARIABLES": "Variables",
+            "LOG": "Log"
         },
         "FILTER": {
             "CREATED-DESC": "Newest first",
@@ -339,10 +346,12 @@
         },
         "ACTION" : {
             "CREATE": "+ Start a case",
+            "EXECUTE": "Execute",
             "BACK-TO-LIST": "Back to case instances",
             "SHOW-DIAGRAM": "Show diagram",
             "CANCEL": "Cancel case",
             "DELETE": "Delete case",
+            "GENERATE-TEST": "Generate test",
             "TRIGGER-USER-EVENT-LISTENER": "Trigger",
             "AUDIT-LOG": "Audit Log"
         },

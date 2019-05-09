@@ -53,9 +53,6 @@ public class DebuggerRestVariable {
         scopeType = variableInstance.getScopeType();
     }
 
-    public DebuggerRestVariable(Object o) {
-    }
-
     public String getName() {
         return name;
     }
