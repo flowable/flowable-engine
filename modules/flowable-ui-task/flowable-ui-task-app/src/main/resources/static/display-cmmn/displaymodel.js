@@ -166,7 +166,7 @@ function _addHoverLogic(element, type, defaultColor)
     });
 
     if (isCmmnDebuggerEnabled) {
-        if (element.current || element.brokenExecutions) {
+        if (element.current || element.brokenPlanItem) {
             topBodyRect.click(function () {
                 if (selectedElement != element.id) {
                     paper.getById(element.id).attr({"stroke": "green"});
@@ -177,8 +177,8 @@ function _addHoverLogic(element, type, defaultColor)
                     selectedElement = undefined;
                     paper.getById(element.id).attr({"stroke": "green"});
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
-                    modelDiv.attr("selected-execution", scope.model.processInstance.id);
-                    scope.model.selectedExecution = scope.model.processInstance.id;
+                    modelDiv.attr("selected-execution", scope.model.caseInstance.id);
+                    scope.model.selectedExecution = scope.model.caseInstance.id;
                     angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
                 }
             });
@@ -282,10 +282,8 @@ function _showCmmnDiagram() {
             if (isCmmnDebuggerEnabled) {
                 _drawBreakpoint(element);
 
-                if (element.brokenExecutions) {
-                    for (var j = 0; j < element.brokenExecutions.length; j++) {
-                        _drawContinueExecution(element.x + 25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
-                    }
+                if (element.brokenPlanItem) {
+                    _drawContinueExecution(element.x + 35, element.y - 15, element.brokenPlanItem, element.id);
                 }
             }
             //} catch(err) {console.log(err);}
@@ -425,9 +423,9 @@ function _drawContinueExecution(x, y , executionId, elementId) {
                 contentType: 'application/json; charset=utf-8',
                 success: function () {
                     paper.clear();
-                    var processInstanceId = angular.element(document.querySelector('#cmmnModel')).scope().model.processInstance.id;
-                    modelDiv.attr("selected-execution", processInstanceId);
-                    angular.element(document.querySelector('#cmmnModel')).scope().model.selectedExecution = processInstanceId;
+                    var caseInstanceId = angular.element(document.querySelector('#cmmnModel')).scope().model.caseInstance.id;
+                    modelDiv.attr("selected-execution", caseInstanceId);
+                    angular.element(document.querySelector('#cmmnModel')).scope().model.selectedExecution = caseInstanceId;
                     angular.element(document.querySelector('#cmmnModel')).scope().getExecutions();
                     angular.element(document.querySelector('#cmmnModel')).scope().model.variables = undefined;
                     angular.element(document.querySelector('#cmmnModel')).scope().loadVariables();
