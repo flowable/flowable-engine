@@ -116,7 +116,6 @@ function _showTip(htmlNode, element)
 
 function _addHoverLogic(element, type, defaultColor)
 {
-    var strokeColor = _cmmnGetColor(element, defaultColor);
     var topBodyRect = null;
     if (type === "rect")
     {
@@ -163,7 +162,7 @@ function _addHoverLogic(element, type, defaultColor)
     });
 
     topBodyRect.mouseout(function() {
-        paper.getById(element.id).attr({"stroke":strokeColor});
+        paper.getById(element.id).attr({"stroke":_cmmnGetColor(element, defaultColor)});
     });
 
     if (isCmmnDebuggerEnabled) {
