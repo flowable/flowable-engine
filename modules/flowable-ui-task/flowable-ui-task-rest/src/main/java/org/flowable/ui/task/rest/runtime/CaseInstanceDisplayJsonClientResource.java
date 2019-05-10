@@ -222,9 +222,10 @@ public class CaseInstanceDisplayJsonClientResource {
             }
 
             elementNode.put("type", "PlanModel");
+            elementNode.put("isBreakable", false);
             elementArray.add(elementNode);
 
-            processCriteria(caseObject.getPlanModel().getExitCriteria(), "ExitCriterion", pojoModel, elementArray);
+            processCriteria(caseObject.getPlanModel().getExitCriteria(), "ExitCriterion", pojoModel, elementArray, false);
 
             processElements(caseObject.getPlanModel().getPlanItems(), pojoModel, elementArray, associationArray, 
                             completedElements, activeElements, availableElements, diagramInfo);
@@ -236,6 +237,7 @@ public class CaseInstanceDisplayJsonClientResource {
             elementNode.put("type", "Association");
             elementNode.put("sourceRef", association.getSourceRef());
             elementNode.put("targetRef", association.getTargetRef());
+            elementNode.put("isBreakable", false);
             List<GraphicInfo> flowInfo = pojoModel.getFlowLocationGraphicInfo(association.getId());
             if (CollectionUtils.isNotEmpty(flowInfo)) {
                 ArrayNode waypointArray = objectMapper.createArrayNode();
@@ -278,7 +280,9 @@ public class CaseInstanceDisplayJsonClientResource {
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             String className = planItemDefinition.getClass().getSimpleName();
             elementNode.put("type", className);
-            
+            elementNode.put("isBreakable", planItem.getEntryCriteria().isEmpty()
+                    && planItem.getExitCriteria().isEmpty());
+
             if (completedElements != null) {
                 elementNode.put("completed", completedElements.contains(planItemDefinition.getId()));
             }
@@ -309,8 +313,8 @@ public class CaseInstanceDisplayJsonClientResource {
 
             elementArray.add(elementNode);
 
-            processCriteria(planItem.getEntryCriteria(), "EntryCriterion", model, elementArray);
-            processCriteria(planItem.getExitCriteria(), "ExitCriterion", model, elementArray);
+            processCriteria(planItem.getEntryCriteria(), "EntryCriterion", model, elementArray, true);
+            processCriteria(planItem.getExitCriteria(), "ExitCriterion", model, elementArray, true);
 
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
@@ -338,12 +342,13 @@ public class CaseInstanceDisplayJsonClientResource {
         return false;
     }
 
-    protected void processCriteria(List<Criterion> criteria, String type, CmmnModel model, ArrayNode elementArray) {
+    protected void processCriteria(List<Criterion> criteria, String type, CmmnModel model, ArrayNode elementArray, boolean isBreakable) {
         for (Criterion criterion : criteria) {
             ObjectNode criterionNode = objectMapper.createObjectNode();
             criterionNode.put("id", criterion.getId());
             criterionNode.put("name", criterion.getName());
             criterionNode.put("type", type);
+            criterionNode.put("isBreakable", isBreakable);
             criterionNode.put("breakpoint", isBreakpointCriterion(criterion));
             criterionNode.put("current", isCurrentCriterion(criterion));
 

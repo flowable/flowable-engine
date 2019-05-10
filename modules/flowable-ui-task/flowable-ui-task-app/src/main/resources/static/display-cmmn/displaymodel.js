@@ -282,7 +282,9 @@ function _showCmmnDiagram() {
             drawFunction(element);
 
             if (isCmmnDebuggerEnabled) {
-                _drawBreakpoint(element);
+                if(element.isBreakable) {
+                    _drawBreakpoint(element);
+                }
 
                 if (element.brokenPlanItem) {
                     _drawContinuePlanItem(element.x + 35, element.y - 15, element.brokenPlanItem, element.id);
