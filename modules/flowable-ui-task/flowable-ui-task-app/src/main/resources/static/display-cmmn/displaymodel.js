@@ -184,6 +184,9 @@ function _addDebuggerLogic(element, topBodyRect) {
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
                     modelDiv.attr("selected-element", undefined);
                     scope.model.selectedPlanItemId = undefined;
+                    if ($scope.gridPlanItemsApi) {
+                        $scope.gridPlanItemsApi.selection.clearSelectedRows();
+                    }
                 }
             });
         }
@@ -424,6 +427,9 @@ function _drawContinuePlanItem(x, y , planItemId, elementId) {
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
                     modelDiv.attr("selected-element", undefined);
                     scope.model.selectedPlanItemId = undefined;
+                    if ($scope.gridPlanItemsApi) {
+                        $scope.gridPlanItemsApi.selection.clearSelectedRows();
+                    }
                     scope.getPlanItems();
                     scope.model.variables = [];
                     scope.loadVariables();
