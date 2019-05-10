@@ -286,6 +286,8 @@ function _drawStage(element)
     if (element.name) {
         this._drawMultilineText(element.name, element.x + 10, element.y + 5, element.width, element.height, "start", "top", 11);
     }
+
+    _addDebuggerLogic(element, rect);
 }
 
 function _drawPlanModel(element)

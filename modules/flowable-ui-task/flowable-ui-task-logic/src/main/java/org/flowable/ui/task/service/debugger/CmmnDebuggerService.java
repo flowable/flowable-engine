@@ -204,7 +204,7 @@ public class CmmnDebuggerService implements CmmnDebugger, ApplicationContextAwar
         List<PlanItemRepresentation> planItemRepresentations = new ArrayList<>(planItemInstances.size());
         for (PlanItemInstance planItemInstance : planItemInstances) {
             planItemRepresentations.add(new PlanItemRepresentation(planItemInstance.getId(),
-                    planItemInstance.getCaseInstanceId(), planItemInstance.getStageInstanceId(), planItemInstance.getElementId(), planItemInstance.getName(),
+                    planItemInstance.getCaseInstanceId(), planItemInstance.getStageInstanceId(), planItemInstance.getElementId(), planItemInstance.getName(), planItemInstance.getState(),
                     planItemInstance.isCompleteable(), planItemInstance.getTenantId()));
         }
         return planItemRepresentations;

@@ -358,6 +358,7 @@ angular.module('flowableApp')
                     {field: 'caseInstanceId', displayName: "Case instance id", name: 'caseInstanceId', maxWidth: 15},
                     {field: 'stageInstanceId',displayName: "Stage instance id",name: 'stageInstanceId',maxWidth: 80},
                     {field: 'name',displayName: "Name",name: 'name',maxWidth: 80},
+                    {field: 'state',displayName: "State",name: 'state',maxWidth: 80},
                     //{field: 'elementId',displayName: "Element key",name: 'elementId',maxWidth: 80},
                     {field: 'completeable', displayName: "Completeable", name: 'completeable', maxWidth: 30},
                     {field: 'tenantId', displayName: "Tenant id", name: 'tenantId', maxWidth: 80}
@@ -374,23 +375,23 @@ angular.module('flowableApp')
                     }
                     $scope.gridPlanItemsApi.selection.on.rowSelectionChanged($scope, function (row) {
                         if(row.isSelected) {
-                            var selectableRow = row.entity !== undefined;
-                            if(selectableRow) {
-                                var elementToUnselect = modelDiv.attr("selected-element");
-                                if (elementToUnselect) {
-                                    var shapeToUnselect = paper.getById(elementToUnselect);
-                                    if (shapeToUnselect) {
-                                        shapeToUnselect.attr({"stroke": "green"});
-                                    }
+                            var elementToUnselect = modelDiv.attr("selected-element");
+                            if (elementToUnselect) {
+                                var shapeToUnselect = paper.getById(elementToUnselect);
+                                if (shapeToUnselect) {
+                                    shapeToUnselect.attr({"stroke": "green"});
                                 }
-                                var elementId = row.entity.elementId;
-                                modelDiv.attr("selected-element", elementId);
-                                $scope.model.selectedPlanItem = row.entity.id;
+                            }
+                            var elementId = row.entity.elementId;
+                            modelDiv.attr("selected-element", elementId);
+                            $scope.model.selectedPlanItem = row.entity.id;
 
-                                var elementToSelect = paper.getById(elementId);
-                                if (elementToSelect) {
-                                    elementToSelect.attr({"stroke": "red"});
-                                }
+                            var elementToSelect = paper.getById(elementId);
+                            var selectableRow = row.entity.state === 'active' || row.entity.state === 'enabled';// || row.entity.state === 'suspended';
+                            if (elementToSelect && selectableRow) {
+                                elementToSelect.attr({"stroke": "red"});
+                            } else {
+                                row.setSelected(false);
                             }
                         } else {
                             $scope.model.selectedPlanItem = undefined;

@@ -164,7 +164,10 @@ function _addHoverLogic(element, type, defaultColor)
     topBodyRect.mouseout(function() {
         paper.getById(element.id).attr({"stroke":_cmmnGetColor(element, defaultColor)});
     });
+    _addDebuggerLogic(element, topBodyRect);
+}
 
+function _addDebuggerLogic(element, topBodyRect) {
     if (isCmmnDebuggerEnabled) {
         if (element.current || element.brokenPlanItem) {
             topBodyRect.click(function () {

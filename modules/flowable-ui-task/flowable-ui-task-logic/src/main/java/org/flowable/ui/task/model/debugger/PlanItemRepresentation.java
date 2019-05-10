@@ -22,16 +22,19 @@ public class PlanItemRepresentation {
     protected String stageInstanceId;
     protected String elementId;
     protected String name;
+    protected String state;
     protected Boolean isCompleteable;
     protected String tenantId;
 
     public PlanItemRepresentation(String id, String caseInstanceId, String stageInstanceId,
-                                   String elementId, String name, boolean isCompleteable, String tenantId) {
+                                   String elementId, String name, String state,
+                                   boolean isCompleteable, String tenantId) {
         this.id = id;
         this.caseInstanceId = caseInstanceId;
         this.stageInstanceId = stageInstanceId;
         this.elementId = elementId;
         this.name = name;
+        this.state = state;
         this.isCompleteable = isCompleteable;
         this.tenantId = tenantId;
     }
@@ -57,5 +60,8 @@ public class PlanItemRepresentation {
     }
     public String getName() {
         return name;
+    }
+    public String getState() {
+        return state;
     }
 }
