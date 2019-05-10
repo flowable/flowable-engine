@@ -68,10 +68,10 @@
                             </div>
                             <div class="grid-wrapper grid-wrapper-compact"
                                  ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[3].id">
-                                <div class="pull-left" ng-show="model.selectedPlanItem">
+                                <div class="pull-left" ng-show="model.selectedPlanItemId">
                                     <label for="expressionPlanItemId">{{'CASE.TITLE.PLANITEM' | translate}}</label>
                                     <span id="expressionPlanItemId"
-                                          ng-bind="model.selectedPlanItem">{{model.selectedPlanItem}}</span>
+                                          ng-bind="model.selectedPlanItemId">{{model.selectedPlanItemId}}</span>
                                 </div>
                                 <div class="col-xs-12">
                                     <label for="expressionText" class="col-xs-1">{{'CASE.TITLE.EXPRESSION' | translate}}</label>
@@ -92,10 +92,10 @@
                             </div>
                             <div class="grid-wrapper grid-wrapper-compact"
                                  ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[4].id">
-                                <div class="pull-left" ng-show="model.selectedPlanItem">
+                                <div class="pull-left" ng-show="model.selectedPlanItemId">
                                     <label for="scriptPlanItemId">{{'CASE.TITLE.PLANITEM' | translate}}</label>
                                     <span id="scriptPlanItemId"
-                                          ng-bind="model.selectedPlanItem">{{model.selectedPlanItem}}</span>
+                                          ng-bind="model.selectedPlanItemId">{{model.selectedPlanItemId}}</span>
                                 </div>
                                 <div class="col-xs-12">
                                     <label for="scriptText" class="col-xs-1">{{'CASE.TITLE.SCRIPT' | translate}}</label>

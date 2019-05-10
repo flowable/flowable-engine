@@ -55,6 +55,7 @@ var isCmmnDebuggerEnabled = angular.element(document.querySelector('#cmmnModel')
 
 var elementsAdded = new Array();
 var elementsRemoved = new Array();
+var selectedElement = undefined;
 
 function _showTip(htmlNode, element)
 {
@@ -168,18 +169,19 @@ function _addHoverLogic(element, type, defaultColor)
     if (isCmmnDebuggerEnabled) {
         if (element.current || element.brokenPlanItem) {
             topBodyRect.click(function () {
-                if (selectedElement != element.id) {
-                    paper.getById(element.id).attr({"stroke": "green"});
+                if (element.id !== selectedElement) {
+                    if(selectedElement) {
+                        paper.getById(selectedElement).attr({"stroke": "green"});
+                    }
                     selectedElement = element.id;
                     paper.getById(element.id).attr({"stroke": "red"});
-                    _executionClicked(element.id);
+                    _planItemClicked(element.id);
                 } else {
+                    paper.getById(selectedElement).attr({"stroke": "green"});
                     selectedElement = undefined;
-                    paper.getById(element.id).attr({"stroke": "green"});
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
-                    modelDiv.attr("selected-plan-item", scope.model.caseInstance.id);
-                    scope.model.selectedPlanItem = scope.model.caseInstance.id;
-                    angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
+                    modelDiv.attr("selected-plan-item", undefined);
+                    scope.model.selectedPlanItemId = undefined;
                 }
             });
         }
@@ -302,32 +304,24 @@ function _showCmmnDiagram() {
     });
 }
 
-function _executionClicked(elementId) {
+function _planItemClicked(elementId) {
     var planItems = angular.element(document.querySelector('#cmmnModel')).scope().model.planItems;
     for (var i in planItems) {
-        if (planItems[i]["elementId"] == elementId) {
-            var activityToUnselect = modelDiv.attr("selected-activity");
-            if (activityToUnselect) {
-                var rectangleToUnselect = paper.getById(activityToUnselect);
-                if (rectangleToUnselect) {
-                    rectangleToUnselect.attr({"stroke": "green"});
+        if (planItems[i].elementId === elementId) {
+            var planItemToUnselect = modelDiv.attr("selected-plan-item");
+            if (planItemToUnselect) {
+                var shapeToUnselect = paper.getById(planItemToUnselect.elementId);
+                if (shapeToUnselect) {
+                    shapeToUnselect.attr({"stroke": "green"});
                 }
             }
-            modelDiv.attr("selected-plan-item", planItems[i].id);
+            modelDiv.attr("selected-plan-item", planItems[i]);
             if (elementId) {
                 paper.getById(elementId).attr({"stroke": "red"});
             }
 
             var scope = angular.element(document.querySelector('#cmmnModel')).scope();
-            if (scope.gridPlanItems.data) {
-                for (var j = 0; j < scope.gridPlanItems.data.length; j++) {
-                    if (planItems[i].id == scope.gridPlanItems.data[j].id) {
-                        scope.gridPlanItemsApi.selection.selectRow(scope.gridPlanItems.data[j]);
-                        j = scope.gridPlanItems.data.length;
-                    }
-                }
-            }
-            scope.loadVariables();
+            scope.selectRowForSelectedPlanItem();
             return;
         }
     }
@@ -412,22 +406,21 @@ function _drawBreakpoint(element, breakpoints) {
     });
 }
 
-function _drawContinuePlanItem(x, y , executionId, elementId) {
+function _drawContinuePlanItem(x, y , planItemId, elementId) {
     var arrow = paper.path("M "+ x +" "+ y + " L "+ (x+8) +" "+ (y+4) +" "+ x +" "+ (y+8) +" z");
 
     arrow.click(function () {
             $.ajax({
                 type: 'PUT',
-                url: '../app/rest/cmmn-debugger/breakpoints/' + executionId + '/continue',
+                url: '../app/rest/cmmn-debugger/breakpoints/' + planItemId + '/continue',
                 contentType: 'application/json; charset=utf-8',
                 success: function () {
                     paper.clear();
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
-                    var caseInstanceId = scope.model.caseInstance.id;
-                    modelDiv.attr("selected-plan-item", caseInstanceId);
-                    scope.model.selectedPlanItem = caseInstanceId;
+                    modelDiv.attr("selected-plan-item", undefined);
+                    scope.model.selectedPlanItemId = undefined;
                     scope.getPlanItems();
-                    scope.model.variables = undefined;
+                    scope.model.variables = [];
                     scope.loadVariables();
                     scope.getEventLog();
 
@@ -448,7 +441,7 @@ function _drawContinuePlanItem(x, y , executionId, elementId) {
     var arrowHtmlNode = jQuery(arrow.node);
     arrowHtmlNode.qtip({
         content: {
-            text: "Trigger execution "+ executionId+", activity " + elementId,
+            text: "Trigger execution of plan item "+ planItemId+", element " + elementId,
             button: false
         },
         position: {

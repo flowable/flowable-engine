@@ -337,7 +337,7 @@ angular.module('flowableApp')
             });
 
             $scope.model.planItems = undefined;
-            $scope.model.selectedPlanItem = undefined;//$scope.model.caseInstance.id;//FIXME: does not work because case instances are not plan items
+            $scope.model.selectedPlanItemId = undefined;
 
             $scope.model.errorMessage = '';
 
@@ -385,15 +385,15 @@ angular.module('flowableApp')
                         if(row.isSelected) {
                             var planItemToUnselect = modelDiv.attr("selected-plan-item");
                             if (planItemToUnselect) {
-                                var shapeToUnselect = paper.getById(planItemToUnselect);
+                                var shapeToUnselect = paper.getById(planItemToUnselect.elementId);
                                 if (shapeToUnselect) {
                                     shapeToUnselect.attr({"stroke": "green"});
                                 }
                             }
-                            modelDiv.attr("selected-plan-item", row.entity.id);
+                            modelDiv.attr("selected-plan-item", row.entity);
                             $scope.model.selectedPlanItem = row.entity.id;
 
-                            var planItemToSelect = paper.getById(row.entity.id);
+                            var planItemToSelect = paper.getById(row.entity.elementId);
                             if (planItemToSelect) {
                                 planItemToSelect.attr({"stroke": "red"});
                             }
@@ -402,10 +402,6 @@ angular.module('flowableApp')
                         }
                     });
                 }
-            };
-
-            $scope.executionSelected = function () {//FIXME: needed?
-                jQuery("#cmmnModel").attr("selectedElement", $scope.model.selectedPlanItem);
             };
 
             // Config for variable grid
@@ -462,10 +458,10 @@ angular.module('flowableApp')
                 }
             };
 
-            $scope.selectRowForSelectedPlanItem = function() {//TODO: check if needed at $scope level
+            $scope.selectRowForSelectedPlanItem = function() {
                 if ($scope.model.isDebuggerEnabled && $scope.gridPlanItems.data) {
                     for (var i = 0; i < $scope.gridPlanItems.data.length; i++) {
-                        if ($scope.model.selectedPlanItem === $scope.gridPlanItems.data[i].id) {
+                        if ($scope.model.selectedPlanItemId === $scope.gridPlanItems.data[i].id) {
                             $scope.gridPlanItemsApi.selection.selectRow($scope.gridPlanItems.data[i]);
                             i = $scope.gridPlanItems.data.length;
                         }
@@ -507,7 +503,7 @@ angular.module('flowableApp')
                     $scope.model.errorMessage = '';
                     $scope.model.result = '';
 
-                    var planItem = $scope.findSelectedPlanItem();
+                    var planItem = $scope.model.selectedPlanItemId;//jQuery("#cmmnModel").attr("selected-plan-item") ? jQuery("#cmmnModel").attr("selected-plan-item").id : undefined;
                     $http({
                         method: 'POST',
                         url: '../app/rest/cmmn-debugger/evaluate/expression/' + planItem,
@@ -524,7 +520,7 @@ angular.module('flowableApp')
                 if ($scope.model.isDebuggerEnabled) {
                     $scope.model.errorMessage = '';
 
-                    var planItem = $scope.findSelectedPlanItem();
+                    var planItem = $scope.model.selectedPlanItemId;//jQuery("#cmmnModel").attr("selected-plan-item") ? jQuery("#cmmnModel").attr("selected-plan-item").id : undefined;
                     $http({
                         method: 'POST',
                         url: '../app/rest/cmmn-debugger/evaluate/' + $scope.model.scriptLanguage + '/' + planItem,
@@ -535,14 +531,6 @@ angular.module('flowableApp')
                         $rootScope.addAlert(data, 'error');
                     });
                 }
-            };
-
-            $scope.findSelectedPlanItem = function() {//TODO: check if needed at $scope level
-                var planItem = jQuery("#cmmnModel").attr("selected-plan-item");
-                /*if (!planItem) {
-                    planItem = $scope.model.caseInstance.id;//FIXME: does not work because case instances are not plan items
-                }*/
-                return planItem;
             };
 
             $timeout(function () {
