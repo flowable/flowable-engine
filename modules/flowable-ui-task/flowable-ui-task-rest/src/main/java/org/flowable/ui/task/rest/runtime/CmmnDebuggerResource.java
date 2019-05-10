@@ -85,27 +85,36 @@ public class CmmnDebuggerResource {
         e1.setTimeStamp(new Date());
         e1.setData("START CASE INSTANCE".getBytes());
         e1.setType("CASE_INSTANCE_START");
-        e1.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
+        e1.setExecutionId("e0cf195b-70f8-11e9-a8b9-b46bfcd9c998");
 
         EventLogEntryEntityImpl e2 = new EventLogEntryEntityImpl();
         e2.setId(UUID.randomUUID().toString());
         e2.setLogNumber(236L);
-        e2.setType("COMPLETE HUMAN_TASK");
+        e2.setType("PROCESS_INSTANCE_START");
         e2.setTimeStamp(new Date());
         e2.setData("COMPLETE HUMAN_TASK".getBytes());
-        e2.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
+        e2.setExecutionId("e0cf191e-70f8-11e9-a8b9-b46bfcd9c998");
 
         EventLogEntryEntityImpl e3 = new EventLogEntryEntityImpl();
         e3.setData("COMPLETE HUMAN TASK 2".getBytes());
-        e3.setType("COMPLETE HUMAN_TASK");
-        e3.setExecutionId("e0cf19fb-70f8-11e9-a8b9-b46bfcd9c998");
+        e3.setType("VARIABLE_CREATED");
+        e3.setExecutionId("e0cf19ad-70f8-11e9-a8b9-b46bfcd9c998");
         e3.setLogNumber(237L);
         e3.setTimeStamp(new Date());
         e3.setId(UUID.randomUUID().toString());
 
+        EventLogEntryEntityImpl e4 = new EventLogEntryEntityImpl();
+        e4.setData("COMPLETE HUMAN TASK 2".getBytes());
+        e4.setType("TASK_COMPLETED");
+        e4.setExecutionId("e0cf19ad-70f8-11e9-a8b9-b46bfcd9c998");
+        e4.setLogNumber(238L);
+        e4.setTimeStamp(new Date());
+        e4.setId(UUID.randomUUID().toString());
+
         eventlogEntries.add(e1);
         eventlogEntries.add(e2);
         eventlogEntries.add(e3);
+        eventlogEntries.add(e4);
 
         return eventlogEntries;
     }

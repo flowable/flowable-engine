@@ -431,7 +431,7 @@ angular.module('flowableApp')
                     {field: 'id', displayName: "Id", maxWidth: 10},
                     {field: 'type', displayName: "Type", maxWidth: 10},
                     {field: 'timeStamp', displayName: "Time Stamp", maxWidth: 90},
-                    {field: 'executionId', displayName: "Execution", maxWidth: 90},//TODO: check if correct/needed
+                    {field: 'executionId', displayName: "PlanItemId", maxWidth: 90},//TODO: check if correct/needed
                 ],
                 enableRowSelection: true,
                 multiSelect: false,
