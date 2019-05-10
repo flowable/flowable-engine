@@ -1906,6 +1906,10 @@ h3+div > .dropzone {
     overflow: auto;
 }
 
+.model-preview-wrapper.debugger {
+    max-height: 300px;
+}
+
 .upload-image-form {
     margin: 0 20% 0 20%;
     text-align: center;
