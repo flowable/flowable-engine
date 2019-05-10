@@ -310,15 +310,6 @@ angular.module('flowableApp')
 angular.module('flowableApp')
     .controller('ShowCaseDiagramCtrl', ['$scope', '$http', '$timeout', '$q', 'ResourceService', 'appResourceRoot',
         function ($scope, $http, $timeout, $q, ResourceService, appResourceRoot) {
-
-            $http({
-                method: 'GET',
-                url: '../app/rest/cmmn-debugger/',
-                async: false
-            }).success(function (data) {
-                $scope.model.isDebuggerEnabled = data;
-            });
-
             $scope.model.isDebuggerEnabled = false;
             $scope.model.scriptLanguage = 'groovy';
 
