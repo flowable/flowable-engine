@@ -366,7 +366,8 @@ angular.module('flowableApp')
                     {field: 'id', displayName: "Id", name: 'id', maxWidth: 15},
                     {field: 'caseInstanceId', displayName: "Case instance id", name: 'caseInstanceId', maxWidth: 15},
                     {field: 'stageInstanceId',displayName: "Stage instance id",name: 'stageInstanceId',maxWidth: 80},
-                    //{field: 'elementId',displayName: "Element id",name: 'elementId',maxWidth: 80},
+                    {field: 'name',displayName: "Name",name: 'name',maxWidth: 80},
+                    //{field: 'elementId',displayName: "Element key",name: 'elementId',maxWidth: 80},
                     {field: 'completeable', displayName: "Completeable", name: 'completeable', maxWidth: 30},
                     {field: 'tenantId', displayName: "Tenant id", name: 'tenantId', maxWidth: 80}
                 ],
