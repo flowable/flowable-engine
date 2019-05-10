@@ -462,6 +462,7 @@ angular.module('flowableApp')
                             i = $scope.gridPlanItems.data.length;
                         }
                     }
+                    //TODO: make sure other rows are not selected
                 }
             };
 

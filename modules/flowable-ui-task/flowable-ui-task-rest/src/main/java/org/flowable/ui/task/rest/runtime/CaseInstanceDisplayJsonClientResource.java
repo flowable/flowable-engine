@@ -280,8 +280,7 @@ public class CaseInstanceDisplayJsonClientResource {
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             String className = planItemDefinition.getClass().getSimpleName();
             elementNode.put("type", className);
-            elementNode.put("isBreakable", planItem.getEntryCriteria().isEmpty()
-                    && planItem.getExitCriteria().isEmpty());
+            elementNode.put("isBreakable", true);//planItem.getEntryCriteria().isEmpty() && planItem.getExitCriteria().isEmpty());
 
             if (completedElements != null) {
                 elementNode.put("completed", completedElements.contains(planItemDefinition.getId()));
