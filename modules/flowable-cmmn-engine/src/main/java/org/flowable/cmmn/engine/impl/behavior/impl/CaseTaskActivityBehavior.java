@@ -12,9 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -31,16 +28,24 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
 import org.flowable.cmmn.model.CaseTask;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
  */
 public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implements PlanItemActivityBehavior {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CaseTaskActivityBehavior.class);
 
     protected Expression caseRefExpression;
     protected Boolean fallbackToDefaultTenant;
@@ -61,15 +66,15 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
             caseInstanceBuilder.tenantId(planItemInstanceEntity.getTenantId());
             caseInstanceBuilder.overrideCaseDefinitionTenantId(planItemInstanceEntity.getTenantId());
         }
-        
+
         caseInstanceBuilder.parentId(planItemInstanceEntity.getCaseInstanceId());
-        
+
         if (fallbackToDefaultTenant != null && fallbackToDefaultTenant) {
             caseInstanceBuilder.fallbackToDefaultTenant();
         }
 
         Map<String, Object> inParametersMap = new HashMap<>();
-        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap);
+        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap, cmmnEngineConfiguration.getExpressionManager());
 
         if (variables != null && !variables.isEmpty()) {
             inParametersMap.putAll(variables);
@@ -85,7 +90,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
         planItemInstanceEntity.setReferenceId(caseInstanceEntity.getId());
-        
+
         if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isEnableEntityLinks()) {
             EntityLinkUtil.copyExistingEntityLinks(planItemInstanceEntity.getCaseInstanceId(), caseInstanceEntity.getId(), ScopeTypes.CMMN);
             EntityLinkUtil.createNewEntityLink(planItemInstanceEntity.getCaseInstanceId(), caseInstanceEntity.getId(), ScopeTypes.CMMN);
@@ -123,13 +128,11 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
             CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
-            CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
             handleOutParameters(
                     planItemInstance,
                     caseInstance,
-                    (executionId, expressionString) -> resolveExpression(cmmnEngineConfiguration, executionId, expressionString),
-                    cmmnRuntimeService::getVariable
-            );
+                    cmmnEngineConfiguration.getCmmnRuntimeService(),
+                    cmmnEngineConfiguration);
         }
     }
 
@@ -151,5 +154,42 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
             throw new FlowableException("Can only delete a child entity for a plan item with callback type " + CallbackTypes.PLAN_ITEM_CHILD_CASE);
         }
     }
+
+    protected void handleOutParameters(DelegatePlanItemInstance planItemInstance,
+                                       CaseInstanceEntity caseInstance,
+                                       CmmnRuntimeService cmmnRuntimeService, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (outParameters == null) {
+            return;
+        }
+
+        for (IOParameter outParameter : outParameters) {
+
+            String variableName = null;
+            if (StringUtils.isNotEmpty(outParameter.getTarget())) {
+                variableName = outParameter.getTarget();
+
+            } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
+                Object variableNameValue = resolveExpression(cmmnEngineConfiguration, planItemInstance.getReferenceId(), outParameter.getTargetExpression());
+                if (variableNameValue != null) {
+                    variableName = variableNameValue.toString();
+                } else {
+                    LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
+                            outParameter.getTargetExpression());
+                }
+
+            }
+
+            Object variableValue = null;
+            if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
+                variableValue = resolveExpression(cmmnEngineConfiguration, planItemInstance.getReferenceId(), outParameter.getSourceExpression());
+
+            } else if (StringUtils.isNotEmpty(outParameter.getSource())) {
+                variableValue = cmmnRuntimeService.getVariable(planItemInstance.getReferenceId(), outParameter.getSource());
+
+            }
+            caseInstance.setVariable(variableName, variableValue);
+        }
+    }
+
 
 }
