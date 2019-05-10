@@ -177,8 +177,8 @@ function _addHoverLogic(element, type, defaultColor)
                     selectedElement = undefined;
                     paper.getById(element.id).attr({"stroke": "green"});
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
-                    modelDiv.attr("selected-execution", scope.model.caseInstance.id);
-                    scope.model.selectedExecution = scope.model.caseInstance.id;
+                    modelDiv.attr("selected-plan-item", scope.model.caseInstance.id);
+                    scope.model.selectedPlanItem = scope.model.caseInstance.id;
                     angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
                 }
             });
@@ -283,7 +283,7 @@ function _showCmmnDiagram() {
                 _drawBreakpoint(element);
 
                 if (element.brokenPlanItem) {
-                    _drawContinueExecution(element.x + 35, element.y - 15, element.brokenPlanItem, element.id);
+                    _drawContinuePlanItem(element.x + 35, element.y - 15, element.brokenPlanItem, element.id);
                 }
             }
             //} catch(err) {console.log(err);}
@@ -303,9 +303,9 @@ function _showCmmnDiagram() {
 }
 
 function _executionClicked(elementId) {
-    var executions = angular.element(document.querySelector('#cmmnModel')).scope().model.executions;
-    for (var i in executions) {
-        if (executions[i]["elementId"] == elementId) {
+    var planItems = angular.element(document.querySelector('#cmmnModel')).scope().model.planItems;
+    for (var i in planItems) {
+        if (planItems[i]["elementId"] == elementId) {
             var activityToUnselect = modelDiv.attr("selected-activity");
             if (activityToUnselect) {
                 var rectangleToUnselect = paper.getById(activityToUnselect);
@@ -313,18 +313,17 @@ function _executionClicked(elementId) {
                     rectangleToUnselect.attr({"stroke": "green"});
                 }
             }
-            modelDiv.attr("selected-execution", executions[i].id);
-            modelDiv.attr("selected-activity", elementId);
+            modelDiv.attr("selected-plan-item", planItems[i].id);
             if (elementId) {
                 paper.getById(elementId).attr({"stroke": "red"});
             }
 
             var scope = angular.element(document.querySelector('#cmmnModel')).scope();
-            if (scope.gridExecutions.data) {
-                for (var j = 0; j < scope.gridExecutions.data.length; j++) {
-                    if (executions[i].id == scope.gridExecutions.data[j].id) {
-                        scope.gridExecutionsApi.selection.selectRow(scope.gridExecutions.data[j]);
-                        j = scope.gridExecutions.data.length;
+            if (scope.gridPlanItems.data) {
+                for (var j = 0; j < scope.gridPlanItems.data.length; j++) {
+                    if (planItems[i].id == scope.gridPlanItems.data[j].id) {
+                        scope.gridPlanItemsApi.selection.selectRow(scope.gridPlanItems.data[j]);
+                        j = scope.gridPlanItems.data.length;
                     }
                 }
             }
@@ -344,7 +343,7 @@ function _breakpointRestCall(actionType, elementId) {
         }),
         success: function () {
             paper.clear();
-            //angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
+            angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
             _showCmmnDiagram();
         }
     })
@@ -371,7 +370,7 @@ function _drawBreakpoint(element, breakpoints) {
     var breakpointTipText = "Inactive element";
     if (element.current) {
         breakpointFillColor = "red";
-        breakpointTipText = "Active execution"
+        breakpointTipText = "Active Plan Item"
     }
 
     if (element.breakpoint) {
@@ -413,7 +412,7 @@ function _drawBreakpoint(element, breakpoints) {
     });
 }
 
-function _drawContinueExecution(x, y , executionId, elementId) {
+function _drawContinuePlanItem(x, y , executionId, elementId) {
     var arrow = paper.path("M "+ x +" "+ y + " L "+ (x+8) +" "+ (y+4) +" "+ x +" "+ (y+8) +" z");
 
     arrow.click(function () {
@@ -425,13 +424,14 @@ function _drawContinueExecution(x, y , executionId, elementId) {
                     paper.clear();
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
                     var caseInstanceId = scope.model.caseInstance.id;
-                    modelDiv.attr("selected-execution", caseInstanceId);
-                    angular.element(document.querySelector('#cmmnModel')).scope().model.selectedExecution = caseInstanceId;
-                    //angular.element(document.querySelector('#cmmnModel')).scope().getExecutions();
-                    angular.element(document.querySelector('#cmmnModel')).scope().model.variables = undefined;
-                   // angular.element(document.querySelector('#cmmnModel')).scope().loadVariables();
-                    //angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
+                    modelDiv.attr("selected-plan-item", caseInstanceId);
+                    scope.model.selectedPlanItem = caseInstanceId;
+                    scope.getPlanItems();
+                    scope.model.variables = undefined;
+                    scope.loadVariables();
+                    scope.getEventLog();
 
+                    // Reload case Tasks after continue
                     scope.loadCaseTasks();
                     _showCmmnDiagram();
                 },
@@ -448,7 +448,7 @@ function _drawContinueExecution(x, y , executionId, elementId) {
     var arrowHtmlNode = jQuery(arrow.node);
     arrowHtmlNode.qtip({
         content: {
-            text: "Fire execution "+ executionId+", activity " + elementId,
+            text: "Trigger execution "+ executionId+", activity " + elementId,
             button: false
         },
         position: {
