@@ -417,7 +417,7 @@ angular.module('flowableApp')
                     {field: 'name', displayName: "Name", maxWidth: 10},
                     {
                         field: 'value', displayName: "Value",
-                        cellTemplate: '<div><div style="text-align: left" class="ngCellText">{{grid.getCellValue(row, col)}}</div></div>'
+                        cellTemplate: '<div><div style="text-align: left" class="ngCellText ui-grid-cell-contents">{{grid.getCellValue(row, col)}}</div></div>'
                     }
                 ],
                 onRegisterApi: function (gridApi) {
@@ -431,7 +431,7 @@ angular.module('flowableApp')
                     {field: 'id', displayName: "Id", maxWidth: 10},
                     {field: 'type', displayName: "Type", maxWidth: 10},
                     {field: 'timeStamp', displayName: "Time Stamp", maxWidth: 90},
-                    {field: 'executionId', displayName: "PlanItemId", maxWidth: 90},//TODO: check if correct/needed
+                    {field: 'executionId', displayName: "PlanItemId", maxWidth: 90},//TODO: change field name
                 ],
                 enableRowSelection: true,
                 multiSelect: false,
