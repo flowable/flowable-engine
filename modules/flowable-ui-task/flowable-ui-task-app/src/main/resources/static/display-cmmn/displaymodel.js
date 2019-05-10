@@ -179,7 +179,7 @@ function _addHoverLogic(element, type, defaultColor)
                     paper.getById(selectedElement).attr({"stroke": "green"});
                     selectedElement = undefined;
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
-                    modelDiv.attr("selected-plan-item", undefined);
+                    modelDiv.attr("selected-element", undefined);
                     scope.model.selectedPlanItemId = undefined;
                 }
             });
@@ -309,19 +309,20 @@ function _planItemClicked(elementId) {
     var planItems = angular.element(document.querySelector('#cmmnModel')).scope().model.planItems;
     for (var i in planItems) {
         if (planItems[i].elementId === elementId) {
-            var planItemToUnselect = modelDiv.attr("selected-plan-item");
-            if (planItemToUnselect) {
-                var shapeToUnselect = paper.getById(planItemToUnselect.elementId);
+            var elementToUnselect = modelDiv.attr("selected-element");
+            if (elementToUnselect) {
+                var shapeToUnselect = paper.getById(elementToUnselect);
                 if (shapeToUnselect) {
                     shapeToUnselect.attr({"stroke": "green"});
                 }
             }
-            modelDiv.attr("selected-plan-item", planItems[i]);
+            modelDiv.attr("selected-element", elementId);
             if (elementId) {
                 paper.getById(elementId).attr({"stroke": "red"});
             }
 
             var scope = angular.element(document.querySelector('#cmmnModel')).scope();
+            scope.model.selectedPlanItemId = planItems[i].id;
             scope.selectRowForSelectedPlanItem();
             return;
         }
@@ -418,7 +419,7 @@ function _drawContinuePlanItem(x, y , planItemId, elementId) {
                 success: function () {
                     paper.clear();
                     var scope = angular.element(document.querySelector('#cmmnModel')).scope();
-                    modelDiv.attr("selected-plan-item", undefined);
+                    modelDiv.attr("selected-element", undefined);
                     scope.model.selectedPlanItemId = undefined;
                     scope.getPlanItems();
                     scope.model.variables = [];

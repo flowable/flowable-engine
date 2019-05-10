@@ -374,19 +374,23 @@ angular.module('flowableApp')
                     }
                     $scope.gridPlanItemsApi.selection.on.rowSelectionChanged($scope, function (row) {
                         if(row.isSelected) {
-                            var planItemToUnselect = modelDiv.attr("selected-plan-item");
-                            if (planItemToUnselect) {
-                                var shapeToUnselect = paper.getById(planItemToUnselect.elementId);
-                                if (shapeToUnselect) {
-                                    shapeToUnselect.attr({"stroke": "green"});
+                            var selectableRow = row.entity !== undefined;
+                            if(selectableRow) {
+                                var elementToUnselect = modelDiv.attr("selected-element");
+                                if (elementToUnselect) {
+                                    var shapeToUnselect = paper.getById(elementToUnselect);
+                                    if (shapeToUnselect) {
+                                        shapeToUnselect.attr({"stroke": "green"});
+                                    }
                                 }
-                            }
-                            modelDiv.attr("selected-plan-item", row.entity);
-                            $scope.model.selectedPlanItem = row.entity.id;
+                                var elementId = row.entity.elementId;
+                                modelDiv.attr("selected-element", elementId);
+                                $scope.model.selectedPlanItem = row.entity.id;
 
-                            var planItemToSelect = paper.getById(row.entity.elementId);
-                            if (planItemToSelect) {
-                                planItemToSelect.attr({"stroke": "red"});
+                                var elementToSelect = paper.getById(elementId);
+                                if (elementToSelect) {
+                                    elementToSelect.attr({"stroke": "red"});
+                                }
                             }
                         } else {
                             $scope.model.selectedPlanItem = undefined;
@@ -450,7 +454,7 @@ angular.module('flowableApp')
             };
 
             $scope.selectRowForSelectedPlanItem = function() {
-                if ($scope.model.isDebuggerEnabled && $scope.gridPlanItems.data) {
+                if ($scope.model.isDebuggerEnabled && $scope.gridPlanItems.data && $scope.gridPlanItemsApi) {
                     for (var i = 0; i < $scope.gridPlanItems.data.length; i++) {
                         if ($scope.model.selectedPlanItemId === $scope.gridPlanItems.data[i].id) {
                             $scope.gridPlanItemsApi.selection.selectRow($scope.gridPlanItems.data[i]);
@@ -494,7 +498,7 @@ angular.module('flowableApp')
                     $scope.model.errorMessage = '';
                     $scope.model.result = '';
 
-                    var planItem = $scope.model.selectedPlanItemId;//jQuery("#cmmnModel").attr("selected-plan-item") ? jQuery("#cmmnModel").attr("selected-plan-item").id : undefined;
+                    var planItem = $scope.model.selectedPlanItemId;
                     $http({
                         method: 'POST',
                         url: '../app/rest/cmmn-debugger/evaluate/expression/' + planItem,
@@ -511,7 +515,7 @@ angular.module('flowableApp')
                 if ($scope.model.isDebuggerEnabled) {
                     $scope.model.errorMessage = '';
 
-                    var planItem = $scope.model.selectedPlanItemId;//jQuery("#cmmnModel").attr("selected-plan-item") ? jQuery("#cmmnModel").attr("selected-plan-item").id : undefined;
+                    var planItem = $scope.model.selectedPlanItemId;
                     $http({
                         method: 'POST',
                         url: '../app/rest/cmmn-debugger/evaluate/' + $scope.model.scriptLanguage + '/' + planItem,
