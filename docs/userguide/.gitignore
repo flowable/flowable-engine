@@ -15,3 +15,11 @@ src/en/cmmn/output
 src/en/dmn/output
 src/en/form/output
 src/en/single/output
+
+
+src/zh_CN/base/output
+src/zh_CN/bpmn/output
+src/zh_CN/cmmn/output
+src/zh_CN/dmn/output
+src/zh_CN/form/output
+src/zh_CN/single/output

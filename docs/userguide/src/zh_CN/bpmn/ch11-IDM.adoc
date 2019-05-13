@@ -1,0 +1,89 @@
+[[IDM]]
+
+== 身份管理
+
+从Flowable V6起，身份管理（IDM IDentity Management）组件从Flowable引擎模块中抽出，并将其逻辑移至几个不同的模块：flowable-idm-api、flowable-idm-engine、flowable-idm-spring及flowable-idm-engine-configurator。分离IDM主要是因为它并不是Flowable引擎的核心，并且在很多将Flowable引擎嵌入应用的用例中，并不使用或需要这部分身份管理逻辑。
+
+默认情况下，IDM引擎在Flowable引擎启动时初始化并启动。这样身份管理逻辑在Flowable V5中也可以使用。IDM引擎管理自己的数据库表结构及下列实体：
+
+* User与UserEntity，用户信息。
+* Group与GroupEntity，组信息。
+* MembershipEntity，组中的用户成员。
+* Privilege与PrivilegeEntity，权限定义（例如在Flowable Modeler与Flowable Task应用中，用于控制应用界面的访问）。
+* PrivilegeMappingEntity，将用户及/或组与权限关联。
+* Token与TokenEntity，应用界面程序使用的认证令牌。
+
+历史与当前进行中的流程实例都在数据库中保存历史实体，因此可以选择直接查询历史表，以减少对运行时流程实例数据的访问，并提高运行时执行的性能。
+
+[[_idm_engine_configuration]]
+
+=== 配置IDM引擎
+
+默认情况下，IDM引擎使用++org.flowable.engine.impl.cfg.IdmEngineConfigurator++启动。这个配置器使用Flowable流程引擎配置中相同的数据源配置。这样使用身份管理就不需要进行额外的配置，就像在Flowable V5中一样。
+
+如果Flowable引擎不需要身份管理，可以在流程引擎配置中禁用IDM引擎。
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  <property name="disableIdmEngine" value="true" />
+  ...
+</bean>
+----
+
+这意味着不能使用用户与组进行查询，也不能在任务查询中，按用户查询其所在的候选组。
+
+默认情况下，用户的密码以明文保存在IDM数据库表中。可以在流程引擎配置中定义一个加密算法，以确保密码加密。
+
+[source,xml,linenums]
+----
+<bean id="bCryptEncoder"
+      class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+      
+<bean id="passwordEncoder" class="org.flowable.idm.spring.authentication.SpringEncoder">
+    <constructor-arg ref="bCryptEncoder"/>
+</bean>
+
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  <property name="passwordEncoder" ref="passwordEncoder" />
+  ...
+</bean>
+----
+
+这里使用的是ShaPasswordEncoder，但也可以使用其他的加密算法，如org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder，不使用Spring的话也可以改用org.flowable.idm.engine.impl.authentication.ApacheDigester。
+
+也可以覆盖默认的IDM引擎配置器，使用自定义方式初始化IDM引擎。LDAPConfigurator的实现就是一个很好的例子。它覆盖了默认的IDM引擎，使用LDAP服务代替了默认的IDM数据库表。流程引擎配置的++idmProcessEngineConfigurator++参数用于设置自定义的配置器，如LDAPConfigurator
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="...SomeProcessEngineConfigurationClass">
+    ...
+    <property name="idmProcessEngineConfigurator">
+      <bean class="org.flowable.ldap.LDAPConfigurator">
+
+        <!-- 服务器连接参数 -->
+        <property name="server" value="ldap://localhost" />
+        <property name="port" value="33389" />
+        <property name="user" value="uid=admin, ou=users, o=flowable" />
+        <property name="password" value="pass" />
+
+        <!-- 查询参数 -->
+        <property name="baseDn" value="o=flowable" />
+        <property name="queryUserByUserId" value="(&(objectClass=inetOrgPerson)(uid={0}))" />
+        <property name="queryUserByFullNameLike" value="(&(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))" />
+        <property name="queryGroupsForUser" value="(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))" />
+
+        <!-- 配置参数 -->
+        <property name="userIdAttribute" value="uid" />
+        <property name="userFirstNameAttribute" value="cn" />
+        <property name="userLastNameAttribute" value="sn" />
+        <property name="userEmailAttribute" value="mail" />
+
+
+        <property name="groupIdAttribute" value="cn" />
+        <property name="groupNameAttribute" value="cn" />
+
+      </bean>
+    </property>
+</bean>
+----

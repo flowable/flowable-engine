@@ -1,0 +1,246 @@
+[[forms]]
+
+== 表单
+
+Flowable提供了一种简便灵活的方式，用来为业务流程中的人工步骤添加表单。
+有两种使用表单的方法：使用（由表单设计器创建的）表单定义的内置表单渲染，以及外部表单渲染。
+使用外部表单渲染时，可以使用（自Explorer web应用V5版本支持的）表单参数；也可以使用表单key定义，引用外部的、使用自定义代码解析的表单。
+
+[[formDefinition]]
+
+=== 表单定义
+
+link:$$http://flowable.org/docs/userguide-form/$$[表单引擎用户手册]中提供了关于表单定义与Flowable表单引擎的完整信息。
+可以使用Flowable表单设计器创建表单定义。表单设计器是Flowable Modeler web应用的一部分。也可以直接使用JSON编辑器创建表单定义。
+表单引擎用户手册中介绍了表单定义JSON的完整结构。表单支持下列表单字段类型：
+
+* Text: 渲染为文本框
+* Multiline text: 渲染为多行文本框
+* Number: 渲染为只允许数字值的文本框
+* CheckBox: 渲染为复选框
+* Date: 渲染为日期框
+* Dropdown: 渲染为下拉选择框，候选值由字段定义配置
+* Radio buttons: 渲染为单选按钮，候选值由字段定义配置
+* People: 渲染为选人框，可以选择用户身份表中的用户
+* Group of people: 渲染为选组框，可以选择组身份表中的组
+* Upload: 渲染为上传框
+* Expression: 渲染为一个标签，可以在标签文字中使用JUEL表达式，以使用变量及/或其他动态值
+
+Flowable Task应用可以用表单定义JSON渲染出html表单。
+也可以使用Flowable API，自行获取表单定义JSON。
+
+[source,java,linenums]
+----
+FormModel RuntimeService.getStartFormModel(String processDefinitionId, String processInstanceId)
+----
+
+或
+
+[source,java,linenums]
+----
+FormModel TaskService.getTaskFormModel(String taskId)
+----
+
+FormModel对象是一个代表了表单定义JSON的Java对象。
+
+可以调用下列API，使用启动表单定义以启动流程实例：
+
+[source,java,linenums]
+----
+ProcessInstance RuntimeService.startProcessInstanceWithForm(String processDefinitionId, String outcome, 
+    Map<String, Object> variables, String processInstanceName)
+----
+
+如果在流程定义的（某一个或多个）启动事件上定义了表单定义，则可以使用这个方法，使用启动表单中填写的值启动流程实例。
+Flowable Task应用使用同样的方法，用表单启动流程实例。
+通过变量map传入所有需要的表单值，也可以指定表单输出字符串及流程实例名。
+
+类似的，可以调用下列API，使用表单完成用户任务：
+
+[source,java,linenums]
+----
+void TaskService.completeTaskWithForm(String taskId, String formDefinitionId, 
+    String outcome, Map<String, Object> variables)
+----
+
+再次强调，要获取关于表单定义的更多信息，请查看link:$$http://flowable.org/docs/userguide-form/$$[表单引擎用户手册]。
+
+
+[[formProperties]]
+
+
+=== 表单参数
+
+所有与业务流程相关的信息，要么包含在流程变量里，要么可以通过流程变量引用。Flowable也支持将复杂的Java对象，以++Serializable++对象、JPA实体，或整个XML文档存储为++String++等方式，存储为流程变量。
+
+启动流程与完成用户任务是用户参与流程的地方，所以需要使用UI界面渲染表单。为了简化UI设计，可以在流程定义中，将流程变量中的复杂的Java对象转换为++Map<String,String>++格式的**__参数__**。
+
+这样UI就可以使用Flowable API方法，在这些参数的基础上构建表单。这些参数可看做是专用（也更受限）的流程变量视图。可以使用**FormData**返回值，获取用于显示表单的参数。如
+
+[source,java,linenums]
+----
+StartFormData FormService.getStartFormData(String processDefinitionId)
+----
+
+或
+
+[source,java,linenums]
+----
+TaskFormData FormService.getTaskFormData(String taskId)
+----
+
+默认情况下，内建表单引擎能够“看到”参数与流程变量。因此如果任务表单参数一对一对应流程变量，则不需要专门进行声明。例如，对于如下声明：
+
+[source,xml,linenums]
+----
+<startEvent id="start" />
+----
+
+当执行到达startEvent时，所有流程变量都可用。但
+
+[source,java,linenums]
+----
+formService.getStartFormData(String processDefinitionId).getFormProperties()
+----
+
+将为空，因为并未指定映射。
+
+在上面的例子中，所有提交的参数都存储为流程变量。也就是说，只要简单地在表单中添加输入框，就可以存储新变量。
+
+参数从流程变量衍生而来，但并不是必须存储为流程变量。例如，流程变量可以是Address类的JPA实体。而UI使用的++StreetName++表单参数，则通过++#{address.street}++表达式获取。
+
+类似的，表单中用户需要提交的参数，可以存储为流程变量，也可以使用UEL值表达式，保存至某个流程变量的参数。如++#{address.street}++。
+
+除非使用++formProperty++声明，否则提交参数时，默认将其存储为流程变量。
+
+在表单参数与流程变量的处理过程中，也可以进行类型转换。
+
+例如：
+
+[source,xml,linenums]
+----
+<userTask id="task">
+  <extensionElements>
+    <flowable:formProperty id="room" />
+    <flowable:formProperty id="duration" type="long"/>
+    <flowable:formProperty id="speaker" variable="SpeakerName" writable="false" />
+    <flowable:formProperty id="street" expression="#{address.street}" required="true" />
+  </extensionElements>
+</userTask>
+----
+
+* ++room++表单参数将作为String，映射为++room++流程变量
+* ++duration++表单参数将作为java.lang.Long，映射为++duration++流程变量
+* ++speaker++表单参数将被映射为++SpeakerName++流程变量。将只在TaskFormData对象中可用。若提交了speaker参数，将抛出FlowableException。对应地，使用++readable="false"++属性，参数可以提交，但不会在FormData中提供。
+* ++street++表单参数将作为String，映射为++address++流程变量的Java bean参数++street++。如果在提交时没有提供这个字段，required="true"将抛出异常。
+
+++StartFormData FormService.getStartFormData(String processDefinitionId)++与++TaskFormdata FormService.getTaskFormData(String taskId)++方法返回的FormData同样提供类型元数据。
+
+支持下列表单参数类型：
+
+* +string+ (org.flowable.engine.impl.form.StringFormType
+* +long+ (org.flowable.engine.impl.form.LongFormType)
+* +double+ (org.flowable.engine.impl.form.DoubleFormType)
+* +enum+ (org.flowable.engine.impl.form.EnumFormType)
+* +date+ (org.flowable.engine.impl.form.DateFormType)
+* +boolean+ (org.flowable.engine.impl.form.BooleanFormType)
+
+可以通过++List<FormProperty> formService.getStartFormData(String processDefinitionId).getFormProperties()++与++List<FormProperty> formService.getTaskFormData(String taskId).getFormProperties()++方法，获取每个表单参数的下列++FormProperty++信息：
+
+[source,java,linenums]
+----
+public interface FormProperty {
+  /**
+   * 在{@link FormService#submitStartFormData(String, java.util.Map)}
+   * 或{@link FormService#submitTaskFormData(String, java.util.Map)}
+   * 中提交参数时使用的key
+   */
+  String getId();
+
+  /** 显示标签 */
+  String getName();
+  
+  /** 在本接口中定义的类型，例如{@link #TYPE_STRING} */
+  FormType getType();
+  
+  /** 可选。这个参数需要显示的值 */
+  String getValue();
+  
+  /** 这个参数是否可以读取：在表单中显示，并可通过
+   * {@link FormService#getStartFormData(String)}
+   * 与{@link FormService#getTaskFormData(String)}
+   * 方法访问。
+   */
+  boolean isReadable();
+  
+  /** 用户提交表单时是否可以包含这个参数？ */
+  boolean isWritable();
+  
+  /** 输入框中是否必填这个参数 */
+  boolean isRequired();
+}
+----
+
+例如：
+
+[source,xml,linenums]
+----
+<startEvent id="start">
+  <extensionElements>
+    <flowable:formProperty id="speaker"
+      name="Speaker"
+      variable="SpeakerName"
+      type="string" />
+
+    <flowable:formProperty id="start"
+      type="date"
+      datePattern="dd-MMM-yyyy" />
+
+    <flowable:formProperty id="direction" type="enum">
+      <flowable:value id="left" name="Go Left" />
+      <flowable:value id="right" name="Go Right" />
+      <flowable:value id="up" name="Go Up" />
+      <flowable:value id="down" name="Go Down" />
+    </flowable:formProperty>
+
+  </extensionElements>
+</startEvent>
+----
+
+所有这些信息都可以通过API获取：用++formProperty.getType().getName()++获取类型名、++formProperty.getType().getInformation("datePattern")++获取日期格式、++formProperty.getType().getInformation("values")++获取枚举值。
+
+下面的XML代码片段
+
+[source,xml,linenums]
+----
+<startEvent>
+  <extensionElements>
+    <flowable:formProperty id="numberOfDays" name="Number of days" value="${numberOfDays}" type="long" required="true"/>
+    <flowable:formProperty id="startDate" name="First day of holiday (dd-MM-yyy)" value="${startDate}" datePattern="dd-MM-yyyy hh:mm" type="date" required="true" />
+    <flowable:formProperty id="vacationMotivation" name="Motivation" value="${vacationMotivation}" type="string" />
+  </extensionElements>
+</userTask>
+
+----
+
+可以在自定义应用中用于渲染流程启动表单。
+
+
+[[externalFormRendering]]
+
+
+=== 外部表单渲染
+
+也可以使用API，在Flowable引擎之外，自行渲染任务表单。下面的步骤介绍在自行渲染任务表单时，可以使用的钩子。
+
+实际上，渲染表单所需的所有数据都组装在：++StartFormData FormService.getStartFormData(String processDefinitionId)++与++TaskFormdata FormService.getTaskFormData(String taskId)++这两个方法中。
+
+可以通过++ProcessInstance FormService.submitStartFormData(String processDefinitionId, Map<String,String> properties)++与++void FormService.submitTaskFormData(String taskId, Map<String,String> properties)++提交表单参数。
+
+查看<<formProperties>>了解如何将表单参数映射至流程变量。
+
+如果希望按版本将表单与流程存储在一起，可以将表单模板资源放在部署的业务存档中，并可以使用++String ProcessDefinition.getDeploymentId()++与++InputStream RepositoryService.getResourceAsStream(String deploymentId, String resourceName);++，作为部署中的资源获取，在你的应用中渲染/显示表单。
+
+除了任务表单之外，也可以获取其他部署资源。
+
+++String FormService.getStartFormData(String processDefinitionId).getFormKey()++与++String FormService.getTaskFormData(String taskId).getFormKey()++API提供++<userTask flowable:formKey="..."++属性。可以用它保存部署中模板的全名（如++org/flowable/example/form/my-custom-form.xml++），但这并非唯一选择。例如，也可以在formKey中保存通用的key，通过算法或转换得到实际需要使用的模板。在你需要在不同的UI界面渲染不同的表单时很方便。例如，在普通屏幕尺寸的Web应用中显示一个表单，在手机等小屏幕中显示另一个表单。甚至可以为IM表单或邮件表单提供专门的模板。
