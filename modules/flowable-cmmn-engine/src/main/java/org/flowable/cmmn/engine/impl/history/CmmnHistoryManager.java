@@ -91,5 +91,4 @@ public interface CmmnHistoryManager {
      * @param logNumber log identifier
      */
     void deleteHistoricUserTaskLogEntry(long logNumber);
-
 }

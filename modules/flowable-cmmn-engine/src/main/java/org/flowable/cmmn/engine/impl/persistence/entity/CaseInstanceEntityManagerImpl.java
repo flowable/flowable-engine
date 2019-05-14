@@ -206,6 +206,4 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
             getCmmnEngineConfiguration().getCmmnHistoryManager().recordUpdateBusinessKey(caseInstanceEntity, businessKey);
         }
     }
-
-
 }

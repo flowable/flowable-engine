@@ -88,6 +88,7 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_UPDATE_CASE_INSTANCE_NAME, data, caseInstanceEntity.getTenantId());
         }
     }
+
     @Override
     public void recordUpdateBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
