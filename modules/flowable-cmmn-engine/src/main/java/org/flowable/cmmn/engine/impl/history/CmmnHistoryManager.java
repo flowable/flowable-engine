@@ -34,6 +34,8 @@ public interface CmmnHistoryManager {
     
     void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name);
 
+    void recordUpdateBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey);
+
     void recordMilestoneReached(MilestoneInstanceEntity milestoneInstanceEntity);
 
     void recordHistoricCaseInstanceDeleted(String caseInstanceId);
@@ -89,4 +91,5 @@ public interface CmmnHistoryManager {
      * @param logNumber log identifier
      */
     void deleteHistoricUserTaskLogEntry(long logNumber);
+
 }

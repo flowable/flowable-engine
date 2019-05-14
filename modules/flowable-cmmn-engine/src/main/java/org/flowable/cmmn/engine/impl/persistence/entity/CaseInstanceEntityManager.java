@@ -39,4 +39,5 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
 
     void clearLockTime(String caseInstanceId);
 
+    void updateCaseInstanceBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey);
 }
