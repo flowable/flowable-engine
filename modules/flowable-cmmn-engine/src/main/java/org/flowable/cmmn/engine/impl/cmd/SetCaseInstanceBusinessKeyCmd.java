@@ -43,9 +43,7 @@ public class SetCaseInstanceBusinessKeyCmd implements Command<Void>, Serializabl
             throw new FlowableObjectNotFoundException("No case instance found for id = '" + caseInstanceId + "'.", CaseInstance.class);
         }
 
-        caseInstanceEntity.setBusinessKey(businessKey);
-
-        CommandContextUtil.getCmmnHistoryManager().recordUpdateBusinessKey(caseInstanceEntity, businessKey);
+        caseInstanceEntityManager.updateCaseInstanceBusinessKey(caseInstanceEntity, businessKey);
 
         return null;
     }
