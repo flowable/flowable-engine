@@ -12,6 +12,9 @@
     <casePlanModel id="casePlanModel" name="Case Instance Business Key Update Process">
       <planItem id="planItem1" name="Task One" definitionRef="task1"></planItem>
       <humanTask id="task1" name="Task One">
+        <extensionElements>
+          <flowable:planItemLifecycleListener sourceState="available" targetState="active" class="org.flowable.cmmn.test.runtime.CaseInstanceUpdateBusinessKeyTest$UpdateBusinessKeyPlanItemJavaDelegate"/>
+        </extensionElements>
       </humanTask>
       <humanTask id="task2" name="Task Two">
       </humanTask>

@@ -35,7 +35,7 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
     @Before
     public void createCase() {
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = cmmnRepositoryService.createDeployment().
-            addClasspathResource("org/flowable/cmmn/test/runtime/CaseInstanceUpdateBusinessKeyTest.testCaseInstanceUpdateBusinessKey.cmmn").
+            addClasspathResource("org/flowable/cmmn/test/runtime/CaseInstanceUpdateBusinessKeyTest.testUpdateExistingCaseBusinessKey.cmmn").
             deploy();
 
         deplId = deployment.getId();
@@ -105,7 +105,6 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
         public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
             CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
             CommandContextUtil.getCaseInstanceEntityManager().updateCaseInstanceBusinessKey(caseInstanceEntity, "bzKey");
-
         }
     }
 
