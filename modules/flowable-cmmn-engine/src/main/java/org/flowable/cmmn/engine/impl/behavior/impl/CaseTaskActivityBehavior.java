@@ -136,13 +136,11 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         }
     }
 
-    private Object resolveExpression(CmmnEngineConfiguration cmmnEngineConfiguration, String executionId, String expressionString) {
+    protected Object resolveExpression(CmmnEngineConfiguration cmmnEngineConfiguration, String executionId, String expressionString) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(expressionString);
-        return cmmnEngineConfiguration.getCommandExecutor().execute(innerCommandContext -> {
-            CaseInstanceEntity caseInstanceEntity = caseInstanceEntityManager.findById(executionId);
-            return expression.getValue(caseInstanceEntity);
-        });
+        CaseInstanceEntity caseInstanceEntity = caseInstanceEntityManager.findById(executionId);
+        return expression.getValue(caseInstanceEntity);
     }
 
     @Override
