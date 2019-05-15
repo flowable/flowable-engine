@@ -657,7 +657,7 @@ flowable.database-schema= # 如果数据库返回的元数据不正确，可以�
 flowable.database-schema-update=true # 数据库schema更新策略。
 flowable.db-history-used=true # 是否要使用db历史。
 flowable.deployment-name=SpringBootAutoDeployment # 自动部署的名称。
-flowable.history-level= # 要使用的历史级别。
+flowable.history-level=audit # 要使用的历史级别。
 flowable.process-definition-location-prefix=classpath*:/processes/ # 自动部署时查找流程的目录。
 flowable.process-definition-location-suffixes=**.bpmn20.xml,**.bpmn # 'processDefinitionLocationPrefix'路径下需要部署的文件的后缀（扩展名）。
 
