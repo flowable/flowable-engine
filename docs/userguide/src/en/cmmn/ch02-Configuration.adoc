@@ -86,7 +86,7 @@ The +flowable.cmmn.cfg.xml+ must contain a bean that has the id +$$'cmmnEngineCo
 ----
 
 
-This bean is then used to construct the +CmmnEngine+. There are multiple classes available that can be used to define the +cmmnEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's best practice to select the class that best matches your environment, to minimize the number of properties needed to configure the engine. The following classes are currently available: [[configurationClasses]]
+This bean is then used to construct the +CmmnEngine+. There are multiple classes available that can be used to define the +cmmnEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It is a best practice to select the class that best matches your environment, to minimize the number of properties needed to configure the engine. The following classes are currently available: [[configurationClasses]]
 
 * *org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable will take care of all transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, no additional configuration is probably needed.
 * *org.flowable.cmmn.spring.SpringCmmnEngineConfiguration*: To be used when the CMMN engine is used in a Spring environment.  See <<springintegration,the Spring integration section>> for more information.
@@ -106,10 +106,10 @@ There are two ways to configure the database that the Flowable CMMN engine will 
 
 The data source that is constructed based on the provided JDBC properties will have the default link:$$http://www.mybatis.org/$$[MyBatis] connection pool settings. The following attributes can optionally be set to tweak that connection pool (taken from the MyBatis documentation):
 
-* *jdbcMaxActiveConnections*: The number of active connections that the connection pool at maximum at any time can contain. Default is 10.
-* *jdbcMaxIdleConnections*: The number of idle connections that the connection pool at maximum at any time can contain.
-* *jdbcMaxCheckoutTime*: The amount of time in milliseconds a connection can be 'checked out' from the connection pool before it is forcefully returned. Default is 20000 (20 seconds).
-* *jdbcMaxWaitTime*: This is a low level setting that gives the pool a chance to print a log status and re-attempt the acquisition of a connection in the case that it is taking unusually long (to avoid failing silently forever if the pool is misconfigured) Default is 20000 (20 seconds).
+* *jdbcMaxActiveConnections*: The number of active (i.e., in use) connections that the exist at any given time. Default is 10.
+* *jdbcMaxIdleConnections*: The number of idle connections that the exist at any given time.
+* *jdbcMaxCheckoutTime*: The amount of time in milliseconds that a connection can be 'checked out' of the connection pool before it is forcefully returned. Default is 20000. (20 seconds).
+* *jdbcMaxWaitTime*: This is a low level setting that gives the pool a chance to print a log status and re-attempt the acquisition of a connection in the case that it is taking unusually long (to avoid failing silently forever if the pool is misconfigured). Default is 20000. (20 seconds).
 
 Example database configuration:
 
@@ -121,7 +121,7 @@ Example database configuration:
 <property name="jdbcPassword" value="" />
 ----
 
-Our benchmarks have shown that the MyBatis connection pool is not the most efficient or resilient when dealing with a lot of concurrent requests. As such, it is advised to us a +javax.sql.DataSource+ implementation and inject it into the process engine configuration (For example HikariCP, Tomcat JDBC Connection Pool, etc.):
+Our benchmarks have shown that the MyBatis connection pool is not the most efficient or resilient when dealing with a lot of concurrent requests. As such, it is advised to use a +javax.sql.DataSource+ implementation and inject it into the process engine configuration (For example HikariCP, Tomcat JDBC Connection Pool, etc.):
 
 [source,xml,linenums]
 ----
@@ -192,7 +192,7 @@ If using Tomcat, the JNDI resource is configured within $CATALINA_BASE/conf/[eng
 
 ==== JNDI properties
 
-To configure a JNDI data source, use following properties in the properties file for the Flowable UI:
+To configure a JNDI data source, use the following properties in the properties file for the Flowable UI:
 
 * spring.datasource.jndi-name=: the JNDI name of the data source.
 * datasource.jndi.resourceRef: Set whether the lookup occurs in a J2EE container, for example, the prefix "java:comp/env/" needs to be added if the JNDI name doesn't already contain it. Default is "true".
@@ -229,7 +229,7 @@ The easiest way to create the database tables for your database is to:
 * Add a Flowable configuration file (__flowable.cmmn.cfg.xml__) to your classpath, pointing to your database (see <<databaseConfiguration,database configuration section>>)
 * Execute the main method of the _DbSchemaCreate_ class
 
-However, often only database administrators can execute DDL statements on a database. On a production system, this is also the wisest of choices. The SQL DDL statements can be found on the Flowable downloads page or inside the Flowable distribution folder, in the +database+ subdirectory. The scripts are also in the engine JAR (__flowable-cmmn-engine-x.jar__), in the package __org/flowable/cmmn/db/create__ . The SQL files are of the form
+However, often only database administrators can execute DDL statements on a database. On a production system, this is also the wisest of choices. The SQL DDL statements can be found on the Flowable downloads page or inside the Flowable distribution folder, in the +database+ subdirectory. The scripts are also in the engine JAR (__flowable-cmmn-engine-x.jar__), in the package __org/flowable/cmmn/db/create__. The SQL files are of the form
 
 ----
 flowable.{db}.cmmn.create.sql
@@ -246,7 +246,7 @@ The database names of the Flowable CMMN Engine all start with *ACT_CMMN_*. The s
 
 * *ACT_CMMN_**: Tables without an additional prefix contain 'static' information such as case definitions and case resources (images, rules, etc.).
 * *ACT_CMMN_RU_**: 'RU' stands for +runtime+. These are the runtime tables that contain the runtime data of case instances, plan items, and so on. Flowable only stores the runtime data during case instance execution and removes the records when a case instance ends. This keeps the runtime tables small and fast.
-* *ACT_CMMN_HI_**: 'HI' stands for +history+. These are the tables that contain historic data, such as past case instances, plan items, and so on.
+* *ACT_CMMN_HI_**: 'HI' stands for +history+. These are the tables that contain historical data, such as past case instances, plan items, and so on.
 
 
 [[databaseUpgrade]]
@@ -308,7 +308,7 @@ By default, all beans that you specify in the +flowable.cmmn.cfg.xml+ configurat
 
 === Deployment cache configuration
 
-All case definitions are cached (after they're parsed) to avoid hitting the database every time a case definition is needed and because case definition data doesn't change. By default, there is no limit on this cache. To limit the case definition cache, add following property:
+All case definitions are cached (after they're parsed) to avoid hitting the database every time a case definition is needed and because case definition data doesn't change. By default, there is no limit on this cache. To limit the case definition cache, add the following property:
 
 [source,xml,linenums]
 ----

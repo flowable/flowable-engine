@@ -136,7 +136,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         user.setTenantId(tenantId);
         identityService.saveUser(user);
 
-        User savedUser = identityService.createUserQuery().userEmail(email).singleResult();
+        User savedUser = identityService.createUserQuery().userId(id).singleResult();
         savedUser.setPassword(password);
         identityService.updateUserPassword(savedUser);
 

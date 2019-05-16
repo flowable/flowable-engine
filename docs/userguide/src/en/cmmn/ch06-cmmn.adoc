@@ -833,7 +833,7 @@ Take for example the following case definition:
 image::images/cmmn.user-event-listener-removal-1.png[align="center"]
 
 Here, the _First stage_ contains two human tasks (A and B) and it can be exited by a user when the _Stop first stage_ user event is triggered.
-However, when both taks A and B are completed, the stage will also complete. If now the user event listener would be triggered, there is nothing that listens to this event anymore.
+However, when both tasks A and B are completed, the stage will also complete. If now the user event listener would be triggered, there is nothing that listens to this event anymore.
 The engine will detect this and terminate the user event automatically.
 
 The same mechanism also works for event listeners that are referenced by entry sentries:
@@ -867,7 +867,7 @@ This means that a user could trigger it after start and the stage would be exite
 
 In some use case however, the event listener shouldn't be _available_ for the user to interact with (or a timer shouldn't start, when using a timer event listener) unless a certain condition is true.
 
-In the example above, we want to only create it when the stage doesn't have any active children (or required) anymore. Setting the *availableCondition* to *${cmmn:isStageCompletable()}* will allow the event listener to be created which makes it move immediately to _available_. Concretely in this model, when human task A is completed Stage 1 becomes _completable_ (as human task B is manually activated and non-required). This makes the _availbleCondition_ of the event listener _true_ and the event listener is now available for a user to decide to exit the stage.
+In the example above, we want to only create it when the stage doesn't have any active children (or required) anymore. Setting the *availableCondition* to *${cmmn:isStageCompletable()}* will allow the event listener to be created which makes it move immediately to _available_. Concretely in this model, when human task A is completed Stage 1 becomes _completable_ (as human task B is manually activated and non-required). This makes the _availableCondition_ of the event listener _true_ and the event listener is now available for a user to decide to exit the stage.
 
 Note: this is a Flowable specific addition to the CMMN specification. Without this addition, the event listener would have to be nested within a substage which is protected with entry criteria that listens to the completion of task A.
 
@@ -878,7 +878,7 @@ Note: if this were an autocompletable stage, the engine would complete the stage
 Plan items on the case model can have a _repetition rule_: an expression that can be used to indicate a certain plan item needs to be repeated.
 When no expression is set, but the repetition is enabled (for example, the checkbox is checked in the Flowable Modeler) or the expression is empty, a _true_ value is assumed by default.
 
-An optional _repetition counter variable_ can be set, which holds the index (one-based) of the instance. If not set, the default variable name is _repeitionCounter_.
+An optional _repetition counter variable_ can be set, which holds the index (one-based) of the instance. If not set, the default variable name is _repetitionCounter_.
 
 If the plan item does not have any entry criteria, the repetition rule expression is evaluated when the plan item is completed or terminated. If the expression resolved to _true_, a new instance is created. For example, a human task with a repetition rule expression _${repetitionCounter < 3}_, will create three sequential human tasks.
 
@@ -1081,7 +1081,7 @@ image::images/cmmn.sentry-eval-02.png[align="center"]
 
 Here, the case model has a stage with with three substages. All substage are repeating. Substage B and C have an entry sentry for the completion of stage B. Also (not visually shown), both sentries have a condition that depends on a variable.
 
-In advanced use cases, it could be wanted or needed that that the sentry parts (and especially the ifPart containing the condition) are evaluated only _when the lifecycle event of the dependent plan item_ happens. In this case, this is the _complete_ event of _Stage A_. For these use cases, the _triggerMode_ of the sentry can be set to _onEvent_. As the name imples, this means that the sentry evaluation only happens when a referenced event happens and no memory of past things are taken into account.
+In advanced use cases, it could be wanted or needed that that the sentry parts (and especially the ifPart containing the condition) are evaluated only _when the lifecycle event of the dependent plan item_ happens. In this case, this is the _complete_ event of _Stage A_. For these use cases, the _triggerMode_ of the sentry can be set to _onEvent_. As the name implies, this means that the sentry evaluation only happens when a referenced event happens and no memory of past things are taken into account.
 
 Concretely, in the example here, the condition of the entry sentries will be evaluated *only* when Stage A completed (and on no other moment). This is very different from the general evaluation rules. In this particular example, it does make managing the variables easier as the conditions are only evaluated on one precise moment and there needs to be no fear of some sentry part being fired due to a variable having a value at a certain point in time. Especially as in the example here all substages are repeating, this would be a lot of work to do. This is a powerful mechanism, but meant for advanced modelers that have an intrinsic knowledge of the case model and the semantics of this triggerMode.
 

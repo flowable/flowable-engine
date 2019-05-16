@@ -69,7 +69,12 @@ public class CmmnParserImpl implements CmmnParser {
             CmmnParseResult cmmnParseResult = new CmmnParseResult();
             cmmnParseResult.setResourceEntity(resourceEntity);
 
-            CmmnModel cmmnModel = new CmmnXmlConverter().convertToCmmnModel(cmmnSource, true, enableSafeBpmnXml, encoding);
+            boolean validateCmmnXml = true;
+            if (cmmnEngineConfiguration.isDisableCmmnXmlValidation()) {
+                validateCmmnXml = false;
+            }
+            
+            CmmnModel cmmnModel = new CmmnXmlConverter().convertToCmmnModel(cmmnSource, validateCmmnXml, enableSafeBpmnXml, encoding);
             cmmnParseResult.setCmmnModel(cmmnModel);
 
             processCmmnElements(cmmnModel, cmmnParseResult);

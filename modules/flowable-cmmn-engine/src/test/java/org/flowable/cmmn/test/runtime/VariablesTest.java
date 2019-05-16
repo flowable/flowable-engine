@@ -227,7 +227,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
     
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void setVariableOnRootCase() {
+    public void testSetVariableOnRootCase() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .variable("varToUpdate", "initialValue")
                 .caseDefinitionKey("oneHumanTaskCase")
@@ -244,7 +244,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void setVariableOnNonExistingCase() {
+    public void testSetVariableOnNonExistingCase() {
         this.expectedException.expect(FlowableObjectNotFoundException.class);
         this.expectedException.expectMessage("No case instance found for id NON-EXISTING-CASE");
 
@@ -253,7 +253,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void setVariableWithoutName() {
+    public void testSetVariableWithoutName() {
         this.expectedException.expect(FlowableIllegalArgumentException.class);
         this.expectedException.expectMessage("variable name is null");
 
@@ -262,7 +262,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void setVariableOnRootCaseWithExpression() {
+    public void testSetVariableOnRootCaseWithExpression() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .variable("varToUpdate", "initialValue")
                 .caseDefinitionKey("oneHumanTaskCase")
@@ -283,7 +283,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
             "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn",
             "org/flowable/cmmn/test/runtime/VariablesTest.rootProcess.cmmn"
     })
-    public void setVariableOnSubCase() {
+    public void testSetVariableOnSubCase() {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("rootCase")
                 .start();
@@ -300,7 +300,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void setVariablesOnRootCase() {
+    public void testSetVariablesOnRootCase() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .variable("varToUpdate", "initialValue")
                 .caseDefinitionKey("oneHumanTaskCase")
@@ -319,7 +319,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void setVariablesOnNonExistingCase() {
+    public void testSetVariablesOnNonExistingCase() {
         this.expectedException.expect(FlowableObjectNotFoundException.class);
         this.expectedException.expectMessage("No case instance found for id NON-EXISTING-CASE");
         Map<String, Object> variables = Stream.of(new ImmutablePair<String, Object>("varToUpdate", "newValue")).collect(
@@ -332,7 +332,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
     @SuppressWarnings("unchecked")
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void setVariablesWithEmptyMap() {
+    public void testSetVariablesWithEmptyMap() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .variable("varToUpdate", "initialValue")
                 .caseDefinitionKey("oneHumanTaskCase")
@@ -349,7 +349,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
             "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn",
             "org/flowable/cmmn/test/runtime/VariablesTest.rootProcess.cmmn"
     })
-    public void setVariablesOnSubCase() {
+    public void testSetVariablesOnSubCase() {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("rootCase")
                 .start();
@@ -362,7 +362,25 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 includeCaseVariables().
                 singleResult();
         assertThat(updatedCaseInstance.getCaseVariables(), is(variables));
-}
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void testIncludeVariablesWithSerializableVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneHumanTaskCase")
+            .variable("myVar", new CustomTestVariable("test", 123))
+            .start();
+
+        CaseInstance caseInstanceWithVariables = cmmnRuntimeService.createCaseInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .includeCaseVariables()
+            .singleResult();
+
+        CustomTestVariable customTestVariable = (CustomTestVariable) caseInstanceWithVariables.getCaseVariables().get("myVar");
+        assertEquals("test", customTestVariable.someValue);
+        assertEquals(123, customTestVariable.someInt);
+    }
 
     // Test helper classes
 
@@ -396,6 +414,17 @@ public class VariablesTest extends FlowableCmmnTestCase {
             planItemInstance.setTransientVariable("transientVar", variableValue + " and delegate");
         }
         
+    }
+
+    public static class CustomTestVariable implements Serializable {
+
+        private String someValue;
+        private int someInt;
+
+        public CustomTestVariable(String someValue, int someInt) {
+            this.someValue = someValue;
+            this.someInt = someInt;
+        }
     }
 
 }

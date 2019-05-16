@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,14 +46,14 @@ public class ProcessDefinitionImageResource extends BaseProcessDefinitionResourc
             @ApiResponse(code = 200, message = "Indicates request was successful and the process-definitions are returned"),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
-    @GetMapping("/repository/process-definitions/{processDefinitionId}/image")
+    @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/image", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
         ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
         InputStream imageStream = repositoryService.getProcessDiagram(processDefinition.getId());
 
         if (imageStream != null) {
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Content-Type", "image/png");
+            responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
             try {
                 return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
             } catch (Exception e) {

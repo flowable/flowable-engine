@@ -1,0 +1,246 @@
+[[_general_flowable_rest_principles]]
+=== Flowable REST一般原则
+
+[[_installation_and_authentication]]
+==== 安装与认证
+
+Flowable为Flowable引擎提供了REST API，可以通过在servlet容器（如Apache Tomcat）中部署flowable-rest.war文件来安装。另外，也可以通过在应用中引入servlet（包括对应的映射），并将所有flowable-rest的依赖加入classpath的方式使用。
+
+默认情况下Flowable引擎会连接至一个H2内存数据库。可以通过__WEB-INF/META-INF/flowable-app__文件夹下的flowable-app.properties文件修改数据库设置。REST API使用JSON格式( http://www.json.org )，并基于Spring MVC( http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html )构建。
+
+默认情况下访问任何REST资源都需要具有__rest-access-api__权限的合法用户。如果需要任何合法用户都可以访问REST API，可以将__flowable.rest.app.authentication-mode__设置为__any-user__（这也是之前版本Flowable的默认设置）。
+
+通过如下参数设置可以访问REST API的默认用户：
+
+----
+flowable.rest.app.admin.user-id=rest-admin
+flowable.rest.app.admin.password=test
+flowable.rest.app.admin.first-name=Rest
+flowable.rest.app.admin.last-name=Admin
+----
+
+当REST应用启动时，如果用户不存在或无法找到，则会创建该用户。这个用户会被赋予访问REST API所需的__access-rest-api__权限。**请不要忘记修改这个用户的密码**。如果未设置__flowable.rest.app.admin.user-id__，则不会创建用户或权限。也因为此，在初始化完成后删除这些参数，并不会删除之前已经配置的用户或权限。
+
+使用基础HTTP访问认证，因此在请求时，需要在HTTP-header中添加 __Authorization: Basic ...==__ 。也可以在请求url中包含用户名与密码（如 __http://username:password@localhost:8080/xyz__）。
+
+**建议使用基础认证时，同时使用HTTPS。**
+
+[[_configuration_2]]
+==== 配置
+
+Flowable REST web应用使用Spring Java Configuration来启动Flowable引擎，使用Spring security定义基础认证安全，并为为特定的变量处理定义了变量转换。
+有少量参数可以通过修改WEB-INF/classes文件夹下的engine.properties文件定义。
+如果需要高级配置选项，可以在flowable-custom-context.xml文件中覆盖默认的Spring bean，这个文件也在WEB-INF/classes文件夹下。
+该文件中已经以注释形式提供了示例配置。也可以在该文件中定义一个新的命名为restResponsefactory的Spring bean，覆盖默认的RestResponseFactory，并使用自定义实现类。
+
+[[restUsageInTomcat]]
+==== 在Tomcat中使用
+
+
+由于link:$$http://tomcat.apache.org/tomcat-8.0-doc/security-howto.html$$[Tomcat中的默认安全参数]，**默认不能使用转义斜线符（++%2F++与++%5C++）（将返回400）。**这可能会影响部署资源与其数据URL，因为URL可能包含转义斜线符。
+
+当发现400异常结果时，可以设置下列系统参数:
+
+__-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true__
+
+最佳实践是（在post/put JSON时），在下面介绍的HTTP请求中，永远将**Accept**与**Content-Type**HTTP头设置为**application/json**。
+
+[[_methods_and_return_codes]]
+==== 方法与返回码
+
+.HTTP方法与对应操作
+[options="header"]
+|===============
+|方法|操作
+|+GET+|获取单个资源，或获取一组资源。
+|+POST+|创建一个新资源。在查询结构太复杂，不能放入GET请求的查询URL中时，也用于执行资源查询。
+|+PUT+|更新一个已有资源的参数。也用于调用已有资源提供的操作。
+|+DELETE+|删除一个已有资源。
+
+|===============
+
+
+.HTTP方法响应码
+[options="header"]
+|===============
+|响应|描述
+|++200 - Ok++|操作成功，返回响应（++GET++与++PUT++请求）。
+|++201 - 已创建++|操作成功，已经创建了实体，并在响应体中返回（++POST++请求）。
+|++204 - 无内容++|操作成功，已经删除了实体，因此没有返回的响应体（++DELETE++请求）。
+|++401 - 未认证++|操作失败。操作要求设置认证头。如果请求中有认证头，则提供的鉴证并不合法，或者用户未被授权进行该操作。
+|++403 - 禁止++|操作被禁止，且不应重试。这不是鉴证或授权的问题，而是说明不允许该操作。例如：无论任何用户或流程/任务的状态，删除一个运行中流程的任务是且永远是不允许的。
+|++404 - 未找到++|操作失败。请求的资源未找到。
+|++405 - 不允许的方法++|操作失败。使用的方法不能用于该资源。例如，更新（PUT）部署资源将返回++405++响应码。
+|++409 - 冲突++|操作失败。该操作导致更新一个已被其他操作更新的资源，因此本更新不再有效。也可以表示正在为一个集合创建一个资源，但该标识符已存在。
+|++415 - 不支持的媒体类型++|操作失败。请求提包含了不支持的媒体类型。也会发生在请求体JSON中包含了未知的属性或值，但没有可用的格式/类型来处理的情况。
+|++500 - 服务器内部错误++|操作失败。执行操作时发生了未知异常。响应体中包含了错误的细节。
+
+|===============
+
+
+HTTP响应的media-type总是++application/json++，除非请求的是二进制内容（例如部署资源数据）。这时将使用内容的media-type。
+
+[[_error_response_body]]
+==== 错误响应体
+
+当发生错误时（可能是客户端或服务器端的错误，4XX及5XX状态码），响应体会包含一个描述了发生的错误的对象。任务未找到时的404状态的例子：
+
+[source,json,linenums]
+----
+{
+  "statusCode" : 404,
+  "errorMessage" : "Could not find a task with id '444'."
+}
+----
+
+[[_request_parameters]]
+==== 请求参数
+
+[[_url_fragments]]
+===== URL片段
+
+作为url的一部分的参数（例如，++http://host/flowable-rest/service/repository/deployments/{deploymentId}++中的deploymentId参数），如果包含特殊字符，则需要进行合适的转义（参见link:$$https://en.wikipedia.org/wiki/Percent-encoding$$[URL编码或百分号编码]）。大多数框架都内建了这个功能，但要记得考虑它。特别是对可能包含斜线符的段落（例如部署资源），就必须要做转义。
+
+[[_rest_url_query_parameters]]
+===== Rest URL查询参数
+
+作为查询字符串添加在URL中的参数（例如++http://host/flowable-rest/service/deployments?name=Deployment++中的name参数）可以使用下列类型。在相应的REST-API文档中也会提到：
+
+
+.URL查询参数类型
+[options="header"]
+|===============
+|类型|格式
+|String|纯文本参数。可以包含任何URL允许的合法字符。对于++XXXLike++参数，字符串可能会包含通配符++%++（需要进行URL编码）。可以进行like搜索，例如，'Tas%'将匹配所有以'Tas'开头的值。
+|Integer|整形参数。只能包含数字型非小数值，在-2.147.483.648至2.147.483.647之间。
+|Long|长整形参数。只能包含数字型非小数值，在-9.223.372.036.854.775.808至9.223.372.036.854.775.807之间。
+|Boolean|boolean型参数。可以为++true++或++false++。任何其他值都会导致'++405 - 错误请求++'响应码。
+|Date|日期型参数。使用ISO-8601日期格式（参考link:$$http://en.wikipedia.org/wiki/ISO_8601$$[wikipedia中的ISO-8601]），使用时间与日期部分（例如++2013-04-03T23:45Z++）。
+
+|===============
+
+
+[[restJsonBody]]
+
+
+===== JSON body 参数
+
+.JSON参数类型
+[options="header"]
+|===============
+|类型|格式
+|String|纯文本参数。对于++XXXLike++参数，字符串可能会包含通配符++%++。可以进行like搜索。例如，'Tas%'将匹配所有以'Tas'开头的值。
+|Integer|整形参数，使用JSON数字。只能包含数字型非小数值，在-2.147.483.648至2.147.483.647之间。
+|Long|长整形参数，使用JSON数字。只能包含数字型非小数值，在-9.223.372.036.854.775.808至9.223.372.036.854.775.807之间。
+|Date|日期型参数，使用JSON文本。使用ISO-8601日期格式（参考link:$$http://en.wikipedia.org/wiki/ISO_8601$$[wikipedia中的ISO-8601]），使用时间与日期组分（例如++2013-04-03T23:45Z++）。
+
+|===============
+
+
+[[restPagingAndSort]]
+
+
+===== 分页与排序
+
+
+分页与排序参数可以作为查询字符串加入URL中（例如++http://host/flowable-rest/service/deployments?sort=name++中的name参数）。
+
+.JSON查询变量参数
+[options="header"]
+|===============
+|参数|默认值|描述
+|sort|各查询实现不同|排序键的名字，在各查询实现中默认值与可用值都不同。
+|order|asc|排序顺序，可以是'asc'（顺序）或'desc'（逆序）。
+|start|0|对结果分页的参数。默认结果从0开始。
+|size|10|对结果分页的参数。默认大小为10.
+
+|===============
+
+[[restQueryVariable]]
+
+
+===== JSON查询变量格式
+
+[source,json,linenums]
+----
+
+{
+  "name" : "variableName",
+  "value" : "variableValue",
+  "operation" : "equals",
+  "type" : "string"
+}
+----
+
+
+.JSON查询变量参数
+[options="header"]
+|===============
+|参数|必填|描述
+|name|否|包含在查询中的变量名。在有些使用'++equals++'的查询中可以为空，查询**任意变量名**为给定值的资源。
+|value|是|包含在查询中的变量值，需要使用给定类型的正确格式。
+|operator|是|查询使用的操作，可以为下列值：++equals, notEquals, equalsIgnoreCase, notEqualsIgnoreCase, lessThan, greaterThan, lessThanOrEquals, greaterThanOrEquals++与++like++。
+|type|否|所用变量的类型。当省略时，会从++value++参数推理类型。任何JSON文本值都使用是++string++类型，JSON boolean值使用++boolean++类型，JSON数字使用++long++或++integer++，取决于数字的大小。建议在有疑惑时明确指定类型。其他支持的类型列在下面。
+
+|===============
+
+
+.默认查询JSON类型
+[options="header"]
+|===============
+|类型名|描述
+|string|值处理转换为++java.lang.String++。
+|short|值处理转换为++java.lang.Integer++。
+|integer|值处理转换为++java.lang.Integer++。
+|long|值处理转换为++java.lang.Long++。
+|double|值处理转换为++java.lang.Double++。
+|boolean|值处理转换为++java.lang.Boolean++。
+|date|值处理转换为++java.util.Date++。JSON字符串将使用ISO-8601日期格式转换。
+
+|===============
+
+
+[[restVariables]]
+
+===== 变量表示
+
+读取与写入变量（执行选择）时，REST API都使用通用原则与JSON格式。变量的JSON表示为：
+
+
+[source,json,linenums]
+----
+{
+  "name" : "variableName",
+  "value" : "variableValue",
+  "valueUrl" : "http://...",
+  "type" : "string"
+}
+----
+
+.变量的JSON属性
+[options="header"]
+|===============
+|参数|必填|描述
+|name|是|变量名。
+|value|否|变量的值。当写入变量且省略了++value++时，会使用++null++作为value。
+|valueUrl|否|当读取++binary++或++serializable++类型的变量时，这个属性将指向可用于获取原始二进制数据的URL。
+|type|否|变量的类型。查看下面的表格了解类型的更多信息。当写入变量且省略了这个值时，将使用请求的原始JSON属性类型推断，限制在++string++, ++double++, ++integer++与++boolean++中。建议总是包含类型，以确保不会错误推断类型。
+
+|===============
+
+.变量类型
+[options="header"]
+|===============
+|类型名|描述
+|string|值按照++java.lang.String++处理。写入变量时使用原始JSON文本。
+|integer|值按照++java.lang.Integer++处理。按约定写入变量时使用JSON数字，失败则退回JSON文本。
+|short|值按照++java.lang.Short++处理。按约定写入变量时使用JSON数字，失败则退回JSON文本。
+|long|值按照++java.lang.Long++处理。按约定写入变量时使用JSON数字，失败则退回JSON文本。
+|double|值按照++java.lang.Double++处理。按约定写入变量时使用JSON数字，失败则退回JSON文本。
+|boolean|值按照++java.lang.Boolean++处理。按约定写入变量时使用JSON boolean。
+|date|值按照++java.util.Date++处理。写入变量时将转换为ISO-8601日期格式。
+
+|===============
+
+
+可以使用自定义JSON表示，以支持额外的变量类型（既可以是简单值，也可以是复杂/嵌套的JSON对象）。通过扩展++org.flowable.rest.service.api.RestResponseFactory++的++initializeVariableConverters()++方法，可以添加额外的++org.flowable.rest.service.api.engine.variable.RestVariableConverter++类，用于将POJO转换为适合通过REST传输的格式，以及将REST值转换为POJO。实际转换JSON使用Jackson。
