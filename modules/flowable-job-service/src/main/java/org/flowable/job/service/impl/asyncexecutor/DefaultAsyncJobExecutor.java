@@ -335,8 +335,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         if (threadPoolQueue != null) {
             return threadPoolQueue.remainingCapacity();
         } else {
-            // return plenty of remaining capacity if there's no thread pool
-            // queue
+            // return plenty of remaining capacity if there's no thread pool queue
             return 99;
         }
     }
