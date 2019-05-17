@@ -1,0 +1,4 @@
+<div ng-controller="FlowableEscalationRefCtrl">
+    <select ng-model="property.value" ng-change="escalationChanged()" ng-options="escalationDefinition.id as (escalationDefinition.name + ' (' + escalationDefinition.id + ')') for escalationDefinition in escalationDefinitions">
+    </select>
+</div>

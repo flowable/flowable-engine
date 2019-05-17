@@ -27,6 +27,7 @@ import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.converter.util.ListenerXmlConverterUtil;
 import org.flowable.cmmn.model.AbstractFlowableHttpHandler;
 import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.ChildTask;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.DecisionTask;
@@ -75,22 +76,22 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                 if (xtr.isStartElement()) {
                     if (CmmnXmlConstants.ELEMENT_COMPLETION_NEUTRAL_RULE.equals(xtr.getLocalName())) {
                         readCompletionNeutralRule(xtr, conversionHelper);
-                        
+
                     } else if (CmmnXmlConstants.ELEMENT_FIELD.equals(xtr.getLocalName())) {
                         readFieldExtension(xtr, conversionHelper);
-                        
+
                     } else if (CmmnXmlConstants.ELEMENT_HTTP_REQUEST_HANDLER.equals(xtr.getLocalName())) {
                         readHttpRequestHandler(xtr, conversionHelper);
-                        
+
                     } else if (CmmnXmlConstants.ELEMENT_HTTP_RESPONSE_HANDLER.equals(xtr.getLocalName())) {
                         readHttpResponseHandler(xtr, conversionHelper);
-                        
-                    } else if (CmmnXmlConstants.ELEMENT_PROCESS_TASK_IN_PARAMETERS.equals(xtr.getLocalName())) {
+
+                    } else if (CmmnXmlConstants.ELEMENT_CHILD_TASK_IN_PARAMETERS.equals(xtr.getLocalName())) {
                         readIOParameter(xtr, true, conversionHelper);
-                        
-                    } else if (CmmnXmlConstants.ELEMENT_PROCESS_TASK_OUT_PARAMETERS.equals(xtr.getLocalName())) {
+
+                    } else if (CmmnXmlConstants.ELEMENT_CHILD_TASK_OUT_PARAMETERS.equals(xtr.getLocalName())) {
                         readIOParameter(xtr, false, conversionHelper);
-                        
+
                     } else if (CmmnXmlConstants.ELEMENT_TASK_LISTENER.equals(xtr.getLocalName())) {
                         readTaskListener(xtr, conversionHelper);
 
@@ -101,7 +102,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                         ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
                         conversionHelper.getCurrentCmmnElement().addExtensionElement(extensionElement);
                     }
-                    
+
                 } else if (xtr.isEndElement()) {
                     if (CmmnXmlConstants.ELEMENT_TASK_LISTENER.equalsIgnoreCase(xtr.getLocalName())
                         || CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())) {
@@ -116,7 +117,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             LOGGER.error("Error processing CMMN document", ex);
             throw new XMLException("Error processing CMMN document", ex);
         }
-   
+
         return null;
     }
 
@@ -127,9 +128,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
             PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
             planItemControl.setCompletionNeutralRule(completionNeutralRule);
-            
+
             readCommonXmlInfo(completionNeutralRule, xtr);
-            
+
             boolean readyWithChildElements = false;
             try {
 
@@ -142,8 +143,8 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                                 completionNeutralRule.setCondition(xtr.getText());
                             }
                             break;
-                        } 
-                        
+                        }
+
                     } else if (xtr.isEndElement()) {
                         if (CmmnXmlConstants.ELEMENT_COMPLETION_NEUTRAL_RULE.equalsIgnoreCase(xtr.getLocalName())) {
                             readyWithChildElements = true;
@@ -157,7 +158,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             }
         }
     }
-    
+
     protected void readFieldExtension(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         BaseElement cmmnElement = conversionHelper.getCurrentCmmnElement();
 
@@ -206,7 +207,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
         }
     }
-    
+
     protected void readHttpRequestHandler(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         BaseElement cmmnElement = conversionHelper.getCurrentCmmnElement();
         if (!(cmmnElement instanceof HttpServiceTask)) {
@@ -218,7 +219,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
         ((HttpServiceTask) cmmnElement).setHttpRequestHandler(requestHandler);
     }
-    
+
     protected void readHttpResponseHandler(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         BaseElement cmmnElement = conversionHelper.getCurrentCmmnElement();
         if (!(cmmnElement instanceof HttpServiceTask)) {
@@ -230,13 +231,14 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
         ((HttpServiceTask) cmmnElement).setHttpResponseHandler(responseHandler);
     }
-    
+
     protected void readIOParameter(XMLStreamReader xtr, boolean isInParameter, ConversionHelper conversionHelper) {
-        if (!(conversionHelper.getCurrentCmmnElement() instanceof ProcessTask)) {
+        CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+        if (!(currentCmmnElement instanceof ChildTask)) {
             return;
         }
-        
-        ProcessTask processTask = (ProcessTask) conversionHelper.getCurrentCmmnElement();
+
+        ChildTask childTask = (ChildTask) currentCmmnElement;
         String source = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
         String sourceExpression = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
         String target = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
@@ -257,9 +259,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         }
 
         if (isInParameter) {
-            processTask.getInParameters().add(parameter);
+            childTask.getInParameters().add(parameter);
         } else {
-            processTask.getOutParameters().add(parameter);
+            childTask.getOutParameters().add(parameter);
         }
     }
 
@@ -295,7 +297,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         conversionHelper.setCurrentCmmnElement(flowableListener);
 
     }
-    
+
     protected void setImplementation(XMLStreamReader xtr, AbstractFlowableHttpHandler handler) {
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_CLASS))) {
             handler.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_CLASS));
@@ -306,7 +308,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             handler.setImplementationType(IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
         }
     }
-    
+
     protected void readCommonXmlInfo(BaseElement baseElement, XMLStreamReader xtr) {
         baseElement.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));
         Location location = xtr.getLocation();

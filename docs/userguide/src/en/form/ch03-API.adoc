@@ -103,7 +103,7 @@ See the +FormDeploymentAnnotation+ class for more information.
 When writing JUnit 4 unit tests, the +org.flowable.form.engine.test.FlowableFormRule+ Rule can be used. Through this rule, the Form engine and services are available through getters. Including this +Rule+ will enable the use of the +org.flowable.form.engine.test.FormDeploymentAnnotation+ annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. Form engines are statically cached over multiple unit tests when using the same configuration resource.
 It's also possible to provide a custom engine configuration to the rule.
 
-The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the +FlowableFormRule+ (and passing an optional custom configuration)
+The following code snippet shows an example of using the JUnit 5 style of testing.
 
 .JUnit 5 test
 [source,java,linenums]

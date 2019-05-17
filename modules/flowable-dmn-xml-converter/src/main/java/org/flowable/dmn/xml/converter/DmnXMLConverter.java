@@ -59,6 +59,7 @@ import org.xml.sax.SAXException;
  * @author Tijs Rademakers
  * @author Yvo Swillens
  * @author Bassam Al-Sarori
+ * @author Zheng Ji
  */
 public class DmnXMLConverter implements DmnXMLConstants {
 
@@ -165,11 +166,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
         return schema;
     }
 
-    public DmnDefinition convertToDmnModel(InputStreamProvider inputStreamProvider, boolean validateSchema, boolean enableSafeBpmnXml) {
-        return convertToDmnModel(inputStreamProvider, validateSchema, enableSafeBpmnXml, DEFAULT_ENCODING);
+    public DmnDefinition convertToDmnModel(InputStreamProvider inputStreamProvider, boolean validateSchema, boolean enableSafeDmnXml) {
+        return convertToDmnModel(inputStreamProvider, validateSchema, enableSafeDmnXml, DEFAULT_ENCODING);
     }
 
-    public DmnDefinition convertToDmnModel(InputStreamProvider inputStreamProvider, boolean validateSchema, boolean enableSafeBpmnXml, String encoding) {
+    public DmnDefinition convertToDmnModel(InputStreamProvider inputStreamProvider, boolean validateSchema, boolean enableSafeDmnXml, String encoding) {
         XMLInputFactory xif = XMLInputFactory.newInstance();
 
         if (xif.isPropertySupported(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES)) {
@@ -186,7 +187,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
         if (validateSchema) {
             try (InputStreamReader in = new InputStreamReader(inputStreamProvider.getInputStream(), encoding)) {
-                if (!enableSafeBpmnXml) {
+                if (!enableSafeDmnXml) {
                     validateModel(inputStreamProvider);
                 } else {
                     validateModel(xif.createXMLStreamReader(in));
@@ -484,8 +485,8 @@ public class DmnXMLConverter implements DmnXMLConstants {
             return outputStream.toByteArray();
 
         } catch (Exception e) {
-            LOGGER.error("Error writing BPMN XML", e);
-            throw new DmnXMLException("Error writing BPMN XML", e);
+            LOGGER.error("Error writing DMN XML", e);
+            throw new DmnXMLException("Error writing DMN XML", e);
         }
     }
 }

@@ -300,6 +300,7 @@ public abstract class AbstractEngineConfiguration {
         databaseTypeMappings.setProperty("H2", DATABASE_TYPE_H2);
         databaseTypeMappings.setProperty("HSQL Database Engine", DATABASE_TYPE_HSQL);
         databaseTypeMappings.setProperty("MySQL", DATABASE_TYPE_MYSQL);
+        databaseTypeMappings.setProperty("MariaDB", DATABASE_TYPE_MYSQL);
         databaseTypeMappings.setProperty("Oracle", DATABASE_TYPE_ORACLE);
         databaseTypeMappings.setProperty(PRODUCT_NAME_POSTGRES, DATABASE_TYPE_POSTGRES);
         databaseTypeMappings.setProperty("Microsoft SQL Server", DATABASE_TYPE_MSSQL);

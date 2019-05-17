@@ -1,0 +1,1023 @@
+
+[[springSpringBoot]]
+
+
+=== Spring Boot
+
+Spring Boot是一个应用框架。按照link:$$http://projects.spring.io/spring-boot/$$[其官网]的介绍，可以__轻松地创建独立运行的，生产级别的，基于Spring的应用，并且可以“直接运行”。它基于约定大于配置的原则使用Spring框架与第三方库，使你可以轻松地开始使用。大多数Spring Boot应用只需要很少的Spring配置__。
+
+要获得更多关于Spring Boot的信息，请查阅link:$$http://projects.spring.io/spring-boot/$$[http://projects.spring.io/spring-boot/]
+
+Flowable与Spring Boot的集成是我们与Spring的提交者共同开发的。
+
+[[_compatibility]]
+==== 兼容性
+
+Flowable使用同一个starter支持Spring Boot 2.0及1.5。主要支持Spring Boot 2.0。所以监控(actuator) endpoint只支持2.0。Flowable的starter直接引用Spring Boot starter，所以如果需要使用1.5版的Spring Boot starter，需要自行定义。
+
+[[_getting_started_2]]
+==== 开始
+
+Spring Boot提倡约定大于配置。要开始工作，只需在项目中添加__flowable-spring-boot-starter__或__flowable-spring-boot-starter-rest__依赖。如果不需要引入所有的引擎，可以查看其它的<<springBootFlowableStarter, Flowable starter>>。
+如使用Maven：
+
+
+[source,xml,linenums]
+----
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter</artifactId>
+    <version>${flowable.version}</version>
+</dependency>
+----
+
+就这么简单。这个依赖会自动向classpath添加正确的Flowable与Spring依赖。现在可以编写Spring Boot应用了：
+
+[source,java,,linenums]
+----
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MyApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MyApplication.class, args);
+    }
+
+}
+----
+
+Flowable需要数据库来存储数据。运行上面的代码会得到异常提示，指出需要在classpath中添加数据库驱动依赖。现在添加H2数据库依赖：
+
+[source,xml,linenums]
+----
+<dependency>
+	<groupId>com.h2database</groupId>
+	<artifactId>h2</artifactId>
+	<version>1.4.197</version>
+</dependency>
+----
+
+应用这次可以启动了。你会看到类似这样的输出：
+
+----
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.0.0.RELEASE)
+
+MyApplication                            : Starting MyApplication on ...
+MyApplication                            : No active profile set, falling back to default profiles: default
+ConfigServletWebServerApplicationContext : Refreshing org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4fdfa676: startup date [Wed Mar 28 12:04:00 CEST 2018]; root of context hierarchy
+o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/8.5.28
+o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 3085 ms
+o.s.b.w.servlet.ServletRegistrationBean  : Servlet dispatcherServlet mapped to [/]
+o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable IDM Rest API mapped to [/idm-api/*]
+o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable Form Rest API mapped to [/form-api/*]
+o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable DMN Rest API mapped to [/dmn-api/*]
+o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable Content Rest API mapped to [/content-api/*]
+o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable CMMN Rest API mapped to [/cmmn-api/*]
+o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable BPMN Rest API mapped to [/process-api/*]
+o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'characterEncodingFilter' to: [/*]
+o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'httpPutFormContentFilter' to: [/*]
+o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'requestContextFilter' to: [/*]
+uration$$EnhancerBySpringCGLIB$$3d0c70ac : No deployment resources were found for autodeployment
+uration$$EnhancerBySpringCGLIB$$8131eb1a : No deployment resources were found for autodeployment
+o.f.e.i.c.ProcessEngineConfigurationImpl : Found 5 Engine Configurators in total:
+o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
+com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+.d.AbstractSqlScriptBasedDbSchemaManager : performing create on identity with resource org/flowable/idm/db/create/flowable.h2.create.identity.sql
+o.f.idm.engine.impl.IdmEngineImpl        : IdmEngine default created
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
+o.f.dmn.engine.impl.DmnEngineImpl        : DmnEngine default created
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
+o.f.form.engine.impl.FormEngineImpl      : FormEngine default created
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
+o.f.c.engine.ContentEngineConfiguration  : Content file system root : ...
+o.f.c.engine.impl.ContentEngineImpl      : ContentEngine default created
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : Found 1 Engine Configurators in total:
+o.f.cmmn.engine.CmmnEngineConfiguration  : class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : Executing beforeInit() of class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : Executing configure() of class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
+o.f.idm.engine.impl.IdmEngineImpl        : IdmEngine default created
+o.f.cmmn.engine.impl.CmmnEngineImpl      : CmmnEngine default created
+o.f.engine.impl.ProcessEngineImpl        : ProcessEngine default created
+o.f.j.s.i.a.AbstractAsyncExecutor        : Starting up the async job executor [org.flowable.spring.job.service.SpringAsyncExecutor].
+o.f.j.s.i.a.AcquireAsyncJobsDueRunnable  : starting to acquire async jobs due
+o.f.j.s.i.a.AcquireTimerJobsRunnable     : starting to acquire async jobs due
+o.f.j.s.i.a.ResetExpiredJobsRunnable     : starting to reset expired jobs
+o.f.e.impl.cmd.ValidateV5EntitiesCmd     : Total of v5 deployments found: 0
+s.w.s.m.m.a.RequestMappingHandlerAdapter : Looking for @ControllerAdvice: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4fdfa676: startup date [Wed Mar 28 12:04:00 CEST 2018]; root of context hierarchy
+s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error],produces=[text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.errorHtml(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)
+o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/**/favicon.ico] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
+o.s.j.e.a.AnnotationMBeanExporter        : Bean with name 'dataSource' has been autodetected for JMX exposure
+o.s.j.e.a.AnnotationMBeanExporter        : Located MBean 'dataSource': registering with JMX server as MBean [com.zaxxer.hikari:name=dataSource,type=HikariDataSource]
+o.s.c.support.DefaultLifecycleProcessor  : Starting beans in phase -20
+o.s.c.support.DefaultLifecycleProcessor  : Starting beans in phase 0
+o.s.c.support.DefaultLifecycleProcessor  : Starting beans in phase 20
+o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+flowable.Application                     : Started Application in 18.235 seconds (JVM running for 19.661)
+----
+
+只是在classpath中添加依赖，并使用__@SpringBootAplication__注解，就会在幕后发生很多事情：
+
+* 自动创建了内存数据库（因为classpath中有H2驱动），并传递给Flowable流程引擎配置
+* 创建并暴露了Flowable的ProcessEngine、CmmnEngine、DmnEngine、FormEngine、ContentEngine及IdmEngine bean
+* 所有的Flowable服务都暴露为Spring bean
+* 创建了Spring Job Executor
+
+并且：
+
+* __processes__目录下的任何BPMN 2.0流程定义都会被自动部署。创建__processes__目录，并在其中创建示例流程定义（命名为__one-task-process.bpmn20.xml__）。
+* __cases__目录下的任何CMMN 1.1事例都会被自动部署。
+* __forms__目录下的任何Form定义都会被自动部署。
+
+[source,xml,linenums]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="Examples">
+
+    <process id="oneTaskProcess" name="The One Task Process">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+        <userTask id="theTask" name="my task" />
+        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+
+</definitions>
+----
+
+然后添加下列代码，以测试部署是否生效。__CommandLineRunner__是一个特殊的Spring bean，在应用启动时执行：
+
+[source,java,linenums]
+----
+@SpringBootApplication
+public class MyApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MyApplication.class, args);
+    }
+
+    @Bean
+    public CommandLineRunner init(final RepositoryService repositoryService,
+                                  final RuntimeService runtimeService,
+                                  final TaskService taskService) {
+
+        return new CommandLineRunner() {
+            @Override
+            public void run(String... strings) throws Exception {
+                System.out.println("Number of process definitions : " 
+                	+ repositoryService.createProcessDefinitionQuery().count());
+                System.out.println("Number of tasks : " + taskService.createTaskQuery().count());
+                runtimeService.startProcessInstanceByKey("oneTaskProcess");
+                System.out.println("Number of tasks after process start: " 
+                    + taskService.createTaskQuery().count());
+            }
+        };
+    }
+}
+----
+
+会得到这样的输出：
+
+----
+Number of process definitions : 1
+Number of tasks : 0
+Number of tasks after process start : 1
+----
+
+[[_changing_the_database_and_connection_pool]]
+==== 更换数据源与连接池
+
+上面也提到过，Spring Boot的约定大于配置。默认情况下，如果classpath中只有H2，就会创建内存数据库，并传递给Flowable流程引擎配置。
+
+只要添加一个数据库驱动的依赖并提供数据库URL，就可以更换数据源。例如，要切换到MySQL数据库：
+
+[source,linenums]
+----
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable-spring-boot?characterEncoding=UTF-8
+spring.datasource.username=flowable
+spring.datasource.password=flowable
+----
+
+从Maven依赖中移除H2，并在classpath中添加MySQL驱动：
+
+[source,xml,linenums]
+----
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>5.1.45</version>
+</dependency>
+----
+
+这次应用启动后，可以看到使用了MySQL作为数据库（并使用HikariCP连接池框架）：
+
+----
+org.flowable.engine.impl.db.DbSqlSession   : performing create on engine with resource org/flowable/db/create/flowable.mysql.create.engine.sql
+org.flowable.engine.impl.db.DbSqlSession   : performing create on history with resource org/flowable/db/create/flowable.mysql.create.history.sql
+org.flowable.engine.impl.db.DbSqlSession   : performing create on identity with resource org/flowable/db/create/flowable.mysql.create.identity.sql
+----
+
+多次重启应用，会发现任务的数量增加了（H2内存数据库在关闭后会丢失，而MySQL不会）。
+
+关于配置数据源的更多信息，可以在Spring Boot的参考手册中link:$$https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-sql.html#boot-features-configure-datasource$$[Configure a DataSource(配置数据源)]章节查看。
+
+[[_rest_support]]
+==== REST 支持
+
+通常会在嵌入的Flowable引擎之上，使用REST API（用于与公司的不同服务交互）。Spring Boot让这变得很容易。在classpath中添加下列依赖：
+
+[source,xml,linenums]
+----
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <version>${spring.boot.version}</version>
+</dependency>
+----
+
+创建一个新的Spring服务类，并创建两个方法：一个用于启动流程，另一个用于获得给定任务办理人的任务列表。在这里只是简单地包装了Flowable调用，但在实际使用场景中会比这复杂得多。
+
+
+[source,java,linenums]
+----
+@Service
+public class MyService {
+
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private TaskService taskService;
+
+    @Transactional
+    public void startProcess() {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    }
+
+    @Transactional
+    public List<Task> getTasks(String assignee) {
+        return taskService.createTaskQuery().taskAssignee(assignee).list();
+    }
+
+}
+----
+
+现在可以用__@RestController__来注解类，以创建REST endpoint。在这里我们简单地调用上面定义的服务。
+
+[source,java,linenums]
+----
+@RestController
+public class MyRestController {
+
+    @Autowired
+    private MyService myService;
+
+    @RequestMapping(value="/process", method= RequestMethod.POST)
+    public void startProcessInstance() {
+        myService.startProcess();
+    }
+
+    @RequestMapping(value="/tasks", method= RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+    public List<TaskRepresentation> getTasks(@RequestParam String assignee) {
+        List<Task> tasks = myService.getTasks(assignee);
+        List<TaskRepresentation> dtos = new ArrayList<TaskRepresentation>();
+        for (Task task : tasks) {
+            dtos.add(new TaskRepresentation(task.getId(), task.getName()));
+        }
+        return dtos;
+    }
+
+    static class TaskRepresentation {
+
+        private String id;
+        private String name;
+
+        public TaskRepresentation(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        
+        public String getId() {
+            return id;
+        }
+        public void setId(String id) {
+            this.id = id;
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+
+    }
+
+}
+----
+
+Spring Boot会自动扫描组件，并找到我们添加在应用类上的__@Service__与__@RestController__。再次运行应用，现在可以与REST API交互了。例如使用cURL：
+
+
+----
+curl http://localhost:8080/tasks?assignee=kermit
+[]
+
+curl -X POST  http://localhost:8080/process
+curl http://localhost:8080/tasks?assignee=kermit
+[{"id":"10004","name":"my task"}]
+----
+
+[[_jpa_support]]
+==== JPA 支持
+
+要为Spring Boot中的Flowable添加JPA支持，增加下列依赖：
+
+[source,xml,linenums]
+----
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter</artifactId>
+    <version>${flowable.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+    <version>${spring-boot.version</version>
+</dependency>
+----
+
+这会加入JPA用的Spring配置以及bean。默认使用Hibernate作为JPA提供者。
+
+创建一个简单的实体类：
+
+[source,java,linenums]
+----
+@Entity
+class Person {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String username;
+
+    private String firstName;
+
+    private String lastName;
+
+    private Date birthDate;
+
+    public Person() {
+    }
+
+    public Person(String username, String firstName, String lastName, Date birthDate) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+}
+----
+
+默认情况下，如果没有使用内存数据库则不会自动创建数据库表。在classpath中创建__application.properties__文件并加入下列参数：
+
+----
+spring.jpa.hibernate.ddl-auto=update
+----
+
+添加下列类：
+
+[source,java,linenums]
+----
+@Repository
+public interface PersonRepository extends JpaRepository<Person, Long> {
+
+    Person findByUsername(String username);
+}
+----
+
+这是一个Spring repository，提供了直接可用的增删改查。我们添加了通过username查找Person的方法。Spring会基于约定自动实现它（也就是使用names属性）。
+
+现在进一步增强我们的服务：
+
+* 在类上添加__@Transactional__。请注意，通过上面添加的JPA依赖，之前使用的DataSourceTransactionManager会自动替换为JpaTransactionManager。
+* __startProcess__增加了任务办理人入参，用于查找Person，并将Person JPA对象作为流程变量存入流程实例。
+* 添加了创建示例用户的方法。CommandLineRunner使用它打桩数据库。
+
+[source,java,linenums]
+----
+@Service
+@Transactional
+public class MyService {
+
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private TaskService taskService;
+
+    @Autowired
+    private PersonRepository personRepository;
+
+    public void startProcess(String assignee) {
+
+        Person person = personRepository.findByUsername(assignee);
+
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("person", person);
+        runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    }
+
+    public List<Task> getTasks(String assignee) {
+        return taskService.createTaskQuery().taskAssignee(assignee).list();
+    }
+
+    public void createDemoUsers() {
+        if (personRepository.findAll().size() == 0) {
+            personRepository.save(new Person("jbarrez", "Joram", "Barrez", new Date()));
+            personRepository.save(new Person("trademakers", "Tijs", "Rademakers", new Date()));
+        }
+    }
+
+}
+----
+
+CommandLineRunner现在为：
+
+[source,java,linenums]
+----
+@Bean
+public CommandLineRunner init(final MyService myService) {
+
+    return new CommandLineRunner() {
+    	public void run(String... strings) throws Exception {
+        	myService.createDemoUsers();
+        }
+    };
+}
+----
+
+RestController也有小改动（只展示新方法），以配合上面的修改。HTTP POST使用body传递办理人用户名：
+
+[source,java,linenums]
+----
+@RestController
+public class MyRestController {
+
+    @Autowired
+    private MyService myService;
+
+    @RequestMapping(value="/process", method= RequestMethod.POST)
+    public void startProcessInstance(@RequestBody StartProcessRepresentation startProcessRepresentation) {
+        myService.startProcess(startProcessRepresentation.getAssignee());
+    }
+
+   ...
+
+    static class StartProcessRepresentation {
+
+        private String assignee;
+
+        public String getAssignee() {
+            return assignee;
+        }
+
+        public void setAssignee(String assignee) {
+            this.assignee = assignee;
+        }
+    }
+----
+
+最后，为了试用Spring-JPA-Flowable集成，我们在流程定义中，将Person JPA对象的ID指派为任务办理人：
+
+[source,xml,linenums]
+----
+<userTask id="theTask" name="my task" flowable:assignee="${person.id}"/>
+----
+
+现在可以在POST body中提供用户名，启动一个新的流程实例：
+
+----
+curl -H "Content-Type: application/json" -d '{"assignee" : "jbarrez"}' http://localhost:8080/process
+----
+
+可以使用Person id获取任务列表：
+
+----
+curl http://localhost:8080/tasks?assignee=1
+
+[{"id":"12505","name":"my task"}]
+----
+
+[[springBootActuatorEndpoint]]
+==== Flowable Actuator Endpoint
+
+Flowable提供了Spring Boot Actuator Endpoint，以提供正在运行的流程的信息。
+默认情况下 `flowable` 端点映射至 `/actuator/flowable` 。
+Spring Boot默认只提供 `info` 与 `health` 端点。要启用 `flowable` 端点，需要在 `application.properties` 中添加 `management.endpoint.flowable.enabled=true` 。
+
+`curl http://localhost:8080/actuator/flowable`
+
+[source,json]
+----
+
+{
+  "completedTaskCountToday": 0,
+  "deployedProcessDefinitions": [
+    "oneTaskProcess (v1)"
+  ],
+  "processDefinitionCount": 1,
+  "cachedProcessDefinitionCount": 0,
+  "runningProcessInstanceCount": {
+    "oneTaskProcess (v1)": 0
+  },
+  "completedTaskCount": 2,
+  "completedActivities": 3,
+  "completedProcessInstanceCount": {
+    "oneTaskProcess (v1)": 0
+  },
+  "openTaskCount": 0
+}
+----
+
+
+要了解Spring Boot Actuator的更多信息，可以在Spring Boot参考手册中查看link:$$https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html$$[Production Ready Endpoint(生产可用的端点)]。
+
+[[springBootInfoContributor]]
+==== Flowable Info Contributor
+
+Flowable也提供了Spring Boot的 `InfoContributor` ：
+
+`curl http://localhost:8080/actuator/info`
+
+[source,json]
+----
+{
+  "flowable": {
+    "version": "6.3.0.1"
+  }
+}
+----
+
+[[springBootFlowableProperties]]
+==== 配置Flowable应用
+
+Flowable会自动配置用于控制Spring Boot的参数与配置。参见Spring Boot参考手册中的link:$$https://docs.spring.io/spring-boot/docs/current/reference/html/howto-properties-and-configuration.html$$[Properties and Configuration(参数与配置)]。
+
+下面是Flowable Spring Boot支持的配置参数列表。
+
+[source,properties,indent=0,subs="verbatim,attributes,macros"]
+----
+
+# ===================================================================
+# Common Flowable Spring Boot Properties
+# 通用Flowable Spring Boot参数
+#
+# This sample file is provided as a guideline. Do NOT copy it in its
+# entirety to your own application.	           ^^^
+# 本示例文件只作为指导。请不要直接拷贝至你自己的应用中。
+# ===================================================================
+
+# Core (Process) {sc-flowable-boot}/FlowableProperties.java[FlowableProperties]
+# 核心（流程）
+flowable.check-process-definitions=true # 是否需要自动部署流程定义。
+flowable.custom-mybatis-mappers= # 需要添加至引擎的自定义Mybatis映射的FQN。
+flowable.custom-mybatis-x-m-l-mappers= # 需要添加至引擎的自定义Mybatis XML映射的路径。
+flowable.database-schema= # 如果数据库返回的元数据不正确，可以在这里设置schema用于检测/生成表。
+flowable.database-schema-update=true # 数据库schema更新策略。
+flowable.db-history-used=true # 是否要使用db历史。
+flowable.deployment-name=SpringBootAutoDeployment # 自动部署的名称。
+flowable.history-level=audit # 要使用的历史级别。
+flowable.process-definition-location-prefix=classpath*:/processes/ # 自动部署时查找流程的目录。
+flowable.process-definition-location-suffixes=**.bpmn20.xml,**.bpmn # 'processDefinitionLocationPrefix'路径下需要部署的文件的后缀（扩展名）。
+
+# Process {sc-flowable-boot}/process/FlowableProcessProperties.java[FlowableProcessProperties]
+# 流程
+flowable.process.definition-cache-limit=-1 # 流程定义缓存中保存流程定义的最大数量。默认值为-1（缓存所有流程定义）。
+flowable.process.enable-safe-xml=true # 在解析BPMN XML文件时进行额外检查。参见 https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml 。不幸的是，部分平台（JDK 6，JBoss）上无法使用这个功能，因此如果你所用的平台在XML解析时不支持StaxSource，需要禁用这个功能。
+flowable.process.servlet.load-on-startup=-1 # 启动时加载Process servlet。
+flowable.process.servlet.name=Flowable BPMN Rest API # Process servlet的名字。
+flowable.process.servlet.path=/process-api # Process servelet的context path。
+
+# Process Async Executor
+# 流程异步执行器
+flowable.process.async-executor-activate=true # 是否启用异步执行器。
+flowable.process.async.executor.async-job-lock-time-in-millis=300000 # 异步作业在被异步执行器取走后的锁定时间（以毫秒计）。在这段时间内，其它异步执行器不会尝试获取及锁定这个任务。
+flowable.process.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # 异步作业获取线程在进行下次获取查询前的等待时间（以毫秒计）。只在当次没有取到新的异步作业，或者只取到很少的异步作业时生效。默认值 = 10秒。
+flowable.process.async.executor.default-queue-size-full-wait-time-in-millis=0 # 异步作业（包括定时器作业与异步执行）获取线程在队列满时，等待执行下次查询的等待时间（以毫秒计）。默认值为0（以向后兼容）
+flowable.process.async.executor.default-timer-job-acquire-wait-time-in-millis=10000 # 定时器作业获取线程在进行下次获取查询前的等待时间（以毫秒计）。只在当次没有取到新的定时器作业，或者只取到很少的定时器作业时生效。默认值 = 10秒。
+flowable.process.async.executor.max-async-jobs-due-per-acquisition=1 # （译者补）单次查询的异步作业数量。默认值为1，以降低乐观锁异常的可能性。除非你知道自己在做什么，否则请不要修改这个值。
+flowable.process.async.executor.retry-wait-time-in-millis=500 # ???（译者补不了了）
+flowable.process.async.executor.timer-lock-time-in-millis=300000 # 定时器作业在被异步执行器取走后的锁定时间（以毫秒计）。在这段时间内，其它异步执行器不会尝试获取及锁定这个任务。
+
+
+# CMMN {sc-flowable-boot}/cmmn/FlowableCmmnProperties.java[FlowableCmmnProperties]
+flowable.cmmn.deploy-resources=true # 是否部署资源。默认值为'true'。
+flowable.cmmn.deployment-name=SpringBootAutoDeployment # CMMN资源部署的名字。
+flowable.cmmn.enable-safe-xml=true # 在解析CMMN XML文件时进行额外检查。参见 https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml 。不幸的是，部分平台（JDK 6，JBoss）上无法使用这个功能，因此如果你所用的平台在XML解析时不支持StaxSource，需要禁用这个功能。
+flowable.cmmn.enabled=true # 是否启用CMMN引擎。
+flowable.cmmn.resource-location=classpath*:/cases/ # CMMN资源的路径。
+flowable.cmmn.resource-suffixes=**.cmmn,**.cmmn11,**.cmmn.xml,**.cmmn11.xml # 需要扫描的资源后缀名。
+flowable.cmmn.servlet.load-on-startup=-1 # 启动时加载CMMN servlet。
+flowable.cmmn.servlet.name=Flowable CMMN Rest API # CMMN servlet的名字。
+flowable.cmmn.servlet.path=/cmmn-api # CMMN servlet的context path。
+
+# CMMN Async Executor
+# CMMN异步执行器
+flowable.cmmn.async-executor-activate=true # 是否启用异步执行器。
+flowable.cmmn.async.executor.async-job-lock-time-in-millis=300000 # 异步作业在被异步执行器取走后的锁定时间（以毫秒计）。在这段时间内，其它异步执行器不会尝试获取及锁定这个任务。
+flowable.cmmn.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # 异步作业获取线程在进行下次获取查询前的等待时间（以毫秒计）。只在当次没有取到新的异步作业，或者只取到很少的异步作业时生效。默认值 = 10秒。
+flowable.cmmn.async.executor.default-queue-size-full-wait-time-in-millis=0 # 异步作业（包括定时器作业与异步执行）获取线程在队列满时，等待执行下次查询的等待时间（以毫秒计）。默认值为0（以向后兼容）
+flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis=1000 # 定时器作业获取线程在进行下次获取查询前的等待时间（以毫秒计）。只在当次没有取到新的定时器作业，或者只取到很少的定时器作业时生效。默认值 = 10秒。
+flowable.cmmn.async.executor.max-async-jobs-due-per-acquisition=1 # （译者补）单次查询的异步作业数量。默认值为1，以降低乐观锁异常的可能性。除非你知道自己在做什么，否则请不要修改这个值。
+flowable.cmmn.async.executor.retry-wait-time-in-millis=500 #（译者补不了了）
+flowable.cmmn.async.executor.timer-lock-time-in-millis=300000 # 定时器作业在被异步执行器取走后的锁定时间（以毫秒计）。在这段时间内，其它异步执行器不会尝试获取及锁定这个任务。
+
+# Content {sc-flowable-boot}/content/FlowableContentProperties.java[FlowableContentProperties]
+flowable.content.enabled=true # 是否启动Content引擎。
+flowable.content.servlet.load-on-startup=-1 # 启动时加载Content servlet。
+flowable.content.servlet.name=Flowable Content Rest API # Content servlet的名字。
+flowable.content.servlet.path=/content-api # Content servlet的context path。
+flowable.content.storage.create-root=true # 如果根路径不存在，是否需要创建？
+flowable.content.storage.root-folder= # 存储content文件（如上传的任务附件，或表单文件）的根路径。
+
+# DMN {sc-flowable-boot}/dmn/FlowableDmnProperties.java[FlowableDmnProperties]
+flowable.dmn.deploy-resources=true # 是否部署资源。默认为'true'。
+flowable.dmn.deployment-name=SpringBootAutoDeployment # DMN资源部署的名字。
+flowable.dmn.enable-safe-xml=true # 在解析DMN XML文件时进行额外检查。参见 https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml 。不幸的是，部分平台（JDK 6，JBoss）上无法使用这个功能，因此如果你所用的平台在XML解析时不支持StaxSource，需要禁用这个功能。
+flowable.dmn.enabled=true # 是否启用DMN引擎。
+flowable.dmn.history-enabled=true # 是否启用DMN引擎的历史。
+flowable.dmn.resource-location=classpath*:/dmn/ # DMN资源的路径。
+flowable.dmn.resource-suffixes=**.dmn,**.dmn.xml,**.dmn11,**.dmn11.xml # 需要扫描的资源后缀名。
+flowable.dmn.servlet.load-on-startup=-1 # 启动时加载DMN servlet。
+flowable.dmn.servlet.name=Flowable DMN Rest API # DMN servlet的名字。
+flowable.dmn.servlet.path=/dmn-api # DMN servlet的context path。
+flowable.dmn.strict-mode=true # 如果希望避免抉择表命中策略检查导致失败，可以将本参数设置为false。如果检查发现了错误，会直接返回错误前一刻的中间结果。
+
+# Form {sc-flowable-boot}/form/FlowableFormProperties.java[FlowableFormProperties]
+flowable.form.deploy-resources=true # 是否部署资源。默认为'true'。
+flowable.form.deployment-name=SpringBootAutoDeployment # Form资源部署的名字。
+flowable.form.enabled=true # 是否启用Form引擎。
+flowable.form.resource-location=classpath*:/forms/ # Form资源的路径。
+flowable.form.resource-suffixes=**.form # 需要扫描的资源后缀名。
+flowable.form.servlet.load-on-startup=-1 # 启动时加载Form servlet。
+flowable.form.servlet.name=Flowable Form Rest API # Form servlet的名字。
+flowable.form.servlet.path=/form-api # Form servlet的context path。
+
+# IDM {sc-flowable-boot}/idm/FlowableIdmProperties.java[FlowableIdmProperties]
+flowable.idm.enabled=true # 是否启用IDM引擎。
+flowable.idm.password-encoder= # 使用的密码编码类型。
+flowable.idm.servlet.load-on-startup=-1 # 启动时加载IDM servlet。
+flowable.idm.servlet.name=Flowable IDM Rest API # IDM servlet的名字。
+flowable.idm.servlet.path=/idm-api # IDM servlet的context path。
+
+# IDM Ldap {sc-flowable-boot}/ldap/FlowableLdapProperties.java[FlowableLdapProperties]
+flowable.idm.ldap.attribute.email= # 用户email的属性名。
+flowable.idm.ldap.attribute.first-name= # 用户名字的属性名。
+flowable.idm.ldap.attribute.group-id= # 用户组ID的属性名。
+flowable.idm.ldap.attribute.group-name= # 用户组名的属性名。
+flowable.idm.ldap.attribute.group-type= # 用户组类型的属性名。
+flowable.idm.ldap.attribute.last-name= # 用户姓的属性名。
+flowable.idm.ldap.attribute.user-id= # 用户ID的属性名。
+flowable.idm.ldap.base-dn= # 查找用户与组的DN（标志名称 distinguished name）。
+flowable.idm.ldap.cache.group-size=-1 # 设置{@link org.flowable.ldap.LDAPGroupCache}的大小。这是LRU缓存，用于缓存用户及组，以避免每次都查询LDAP系统。
+flowable.idm.ldap.custom-connection-parameters= # 用于设置所有没有专用setter的LDAP连接参数。查看 http://docs.oracle.com/javase/tutorial/jndi/ldap/jndi.html 介绍的自定义参数。参数包括配置链接池，安全设置，等等。
+flowable.idm.ldap.enabled=false # 是否启用LDAP IDM 服务。
+flowable.idm.ldap.group-base-dn= # 组查找的DN。
+flowable.idm.ldap.initial-context-factory=com.sun.jndi.ldap.LdapCtxFactory # 初始化上下文工厂的类名。
+flowable.idm.ldap.password= # 连接LDAP系统的密码。
+flowable.idm.ldap.port=-1 # LDAP系统的端口。
+flowable.idm.ldap.query.all-groups= # 查询所有组所用的语句。
+flowable.idm.ldap.query.all-users= # 查询所有用户所用的语句。
+flowable.idm.ldap.query.groups-for-user= # 按照指定用户查询所属组所用的语句
+flowable.idm.ldap.query.user-by-full-name-like= # 按照给定全名查找用户所用的语句。
+flowable.idm.ldap.query.user-by-id= # 按照userId查找用户所用的语句。
+flowable.idm.ldap.search-time-limit=0 # 查询LDAP的超时时间（以毫秒计）。默认值为'0'，即“一直等待”。
+flowable.idm.ldap.security-authentication=simple # 连接LDAP系统所用的'java.naming.security.authentication'参数的值。
+flowable.idm.ldap.server= # LDAP系统的主机名。如'ldap://localhost'。
+flowable.idm.ldap.user= # 连接LDAP系统的用户ID。
+flowable.idm.ldap.user-base-dn= # 查找用户的DN。
+
+# Flowable Mail {sc-flowable-boot}/FlowableMailProperties.java[FlowableMailProperties]
+flowable.mail.server.default-from=flowable@localhost # 发送邮件时使用的默认发信人地址。
+flowable.mail.server.host=localhost # 邮件服务器。
+flowable.mail.server.password= # 邮件服务器的登录密码。
+flowable.mail.server.port=1025 # 邮件服务器的端口号。
+flowable.mail.server.use-ssl=false # 是否使用SSL/TLS加密SMTP传输连接（即SMTPS/POPS)。
+flowable.mail.server.use-tls=false # 使用或禁用STARTTLS加密。
+flowable.mail.server.username= # 邮件服务器的登录用户名。如果为空，则不需要登录。
+
+# Actuator
+management.endpoint.flowable.cache.time-to-live=0ms # 缓存响应的最大时间。
+management.endpoint.flowable.enabled=true # 是否启用flowable端点。
+
+----
+
+
+.弃用的参数
+[cols="4*",options="header"]
+|===============
+|现参数
+|原参数
+|默认值
+|描述
+
+|flowable.process.servlet.name
+|flowable.rest-api-servlet-name
+|Flowable BPMN Rest API
+|Process servlet的名字。
+
+|flowable.process.servlet.path
+|flowable.rest-api-mapping
+|/process-api
+|Process servlet的context path。
+
+|flowable.mail.server.host
+|flowable.mail-server-host
+|localhost
+|邮件服务器。
+
+|flowable.mail.server.password
+|flowable.mail-server-password
+|-
+|邮件服务器的密码。
+
+|flowable.mail.server.port
+|flowable.mail-server-port
+|1025
+|邮件服务器的端口号。
+
+|flowable.mail.server.use-ssl
+|flowable.mail-server-use-ssl
+|false
+|是否使用SSL/TLS加密SMTP传输连接（即SMTPS/POPS)。
+
+|flowable.mail.server.use-tls
+|flowable.mail-server-use-tls
+|false
+|使用或禁用STARTTLS加密。
+
+|flowable.mail.server.username
+|flowable.mail-server-user-name
+|-
+|邮件服务器的登录用户名。如果为空，则不需要登录。
+
+|flowable.process.definition-cache-limit
+|flowable.process-definitions.cache.max
+|-1
+|流程定义缓存中保存流程定义的最大数量。默认值为-1（缓存所有流程定义）。
+|===============
+
+[[springBootFlowableAutoConfiguration]]
+==== Flowable自动配置类
+
+这是Flowable提供的所有自动配置类的列表，并包括了文档及源码的连接。记得查看你的应用的conditions报告，以确认具体启用了哪些功能。（使用--debug或-Ddebug或在Actuator应用中启动应用，并使用 `conditions` 端点）。
+
+[cols=*,options="header"]
+|===
+|配置类
+
+|{sc-flowable-boot}/content/ContentEngineAutoConfiguration.java[ContentEngineAutoConfiguration]
+|{sc-flowable-boot}/content/ContentEngineServicesAutoConfiguration.java[ContentEngineServicesAutoConfiguration]
+|{sc-flowable-boot}/cmmn/CmmnEngineAutoConfiguration.java[CmmnEngineAutoConfiguration]
+|{sc-flowable-boot}/cmmn/CmmnEngineServicesAutoConfiguration.java[CmmnEngineServicesAutoConfiguration]
+|{sc-flowable-boot}/dmn/DmnEngineAutoConfiguration.java[DmnEngineAutoConfiguration]
+|{sc-flowable-boot}/dmn/DmnEngineServicesAutoConfiguration.java[DmnEngineServicesAutoConfiguration]
+|{sc-flowable-boot}/EndpointAutoConfiguration.java[EndpointAutoConfiguration]
+|{sc-flowable-boot}/actuate/info/FlowableInfoAutoConfiguration.java[FlowableInfoAutoConfiguration]
+|{sc-flowable-boot}/ldap/FlowableLdapAutoConfiguration.java[FlowableLdapAutoConfiguration]
+|{sc-flowable-boot}/FlowableTransactionAutoConfiguration.java[FlowableTransactionAutoConfiguration]
+|{sc-flowable-boot}/form/FormEngineAutoConfiguration.java[FormEngineAutoConfiguration]
+|{sc-flowable-boot}/form/FormEngineServicesAutoConfiguration.java[FormEngineServicesAutoConfiguration]
+|{sc-flowable-boot}/idm/IdmEngineAutoConfiguration.java[IdmEngineAutoConfiguration]
+|{sc-flowable-boot}/idm/IdmEngineServicesAutoConfiguration.java[IdmEngineServicesAutoConfiguration]
+|{sc-flowable-boot}/ProcessEngineAutoConfiguration.java[ProcessEngineAutoConfiguration]
+|{sc-flowable-boot}/RestApiAutoConfiguration.java[RestApiAutoConfiguration]
+|{sc-flowable-boot}/SecurityAutoConfiguration.java[SecurityAutoConfiguration]
+
+|===
+
+[[springBootFlowableStarter]]
+==== Flowable Starter
+
+这是Flowable Spring Boot stater的列表。
+
+[cols=2*,options="header"]
+|===
+|Starter
+|描述
+
+|{sc-flowable-starter}/flowable-spring-boot-starter-cmmn/pom.xml[flowable-spring-boot-starter-cmmn]
+|提供以独立运行模式启动CMMN引擎的依赖
+
+|{sc-flowable-starter}/flowable-spring-boot-starter-cmmn-rest/pom.xml[flowable-spring-boot-starter-cmmn-rest]
+|提供以独立运行模式启动CMMN引擎，并提供其REST API的依赖。
+
+|{sc-flowable-starter}/flowable-spring-boot-starter-dmn/pom.xml[flowable-spring-boot-starter-dmn]
+|提供以独立运行模式启动DMN引擎的依赖。
+
+|{sc-flowable-starter}/flowable-spring-boot-starter-dmn-rest/pom.xml[flowable-spring-boot-starter-dmn-rest]
+|提供以独立运行模式启动DMN引擎，并提供其REST API的依赖。
+
+|{sc-flowable-starter}/flowable-spring-boot-starter-process/pom.xml[flowable-spring-boot-starter-process]
+|提供以独立运行模式启动流程引擎的依赖。
+
+|{sc-flowable-starter}/flowable-spring-boot-starter-process-rest/pom.xml[flowable-spring-boot-starter-process-rest]
+|提供以独立运行模式启动流程引擎，并提供其REST API的依赖。
+
+|{sc-flowable-starter}/flowable-spring-boot-starter/pom.xml[flowable-spring-boot-starter]
+|提供启动所有Flowable引擎（流程，CMMN，DMN，Form，Content及IDM）的依赖。
+
+|{sc-flowable-starter}/flowable-spring-boot-starter-rest/pom.xml[flowable-spring-boot-starter-rest]
+|提供启动所有Flowable引擎，并提供其REST API的依赖。
+
+|{sc-flowable-starter}/flowable-spring-boot-starter-actuator/pom.xml[flowable-spring-boot-starter-actuator]
+|提供Spring Boot Actuator所需的依赖。
+
+|===
+
+
+[[_using_liquibase]]
+==== 使用Liquibase
+
+Flowable引擎使用Liquibase管理数据库版本。
+因此Spring Boot的 `LiquibaseAutoConfiguration` 会自动启用。
+然而，如果你并未使用Liquibase，则应用将无法启动，并抛出异常。
+因此Flowable将 `spring.liquibase.enabled` 设置为 `false` ，也即如果需要使用Liquibase，则需手动启用它。
+
+[[_further_reading]]
+==== 扩展阅读
+
+很明显还有很多Spring Boot相关的内容还没有提及，如非常简单的JTA集成、构建能在主流应用服务器上运行的WAR文件。也还有很多Spring Boot集成：
+
+* Actuator支持
+* Spring Integration支持
+* Rest API集成：启动Spring应用中嵌入的Flowable Rest API
+* Spring Security支持
+
+[[_advanced_configuration]]
+==== 高级配置
+
+[[_customizing_engine_configuration]]
+===== 自定义引擎配置
+
+实现__org.flowable.spring.boot.EngineConfigurationConfigurer<T>__接口，可以获取引擎配置对象。其中__T__是具体引擎配置的Spring类型。
+这样可以在参数尚未公开时，进行高级配置，或简化配置。
+例如：
+
+[source, java, linenums]
+----
+public class MyConfigurer implements EngineConfigurationConfigurer<SpringProcessEngineConfiguration> {
+
+    public void configure(SpringProcessEngineConfiguration processEngineConfiguration) {
+        // advanced configuration
+    }
+    
+}
+----
+
+在Spring Boot配置中使用__@Bean__发布该类的实例，这样配置类会在流程引擎创建前调用。
+
+[TIP]
+====
+可以用这种方法实现自定义的Flowable服务。参见 {sc-flowable-boot}/ldap/FlowableLdapAutoConfiguration.java[FlowableLdapAutoConfiguration]
+====
+
+[[_combining_starters]]
+===== 整合starter
+
+如果需要一组引擎，则只能依次添加依赖。
+比如要使用流程、CMMN、Form与IDM引擎，并使用LDAP，则需要添加这些依赖：
+
+[source,xml,linenums]
+----
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter-process</artifactId>
+    <version>${flowable.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter-cmmn</artifactId>
+    <version>${flowable.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-content-spring-configurator</artifactId>
+    <version>${flowable.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-ldap</artifactId>
+    <version>${flowable.version}</version>
+</dependency>
+----
+
+[[_configuring_async_executors]]
+===== 配置异步执行器
+
+流程及CMMN引擎使用专门的 `AsyncExecutor` ，并可使用 `flowable.{engine}.async.executor` 参数组进行配置。
+其中 `engine` 代表 `process` 或 `cmmn` 。
+
+默认情况下， `AsyncExecutor` 共享同一个Spring `TaskExecutor` 及 `SpringRejectedJobsHandler` 。
+如果需要为引擎提供专门的执行器，则需要使用 `@Process` 及 `@Cmmn` 定义的bean。
+
+可以使用如下方法配置自定义的执行器：
+
+[source,java,linenums]
+----
+@Configuration
+public class MyConfiguration {
+
+    @Process <1>
+    @Bean
+    public TaskExecutor processTaskExecutor() {
+        return new SimpleAsyncTaskExecutor();
+    }
+
+    @Cmmn <2>
+    @Bean
+    public TaskExecutor cmmnTaskExecutor() {
+        return new SyncTaskExecutor();
+    }
+}
+----
+<1> 流程引擎将使用 `SimpleAsyncTaskExecutor` 作为异步执行器
+<2> CMMN引擎将使用 `SyncTaskExecutor` 作为异步执行器
+
+[IMPORTANT]
+======
+如果使用了自定义的 `TaskExecutor` bean，则Flowable将不会再创建自己的bean。
+也就是说如果使用 `@Process` 定义了bean，也需要使用 `@Cmmn` 或 `@Primary` 再定义一个bean。否则Cmmn异步执行器将使用流程引擎所用的bean。
+======
+

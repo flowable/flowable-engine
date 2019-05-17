@@ -850,7 +850,7 @@ Following settings are possible:
 * *maxStackDepth*: Limits the stack depth while calling functions within a script. This can be used to avoid stack overflow exceptions that occur when recursively calling a method defined in the script. By default _-1_ (disabled).
 * *maxScriptExecutionTime*: The maximum time a script is allowed to run. By default _-1_ (disabled).
 * *maxMemoryUsed*: The maximum memory, in bytes, that the script is allowed to use. Note that the script engine itself takes a a certain amount of memory that is counted here too. By default _-1_ (disabled).
-* *nrOfInstructionsBeforeStateCheckCallback*: The maximum script execution time and memory usage is implemented using a callback that is called every x instructions of the script. Note that these are not script instructions, but java byte code instructions (which means one script line could be hundreds of byte code instructions). By default 100.
+* *nrOfInstructionsBeforeStateCheckCallback*: The maximum script execution time and memory usage is implemented using a callback that is called every x instructions of the script. Note that these are not script instructions, but Java byte code instructions (which means one script line could be hundreds of byte code instructions). By default 100.
 
 _Note:_ the _maxMemoryUsed_ setting can only be used by a JVM that supports the com.sun.management.ThreadMXBean#getThreadAllocatedBytes() method. The Oracle JDK has this.
 

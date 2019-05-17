@@ -155,6 +155,17 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * An activity is about to be executed as a compensation for another activity. The event targets the activity that is about to be executed for compensation.
      */
     ACTIVITY_COMPENSATE,
+    
+    /**
+     * A boundary, intermediate, or subprocess start escalation catching event has started.
+     */
+    ACTIVITY_ESCALATION_WAITING,
+    
+    /**
+     * An activity has received an escalation event. Dispatched before the actual escalation has been received by the activity. This event will be either followed by a {@link #ACTIVITY_SIGNALLED} event or
+     * {@link #ACTIVITY_COMPLETED} for the involved activity, if the error was delivered successfully.
+     */
+    ACTIVITY_ESCALATION_RECEIVED,
 
     /**
      * A boundary, intermediate, or subprocess start message catching event has started.
@@ -278,6 +289,11 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * A process has been completed with an error end event.
      */
     PROCESS_COMPLETED_WITH_ERROR_END_EVENT,
+    
+    /**
+     * A process has been completed with an escalation end event.
+     */
+    PROCESS_COMPLETED_WITH_ESCALATION_END_EVENT,
 
     /**
      * A process has been cancelled. Dispatched when process instance is deleted by

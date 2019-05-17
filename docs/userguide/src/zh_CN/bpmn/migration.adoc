@@ -1,0 +1,206 @@
+= Flowable迁移指导：Flowable V5到Flowable V6
+:doctype: book
+:docinfo1: header
+:icons: font
+:numbered:
+:source-highlighter: pygments
+:pygments-css: class
+:pygments-linenums-mode: table
+:compat-mode:
+:nofooter:
+
+== 简介
+
+本手册介绍了从Flowable V5.x迁移至Flowable V6时需要注意的事项。
+
+== 设计目标
+
+V6版本的设计目标是：
+
+* 完全向前兼容V5版本：数据库层面、概念层面以及代码层面。
+* 重写核心引擎：直接执行BPMN 2.0（不再转换为中间模型）。
+* 更简洁干净的运行时执行数据结构，重点关注结构的可预判性。
+* 解耦持久层，以支持未来的不同实现。
+
+
+== 数据库迁移
+
+从V5至V6不需要数据库迁移：V5与V6的数据库表结构基本一致，只是多了一些表与列。所有Flowable V5生成的数据都可以保留在数据库中，甚至包括活动的、执行中的流程实例。在V6引擎第一次运行时，会对表结构进行自动升级（同V5版本中一样）。除了一些小的数据库结构改动外，主要的改动是将作业表分拆为作业表、定时器作业表、暂停作业表与死信作业表。还未到期的定时器作业将移至新的定时器作业表；用尽重试次数的作业将移至死信作业表；已暂停流程实例的作业将移至暂停作业表。
+
+== 概念变化
+
+称为Flowable V6的主要原因是完全重写了核心引擎。核心引擎执行的方式已经完全变化，将直接执行BPMN（在V5中使用的是中间模型）。同时，运行时执行的表现形式（__执行树__）也作了修改。总的来说，这些概念都大幅简化了，让执行更简单清晰，也让撰写自定义代码更容易更易懂。在V6中内嵌了一个V5引擎，在需要时可以保证完全的兼容性。
+
+我们将在之后的文章中详细介绍引擎内部的工作。
+
+== 破坏性改动
+
+下列改动是破坏性改动（也就是说很可能导致编译错误）。
+
+=== 包重命名：org.activiti重命名为org.flowable
+
+所有org.activiti包都已重命名为org.flowable。
+
+=== Activiti类重命名
+
+所有类名中包含的"Activiti"都已重命名，替换为Flowable。
+例如，ActivitiEvent重命名为FlowableEvent，而ActivitiException重命名为FlowableException。
+
+=== activiti.cfg.xml重命名为flowable.cfg.xml
+
+在Flowable引擎启动时读取的默认配置文件，已经从activiti.cfg.xml重命名为flowable.cfg.xml。
+对于默认的Spring配置文件activiti-context.xml也是一样，已经重命名为flowable-context.xml.
+
+
+=== PVM类
+
+以前在org.activiti.engine.impl.pvm包（及其子包）下的所有类都已移除。这是因为__PVM__ (流程虚拟机 Process Virtual Machine)模型已被替换为一个更简单更轻量的模型。
+
+这意味着__ActivitiImpl__、__ProcessDefinitionImpl__、__ExecutionImpl__及__TransitionImpl__都将失效。
+
+在V5中这些类大多用于获取流程定义中包含的信息。在V6中，所有流程定义的信息都可以通过__BpmnModel__获取。这是一个BPMN 2.0 XML流程定义的Java表现形式（并对特定操作及搜索进行了增强）。
+
+获取__BpmnModel__流程定义最快捷的方法是使用org.flowable.engine.RepositoryService服务：
+
+----
+BpmnModel bpmnModel = repositoryService.getBpmnModel(myProcessDefinitionId);
+----
+
+使用org.flowable.engine.impl.context.Context类获取__RepositoryService__，JavaDelegate或ActivityBehavior实现类：
+
+----
+RepositoryService repositoryService = Context.getProcessEngineConfiguration().getRepositoryService();
+----
+
+（请注意只有在上下文可用时才能如此操作，获取JavaDelegate和ActivityBehavior时也是这样）
+
+
+=== DelegateExecution代替ActivityExecution
+
+我们移除了ActivityExecution，并使用DelegateExecution类代替它。
+
+所有ActivityExecution类中的方法都已复制到DelegateExecution类中。
+
+
+=== 移除EngineServices
+
+移除了DelegateExecution中的getEngineServices方法，因为它已经没有实际作用，并导致在Flowable 6与内嵌的Flowable 5引擎中，DelegateExecution的使用不一致。
+
+将所有对getEngineServices方法的调用，替换为对org.flowable.engine.impl.context.Context.getProcessEngineConfiguration方法的调用。
+
+
+=== 作业、定时器、暂停与死信作业
+
+Flowable V5中只有一个作业表，导致查询需要执行的作业时，查询条件异常复杂。
+
+在Flowable V6中，作业被分拆成了作业表(ACT_RU_JOB)、定时器表(ACT_RU_TIMER_JOB)、暂停表(ACT_RU_SUSPENDED_JOB)与死信表(ACT_RU_DEADLETTER_JOB)。
+
+* 作业表中的作业可以直接执行（类似异步作业与到期的定时器作业）。因此就不需要使用复杂的查询，唯一的where条件是lock time(锁定时间)不能为NULL。
+* 定时器作业现在持久化在专门的定时器作业表中，并由一个线程检查到期需要执行的定时器作业。当定时器作业到期需要执行时，该作业会被移至作业表。
+* 当作业执行器线程准备执行作业时，会从作业表获取并执行。
+* 当流程定义或流程实例暂停时，其关联的作业将被移至单独的暂停作业表。这简化了作业执行器的查询，并清楚显示了暂停中的作业。
+* 如果一个作业执行失败，它将被放入定时器作业表，并用 当前时间+引擎配置的作业失败等待时间 作为到期日期。在该作业到期将被执行时，会重新移至作业表，并被执行。如果重试次数减至0，则该作业将被移至死信表，不再自动执行。这样简化了默认的作业执行器查询，也清楚显示了卡住需要人工干预的作业。
+
+Flowable V6内嵌的Flowable V5引擎也能够使用这4个作业表。但是只会有一个线程池从数据库中获取作业，这个线程池在两个引擎间共享。当获取到一个作业后，会基于流程定义id检查引擎的版本，以判断作业由Flowable V6还是嵌入的Flowable V5引擎执行。
+
+=== 向一个执行发信号
+
+在V5中，使用像是__runtimeService.signal(executionI);__这样的方法__向一个执行发信号__十分令人困惑。因为__信号(signal)__是一个BPMN 2.0概念和特性，它们的概念互相冲突。
+
+在V6中，__signal()__方法更名为__trigger()__。
+
+同时，用于实现可以被外部触发的行为的接口__SignalableActivityBehavior__，改名为__TriggerableActivityBehavior__。
+
+=== 受检异常
+
+在V5中，__JavaDelegate__与__FlowableBehavior__之类的代理类在其签名中标示抛出__Exception__。像其他现代框架一样，在V6版本中已经不再使用受检异常。
+
+=== 代理类
+
+__org.flowable.engine.impl.pvm.delegate.ActivityBehavior__的包变更为__org.flowable.engine.impl.delegate__。
+
+从__DelegateExecution__中移除了下列方法：
+
+* end()
+* createdExecution()
+
+而用ExecutionEntityManager的方法代替。可以通过Context.getCommandContext.getExecutionEntityManager()获取ExecutionEntityManager。
+
+=== 实体管理器
+
+在Flowable V5中，所有的实体管理器类（负责持久化，也包含一些逻辑）都没有接口。在V6中，所有的实体类都已经重命名为__Impl__后缀，并提供了不带后缀的接口。也就是说V5的实体管理器类名现在是相应的接口名。
+
+所有的实体管理器接口都扩展了org.flowable.engine.impl.persistence.entity.EntityManager泛型接口。所有的实现类都实现了__AbstractEntityManager__泛型接口。
+
+同时，为了保证一致性：
+
+* UserIdentityManager接口重命名为UserEntityManager
+* GroupIdentityManager接口重命名为GroupEntityManager
+
+
+=== 持久化对象重命名为实体
+
+__org.flowable.engine.impl.db.PersistentObject__类重命名为__Entity__，与其他类保持一致（实体管理器类等等）。
+
+所有使用“持久化对象”的相关类也都已经重构为“实体”。
+
+
+=== 身份逻辑与表的分离
+
+在V5中，身份逻辑及表示流程引擎的必要部分。在V6中，这部分逻辑已经重构为独立的模块，名为__flowable-idm-engine__（其中IDM代表“身份管理(identity management)”）。相关的数据库表由这个引擎管理。为了保证兼容性，在启动流程引擎时，也会默认启用IDM引擎。可以在流程引擎配置中，将__disableIdmEngine__设置为__true__以禁用IDM引擎。如果禁用了IDM，就不会创建身份数据库表（以__ACT_ID__开头）。如果这些表已经存在，也可以删除。
+
+
+=== Camel端点改名为flowable
+
+在使用Flowable Camel模块时，请确保使用flowable端点替代activiti端点。下面的Route作为简单的例子：
+
+[source,java,linenums]
+----
+public class SimpleCamelCallRoute extends RouteBuilder {
+
+  @Override
+  public void configure() throws Exception {
+    from("flowable:SimpleCamelCallProcess:simpleCall").to("log:org.flowable.camel.examples.SimpleCamelCall");
+  }
+}
+----
+
+== V5兼容性
+
+在迁移至Flowable V6时（基本上就是替换classpath中的JAR包），所有当前的部署与流程定义都将__标记__为__V5版本__的工件。在很多地方（完成一个任务，启动一个新流程实例，指派任务等等）引擎都会检查相关的流程定义是否__标记为V5版本__。若是，则将其执行代理至__内嵌的微型V5引擎__。
+
+也就是说为了简化迁移，可以选择逐步替换：首先在__V5模式__下运行当前的流程定义，直到已经验证并测试其行为与V6版本相同。
+
+默认情况下，嵌入的V5引擎是__禁用的__！要启用它，在引擎配置中添加下列配置：
+
+----
+<property name="flowable5CompatibilityEnabled" value="true" />
+----
+
+**并且**在classpath中添加**flowable5-compatibility**（手动或通过Maven之类的依赖管理机制）。
+
+如果默认的实现__org.flowable.compatibility.DefaultFlowable5CompatibilityHandler__不满足要求，也可以创建自定义的实现。可以将引擎配置中的__flowable5CompatibilityHandlerFactory__参数设置为所创建类的全限定类名。这个工厂类构造用于处理V5与V6桥接的类实例。
+
+要让一个V5流程定义使用V6引擎运行，只需要重新部署它即可。新的流程实例将会在__V6模式__下运行，而之前的流程实例仍然在__V5模式__下运行。
+
+如果出于某些原因，希望部署的新版流程定义仍然在__V5模式__下运行，可以使用下列代码：
+
+----
+repositoryService.createDeployment()
+      .addClasspathResource("xyz")
+      .deploymentProperty(DeploymentProperties.DEPLOY_AS_FLOWABLE5_PROCESS_DEFINITION, Boolean.TRUE)
+      .deploy();
+----
+
+如果使用Flowable Spring模块，要使用Flowable V5兼容模式需要进行额外配置：
+
+----
+<property name="flowable5CompatibilityEnabled" value="true" />
+<property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompabilityFactory" />
+
+....
+
+<bean id="flowable5CompabilityFactory" class="org.flowable.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
+----
+
+**并且**在classpath中添加**flowable5-spring**与**flowable5-spring-compatibility** JAR包（手动或通过Maven之类的依赖管理机制）。

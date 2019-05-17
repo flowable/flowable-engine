@@ -242,6 +242,10 @@ function _drawEventIcon(paper, element)
 		{
 			_drawErrorIcon(paper, element);
 		}
+		else if ("escalation" === element.eventDefinition.type)
+        {
+            _drawEscalationIcon(paper, element);
+        }
 		else if ("signal" === element.eventDefinition.type)
 		{
 			_drawSignalIcon(paper, element);
@@ -304,6 +308,24 @@ function _drawErrorIcon(paper, element)
 
 	path.transform("T" + x + "," + y);
 	return path;
+}
+
+function _drawEscalationIcon(paper, element)
+{
+    var fill = "none";
+    if (element.type === "ThrowEvent")
+    {
+        fill = "black";
+    }
+
+    var path = paper.path("M 16,8.75 L22,23.75 L16,17 L10,23.75z");
+    path.attr({
+        "stroke": "black",
+        "stroke-width": 1,
+        "fill": fill
+    });
+    path.transform("T" + (element.x - 1) + "," + (element.y - 1));
+    return path;
 }
 
 function _drawSignalIcon(paper, element)

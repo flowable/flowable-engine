@@ -15,7 +15,7 @@ Decision Model and Notation (DMN) is a standard published by the link:$$http://w
 === What is a DMN definition
 
 The root element of the DMN 1.1 schema is a *definitions* element. Within this element multiple decision definitions can be defined (although we advise you to
-have only one process definition in each file, as this simplifies maintenance later in the development process). Within each decision, one expression can be defined. There are several types of expressions. Within Flowable, currently, the expression type *decision table* is supported.
+have only one decision definition in each file, as this simplifies maintenance later in the development process). Within each decision, one expression can be defined. There are several types of expressions. Within Flowable, currently, the expression type *decision table* is supported.
 
 [source,xml,linenums]
 ----

@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.editor;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -53,5 +55,13 @@ public class CaseTaskJsonConverterTest extends AbstractConverterTest {
         assertEquals("sid-E06221FA-0225-4EF8-A1E8-8DC177326B77", caseTask.getId());
         assertEquals("caseTaskName", caseTask.getName());
         assertTrue(caseTask.getFallbackToDefaultTenant());
+
+        assertThat(caseTask.getInParameters())
+                .isNotNull()
+                .hasSize(1);
+        IOParameter inParameter = caseTask.getInParameters().get(0);
+        assertThat(inParameter).isNotNull();
+        assertThat(inParameter.getSource()).isEqualTo("testSource");
+        assertThat(inParameter.getTarget()).isEqualTo("testTarget");
     }
 }

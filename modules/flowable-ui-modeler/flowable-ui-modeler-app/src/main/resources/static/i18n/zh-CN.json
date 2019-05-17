@@ -673,6 +673,12 @@
           "DESCRIPTION" : "定义错误名称"
         }
       },
+      "ESCALATIONREFPACKAGE" : {
+        "ESCALATIONREF" : {
+          "TITLE" : "升级引用",
+          "DESCRIPTION" : "定义升级名称"
+        }
+      },
       "CANCELACTIVITYPACKAGE" : {
         "CANCELACTIVITY" : {
           "TITLE" : "取消活动",
@@ -743,6 +749,12 @@
         "MESSAGEDEFINITIONS" : {
           "TITLE" : "消息定义",
           "DESCRIPTION" : "消息定义"
+        }
+      },
+      "ESCALATIONDEFINITIONSPACKAGE" : {
+        "ESCALATIONDEFINITIONS" : {
+          "TITLE" : "升级的定义",
+          "DESCRIPTION" : "升级的定义"
         }
       },
       "ISTRANSACTIONPACKAGE" : {
@@ -846,6 +858,10 @@
         "TITLE" : "启动错误事件",
         "DESCRIPTION" : "用于捕获BPMN抛出的错误的启动事件"
       },
+      "STARTESCALATIONEVENT" : {
+        "TITLE" : "开始升级事件",
+        "DESCRIPTION" : "捕获抛出的BPMN升级的启动事件"
+      },
       "USERTASK" : {
         "TITLE" : "用户任务",
         "DESCRIPTION" : "分配给特定人的任务"
@@ -934,6 +950,10 @@
         "TITLE" : "边界错误事件",
         "DESCRIPTION" : "捕捉bpmn错误的边界事件"
       },
+      "BOUNDARYESCALATIONEVENT" : {
+        "TITLE" : "边界升级事件",
+        "DESCRIPTION" : "捕获BPMN升级的边界事件"
+      },
       "BOUNDARYTIMEREVENT" : {
         "TITLE" : "边界计时器事件",
         "DESCRIPTION" : "具有计时器触发器的边界事件"
@@ -974,6 +994,10 @@
         "TITLE" : "中间信号抛出事件",
         "DESCRIPTION" : "带有信号触发器的中间事件"
       },
+      "THROWESCALATIONEVENT" : {
+        "TITLE" : "中间升级抛出事件",
+        "DESCRIPTION" : "具有升级触发器的中间事件"
+      },
       "ENDNONEEVENT" : {
         "TITLE" : "结束事件",
         "DESCRIPTION" : "没有特定触发器的结束事件"
@@ -981,6 +1005,10 @@
       "ENDERROREVENT" : {
         "TITLE" : "结束错误事件",
         "DESCRIPTION" : "引发错误事件的结束事件"
+      },
+      "ENDESCALATIONEVENT" : {
+        "TITLE" : "结束升级事件",
+        "DESCRIPTION" : "抛出升级事件的结束时间"
       },
       "ENDCANCELEVENT" : {
         "TITLE" : "结束取消事件",
@@ -2499,6 +2527,11 @@
   "PROPERTY.MESSAGEDEFINITIONS.EMPTY" : "没有配置消息定义",
   "PROPERTY.MESSAGEDEFINITIONS.ID" : "Id",
   "PROPERTY.MESSAGEDEFINITIONS.NAME" : "名称",
+
+  "PROPERTY.ESCALATIONDEFINITIONS.DISPLAY" : "{{length}} 个升级定义",
+  "PROPERTY.ESCALATIONDEFINITIONS.EMPTY" : "没有配置升级定义",
+  "PROPERTY.ESCALATIONDEFINITIONS.ID" : "Id",
+  "PROPERTY.ESCALATIONDEFINITIONS.NAME" : "名称",
 
   "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "没有确定连线的顺序",
   "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "设置连线的顺序",
