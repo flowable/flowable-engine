@@ -1,13 +1,11 @@
 [[springintegration]]
+== 集成Spring
 
-== Spring integration
-
-While you can definitely use Flowable Form without Spring, we've provided some very nice integration features that are explained in this chapter.
+虽然你可以在没有Spring的情况下使用Flowable 表单，但我们提供了一些非常好的集成功能，本章将对此进行说明。
 
 === FormEngineFactoryBean
 
-The +~FormEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.form.spring.FormEngineFactoryBean+. This bean takes a Form engine configuration and creates the Form engine. This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration, the configuration and engine beans will look like this:
-
+表单引擎可以按照常规的Spring bean方式进行配置.整合引用到的类是org.flowable.form.spring.FormEngineFactoryBean.该bean持有一个表单引擎配置类并创建表单引擎.这意味着Spring属性的创建和配置与 <<configuration,configuration section>> 中记录的相同.关于Spring集成和配置引擎bean如下所示
 [source,xml,linenums]
 ----
 <bean id="formEngineConfiguration" class="org.flowable.form.spring.SpringFormEngineConfiguration">
@@ -20,15 +18,12 @@ The +~FormEngine+ can be configured as a regular Spring bean. The starting point
 
 ----
 
-Note that the +formEngineConfiguration+ bean now uses the +org.flowable.form.spring.SpringFormEngineConfiguration+ class.
+注意，formEngineConfiguration bean现在使用的是 +org.flowable.form.spring.SpringFormEngineConfiguration+ 类。
 
+=== 自动部署资源
+集成Spring还具有部署资源的特性。在配置表单引擎时，您可以指定一组资源.当表单引擎被创建时，将扫描和部署这些资源并过滤防止重复部署。只有资源被更改时，才会将重新部署部署到Flowable 表单数据库.这在经常重启包含大量表单资源的Spring容器中具有很大的意义（例如，测试）
 
-=== Automatic resource deployment
-
-Spring integration also has a special feature for deploying resources.  In the Form engine configuration, you can specify a set of resources. When the Form engine is created, all those resources will be scanned and deployed.  There is filtering in place that prevents duplicate deployments.  Only when the resources actually have changed will new deployments be deployed to the Flowable Form DB. This makes sense in a lot of use cases, where the Spring container is rebooted often (for example, testing).
-
-Here's an example:
-
+例如:
 [source,xml,linenums]
 ----
 <bean id="formEngineConfiguration" class="org.flowable.spring.SpringFormEngineConfiguration">
@@ -42,14 +37,12 @@ Here's an example:
 </bean>
 ----
 
-By default, the configuration above will group all of the resources matching the filtering into a single deployment to the Flowable Form engine. The duplicate filtering to prevent re-deployment of unchanged resources applies to the whole deployment. In some cases, this may not be what you want. For instance, if you deploy a set of Form resources this way and only a single Form definition in those resources has changed, the deployment as a whole will be considered new and all of the process definitions in that deployment will be re-deployed, resulting in new versions of each of the Form definitions, even though only one was actually changed.
+默认情况下，上面的配置会将匹配过滤后的所有资源进行分组并单独部署到Flowable 表单引擎中,在整个部署过程中重复过滤以防止重新部署未更改的资源.在某些情况下，你可能并不想这么做.例如，如果以这种方式部署一组表单资源，并且这些资源中只有一个表单定义更改了，整个流程定义部署将被视为新的并且被重新部署,尽管实际上只改变了一个但是每个表单都被定义为了新的版本,
+为了能够自定义部署的方式，您可以在 +SpringFormEngineConfiguration+ 中，指定 +deploymentMode+ 属性。该属性定义了从过滤器匹配的资源集合以及确定部署的方式。默认情况下，该属性提供3个默认属性：
 
-To be able to customize the way deployments are determined, you can specify an additional property in the +SpringFormEngineConfiguration+, +deploymentMode+. This  property defines the way deployments will be determined from the set of resources that match the filter. There are 3 values that are supported by default for this property:
-
-* ++default++: Group all resources into a single deployment and apply duplicate filtering to that deployment. This is the default value and it will be used if you don't specify a value.
-* ++single-resource++: Create a separate deployment for each individual resource and apply duplicate filtering to that deployment. This is the value you would use to have each Form definition be deployed separately and only create a new Form definition version if it has changed.
-* ++resource-parent-folder++: Create a separate deployment for resources that share the same parent folder and apply duplicate filtering to that deployment. This value can be used to create separate deployments for most resources, but still be able to group some by placing them in a shared folder. Here's an example of how to specify the +single-resource+ configuration for ++deploymentMode++:
-
+* ++default++: 将所有资源分组到单个部署中，并对该部署应用重复过滤。如果您未指定其他值，将默认使用它。
+* ++single-resource++: 为每个单独的资源单独部署，并对该部署应用重复过滤。适用于单独部署某个已更改表单定义的资源，仅创建该表单定义的新版本。
+* ++resource-parent-folder++: 为共享同一父文件夹的资源创建单独的部署，并对该部署应用重复过滤。适用于为大多数资源创建单独的部署，但仍可以通过将它们放在共享文件夹中来对其进行分组。以下是为 ++deploymentMode++ 属性指定 +single-resource+ 配置的示例：
 
 [source,xml,linenums]
 ----
@@ -61,16 +54,43 @@ To be able to customize the way deployments are determined, you can specify an a
 </bean>
 ----
 
-In addition to using the values listed above for +deploymentMode+, you may require customized behavior towards determining deployments. If so, you can create a subclass of +SpringFormEngineConfiguration+ and override the +getAutoDeploymentStrategy(String deploymentMode)+ method. This method determines which deployment strategy is used for a certain value of the +deploymentMode+ configuration.
-
+除了使用上面列出的 +deploymentMode+ 属性之外，您还可以自定义属性来实现部署。如果需要，您可以创建 +SpringFormEngineConfiguration+ 的子类并重写+getAutoDeploymentStrategy（String deploymentMode）+ 方法。该法确定将哪个部署策略用于 +deploymentMode+ 配置的特定值。
 
 [[springUnitTest]]
 
+=== 单元测试
 
-=== Unit testing
+与Spring集成时，使用标准的<<apiUnitTesting,Flowable testing facilities>>来测试表单将会变得非常简单.
+以下示例展示了如何在基于Spring的JUnit 4和5测试中测试表单：
 
-When integrating with Spring, forms can be tested very easily using the standard <<apiUnitTesting,Flowable testing facilities>>. The following example shows how a form is tested in a typical Spring-based unit test:
+.JUnit 5 测试
+[source,java,linenums]
+----
+@ExtendWith(FlowableFormSpringExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = SpringJunitJupiterTest.TestConfiguration.class)
+public class SpringJunit4Test {
 
+    @Autowired
+    private FormEngine formEngine;
+
+    @Autowired
+    private FormService formService;
+
+    @Test
+    @FormDeploymentAnnotation
+    public void simpleFormInstanceTest() {
+        FormInstance result = formService.getFormInstanceModelById(
+            "f7689f79-f1cc-11e6-8549-acde48001122", null);
+
+        Assertions.assertNotNull(result));
+    }
+}
+----
+
+使用 +FlowableFormSpringExtension+ 时允许使用 +Deployment+ 注解。
+
+.JUnit 4 测试
 [source,java,linenums]
 ----
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -98,8 +118,7 @@ public class SpringJunit4Test {
 }
 ----
 
-Note that for this to work, you need to define a _org.flowable.form.engine.test.FlowableFormRule_ bean in the Spring configuration (which is injected by auto-wiring in the example above).
-
+注意，在测试时，您需要在Spring配置中定义 _org.flowable.form.engine.test.FlowableFormRule_ bean（在上面的示例中通过自动装配注入）。
 [source,xml,linenums]
 ----
 <bean id="flowableFormRule" class="org.flowable.form.engine.test.FlowableFormRule">

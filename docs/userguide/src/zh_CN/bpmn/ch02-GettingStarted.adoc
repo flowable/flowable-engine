@@ -64,7 +64,6 @@ image::images/getting.started.new.maven3.png[align="center"]
   <dependency>
     <groupId>org.flowable</groupId>
     <artifactId>flowable-engine</artifactId>
-    <version>6.3.0</version>
   </dependency>
   <dependency>
     <groupId>com.h2database</groupId>
