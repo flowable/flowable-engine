@@ -1,4 +1,4 @@
-== Introduction
+== 说明
 
 include::../bpmn/ch02-GettingStarted.adoc[tags=getting.started.flowable]
 
