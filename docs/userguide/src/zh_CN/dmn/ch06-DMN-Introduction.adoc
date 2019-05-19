@@ -1,21 +1,23 @@
 [[bpmn20]]
 
-== DMN 1.1 Introduction
+
+== DMN 1.1 入门
 
 [[whatIsDmn]]
 
 
-=== What is DMN?
+=== 什么是DMN？
 
-Decision Model and Notation (DMN) is a standard published by the link:$$http://www.omg.org/spec/DMN/1.1$$[Object Management Group]. It's a standard approach for describing and modeling repeatable decisions within organizations to ensure that decision models are interchangeable across organizations.
+
+Decision Model & Notation(DMN)是由link:$$http://www.omg.org/spec/DMN/1.1$$[对象管理组（OMG）]发布的标准。它是描述和构建组织内可重复决策的标准方法，以确保决策模型在各组织之间是通用的。
 
 [[dmnDefiningDecision]]
 
 
-=== What is a DMN definition
+=== 什么是DMN定义？
 
-The root element of the DMN 1.1 schema is a *definitions* element. Within this element multiple decision definitions can be defined (although we advise you to
-have only one process definition in each file, as this simplifies maintenance later in the development process). Within each decision, one expression can be defined. There are several types of expressions. Within Flowable, currently, the expression type *decision table* is supported.
+
+DMN 1.1模式的根元素是**definitions**。在这个项目中可以定义多个决策定义(尽管我们建议每个文件中只有一个决策定义，这可以简化开发过程的后期维护)。每个决策可以定义一个表达式。目前，Flowable支持几种表达式类型中的**决策表**。
 
 [source,xml,linenums]
 ----
@@ -34,114 +36,139 @@ have only one process definition in each file, as this simplifies maintenance la
 </definitions>
 ----
 
-=== Creating a DMN definition
 
-It's possible to create a DMN Definition with a plain text editor, but for this example we'll start by using the decision table editor included in the Flowable modeler.
+=== 创建DMN定义
 
-We'll implement a very simple use case: determining the discount percentage based on a customer category.
 
-Start by opening the decision tables section within the Flowable modeler.
+虽然使用纯文本编辑器创建DMN定义是可行的，但是对于此示例，我们将首先使用Flowable建模器的决策表编辑器。
+
+
+接下来，我们将实现一个非常简单的用例：根据客户类别确定折扣百分比。
+
+
+首先打开Flowable建模器中的决策表部分。
 
 image::images/decision_tables_1.png[align="center"]
 
-And select *Create Decision Table*.
+
+选择**Create Decision Table**。
 
 image::images/decision_tables_2.png[align="center"]
 
-Provide a decision table name and a unique decision table key and select *Create new decision table*.
+
+填写决策表名称和决策表唯一键，然后选择**Create new decision table**。
 
 image::images/decision_tables_3.png[align="center"]
 
-You're now ready to define your decision table. Let's describe what is presented within the editor.
 
-==== Hit Policy
-
-In the top left corner you can select a *hit policy*.
-
-There are 7 hit policies available;
-
-*single hit*
-
-* **F**IRST: multiple (overlapping) rules can match, with different output entries. The first hit by rule order is returned (and evaluation can halt).
-
-* **U**NIQUE: no overlap is possible and all rules are disjoint. Only a single rule can be matched.
-
-* **A**NY: there may be overlap, but all of the matching rules show equal output entries for each output, so any match can be used. If the output entries are non-equal, the hit policy is incorrect and the result will be empty and marked as failed. When link:$$#strictMode$$[strict mode] is disabled the last valid rule be the result. (The violation will be present as a validation message)
-
-* **P**RIORITY: multiple rules can match, with different output entries. This policy returns the matching rule with the highest output priority. Output priorities are specified in the ordered list of output values, in decreasing order of priority.
-When link:$$#strictMode$$[strict mode] is disabled and there are no output values defined the first valid rule be the result. (The violation will be present as a validation message)
+现在就可以定义决策表了。接下来我们对编辑器做个说明。
 
 
-*multiple hit*
-
-* **O**UTPUT ORDER: returns all hits in decreasing output priority order. Output priorities are specified in the ordered list of output values in decreasing order of priority.
-
-* **R**ULE ORDER: returns all hits in rule order.
-
-* **C**OLLECT: returns all hits in arbitrary order. An operator (‘+’, ‘<’, ‘>’, ‘#’) can be added to apply a simple function to the outputs. If no operator is present, the result is the list of all the output entries.
-
-** + (sum): the result of the decision table is the sum of all the distinct outputs.
-** < (min): the result of the decision table is the smallest value of all the outputs.
-** > (max): the result of the decision table is the largest value of all the outputs.
-** # (count): the result of the decision table is the number of distinct outputs.
+==== Hit Policy 命中策略
 
 
-==== Input and Output expressions
+我们可以在左上角选择**hit policy**。
 
-The header of the decision table itself is divided in two sections; blue and green. In the blue section are the *input expressions*; the green the *output expressions*.
+
+可以看到，有7个命中策略可用。
+
+
+*单一命中*
+
+* **F**IRST: 可以匹配多个（重叠）具有不同输出条目的规则。返回规则顺序中的第一次命中（返回后停止评估）。
+
+
+* **U**NIQUE: 没有重叠的可能，所有规则都是互斥的。只能匹配到一条规则。
+
+
+* **A**NY: 可能会有重叠，但如果所有匹配规则显示每个输出的输出条目相等，就可以使用任何匹配。如果输出条目不相等，则命中策略不正确，结果将为空并标记为failed。当禁用link:$$#strictMode$$[strict mode]时，结果是最后一个有效规则。(违规将以验证消息的形式出现)
+
+
+* **P**RIORITY: 具有不同的输出条目的多个规则可以匹配。此策略返回具有最高输出优先级的匹配规则。输出优先级在输出值的有序列表中按优先级递减的顺序指定。当禁用link:$$#strictMode$$[strict mode]且未定义输出值时，结果是最后一个有效规则。(违规将以验证消息的形式出现)
+
+
+
+*多重命中*
+
+
+* **O**UTPUT ORDER: 按输出优先级递减的顺序返回所有命中规则。输出优先级在输出值的有序列表中按优先级递减的顺序指定。
+
+
+* **R**ULE ORDER: 按规则顺序返回所有命中。
+
+
+* **C**OLLECT: 以任意顺序返回所有命中。我们可以添加运算符（'+'，'<'，'>'，'＃'）来将一个简单函数应用于输出。如果没有运算符，则结果是所有输出条目的列表。
+
+** + (sum): 决策表的结果是所有不同输出的总和。
+** < (min): 决策表的结果是所有输出的最小值。
+** > (max): 决策表的结果是所有输出的最大值。
+** # (count): 决策表的结果是所有不同输出的总数。
+
+
+==== 输入和输出表达式
+
+
+决策表本身的表头分为两部分;蓝色和绿色。蓝色部分是**input expressions**（输入表达式）;绿色的是**output expressions**（输出表达式）。
 
 image::images/decision_tables_4.png[align="center"]
 
-Within an input expression, you can define the variable that will be used in the expression of the rule input entries (explained below). It's possible to define multiple input expressions by selecting *Add Input* (right click option menu or by clicking the plus icon).
+
+在输入表达式中，我们可以定义将在规则输入条目的表达式中使用的变量(下面解释)。还可以通过选择**Add Input**(右键单击option菜单或单击plus图标)来定义多个输入表达式。
 
 image::images/decision_tables_5.png[align="center"]
 
-Within an output expression, you can define what variable will be created to form the result of a decision table execution (the value of the variable will be determined by the output entry expression; explained below). It's possible to define multiple output expressions by selecting *Add Output* (right click option menu or by clicking the plus icon).
+
+在输出表达式中，我们可以定义将创建什么变量来构成决策表执行的结果(变量的值将由输出条目表达式决定，下面解释)。还可以通过选择**Add Output**(右键单击option菜单或单击plus图标)来定义多个输出表达式。
 
 
-==== Rules
+==== 规则
 
-Each rule consists of one or more input entries and one or more output entries.
-A input entry is an expression that will be evaluated against the input variable (of that 'column'). When all input entries are evaluated to be true the rule is considered true, and the output entry is evaluated.
+
+每个规则由一个或多个输入项和一个或多个输出项组成。输入项是一个表达式，它将根据输入的变量(该“列”的值)求值。当所有输入项都为true时，就认为整个规则是true，开始计算输出项。
 
 [NOTE]
 ====
-The DMN specification defines an expression language: (S)-FEEL. Currently, we do not supported this part of the specification. Within Flowable DMN, we use JUEL as the expression language.
+
+DMN规范定义了一种表达式语言：(S)-FEEL。目前，我们不支持这部分规范。 在Flowable DMN中，我们使用JUEL作为表达式语言。
 ====
 
 image::images/decision_tables_6.png[align="center"]
 
-To enter an expression, double-click on the corresponding cell. 
-In this example, the expression _== BRONZE_ is entered. Combined with the variable defined in the corresponding input expression (column header), this will result at runtime in the full expression _customerCat == "BRONZE"_.
+我们可以双击相应的单元格输入表达式。在此示例中，输入表达式== BRONZE。结合相应输入表达式（列标题）中定义的变量，将在运行时生成完整的表达式customerCat == "BRONZE"。
 
 image::images/decision_tables_7.png[align="center"]
 
-To enter an output expression, double-click the corresponding cell.
-In this example the expression _5_ is entered. This is actually more like an implicit assignment. The value 5 will be assigned to the variable in the corresponding output entry (column) when all input entries of that rule are evaluated true.
+然后双击相应的单元格输出表达式。这实际上更像是一个隐式赋值。
+在此示例中，输入表达式5。
 
-We can then continue completing the decision table by adding more rules (by selecting Add Rule).
+然后，我们可以通过添加更多规则（通过选择添加规则）继续完成决策表。
 
 image::images/decision_tables_8.png[align="center"]
 
-In our example, rule 4 has an empty input entry. Empty input entries will be evaluated by the engine as true. This means that if none of the other rules are valid, the outcome of rule 4 will be the output of this decision table. In this case, variable *discountPerc* will have value *0*.
+
+在我们的示例中，规则4有一个空的输入条目，引擎将会把这个空输入条目评估为true。那么如果其他规则都无效，则规则4的结果将是该决策表的输出。在这种情况下，变量**discountPerc**的值为**0**。
 
 image::images/decision_tables_9.png[align="center"]
 
-The decision table can now be saved. Provide a unique Decision Table key.
 
-=== Use in a BPMN2.0 process
+现在我们可以保存决策表。填入决策表唯一键。
 
-The newly created decision table can be used in a BPMN2.0 process by including a *Decision task* and selecting the *Decision table reference*.
+
+=== BPMN2.0流程中的应用
+
+
+通过包含**Decision task**并选择**Decision table reference**，可以在BPMN2.0流程中使用新创建的决策表。
 
 image::images/decision_tables_10.png[align="center"]
 
-In the process above, the process has a start form that will provide the *customer category* to the process instance (and thus to the decision table).
-The *Display Discount* user task displays the result of the decision table with an expression form field, using the expression; ${discountperc}.
+
+上面定义的流程中，该流程有一个启动表单，它将**customer category**（客户类别）提供给流程实例（从而提供给决策表）。**Display Discount**（显示折扣）用户任务使用表达式表单字段显示决策表的结果;${discountperc}。
 
 
-=== DMN 1.1 XML
+=== DMN 1.1 xml文件
 
-The full DMN 1.1 XML of the example above.
+
+上面示例的完整DMN 1.1 xml文件。
 
 [source,xml,linenums]
 ----
@@ -198,4 +225,5 @@ The full DMN 1.1 XML of the example above.
 </definitions>
 ----
 
-* Important to note here, is that the decision table key used in Flowable is the decision ID in the DMN XML. *
+
+* 此处需要重点强调的是，在Flowable中使用的决策表键是DMN xml文件中的决策ID。
