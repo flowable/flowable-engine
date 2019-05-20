@@ -127,6 +127,7 @@ public class DefaultProcessDiagramCanvas {
     protected static BufferedImage TIMER_IMAGE;
     protected static BufferedImage COMPENSATE_THROW_IMAGE;
     protected static BufferedImage COMPENSATE_CATCH_IMAGE;
+    protected static BufferedImage CONDITIONAL_CATCH_IMAGE;
     protected static BufferedImage ERROR_THROW_IMAGE;
     protected static BufferedImage ERROR_CATCH_IMAGE;
     protected static BufferedImage ESCALATION_THROW_IMAGE;
@@ -237,6 +238,7 @@ public class DefaultProcessDiagramCanvas {
             TIMER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/timer.png", customClassLoader));
             COMPENSATE_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/compensate-throw.png", customClassLoader));
             COMPENSATE_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/compensate.png", customClassLoader));
+            CONDITIONAL_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/conditional.png", customClassLoader));
             ERROR_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/error-throw.png", customClassLoader));
             ERROR_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/error.png", customClassLoader));
             ESCALATION_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/escalation-throw.png", customClassLoader));
@@ -245,6 +247,7 @@ public class DefaultProcessDiagramCanvas {
             MESSAGE_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/message.png", customClassLoader));
             SIGNAL_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/signal-throw.png", customClassLoader));
             SIGNAL_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/signal.png", customClassLoader));
+            
         } catch (IOException e) {
             LOGGER.warn("Could not load image for process diagram creation: {}", e.getMessage());
         }
@@ -402,6 +405,14 @@ public class DefaultProcessDiagramCanvas {
                 (int) (ESCALATION_CATCH_IMAGE.getWidth() / scaleFactor),
                 (int) (ESCALATION_CATCH_IMAGE.getHeight() / scaleFactor), null);
     }
+    
+    public void drawConditionalStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
+        drawNoneStartEvent(graphicInfo);
+        g.drawImage(CONDITIONAL_CATCH_IMAGE, (int) (graphicInfo.getX() + (graphicInfo.getWidth() / 4)),
+                (int) (graphicInfo.getY() + (graphicInfo.getHeight() / 4)),
+                (int) (CONDITIONAL_CATCH_IMAGE.getWidth() / scaleFactor),
+                (int) (CONDITIONAL_CATCH_IMAGE.getHeight() / scaleFactor), null);
+    }
 
     public void drawCatchingEvent(GraphicInfo graphicInfo, boolean isInterrupting,
             BufferedImage image, String eventType, double scaleFactor) {
@@ -457,6 +468,15 @@ public class DefaultProcessDiagramCanvas {
 
     public void drawCatchingCompensateEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, COMPENSATE_CATCH_IMAGE, "compensate", scaleFactor);
+    }
+    
+    public void drawCatchingConditionalEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingConditionalEvent(graphicInfo, isInterrupting, scaleFactor);
+        drawLabel(name, graphicInfo);
+    }
+    
+    public void drawCatchingConditionalEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, CONDITIONAL_CATCH_IMAGE, "conditional", scaleFactor);
     }
 
     public void drawCatchingTimerEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {

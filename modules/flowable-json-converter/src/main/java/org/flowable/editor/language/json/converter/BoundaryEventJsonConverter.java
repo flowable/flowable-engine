@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
@@ -47,6 +48,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_TIMER, BoundaryEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_CONDITIONAL, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_ERROR, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_ESCALATION, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_SIGNAL, BoundaryEventJsonConverter.class);
@@ -69,7 +71,9 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         }
 
         EventDefinition eventDefinition = eventDefinitions.get(0);
-        if (eventDefinition instanceof ErrorEventDefinition) {
+        if (eventDefinition instanceof ConditionalEventDefinition) {
+            return STENCIL_EVENT_BOUNDARY_CONDITIONAL;
+        } else if (eventDefinition instanceof ErrorEventDefinition) {
             return STENCIL_EVENT_BOUNDARY_ERROR;
         } else if (eventDefinition instanceof EscalationEventDefinition) {
             return STENCIL_EVENT_BOUNDARY_ESCALATION;
@@ -125,6 +129,9 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         if (STENCIL_EVENT_BOUNDARY_TIMER.equals(stencilId)) {
             convertJsonToTimerDefinition(elementNode, boundaryEvent);
             boundaryEvent.setCancelActivity(getPropertyValueAsBoolean(PROPERTY_CANCEL_ACTIVITY, elementNode));
+            
+        } else if (STENCIL_EVENT_BOUNDARY_CONDITIONAL.equals(stencilId)) {
+            convertJsonToConditionalDefinition(elementNode, boundaryEvent);
 
         } else if (STENCIL_EVENT_BOUNDARY_ERROR.equals(stencilId)) {
             convertJsonToErrorDefinition(elementNode, boundaryEvent);

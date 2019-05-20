@@ -104,6 +104,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         public void planDestroyScopeOperation(ExecutionEntity execution) {
             agenda.planDestroyScopeOperation(execution);
         }
+        
+        @Override
+        public void planEvaluateConditionalEventsOperation(ExecutionEntity execution) {
+            agenda.planEvaluateConditionalEventsOperation(execution);
+        }
 
         @Override
         public void planExecuteInactiveBehaviorsOperation() {
@@ -126,14 +131,12 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
 
         @Override
         public void flush() {
-            // TODO Auto-generated method stub
-            
+            agenda.flush();
         }
 
         @Override
         public void close() {
-            // TODO Auto-generated method stub
-            
+            agenda.close();
         }
 
     }

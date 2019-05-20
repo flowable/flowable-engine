@@ -140,6 +140,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
     private static final List<String> DI_GATEWAY = new ArrayList<>();
 
     static {
+        DI_CIRCLES.add(STENCIL_EVENT_START_CONDITIONAL);
         DI_CIRCLES.add(STENCIL_EVENT_START_ERROR);
         DI_CIRCLES.add(STENCIL_EVENT_START_ESCALATION);
         DI_CIRCLES.add(STENCIL_EVENT_START_MESSAGE);
@@ -147,6 +148,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_START_TIMER);
         DI_CIRCLES.add(STENCIL_EVENT_START_SIGNAL);
 
+        DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_CONDITIONAL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_ERROR);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_ESCALATION);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_SIGNAL);
@@ -155,6 +157,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_CANCEL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_COMPENSATION);
 
+        DI_CIRCLES.add(STENCIL_EVENT_CATCH_CONDITIONAL);
         DI_CIRCLES.add(STENCIL_EVENT_CATCH_MESSAGE);
         DI_CIRCLES.add(STENCIL_EVENT_CATCH_SIGNAL);
         DI_CIRCLES.add(STENCIL_EVENT_CATCH_TIMER);

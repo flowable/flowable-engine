@@ -33,6 +33,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.DataObject;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
@@ -402,6 +403,8 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 writeSignalDefinition(parentEvent, (SignalEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof MessageEventDefinition) {
                 writeMessageDefinition(parentEvent, (MessageEventDefinition) eventDefinition, model, xtw);
+            } else if (eventDefinition instanceof ConditionalEventDefinition) {
+                writeConditionalDefinition(parentEvent, (ConditionalEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof ErrorEventDefinition) {
                 writeErrorDefinition(parentEvent, (ErrorEventDefinition) eventDefinition, model, xtw);
             } else if (eventDefinition instanceof EscalationEventDefinition) {
@@ -508,6 +511,22 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
+        xtw.writeEndElement();
+    }
+    
+    protected void writeConditionalDefinition(Event parentEvent, ConditionalEventDefinition conditionalDefinition, BpmnModel model, XMLStreamWriter xtw) throws Exception {
+        xtw.writeStartElement(ELEMENT_EVENT_CONDITIONALDEFINITION);
+        boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(conditionalDefinition, false, model.getNamespaces(), xtw);
+        if (didWriteExtensionStartElement) {
+            xtw.writeEndElement();
+        }
+        
+        if (StringUtils.isNotEmpty(conditionalDefinition.getConditionExpression())) {
+            xtw.writeStartElement(ELEMENT_CONDITION);
+            xtw.writeCharacters(conditionalDefinition.getConditionExpression());
+            xtw.writeEndElement();
+        }
+        
         xtw.writeEndElement();
     }
 
