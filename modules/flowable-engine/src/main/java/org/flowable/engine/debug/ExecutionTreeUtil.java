@@ -47,7 +47,7 @@ public class ExecutionTreeUtil {
         return buildExecutionTree(allExecutions);
     }
 
-    protected static void collectChildExecutions(ExecutionEntity rootExecutionEntity, List<ExecutionEntity> allExecutions) {
+    public static void collectChildExecutions(ExecutionEntity rootExecutionEntity, List<ExecutionEntity> allExecutions) {
         for (ExecutionEntity childExecutionEntity : rootExecutionEntity.getExecutions()) {
             allExecutions.add(childExecutionEntity);
             collectChildExecutions(childExecutionEntity, allExecutions);

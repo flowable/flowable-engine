@@ -19,6 +19,7 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
@@ -58,7 +59,8 @@ public class BoundaryEventValidator extends ProcessLevelValidator {
                 EventDefinition eventDefinition = boundaryEvent.getEventDefinitions().get(0);
                 if (!(eventDefinition instanceof TimerEventDefinition) && !(eventDefinition instanceof ErrorEventDefinition) && !(eventDefinition instanceof SignalEventDefinition)
                         && !(eventDefinition instanceof CancelEventDefinition) && !(eventDefinition instanceof MessageEventDefinition) 
-                        && !(eventDefinition instanceof CompensateEventDefinition) && !(eventDefinition instanceof EscalationEventDefinition)) {
+                        && !(eventDefinition instanceof ConditionalEventDefinition) && !(eventDefinition instanceof CompensateEventDefinition) 
+                        && !(eventDefinition instanceof EscalationEventDefinition)) {
 
                     addError(errors, Problems.BOUNDARY_EVENT_INVALID_EVENT_DEFINITION, process, boundaryEvent, "Invalid or unsupported event definition");
 

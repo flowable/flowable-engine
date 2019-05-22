@@ -32,6 +32,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.BusinessRuleTask;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
@@ -104,6 +105,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                         processDiagramCanvas.drawErrorStartEvent(graphicInfo, scaleFactor);
                     } else if (eventDefinition instanceof EscalationEventDefinition) {
                         processDiagramCanvas.drawEscalationStartEvent(graphicInfo, scaleFactor);
+                    } else if (eventDefinition instanceof ConditionalEventDefinition) {
+                        processDiagramCanvas.drawConditionalStartEvent(graphicInfo, scaleFactor);
                     } else if (eventDefinition instanceof SignalEventDefinition) {
                         processDiagramCanvas.drawSignalStartEvent(graphicInfo, scaleFactor);
                     } else if (eventDefinition instanceof MessageEventDefinition) {
@@ -124,14 +127,16 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
             public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
                 GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
                 IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) flowNode;
-                if (intermediateCatchEvent.getEventDefinitions() != null && !intermediateCatchEvent.getEventDefinitions()
-                        .isEmpty()) {
+                if (intermediateCatchEvent.getEventDefinitions() != null && !intermediateCatchEvent.getEventDefinitions().isEmpty()) {
+                    
                     if (intermediateCatchEvent.getEventDefinitions().get(0) instanceof SignalEventDefinition) {
                         processDiagramCanvas.drawCatchingSignalEvent(flowNode.getName(), graphicInfo, true, scaleFactor);
                     } else if (intermediateCatchEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
                         processDiagramCanvas.drawCatchingTimerEvent(flowNode.getName(), graphicInfo, true, scaleFactor);
                     } else if (intermediateCatchEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
                         processDiagramCanvas.drawCatchingMessageEvent(flowNode.getName(), graphicInfo, true, scaleFactor);
+                    } else if (intermediateCatchEvent.getEventDefinitions().get(0) instanceof ConditionalEventDefinition) {
+                        processDiagramCanvas.drawCatchingConditionalEvent(flowNode.getName(), graphicInfo, true, scaleFactor);
                     }
                 }
             }
@@ -332,22 +337,26 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
                 BoundaryEvent boundaryEvent = (BoundaryEvent) flowNode;
                 if (boundaryEvent.getEventDefinitions() != null && !boundaryEvent.getEventDefinitions().isEmpty()) {
-                    if (boundaryEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
+                    EventDefinition eventDefinition = boundaryEvent.getEventDefinitions().get(0);
+                    if (eventDefinition instanceof TimerEventDefinition) {
                         processDiagramCanvas.drawCatchingTimerEvent(flowNode.getName(), graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
+                        
+                    } else if (eventDefinition instanceof ConditionalEventDefinition) {
+                        processDiagramCanvas.drawCatchingConditionalEvent(graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
 
-                    } else if (boundaryEvent.getEventDefinitions().get(0) instanceof ErrorEventDefinition) {
+                    } else if (eventDefinition instanceof ErrorEventDefinition) {
                         processDiagramCanvas.drawCatchingErrorEvent(graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
                         
-                    } else if (boundaryEvent.getEventDefinitions().get(0) instanceof EscalationEventDefinition) {
+                    } else if (eventDefinition instanceof EscalationEventDefinition) {
                         processDiagramCanvas.drawCatchingEscalationEvent(graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
 
-                    } else if (boundaryEvent.getEventDefinitions().get(0) instanceof SignalEventDefinition) {
+                    } else if (eventDefinition instanceof SignalEventDefinition) {
                         processDiagramCanvas.drawCatchingSignalEvent(flowNode.getName(), graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
 
-                    } else if (boundaryEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
+                    } else if (eventDefinition instanceof MessageEventDefinition) {
                         processDiagramCanvas.drawCatchingMessageEvent(flowNode.getName(), graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
 
-                    } else if (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
+                    } else if (eventDefinition instanceof CompensateEventDefinition) {
                         processDiagramCanvas.drawCatchingCompensateEvent(graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
                     }
                 }

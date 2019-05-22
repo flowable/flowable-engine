@@ -38,6 +38,8 @@ public interface FlowableEngineAgenda extends Agenda {
     void planTriggerExecutionOperation(ExecutionEntity execution);
 
     void planAsyncTriggerExecutionOperation(ExecutionEntity execution);
+    
+    void planEvaluateConditionalEventsOperation(ExecutionEntity execution);
 
     void planDestroyScopeOperation(ExecutionEntity execution);
 

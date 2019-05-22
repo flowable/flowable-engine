@@ -151,6 +151,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.CallActivityParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.CancelEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.CaseServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.CompensateEventDefinitionParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.ConditionalEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.EndEventParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ErrorEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.EscalationEventDefinitionParseHandler;
@@ -1832,6 +1833,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new CaseServiceTaskParseHandler());
         bpmnParserHandlers.add(new CancelEventDefinitionParseHandler());
         bpmnParserHandlers.add(new CompensateEventDefinitionParseHandler());
+        bpmnParserHandlers.add(new ConditionalEventDefinitionParseHandler());
         bpmnParserHandlers.add(new EndEventParseHandler());
         bpmnParserHandlers.add(new ErrorEventDefinitionParseHandler());
         bpmnParserHandlers.add(new EscalationEventDefinitionParseHandler());
