@@ -1,12 +1,13 @@
 [[springintegration]]
 
-== Spring integration
+== 整合Spring
 
-While you can definitely use Flowable without Spring, we've provided some very nice integration features that are explained in this chapter.
+不使用spring也可以很好的使用Flowable,在这一章,我们会介绍一些很有用的整合特性。
 
 === CmmnEngineFactoryBean
 
-The +CmmnEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.cmmn.spring.CmmnEngineFactoryBean+. That bean takes a CMMN engine configuration and creates the CMMN engine.  This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration, the configuration and engine beans will look like this:
+
++CmmnEngine+ 可以配置位一般的spring bean。整合的基点是 +org.flowable.cmmn.spring.CmmnEngineFactoryBean+ 类。这个bean加载CMMN配置文件并创建CMMN引擎。这意味着创建和配置和之前文档 <<configuration,configuration section>> 是一致的。整合spring,配置文件和引擎的服务类看上去是这样的：
 
 [source,xml,linenums]
 ----
@@ -20,16 +21,17 @@ The +CmmnEngine+ can be configured as a regular Spring bean. The starting point 
 
 ----
 
-Note that the +cmmnEngineConfiguration+ bean now uses the +org.flowable.cmmn.spring.SpringCmmnEngineConfiguration+ class.
+注意 +cmmnEngineConfiguration+ bean现在使用的是 +org.flowable.cmmn.spring.SpringCmmnEngineConfiguration+ 。
+
+=== 默认spring配置
+
+以下章节包括数据源(dataSource),事务管理(transactionManager),cmmn引擎(cmmnEngine)以及Flowable引擎各服务。
 
 
-=== Default Spring configuration
+当将数据源(DataSource)装入 +SpringCmmnEngineConfiguration+ (使用字段"dataSource") 里,Flowable将全局使用  +org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy+ 代理,用来包装传入的数据源。目的是让spring事务很好的管理数据库连接。这意味着您在spring配置里,不需要再代理数据源。尽管也可以将一个  +TransactionAwareDataSourceProxy+ 装入 +SpringCmmnEngineConfiguration+ ,但是再这种情况下,CMMN引擎不会再次包装该数据源。
 
-The section shown below contains the dataSource, transactionManager, cmmnEngine and the Flowable engine services.
 
-When passing the DataSource to the +SpringCmmnEngineConfiguration+ (using property "dataSource"), Flowable uses a +org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy+ internally, which wraps the passed DataSource. This is done to make sure the SQL connections retrieved from the DataSource and the Spring transactions play well together. This implies that it's no longer necessary to proxy the dataSource yourself in Spring configuration, although it's still possible to pass a +TransactionAwareDataSourceProxy+ into the +SpringCmmnEngineConfiguration+. In this case, no additional wrapping will occur.
-
-*Make sure when declaring a +TransactionAwareDataSourceProxy+ in Spring configuration yourself that you don't use it for resources that are already aware of Spring transactions (e.g. DataSourceTransactionManager need the un-proxied dataSource).*
+*确保在使用在spring配置中声明 +TransactionAwareDataSourceProxy+ 时,不要使用在spring事务代管下的数据源（比如 DataSourceTransactionManager 需要未被代理的dataSource)。*
 
 [source,xml,linenums]
 ----
@@ -39,7 +41,7 @@ When passing the DataSource to the +SpringCmmnEngineConfiguration+ (using proper
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                              http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context
                              http://www.springframework.org/schema/context/spring-context-2.5.xsd
                            http://www.springframework.org/schema/tx
                              http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
@@ -75,7 +77,8 @@ When passing the DataSource to the +SpringCmmnEngineConfiguration+ (using proper
 ----
 
 
-First, the application context is created using any of the ways supported by Spring. In this example, you could use a classpath XML resource to configure our Spring application context:
+
+首先,application context(spring容器上下文)可以使用任何spring的配置方式(比如：xml,@Configuration等)。这个示例使用的XML配置方式。
 
 [source,java,linenums]
 ----
@@ -83,7 +86,7 @@ ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationC
 	"org/flowable/cmmn/examples/spring/SpringIntegrationTest-context.xml");
 ----
 
-or, as it's a test:
+测试时这样使用：
 
 [source,java,linenums]
 ----
@@ -94,10 +97,11 @@ or, as it's a test:
 
 [[springExpressions]]
 
+=== 表达式
 
-=== Expressions
 
-When using the CmmnEngineFactoryBean, all expressions in the CMMN processes will also 'see' all the Spring beans, by default. It's possible to limit the beans (even none) you want to expose in expressions using a map that you can configure.  The example below exposes a single bean (printer), available to use under the key "printer".  *To have NO beans exposed at all, just pass an empty list as 'beans' property on the SpringCmmnEngineConfiguration. When no 'beans' property is set, all Spring beans in the context will be available.*
+使用CmmnEngineFactoryBean,所有的spring bean在CMMN流程中的表达式默认都是可见的。可以在配置SpringCmmnEngineConfiguration的beans(类型Map)属性,限制表达式中使用的bean。下面的示例是暴露了单独的名为printer的bean。
+* 如果没有需要暴露给表达式的bean,配置 beans属性位一个空map。当不设置 'beans' 属性时,所有spring容器里的bean都是可用的。 *
 
 [source,xml,linenums]
 ----
@@ -113,8 +117,7 @@ When using the CmmnEngineFactoryBean, all expressions in the CMMN processes will
 <bean id="printer" class="org.flowable.cmmn.examples.spring.Printer" />
 ----
 
-Now the exposed beans can be used in expressions:
-
+将可以使用的bean暴露给表达式：
 
 [source,xml,linenums]
 ----
@@ -140,7 +143,7 @@ Now the exposed beans can be used in expressions:
     </case>
 ----
 
-Where +Printer+ looks like this:
+ +Printer+ 代码：
 
 [source,java,linenums]
 ----
@@ -152,7 +155,7 @@ public class Printer {
 }
 ----
 
-And the Spring bean configuration (also shown above) looks like this:
+Spring配置是这样的(如上所示)：
 
 [source,xml,linenums]
 ----
@@ -165,11 +168,15 @@ And the Spring bean configuration (also shown above) looks like this:
 ----
 
 
-=== Automatic resource deployment
+=== 自动部署资源
 
 Spring integration also has a special feature for deploying resources.  In the CMMN engine configuration, you can specify a set of resources. When the CMMN engine is created, all those resources will be scanned and deployed.  There is filtering in place that prevents duplicate deployments.  Only when the resources have actually changed will new deployments be deployed to the Flowable DB. This makes sense in a lot of use cases, where the Spring container is rebooted frequently (for example, testing).
 
+整合spring,部署资源有一个独有的特性。CMMN引擎配置中可以定义很多资源。当CMMN引擎创建,这些资源将被扫描,发布。这个过程中将过滤重复发布的资源。当资源产生改变,将重新发布对应资源到数据库。这个在频繁重启的时候是很有意义的(比如测试时)。
+
 Here's an example:
+
+请看示例：
 
 [source,xml,linenums]
 ----
@@ -184,13 +191,16 @@ Here's an example:
 </bean>
 ----
 
-By default, the configuration above will group all of the resources matching the filter into a single deployment to the Flowable engine. The duplicate filtering to prevent re-deployment of unchanged resources applies to the whole deployment. In some cases, this may not be what you want. For instance, if you deploy a set of process resources this way and only a single case definition in those resources has changed, the deployment as a whole will be considered new and all of the case definitions in that deployment will be re-deployed, resulting in new  versions of each of the case definitions, even though only one was actually changed.
 
-To be able to customize the way deployments are determined, you can specify an additional property in the +SpringCmmnEngineConfiguration+, +deploymentMode+. This property defines the way deployments will be determined from the set of resources that match the filter. There are 3 values that are supported by default for this property:
+以上配置默认将匹配到资源当作同一次发布(deployment)到Flowable引擎。没有更改的资源对整个发布生效。某些情况下,这可能不是所需要的。举个例子,这些发布里仅仅有一个资源文件有改动,那么发布(deployment)包含的所有资源都会被重新发布,导致实际没有变更的事例定义会产生新的版本。
 
-* ++default++: Group all resources into a single deployment and apply duplicate filtering to that deployment. This is the default value and it will be used if you don't specify a value.
-* ++single-resource++: Create a separate deployment for each individual resource and apply duplicate filtering to that deployment. This is the value you would use to have each process definition be deployed separately and only create a new case definition version if it has changed.
-* ++resource-parent-folder++: Create a separate deployment for resources that share the same parent folder and apply duplicate filtering to that deployment. This value can be used to create separate deployments for most resources, but still be able to group some by placing them in a shared folder. Here's an example of how to specify the +single-resource+ configuration for ++deploymentMode++:
+
+针对以上的问题,可以更改 +SpringCmmnEngineConfiguration+, +deploymentMode+ , 整个属性定义了如何判断资源将被部署。默认情况下该属性有一下三个选项：
+
+
+* ++default++: 默认配置,将所有资源视为一组,当作同一发布.
+* ++single-resource++: 单独发布,将所有分开的资源每一个当作一组发布。适用于分开发布所有流程定义,当有所改变时,只有改变的事务定义会产生新的版本号。
+* ++resource-parent-folder++: 目录发布,将同一文件夹下的资源文件视为一组,作为同一文件发布。适用于将不同的部署于大多数资源文件,但是依然会将共享文件夹的资源文件视为一组。下面的示例代码为使用+single-resource+ 配置 ++deploymentMode++:
 
 
 [source,xml,linenums]
@@ -203,19 +213,49 @@ To be able to customize the way deployments are determined, you can specify an a
 </bean>
 ----
 
-In addition to using the values listed above for +deploymentMode+, you may require customized behavior towards determining deployments. If so, you can create a subclass of +SpringCmmnEngineConfiguration+ and override the +getAutoDeploymentStrategy(String deploymentMode)+ method.  This method determines which deployment strategy is used for a certain value of the +deploymentMode+ configuration.
 
+除了以上列举的3个值来配置  +deploymentMode+, 您也可以自定义规则去检测发布,创建 +SpringCmmnEngineConfiguration+  的子类,覆盖 +getAutoDeploymentStrategy(String deploymentMode)+ 方法。该方法确定 +deploymentMode+ 将使用哪种策略。
 
 [[springUnitTest]]
 
 
-=== Unit testing
+=== 单元测试
 
-When integrating with Spring, business processes can be tested very easily using the standard Flowable testing facilities. The following example shows how a case definition is tested in a typical Spring-based unit test:
 
+整合spring 使用 <<apiUnitTesting,Flowable testing facilities>> 可以很容易去测试业务事例。
+以下示例是经典的Spring-based JUnit 4或5的测试用例：
+
+.JUnit 5 test
 [source,java,linenums]
 ----
-public class MyBusinessProcessTest {
+@ExtendWith(FlowableCmmnSpringExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = CmmnSpringJunitJupiterTest.TestConfiguration.class)
+class MyBusinessCaseTest {
+
+  @Autowired
+  private CmmnRepositoryService cmmnRepositoryService;
+
+  @Autowired
+  private CmmnRuntimeService cmmnRuntimeService;
+
+  @Test
+  @CmmnDeployment
+  public void simpleCaseTest() {
+    CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+    		.caseDefinitionKey("simpleCase")
+            .variable("var1", "John Doe")
+            .start();
+
+	Assertions.assertNotNull(caseInstance);
+  }
+}
+----
+
+.JUnit 4 test
+[source,java,linenums]
+----
+public class MyBusinessCaseTest {
 
   @Rule
   public FlowableCmmnRule cmmnRule = new FlowableCmmnRule("org/flowable/spring/test/el/SpringBeanTest-context.xml");
@@ -228,9 +268,8 @@ public class MyBusinessProcessTest {
     		.caseDefinitionKey("myCase")
             .variable("var1", "John Doe")
             .start();
-            
+
 	Assert.assertNotNull(caseInstance);
   }
 }
 ----
-
