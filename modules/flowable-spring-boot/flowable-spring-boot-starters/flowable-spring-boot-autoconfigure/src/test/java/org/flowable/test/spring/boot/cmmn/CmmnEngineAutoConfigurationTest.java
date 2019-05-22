@@ -33,6 +33,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.cmmn.engine.HttpClientConfig;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -71,6 +72,30 @@ public class CmmnEngineAutoConfigurationTest {
             CmmnEngineAutoConfiguration.class
         ))
         .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class);
+
+    @Test
+    public void httpProperties() {
+        contextRunner.withPropertyValues(
+            "flowable.http.useSystemProperties=true",
+            "flowable.http.connectTimeout=PT0.250S",
+            "flowable.http.socketTimeout=PT0.500S",
+            "flowable.http.connectionRequestTimeout=PT1S",
+            "flowable.http.requestRetryLimit=1",
+            "flowable.http.disableCertVerify=true"
+        ).run(context -> {
+            CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+            HttpClientConfig httpClientConfig = cmmnEngine.getCmmnEngineConfiguration().getHttpClientConfig();
+
+            assertThat(httpClientConfig.isUseSystemProperties()).isTrue();
+            assertThat(httpClientConfig.getConnectTimeout()).isEqualTo(250);
+            assertThat(httpClientConfig.getSocketTimeout()).isEqualTo(500);
+            assertThat(httpClientConfig.getConnectionRequestTimeout()).isEqualTo(1000);
+            assertThat(httpClientConfig.getRequestRetryLimit()).isEqualTo(1);
+            assertThat(httpClientConfig.isDisableCertVerify()).isTrue();
+
+            deleteDeployments(cmmnEngine);
+        });
+    }
 
     @Test
     public void standaloneCmmnEngineWithBasicDataSource() {

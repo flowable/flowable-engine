@@ -136,6 +136,11 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
         }
         httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(retryCount, false));
 
+        // client builder settings
+        if (config.isUseSystemProperties()) {
+            httpClientBuilder.useSystemProperties();
+        }
+
         this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator(), 
                 CommandContextUtil.getProcessEngineConfiguration().getObjectMapper());
     }

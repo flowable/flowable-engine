@@ -26,6 +26,7 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.flowable.spring.boot.FlowableHttpProperties;
 import org.flowable.spring.boot.FlowableJobConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -62,7 +63,8 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableProperties.class,
     FlowableIdmProperties.class,
     FlowableCmmnProperties.class,
-    FlowableAppProperties.class
+    FlowableAppProperties.class,
+    FlowableHttpProperties.class
 })
 @AutoConfigureAfter(value = {
     AppEngineAutoConfiguration.class,
@@ -81,11 +83,14 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableHttpProperties httpProperties;
 
-    public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties) {
+    public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties,
+        FlowableHttpProperties httpProperties) {
         super(flowableProperties);
         this.cmmnProperties = cmmnProperties;
         this.idmProperties = idmProperties;
+        this.httpProperties = httpProperties;
     }
 
     /**
@@ -140,6 +145,13 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setDisableIdmEngine(!idmProperties.isEnabled());
 
         configuration.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
+
+        configuration.getHttpClientConfig().setUseSystemProperties(httpProperties.isUseSystemProperties());
+        configuration.getHttpClientConfig().setConnectionRequestTimeout(httpProperties.getConnectionRequestTimeout());
+        configuration.getHttpClientConfig().setConnectTimeout(httpProperties.getConnectTimeout());
+        configuration.getHttpClientConfig().setDisableCertVerify(httpProperties.isDisableCertVerify());
+        configuration.getHttpClientConfig().setRequestRetryLimit(httpProperties.getRequestRetryLimit());
+        configuration.getHttpClientConfig().setSocketTimeout(httpProperties.getSocketTimeout());
 
         //TODO Can it have different then the Process engine?
         configuration.setHistoryLevel(flowableProperties.getHistoryLevel());
