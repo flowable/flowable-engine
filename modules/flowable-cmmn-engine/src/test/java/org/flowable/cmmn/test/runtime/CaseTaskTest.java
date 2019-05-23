@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
@@ -32,6 +33,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.HierarchyType;
@@ -126,6 +128,13 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
             .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
             .singleResult();
         assertEquals(PlanItemInstanceState.ACTIVE, humanTaskPlanItemInstance.getState());
+
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricCaseInstance historicChildCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseInstance.getId()).singleResult();
+            assertEquals(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemDefinitionType(PlanItemDefinitionType.CASE_TASK).singleResult().getId(), historicChildCaseInstance.getCallbackId());
+            assertEquals(CallbackTypes.PLAN_ITEM_CHILD_CASE, historicChildCaseInstance.getCallbackType());
+        }
 
         PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(childCaseInstance.getId())
