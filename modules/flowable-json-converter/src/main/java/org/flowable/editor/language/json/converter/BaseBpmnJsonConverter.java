@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.DataStoreReference;
 import org.flowable.bpmn.model.ErrorEventDefinition;
@@ -504,6 +505,12 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 if (StringUtils.isNotEmpty(messageDefinition.getMessageRef())) {
                     propertiesNode.put(PROPERTY_MESSAGEREF, messageDefinition.getMessageRef());
                 }
+                
+            } else if (eventDefinition instanceof ConditionalEventDefinition) {
+                ConditionalEventDefinition conditionalDefinition = (ConditionalEventDefinition) eventDefinition;
+                if (StringUtils.isNotEmpty(conditionalDefinition.getConditionExpression())) {
+                    propertiesNode.put(PROPERTY_CONDITIONAL_EVENT_CONDITION, conditionalDefinition.getConditionExpression());
+                }
 
             } else if (eventDefinition instanceof TimerEventDefinition) {
                 TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;
@@ -623,6 +630,15 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         String messageRef = getPropertyValueAsString(PROPERTY_MESSAGEREF, objectNode);
         MessageEventDefinition eventDefinition = new MessageEventDefinition();
         eventDefinition.setMessageRef(messageRef);
+        event.getEventDefinitions().add(eventDefinition);
+    }
+    
+    protected void convertJsonToConditionalDefinition(JsonNode objectNode, Event event) {
+        String condition = getPropertyValueAsString(PROPERTY_CONDITIONAL_EVENT_CONDITION, objectNode);
+        ConditionalEventDefinition eventDefinition = new ConditionalEventDefinition();
+        if (StringUtils.isNotEmpty(condition)) {
+            eventDefinition.setConditionExpression(condition);
+        }
         event.getEventDefinitions().add(eventDefinition);
     }
     

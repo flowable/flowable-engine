@@ -31,6 +31,8 @@ import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.CancelEventDefinitionParser;
 import org.flowable.bpmn.converter.child.CompensateEventDefinitionParser;
 import org.flowable.bpmn.converter.child.ConditionExpressionParser;
+import org.flowable.bpmn.converter.child.ConditionParser;
+import org.flowable.bpmn.converter.child.ConditionalEventDefinitionParser;
 import org.flowable.bpmn.converter.child.DataInputAssociationParser;
 import org.flowable.bpmn.converter.child.DataOutputAssociationParser;
 import org.flowable.bpmn.converter.child.DataStateParser;
@@ -70,6 +72,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     static {
         addGenericParser(new CancelEventDefinitionParser());
         addGenericParser(new CompensateEventDefinitionParser());
+        addGenericParser(new ConditionalEventDefinitionParser());
+        addGenericParser(new ConditionParser());
         addGenericParser(new ConditionExpressionParser());
         addGenericParser(new DataInputAssociationParser());
         addGenericParser(new DataOutputAssociationParser());

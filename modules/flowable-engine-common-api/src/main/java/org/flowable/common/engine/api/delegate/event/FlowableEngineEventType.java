@@ -157,6 +157,17 @@ public enum FlowableEngineEventType implements FlowableEventType {
     ACTIVITY_COMPENSATE,
     
     /**
+     * A boundary, intermediate, or subprocess start conditional catching event has started.
+     */
+    ACTIVITY_CONDITIONAL_WAITING,
+    
+    /**
+     * An activity has received a conditional event. Dispatched before the actual conditional event has been received by the activity. This event will be either followed by a {@link #ACTIVITY_SIGNALLED} event or
+     * {@link #ACTIVITY_COMPLETED} for the involved activity, if the error was delivered successfully.
+     */
+    ACTIVITY_CONDITIONAL_RECEIVED,
+    
+    /**
      * A boundary, intermediate, or subprocess start escalation catching event has started.
      */
     ACTIVITY_ESCALATION_WAITING,

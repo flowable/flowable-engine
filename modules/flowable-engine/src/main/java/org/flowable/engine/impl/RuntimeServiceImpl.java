@@ -39,6 +39,7 @@ import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteMultiInstanceExecutionCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DispatchEventCommand;
+import org.flowable.engine.impl.cmd.EvaluateConditionalEventsCmd;
 import org.flowable.engine.impl.cmd.ExecuteActivityForAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.flowable.engine.impl.cmd.GetActiveAdhocSubProcessesCmd;
@@ -443,6 +444,16 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
         commandExecutor.execute(new TriggerCmd(executionId, processVariables, transientVariables));
+    }
+    
+    @Override
+    public void evaluateConditionalEvents(String processInstanceId) {
+        commandExecutor.execute(new EvaluateConditionalEventsCmd(processInstanceId, null));
+    }
+
+    @Override
+    public void evaluateConditionalEvents(String processInstanceId, Map<String, Object> processVariables) {
+        commandExecutor.execute(new EvaluateConditionalEventsCmd(processInstanceId, processVariables));
     }
 
     @Override

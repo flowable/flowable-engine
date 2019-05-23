@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.DataObject;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
@@ -335,6 +336,13 @@ public class BpmnDisplayJsonConverter {
                     }
                     if (StringUtils.isNotEmpty(timerDef.getTimeDuration())) {
                         eventNode.put("timeDuration", timerDef.getTimeDuration());
+                    }
+                    
+                } else if (eventDef instanceof ConditionalEventDefinition) {
+                    ConditionalEventDefinition conditionalDef = (ConditionalEventDefinition) eventDef;
+                    eventNode.put("type", "conditional");
+                    if (StringUtils.isNotEmpty(conditionalDef.getConditionExpression())) {
+                        eventNode.put("condition", conditionalDef.getConditionExpression());
                     }
 
                 } else if (eventDef instanceof ErrorEventDefinition) {

@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
@@ -48,6 +49,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_EVENT_START_NONE, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_TIMER, StartEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_START_CONDITIONAL, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_ERROR, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_ESCALATION, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_MESSAGE, StartEventJsonConverter.class);
@@ -65,6 +67,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
             EventDefinition eventDefinition = event.getEventDefinitions().get(0);
             if (eventDefinition instanceof TimerEventDefinition) {
                 return STENCIL_EVENT_START_TIMER;
+            } else if (eventDefinition instanceof ConditionalEventDefinition) {
+                return STENCIL_EVENT_START_CONDITIONAL;
             } else if (eventDefinition instanceof ErrorEventDefinition) {
                 return STENCIL_EVENT_START_ERROR;
             } else if (eventDefinition instanceof EscalationEventDefinition) {
@@ -137,6 +141,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
 
         } else if (STENCIL_EVENT_START_TIMER.equals(stencilId)) {
             convertJsonToTimerDefinition(elementNode, startEvent);
+        } else if (STENCIL_EVENT_START_CONDITIONAL.equals(stencilId)) {
+            convertJsonToConditionalDefinition(elementNode, startEvent);
         } else if (STENCIL_EVENT_START_ERROR.equals(stencilId)) {
             convertJsonToErrorDefinition(elementNode, startEvent);
         } else if (STENCIL_EVENT_START_ESCALATION.equals(stencilId)) {

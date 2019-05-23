@@ -26,6 +26,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableConditionalEvent;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
 import org.flowable.engine.delegate.event.FlowableEscalationEvent;
@@ -364,6 +365,18 @@ public class FlowableEventBuilder {
         newEvent.setProcessInstanceId(processInstanceId);
         newEvent.setMessageName(messageName);
         newEvent.setMessageData(payload);
+        return newEvent;
+    }
+    
+    public static FlowableConditionalEvent createConditionalEvent(FlowableEngineEventType type, String activityId, String conditionExpression,
+                    String executionId, String processInstanceId, String processDefinitionId) {
+        
+        FlowableConditionalEventImpl newEvent = new FlowableConditionalEventImpl(type);
+        newEvent.setActivityId(activityId);
+        newEvent.setExecutionId(executionId);
+        newEvent.setProcessDefinitionId(processDefinitionId);
+        newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setConditionExpression(conditionExpression);
         return newEvent;
     }
     

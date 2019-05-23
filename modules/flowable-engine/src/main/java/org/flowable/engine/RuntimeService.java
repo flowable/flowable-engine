@@ -405,6 +405,30 @@ public interface RuntimeService {
     void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables);
 
     /**
+     * Evaluate waiting conditional events (boundary, intermediate catch and event sub process start events) and trigger them if a 
+     * condition evaluates to true.
+     *
+     * @param processInstanceId
+     *            id of process instance, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when no execution is found for the given processInstanceId.
+     */
+    void evaluateConditionalEvents(String processInstanceId);
+    
+    /**
+     * Evaluate waiting conditional events (boundary, intermediate catch and event sub process start events) and trigger them if a 
+     * condition evaluates to true.
+     *
+     * @param processInstanceId
+     *            id of process instance, cannot be null.
+     * @param processVariables
+     *            a map of process variables to be set before evaluation
+     * @throws FlowableObjectNotFoundException
+     *             when no execution is found for the given processInstanceId.
+     */
+    void evaluateConditionalEvents(String processInstanceId, Map<String, Object> processVariables);
+    
+    /**
      * Updates the business key for the provided process instance
      *
      * @param processInstanceId
