@@ -15,7 +15,7 @@ package org.flowable.cmmn.model;
 /**
  * @author Joram Barrez
  */
-public class CaseTask extends Task {
+public class CaseTask extends ChildTask {
 
     protected String caseRef;
     protected Boolean fallbackToDefaultTenant;

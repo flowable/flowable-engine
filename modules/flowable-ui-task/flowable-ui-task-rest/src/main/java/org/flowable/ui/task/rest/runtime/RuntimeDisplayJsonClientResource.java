@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
@@ -524,6 +525,13 @@ public class RuntimeDisplayJsonClientResource {
                     }
                     if (StringUtils.isNotEmpty(timerDef.getTimeDuration())) {
                         eventNode.put("timeDuration", timerDef.getTimeDuration());
+                    }
+                    
+                } else if (eventDef instanceof ConditionalEventDefinition) {
+                    ConditionalEventDefinition conditionalDef = (ConditionalEventDefinition) eventDef;
+                    eventNode.put("type", "conditional");
+                    if (StringUtils.isNotEmpty(conditionalDef.getConditionExpression())) {
+                        eventNode.put("condition", conditionalDef.getConditionExpression());
                     }
 
                 } else if (eventDef instanceof ErrorEventDefinition) {

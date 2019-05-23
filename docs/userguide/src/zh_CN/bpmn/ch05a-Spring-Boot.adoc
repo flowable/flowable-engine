@@ -657,7 +657,7 @@ flowable.database-schema= # 如果数据库返回的元数据不正确，可以�
 flowable.database-schema-update=true # 数据库schema更新策略。
 flowable.db-history-used=true # 是否要使用db历史。
 flowable.deployment-name=SpringBootAutoDeployment # 自动部署的名称。
-flowable.history-level= # 要使用的历史级别。
+flowable.history-level=audit # 要使用的历史级别。
 flowable.process-definition-location-prefix=classpath*:/processes/ # 自动部署时查找流程的目录。
 flowable.process-definition-location-suffixes=**.bpmn20.xml,**.bpmn # 'processDefinitionLocationPrefix'路径下需要部署的文件的后缀（扩展名）。
 
@@ -698,7 +698,7 @@ flowable.cmmn.async-executor-activate=true # 是否启用异步执行器。
 flowable.cmmn.async.executor.async-job-lock-time-in-millis=300000 # 异步作业在被异步执行器取走后的锁定时间（以毫秒计）。在这段时间内，其它异步执行器不会尝试获取及锁定这个任务。
 flowable.cmmn.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # 异步作业获取线程在进行下次获取查询前的等待时间（以毫秒计）。只在当次没有取到新的异步作业，或者只取到很少的异步作业时生效。默认值 = 10秒。
 flowable.cmmn.async.executor.default-queue-size-full-wait-time-in-millis=0 # 异步作业（包括定时器作业与异步执行）获取线程在队列满时，等待执行下次查询的等待时间（以毫秒计）。默认值为0（以向后兼容）
-flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis=1000 # 定时器作业获取线程在进行下次获取查询前的等待时间（以毫秒计）。只在当次没有取到新的定时器作业，或者只取到很少的定时器作业时生效。默认值 = 10秒。
+flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis=10000 # 定时器作业获取线程在进行下次获取查询前的等待时间（以毫秒计）。只在当次没有取到新的定时器作业，或者只取到很少的定时器作业时生效。默认值 = 10秒。
 flowable.cmmn.async.executor.max-async-jobs-due-per-acquisition=1 # （译者补）单次查询的异步作业数量。默认值为1，以降低乐观锁异常的可能性。除非你知道自己在做什么，否则请不要修改这个值。
 flowable.cmmn.async.executor.retry-wait-time-in-millis=500 #（译者补不了了）
 flowable.cmmn.async.executor.timer-lock-time-in-millis=300000 # 定时器作业在被异步执行器取走后的锁定时间（以毫秒计）。在这段时间内，其它异步执行器不会尝试获取及锁定这个任务。

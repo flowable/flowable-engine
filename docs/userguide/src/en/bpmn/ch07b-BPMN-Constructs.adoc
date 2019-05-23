@@ -184,7 +184,7 @@ The ++signalEventDefinition++s reference the same +signal+ element.
 
 ===== Throwing a Signal Event
 
-A signal can either be thrown by a process instance using a BPMN construct or programmatically using java API. The following methods on the +org.flowable.engine.RuntimeService+ can be used to throw a signal programmatically:
+A signal can either be thrown by a process instance using a BPMN construct or programmatically using the Java API. The following methods on the +org.flowable.engine.RuntimeService+ can be used to throw a signal programmatically:
 
 [source,java,linenums]
 ----

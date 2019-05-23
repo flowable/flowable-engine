@@ -679,6 +679,12 @@
             "DESCRIPTION" : "Define the escalation name."
           }
         },
+        "CONDITIONALEVENTPACKAGE" : {
+          "CONDITION" : {
+            "TITLE" : "Condition expression",
+            "DESCRIPTION" : "Define the condition expression for the conditional event."
+          }
+        },
         "CANCELACTIVITYPACKAGE" : {
           "CANCELACTIVITY" : {
             "TITLE" : "Cancel activity",
@@ -854,6 +860,10 @@
           "TITLE" : "Start message event",
           "DESCRIPTION" : "A start event with a message trigger"
         },
+        "STARTCONDITIONALEVENT" : {
+          "TITLE" : "Start conditional event",
+          "DESCRIPTION" : "A start event that evaluates a conditional event"
+        },
         "STARTERROREVENT" : {
           "TITLE" : "Start error event",
           "DESCRIPTION" : "A start event that catches a thrown BPMN error"
@@ -946,6 +956,10 @@
           "TITLE" : "Event gateway",
           "DESCRIPTION" : "An event gateway"
         },
+        "BOUNDARYCONDITIONALEVENT" : {
+          "TITLE" : "Boundary conditional event",
+          "DESCRIPTION" : "A boundary event that evaluates a conditional event"
+        },
         "BOUNDARYERROREVENT" : {
           "TITLE" : "Boundary error event",
           "DESCRIPTION" : "A boundary event that catches a BPMN error"
@@ -985,6 +999,10 @@
         "CATCHMESSAGEEVENT" : {
           "TITLE" : "Intermediate message catching event",
           "DESCRIPTION" : "An intermediate catching event with a message trigger"
+        },
+        "CATCHCONDITIONALEVENT" : {
+          "TITLE" : "Intermediate conditional catching event",
+          "DESCRIPTION" : "An intermediate catching event with a conditional trigger"
         },
         "THROWNONEEVENT" : {
           "TITLE" : "Intermediate none throwing event",

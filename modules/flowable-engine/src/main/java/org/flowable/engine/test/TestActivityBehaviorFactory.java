@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.Escalation;
@@ -57,6 +58,7 @@ import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryCancelEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryCompensateEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.BoundaryConditionalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryMessageEventActivityBehavior;
@@ -69,6 +71,7 @@ import org.flowable.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EscalationEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessConditionalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessErrorStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessEscalationStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
@@ -76,6 +79,7 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventAct
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchConditionalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchSignalEventActivityBehavior;
@@ -310,6 +314,13 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     public EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess) {
         return wrappedActivityBehaviorFactory.createEventSubprocessActivityBehavior(eventSubProcess);
     }
+    
+    @Override
+    public EventSubProcessConditionalStartEventActivityBehavior createEventSubProcessConditionalStartEventActivityBehavior(StartEvent startEvent,
+                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression) {
+        
+        return wrappedActivityBehaviorFactory.createEventSubProcessConditionalStartEventActivityBehavior(startEvent, conditionalEventDefinition, conditionExpression);
+    }
 
     @Override
     public EventSubProcessErrorStartEventActivityBehavior createEventSubProcessErrorStartEventActivityBehavior(StartEvent startEvent) {
@@ -359,6 +370,14 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public IntermediateCatchEventActivityBehavior createIntermediateCatchEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent) {
         return wrappedActivityBehaviorFactory.createIntermediateCatchEventActivityBehavior(intermediateCatchEvent);
+    }
+    
+    @Override
+    public IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, 
+                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression) {
+        
+        return wrappedActivityBehaviorFactory.createIntermediateCatchConditionalEventActivityBehavior(intermediateCatchEvent, 
+                        conditionalEventDefinition, conditionExpression);
     }
 
     @Override
@@ -436,6 +455,14 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public BoundaryCancelEventActivityBehavior createBoundaryCancelEventActivityBehavior(CancelEventDefinition cancelEventDefinition) {
         return wrappedActivityBehaviorFactory.createBoundaryCancelEventActivityBehavior(cancelEventDefinition);
+    }
+    
+    @Override
+    public BoundaryConditionalEventActivityBehavior createBoundaryConditionalEventActivityBehavior(BoundaryEvent boundaryEvent,
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, boolean interrupting) {
+
+        return wrappedActivityBehaviorFactory.createBoundaryConditionalEventActivityBehavior(boundaryEvent, 
+                        conditionalEventDefinition, conditionExpression, interrupting);
     }
 
     @Override

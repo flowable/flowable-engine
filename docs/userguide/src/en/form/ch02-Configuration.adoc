@@ -86,7 +86,7 @@ The +flowable.form.cfg.xml+ must contain a bean that has the id +$$'formEngineCo
 ----
 
 
-This bean is then used to construct the +FormEngine+. There are multiple classes available that can be used to define the +formEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It's best practice to select the class that matches your environment the most, to minimalise the number of properties needed to configure the engine. The following classes are currently available: [[configurationClasses]]
+This bean is then used to construct the +FormEngine+. There are multiple classes available that can be used to define the +formEngineConfiguration+. These classes represent different environments, and set defaults accordingly. It is a best practice to select the class that matches your environment the most, to minimize the number of properties needed to configure the engine. The following classes are currently available: [[configurationClasses]]
 
 * *org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration*: the process engine is used in a standalone way. Flowable will take care of the transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable Form schema or the schema version is incorrect).
 * *org.flowable.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable Form will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed).

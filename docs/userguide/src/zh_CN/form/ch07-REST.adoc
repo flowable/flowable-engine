@@ -1,40 +1,51 @@
 
-=== Deployment
+=== 部署
 
-*When using tomcat, please read <<restUsageInTomcat,Usage in Tomcat>>.*
 
-==== List of Deployments
+*当使用tomcat时, 请参考在<<restTomcat,Tomcat>>中的用法。*
+
+==== 部署列表
 
 ----
 GET form-repository/deployments
 ----
 
-.URL query parameters
+.URL查询参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|name|No|String|Only return deployments with the given name.
-|nameLike|No|String|Only return deployments with a name like the given name.
-|category|No|String|Only return deployments with the given category.
-|categoryNotEquals|No|String|Only return deployments which don't have the given category.
-|tenantId|No|String|Only return deployments with the given tenantId.
-|tenantIdLike|No|String|Only return deployments with a tenantId like the given value.
-|withoutTenantId|No|Boolean|If +true+, only returns deployments without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.
-|sort|No|'id' (default), 'name', 'deploytime' or 'tenantId'|Property to sort on, to be used together with the 'order'.
-|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+|参数名称|是否必须|参数类型|描述
+
+|name|否|字符串|仅返回根据名称查询返回的部署结果集.
+
+|name模糊查询|否|字符串|仅返回根据名称模糊匹配的部署结果集.
+
+|category|否|字符串|仅返回符合类别的部署结果集.
+
+|不等于category|否|字符串|仅返回不等于该类别的其他部署结果集.
+
+|tenantId|否|字符串|仅返回给符合租户ID的部署结果集.
+
+|模糊匹配tenantId值|否|字符串|仅返回模糊匹配到租户ID值的部署结果集.
+
+|withoutTenantId|否|布尔|如果为 true 则仅返回未设置tenantId的部署。如果为 false 则忽略参数租户ID。
+
+|sort|否|'id' (默认), '名称', '部署时间' or '租户ID'|要排序的属性要与 'order' 一起使用.
+
+|普通的分页和排序可以用这个URL.
 
 |===============
 
 
-.REST Response codes
+.REST 响应编码
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates the request was successful.
+|响应编码|描述
+|200|表示请求成功.
 
 |===============
 
-*Success response body:*
+
+*成功响应正文:*
 
 [source,json,linenums]
 ----
@@ -58,31 +69,37 @@ GET form-repository/deployments
 ----
 
 
-==== Get a deployment
+
+==== 获取单个部署
 
 ----
 GET form-repository/deployments/{deploymentId}
 ----
 
-.Get a deployment - URL parameters
+.获取单个部署信息 - 请求参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|deploymentId|Yes|String|The ID of the deployment to get.
+|参数名称|是否必须|值类型|描述
+
+|部署ID|是|字符串|根据部署ID获取部署信息.
 
 |===============
 
 
-.Get a deployment - Response codes
+
+.获取部署信息 - 响应编码
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates the deployment was found and returned.
-|404|Indicates the requested deployment was not found.
+|响应编码|描述
+
+|200|表示该部署信息已经找到并且返回.
+
+|404|表示请求的部署信息未找到.
 
 |===============
 
-*Success response body:*
+
+*成功响应体:*
 
 [source,json,linenums]
 ----
@@ -97,28 +114,37 @@ GET form-repository/deployments/{deploymentId}
 ----
 
 
-==== Create a new deployment
+
+==== 创建部署信息
 
 ----
 POST form-repository/deployments
 ----
 
-*Request body:*
 
-The request body should contain data of type _multipart/form-data_. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in.
+*请求正文:*
 
-An additional parameter (form-field) can be passed in the request body with name +tenantId+. The value of this field will be used as the identifier of the tenant in which this deployment is done.
 
-.Create a new deployment - Response codes
+请求正文应包含multipart / form-data类型的数据。 请求中应该只有一个文件，任何其他文件都将被忽略。 部署名称是传入的文件字段的名称。
+
+
+可以在名称为tenantId的请求正文中传递附加参数（表单字段）。 此字段的值将用作完成此部署的租户的标识符。
+
+
+.创建新的部署信息 - 响应编码
+
 [options="header"]
 |===============
-|Response code|Description
-|201|Indicates the deployment was created.
-|400|Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.
+|响应编码|描述
+
+|201|表示已经部署成功.
+
+|400|表示请求正文中不存在任何内容，或者部署不支持内容mime-type。 状态描述包含其他信息。
 
 |===============
 
-*Success response body:*
+
+*成功响应正文:*
 
 
 [source,json,linenums]
@@ -134,105 +160,127 @@ An additional parameter (form-field) can be passed in the request body with name
 ----
 
 
-==== Delete a deployment
+==== 删除部署信息
 
 ----
 DELETE form-repository/deployments/{deploymentId}
 ----
 
-.Delete a deployment - URL parameters
+.删除一个部署信息 - 传输参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|deploymentId|Yes|String|The identifier of the deployment to delete.
+|参数|是否必须|值类型|描述
+|部署ID|是|字符串|要删除的部署的标识符。
 
 |===============
 
 
-.Delete a deployment - Response codes
+.删除某个部署 - 响应编码
 [options="header"]
 |===============
-|Response code|Description
-|204|Indicates the deployment was found and has been deleted. Response-body is intentionally empty.
-|404|Indicates the requested deployment was not found.
+|响应编码|描述
+|204|表示已找到部署并已删除。 响应体是空的。
+
+|404|表示未找到请求的部署。
 
 |===============
 
 
-==== Get a deployment resource content
+
+==== 获取部署资源内容
 
 ----
 GET form-repository/deployments/{deploymentId}/resourcedata/{resourceId}
 ----
 
-.Get a deployment resource content - URL parameters
+.获取部署资源内容 - 请求参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|deploymentId|Yes|String|The identifier of the deployment the requested resource is part of.
-|resourceId|Yes|String|The identifier of the resource to get the data for. *Make sure you URL-encode the resourceId in case it contains forward slashes. Fro example, use 'forms%2Fmy-form.form' instead of 'forms/my-form.form'.*
+|参数|是否必须|值类型|描述
+
+|部署ID|是|字符串|请求的资源所属的部署标识符。
+
+|资源ID|必须|字符串|获取数据的资源的标识符。 *确保对resourceId进行URL编码，以防它包含正斜杠。 举个例子, 比如 'forms%2Fmy-form.form' 代替 'forms/my-form.form'.*
 
 |===============
 
 
 
-.Get a deployment resource content - Response codes
+.获取部署资源内容 - 响应编码
+
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates both deployment and resource have been found and the resource data has been returned.
-|404|Indicates the requested deployment was not found or there is no resource with the given ID present in the deployment. The status-description contains additional information.
+|响应编码|描述
+|200|表示已找到部署和资源，并且已返回资源数据。
+
+|404|表示未找到请求的部署，或者部署中不存在具有给定ID的资源。 状态描述包含其他信息。
 
 |===============
 
-*Success response body:*
+
+*成功响应正文:*
 
 
-The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources 'mimeType' property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.
+响应正文将包含所请求资源的二进制资源内容。 响应内容类型将与资源'mimeType'属性中返回的类型相同。 此外，还设置了内容处置标题，允许浏览器下载文件而不是显示文件。
+
+=== 表单定义
 
 
-=== Form Definitions
-
-
-==== List of Form definitions
+==== 表单定义列表
 
 ----
 GET form-repository/form-definitions
 ----
 
-.List of form definitions - URL parameters
+.表单定义列表 - 请求参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|version|No|integer|Only return form definitions with the given version.
-|name|No|String|Only return form definitions with the given name.
-|nameLike|No|String|Only return form definitions with a name like the given name.
-|key|No|String|Only return form definitions with the given key.
-|keyLike|No|String|Only return form definitions with a name like the given key.
-|resourceName|No|String|Only return form definitions with the given resource name.
-|resourceNameLike|No|String|Only return form definitions with a name like the given resource name.
-|category|No|String|Only return form definitions with the given category.
-|categoryLike|No|String|Only return form definitions with a category like the given name.
-|categoryNotEquals|No|String|Only return form definitions which don't have the given category.
-|deploymentId|No|String|Only return form definitions which are part of a deployment with the given identifier.
-|latest|No|Boolean|Only return the latest form definition versions. Can only be used together with 'key' and 'keyLike' parameters, using any other parameter will result in a 400-response.
-|sort|No|'name' (default), 'id', 'key', 'category', 'deploymentId' and 'version'|Property to sort on, to be used together with the 'order'.
-|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+|参数|是否必须|参数类型|描述
+|version|否|整型|仅返回给定版本定义的表单.
+
+|name|否|字符串|仅返回给定名称的定义的表单。
+
+|根据name模糊匹配|否|字符串|仅返会根据名称模糊匹配到的定义表单
+
+|key|否|字符串|仅返回具有给定键的表单定义。
+
+|模糊匹配key|否|字符串|仅返回模糊匹配给定键的表单定义.
+
+|resourceName|否|字符串|仅返回具有给定资源名称的表单定义
+
+|模糊匹配resourceName|否|字符串|仅返回具有模糊匹配资源名称的表单定义
+
+|category|否|字符串|仅返回给定类别的表单定义。
+
+|模糊匹配category|否|字符串|仅返回模糊匹配给定类别的表单定义。
+
+|不等于category|否|字符串|仅返回非给定类别的表单定义。
+
+|deploymentId|否|字符串|仅返回作为具有给定标识符的部署的一部分的表单定义。
+
+|latest|否|布尔|仅返回最新的表单定义版本。 只能与'key'和'keyLike'参数一起使用，使用任何其他参数将导致400响应。
+
+|sort|否|'name' (default), 'id', 'key', 'category', 'deploymentId' 和 'version'|要排序的属性，与“order”一起使用。
+
+|一般 <<restPagingAndSort,分页和排序请求参数>>可以用在这个请求.
 
 |===============
 
 
-.List of form definitions - Response codes
+.表单定义列表 - 响应编码
+
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates request was successful and the form definitions are returned
-|400|Indicates a parameter was passed in the wrong format or that 'latest' is used with other parameters other than 'key' and 'keyLike'. The status-message contains additional information.
+|响应编码|描述
+|200|表示请求成功，并返回表单定义
+
+|400|表示参数以错误的格式传递，或者“latest”与“key”和“keyLike”以外的其他参数一起使用。 状态消息包含其他信息。
 
 |===============
 
 
-*Success response body:*
+
+*成功响应正文:*
 
 [source,json,linenums]
 ----
@@ -259,32 +307,36 @@ GET form-repository/form-definitions
 ----
 
 
-==== Get a form definition
+==== 获取定义的表单
+
 
 ----
 GET repository/form-definitions/{formDefinitionId}
 ----
 
-.Get a form definition - URL parameters
+
+.获取表单 - 请求参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|formDefinitionId|Yes|String|The identifier of the process definition to get.
+|参数|是否必须|值类型|描述
+|formDefinitionId|是|字符串|要获取的流程定义的标识符。
 
 |===============
 
 
-.Get a form definition - Response codes
+.获取定义的表单 - 响应编码
 [options="header"]
 |===============
 |Response code|Description
-|200|Indicates the form definition was found and returned.
-|404|Indicates the requested form definition was not found.
+|响应编码|描述
+|200|表示已找到并返回表单定义。
+
+|404|表示找不到请求的表单定义。
 
 |===============
 
 
-*Success response body:*
+*成功返回例子:*
 
 [source,json,linenums]
 ----
@@ -302,85 +354,87 @@ GET repository/form-definitions/{formDefinitionId}
 ----
 
 
-==== Get a form definition resource content
+==== 获取表单定义资源内容
 
 ----
 GET repository/form-definitions/{formDefinitionId}/resourcedata
 ----
 
-.Get a form definition resource content - URL parameters
+.获取表单定义资源内容 - 请求参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|formDefinitionId|Yes|String|The identifier of the form definition to get the resource data for.
+|参数名|是否必须|参数类型|描述
+
+|formDefinitionId|是|字符串|用于获取资源数据的表单定义的标识符。
 
 |===============
 
-*Response:*
+*返回值:*
 
-Exactly the same response codes/boy as +GET form-repository/deployment/{deploymentId}/resourcedata/{resourceId}+.
+返回的编码和响应体与+GET form-repository/deployment/{deploymentId}/resourcedata/{resourceId}+ 一样.
 
 
-==== Get a form definition Form model
+==== 获取定义表单的表单模型
 
 ----
 GET form-repository/form-definitions/{formDefinitionId}/model
 ----
 
-.Get a form definition Form model - URL parameters
+.获取定义表单的表单模型 - 请求参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|formDefinitionId|Yes|String|The identifier of the form definition to get the model for.
+|请求参数|是否必须|参数类型|描述
 
+|formDefinitionId|是|字符串|获取模型的表单定义的标识符。
 |===============
 
 
-.Get a form definition Form model - Response codes
+.获取定义表单的表单模型 - 响应编码
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates the form definition was found and the model is returned.
-|404|Indicates the requested form definition was not found.
+|响应编码|描述
+|200|表示找到了表单定义并返回了模型.
+
+|404|表示找不到请求的表单定义。
 
 |===============
 
 
-*Response body:*
-The response body is a JSON representation of the +org.flowable.form.model.FormModel+ and contains the full form definition model.
+*响应正文:*
+响应主体是+ org.flowable.form.model.FormModel +的JSON表示，并包含完整的表单定义模型。
+
+=== 表单实例
 
 
-=== Form Instances
-
-
-==== Get a form instance
+==== 获取表单实例
 
 
 ----
 GET form/form-instances/{formInstanceId}
 ----
 
-.Get a form instance - URL parameters
+.获取表单实例 - 请求参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|formInstanceId|Yes|String|The identifier of the form instance to get.
+|请求参数|是否必须|参数类型|描述
+
+|formInstanceId|是|字符串|要获取的表单实例的标识符。
 
 |===============
 
 
-.Get a form instance - Response codes
+.获取表单实例 - 响应编码
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates the form instance was found and returned.
-|404|Indicates the requested form instance was not found.
+|响应编码|描述
+|200|表示找到并返回了表单实例.
+
+|404|表示找不到请求的表单实例。
 
 |===============
 
 
-*Success response body:*
-
+*成功响应正文:*
 [source,json,linenums]
 ----
 {
@@ -398,13 +452,13 @@ GET form/form-instances/{formInstanceId}
 ----
 
 
-==== Store a form instance
+==== 存储表单实例
 
 ----
 POST form/form-instances
 ----
 
-*Request body (start by process definition id):*
+*请求正文（以流程定义ID开头）:*
 
 [source,json,linenums]
 ----
@@ -413,17 +467,13 @@ POST form/form-instances
    "taskId":"88",
    "processInstanceId":"66",
    "processDefinitionId":"oneTaskProcess:1:158",
-   "businessKey":"myBusinessKey",
-   "variables": [
-      {
-        "name":"input1",
-        "value":"test",
-      }
-   ]
+   "variables": {
+      "input1": "test"
+   }
 }
 ----
 
-*Request body (start by form definition key):*
+*请求正文（从表单定义键开始）：*
 
 [source,json,linenums]
 ----
@@ -432,31 +482,28 @@ POST form/form-instances
    "taskId":"88",
    "processInstanceId":"66",
    "processDefinitionId":"oneTaskProcess:1:158",
-   "businessKey":"myBusinessKey",
-   "variables": [
-      {
-        "name":"input1",
-        "value":"test",
-      }
-   ]
+   "variables": {
+      "input1": "test"
+   }
 }
 ----
 
 
-Only one of +formDefinitionId+ or +formDefinitionKey+ can be used in the request body. Parameters +variables+ and +tenantId+ are optional. If +tenantId+ is omitted, the default tenant will be used. More information about the variable format can be found in <<restVariables,the REST variables section>>.
 
+在请求正文中只能使用+ formDefinitionId +或+ formDefinitionKey +中的一个。 参数+变量+和+ tenantId +是可选的。 如果省略+ tenantId +，将使用默认租户。 有关变量格式的更多信息可以在<<restVariables,变量部分>>中找到。
 
-.Store a form instance - Response codes
+.存储表单实例 - 响应代码
 [options="header"]
 |===============
-|Response code|Description
-|201|Indicates the form instance was created.
-|400|Indicates either the form definition was not found (based on identifier or key), no form instance was stored by sending the given message, or an invalid variable has been passed. Status description contains additional information about the error.
+|响应吗|描述
+|201|表示已创建表单实例。
+
+|400|表示未找到表单定义（基于标识符或键），通过发送给定消息未存储表单实例，或者已传递无效变量。 状态描述包含有关错误的其他信息。
 
 |===============
 
 
-*Success response body:*
+*响应成功正文:*
 
 [source,json,linenums]
 ----
@@ -478,47 +525,62 @@ Only one of +formDefinitionId+ or +formDefinitionKey+ can be used in the request
 [[restProcessInstancesGet]]
 
 
-==== List of form instances
+==== 表单实例列表
 
 ----
 GET form/form-instances
 ----
 
-.List of form instances - URL query parameters
+.表单实例列表 - 请求参数
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|id|No|String|Only return process instance with the given identifier.
-|formDefinitionId|No|String|Only return form instances with the given form definition identifier.
-|formDefinitionIdLike|No|String|Only return form instances with a form definition identifier like the given value.
-|taskId|No|String|Only return form instances with the given task identifier.
-|taskIdLike|No|String|Only return form instances with a task identifier like the given value.
-|processInstanceId|No|String|Only return form instances with the given process instance identifier.
-|processInstanceIdLike|No|String|Only return form instances with a process instance identifier like the given value.
-|processDefinitionId|No|String|Only return form instances with the given process definition identifier.
-|processDefinitionIdLike|No|String|Only return form instances with a process definition identifier like the given value.
-|submittedBy|No|String|Only return form instances with the given submitted by.
-|submittedByLike|No|String|Only return form instances with a submitted by like the given value.
-|tenantId|No|String|Only return process instances with the given tenantId.
-|tenantIdLike|No|String|Only return process instances with a tenantId like the given value.
-|withoutTenantId|No|Boolean|If +true+, only returns process instances without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.
-|sort|No|String|Sort field, should be either one of +submittedDate+ (default) or +tenantId+.
-|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+|请求参数|是否必须|值类型|描述
 
+|id|否|字符串|仅返回具有给定标识符的流程实例。
+
+|表单定义ID|否|字符串|仅返回具有给定表单定义标识符的表单实例。
+
+|模糊匹配表单ID|否|字符串|仅返回具有表单定义标识符（模糊匹配给定值）的表单实例。
+
+|任务ID|否|字符串|仅返回具有给定任务标识符的表单实例。
+|模糊匹配任务ID|否|字符串|仅返回具有任务标识符（如模糊匹配给定值）的表单实例。
+
+|流程实例ID|否|字符串|仅返回具有给定流程实例标识符的表单实例。
+
+|模糊匹配表单实例ID|否|字符串|仅返回具有与给定值(模糊匹配流程实例标识符)的表单实例。
+
+|流程定义ID|否|字符串|仅返回具有给定流程定义标识符的表单实例。
+
+|模糊匹配流程定义ID|否|字符串|仅返回具有与给定值（模糊匹配的流程定义标识符）的表单实例。
+
+|由...提交|否|字符串|仅返回由...提交的给定提交的表单实例。
+
+|模糊匹配由...提交|否|字符串|只返回模糊匹配给定值的提交的表单实例。
+
+|租户ID|否|字符串|仅返回具有给定租户ID的流程实例。
+
+|模糊匹配租户ID|否|字符串|仅返回具有类似给定值的(模糊匹配租户ID)的流程实例。
+
+|没有租户ID|否|布尔|如果 true，则仅返回没有设置租户ID的流程实例。 如果是false，则忽略 租户ID 参数。
+
+|排序|否|字符串|排序字段，应该是 提交日期 （默认）或 租户ID。
+
+一般<<restPagingAndSort,分页和排序 查询参数>>可以用在本链接
 |===============
 
 
-.List of form instances - Response codes
+.表单实例列表 - 响应编码
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates request was successful and the form instances are returned
-|400|Indicates a parameter was passed in the wrong format. The status message contains additional information.
+|响应编码|描述
+|200|表示请求成功，并返回表单实例
+
+|400|表示参数以错误的格式传递。 状态消息包含其他信息。
 
 |===============
 
 
-*Success response body:*
+*成功响应正文:*
 
 [source,json,linenums]
 ----
@@ -546,13 +608,13 @@ GET form/form-instances
 ----
 
 
-==== Query form instances
+==== 查询表单实例
 
 ----
 POST query/form-instances
 ----
 
-*Request body:*
+*请求正文:*
 
 [source,json,linenums]
 ----
@@ -561,22 +623,22 @@ POST query/form-instances
 }
 ----
 
-The request body can contain all possible filters that can be used in the <<restFormInstancesGet,List process instances>> URL query.
+请求正文可以包含可以在查询<<restFormInstancesGet,流程实例列表>>中使用的所有可能的过滤器
+
+普通 <<restPagingAndSort,分页和排序，查询参数>> 可用于此URL。
 
 
-The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
-
-
-.Query form instances - Response codes
+.查询表单实例 - 响应编码
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates request was successful and the form instances are returned
-|400|Indicates a parameter was passed in the wrong format. The status message contains additional information.
+|响应编码|描述
+|200|表示请求成功，并返回表单实例
+
+|400|表示参数以错误的格式传递。 状态消息包含其他信息
 
 |===============
 
-*Success response body:*
+*成功响正文:*
 
 [source,json,linenums]
 ----
@@ -604,37 +666,38 @@ The general <<restPagingAndSort,paging and sorting query-parameters>> can be use
 ----
 
 
-=== Form Engine
+=== 表单引擎
 
 
-==== Get form engine info
+==== 获取表单引擎信息
 
 ----
 GET form-management/engine
 ----
 
 
-Returns a read-only view of the engine that is used in this REST-service.
+返回此REST服务中使用的引擎的只读视图。
 
 
-*Success response body:*
+*成功响应正文:*
 
 [source,json,linenums]
 ----
 {
    "name":"default",
-   "version":"6.3.0",
+   "version":"6.5.0-SNAPSHOT",
    "resourceUrl":"file://flowable/flowable.form.cfg.xml",
    "exception":null
 }
 ----
 
 
-.Get engine information - Response codes
+.获取引擎信息 - 响应编码
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates the form engine information is returned.
+|响应编码|描述
+
+|200|表示返回表单引擎信息。
 
 |===============
 

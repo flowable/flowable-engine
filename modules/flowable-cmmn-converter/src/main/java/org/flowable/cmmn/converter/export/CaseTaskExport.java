@@ -17,7 +17,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CaseTask;
 
-public class CaseTaskExport extends AbstractPlanItemDefinitionExport<CaseTask> {
+public class CaseTaskExport extends AbstractChildTaskExport<CaseTask> {
 
     @Override
     protected Class<CaseTask> getExportablePlanItemDefinitionClass() {

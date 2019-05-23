@@ -55,6 +55,7 @@ import io.swagger.annotations.Authorization;
  * 
  * @author Frederik Heremans
  * @author Ryan Johnston (@rjfsu)
+ * @author Zheng Ji
  */
 @RestController
 @Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
@@ -237,7 +238,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         Map<String, Object> startVariables = null;
         Map<String, Object> transientVariables = null;
         Map<String, Object> startFormVariables = null;
-        if (request.getStartFormVariables() != null) {
+        if (request.getStartFormVariables() != null && request.getStartFormVariables().size()>0) {
             startFormVariables = new HashMap<>();
             for (RestVariable variable : request.getStartFormVariables()) {
                 if (variable.getName() == null) {
@@ -248,7 +249,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             
         } else {
             
-            if (request.getVariables() != null) {
+            if (request.getVariables() != null && request.getVariables().size()>0) {
                 startVariables = new HashMap<>();
                 for (RestVariable variable : request.getVariables()) {
                     if (variable.getName() == null) {
@@ -258,7 +259,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 }
             }
     
-            if (request.getTransientVariables() != null) {
+            if (request.getTransientVariables() != null && request.getTransientVariables().size()>0) {
                 transientVariables = new HashMap<>();
                 for (RestVariable variable : request.getTransientVariables()) {
                     if (variable.getName() == null) {

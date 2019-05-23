@@ -1,33 +1,32 @@
 
-=== Deployment
+=== 部署
 
-*When using tomcat, please read <<restUsageInTomcat,Usage in Tomcat>>.*
+*当使用tomcat时，请阅读 <<restUsageInTomcat,Usage in Tomcat>>.*
 
 
-==== List of DMN Deployments
-
+==== 获取多个DMN部署
 ----
 GET dmn-repository/deployments
 ----
 
-.URL query parameters
+.URL 查询参数
+
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|name|No|String|Only return deployments with the given name.
-|nameLike|No|String|Only return deployments with a name like the given name.
-|category|No|String|Only return deployments with the given category.
-|categoryNotEquals|No|String|Only return deployments which don't have the given category.
-|tenantId|No|String|Only return deployments with the given tenantId.
-|tenantIdLike|No|String|Only return deployments with a tenantId like the given value.
-|withoutTenantId|No|Boolean|If +true+, only returns deployments without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.
-|sort|No|'id' (default), 'name', 'deploytime' or 'tenantId'|Property to sort on, to be used together with the 'order'.
-|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
-
+|参数|必需|类型|描述
+|name|No|String|返回指定名称的部署.
+|nameLike|No|String|模糊查询指定名称.
+|category|No|String|返回指定类别.
+|categoryNotEquals|No|String|返回指定类别以外的部署.
+|tenantId|No|String|返回指定tenantId的部署.
+|tenantIdLike|No|String|模糊查询指定tenantId的部署.
+|withoutTenantId|No|Boolean|如果为true 则返回指定tenantId以外的部署，如果为false 则忽略掉该参数.
+|sort|No|'id' (default), 'name', 'deploytime' or 'tenantId'|属性进行排序，与“order”一起使用.
+|可以使用<<restPagingAndSort,paging and sorting query-parameters>>.
 |===============
 
 
-.REST Response codes
+.REST 返回编码
 [options="header"]
 |===============
 |Response code|Description
@@ -35,7 +34,15 @@ GET dmn-repository/deployments
 
 |===============
 
+[options="header"]
+|===============
+|返回编码|描述
+|200|请求成功.
+|===============
+
+
 *Success response body:*
+*成功返回示例:*
 
 [source,json,linenums]
 ----
@@ -60,32 +67,34 @@ GET dmn-repository/deployments
 ----
 
 
-==== Get a DMN deployment
+==== 获取一个DMN部署
 
 ----
 GET dmn-repository/deployments/{deploymentId}
 ----
 
-.Get a deployment - URL parameters
+.获取一个部署- URL 参数
+
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|deploymentId|Yes|String|The identifier of the deployment to get.
+|参数|必需|类型|描述
+|deploymentId|Yes|String|部署唯一id.
 
 |===============
 
 
-.Get a deployment - Response codes
+.获取一个部署- 返回编码
+[options="header"]
+
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates the deployment was found and returned.
-|404|Indicates the requested deployment was not found.
+|返回编码|描述
+|200|找到并返回指定部署.
+|404|为找到指定的部署.
 
 |===============
 
-*Success response body:*
-
+*成功示例:*
 [source,json,linenums]
 ----
 {
@@ -101,18 +110,22 @@ GET dmn-repository/deployments/{deploymentId}
 
 
 ==== Create a new DMN deployment
+（创建一个DMN部署）
 
 ----
 POST dmn-repository/deployments
 ----
 
 *Request body:*
+*请求消息体:*
 
 The request body should contain data of type _multipart/form-data_. There should be exactly one file in the request: any additional files will be ignored. The deployment name is the name of the file-field passed in.
-
+（请求消息体应该包含 _multipart/form-data_ 类型。请求中应该只有一个文件:任何额外的文件都将被忽略。file-field 的名称作为部署的名称）
 An additional parameter (form-field) can be passed in the request body with name +tenantId+. The value of this field will be used as the identifier of the tenant in which this deployment is done.
-
+（可以在请求体中通过name +tenantId+传递附加参数(表单字段)。此字段的值将用作执行此部署的租户的标识符。）
 .Create a new DMN deployment - Response codes
+（创建一个DMN部署-返回编码）
+
 [options="header"]
 |===============
 |Response code|Description
@@ -121,8 +134,16 @@ An additional parameter (form-field) can be passed in the request body with name
 
 |===============
 
-*Success response body:*
+[options="header"]
+|===============
+|返回编码|描述
+|201|指定的部署已经存在.
+|400|请求主体中不存在内容，或部署不支持该内容的mime-type。状态描述包含附加信息。
 
+|===============
+
+*Success response body:*
+(*成功示例:*)
 
 [source,json,linenums]
 ----
@@ -138,12 +159,14 @@ An additional parameter (form-field) can be passed in the request body with name
 
 
 ==== Delete a DMN deployment
+（删除一个部署）
 
 ----
 DELETE dmn-repository/deployments/{deploymentId}
 ----
 
 .Delete a DMN deployment - URL parameters
+（删除一个部署- URL 参数）
 [options="header"]
 |===============
 |Parameter|Required|Value|Description
@@ -151,8 +174,16 @@ DELETE dmn-repository/deployments/{deploymentId}
 
 |===============
 
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|deploymentId|Yes|String|需要删除的部署的编号.
+
+|===============
+
 
 .Delete a DMN deployment - Response codes
+（删除一个部署 - 返回编码）
 [options="header"]
 |===============
 |Response code|Description
@@ -161,14 +192,23 @@ DELETE dmn-repository/deployments/{deploymentId}
 
 |===============
 
+[options="header"]
+|===============
+|返回编码|描述
+|204|指定的部署已经被删除。返回内容特意为空。
+|404|未找到指定的部署。
+
+|===============
+
 
 ==== Get a DMN deployment resource content
-
+（获取DMN部署资源内容）
 ----
 GET dmn-repository/deployments/{deploymentId}/resourcedata/{resourceId}
 ----
 
 .Get a deployment resource content - URL parameters
+（获取DMN部署资源内容 - URL 参数）
 [options="header"]
 |===============
 |Parameter|Required|Value|Description
@@ -177,9 +217,18 @@ GET dmn-repository/deployments/{deploymentId}/resourcedata/{resourceId}
 
 |===============
 
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|deploymentId|Yes|String|指定部署编号。
+|resourceId|Yes|String|指定资源编号。确保resourceId的URL编码，以防它包含前斜杠。例如，使用 'decisions%2Fmy-decision.dmn'。而不是'decisions/my-decision.dmn'
+
+|===============
+
 
 
 .Get a deployment resource content - Response codes
+（.获取DMN部署资源内容 - 返回编码）
 [options="header"]
 |===============
 |Response code|Description
@@ -188,16 +237,26 @@ GET dmn-repository/deployments/{deploymentId}/resourcedata/{resourceId}
 
 |===============
 
+[options="header"]
+|===============
+|Response code|Description
+|200|已找到指定的部署和资源，并返回资源数据。
+|404|未找到所请求的部署，或部署中不存在指定的资源。状态描述包含附加信息。
+
+|===============
+
 *Success response body:*
+（*成功示例:*）
 
 
 The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources 'mimeType' property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.
-
+（响应体将包含请求资源的二进制资源内容。响应内容类型将与资源“mimeType”属性中返回的类型相同。此外，header还设置了一个content-disposition ，允许浏览器下载文件而不是显示它。）
 
 === Decision Tables
-
+（决策表）
 
 ==== List of decision tables
+（获取决策表列表）
 
 
 ----
@@ -205,6 +264,7 @@ GET dmn-repository/decision-tables
 ----
 
 .List of process definitions - URL parameters
+（获取流程定义列表- URL 参数）
 [options="header"]
 |===============
 |Parameter|Required|Value|Description
@@ -225,18 +285,39 @@ GET dmn-repository/decision-tables
 
 |===============
 
-
-.List of process definitions - Response codes
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates request was successful and the decision tables are returned
-|400|Indicates a parameter was passed in the wrong format or that 'latest' is used with other parameters other than 'key' and 'keyLike'. The status-message contains additional information.
+|参数|必需|类型|描述
+|version|No|integer|返回指定版本的流程定义。
+|name|No|String|返回指定名称的流程定义。
+|nameLike|No|String|模糊查询指定名称的流程定义。
+|key|No|String|返回指定key的流程定义。
+|keyLike|No|String|模糊查询指定key的流程定义。
+|resourceName|No|String|返回指定资源名称的流程定义。
+|resourceNameLike|No|String|模糊查询指定资源名称的流程定义。
+|category|No|String|返回指定类别的流程定义。
+|categoryLike|No|String|模糊查询指定名称的流程定义。
+|categoryNotEquals|No|String|返回指定类型以外的流程定义。
+|deploymentId|No|String|返回指定部署编号的流程定义。
+|latest|No|Boolean|返回最新版本的流程定义。只能与“key”和“keyLike”参数一起使用，使用任何其他参数都会得到400个响应。
+|sort|No|'name' (default), 'id', 'key', 'category', 'deploymentId' and 'version'|排序，与“order”一起使用。
+|可以使用<<restPagingAndSort,paging and sorting query-parameters>>.
 
 |===============
 
 
-*Success response body:*
+.获取流程定义列表 - 返回编码
+
+[options="header"]
+|===============
+|返回编码|描述
+|200|请求成功，并返回决策表
+|400|参数以错误的格式传递，或'latest' 与'key' 和 'keyLike'以外的其他参数一起使用。状态消息包含其他信息。
+
+|===============
+
+
+*成功示例:*
 
 [source,json,linenums]
 ----
@@ -265,32 +346,36 @@ GET dmn-repository/decision-tables
 ----
 
 
-==== Get a decision table
+==== 获取一个决策表
 
 ----
 GET dmn-repository/decision-tables/{decisionTableId}
 ----
 
-.Get a decision table - URL parameters
+.获取一个决策表 - URL 参数
+[options="header"]
+
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|decisionTableId|Yes|String|The identifier of the decision table to get.
+|参数|必需|类型|描述
+|decisionTableId|Yes|String|决策表编号。
 
 |===============
 
 
-.Get a decision table - Response codes
+.获取一个决策表 - 返回编码
+[options="header"]
+
 [options="header"]
 |===============
 |Response code|Description
-|200|Indicates the decision table was found and returned.
-|404|Indicates the requested decision table was not found.
+|200|找到指定编号决策表并返回
+|404|未找到指定编号决策表
 
 |===============
 
 
-*Success response body:*
+*成功示例:*
 
 [source,json,linenums]
 ----
@@ -310,52 +395,58 @@ GET dmn-repository/decision-tables/{decisionTableId}
 ----
 
 
-==== Get a decision table resource content
-
+==== 获取一个决策表资源内容
 ----
 GET dmn-repository/decision-tables/{decisionTableId}/resourcedata
 ----
 
-.Get a decision table resource content - URL parameters
+.获取一个决策表资源内容 - URL 参数
+
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|decisionTableId|Yes|String|The identifier of the decision table to get the resource data for.
+|参数|必需|类型|描述
+|decisionTableId|Yes|String|决策表编号。
 
 |===============
 
-*Response:*
+*返回:*
 
-Exactly the same response codes/boy as +GET dmn-repository/deployment/{deploymentId}/resourcedata/{resourceId}+.
+与 +GET dmn-repository/deployment/{deploymentId}/resourcedata/{resourceId}+ 相同.
 
 
-==== Get a decision table DMN model
+==== 获取一个决策表DMN模型
 
 ----
 GET dmn-repository/decision-tables/{decisionTableId}/model
 ----
 
-.Get a decision table DMN model - URL parameters
+.获取一个决策表DMN模型- URL 参数
+[options="header"]
+
+
 [options="header"]
 |===============
-|Parameter|Required|Value|Description
-|decisionTableId|Yes|String|The identifier of the decision table to get the model for.
+|参数|必需|类型|描述
+|decisionTableId|Yes|String|决策表编号。
 
 |===============
 
 
-.Get a decision table DMN model - Response codes
+.获取一个决策表DMN模型- 返回编码
+[options="header"]
+
+
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates the decision table was found and the model is returned.
-|404|Indicates the requested decision table was not found.
+|返回编码|描述
+|200|找到指定决策表并返回模型。
+|404|未找到指定决策表。
 
 |===============
 
 
-*Response body:*
-The response body is a JSON representation of the +org.flowable.dmn.model.DmnDefinition+ and contains the full DMN definition model.
+*返回内容:*
+返回内容是+org.flowable.dmn.model.DmnDefinition+的JSON。并包含完整的DMN定义模型。
 
 [source,json,linenums]
 ----
@@ -377,10 +468,9 @@ The response body is a JSON representation of the +org.flowable.dmn.model.DmnDef
 ----
 
 
-=== DMN Rule Service
+=== DMN规则服务
 
-
-==== Execute a decision
+==== 执行一个决策
 
 ----
 POST dmn-rule/execute
@@ -388,7 +478,7 @@ POST dmn-rule/execute
 
 *Request body:*
 
-The request body should contain data of type _multipart/form-data_. The decisionKey is required. The tenantId, parentDeploymentId and a map of inputVariables (restVariables) are optional.
+请求体应该包含_multipart/form-data_类型的数据。需要decisionKey。tenantId、parentdeploymentd和inputVariables (restVariables)映射是可选的。
 
 *Response body:*
 
@@ -421,26 +511,29 @@ The request body should contain data of type _multipart/form-data_. The decision
   "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-rule/execute"
 }
 ----
-.Execute a decision - Response codes
+.执行一个决策 - 返回编码
+[options="header"]
+
+
 [options="header"]
 |===============
-|Response code|Description
-|201|Indicates the Decision has been executed.
+|返回编码|描述
+|201|已执行该决策。
+
 |===============
 
-==== Execute a single result decision
-
+==== 执行一个单结果决策
 ----
 POST dmn-rule/execute/single-result
 ----
 
 *Request body:*
 
-The request body should contain data of type _multipart/form-data_. The decisionKey is required. The tenantId, parentDeploymentId and a map of inputVariables (restVariables) are optional.
+请求体应该包含_multipart/form-data_类型的数据。需要decisionKey。tenantId、parentdeploymentd和inputVariables (restVariables)映射是可选的。
 
-When multiple rules are valid the service will respond with a 500 code. 
-*Note: a single hit with a compound output is valid (see response below)*
+当多个规则有效时，返回500。
 
+*注意:使用复合输出的单个命中是有效的(参见下面的响应)*
 
 *Response body:*
 
@@ -462,45 +555,49 @@ When multiple rules are valid the service will respond with a 500 code.
   "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-rule/execute/single-result"
 }
 ----
-.Execute a single resultdecision - Response codes
+.执行一个单结果决策 - 返回编码
+[options="header"]
+
+
 [options="header"]
 |===============
-|Response code|Description
-|201|Indicates the Decision has been executed.
-|500|Indicates the Decision returned multiple results.
+|返回编码|描述
+|201|已执行指定决策。
+|500|指定决策返回多个结果。
+
 |===============
 
 
 
-=== Engine
+=== 引擎
 
-
-==== Get DMN engine info
+==== 获取一个DMN引擎信息
 
 ----
 GET dmn-management/engine
 ----
 
+返回此rest服务中使用的DMN引擎的只读视图。
 
-Returns a read-only view of the DMN engine that is used in this REST-service.
 
-
-*Success response body:*
+*响应成功:*
 
 [source,json,linenums]
 ----
 {
    "name":"default",
-   "version":"6.3.0",
+   "version":"6.5.0-SNAPSHOT",
    "resourceUrl":"file://flowable-dmn/flowable.dmn.cfg.xml",
    "exception":null
 }
 ----
 
-.Get engine information - Response codes
+.获取引擎信息 - 返回编码
+[options="header"]
+
 [options="header"]
 |===============
-|Response code|Description
-|200|Indicates the engine information has been returned.
+|返回编码|描述
+|200|返回指定引擎信息。
 
 |===============
