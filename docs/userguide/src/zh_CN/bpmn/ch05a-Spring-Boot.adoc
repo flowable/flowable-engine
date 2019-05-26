@@ -777,6 +777,14 @@ flowable.mail.server.use-ssl=false # 是否使用SSL/TLS加密SMTP传输连接�
 flowable.mail.server.use-tls=false # 使用或禁用STARTTLS加密。
 flowable.mail.server.username= # 邮件服务器的登录用户名。如果为空，则不需要登录。
 
+# Flowable Http {sc-flowable-boot}/FlowableHttpProperties.java[FlowableHttpProperties]
+flowable.http.user-system-properties=false # 是否使用系统属性 (e.g. http.proxyPort).
+flowable.http.connect-timeout=5s # 连接http客户端的超时时间
+flowable.http.socket-timeout=5s #  http客户端的Socket超时时间
+flowable.http.connection-request-timeout=5s #  http客户端的连接请求超时时间
+flowable.http.request-retry-limit=3 #  请求http客户端的重试限制
+flowable.http.disable-cert-verify=false # 是否禁用http客户端的证书验证
+
 # Actuator
 management.endpoint.flowable.cache.time-to-live=0ms # 缓存响应的最大时间。
 management.endpoint.flowable.enabled=true # 是否启用flowable端点。
