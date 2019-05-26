@@ -66,6 +66,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
+ * @author Zheng Ji
  */
 public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, StencilConstants {
 
@@ -623,6 +624,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         String signalRef = getPropertyValueAsString(PROPERTY_SIGNALREF, objectNode);
         SignalEventDefinition eventDefinition = new SignalEventDefinition();
         eventDefinition.setSignalRef(signalRef);
+        eventDefinition.setAsync(getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, objectNode));
         event.getEventDefinitions().add(eventDefinition);
     }
 
