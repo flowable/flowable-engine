@@ -802,7 +802,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initEntityLinkServiceConfiguration();
         initEventSubscriptionServiceConfiguration();
         initVariableServiceConfiguration();
-        configuratorsAfterInit();
         initTaskServiceConfiguration();
         initBusinessCalendarManager();
         initJobHandlers();
@@ -812,6 +811,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initAsyncExecutor();
         initAsyncHistoryExecutor();
         initScriptingEngines();
+        configuratorsAfterInit();
     }
 
     public void initCaseDiagramGenerator() {

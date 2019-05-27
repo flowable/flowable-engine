@@ -114,6 +114,11 @@ public class VariableServiceImpl extends CommonServiceImpl<VariableServiceConfig
     }
 
     @Override
+    public VariableInstanceEntity createVariableInstance(String name, VariableType type) {
+        return getVariableInstanceEntityManager().create(name, type);
+    }
+
+    @Override
     public void insertVariableInstance(VariableInstanceEntity variable) {
         getVariableInstanceEntityManager().insert(variable);
     }
