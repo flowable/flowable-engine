@@ -73,6 +73,14 @@
                 <constraints nullable="true" />
             </column>
         </createTable>
+        
+        <addUniqueConstraint columnNames="CONTENT_STORE_ID_" tableName="ACT_CO_CONTENT_ITEM"/>
+        
+        <addForeignKeyConstraint constraintName="ACT_FK_CO_COIT_STIT" 
+            referencedTableName="ACT_CO_CONTENT_ITEM"
+            referencedColumnNames="CONTENT_STORE_ID_" 
+            baseTableName="ACT_CO_STORAGE_ITEM"
+            baseColumnNames="ID_" />
     </changeSet>
 
 </databaseChangeLog>
