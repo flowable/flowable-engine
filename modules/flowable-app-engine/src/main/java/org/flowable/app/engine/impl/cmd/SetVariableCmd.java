@@ -50,9 +50,10 @@ public class SetVariableCmd implements Command<Void> {
         VariableType type = variableTypes.findVariableType(variableValue);
      
         VariableService variableService = CommandContextUtil.getVariableService(commandContext);
-        VariableInstanceEntity variableInstance = variableService.createVariableInstance(variableName, type, variableValue);
+        VariableInstanceEntity variableInstance = variableService.createVariableInstance(variableName, type);
         variableInstance.setScopeId(appDefinitionId);
         variableInstance.setScopeType(ScopeTypes.APP);
+        variableInstance.setValue(variableValue);
         variableService.updateVariableInstance(variableInstance);
         
         return null;

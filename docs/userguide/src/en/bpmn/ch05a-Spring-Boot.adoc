@@ -775,6 +775,14 @@ flowable.mail.server.use-ssl=false # Sets whether SSL/TLS encryption should be e
 flowable.mail.server.use-tls=false # Set or disable the STARTTLS encryption.
 flowable.mail.server.username= # The username that needs to be used for the mail server authentication. If empty no authentication would be used.
 
+# Flowable Http {sc-flowable-boot}/FlowableHttpProperties.java[FlowableHttpProperties]
+flowable.http.user-system-properties=false # Whether to use system properties (e.g. http.proxyPort).
+flowable.http.connect-timeout=5s # Connect timeout for the http client
+flowable.http.socket-timeout=5s # Socket timeout for the http client
+flowable.http.connection-request-timeout=5s # Connection Request Timeout for the http client
+flowable.http.request-retry-limit=3 # Request retry limit for the http client
+flowable.http.disable-cert-verify=false # Whether to disable certificate validation for the http client
+
 # Actuator
 management.endpoint.flowable.cache.time-to-live=0ms # Maximum time that a response can be cached.
 management.endpoint.flowable.enabled=true # Whether to enable the flowable endpoint.

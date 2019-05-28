@@ -178,7 +178,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         }
         
         CaseInstanceEntity caseInstanceEntity = createCaseInstanceEntityFromDefinition(commandContext, caseDefinition, instanceBeforeContext);
-        applyCaseInstanceBuilder(caseInstanceBuilder, caseInstanceEntity, caseDefinition, instanceBeforeContext, commandContext);
+        applyCaseInstanceBuilder(cmmnEngineConfiguration, caseInstanceBuilder, caseInstanceEntity, caseDefinition, instanceBeforeContext, commandContext);
 
         if (cmmnEngineConfiguration.isEnableEntityLinks()) {
             if (CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(caseInstanceEntity.getCallbackType())) {
@@ -202,7 +202,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         return caseInstanceEntity;
     }
 
-    protected void applyCaseInstanceBuilder(CaseInstanceBuilder caseInstanceBuilder, CaseInstanceEntity caseInstanceEntity, 
+    protected void applyCaseInstanceBuilder(CmmnEngineConfiguration cmmnEngineConfiguration, CaseInstanceBuilder caseInstanceBuilder, CaseInstanceEntity caseInstanceEntity,
                     CaseDefinition caseDefinition, StartCaseInstanceBeforeContext instanceBeforeContext, CommandContext commandContext) {
         
         if (instanceBeforeContext.getCaseInstanceName() != null) {
@@ -227,6 +227,13 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         if (instanceBeforeContext.getCallbackType() != null) {
             caseInstanceEntity.setCallbackType(instanceBeforeContext.getCallbackType());
+        }
+
+        if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            cmmnEngineConfiguration.getIdentityLinkInterceptor().handleCreateCaseInstance(caseInstanceEntity);
+        }
+        if (instanceBeforeContext.getInitiatorVariableName() != null) {
+            caseInstanceEntity.setVariable(instanceBeforeContext.getInitiatorVariableName(), Authentication.getAuthenticatedUserId());
         }
 
         Map<String, Object> variables = instanceBeforeContext.getVariables();
@@ -256,7 +263,6 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 if (formRepositoryService != null) {
 
                     FormInfo formInfo = null;
-                    CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
                     if (caseInstanceEntity.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(caseInstanceEntity.getTenantId())) {
                         formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey());
                     } else {
@@ -325,16 +331,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         caseInstanceEntity.setStartUserId(authenticatedUserId);
         
         caseInstanceEntityManager.insert(caseInstanceEntity);
-        
-        if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
-            cmmnEngineConfiguration.getIdentityLinkInterceptor().handleCreateCaseInstance(caseInstanceEntity);
-        }
-
         caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<>(1));
-
-        if (instanceBeforeContext.getInitiatorVariableName() != null) {
-            caseInstanceEntity.setVariable(instanceBeforeContext.getInitiatorVariableName(), authenticatedUserId);
-        }
 
         return caseInstanceEntity;
     }

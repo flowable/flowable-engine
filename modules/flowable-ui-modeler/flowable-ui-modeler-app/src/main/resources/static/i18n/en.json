@@ -227,9 +227,7 @@
           "SERVICETASKRESULTVARIABLE" : {
             "TITLE" : "Result variable name",
             "DESCRIPTION" : "Process variable name to store the service task result."
-          }
-        },
-        "SERVICETASKRESULTVARIABLEPACKAGE" : {
+          },
           "SERVICETASKUSELOCALSCOPEFORRESULTVARIABLE" : {
             "TITLE" : "Use local scope for result variable",
             "DESCRIPTION" : "Flag that marks that the used resultVariable needs to be saved as a local variable"

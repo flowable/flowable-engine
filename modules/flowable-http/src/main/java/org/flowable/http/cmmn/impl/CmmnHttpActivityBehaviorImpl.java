@@ -126,6 +126,11 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
         }
         httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(retryCount, false));
 
+        // client builder settings
+        if (config.isUseSystemProperties()) {
+            httpClientBuilder.useSystemProperties();
+        }
+
         this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new NopErrorPropagator(), 
                 CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper());
     }

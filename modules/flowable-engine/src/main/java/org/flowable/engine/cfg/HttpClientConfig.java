@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.cfg;
 
+import java.time.Duration;
+
 /**
  * @author Harsha Teja Kanna
  */
@@ -24,6 +26,8 @@ public class HttpClientConfig {
     protected int requestRetryLimit = 3;
     // https settings
     protected boolean disableCertVerify;
+
+    protected boolean useSystemProperties = false;
 
     public int getConnectTimeout() {
         return connectTimeout;
@@ -65,6 +69,14 @@ public class HttpClientConfig {
         this.disableCertVerify = disableCertVerify;
     }
 
+    public void setUseSystemProperties(boolean useSystemProperties) {
+        this.useSystemProperties = useSystemProperties;
+    }
+
+    public boolean isUseSystemProperties() {
+        return useSystemProperties;
+    }
+
     public void merge(HttpClientConfig other) {
         if (this.connectTimeout != other.getConnectTimeout()) {
             setConnectTimeout(other.getConnectTimeout());
@@ -85,5 +97,22 @@ public class HttpClientConfig {
         if (this.disableCertVerify != other.isDisableCertVerify()) {
             setDisableCertVerify(other.isDisableCertVerify());
         }
+
+        if (this.useSystemProperties != other.isUseSystemProperties()) {
+            setUseSystemProperties(other.isUseSystemProperties());
+        }
     }
+
+    public void setConnectionRequestTimeout(Duration connectionRequestTimeout) {
+        setConnectionRequestTimeout(Math.toIntExact(connectionRequestTimeout.toMillis()));
+    }
+
+    public void setConnectTimeout(Duration connectTimeout) {
+        setConnectTimeout(Math.toIntExact(connectTimeout.toMillis()));
+    }
+
+    public void setSocketTimeout(Duration socketTimeout) {
+        setSocketTimeout(Math.toIntExact(socketTimeout.toMillis()));
+    }
+
 }
