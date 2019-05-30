@@ -624,7 +624,10 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         String signalRef = getPropertyValueAsString(PROPERTY_SIGNALREF, objectNode);
         SignalEventDefinition eventDefinition = new SignalEventDefinition();
         eventDefinition.setSignalRef(signalRef);
-        eventDefinition.setAsync(getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, objectNode));
+        boolean isAsync = getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, objectNode);
+        if (isAsync) {
+            eventDefinition.setAsync(isAsync);
+        }
         event.getEventDefinitions().add(eventDefinition);
     }
 
