@@ -956,6 +956,10 @@
         "TITLE" : "事件网关",
         "DESCRIPTION" : "一个事件网关"
       },
+      "BOUNDARYCONDITIONALEVENT" : {
+        "TITLE" : "边界条件事件",
+        "DESCRIPTION" : "捕获指定条件的边界事件"
+      },
       "BOUNDARYERROREVENT" : {
         "TITLE" : "边界错误事件",
         "DESCRIPTION" : "捕捉bpmn错误的边界事件"
