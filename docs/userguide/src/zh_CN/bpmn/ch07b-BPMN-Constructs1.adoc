@@ -1,28 +1,4 @@
-[[bpmnConstructs]]
 
-== BPMN 2.0结构
-
-本章节介绍Flowable支持的BPMN 2.0结构，以及Flowable对BPMN标准的自定义扩展。
-
-
-[[bpmnCustomExtensions]]
-
-
-=== 自定义扩展
-
-BPMN 2.0标准对流程的所有的参与者都很有用。最终用户不会因为依赖专有解决方案，而被供应商“绑架”。Flowable之类的开源框架，也可以提供与大型供应商的解决方案相同（经常是更好;-）的实现。有了BPMN 2.0标准，从大型供应商解决方案向Flowable的迁移，可以十分简单平滑。
-
-缺点则是标准通常是不同公司（不同观点）大量讨论与妥协的结果。作为阅读BPMN 2.0 XML流程定义的开发者，有时会觉得某些结构或方法十分笨重。Flowable将开发者的感受放在最高优先，因此引入了一些**'Flowable BPMN扩展（extensions）'**。这些“扩展”并不在BPMN 2.0规格中，有些是新结构，有些是对特定结构的简化。
-
-尽管BPMN 2.0规格明确指出可以支持自定义扩展，我们仍做了如下保证：
-
-* 自定义扩展**保证是**在**标准方式**的基础上进行简化。因此当你决定使用自定义扩展时，不用担心无路可退（仍然可以用标准方式）。
-* 使用自定义扩展时，总是通过**flowable:**命名空间前缀，明确标识出XML元素、属性等。请注意Flowable引擎也支持**activiti:**命名空间前缀。
-
-因此是否使用自定义扩展，完全取决于你自己。有些其他因素会影响选择（图形化编辑器的使用，公司策略，等等）。我们提供扩展，只是因为相信标准中的某些地方可以用更简单或效率更高的方式处理。请不要吝啬给我们反馈你对扩展的评价（正面的或负面的），也可以给我们提供关于自定义扩展的新想法。说不定某一天，你的想法会成为标准的一部分！
-
-
-[[bpmnEvents]]
 
 === 事件
 
@@ -1235,24 +1211,6 @@ image::images/bpmn.boundary.compensation.event.png[align="center"]
 [[bpmnIntermediateCatchingEvent]]
 
 
-==== 捕获中间事件
-
-所有的捕获中间事件（intermediate catching events）都使用相同方式定义：
-
-[source,xml,linenums]
-----
-<intermediateCatchEvent id="myIntermediateCatchEvent" >
-    <XXXEventDefinition/>
-</intermediateCatchEvent>
-----
-
-捕获中间事件由下列元素定义:
-
-* （流程范围内）唯一的标识符
-* 定义了捕获中间事件类型的，形如__XXXEventDefinition__的XML子元素（例如__TimerEventDefinition__等）。查阅特定中间捕获事件类型，以了解更多细节。
-
-
-[[bpmnTimerIntermediateEvent]]
 
 
 ==== 定时器捕获中间事件
@@ -4225,7 +4183,7 @@ Shell任务通过<<serviceTaskFieldInjection,字段注入>>配置。这些参数
 |===============
 |参数|必填?|类型|描述|默认值
 |command|是|String|要执行的Shell命令。|
-|arg1-5|否|String|参数1至参数5|
+|arg0-5|否|String|参数0至参数5|
 |wait|否|true/false|是否等待Shell进程终止。|true
 |redirectError|否|true/false|是否将标准错误（standard error）并入标准输出（standard output）。|false
 |cleanEnv|否|true/false|是否避免Shell进程继承当前环境。|false
