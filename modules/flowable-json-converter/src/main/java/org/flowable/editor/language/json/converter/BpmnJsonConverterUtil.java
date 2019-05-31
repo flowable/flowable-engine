@@ -22,6 +22,7 @@ import org.flowable.bpmn.model.BooleanDataObject;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.DateDataObject;
 import org.flowable.bpmn.model.DoubleDataObject;
+import org.flowable.bpmn.model.Escalation;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
@@ -271,6 +272,20 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                 messageNode.put(PROPERTY_MESSAGE_DEFINITION_NAME, message.getName());
             }
             propertiesNode.set(PROPERTY_MESSAGE_DEFINITIONS, messageDefinitions);
+        }
+    }
+    
+    public static void convertEscalationDefinitionsToJson(BpmnModel bpmnModel, ObjectNode propertiesNode) {
+        if (bpmnModel.getEscalations() != null) {
+            ArrayNode escalationDefinitions = objectMapper.createArrayNode();
+            for (Escalation escalation : bpmnModel.getEscalations()) {
+                ObjectNode escalationNode = escalationDefinitions.addObject();
+                escalationNode.put(PROPERTY_ESCALATION_DEFINITION_ID, escalation.getEscalationCode());
+                if (StringUtils.isNotEmpty(escalation.getName())) {
+                    escalationNode.put(PROPERTY_ESCALATION_DEFINITION_NAME, escalation.getName());
+                }
+            }
+            propertiesNode.set(PROPERTY_ESCALATION_DEFINITIONS, escalationDefinitions);
         }
     }
 

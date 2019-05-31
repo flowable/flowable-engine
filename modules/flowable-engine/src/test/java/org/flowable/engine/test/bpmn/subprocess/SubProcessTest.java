@@ -13,6 +13,7 @@
 
 package org.flowable.engine.test.bpmn.subprocess;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
@@ -455,5 +457,62 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         taskService.complete(currentTask.getId());
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+    }
+
+    @Test
+    @Deployment
+    public void testAsyncMiSequentialSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testAsyncMiSubProcess")
+                .variable("myList", Arrays.asList("one", "two", "three"))
+                .start();
+        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        managementService.executeJob(job.getId());
+
+        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        String variable = (String) runtimeService.getVariable(task.getExecutionId(), "counter");
+        assertEquals("one", variable);
+        taskService.complete(task.getId());
+
+        Job secondJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotSame(job.getId(), secondJob.getId());
+        managementService.executeJob(secondJob.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("two", (String) runtimeService.getVariable(task.getExecutionId(), "counter"));
+        taskService.complete(task.getId());
+
+        Job thirdJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotSame(secondJob.getId(), thirdJob.getId());
+        managementService.executeJob(thirdJob.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("three", (String) runtimeService.getVariable(task.getExecutionId(), "counter"));
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment
+    public void testAsyncMiParallelSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testAsyncMiSubProcess")
+                .variable("myList", Arrays.asList("one", "two", "three"))
+                .start();
+        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, jobs.size());
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+
+        assertEquals(3, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().forEach(task -> taskService.complete(task.getId()));
+
+        assertProcessEnded(processInstance.getId());
     }
 }

@@ -90,6 +90,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected Date createTimeAfter;
     protected String category;
     protected boolean withFormKey;
+    protected String formKey;
     protected String taskDefinitionId;
     protected String key;
     protected String keyLike;
@@ -857,6 +858,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQuery taskFormKey(String formKey) {
+        if (formKey == null) {
+            throw new FlowableIllegalArgumentException("Task formKey is null");
+        }
+        if (orActive) {
+            currentOrQueryObject.formKey = formKey;
+        } else {
+            this.formKey = formKey;
+        }
+        return this;
+    }
+
+    @Override
     public TaskQuery taskDefinitionId(String taskDefinitionId) {
         if (orActive) {
             currentOrQueryObject.taskDefinitionId = taskDefinitionId;
@@ -1603,7 +1617,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public List<Task> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
-        checkQueryOk();
         List<Task> tasks = null;
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
@@ -1632,7 +1645,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        checkQueryOk();
         
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
@@ -1850,6 +1862,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean isWithFormKey() {
         return withFormKey;
+    }
+
+    public String getFormKey() {
+        return formKey;
     }
 
     public String getProcessDefinitionKeyLike() {

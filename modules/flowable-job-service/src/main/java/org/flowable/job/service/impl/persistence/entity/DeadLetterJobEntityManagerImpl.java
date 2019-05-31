@@ -61,7 +61,9 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
 
     @Override
     public void insert(DeadLetterJobEntity jobEntity, boolean fireCreateEvent) {
-        getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+        if (getJobServiceConfiguration().getInternalJobManager() != null) {
+            getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+        }
 
         jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
@@ -79,10 +81,12 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
-        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        if (getJobServiceConfiguration().getInternalJobManager() != null) {
+            getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        }
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }

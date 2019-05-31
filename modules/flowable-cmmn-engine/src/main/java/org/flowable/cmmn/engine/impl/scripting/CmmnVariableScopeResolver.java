@@ -28,24 +28,24 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class CmmnVariableScopeResolver implements Resolver {
 
-    protected final static String ENGINE_CONFIG_KEY = "engineConfiguration";
-    protected final static String CMMN_ENGINE_CONFIG_KEY = "cmmnEngineConfiguration";
+    protected static final String ENGINE_CONFIG_KEY = "engineConfiguration";
+    protected static final String CMMN_ENGINE_CONFIG_KEY = "cmmnEngineConfiguration";
 
-    protected final static String RUNTIME__SERVICE_KEY = "runtimeService";
-    protected final static String CMMN_RUNTIME__SERVICE_KEY = "cmmnRuntimeService";
+    protected static final String RUNTIME__SERVICE_KEY = "runtimeService";
+    protected static final String CMMN_RUNTIME__SERVICE_KEY = "cmmnRuntimeService";
 
-    protected final static String HISTORY_SERVICE_KEY = "historyService";
-    protected final static String CMMN_HISTORY_SERVICE_KEY = "cmmnHistoryService";
+    protected static final String HISTORY_SERVICE_KEY = "historyService";
+    protected static final String CMMN_HISTORY_SERVICE_KEY = "cmmnHistoryService";
 
-    protected final static String MANAGEMENT_SERVICE_KEY = "managementService";
-    protected final static String CMMN_MANAGEMENT_SERVICE_KEY = "cmmnManagementService";
+    protected static final String MANAGEMENT_SERVICE_KEY = "managementService";
+    protected static final String CMMN_MANAGEMENT_SERVICE_KEY = "cmmnManagementService";
 
-    protected final static String TASK_SERVICE_KEY = "taskService";
-    protected final static String CMMN_TASK_SERVICE_KEY = "cmmnTaskService";
+    protected static final String TASK_SERVICE_KEY = "taskService";
+    protected static final String CMMN_TASK_SERVICE_KEY = "cmmnTaskService";
 
-    protected final static String CASE_INSTANCE_KEY = "caseInstance";
-    protected final static String PLAN_ITEM_INSTANCE_KEY = "planItemInstance";
-    protected final static String TASK_KEY = "task";
+    protected static final String CASE_INSTANCE_KEY = "caseInstance";
+    protected static final String PLAN_ITEM_INSTANCE_KEY = "planItemInstance";
+    protected static final String TASK_KEY = "task";
 
     protected static final Set<String> KEYS = new HashSet<>(Arrays.asList(
         ENGINE_CONFIG_KEY, CMMN_ENGINE_CONFIG_KEY,

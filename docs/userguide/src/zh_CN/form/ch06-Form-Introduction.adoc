@@ -1,0 +1,68 @@
+[[formIntroduction]]
+
+== 表单介绍
+[[whatIsFormDefinition]]
+
+=== 表单定义是什么？
+
+
+对于BPMN引擎而言，我们沿用了BPMN规范，同理对与DMN引擎，我们使用了DMN规范。但是对于开始或任务表单，并不存在类似的共性问题让我们使用。因此，我们自己定义了一个基于JSON格式的的表单结构定义，我们使用这种结构作为Flowable表单编辑器的输出格式，而且我们会在Flowable任务应用中提取该结构让开始或任务表单使用。
+
+[[formDefining]]
+
+=== Defining a form
+
+用你最爱的文本或JSON编辑器新建一个JSON文件，然后给这个文件起个个性的名字。确保这个文件的后缀为.form，比如shareniu.fom,否则表单引擎将无法部署此文件。
+
+表单的JSON定义以key、name和description开头。表单引擎通过属性key来辨别表单在整个表单引擎中的唯一身份。对于来源相同的同一个表单定义的版本系统也是基于属性key运作的。第二部分是一个数组类型fields，表单定义的字段在这里阐明。第三部分是可选的，用来定义表单的结果outcomes。示例如下：
+[source,json,linenums]
+----
+{
+    "key": "form1",
+    "name": "My first form",
+    "fields": [
+        {
+            "id": "input1",
+            "name": "Input1",
+            "type": "text",
+            "required": false,
+            "placeholder": "empty"
+        }
+    ],
+    "outcomes": [
+        {
+            "id": "null",
+            "name": "Accept"
+        },
+        {
+            "id": "null",
+            "name": "Reject"
+        }
+    ]
+}
+----
+
+每个表单字段都有一个id、name和type属性。在同一个表单定义中id应该是独一无二的。当一个用户完成表单后id还能当作变量名使用。在这个小例子中，一个名叫input1的流程变量被创建了，用户填入这个文本字段里的东西就是这个变量的值。结果outcomes也可以被映射成一个变量，此变量基于表单标识符，格式为："form_<form-identifier>_outcome"。举例说明，选中的结果会被设置为一个名叫"form_form1_outcome"的变量。你可以通过表达式${form_form1_outcome == "Accept"}来检验结果outcome是否为'Accept'
+
+表单支持以下类型字段
+
+* text: 文本字段
+* multi-line-text: 多行文本字段
+
+* integer: 文本字段，但是只允许数字类型的值
+
+* boolean: 复选框字段
+
+* date: 日期字段
+
+* dropdown: 选择框字段，定义字段时可以设置选项的值
+
+* radio-buttons: 单选字段，定义字段时可以设置选项的值
+
+* people: 选择框字段，可以选中用户表里的一个用户
+
+* functional-group: 选择框字段，可以选中分组表里的一个组
+
+* upload: 上传文件字段
+
+* expression:  一个标签，在标签文本中你可以运用JUEL表达式操作变量或其他动态的值

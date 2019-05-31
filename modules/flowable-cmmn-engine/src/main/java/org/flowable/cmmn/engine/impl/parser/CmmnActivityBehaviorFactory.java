@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionAct
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ScriptTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.SignalEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBehaviour;
@@ -36,6 +37,7 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TimerEventListener;
@@ -73,6 +75,8 @@ public interface CmmnActivityBehaviorFactory {
     ScriptTaskActivityBehavior createScriptTaskActivityBehavior(PlanItem planItem, ScriptServiceTask task);
 
     UserEventListenerActivityBehaviour createUserEventListenerActivityBehavior(PlanItem planItem, UserEventListener userEventListener);
+    
+    SignalEventListenerActivityBehaviour createSignalEventListenerActivityBehavior(PlanItem planItem, SignalEventListener signalEventListener);
     
     GenericEventListenerActivityBehaviour createGenericEventListenerActivityBehavior(PlanItem planItem, GenericEventListener genericEventListener);
 

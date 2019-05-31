@@ -39,6 +39,7 @@ import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteMultiInstanceExecutionCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DispatchEventCommand;
+import org.flowable.engine.impl.cmd.EvaluateConditionalEventsCmd;
 import org.flowable.engine.impl.cmd.ExecuteActivityForAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.flowable.engine.impl.cmd.GetActiveAdhocSubProcessesCmd;
@@ -81,7 +82,6 @@ import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
-import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.NativeExecutionQuery;
@@ -91,6 +91,8 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -442,6 +444,16 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
         commandExecutor.execute(new TriggerCmd(executionId, processVariables, transientVariables));
+    }
+    
+    @Override
+    public void evaluateConditionalEvents(String processInstanceId) {
+        commandExecutor.execute(new EvaluateConditionalEventsCmd(processInstanceId, null));
+    }
+
+    @Override
+    public void evaluateConditionalEvents(String processInstanceId, Map<String, Object> processVariables) {
+        commandExecutor.execute(new EvaluateConditionalEventsCmd(processInstanceId, processVariables));
     }
 
     @Override

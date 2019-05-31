@@ -47,9 +47,10 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
     protected String scopeType;
     protected String scopeDefinitionId;
     protected String tenantId;
+    protected String outcome;
 
-    public AbstractSaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String processInstanceId, 
-                    String processDefinitionId, String tenantId) {
+    public AbstractSaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String processInstanceId,
+        String processDefinitionId, String tenantId, String outcome) {
         
         this.formInfo = formInfo;
         this.variables = variables;
@@ -57,10 +58,11 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
         this.processInstanceId = processInstanceId;
         this.processDefinitionId = processDefinitionId;
         this.tenantId = tenantId;
+        this.outcome = outcome;
     }
 
-    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, 
-                    String processDefinitionId, String tenantId) {
+    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId,
+        String processDefinitionId, String tenantId, String outcome) {
         
         this.formModelId = formModelId;
         this.variables = variables;
@@ -68,11 +70,12 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
         this.processInstanceId = processInstanceId;
         this.processDefinitionId = processDefinitionId;
         this.tenantId = tenantId;
+        this.outcome = outcome;
     }
-    
-    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType, 
-                    String scopeDefinitionId, String tenantId) {
-        
+
+    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType,
+        String scopeDefinitionId, String tenantId, String outcome) {
+
         this.formModelId = formModelId;
         this.variables = variables;
         this.taskId = taskId;
@@ -80,10 +83,11 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
         this.scopeType = scopeType;
         this.scopeDefinitionId = scopeDefinitionId;
         this.tenantId = tenantId;
+        this.outcome = outcome;
     }
     
-    public AbstractSaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String scopeId, String scopeType, 
-                    String scopeDefinitionId, String tenantId) {
+    public AbstractSaveFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String scopeId, String scopeType,
+        String scopeDefinitionId, String tenantId, String outcome) {
         
         this.formInfo = formInfo;
         this.variables = variables;
@@ -92,6 +96,7 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
         this.scopeType = scopeType;
         this.scopeDefinitionId = scopeDefinitionId;
         this.tenantId = tenantId;
+        this.outcome = outcome;
     }
 
     @Override
@@ -124,7 +129,7 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
                 continue;
             }
 
-            if (variables.containsKey(fieldId)) {
+            if (variables != null && variables.containsKey(fieldId)) {
                 Object variableValue = variables.get(fieldId);
                 if (variableValue == null) {
                     valuesNode.putNull(fieldId);
@@ -146,16 +151,8 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
             }
         }
 
-        // Handle outcome
-        String outcomeVariable = null;
-        if (formModel.getOutcomeVariableName() != null) {
-            outcomeVariable = formModel.getOutcomeVariableName();
-        } else {
-            outcomeVariable = "form_" + formModel.getKey() + "_outcome";
-        }
-
-        if (variables.containsKey(outcomeVariable) && variables.get(outcomeVariable) != null) {
-            submittedFormValuesJson.put("flowable_form_outcome", variables.get(outcomeVariable).toString());
+        if (outcome != null) {
+            submittedFormValuesJson.put("flowable_form_outcome", outcome);
         }
 
         FormInstanceEntityManager formInstanceEntityManager = CommandContextUtil.getFormInstanceEntityManager(commandContext);

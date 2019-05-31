@@ -43,11 +43,17 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
 
     @Override
     public VariableInstanceEntity create(String name, VariableType type, Object value) {
+        VariableInstanceEntity variableInstance = create(name, type);
+        variableInstance.setValue(value);
+        return variableInstance;
+    }
+
+    @Override
+    public VariableInstanceEntity create(String name, VariableType type) {
         VariableInstanceEntity variableInstance = create();
         variableInstance.setName(name);
         variableInstance.setType(type);
         variableInstance.setTypeName(type.getTypeName());
-        variableInstance.setValue(value);
         return variableInstance;
     }
 

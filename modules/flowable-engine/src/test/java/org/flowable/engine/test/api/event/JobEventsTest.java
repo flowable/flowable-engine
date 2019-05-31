@@ -474,6 +474,8 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         theJob = managementService.createDeadLetterJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(theJob);
+        assertEquals("timer", theJob.getElementId());
+        assertEquals("Timer", theJob.getElementName());
 
         // Check delete-event has been dispatched
         assertEquals(8, listener.getEventsReceived().size());

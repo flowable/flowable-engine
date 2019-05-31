@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -355,7 +357,17 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     public void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances) {
         this.childPlanItemInstances = childPlanItemInstances;
     }
-    
+
+    @Override
+    public List<PlanItem> getPlanItems() {
+        PlanItem planItem = getPlanItem();
+        if (planItem != null && planItem.getPlanItemDefinition() instanceof PlanFragment) {
+            return ((PlanFragment) planItem.getPlanItemDefinition()).getPlanItems();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
         return childPlanItemInstances;
@@ -363,7 +375,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     
     @Override
     public PlanItemInstanceEntity getStagePlanItemInstanceEntity() {
-        if (stagePlanItemInstance == null) {
+        if (stagePlanItemInstance == null && stageInstanceId != null) {
             stagePlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(stageInstanceId);
         }
         return stagePlanItemInstance;

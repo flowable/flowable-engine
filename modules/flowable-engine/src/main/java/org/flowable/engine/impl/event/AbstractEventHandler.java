@@ -18,9 +18,9 @@ import java.util.Map;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Tijs Rademakers
@@ -29,7 +29,8 @@ public abstract class AbstractEventHandler implements EventHandler {
 
     @Override
     public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
-        ExecutionEntity execution = eventSubscription.getExecution();
+        String executionId = eventSubscription.getExecutionId();
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
         FlowNode currentFlowElement = (FlowNode) execution.getCurrentFlowElement();
 
         if (currentFlowElement == null) {

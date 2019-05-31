@@ -101,6 +101,11 @@ public class FlowableProperties {
      */
     private List<String> customMybatisXMLMappers;
 
+    /**
+     * Enable form field validation after form submission on the engine level
+     */
+    protected boolean formFieldValidationEnabled = false;
+
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
     }
@@ -290,5 +295,12 @@ public class FlowableProperties {
 	public void setAnnotationFontName(String annotationFontName) {
 		this.annotationFontName = annotationFontName;
 	}
-    
+
+    public boolean isFormFieldValidationEnabled() {
+        return formFieldValidationEnabled;
+    }
+
+    public void setFormFieldValidationEnabled(boolean formFieldValidationEnabled) {
+        this.formFieldValidationEnabled = formFieldValidationEnabled;
+    }
 }

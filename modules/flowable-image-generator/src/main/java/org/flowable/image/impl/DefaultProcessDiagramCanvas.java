@@ -127,8 +127,11 @@ public class DefaultProcessDiagramCanvas {
     protected static BufferedImage TIMER_IMAGE;
     protected static BufferedImage COMPENSATE_THROW_IMAGE;
     protected static BufferedImage COMPENSATE_CATCH_IMAGE;
+    protected static BufferedImage CONDITIONAL_CATCH_IMAGE;
     protected static BufferedImage ERROR_THROW_IMAGE;
     protected static BufferedImage ERROR_CATCH_IMAGE;
+    protected static BufferedImage ESCALATION_THROW_IMAGE;
+    protected static BufferedImage ESCALATION_CATCH_IMAGE;
     protected static BufferedImage MESSAGE_THROW_IMAGE;
     protected static BufferedImage MESSAGE_CATCH_IMAGE;
     protected static BufferedImage SIGNAL_CATCH_IMAGE;
@@ -235,12 +238,16 @@ public class DefaultProcessDiagramCanvas {
             TIMER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/timer.png", customClassLoader));
             COMPENSATE_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/compensate-throw.png", customClassLoader));
             COMPENSATE_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/compensate.png", customClassLoader));
+            CONDITIONAL_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/conditional.png", customClassLoader));
             ERROR_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/error-throw.png", customClassLoader));
             ERROR_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/error.png", customClassLoader));
+            ESCALATION_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/escalation-throw.png", customClassLoader));
+            ESCALATION_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/escalation.png", customClassLoader));
             MESSAGE_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/message-throw.png", customClassLoader));
             MESSAGE_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/message.png", customClassLoader));
             SIGNAL_THROW_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/signal-throw.png", customClassLoader));
             SIGNAL_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/signal.png", customClassLoader));
+            
         } catch (IOException e) {
             LOGGER.warn("Could not load image for process diagram creation: {}", e.getMessage());
         }
@@ -359,6 +366,13 @@ public class DefaultProcessDiagramCanvas {
             drawLabel(name, graphicInfo);
         }
     }
+    
+    public void drawEscalationEndEvent(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawEscalationEndEvent(graphicInfo, scaleFactor);
+        if (scaleFactor == 1.0) {
+            drawLabel(name, graphicInfo);
+        }
+    }
 
     public void drawErrorEndEvent(GraphicInfo graphicInfo, double scaleFactor) {
         drawNoneEndEvent(graphicInfo, scaleFactor);
@@ -367,6 +381,14 @@ public class DefaultProcessDiagramCanvas {
                 (int) (ERROR_THROW_IMAGE.getWidth() / scaleFactor),
                 (int) (ERROR_THROW_IMAGE.getHeight() / scaleFactor), null);
     }
+    
+    public void drawEscalationEndEvent(GraphicInfo graphicInfo, double scaleFactor) {
+        drawNoneEndEvent(graphicInfo, scaleFactor);
+        g.drawImage(ESCALATION_THROW_IMAGE, (int) (graphicInfo.getX() + (graphicInfo.getWidth() / 4)),
+                (int) (graphicInfo.getY() + (graphicInfo.getHeight() / 4)),
+                (int) (ESCALATION_THROW_IMAGE.getWidth() / scaleFactor),
+                (int) (ESCALATION_THROW_IMAGE.getHeight() / scaleFactor), null);
+    }
 
     public void drawErrorStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
         drawNoneStartEvent(graphicInfo);
@@ -374,6 +396,22 @@ public class DefaultProcessDiagramCanvas {
                 (int) (graphicInfo.getY() + (graphicInfo.getHeight() / 4)),
                 (int) (ERROR_CATCH_IMAGE.getWidth() / scaleFactor),
                 (int) (ERROR_CATCH_IMAGE.getHeight() / scaleFactor), null);
+    }
+    
+    public void drawEscalationStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
+        drawNoneStartEvent(graphicInfo);
+        g.drawImage(ESCALATION_CATCH_IMAGE, (int) (graphicInfo.getX() + (graphicInfo.getWidth() / 4)),
+                (int) (graphicInfo.getY() + (graphicInfo.getHeight() / 4)),
+                (int) (ESCALATION_CATCH_IMAGE.getWidth() / scaleFactor),
+                (int) (ESCALATION_CATCH_IMAGE.getHeight() / scaleFactor), null);
+    }
+    
+    public void drawConditionalStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
+        drawNoneStartEvent(graphicInfo);
+        g.drawImage(CONDITIONAL_CATCH_IMAGE, (int) (graphicInfo.getX() + (graphicInfo.getWidth() / 4)),
+                (int) (graphicInfo.getY() + (graphicInfo.getHeight() / 4)),
+                (int) (CONDITIONAL_CATCH_IMAGE.getWidth() / scaleFactor),
+                (int) (CONDITIONAL_CATCH_IMAGE.getHeight() / scaleFactor), null);
     }
 
     public void drawCatchingEvent(GraphicInfo graphicInfo, boolean isInterrupting,
@@ -386,6 +424,7 @@ public class DefaultProcessDiagramCanvas {
         if (innerCircleSize == 0) {
             innerCircleSize = 1;
         }
+        
         int innerCircleX = (int) graphicInfo.getX() + innerCircleSize;
         int innerCircleY = (int) graphicInfo.getY() + innerCircleSize;
         int innerCircleWidth = (int) graphicInfo.getWidth() - (2 * innerCircleSize);
@@ -398,8 +437,10 @@ public class DefaultProcessDiagramCanvas {
         g.fill(outerCircle);
 
         g.setPaint(EVENT_BORDER_COLOR);
-        if (!isInterrupting)
+        if (!isInterrupting) {
             g.setStroke(NON_INTERRUPTING_EVENT_STROKE);
+        }
+        
         g.draw(outerCircle);
         g.setStroke(originalStroke);
         g.setPaint(originalPaint);
@@ -414,6 +455,7 @@ public class DefaultProcessDiagramCanvas {
                 imageX++;
                 imageY++;
             }
+            
             g.drawImage(image, imageX, imageY, (int) (image.getWidth() / scaleFactor),
                     (int) (image.getHeight() / scaleFactor), null);
         }
@@ -426,6 +468,15 @@ public class DefaultProcessDiagramCanvas {
 
     public void drawCatchingCompensateEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, COMPENSATE_CATCH_IMAGE, "compensate", scaleFactor);
+    }
+    
+    public void drawCatchingConditionalEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingConditionalEvent(graphicInfo, isInterrupting, scaleFactor);
+        drawLabel(name, graphicInfo);
+    }
+    
+    public void drawCatchingConditionalEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, CONDITIONAL_CATCH_IMAGE, "conditional", scaleFactor);
     }
 
     public void drawCatchingTimerEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
@@ -444,6 +495,10 @@ public class DefaultProcessDiagramCanvas {
 
     public void drawCatchingErrorEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, ERROR_CATCH_IMAGE, "error", scaleFactor);
+    }
+    
+    public void drawCatchingEscalationEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, ESCALATION_CATCH_IMAGE, "escalation", scaleFactor);
     }
 
     public void drawCatchingSignalEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
@@ -470,6 +525,10 @@ public class DefaultProcessDiagramCanvas {
 
     public void drawThrowingSignalEvent(GraphicInfo graphicInfo, double scaleFactor) {
         drawCatchingEvent(graphicInfo, true, SIGNAL_THROW_IMAGE, "signal", scaleFactor);
+    }
+    
+    public void drawThrowingEscalationEvent(GraphicInfo graphicInfo, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, true, ESCALATION_THROW_IMAGE, "escalation", scaleFactor);
     }
 
     public void drawThrowingNoneEvent(GraphicInfo graphicInfo, double scaleFactor) {

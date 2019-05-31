@@ -13,7 +13,7 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -65,7 +65,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
 
     private static final long serialVersionUID = 1L;
     
-    protected static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-M-yyyy");
+    protected static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("d-M-yyyy");
 
     protected String formInstanceId;
     protected String formDefinitionKey;
@@ -217,7 +217,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                         if (variableValue instanceof LocalDate) {
                             field.setValue(((LocalDate) variableValue).toString("d-M-yyyy"));
                         } else if (variableValue instanceof Date) {
-                            field.setValue(DATE_FORMAT.format((Date) variableValue));
+                            field.setValue(DATE_FORMAT.format(((Date) variableValue).toInstant()));
                         } else {
                             field.setValue(variableValue);
                         }
@@ -256,14 +256,16 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                 throw new FlowableObjectNotFoundException("No form definition found for id = '" + formDefinitionId + "'", FormDefinitionEntity.class);
             }
 
-        } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId == null) {
+        } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && 
+                        (parentDeploymentId == null || formEngineConfiguration.isAlwaysLookupLatestDefinitionVersion())) {
 
             formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKey(formDefinitionKey);
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey + "'", FormDefinitionEntity.class);
             }
 
-        } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId == null) {
+        } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && 
+                        (parentDeploymentId == null || formEngineConfiguration.isAlwaysLookupLatestDefinitionVersion())) {
 
             formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
             

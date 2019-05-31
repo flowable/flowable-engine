@@ -12,24 +12,21 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import static org.flowable.cmmn.engine.impl.task.TaskHelper.logUserTaskCompleted;
+
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.task.api.history.HistoricTaskLogEntryType;
-import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.delegate.TaskListener;
-import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -75,9 +72,13 @@ public class CompleteTaskCmd implements Command<Void> {
         }
 
         logUserTaskCompleted(taskEntity);
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            cmmnEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(taskEntity);
+        }
 
-        CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLinkToParent(taskEntity, Authentication.getAuthenticatedUserId());
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+        cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
 
         if (planItemInstanceEntity != null) {
             CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
@@ -86,19 +87,6 @@ public class CompleteTaskCmd implements Command<Void> {
         }
         
         return null;
-    }
-
-    protected void logUserTaskCompleted(TaskEntity taskEntity) {
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
-        if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
-            BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(taskEntity);
-            ObjectNode data = taskServiceConfiguration.getObjectMapper().createObjectNode();
-            taskLogEntryBuilder.timeStamp(taskServiceConfiguration.getClock().getCurrentTime());
-            taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
-            taskLogEntryBuilder.data(data.toString());
-            taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
-            taskServiceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
-        }
     }
 
 }

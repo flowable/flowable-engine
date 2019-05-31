@@ -26,18 +26,20 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -544,6 +546,50 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
         assertTrue(processInstance.isEnded());
     }
+    
+    @Test
+    @Deployment
+    public void testSkipExpressionWithDefinitionInfo() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("inclusiveGwSkipExpression").singleResult();
+        ObjectNode infoNode = dynamicBpmnService.enableSkipExpression();
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        Map<String, Object> varMap = new HashMap<>();
+        varMap.put("input", 10);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertEquals("theTask1", task.getTaskDefinitionKey());
+
+        varMap = new HashMap<>();
+        varMap.put("input", 30);
+        processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        dynamicBpmnService.removeEnableSkipExpression(infoNode);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        varMap = new HashMap<>();
+        varMap.put("input", 10);
+        processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertEquals("theTask2", task.getTaskDefinitionKey());
+        
+        dynamicBpmnService.enableSkipExpression(infoNode);
+        dynamicBpmnService.changeSkipExpression("flow2", "${input < 30}", infoNode);
+        dynamicBpmnService.changeSkipExpression("flow3", "${input >= 30}", infoNode);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+        varMap = new HashMap<>();
+        varMap.put("input", 30);
+        processInstance = runtimeService.startProcessInstanceByKey("inclusiveGwSkipExpression", varMap);
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        for (Task taskObject : tasks) {
+            if (!"theTask2".equals(taskObject.getTaskDefinitionKey()) && !"theTask3".equals(taskObject.getTaskDefinitionKey())) {
+                fail("expected theTask2 and theTask3 only");
+            }
+        }
+        assertEquals(2, tasks.size());
+    }
 
     @Test
     @Deployment
@@ -618,7 +664,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
                 q.processInstanceId(instance.getProcessInstanceId());
 
                 List<EventSubscription> subs = CommandContextUtil
-                        .getEventSubscriptionEntityManager()
+                        .getEventSubscriptionService()
                         .findEventSubscriptionsByQueryCriteria(q);
 
                 assertEquals(1, subs.size());

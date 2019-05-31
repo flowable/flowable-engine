@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -101,7 +102,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         // For a subprocess, a new child execution is created that will visit the steps of the subprocess
         // The original execution that arrived here will wait until the subprocess is finished
         // and will then be used to continue the process instance.
-        if (flowNode instanceof SubProcess) {
+        if (!forceSynchronousOperation && flowNode instanceof SubProcess) {
             createChildExecutionForSubProcess((SubProcess) flowNode);
         }
 
@@ -171,6 +172,8 @@ public class ContinueProcessOperation extends AbstractOperation {
         job.setExecutionId(execution.getId());
         job.setProcessInstanceId(execution.getProcessInstanceId());
         job.setProcessDefinitionId(execution.getProcessDefinitionId());
+        job.setElementId(flowNode.getId());
+        job.setElementName(flowNode.getName());
         job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
 
         // Inherit tenant id (if applicable)
@@ -246,7 +249,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = null;
+        if (processEngineConfiguration != null) {
+            eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        }
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
 
             if (flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics()) {
                 processEngineConfiguration.getEventDispatcher().dispatchEvent(
@@ -280,7 +287,11 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         // Firing event that transition is being taken
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = null;
+        if (processEngineConfiguration != null) {
+            eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        }
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
             FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
             processEngineConfiguration.getEventDispatcher().dispatchEvent(

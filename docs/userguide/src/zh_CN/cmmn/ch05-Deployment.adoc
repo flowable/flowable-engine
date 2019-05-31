@@ -1,0 +1,136 @@
+[[chDeployment]]
+
+== 部署
+
+
+=== 外部资源
+
+
+
+
+案例定义位于Flowable 数据库中。当在Flowable 配置文件使用Service Tasks或Spring Beans时，这些案例定义可以引用委托类来处理。
+这些类和Spring配置文件,必须可以用于所有可能执行案例定义的CMMN引擎。
+
+==== JAVA 类
+
+
+
+
+在案例定义中使用的所有自定义类（例如，服务任务中使用的PlanItemJavaDelegates）都应该在启动案例实例时，配置在引擎的类路径上。
+
+
+但是，在部署案例定义期间，这些类不必配置在类路径上。也就是说在部署新的案例定义时，您的委托类不必位于类路径上，例如：当您使用演示安装程序并要添加自定义类时，应该将包含类的JAR添加到“flowable-task”或“flowable-rest” webapp lib中。别忘了还要包括自定义类（如果有的话）的依赖项。或者您也可以将依赖项配置在Tomcat安装的libraries目录中，$tomcat.home/lib（或其他Web容器的类似位置）。
+
+==== 从案例实例中使用SpringBeans
+
+
+
+
+当在表达式或脚本使用SpringBean时，在执行案例定义时，这些bean必须对引擎可用。如果您正在构建自己的webapp，并按照 “Spring集成”章节 中的相关章节描述，在您的应用上下问文中配置CMMN引擎，那这很简单。但请记住，如果您使用"Flowable task"和"Flowable rest" webapps，那么也应该使用该上下文对其进行更新。
+
+[[versioningOfCaseDefinitions]]
+
+
+=== 案例定义的版本管理
+
+
+
+
+CMMN没有版本控制的概念，这实际上很好，因为可执行CMMN文件可能作为开发项目的一部分存在于版本控制系统库中（如Subversion、Git或Mercurial）。但是，案例定义的版本是作为部署的一部分在引擎中创建的。在部署过程中，flowable将为CaseDefinition分配一个版本，然后将其存储在flowable数据库中
+
+
+对于部署中的每个案例定义，执行以下步骤初始化属性键、版本、名称和ID：
+
+
+* XML文件中的案例定义+id+属性,用作案例定义+key+属性。
+
+
+* XML文件中的案例定义+名称+属性用作案例定义+名称+属性。如果未指定名称属性，则使用id属性作为名称。
+
+
+* 第一次部署具有特定密钥的案例时，将分配版本1。对于具有相同键的案例定义的所有后续部署版本，版本将设置为比当前部署的最高版本高1。key属性用于区分大小写定义。
+
+
+
+
+
+
+以下面的例子为例
+
+[source,xml,linenums]
+----
+<definitions id="myDefinitions" >
+  <case id="myCase" name="My important case" >
+    ...
+----
+
+
+部署此案例定义时，数据库中的案例定义将看起来像这样
+
+[options="header"]
+|===============
+|id|key|name|version
+|676|myCase|My important case|1
+
+|===============
+
+
+假设我们现在部署相同案例的更新版本（例如，更改一些人工任务），但案例定义的ID保持不变。案例定义表现在将包含以下条目：
+
+[options="header"]
+|===============
+|id|key|name|version
+|676|myCase|My important case|1
+|870|myCase|My important case|2
+
+|===============
+
+
+当调用RuntimeService.CreateCaseInstanceBuilder（）.CaseDefinitionKey（“MyCase”）.Start（）时，它现在将在版本2中使用案例定义，因为这是案例定义的最新版本。
+
+
+如果我们像下面定义的那样创建第二个案例并将其部署到Flowable，那么第三行将添加到表中。
+
+
+[source,xml,linenums]
+----
+<definitions id="myNewDefinitions" >
+  <case id="myNewCase" name="My important case" >
+    ...
+----
+
+
+这个表看起来像这样：
+
+[options="header"]
+|===============
+|id|key|name|version
+|676|myCase|My important case|1
+|870|myCase|My important case|2
+|1033|myNewCase|My important case|1
+
+|===============
+
+
+请注意：新案例的关键与第一个案例有何不同？尽管名称是相同的（我们可能也该更改它），但在区分大小写时，Flowable只考虑ID属性。因此，新案例会与版本1一起部署。
+
+[[deploymentCategory]]
+
+
+=== 分类
+
+
+
+部署和案例定义都有用户定义的类别。案例定义类别是用CMMN XML中的“targetNamespace”属性的值初始化的：<definitions…targetNamespace=“您定义的类别”…
+
+
+部署类别也可以在API中指定，如下所示：
+
+[source,java,linenums]
+----
+repositoryService
+    .createDeployment()
+    .category("yourCategory")
+    ...
+    .deploy();
+----

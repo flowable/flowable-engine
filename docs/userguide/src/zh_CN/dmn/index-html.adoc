@@ -1,0 +1,15 @@
+= Flowable DMN 用户手册 (v 6.5.0-SNAPSHOT)
+:doctype: book
+:docinfodir: ../base
+:docinfo1: header
+:icons: font
+:numbered:
+:source-highlighter: pygments
+:pygments-css: class
+:pygments-linenums-mode: table
+:compat-mode:
+:pdf-page-size: A4
+:nofooter:
+
+
+include::index-common.adoc[]

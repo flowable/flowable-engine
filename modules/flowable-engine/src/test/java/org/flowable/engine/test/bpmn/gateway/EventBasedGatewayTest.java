@@ -16,12 +16,12 @@ package org.flowable.engine.test.bpmn.gateway;
 import java.util.Date;
 
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.job.api.Job;
 import org.junit.jupiter.api.Test;
 

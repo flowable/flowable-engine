@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.runtime.EventSubscriptionQuery;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

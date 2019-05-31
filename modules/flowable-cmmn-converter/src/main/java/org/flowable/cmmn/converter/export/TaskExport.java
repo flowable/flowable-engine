@@ -35,7 +35,7 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
         } else {
             xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "true");
         }
-        //isblockingexpression
+        
         if (StringUtils.isNotEmpty(task.getBlockingExpression())){
             xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING_EXPRESSION, task.getBlockingExpression());
         }
@@ -43,9 +43,7 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
         // Async
         if (task.isAsync()) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_ASYNCHRONOUS, String.valueOf(task.isAsync()));
-        }
-        if (task.isExclusive()) {
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_EXCLUSIVE, String.valueOf(task.isAsync()));
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_EXCLUSIVE, String.valueOf(task.isExclusive()));
         }
     }
 

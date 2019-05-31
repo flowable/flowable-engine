@@ -59,7 +59,7 @@ public abstract class AbstractFlowableShortHandExpressionFunction implements Flo
         
         this.replacePattern = getFinalFunctionPrefix() + ":" 
                 + functionName 
-                + "(" + variableScopeName + ",'$3'" // 3th word group: prefix and function name are two first groups
+                + (isNoParameterMethod() ? ("(" + variableScopeName) : ("(" + variableScopeName + ",'$3'") ) // 3th word group, the parameter: prefix and function name are two first groups
                 + (isMultiParameterFunction() ? "," : ")");
         
         this.prefix = getFinalFunctionPrefix();
@@ -84,6 +84,13 @@ public abstract class AbstractFlowableShortHandExpressionFunction implements Flo
     protected abstract String getFinalFunctionPrefix();
     
     protected abstract boolean isMultiParameterFunction();
+
+    /**
+     * Override and return true in case the method call does not have any parameters. E.g. ${prefix:someFunction()}
+     */
+    protected boolean isNoParameterMethod() {
+        return false;
+    }
     
     protected String buildOrWordGroup(List<String> options) {
         StringBuilder strb = new StringBuilder();

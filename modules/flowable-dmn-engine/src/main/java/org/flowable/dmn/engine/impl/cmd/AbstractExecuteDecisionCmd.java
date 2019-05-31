@@ -66,7 +66,9 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         String parentDeploymentId = executeDecisionInfo.getParentDeploymentId();
         String tenantId = executeDecisionInfo.getTenantId();
         
-        if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && StringUtils.isNotEmpty(tenantId)) {
+        if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && 
+                        !dmnEngineConfiguration.isAlwaysLookupLatestDefinitionVersion() && StringUtils.isNotEmpty(tenantId)) {
+            
             List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
                 new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
 
@@ -105,7 +107,9 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                 }
             }
             
-        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId)) {
+        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && 
+                        !dmnEngineConfiguration.isAlwaysLookupLatestDefinitionVersion()) {
+            
             List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
                 new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
 
@@ -161,6 +165,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         }
 
         executeDecisionInfo.setDecisionDefinitionId(decisionTable.getId());
+        executeDecisionInfo.setDecisionVersion(decisionTable.getVersion());
         executeDecisionInfo.setDeploymentId(decisionTable.getDeploymentId());
 
         return decisionTable;

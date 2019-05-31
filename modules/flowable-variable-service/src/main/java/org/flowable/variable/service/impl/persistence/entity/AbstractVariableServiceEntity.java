@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 public abstract class AbstractVariableServiceEntity extends AbstractEntity {
 
+    @Override
     public String getIdPrefix() {
         return VariableServiceEntityConstants.VARIABLE_SERVICE_ID_PREFIX;
     }

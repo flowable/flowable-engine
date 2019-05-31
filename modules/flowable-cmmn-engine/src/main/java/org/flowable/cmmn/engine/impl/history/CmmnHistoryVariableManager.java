@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Date;
+
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -20,25 +23,26 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class CmmnHistoryVariableManager implements InternalHistoryVariableManager {
     
-    protected CmmnHistoryManager cmmnHistoryManager;
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
-    public CmmnHistoryVariableManager(CmmnHistoryManager cmmnHistoryManager) {
-        this.cmmnHistoryManager = cmmnHistoryManager;
+    public CmmnHistoryVariableManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
-        cmmnHistoryManager.recordVariableCreate(variable);
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordVariableCreate(variable, createTime);
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
-        cmmnHistoryManager.recordVariableUpdate(variable);
+    public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordVariableUpdate(variable, updateTime);
     }
 
     @Override
-    public void recordVariableRemoved(VariableInstanceEntity variable) {
-        cmmnHistoryManager.recordVariableRemoved(variable);
+    public void recordVariableRemoved(VariableInstanceEntity variable, Date removeTime) {
+        // The remove time is not needed for the CmmnHistoryManager
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordVariableRemoved(variable);
     }
 
 }

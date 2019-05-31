@@ -331,7 +331,7 @@ public class CronExpression implements Serializable, Cloneable {
 
         Date timeAfter = getTimeAfter(testDateCal.getTime());
 
-        return ((timeAfter != null) && timeAfter.equals(originalDate));
+        return (originalDate.equals(timeAfter));
     }
 
     /**
@@ -534,7 +534,7 @@ public class CronExpression implements Serializable, Cloneable {
         } catch (ParseException pe) {
             throw pe;
         } catch (Exception e) {
-            throw new ParseException("Illegal cron expression format (" + e.toString() + ")", 0);
+            throw new ParseException("Illegal cron expression format (" + e + ")", 0);
         }
     }
 

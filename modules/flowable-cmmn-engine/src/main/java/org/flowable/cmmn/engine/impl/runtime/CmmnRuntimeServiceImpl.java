@@ -24,6 +24,8 @@ import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
+import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseInstanceCmd;
@@ -60,6 +62,8 @@ import org.flowable.cmmn.engine.impl.cmd.TerminatePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 
@@ -75,6 +79,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public CaseInstanceBuilder createCaseInstanceBuilder() {
         return new CaseInstanceBuilderImpl(this);
+    }
+
+    @Override
+    public PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId) {
+        return new PlanItemInstanceTransitionBuilderImpl(commandExecutor, planItemInstanceId);
     }
 
     public CaseInstance startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
@@ -239,10 +248,20 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery() {
         return new GenericEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
     }
+    
+    @Override
+    public SignalEventListenerInstanceQuery createSignalEventListenerInstanceQuery() {
+        return new SignalEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
+    }
 
     @Override
     public UserEventListenerInstanceQuery createUserEventListenerInstanceQuery() {
         return new UserEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
+    }
+    
+    @Override
+    public EventSubscriptionQuery createEventSubscriptionQuery() {
+        return new EventSubscriptionQueryImpl(configuration.getCommandExecutor());
     }
 
     @Override

@@ -135,7 +135,7 @@ public class JobRetryCmd implements Command<Object> {
 
         // Dispatch both an update and a retry-decrement event
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, newJobEntity));
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
         }

@@ -12,6 +12,8 @@
  */
 package org.flowable.task.service.history;
 
+import java.util.Date;
+
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -20,7 +22,12 @@ public interface InternalHistoryTaskManager {
     /**
      * Record task name change, if audit history is enabled.
      */
-    void recordTaskInfoChange(TaskEntity taskEntity);
+    void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
+
+    /**
+     * Record task created.
+     */
+    void recordTaskCreated(TaskEntity taskEntity);
 
     /**
      * Record historyUserTaskLogEntry

@@ -347,12 +347,12 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     protected void doMigrateProcessInstance(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        LOGGER.debug("Start migration of process instance with Id:'" + processInstance.getId() + "' to " + printProcessDefinitionIdentifierMessage(document));
+        LOGGER.debug("Start migration of process instance with Id:'{}' to {}", processInstance.getId(), printProcessDefinitionIdentifierMessage(document));
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders((ExecutionEntity) processInstance, procDefToMigrateTo, document, commandContext);
 
-        LOGGER.debug("Updating Process definition reference of process root execution with id:'" + processInstance.getId() + "' to '" + procDefToMigrateTo.getId() + "'");
+        LOGGER.debug("Updating Process definition reference of process root execution with id:'{}' to '{}'", processInstance.getId(), procDefToMigrateTo.getId());
         ((ExecutionEntity) processInstance).setProcessDefinitionId(procDefToMigrateTo.getId());
 
         LOGGER.debug("Resolve activity executions to migrate");
@@ -382,7 +382,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         LOGGER.debug("Updating Process definition reference in history");
         changeProcessDefinitionReferenceOfHistory(processInstance, procDefToMigrateTo, commandContext);
 
-        LOGGER.debug("Process migration ended for process instance with Id:'" + processInstance.getId() + "'");
+        LOGGER.debug("Process migration ended for process instance with Id:'{}'", processInstance.getId());
     }
 
     @Override
@@ -421,7 +421,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             .filter(executionEntity -> !(executionEntity.getCurrentFlowElement() instanceof BoundaryEvent))
             .collect(Collectors.groupingBy(ExecutionEntity::getCurrentActivityId));
 
-        LOGGER.debug("Preparing ActivityChangeState builder for '" + filteredExecutionsByActivityId.size() + "' distinct activities");
+        LOGGER.debug("Preparing ActivityChangeState builder for '{}' distinct activities", filteredExecutionsByActivityId.size());
 
         HashMap<String, ActivityMigrationMapping> mainProcessActivityMappingByFromActivityId = new HashMap<>();
         HashMap<String, HashMap<String, ActivityMigrationMapping>> subProcessActivityMappingsByCallActivityIdAndFromActivityId = new HashMap<>();
@@ -450,7 +450,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         BpmnModel currentModel = ProcessDefinitionUtil.getBpmnModel(processInstanceExecution.getProcessDefinitionId());
 
         //Auto Mapping
-        LOGGER.debug("Process AutoMapping for '" + executionActivityIdsToAutoMap.size() + "' activity executions");
+        LOGGER.debug("Process AutoMapping for '{}' activity executions", executionActivityIdsToAutoMap.size());
         for (String executionActivityId : executionActivityIdsToAutoMap) {
             FlowElement currentModelFlowElement = currentModel.getFlowElement(executionActivityId);
 
@@ -501,7 +501,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 List<ExecutionEntity> miRootExecutions = (List<ExecutionEntity>) executionEntityManager.findInactiveExecutionsByActivityIdAndProcessInstanceId(flowElementMultiInstanceParentId.get(), processInstanceExecution.getId());
                 filteredExecutionsByActivityId.put(flowElementMultiInstanceParentId.get(), miRootExecutions);
             } else {
-                LOGGER.debug("Checking execution(s) - activityId:'" + executionActivityId);
+                LOGGER.debug("Checking execution(s) - activityId:'{}", executionActivityId);
                 if (isActivityIdInProcessDefinitionModel(executionActivityId, newModel)) {
                     //Cannot auto-map inside a MultiInstance container
                     FlowElement newModelFlowElement = newModel.getFlowElement(executionActivityId);
@@ -511,7 +511,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                         throw new FlowableException("Cannot autoMap activity migration for '" + executionActivityId + "'. Cannot migrate arbitrarily inside a Multi Instance container '" + newFlowElementMIParentId.get());
                     }
 
-                    LOGGER.debug("Auto mapping activity '" + executionActivityId + "'");
+                    LOGGER.debug("Auto mapping activity '{}'", executionActivityId);
                     List<ExecutionEntity> executionEntities = filteredExecutionsByActivityId.get(executionActivityId);
                     if (executionEntities.size() > 1) {
                         List<String> executionIds = executionEntities.stream().map(ExecutionEntity::getId).collect(Collectors.toList());
@@ -528,7 +528,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         //Explicit Mapping - Iterates over the provided mappings instead, to keep the explicit migration order
         List<ActivityMigrationMapping> activityMigrationMappings = document.getActivityMigrationMappings();
 
-        LOGGER.debug("Process explicit mapping for '" + executionActivityIdsToMapExplicitly.size() + "' activity executions");
+        LOGGER.debug("Process explicit mapping for '{}' activity executions", executionActivityIdsToMapExplicitly.size());
         for (
             ActivityMigrationMapping activityMapping : activityMigrationMappings) {
 

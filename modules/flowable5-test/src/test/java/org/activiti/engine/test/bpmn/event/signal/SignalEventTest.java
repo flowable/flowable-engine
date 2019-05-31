@@ -22,11 +22,11 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.runtime.Clock;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.job.api.Job;
 import org.flowable.validation.validator.Problems;
 

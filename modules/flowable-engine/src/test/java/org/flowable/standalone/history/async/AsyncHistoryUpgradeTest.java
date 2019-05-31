@@ -15,6 +15,7 @@ package org.flowable.standalone.history.async;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -339,7 +340,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
             try {
                 HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
                 List<Map<String, Object>> configurations = processEngineConfiguration.getObjectMapper().readValue(
-                    new String(((HistoryJobEntity) historyJob).getAdvancedJobHandlerConfiguration().getBytes(), "utf-8"),
+                    new String(((HistoryJobEntity) historyJob).getAdvancedJobHandlerConfiguration().getBytes(), StandardCharsets.UTF_8),
                     List.class
                 );
 

@@ -53,6 +53,10 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
     protected HistoryLevel historyLevel;
     
     protected ObjectMapper objectMapper;
+    
+    public EntityLinkServiceConfiguration(String engineName) {
+        super(engineName);
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////

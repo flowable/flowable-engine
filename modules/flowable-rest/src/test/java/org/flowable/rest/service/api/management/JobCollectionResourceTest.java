@@ -68,6 +68,18 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?dueAfter=" + getISODateString(inAnHour.getTime());
         assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?elementId=escalationTimer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?elementId=unknown";
+        assertEmptyResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?elementName=Escalation";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?elementName=unknown";
+        assertEmptyResultsPresentInDataResponse(url);
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?withoutTenantId=true";
         assertResultsPresentInDataResponse(url, timerJob.getId());
@@ -124,6 +136,19 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url);
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?processDefinitionId=unexisting";
+        assertResultsPresentInDataResponse(url);
+        
+        // Fetch using element id and name
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?elementId=escalationTimer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?elementId=unexisting";
+        assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?elementName=Escalation";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?elementName=unexisting";
         assertResultsPresentInDataResponse(url);
 
         // Fetch using withRetriesLeft

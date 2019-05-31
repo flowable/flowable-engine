@@ -43,9 +43,8 @@
             <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
-            <!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -107,12 +106,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<runOrder>alphabetical</runOrder>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>

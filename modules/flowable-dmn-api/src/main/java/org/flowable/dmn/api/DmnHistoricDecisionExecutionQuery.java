@@ -51,6 +51,16 @@ public interface DmnHistoricDecisionExecutionQuery extends Query<DmnHistoricDeci
     /** Only select decision executions with the given scope type. */
     DmnHistoricDecisionExecutionQuery scopeType(String scopeType);
     
+    /**
+     * Select all decision executions for the given process instance id and its children.
+     */
+    DmnHistoricDecisionExecutionQuery processInstanceIdWithChildren(String processInstanceId);
+    
+    /**
+     * Select all decision executions for the given case instance id and its children.
+     */
+    DmnHistoricDecisionExecutionQuery caseInstanceIdWithChildren(String caseInstanceId);
+    
     /** Only select decision executions with the given failed state. */
     DmnHistoricDecisionExecutionQuery failed(Boolean failed);
 

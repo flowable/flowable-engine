@@ -49,6 +49,10 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-eventsubscription-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-variable-service</artifactId>
         </dependency>
         <dependency>
@@ -153,6 +157,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-api</artifactId>
         </dependency>
@@ -182,6 +191,12 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${argLine} -Xmx3g</argLine>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
@@ -456,8 +471,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -473,8 +488,30 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>mssql</id>
+            <activation>
+                <property>
+                    <name>databasemssql</name>
+                    <value>mssql</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -500,16 +537,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        
-        <profile>
-            <id>java8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <argLine>-Xmx3g</argLine>
-            </properties>
         </profile>
     </profiles>
 

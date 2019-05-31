@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 /**
@@ -120,7 +121,7 @@ public abstract class ExpressionFactory {
 		InputStream input = classLoader.getResourceAsStream(serviceId);
 		try {
 			if (input != null) {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
 				className = reader.readLine();
 				reader.close();
 			}

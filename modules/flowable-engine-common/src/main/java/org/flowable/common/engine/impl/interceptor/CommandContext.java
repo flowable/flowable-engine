@@ -203,7 +203,7 @@ public class CommandContext {
     }
 
     /**
-     * Stores the provided exception on this {@link AbstractCommandContext} instance. That exception will be rethrown at the end of closing the {@link AbstractCommandContext} instance.
+     * Stores the provided exception on this {@link CommandContext} instance. That exception will be rethrown at the end of closing the {@link CommandContext} instance.
      * 
      * If there is already an exception being stored, a 'masked exception' message will be logged.
      */
@@ -214,6 +214,10 @@ public class CommandContext {
         } else {
             LOGGER.error("masked exception in command context. for root cause, see below as it will be rethrown later.", exception);
         }
+    }
+
+    public void resetException() {
+        this.exception = null;
     }
 
     public void addAttribute(String key, Object value) {

@@ -28,7 +28,7 @@
             <processTask id="theProcess" isBlocking="true">
                 <extensionElements>
                   <flowable:in sourceExpression="${1 + 1}" target="numberVariable"></flowable:in>
-                  <flowable:out sourceExpression="processVariable" targetExpression="${'string'}${'Variable'}"></flowable:out>
+                  <flowable:out sourceExpression="${processVariable}" targetExpression="${'string'}${'Variable'}"></flowable:out>
                 </extensionElements>
                 <processRefExpression><![CDATA[${processDefinitionKey}]]></processRefExpression>
             </processTask>

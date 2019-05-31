@@ -47,12 +47,12 @@ import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -74,6 +74,7 @@ import org.flowable.rest.service.api.history.HistoricDetailResponse;
 import org.flowable.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.flowable.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.flowable.rest.service.api.history.HistoricTaskInstanceResponse;
+import org.flowable.rest.service.api.history.HistoricTaskLogEntryResponse;
 import org.flowable.rest.service.api.history.HistoricVariableInstanceResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.identity.MembershipResponse;
@@ -93,6 +94,7 @@ import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.flowable.rest.service.api.runtime.task.TaskResponse;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -839,6 +841,34 @@ public class RestResponseFactory {
         return result;
     }
 
+    public List<HistoricTaskLogEntryResponse> createHistoricTaskLogEntryResponseList(List<HistoricTaskLogEntry> logEntries) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<HistoricTaskLogEntryResponse> responseList = new ArrayList<>();
+        for (HistoricTaskLogEntry instance : logEntries) {
+            responseList.add(createHistoricTaskLogEntryResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public HistoricTaskLogEntryResponse createHistoricTaskLogEntryResponse(HistoricTaskLogEntry logEntry, RestUrlBuilder urlBuilder) {
+        HistoricTaskLogEntryResponse response = new HistoricTaskLogEntryResponse();
+        response.setLogNumber(logEntry.getLogNumber());
+        response.setType(logEntry.getType());
+        response.setTaskId(logEntry.getTaskId());
+        response.setTimeStamp(logEntry.getTimeStamp());
+        response.setUserId(logEntry.getUserId());
+        response.setData(logEntry.getData());
+        response.setExecutionId(logEntry.getExecutionId());
+        response.setProcessInstanceId(logEntry.getProcessInstanceId());
+        response.setProcessDefinitionId(logEntry.getProcessDefinitionId());
+        response.setScopeId(logEntry.getScopeId());
+        response.setScopeDefinitionId(logEntry.getScopeDefinitionId());
+        response.setSubScopeId(logEntry.getSubScopeId());
+        response.setScopeType(logEntry.getScopeType());
+        response.setTenantId(logEntry.getTenantId());
+        return response;
+    }
+
     public List<HistoricActivityInstanceResponse> createHistoricActivityInstanceResponseList(List<HistoricActivityInstance> activityInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<HistoricActivityInstanceResponse> responseList = new ArrayList<>();
@@ -1010,6 +1040,8 @@ public class RestResponseFactory {
         response.setExecutionId(job.getExecutionId());
         response.setProcessDefinitionId(job.getProcessDefinitionId());
         response.setProcessInstanceId(job.getProcessInstanceId());
+        response.setElementId(job.getElementId());
+        response.setElementName(job.getElementName());
         response.setRetries(job.getRetries());
         response.setCreateTime(job.getCreateTime());
         response.setTenantId(job.getTenantId());
@@ -1099,7 +1131,8 @@ public class RestResponseFactory {
         response.setId(user.getId());
         response.setEmail(user.getEmail());
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_USER, user.getId()));
-
+        response.setTenantId(user.getTenantId());
+        
         if (incudePassword) {
             response.setPassword(user.getPassword());
         }

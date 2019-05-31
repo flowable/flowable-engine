@@ -41,10 +41,10 @@ import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.DataObject;
-import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.api.runtime.changestate.ChangeStateEventListener;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -144,7 +144,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testSimpleMigrationWithTaskMapping() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");
@@ -202,7 +202,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testSimpleMigrationWithTaskJsonMapping() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");
@@ -260,7 +260,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testMigrationWithParallelTaskMapping() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-tasks.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/parallel-gateway-two-tasks.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -331,7 +331,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     @Test
     public void testMigrationWithNewSubProcessScope() {
         //Deploy first version of the process
-        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
 
         //Start and instance of the recent first version of the process for migration and one for reference
         ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP");

@@ -135,7 +135,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertEquals(4, responseNode.get("data").size());
 
         //sorted by timestamp
-        List<HistoricMilestoneInstance> expected = historyService.createHistoricMilestoneInstanceQuery().orderByTimeStamp().list();
+        List<HistoricMilestoneInstance> expected = historyService.createHistoricMilestoneInstanceQuery().orderByTimeStamp().asc().list();
         assertHistoricMilestoneValues(expected, responseNode.get("data"));
 
         //Check using before/after //DATE SHOULD BE SENT AS UTC
@@ -240,7 +240,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertEquals(4, responseNode.get("data").size());
 
         //sorted by timestamp
-        List<HistoricMilestoneInstance> expected = historyService.createHistoricMilestoneInstanceQuery().orderByTimeStamp().list();
+        List<HistoricMilestoneInstance> expected = historyService.createHistoricMilestoneInstanceQuery().orderByTimeStamp().asc().list();
         assertHistoricMilestoneValues(expected, responseNode.get("data"));
 
         //Check using before/after //DATE SHOULD BE SENT AS UTC

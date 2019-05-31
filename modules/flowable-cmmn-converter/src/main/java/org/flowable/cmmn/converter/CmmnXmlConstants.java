@@ -57,13 +57,13 @@ public interface CmmnXmlConstants {
 
     String ELEMENT_TASK_LISTENER = "taskListener";
     String ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER = "planItemLifecycleListener";
-    public static final String ATTRIBUTE_LISTENER_CLASS = "class";
-    public static final String ATTRIBUTE_LISTENER_EXPRESSION = "expression";
-    public static final String ATTRIBUTE_LISTENER_DELEGATEEXPRESSION = "delegateExpression";
-    public static final String ATTRIBUTE_LISTENER_EVENT = "event";
-    public static final String ATTRIBUTE_LISTENER_SOURCE_STATE = "sourceState";
-    public static final String ATTRIBUTE_LISTENER_TARGET_STATE = "targetState";
-    public static final String ATTRIBUTE_LISTENER_ON_TRANSACTION = "onTransaction";
+    String ATTRIBUTE_LISTENER_CLASS = "class";
+    String ATTRIBUTE_LISTENER_EXPRESSION = "expression";
+    String ATTRIBUTE_LISTENER_DELEGATEEXPRESSION = "delegateExpression";
+    String ATTRIBUTE_LISTENER_EVENT = "event";
+    String ATTRIBUTE_LISTENER_SOURCE_STATE = "sourceState";
+    String ATTRIBUTE_LISTENER_TARGET_STATE = "targetState";
+    String ATTRIBUTE_LISTENER_ON_TRANSACTION = "onTransaction";
 
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
@@ -118,8 +118,10 @@ public interface CmmnXmlConstants {
 
     String ELEMENT_PARAMETER_MAPPING = "parameterMapping";
 
-    String ELEMENT_PROCESS_TASK_IN_PARAMETERS = "in";
-    String ELEMENT_PROCESS_TASK_OUT_PARAMETERS = "out";
+    String ELEMENT_CHILD_TASK_IN_PARAMETERS = "in";
+    String ELEMENT_CHILD_TASK_OUT_PARAMETERS = "out";
+    String ELEMENT_PROCESS_TASK_IN_PARAMETERS = ELEMENT_CHILD_TASK_IN_PARAMETERS;
+    String ELEMENT_PROCESS_TASK_OUT_PARAMETERS = ELEMENT_CHILD_TASK_OUT_PARAMETERS;
 
     String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
@@ -154,12 +156,17 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
     String ATTRIBUTE_PRIORITY = "priority";
     String ATTRIBUTE_FORM_KEY = "formKey";
+    String ATTRIBUTE_FORM_FIELD_VALIDATION = "formFieldValidation";
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
 
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
 
     String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
+
+    String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType";
+    String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";
+    String ATTRIBUTE_EVENT_LISTENER_SIGNAL_REF = "signalRef";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

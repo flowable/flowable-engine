@@ -39,7 +39,7 @@ public abstract class AbstractNeedsCaseInstanceCmd implements Command<Void>, Ser
         }
         CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
         if (caseInstanceEntity == null) {
-            throw new FlowableObjectNotFoundException("Cannot find case instance for id " + caseInstanceEntity, CaseInstanceEntity.class);
+            throw new FlowableObjectNotFoundException("Cannot find case instance for id " + caseInstanceId, CaseInstanceEntity.class);
         }
         
         internalExecute(commandContext, caseInstanceEntity);

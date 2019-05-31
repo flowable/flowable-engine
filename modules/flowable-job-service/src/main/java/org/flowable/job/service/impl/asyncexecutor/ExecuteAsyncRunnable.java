@@ -141,7 +141,11 @@ public class ExecuteAsyncRunnable implements Runnable {
 
         } catch (final FlowableOptimisticLockingException e) {
 
-            handleFailedJob(e);
+            try {
+                handleFailedJob(e);
+            } catch (Exception fe) {
+                // no additional handling is needed
+            }
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Optimistic locking exception during job execution. If you have multiple async executors running against the same database, "

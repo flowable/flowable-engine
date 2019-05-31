@@ -32,7 +32,6 @@ import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
-import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.NativeActivityInstanceQuery;
@@ -43,6 +42,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -404,6 +404,30 @@ public interface RuntimeService {
      */
     void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables);
 
+    /**
+     * Evaluate waiting conditional events (boundary, intermediate catch and event sub process start events) and trigger them if a 
+     * condition evaluates to true.
+     *
+     * @param processInstanceId
+     *            id of process instance, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when no execution is found for the given processInstanceId.
+     */
+    void evaluateConditionalEvents(String processInstanceId);
+    
+    /**
+     * Evaluate waiting conditional events (boundary, intermediate catch and event sub process start events) and trigger them if a 
+     * condition evaluates to true.
+     *
+     * @param processInstanceId
+     *            id of process instance, cannot be null.
+     * @param processVariables
+     *            a map of process variables to be set before evaluation
+     * @throws FlowableObjectNotFoundException
+     *             when no execution is found for the given processInstanceId.
+     */
+    void evaluateConditionalEvents(String processInstanceId, Map<String, Object> processVariables);
+    
     /**
      * Updates the business key for the provided process instance
      *

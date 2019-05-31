@@ -101,7 +101,8 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     public void delete(EntityImpl entity, boolean fireDeleteEvent) {
         getDataManager().delete(entity);
 
-        if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (fireDeleteEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
             fireEntityDeletedEvent(entity);
         }
     }

@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.test.bpmn.event;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +33,7 @@ public class MessageEventDefinitionWithExtensionElementsTest {
         MessageEventDefinition messageEventDefinitionMock = Mockito.mock(MessageEventDefinition.class);
         BpmnModel bpmnModelMock = Mockito.mock(BpmnModel.class);
         Message messageMock = Mockito.mock(Message.class);
-        @SuppressWarnings("unchecked")
-        Map<String, List<ExtensionElement>> extensionElementMap = Mockito.mock(Map.class);
+        Map<String, List<ExtensionElement>> extensionElementMap = Collections.emptyMap();
 
         Mockito.when(bpmnParseMock.getBpmnModel()).thenReturn(bpmnModelMock);
         Mockito.when(messageEventDefinitionMock.getMessageRef()).thenReturn("messageId");

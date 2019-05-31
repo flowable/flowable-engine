@@ -15,10 +15,18 @@ package org.flowable.test.spring.boot;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDeployments;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
 
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.app.spring.SpringAppExpressionManager;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.SpringCmmnExpressionManager;
@@ -33,6 +41,8 @@ import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.SpringDmnExpressionManager;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
@@ -57,6 +67,7 @@ import org.flowable.spring.boot.form.FormEngineAutoConfiguration;
 import org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
+import org.flowable.task.api.Task;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -187,5 +198,48 @@ public class AllEnginesAutoConfigurationTest {
             deleteDeployments(context.getBean(ProcessEngine.class));
         });
 
+    }
+    
+    @Test
+    public void testInclusiveGatewayProcessTask() {
+        contextRunner.run((context -> {
+            SpringCmmnEngineConfiguration cmmnEngineConfiguration = context.getBean(SpringCmmnEngineConfiguration.class);
+            SpringProcessEngineConfiguration processEngineConfiguration = context.getBean(SpringProcessEngineConfiguration.class);
+            
+            CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+            CmmnHistoryService cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
+            RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
+            TaskService taskService = processEngineConfiguration.getTaskService();
+            
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+            assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+            assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionId("theTask")
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertEquals(1, planItemInstances.size());
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+            assertEquals("No process instance started", 1L, runtimeService.createProcessInstanceQuery().count());
+            
+            assertEquals(2, taskService.createTaskQuery().count());
+            
+            List<Task> tasks = taskService.createTaskQuery().list();
+            taskService.complete(tasks.get(0).getId());
+            taskService.complete(tasks.get(1).getId());
+            
+            assertEquals(0, taskService.createTaskQuery().count());
+            assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+            
+            planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionId("theTask2")
+                    .list();
+            assertEquals(1, planItemInstances.size());
+            assertEquals("Task Two", planItemInstances.get(0).getName());
+            assertEquals(PlanItemInstanceState.ENABLED, planItemInstances.get(0).getState());
+        }));
     }
 }

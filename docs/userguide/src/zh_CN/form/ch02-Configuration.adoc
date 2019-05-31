@@ -1,0 +1,362 @@
+
+== 配置
+
+[[configuration]]
+
+
+=== 创建表单引擎
+
+_Flowable 表单引擎的结构与Flowable流程引擎非常相似。 因此，文档的某些部分与其流程引擎对应部分相似._
+
+Flowable Form引擎通过名为flowable.form.cfg.xml的XML文件进行配置。 请注意，如果您使用的是“springintegration，构建表单引擎的Spring样式”，则这不适用*。
+
+获取FormEngine的最简单方法是使用org.flowable.form.engine.FormEngines类：
+
+
+[source,java,linenums]
+----
+FormEngine formEngine = FormEngines.getDefaultFormEngine()
+----
+
+这将在类路径上查找flowable.form.cfg.xml文件，并根据该文件中的配置构造引擎。 以下代码段显示了示例配置。 以下部分将详细介绍配置属性。
+
+[source,xml,linenums]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="formEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneFormEngineConfiguration">
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+
+    <property name="databaseSchemaUpdate" value="true" />
+
+  </bean>
+
+</beans>
+----
+请注意，配置XML实际上是Spring配置。 这并不意味着Flowable Form只能在Spring环境中使用！ 我们只是在内部利用Spring的解析和依赖注入功能来构建引擎。
+
+也可以使用配置文件以编程方式创建FormEngineConfiguration对象。 也可以使用不同的bean id（例如，参见第3行）。
+
+
+[source,java,linenums]
+----
+FormEngineConfiguration.
+  createFormEngineConfigurationFromResourceDefault();
+  createFormEngineConfigurationFromResource(String resource);
+  createFormEngineConfigurationFromResource(String resource, String beanName);
+  createFormEngineConfigurationFromInputStream(InputStream inputStream);
+  createFormEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
+----
+也可以不使用配置文件，并基于创建配置
+默认值（有关更多信息，请参阅<< configurationClasses类>>）。
+
+
+[source,java,linenums]
+----
+FormEngineConfiguration.createStandaloneFormEngineConfiguration();
+FormEngineConfiguration.createStandaloneInMemFormEngineConfiguration();
+----
+
+所有这些FormEngineConfiguration.createXXX（）方法返回一个FormEngineConfiguration，如果需要可以进一步调整。 调用buildFormEngine（）操作后，创建一个FormEngine：
+
+[source,java,linenums]
+----
+FormEngine formEngine = FormEngineConfiguration.createStandaloneInMemFormEngineConfiguration()
+  .setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+  .setJdbcUrl("jdbc:h2:mem:my-own-db;DB_CLOSE_DELAY=1000")
+  .buildFormEngine();
+----
+
+[[configurationRoot]]
+
+
+=== 表单引擎配置类
+
+
+
+flowable.form.cfg.xml文件必须包含一个具有id值为 'formEngineConfiguration' 的bean。
+[source,xml,linenums]
+----
+ <bean id="formEngineConfiguration" class="org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration">
+----
+然后使用该bean构造FormEngine。
+
+
+* *org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration*: the process engine is used in a standalone way. Flowable will take care of the transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable Form schema or the schema version is incorrect).
+* *org.flowable.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration*: this is a convenience class for unit testing purposes. Flowable Form will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed).
+* *org.flowable.form.spring.SpringFormEngineConfiguration*: To be used when the Form engine is used in a Spring environment.  See <<springintegration,the Spring integration section>> for more information.
+
+
+=== 插件方式集成流程引擎
+
+除了在独立模式下运行外，还可以将表单引擎插入流程引擎。 这使得流程引擎可以识别它和其他引擎。 例如，这可以将包含BPMN模型和DMN模型的工件部署到流程引擎的部署服务API。
+
+要使流程引擎知道表单引擎，需要将org.flowable.dmn.engine.configurator.FormEngineConfigurator添加到流程引擎配置中的配置程序列表中。 此配置程序是flowable-form-engine-configurator模块的一部分。
+
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+    <property name="configurators">
+      <list>
+        <ref bean="formEngineConfigurator" />
+      </list>
+    </property>
+    ...
+</bean>
+
+<bean id="formEngineConfiguration" class="org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration">
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+</bean>
+
+<bean id="formEngineConfigurator" class="org.flowable.form.engine.configurator.FormEngineConfigurator">
+    <property name="formEngineConfiguration" ref="formEngineConfiguration" />
+</bean>
+
+----
+
+
+[[databaseConfiguration]]
+
+=== 数据源配置
+
+有两种方法可以配置Flowable 表单引擎将使用的数据库。 第一个选项是定义数据库的JDBC属性：
+* *jdbcUrl*: 数据库的JDBC URL.
+* *jdbcDriver*: 为特定数据库类型实现驱动程序.
+* *jdbcUsername*: 用于连接数据库的用户名.
+* *jdbcPassword*: 用于连接数据库的密码.
+
+基于提供的JDBC属性构造的数据源将具有默认链接：$$ http：//www.mybatis.org/$$ [MyBatis]连接池设置。 可以选择设置以下属性来调整该连接池（取自MyBatis文档）：
+
+* *jdbcMaxActiveConnections*: 连接池中处于被使用状态的连接的最大值。默认为10。
+* *jdbcMaxIdleConnections*: 连接池中处于空闲状态的连接的最大值。
+* *jdbcMaxCheckoutTime*: 连接被取出使用的最长时间，超过时间会被强制回收。 默认为20000（20秒）。
+* *jdbcMaxWaitTime*:这是一个底层配置，让连接池可以在长时间无法获得连接时， 打印一条日志，并重新尝试获取一个连接。（避免因为错误配置导致沉默的操作失败）。 默认为20000（20秒）。
+
+示例数据库配置：
+
+[source,xml,linenums]
+----
+<property name="jdbcUrl" value="jdbc:h2:mem:flowable_dmn;DB_CLOSE_DELAY=1000" />
+<property name="jdbcDriver" value="org.h2.Driver" />
+<property name="jdbcUsername" value="sa" />
+<property name="jdbcPassword" value="" />
+----
+
+我们的基准测试表明，在处理大量并发请求时，MyBatis连接池可能扛不住。 因此，我们建议使用javax.sql.DataSource实现并将其注入流程引擎配置（例如HikariCP，Tomcat JDBC连接池等）：
+[source,xml,linenums]
+----
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
+  <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+  <property name="url" value="jdbc:mysql://localhost:3306/flowable_dmn" />
+  <property name="username" value="flowable" />
+  <property name="password" value="flowable" />
+  <property name="defaultAutoCommit" value="false" />
+</bean>
+
+<bean id="formEngineConfiguration" class="org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration">
+
+    <property name="dataSource" ref="dataSource" />
+    ...
+
+----
+
+
+请注意，Flowable 表单不附带允许您定义此类数据源的库。 所以你必须确保库在你的类路径上。
+
+无论您使用的是JDBC还是数据源方法，都可以设置以下属性：
+
+* *databaseType*: 数据库类型，可以是如下的值（h2, mysql, oracle, postgres, mssql, db2）.
+* *databaseSchemaUpdate*:允许您设置策略以在表单引擎启动和关闭时如何处理数据库表.
+** +false+ (default): 在创建表单引擎时检查库模式的版本，如果版本不匹配则抛出异常.
+** ++true++: 在构建表单引擎时，执行检查并在必要时执行模式的更新。 如果schema不存在，则创建它.
+** ++create-drop++: 在创建表单引擎时创建schema，并在关闭流程引擎时删除schema.
+
+
+[[jndiDatasourceConfig]]
+
+
+=== JNDI方式数据源配置
+
+默认情况下，Flowable Form的数据库配置包含在每个Web应用程序的WEB-INF/classes中的db.properties文件中。 这并不总是理想的，因为它
+要求用户修改Flowable源中的db.properties并重新编译WAR文件，或者在每次部署时分解WAR并修改db.properties。
+通过使用JNDI（Java命名和目录接口）获取数据库连接，连接完全由Servlet容器管理，并且可以在WAR部署之外管理配置。 这也允许对db.properties文件提供的连接参数进行更多控制。
+
+[[jndi_configuration]]
+
+
+==== 配置
+
+JNDI数据源的配置将根据您使用的servlet容器应用程序而有所不同。 以下说明适用于Tomcat，但对于其他容器应用程序，请参阅容器应用程序的文档。
+
+如果使用Tomcat，则在$CATALINA_BASE/conf/[enginename]/[hostname]/[warname].xml中配置JNDI资源（对于Flowable UI，这通常是$CATALINA_BASE/conf/Catalina/localhost/flowable-app。XML）。 首次部署应用程序时，将从Flowable WAR文件复制默认上下文，因此如果已存在，则需要替换它。 例如，要更改JNDI资源以便应用程序连接到MySQL而不是H2，请将文件更改为以下内容：
+
+[source,xml,linenums]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+    <Context antiJARLocking="true" path="/flowable-app">
+        <Resource auth="Container"
+            name="jdbc/flowableDB"
+            type="javax.sql.DataSource"
+            description="JDBC DataSource"
+            url="jdbc:mysql://localhost:3306/flowable"
+            driverClassName="com.mysql.jdbc.Driver"
+            username="sa"
+            password=""
+            defaultAutoCommit="false"
+            initialSize="5"
+            maxWait="5000"
+            maxActive="120"
+            maxIdle="5"/>
+        </Context>
+----
+
+==== JNDI 属性
+
+要配置JNDI数据源，请在Flowable UI的属性文件中使用以下属性：
+
+* spring.datasource.jndi-name=: 数据源的JNDI名称.
+* datasource.jndi.resourceRef: 设置查询是否发生在J2EE容器中，换句话说，如果JNDI名称尚未包含它，则需要添加前缀“java：comp/env/”。 默认为“true”.
+
+
+[[supporteddatabases]]
+
+
+=== 支持的数据库厂商
+
+下面列出了Flowable用于引用数据库的类型（区分大小写！）。
+
+[[databaseTypes]]
+[options="header"]
+|===============
+|数据库类型|连接URL|Notes
+|h2|jdbc:h2:tcp://localhost/flowable_form|Default configured database
+|mysql|jdbc:mysql://localhost:3306/flowable_form?autoReconnect=true|Tested using mysql-connector-java database driver
+|oracle|jdbc:oracle:thin:@localhost:1521:xe|
+|postgres|jdbc:postgresql://localhost:5432/flowable_form|
+|db2|jdbc:db2://localhost:50000/flowable_form|
+|mssql|jdbc:sqlserver://localhost:1433;databaseName=flowable_form (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) _OR_ jdbc:jtds:sqlserver://localhost:1433/flowable_form (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)|Tested using Microsoft JDBC Driver 4.0 (sqljdbc4.jar) and JTDS Driver
+|===============
+
+
+[[creatingDatabaseTable]]
+
+
+=== 创建表
+
+Flowable表单使用链接：$$http://www.liquibase.org$$[Liquibase]来跟踪，管理和应用数据库架构更改。
+为数据库创建数据库表的最简单方法是：
+
+* 在classpath中添加flowable-form-engine JARS包
+* 添加合适的数据库驱动
+* 将Flowable配置文件（flowable.form.cfg.xml）添加到类路径中，指向您的数据库（请参阅<< databaseConfiguration，数据库配置部分>>）
+* 执行DbSchemaCreate类的main方法
+
+[[database.tables.explained]]
+
+
+=== 数据库表名称解释
+
+Flowable表单的数据库名称都以ACT_FO_开头。
+
+
+* ACT_FO_DATABASECHANGELOG: Liquibase使用此表来跟踪已运行的changesets.
+* ACT_FO_DATABASECHANGELOGLOCK: Liquibase使用此表来确保一次只运行一个Liquibase实例.
+* ACT_FO_FORM_DEFINITION: 此表包含已部署的表单定义的定义信息.
+* ACT_FO_FORM_INSTANCE: 此表包含具有已由用户填写的值的表单实例.
+* ACT_FO_FORM_DEPLOYMENT: 该表包含部署元数据.
+* ACT_FO_FORM_RESOURCE: 此表包含表单定义资源.
+
+[[databaseUpgrade]]
+
+
+=== 数据库升级
+
+在运行升级之前，请确保备份数据库（使用数据库备份功能）。
+
+
+默认情况下，每次创建流程引擎时都会执行版本检查。 这通常在应用程序或Flowable Web应用程序的引导时发生一次。 如果Flowable库注意到库版本与Flowable数据库表的版本之间的差异，则抛出异常。
+
+要升级，必须首先将以下配置属性放在flowable.form.cfg.xml配置文件中：
+[source,xml,linenums]
+----
+<beans >
+
+  <bean id="formEngineConfiguration" class="org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration">
+    <!-- ... -->
+    <property name="databaseSchemaUpdate" value="true" />
+    <!-- ... -->
+  </bean>
+
+</beans>
+----
+
+ 使用databaseSchemaUpdate设置为true即可。
+
+[[formDefinitionCacheConfiguration]]
+
+
+=== 部署缓存配置
+
+
+所有定义都被缓存（在解析之后），以避免每次需要表单时都访问数据库，并且表单数据不会更改。 默认情况下，此缓存没有限制。 要限制表单缓存使用的容器大小，请添加以下属性：
+[source,xml,linenums]
+----
+<property name="formCacheLimit" value="10" />
+----
+
+设置此属性将使默认的LRU算法。 当然，此属性的“最佳”值取决于存储的表单总量和运行时实际使用的表单数。
+
+您也可以注入自己的缓存实现。 自定义类必须实现org.flowable.form.engine.impl.persistence.deploy.DeploymentCache接口的bean：
+[source,xml,linenums]
+----
+<property name="formCache">
+  <bean class="org.flowable.MyCache" />
+</property>
+----
+
+
+[[loggingConfiguration]]
+
+
+=== 日志
+
+所有日志记录（flowable，spring，mybatis，...）都通过SLF4J进行路由，并允许选择您选择的日志记录实现。
+
+*默认情况下，flowable-dmn-engine依赖项中不存在SFL4J-binding jar，这应该在项目中添加，以便使用您选择的日志框架。
+*如果没有添加实现jar，SLF4J将使用NOP-logger，不记录任何内容，除了警告不会记录任何内容。 有关这些绑定链接的更多信息，请访问：$$http://www.slf4j.org/codes.html#StaticLoggerBinder$$[http://www.slf4j.org/codes.html#StaticLoggerBinder]。
+使用Maven，添加例如这样的依赖（这里使用log4j），请注意您仍然需要添加一个版本：
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>slf4j-log4j12</artifactId>
+</dependency>
+----
+
+flowable-ui和flowable-rest webapps配置了使用Log4j binding.。 在运行所有flowable-*模块的测试时也使用Log4j。
+
+在类路径中使用带有commons-logging的容器时的重要注意事项：
+为了通过SLF4J路由spring-logging，使用了一个桥接器（参见链接：$$http://www.slf4j.org/legacy.html#jclOverSLF4J$$[http://www.slf4j.org/legacy.html#jclOverSLF4J]）。
+如果您的容器提供了commons-logging实现，请按照此页面上的说明进行操作：$$http://www.slf4j.org/codes.html#release$$[http://www.slf4j.org/codes.html#release]确保稳定性。
+
+使用Maven时的示例（省略版本）：
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>jcl-over-slf4j</artifactId>
+</dependency>
+----

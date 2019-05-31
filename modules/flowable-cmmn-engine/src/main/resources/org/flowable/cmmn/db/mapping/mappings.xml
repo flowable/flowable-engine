@@ -45,6 +45,9 @@
     <mapper resource="org/flowable/entitylink/service/db/mapping/entity/EntityLink.xml" />
     <mapper resource="org/flowable/entitylink/service/db/mapping/entity/HistoricEntityLink.xml" />
     
+    <!-- Event subscription support -->
+    <mapper resource="org/flowable/eventsubscription/service/db/mapping/entity/EventSubscription.xml" />
+    
     <!-- Task support -->
     <mapper resource="org/flowable/task/service/db/mapping/common.xml" />
     <mapper resource="org/flowable/task/service/db/mapping/entity/Task.xml" />

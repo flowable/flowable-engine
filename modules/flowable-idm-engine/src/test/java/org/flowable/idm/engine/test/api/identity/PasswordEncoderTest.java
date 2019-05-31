@@ -13,6 +13,7 @@
 package org.flowable.idm.engine.test.api.identity;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.flowable.idm.api.PasswordEncoder;
@@ -44,7 +45,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         User johndoe = idmIdentityService.createUserQuery().userId("johndoe").list().get(0);
         LOGGER.info("Hash Password = {}", johndoe.getPassword());
 
-        assertFalse("xxx".equals(johndoe.getPassword()));
+        assertNotEquals("xxx", johndoe.getPassword());
         assertTrue(idmIdentityService.checkPassword("johndoe", "xxx"));
         assertFalse(idmIdentityService.checkPassword("johndoe", "invalid pwd"));
 
@@ -104,7 +105,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         String salt = idmIdentityService.createUserQuery().userId("johndoe1").list().get(0).getPassword();
         assertTrue(idmIdentityService.checkPassword("johndoe1", "xxx"));
 
-        assertFalse(noSalt.equals(salt));
+        assertNotEquals(noSalt, salt);
         idmIdentityService.deleteUser("johndoe1");
 
         idmEngineConfiguration.setPasswordEncoder(passwordEncoder);

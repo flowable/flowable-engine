@@ -19,9 +19,9 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
 
 /**
  * @author Daniel Meyer

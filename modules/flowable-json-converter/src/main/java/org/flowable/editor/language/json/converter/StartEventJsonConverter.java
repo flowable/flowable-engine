@@ -16,7 +16,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
@@ -40,7 +42,6 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     protected Map<String, ModelInfo> formKeyMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
-
         fillJsonTypes(convertersToBpmnMap);
         fillBpmnTypes(convertersToJsonMap);
     }
@@ -48,7 +49,9 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_EVENT_START_NONE, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_TIMER, StartEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_START_CONDITIONAL, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_ERROR, StartEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_START_ESCALATION, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_MESSAGE, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_SIGNAL, StartEventJsonConverter.class);
     }
@@ -64,8 +67,12 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
             EventDefinition eventDefinition = event.getEventDefinitions().get(0);
             if (eventDefinition instanceof TimerEventDefinition) {
                 return STENCIL_EVENT_START_TIMER;
+            } else if (eventDefinition instanceof ConditionalEventDefinition) {
+                return STENCIL_EVENT_START_CONDITIONAL;
             } else if (eventDefinition instanceof ErrorEventDefinition) {
                 return STENCIL_EVENT_START_ERROR;
+            } else if (eventDefinition instanceof EscalationEventDefinition) {
+                return STENCIL_EVENT_START_ESCALATION;
             } else if (eventDefinition instanceof MessageEventDefinition) {
                 return STENCIL_EVENT_START_MESSAGE;
             } else if (eventDefinition instanceof SignalEventDefinition) {
@@ -96,6 +103,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
             }
         }
 
+        setPropertyValue(PROPERTY_FORM_FIELD_VALIDATION, startEvent.getValidateFormFields(), propertiesNode);
+
         if (startEvent.getSubProcess() instanceof EventSubProcess && !startEvent.isInterrupting()) {
             propertiesNode.put(PROPERTY_INTERRUPTING, false);
         } else {
@@ -124,12 +133,20 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
                     }
                 }
             }
+            String validateFormFields = getPropertyValueAsString(PROPERTY_FORM_FIELD_VALIDATION, elementNode);
+            if (StringUtils.isNotEmpty(validateFormFields)) {
+                startEvent.setValidateFormFields(validateFormFields);
+            }
             convertJsonToFormProperties(elementNode, startEvent);
 
         } else if (STENCIL_EVENT_START_TIMER.equals(stencilId)) {
             convertJsonToTimerDefinition(elementNode, startEvent);
+        } else if (STENCIL_EVENT_START_CONDITIONAL.equals(stencilId)) {
+            convertJsonToConditionalDefinition(elementNode, startEvent);
         } else if (STENCIL_EVENT_START_ERROR.equals(stencilId)) {
             convertJsonToErrorDefinition(elementNode, startEvent);
+        } else if (STENCIL_EVENT_START_ESCALATION.equals(stencilId)) {
+            convertJsonToEscalationDefinition(elementNode, startEvent);
         } else if (STENCIL_EVENT_START_MESSAGE.equals(stencilId)) {
             convertJsonToMessageDefinition(elementNode, startEvent);
         } else if (STENCIL_EVENT_START_SIGNAL.equals(stencilId)) {

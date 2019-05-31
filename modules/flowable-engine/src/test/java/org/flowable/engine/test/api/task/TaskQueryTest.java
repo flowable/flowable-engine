@@ -34,6 +34,7 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.AfterEach;
@@ -487,6 +488,69 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableIllegalArgumentException e) {
 
+        }
+    }
+
+    @Test
+    public void testQueryByFormKey() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().taskFormKey("testFormKey").list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .taskFormKey("testFormKey")
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
+    public void testQueryByFormKeyOr() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().or().taskId("invalid").taskFormKey("testFormKey").list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().or()
+                .taskFormKey("testFormKey")
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
+    public void testQueryWithFormKey() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().taskWithFormKey().list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .taskWithFormKey()
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
         }
     }
 
@@ -3041,20 +3105,21 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testNativeQueryPaging() {
-        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class));
-        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class, false));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class, false));
         assertEquals(5, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).listPage(0, 5).size());
         assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).listPage(10, 12).size());
     }
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class));
-        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class, false));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class, false));
         assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).list().size());
         assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).count());
 
-        assertEquals(144, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM ACT_RU_TASK T1, ACT_RU_TASK T2").count());
+        assertEquals(144, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM "
+            + managementService.getTableName(Task.class) + " T1, " + managementService.getTableName(Task.class) + " T2").count());
 
         // join task and variable instances
         assertEquals(
@@ -3068,14 +3133,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals("gonzoTask", tasks.get(0).getName());
 
         // select with distinct
-        assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT DISTINCT T1.* FROM ACT_RU_TASK T1").list().size());
+        assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT DISTINCT T1.* FROM " + managementService.getTableName(Task.class) + " T1").list().size());
 
         assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = 'gonzoTask'").count());
         assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = 'gonzoTask'").list().size());
 
         // use parameters
-        assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask")
-                .count());
+        assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class)
+            + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask").count());
     }
 
     @Test

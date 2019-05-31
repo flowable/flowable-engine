@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -385,7 +386,7 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
     @Test
     public void testLastDisabledBeforeAndAfter() {
-        Date now = new Date();
+        Date now = setClockFixedToCurrentTime();
         setClockTo(now);
         startInstances(3);
 
@@ -580,6 +581,41 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().planItemInstanceEndedAfter(new Date(now.getTime() - 1000)).list()).hasSize(2);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testWaitRepetitionOfNestedStages() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testWaitRepetitionOfNestedStages")
+            .variable("stage1", false)
+            .variable("stage11", false)
+            .variable("stage12", false)
+            .start();
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list())
+            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+            .containsExactlyInAnyOrder(
+                tuple("oneexpandedstage1", "available"),
+                tuple("oneexpandedstage2", "available")
+            );
+
+        cmmnRuntimeService.createChangePlanItemStateBuilder()
+            .caseInstanceId(caseInstance.getId())
+            .activatePlanItemDefinitionIds(Arrays.asList("oneexpandedstage4"))
+            .changeState();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list())
+            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+            .containsExactlyInAnyOrder(
+                tuple("oneexpandedstage1", "active"),
+                tuple("oneexpandedstage1", "wait_repetition"),
+                tuple("oneexpandedstage2", "available"),
+                tuple("oneexpandedstage6", "available"),
+                tuple("oneexpandedstage4", "active"),
+                tuple("oneexpandedstage4", "wait_repetition"), // FIXME: this plan item instance is missing
+                tuple("oneeventlistener1", "available"),
+                tuple("onehumantask1", "available")
+            );
+    }
 
     private List<String> startInstances(int numberOfInstances) {
         List<String> caseInstanceIds = new ArrayList<>();

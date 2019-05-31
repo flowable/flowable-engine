@@ -12,8 +12,10 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -228,6 +230,23 @@ public class StageTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testStageFlagSet() {
+        Date now = new Date();
+        setClockTo(now);
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+
+        CaseInstance testStagesOnly = cmmnRuntimeService.createCaseInstanceQuery()
+            .caseDefinitionKey("testCase")
+            .singleResult();
+        assertThat(testStagesOnly).isNotNull();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(testStagesOnly.getId()).planItemDefinitionType("stage").count()).isEqualTo(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(testStagesOnly.getId()).onlyStages().count()).isEqualTo(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(testStagesOnly.getId()).onlyStages().list()).extracting(PlanItemInstance::isStage).containsOnly(true);
     }
     
 }

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -67,13 +67,11 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricActivityInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstancesByQueryCriteria(this);
     }
 
@@ -193,6 +191,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQuery tenantIdIn(List<String> tenantIds) {
         this.tenantIds = tenantIds;
         return this;

@@ -71,6 +71,41 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void getCaseInstanceByCaseInstanceName() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .name("taskName1")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .name("taskName2")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .name("nameTask3")
+                .start();
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceNameLikeIgnoreCase("taskName%").count(), is(2L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceNameLikeIgnoreCase("%TASK3").count(), is(1L));
+    }
+
+    public void getCaseInstanceByCaseDefinitionKeyIncludingVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("oneTaskCase").
+                start();
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().count(), is(1L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").includeCaseVariables().singleResult().getId(), is(caseInstance.getId()));
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").caseInstanceId("Undefined").endOr().includeCaseVariables().count(), is(1L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").caseInstanceId("Undefined").endOr().includeCaseVariables().list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").caseInstanceId("Undefined").endOr().includeCaseVariables().singleResult().getId(), is(caseInstance.getId()));
+    }
+
+    @Test
     public void getCaseInstanceByCaseDefinitionKeys() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").

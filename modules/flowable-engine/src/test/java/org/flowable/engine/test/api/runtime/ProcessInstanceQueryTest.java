@@ -378,7 +378,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertEquals(PROCESS_DEPLOY_COUNT, instances.size());
         ProcessInstance processInstance = instances.get(0);
         assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(new Integer(1), processInstance.getProcessDefinitionVersion());
+        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
         assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
         assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
         assertEquals(PROCESS_DEPLOY_COUNT, runtimeService.createProcessInstanceQuery().deploymentId(deployment.getId()).count());
@@ -393,7 +393,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = instances.get(0);
         assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(new Integer(1), processInstance.getProcessDefinitionVersion());
+        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
         assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
         assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
 
@@ -406,7 +406,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertEquals(PROCESS_DEPLOY_COUNT, instances.size());
         ProcessInstance processInstance = instances.get(0);
         assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(new Integer(1), processInstance.getProcessDefinitionVersion());
+        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
         assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
         assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
 
@@ -468,7 +468,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = instances.get(0);
         assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(new Integer(1), processInstance.getProcessDefinitionVersion());
+        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
         assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
         assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
 
@@ -1871,7 +1871,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     public void testNativeQuery() {
         // just test that the query will be constructed and executed, details
         // are tested in the TaskQueryTest
-        assertEquals("ACT_RU_EXECUTION", managementService.getTableName(ProcessInstance.class));
+        assertEquals("ACT_RU_EXECUTION", managementService.getTableName(ProcessInstance.class, false));
 
         long piCount = runtimeService.createProcessInstanceQuery().count();
 
@@ -2059,5 +2059,19 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
             .extracting(ProcessInstance::getId)
             .as("descending order by startTime")
             .containsExactly(nowPlus1InstanceId, nowInstanceId, nowMinus1InstanceId);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidCallbackId() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackId("foo").list()).isNullOrEmpty();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidCallbackType() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").list()).isNullOrEmpty();
     }
 }

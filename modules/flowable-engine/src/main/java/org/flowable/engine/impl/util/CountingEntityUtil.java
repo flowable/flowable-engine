@@ -18,6 +18,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -42,7 +43,7 @@ public class CountingEntityUtil {
         }
         
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
-        if (fireDeleteEvent && eventDispatcher.isEnabled()) {
+        if (fireDeleteEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
     
             eventDispatcher.dispatchEvent(EventUtil.createVariableDeleteEvent(variableInstance));
@@ -60,6 +61,28 @@ public class CountingEntityUtil {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager(commandContext).findById(variableInstance.getExecutionId());
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
+            }
+        }
+    }
+    
+    public static void handleInsertEventSubscriptionEntityCount(EventSubscription eventSubscription) {
+        if (eventSubscription.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
+            CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager().findById(
+                            eventSubscription.getExecutionId());
+
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
+                executionEntity.setEventSubscriptionCount(executionEntity.getEventSubscriptionCount() + 1);
+            }
+        }
+    }
+    
+    public static void handleDeleteEventSubscriptionEntityCount(EventSubscription eventSubscription) {
+        if (eventSubscription.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
+            CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager().findById(
+                            eventSubscription.getExecutionId());
+            
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
+                executionEntity.setEventSubscriptionCount(executionEntity.getEventSubscriptionCount() - 1);
             }
         }
     }

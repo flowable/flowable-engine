@@ -128,6 +128,8 @@
         <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
         <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
         <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+        <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+        <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
 
@@ -272,6 +274,9 @@
 
     <sql id="selectHistoricCaseInstancesWithVariablesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
+        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null or deploymentId != null or deploymentIds != null">
+            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        </if>
         <if test="includeCaseVariables">
             left outer join ${prefix}ACT_HI_VARINST VAR ON VAR.PROC_INST_ID_ is null and
             RES.ID_ = VAR.SCOPE_ID_ and VAR.SCOPE_TYPE_ = 'cmmn' and VAR.SUB_SCOPE_ID_ is null
@@ -318,6 +323,9 @@
                          open="(" separator="," close=")">
                   #{caseInstanceId}
                 </foreach>
+            </if>
+            <if test="caseInstanceNameLikeIgnoreCase != null">
+	            and lower(RES.NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
             </if>
             <if test="caseDefinitionId != null">
                 and RES.CASE_DEF_ID_ = #{caseDefinitionId}

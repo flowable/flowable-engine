@@ -33,6 +33,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.cmmn.engine.HttpClientConfig;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -73,6 +74,30 @@ public class CmmnEngineAutoConfigurationTest {
         .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class);
 
     @Test
+    public void httpProperties() {
+        contextRunner.withPropertyValues(
+            "flowable.http.useSystemProperties=true",
+            "flowable.http.connectTimeout=PT0.250S",
+            "flowable.http.socketTimeout=PT0.500S",
+            "flowable.http.connectionRequestTimeout=PT1S",
+            "flowable.http.requestRetryLimit=1",
+            "flowable.http.disableCertVerify=true"
+        ).run(context -> {
+            CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+            HttpClientConfig httpClientConfig = cmmnEngine.getCmmnEngineConfiguration().getHttpClientConfig();
+
+            assertThat(httpClientConfig.isUseSystemProperties()).isTrue();
+            assertThat(httpClientConfig.getConnectTimeout()).isEqualTo(250);
+            assertThat(httpClientConfig.getSocketTimeout()).isEqualTo(500);
+            assertThat(httpClientConfig.getConnectionRequestTimeout()).isEqualTo(1000);
+            assertThat(httpClientConfig.getRequestRetryLimit()).isEqualTo(1);
+            assertThat(httpClientConfig.isDisableCertVerify()).isTrue();
+
+            deleteDeployments(cmmnEngine);
+        });
+    }
+
+    @Test
     public void standaloneCmmnEngineWithBasicDataSource() {
         contextRunner.run(context -> {
             assertThat(context)
@@ -91,7 +116,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class
                         );
@@ -127,7 +152,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class,
                             SpringProcessEngineConfiguration.class
@@ -166,7 +191,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
-                        .containsExactly(
+                        .containsExactlyInAnyOrder(
                             SpringProcessEngineConfiguration.class,
                             SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class,
@@ -224,9 +249,9 @@ public class CmmnEngineAutoConfigurationTest {
         
         List<CmmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
 
-        assertThat(deployments).hasSize(2)
+        assertThat(deployments).hasSize(3)
             .extracting(CmmnDeployment::getName)
-            .contains("SpringBootAutoDeployment", "simple.bar");
+            .contains("SpringBootAutoDeployment", "simple.bar", "processTask.bar");
         
         AppRepositoryService appRepositoryService = context.getBean(AppRepositoryService.class);
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().list();
@@ -242,9 +267,9 @@ public class CmmnEngineAutoConfigurationTest {
         assertThat(appDefinition.getVersion()).isOne();
         
         List<AppDeployment> appDeployments = appRepositoryService.createDeploymentQuery().list();
-        assertThat(appDeployments).hasSize(2)
+        assertThat(appDeployments).hasSize(3)
             .extracting(AppDeployment::getName)
-            .contains("simple.bar", "vacationRequest.zip");
+            .contains("simple.bar", "vacationRequest.zip", "processTask.bar");
     }
 
     private static CmmnEngineConfigurationApi cmmnEngine(ProcessEngine processEngine) {

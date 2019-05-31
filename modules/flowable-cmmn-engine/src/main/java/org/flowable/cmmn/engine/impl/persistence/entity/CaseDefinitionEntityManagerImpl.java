@@ -21,21 +21,20 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryHelper;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
-import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 
 
 /**
@@ -100,21 +99,23 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = getHistoricIdentityLinkEntityManager();
             historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(caseDefinitionId, ScopeTypes.CMMN);
             
-            // Historic mile stone
+            // Historic milestone
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = getHistoricMilestoneInstanceEntityManager();
             List<HistoricMilestoneInstance> historicMilestoneInstances = historicMilestoneInstanceEntityManager
                     .findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseDefinitionId(caseDefinitionId));
             for (HistoricMilestoneInstance historicMilestoneInstance : historicMilestoneInstances) {
                 historicMilestoneInstanceEntityManager.delete(historicMilestoneInstance.getId());
             }
-            
+
+            // Historic tasks
             HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = getHistoricTaskInstanceEntityManager();
             List<HistoricTaskInstance> historicTaskInstances = historicTaskInstanceEntityManager
                     .findHistoricTaskInstancesByQueryCriteria(new HistoricTaskInstanceQueryImpl().scopeDefinitionId(caseDefinitionId).scopeType(ScopeTypes.CMMN)); 
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-                historicTaskInstanceEntityManager.delete((HistoricTaskInstanceEntity) historicTaskInstance);
+                TaskHelper.deleteHistoricTask(historicTaskInstance.getId());
             }
 
+            // Historic Plan Items
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = getHistoricPlanItemInstanceEntityManager();
             historicPlanItemInstanceEntityManager.findByCaseDefinitionId(caseDefinitionId)
                     .forEach(p -> historicPlanItemInstanceEntityManager.delete(p.getId()));
@@ -123,17 +124,7 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             List<HistoricCaseInstance> historicCaseInstanceEntities = historicCaseInstanceEntityManager
                     .findByCriteria(new HistoricCaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
             for (HistoricCaseInstance historicCaseInstanceEntity : historicCaseInstanceEntities) {
-
-                HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
-                List<HistoricVariableInstanceEntity> historicVariableInstanceEntities = historicVariableInstanceEntityManager
-                        .findHistoricalVariableInstancesByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
-                for (HistoricVariableInstanceEntity historicVariableInstanceEntity : historicVariableInstanceEntities) {
-                    historicVariableInstanceEntityManager.delete(historicVariableInstanceEntity);
-                }
-
-                historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstanceEntity.getId(), ScopeTypes.CMMN);
-
-                historicCaseInstanceEntityManager.delete(historicCaseInstanceEntity.getId());
+                CmmnHistoryHelper.deleteHistoricCaseInstance(cmmnEngineConfiguration, historicCaseInstanceEntity.getId());
             }
         }
         

@@ -29,8 +29,18 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
@@ -45,6 +55,12 @@ public class EntityDependencyOrder {
 
     static {
 
+        DELETE_ORDER.add(JobEntityImpl.class);
+        DELETE_ORDER.add(TimerJobEntityImpl.class);
+        DELETE_ORDER.add(SuspendedJobEntityImpl.class);
+        DELETE_ORDER.add(DeadLetterJobEntityImpl.class);
+        DELETE_ORDER.add(JobByteArrayEntityImpl.class);
+        DELETE_ORDER.add(HistoryJobEntityImpl.class);
         DELETE_ORDER.add(HistoricEntityLinkEntityImpl.class);
         DELETE_ORDER.add(HistoricIdentityLinkEntityImpl.class);
         DELETE_ORDER.add(HistoricMilestoneInstanceEntityImpl.class);
@@ -52,6 +68,10 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(VariableInstanceEntityImpl.class);
         DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
         DELETE_ORDER.add(HistoricVariableInstanceEntityImpl.class);
+        DELETE_ORDER.add(SignalEventSubscriptionEntityImpl.class);
+        DELETE_ORDER.add(MessageEventSubscriptionEntityImpl.class);
+        DELETE_ORDER.add(CompensateEventSubscriptionEntityImpl.class);
+        DELETE_ORDER.add(EventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(EntityLinkEntityImpl.class);
         DELETE_ORDER.add(IdentityLinkEntityImpl.class);
         DELETE_ORDER.add(MilestoneInstanceEntityImpl.class);

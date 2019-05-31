@@ -12,7 +12,6 @@
  */
 package org.flowable.common.engine.impl.event;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.cfg.TransactionListener;
@@ -38,7 +37,7 @@ public class ExecuteEventListenerTransactionListener implements TransactionListe
             listener.onEvent(flowableEvent);
         } catch (Throwable t) {
             if (listener.isFailOnException()) {
-                throw new FlowableException("Exception while executing event-listener", t);
+                throw t;
             } else {
                 // Ignore the exception and continue notifying remaining listeners. The listener
                 // explicitly states that the exception should not bubble up

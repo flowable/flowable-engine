@@ -72,6 +72,10 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
      * By default true for backwards compatibility.
      */
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
+    
+    public VariableServiceConfiguration(String engineName) {
+        super(engineName);
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////

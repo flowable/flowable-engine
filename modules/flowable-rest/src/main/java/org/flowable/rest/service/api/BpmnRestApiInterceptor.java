@@ -25,13 +25,13 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
-import org.flowable.engine.runtime.EventSubscription;
-import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.User;
@@ -46,6 +46,7 @@ import org.flowable.rest.service.api.history.HistoricActivityInstanceQueryReques
 import org.flowable.rest.service.api.history.HistoricDetailQueryRequest;
 import org.flowable.rest.service.api.history.HistoricProcessInstanceQueryRequest;
 import org.flowable.rest.service.api.history.HistoricTaskInstanceQueryRequest;
+import org.flowable.rest.service.api.history.HistoricTaskLogEntryQueryRequest;
 import org.flowable.rest.service.api.history.HistoricVariableInstanceQueryRequest;
 import org.flowable.rest.service.api.identity.GroupRequest;
 import org.flowable.rest.service.api.identity.UserRequest;
@@ -64,6 +65,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 
@@ -75,6 +77,8 @@ public interface BpmnRestApiInterceptor {
     
     void createTask(Task task, TaskRequest request);
     
+    void updateTask(Task task, TaskRequest request);
+
     void deleteTask(Task task);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
@@ -162,7 +166,9 @@ public interface BpmnRestApiInterceptor {
     void accessHistoryVariableInfoById(HistoricVariableInstance historicVariableInstance);
     
     void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
-    
+
+    void accessHistoricTaskLogWithQuery(HistoricTaskLogEntryQuery historicTaskLogEntryQuery, HistoricTaskLogEntryQueryRequest request);
+
     void accessGroupInfoById(Group group);
     
     void accessGroupInfoWithQuery(GroupQuery groupQuery);

@@ -63,7 +63,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
 
         if (task.getRevision() == 0) {
-            TaskHelper.insertTask(task, null, true);
+            TaskHelper.insertTask(task, null, true, false);
 
             FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
@@ -82,7 +82,8 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
                 originalTaskEntity = CommandContextUtil.getHistoricTaskService().getHistoricTask(task.getId());
             }
 
-            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(task);
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext)
+                .recordTaskInfoChange(task, processEngineConfiguration.getClock().getCurrentTime());
             taskService.updateTask(task, true);
 
             // Special care needed to detect the assignee task has changed

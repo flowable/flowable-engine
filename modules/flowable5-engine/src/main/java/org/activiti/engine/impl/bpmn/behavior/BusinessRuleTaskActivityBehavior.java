@@ -78,8 +78,7 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
 
         Collection<? extends Object> ruleOutputObjects = ksession.getObjects();
         if (ruleOutputObjects != null && !ruleOutputObjects.isEmpty()) {
-            Collection<Object> outputVariables = new ArrayList<>();
-            outputVariables.addAll(ruleOutputObjects);
+            Collection<Object> outputVariables = new ArrayList<>(ruleOutputObjects);
             execution.setVariable(resultVariable, outputVariables);
         }
         ksession.dispose();

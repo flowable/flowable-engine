@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+  <case id="activatePlanItemTest" name="Activate Plan Item Test" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      <planItem id="planItem1" name="Validate" definitionRef="oneprocesstask1"></planItem>
+      <planItem id="planItem4" name="ACTIVE" definitionRef="oneexpandedstage1">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+        </itemControl>
+        <entryCriterion id="oneentrycriterion1" sentryRef="sentry1"></entryCriterion>
+        <entryCriterion id="oneentrycriterion2" sentryRef="sentry2"></entryCriterion>
+        <exitCriterion id="oneexitcriterion2" sentryRef="sentry4"></exitCriterion>
+      </planItem>
+      <planItem id="planItem6" name="INACTIVE" definitionRef="oneexpandedstage2">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+        </itemControl>
+        <entryCriterion id="oneentrycriterion5" sentryRef="sentry5"></entryCriterion>
+        <exitCriterion id="oneexitcriterion1" sentryRef="sentry3"></exitCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem5">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry4">
+        <planItemOnPart id="sentryOnPart3" sourceRef="planItem3">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry3">
+        <planItemOnPart id="sentryOnPart4" sourceRef="planItem5">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry5">
+        <planItemOnPart id="sentryOnPart5" sourceRef="planItem3">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <processTask id="oneprocesstask1" name="Validate" flowable:fallbackToDefaultTenant="true">
+        <processRefExpression><![CDATA[oneTask]]></processRefExpression>
+      </processTask>
+      <stage id="oneexpandedstage1" name="ACTIVE" flowable:includeInStageOverview="true">
+        <planItem id="planItem2" name="Add Account" definitionRef="oneprocesstask2">
+          <itemControl>
+            <manualActivationRule></manualActivationRule>
+          </itemControl>
+        </planItem>
+        <planItem id="planItem3" name="Deactivate User" definitionRef="oneprocesstask4">
+          <itemControl>
+            <manualActivationRule></manualActivationRule>
+          </itemControl>
+        </planItem>
+        <processTask id="oneprocesstask2" name="Add Account" flowable:fallbackToDefaultTenant="true">
+          <processRefExpression><![CDATA[oneTask]]></processRefExpression>
+        </processTask>
+        <processTask id="oneprocesstask4" name="Deactivate User" flowable:fallbackToDefaultTenant="true">
+          <processRefExpression><![CDATA[oneTask]]></processRefExpression>
+        </processTask>
+      </stage>
+      <stage id="oneexpandedstage2" name="INACTIVE" flowable:includeInStageOverview="true">
+        <planItem id="planItem5" name="Reactivate" definitionRef="oneprocesstask3">
+          <itemControl>
+            <requiredRule></requiredRule>
+            <manualActivationRule></manualActivationRule>
+          </itemControl>
+        </planItem>
+        <processTask id="oneprocesstask3" name="Reactivate" flowable:fallbackToDefaultTenant="true">
+          <processRefExpression><![CDATA[oneTask]]></processRefExpression>
+        </processTask>
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>

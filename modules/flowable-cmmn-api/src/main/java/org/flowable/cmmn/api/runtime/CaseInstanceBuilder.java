@@ -23,6 +23,8 @@ public interface CaseInstanceBuilder {
     CaseInstanceBuilder caseDefinitionId(String caseDefinitionId);
 
     CaseInstanceBuilder caseDefinitionKey(String caseDefinitionKey);
+    
+    CaseInstanceBuilder predefinedCaseInstanceId(String caseInstanceId);
 
     CaseInstanceBuilder name(String name);
 
@@ -92,6 +94,8 @@ public interface CaseInstanceBuilder {
     String getCaseDefinitionId();
 
     String getCaseDefinitionKey();
+    
+    String getPredefinedCaseInstanceId();
 
     String getName();
 
@@ -117,4 +121,5 @@ public interface CaseInstanceBuilder {
 
     boolean isFallbackToDefaultTenant();
 
+    boolean isStartWithForm();
 }

@@ -169,7 +169,7 @@ public abstract class LiquibaseBasedSchemaManager implements SchemaManager {
             if (jdbcConnection != null && closeConnection) {
                 jdbcConnection.close();
             }
-            throw new FlowableException("Error creating " + context + "liquibase instance", e);
+            throw new FlowableException("Error creating " + context + " liquibase instance", e);
         }
     }
 
@@ -182,7 +182,7 @@ public abstract class LiquibaseBasedSchemaManager implements SchemaManager {
                     try {
                         database.close();
                     } catch (DatabaseException e) {
-                        logger.warn("Error closing database for " + context, e);
+                        logger.warn("Error closing database for {}", context, e);
                     }
                 }
             }

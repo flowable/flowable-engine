@@ -30,6 +30,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryValue;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -90,6 +91,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String callbackId;
+    protected String callbackType;
     
     protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
     protected ExecutionQueryImpl currentOrQueryObject;
@@ -791,7 +794,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -805,7 +807,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     @SuppressWarnings({ "unchecked" })
     @Override
     public List<Execution> executeList(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -1079,4 +1080,5 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
     }
+
 }

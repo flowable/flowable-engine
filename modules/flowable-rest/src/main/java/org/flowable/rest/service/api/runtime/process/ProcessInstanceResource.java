@@ -143,6 +143,18 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
         
     }
     
+    @ApiOperation(value = "Evaluate the conditions of a process instance", tags = { "Process Instances" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and the evaluation of the conditions was executed."),
+            @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/evaluate-conditions", produces = "application/json")
+    public void evaluateConditions(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId) {
+        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        runtimeService.evaluateConditionalEvents(processInstance.getId());
+    }
+    
     @ApiOperation(value = "Migrate process instance", tags = { "Process Instances" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and migration was executed."),

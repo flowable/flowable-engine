@@ -306,7 +306,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
      * 
      * @author Frederik Heremans
      */
-    private class ScriptContextFunctionMapper extends FunctionMapper {
+    private static class ScriptContextFunctionMapper extends FunctionMapper {
 
         private ScriptContext scriptContext;
 

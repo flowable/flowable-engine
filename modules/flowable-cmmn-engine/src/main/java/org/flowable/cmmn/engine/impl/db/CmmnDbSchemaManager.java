@@ -15,17 +15,22 @@ package org.flowable.cmmn.engine.impl.db;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.db.EngineDatabaseConfiguration;
 import org.flowable.common.engine.impl.db.LiquibaseBasedSchemaManager;
 import org.flowable.common.engine.impl.db.LiquibaseDatabaseConfiguration;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 
 public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
 
     public static final String LIQUIBASE_CHANGELOG = "org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml";
 
-    public CmmnDbSchemaManager() {
-        super("cmmn", LIQUIBASE_CHANGELOG, CmmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);
+    public static final String LIQUIBASE_CHANGELOG_CRDB = "org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog-crdb.xml";
+
+    public CmmnDbSchemaManager(String changelogFile) {
+        super("cmmn", changelogFile, CmmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);
     }
 
     @Override
@@ -36,7 +41,24 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
     public void initSchema() {
         initSchema(CommandContextUtil.getCmmnEngineConfiguration().getDatabaseSchemaUpdate());
     }
-    
+
+    @Override
+    public void initSchema(String databaseSchemaUpdate) {
+        super.initSchema(databaseSchemaUpdate);
+
+        // When the databaseSchemaUpdate is drop-create:
+        // the IDM engine will have done a drop-create due to the configurator running first
+        // The CmmnDbSchemaManager will go next, but it will do a dropAll, dropping the idm tables too.
+        if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
+            AbstractEngineConfiguration abstractEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration().getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+            if (abstractEngineConfiguration != null) {
+                IdmEngineConfiguration idmEngineConfiguration = (IdmEngineConfiguration) abstractEngineConfiguration;
+                idmEngineConfiguration.getSchemaManager().schemaCreate();
+            }
+        }
+    }
+
     @Override
     public void schemaCreate() {
         try {
@@ -44,6 +66,7 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
             getCommonSchemaManager().schemaCreate();
             getIdentityLinkSchemaManager().schemaCreate();
             getEntityLinkSchemaManager().schemaCreate();
+            getEventSubscriptionSchemaManager().schemaCreate();
             getTaskSchemaManager().schemaCreate();
             getVariableSchemaManager().schemaCreate();
             getJobSchemaManager().schemaCreate();
@@ -81,15 +104,21 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
         }
         
         try {
-            getIdentityLinkSchemaManager().schemaDrop();
+            getEventSubscriptionSchemaManager().schemaDrop();
         } catch (Exception e) {
-            logger.info("Error dropping identity link tables", e);
+            logger.info("Error dropping event subscription tables", e);
         }
         
         try {
             getEntityLinkSchemaManager().schemaDrop();
         } catch (Exception e) {
             logger.info("Error dropping entity link tables", e);
+        }
+        
+        try {
+            getIdentityLinkSchemaManager().schemaDrop();
+        } catch (Exception e) {
+            logger.info("Error dropping identity link tables", e);
         }
         
         try {
@@ -108,6 +137,7 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
             if (CommandContextUtil.getCmmnEngineConfiguration().isExecuteServiceSchemaManagers()) {
                 getIdentityLinkSchemaManager().schemaUpdate();
                 getEntityLinkSchemaManager().schemaUpdate();
+                getEventSubscriptionSchemaManager().schemaUpdate();
                 getTaskSchemaManager().schemaUpdate();
                 getVariableSchemaManager().schemaUpdate();
                 getJobSchemaManager().schemaUpdate();
@@ -131,6 +161,10 @@ public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
     
     protected SchemaManager getEntityLinkSchemaManager() {
         return CommandContextUtil.getCmmnEngineConfiguration().getEntityLinkSchemaManager();
+    }
+    
+    protected SchemaManager getEventSubscriptionSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getEventSubscriptionSchemaManager();
     }
     
     protected SchemaManager getVariableSchemaManager() {

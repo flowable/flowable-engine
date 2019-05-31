@@ -13,14 +13,19 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -163,6 +168,15 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
 
     @Override
+    public List<PlanItem> getPlanItems() {
+        if (caseDefinitionId != null) {
+            return CaseDefinitionUtil.getCase(caseDefinitionId).getPlanModel().getPlanItems();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
         return childPlanItemInstances;
     }
@@ -236,6 +250,9 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
 
     public List<VariableInstanceEntity> getQueryVariables() {
+        if (queryVariables == null && Context.getCommandContext() != null) {
+            queryVariables = new VariableInitializingList();
+        }
         return queryVariables;
     }
 

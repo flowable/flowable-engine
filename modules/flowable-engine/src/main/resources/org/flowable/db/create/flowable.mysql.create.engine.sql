@@ -88,21 +88,6 @@ create table ACT_RE_PROCDEF (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
-create table ACT_RU_EVENT_SUBSCR (
-    ID_ varchar(64) not null,
-    REV_ integer,
-    EVENT_TYPE_ varchar(255) not null,
-    EVENT_NAME_ varchar(255),
-    EXECUTION_ID_ varchar(64),
-    PROC_INST_ID_ varchar(64),
-    ACTIVITY_ID_ varchar(64),
-    CONFIGURATION_ varchar(255),
-    CREATED_ timestamp(3) not null DEFAULT CURRENT_TIMESTAMP(3),
-    PROC_DEF_ID_ varchar(64),
-    TENANT_ID_ varchar(255) default '',
-    primary key (ID_)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-
 create table ACT_EVT_LOG (
     LOG_NR_ bigint auto_increment,
     TYPE_ varchar(64),
@@ -149,7 +134,6 @@ create table ACT_RU_ACTINST (
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDC_EXEC_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
-create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INFO_PROCDEF on ACT_PROCDEF_INFO(PROC_DEF_ID_);
@@ -325,7 +309,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.5.0.0', 1);
+values ('schema.version', '6.5.0.1', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.5.0.0)', 1);
+values ('schema.history', 'create(6.5.0.1)', 1);

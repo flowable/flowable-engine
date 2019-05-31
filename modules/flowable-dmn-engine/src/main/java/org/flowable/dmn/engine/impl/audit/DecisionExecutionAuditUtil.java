@@ -12,9 +12,8 @@
  */
 package org.flowable.dmn.engine.impl.audit;
 
-import java.util.Map;
-
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
@@ -28,7 +27,7 @@ public class DecisionExecutionAuditUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DecisionExecutionAuditUtil.class);
 
-    public static DecisionExecutionAuditContainer initializeRuleExecutionAudit(Decision decision, Map<String, Object> inputVariables) {
+    public static DecisionExecutionAuditContainer initializeRuleExecutionAudit(Decision decision, ExecuteDecisionInfo executeDecisionInfo) {
 
         if (decision == null || decision.getId() == null) {
             LOGGER.error("decision does not contain key");
@@ -42,11 +41,8 @@ public class DecisionExecutionAuditUtil {
             throw new IllegalArgumentException("decision table does not contain a hit policy");
         }
 
-        String decisionKey = decision.getId();
-        String decisionName = decision.getName();
-
-        return new DecisionExecutionAuditContainer(decisionKey, decisionName, decisionTable.getHitPolicy(),
-            CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), inputVariables);
+        return new DecisionExecutionAuditContainer(decision.getId(), decision.getName(), executeDecisionInfo.getDecisionVersion(), 
+                        decisionTable.getHitPolicy(), CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), executeDecisionInfo.getVariables());
     }
 
 }

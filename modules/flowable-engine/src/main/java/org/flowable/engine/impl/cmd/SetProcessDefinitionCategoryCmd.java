@@ -15,6 +15,7 @@ package org.flowable.engine.impl.cmd;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
@@ -67,8 +68,10 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
             processDefinitionCache.remove(processDefinitionId);
         }
 
-        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, processDefinition));
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher
+                .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, processDefinition));
         }
 
         return null;

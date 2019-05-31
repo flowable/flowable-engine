@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.cmd;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -44,7 +45,8 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         if (userId != null) {
-            task.setClaimTime(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
+            Clock clock = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock();
+            task.setClaimTime(clock.getCurrentTime());
 
             if (task.getAssignee() != null) {
                 if (!task.getAssignee().equals(userId)) {
@@ -52,7 +54,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                     // exception. Otherwise, ignore this, post-conditions of method already met.
                     throw new FlowableTaskAlreadyClaimedException(task.getId(), task.getAssignee());
                 }
-                CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(task);
+                CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(task, clock.getCurrentTime());
                 
             } else {
                 TaskHelper.changeTaskAssignee(task, userId);

@@ -21,12 +21,16 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -102,6 +106,10 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         for (TaskEntity taskEntity : taskEntities) {
             TaskHelper.deleteTask(taskEntity, deleteReason, cascade, true);
         }
+        
+        // Event subscriptions
+        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        eventSubscriptionService.deleteEventSubscriptionsForScopeIdAndType(caseInstanceId, ScopeTypes.CMMN);
 
         // Sentry part instances
         getSentryPartInstanceEntityManager().deleteByCaseInstanceId(caseInstanceId);
@@ -112,13 +120,23 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         // Plan item instances
         PlanItemInstanceEntityManager planItemInstanceEntityManager = getPlanItemInstanceEntityManager();
         
+        List<PlanItemInstanceEntity> stagePlanItemInstances = new ArrayList<>();
+        List<PlanItemInstanceEntity> childTaskPlanItemInstances = new ArrayList<>();
+        collectPlanItemInstances(caseInstanceEntity, stagePlanItemInstances, childTaskPlanItemInstances);
+
         // Plan item instances are removed per stage, in reversed order
-        ArrayList<PlanItemInstanceEntity> stagePlanItemInstances = new ArrayList<>();
-        collectStagePlanItemInstances(caseInstanceEntity, stagePlanItemInstances);
         for (int i = stagePlanItemInstances.size() - 1; i>=0; i--) {
             planItemInstanceEntityManager.deleteByStageInstanceId(stagePlanItemInstances.get(i).getId());
         }
         planItemInstanceEntityManager.deleteByCaseInstanceId(caseInstanceId); // root plan item instances
+
+        // Child task behaviors have potentially associated child entities (case/process instances)
+        for (PlanItemInstanceEntity childTaskPlanItemInstance : childTaskPlanItemInstances) {
+            if (PlanItemInstanceState.ACTIVE.equals(childTaskPlanItemInstance.getState())) {
+                ChildTaskActivityBehavior childTaskActivityBehavior = (ChildTaskActivityBehavior) childTaskPlanItemInstance.getPlanItem().getBehavior();
+                childTaskActivityBehavior.deleteChildEntity(CommandContextUtil.getCommandContext(), childTaskPlanItemInstance, cascade);
+            }
+        }
 
         // Jobs have dependencies (byte array refs that need to be deleted, so no immediate delete for the moment)
         JobEntityManager jobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
@@ -146,12 +164,20 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         delete(caseInstanceEntity);
     }
 
-    protected void collectStagePlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer, ArrayList<PlanItemInstanceEntity> stagePlanItemInstanceEntities) {
+    protected void collectPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer,
+        List<PlanItemInstanceEntity> stagePlanItemInstanceEntities, List<PlanItemInstanceEntity> childTaskPlanItemInstanceEntities) {
         for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceContainer.getChildPlanItemInstances()) {
+
             if (planItemInstanceEntity.isStage()) {
                 stagePlanItemInstanceEntities.add(planItemInstanceEntity);
-                collectStagePlanItemInstances(planItemInstanceEntity, stagePlanItemInstanceEntities);
+                collectPlanItemInstances(planItemInstanceEntity, stagePlanItemInstanceEntities, childTaskPlanItemInstanceEntities);
+
+            } else if (planItemInstanceEntity.getPlanItem() != null
+                && planItemInstanceEntity.getPlanItem().getBehavior() != null
+                && planItemInstanceEntity.getPlanItem().getBehavior() instanceof ChildTaskActivityBehavior) {
+                    childTaskPlanItemInstanceEntities.add(planItemInstanceEntity);
             }
+
         }
     }
 

@@ -26,13 +26,13 @@ import org.flowable.task.service.impl.HistoricTaskServiceImpl;
 import org.flowable.task.service.impl.TaskServiceImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManagerImpl;
-import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
-import org.flowable.task.service.impl.persistence.entity.TaskEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManagerImpl;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityManagerImpl;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
-import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskLogEntryDataManager;
+import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MyBatisHistoricTaskLogEntryDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisTaskDataManager;
@@ -77,6 +77,10 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     // Events
     protected boolean enableHistoricTaskLogging;
+    
+    public TaskServiceConfiguration(String engineName) {
+        super(engineName);
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////

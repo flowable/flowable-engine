@@ -26,11 +26,18 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * Callback implementation for a child case instance (started from a process instance) returning it's state change to its parent.
+ *
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class ChildBpmnCaseInstanceStateChangeCallback implements RuntimeInstanceStateChangeCallback {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChildBpmnCaseInstanceStateChangeCallback.class);
 
     @Override
     public void stateChanged(CallbackData callbackData) {
@@ -49,17 +56,33 @@ public class ChildBpmnCaseInstanceStateChangeCallback implements RuntimeInstance
             ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
             
             Map<String, Object> variables = new HashMap<>();
-            for (IOParameter ioParameter : processInstanceService.getOutputParametersOfCaseTask(callbackData.getCallbackId())) {
+            for (IOParameter outParameter : processInstanceService.getOutputParametersOfCaseTask(callbackData.getCallbackId())) {
+
                 Object value = null;
-                if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                    Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(ioParameter.getSourceExpression().trim());
+                if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
+                    Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(outParameter.getSourceExpression().trim());
                     value = expression.getValue(caseInstance);
 
                 } else {
-                    value = caseInstance.getVariable(ioParameter.getSource());
+                    value = caseInstance.getVariable(outParameter.getSource());
                 }
 
-                variables.put(ioParameter.getTarget(), value);
+                String variableName = null;
+                if (liquibase.util.StringUtils.isNotEmpty(outParameter.getTarget()))  {
+                    variableName = outParameter.getTarget();
+
+                } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
+                    Object variableNameValue = cmmnEngineConfiguration.getExpressionManager().createExpression(outParameter.getTargetExpression()).getValue(caseInstance);
+                    if (variableNameValue != null) {
+                        variableName = variableNameValue.toString();
+                    } else {
+                        LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
+                            outParameter.getTargetExpression());
+                    }
+
+                }
+
+                variables.put(variableName, value);
             }
             
             processInstanceService.triggerCaseTask(callbackData.getCallbackId(), variables);

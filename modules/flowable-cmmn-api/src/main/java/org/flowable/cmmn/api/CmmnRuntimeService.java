@@ -22,9 +22,12 @@ import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
+import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 
@@ -34,6 +37,8 @@ import org.flowable.identitylink.api.IdentityLink;
 public interface CmmnRuntimeService {
 
     CaseInstanceBuilder createCaseInstanceBuilder();
+
+    PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId);
     
     void triggerPlanItemInstance(String planItemInstanceId);
     
@@ -86,7 +91,7 @@ public interface CmmnRuntimeService {
     
     void removeLocalVariable(String planItemInstanceId, String variableName);
     
-    void removeLocalVariables(String caseInstanceId, Collection<String> variableNames);
+    void removeLocalVariables(String planItemInstanceId, Collection<String> variableNames);
 
     /**
      * Set or change the name of the case instance.
@@ -103,8 +108,15 @@ public interface CmmnRuntimeService {
     MilestoneInstanceQuery createMilestoneInstanceQuery();
     
     GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery();
+    
+    SignalEventListenerInstanceQuery createSignalEventListenerInstanceQuery();
 
     UserEventListenerInstanceQuery createUserEventListenerInstanceQuery();
+    
+    /**
+     * Creates a new {@link EventSubscriptionQuery} instance, that can be used to query the event subscriptions.
+     */
+    EventSubscriptionQuery createEventSubscriptionQuery();
     
     /**
      * Involves a user with a case instance. The type of identity link is defined by the given identityLinkType.

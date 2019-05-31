@@ -1,0 +1,156 @@
+[[springintegration]]
+
+== Spring集成
+
+
+虽然我们可以在没有Spring的情况下使用 Flowable DMN，但我们还是有必要提供了一些非常好的集成特性，本章我们将对此进行说明。
+
+=== DmnEngineFactoryBean
+
+我们可以将++DMN引擎++配置为普通的Spring Bean。配置的入口是++org.flowable.dmn.spring.DmnEngineFactoryBean++类。这个bean采用DMN引擎配置并同时创建DMN引擎。 这意味着Spring属性的创建和配置与<<configuration,configuration章节>>中记录的是一致的。Spring集成所用的配置与引擎Bean如下所示：
+
+[source,xml,linenums]
+----
+<bean id="dmnEngineConfiguration" class="org.flowable.dmn.spring.SpringDmnEngineConfiguration">
+    ...
+</bean>
+
+<bean id="dmnEngine" class="org.flowable.dmn.spring.DmnEngineFactoryBean">
+  <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration" />
+</bean>
+
+----
+
+
+注意：DmnEngine Bean的配置现在使用的是++org.flowable.dmn.spring.SpringDmnEngineConfiguration++类。
+
+
+
+=== 自动资源部署
+
+
+Spring集成还有一个自动部署资源的特殊功能。在DMN引擎配置中，我们可以指定一组资源。一旦创建DMN引擎，所有指定的资源都会被扫描和部署。适当的过滤可以防止重复的部署。只有当资源确实发生变化时，才会重新部署至Flowable DMN数据库中。这在Spring容器经常重启（例如：测试）的时候非常有用。
+
+
+以下是一个例子：
+
+[source,xml,linenums]
+----
+<bean id="dmnEngineConfiguration" class="org.flowable.spring.SpringDmnEngineConfiguration">
+  ...
+  <property name="deploymentResources"
+    value="classpath*:/org/flowable/spring/test/autodeployment/autodeploy/decision*.dmn" />
+</bean>
+
+<bean id="dmnEngine" class="org.flowable.dmn.spring.DmnEngineFactoryBean">
+  <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration" />
+</bean>
+----
+
+
+默认情况下，上面的配置方式会将符合这个过滤器的所有资源组织在一起，作为Flowable DMN引擎的一个部署。为避免未改变资源导致重复部署，重复检测过滤将作用于整个部署操作。有时候，这并不是你想要的。例如，如果我们以这种方式部署了一组DMN资源，即使这些资源中只有的一个DMN流程定义发生了改变，整个部署都被视为新的部署，这个部署中的所有流程定义都将被重新部署，这将导致每个流程定义都会刷新版本，即使实际上只有一个流程定义发生了变化。
+
+
+要想定制部署的方式，我们可以在++SpringProcessEngineConfiguration++中指定一个额外属性++deploymentMode++，这个属性定义了部署一组符合过滤器的资源的策略。这个属性默认支持3个值：
+
+
+* ++default++: 将所有资源组织在一个部署中，整体用于重复检测过滤。这是默认值，在不指定属性值的时候也使用这个。
+
+
+* ++single-resource++: 为每个资源创建一个单独的部署，并用于重复检测过滤。如果希望单独部署每一个DMN流程定义，并且只有在它发生变化时才创建新的DMN流程定义版本，就应该使用这个值。
+
+
+* ++resource-parent-folder++: 为同一个目录下的资源创建一个单独的部署，并用于重复检测过滤。这个属性值可以为大多数资源创建独立的部署。同时仍可以通过将部分资源放在同一个目录下，将它们组织在一起。以下是一个将++deploymentMode++设置为++single-resource++的例子：
+
+[source,xml,linenums]
+----
+<bean id="dmnEngineConfiguration"
+    class="org.flowable.dmn.spring.SpringDmnEngineConfiguration">
+  ...
+  <property name="deploymentResources" value="classpath*:/flowable/*.dmn" />
+  <property name="deploymentMode" value="single-resource" />
+</bean>
+----
+
+
+除了使用上面列出的++deploymentMode++几个枚举值之外，我们还可以自定义自动部署的行为。如果是这样做，我们可以创建++SpringDmnEngineConfiguration++的子类并覆盖++getAutoDeploymentStrategy(String deploymentMode)++方法。 这个方法用来设置++deploymentMode++属性值。
+
+
+[[springUnitTest]]
+
+
+
+=== 单元测试
+
+
+集成Spring后，我们可以很轻松使用标准的<<apiUnitTesting,Flowable测试工具>>测试业务流程。下面的例子我们来展示如何使用典型的Spring单元测试工具测试业务流程：
+
+.JUnit 5 测试
+[source,java,linenums]
+----
+@ExtendWith(FlowableDmnSpringExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = DmnSpringJunitJupiterTest.TestConfiguration.class)
+public class SpringJunit4Test {
+
+    @Autowired
+    private DmnEngine dmnEngine;
+
+    @Autowired
+    private DmnRuleService ruleService;
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void simpleDecisionTest() {
+        Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()
+            .decisionKey("extensionUsage")
+            .variable("inputVariable1", 2)
+            .variable("inputVariable2", "test2")
+            .executeWithSingleResult();
+
+        Assertions.assertThat(executionResult).containsEntry("output1", "test1");
+    }
+}
+----
+
+.JUnit 4 测试
+[source,java,linenums]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
+public class SpringJunit4Test {
+
+    @Autowired
+    private DmnEngine dmnEngine;
+
+    @Autowired
+    private DmnRuleService ruleService;
+
+    @Autowired
+    @Rule
+    public FlowableDmnRule flowableSpringRule;
+
+    @Test
+    @DmnDeploymentAnnotation
+    public void simpleDecisionTest() {
+        Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("extensionUsage")
+                .variable("inputVariable1", 2)
+                .variable("inputVariable2", "test2")
+                .executeWithSingleResult();
+
+        Assertions.assertThat(executionResult).containsEntry("output1", "test1");
+    }
+}
+----
+
+
+注意：这个例子正常运行的条件是，需要在Spring配置中定义一个 _org.flowable.dmn.engine.test.FlowableDmnRule_ Bean（在上面的例子中通过@Autowire自动注入）
+
+[source,xml,linenums]
+----
+<bean id="flowableDmnRule" class="org.flowable.dmn.engine.test.FlowableDmnRule">
+    <property name="dmnEngine" ref="dmnEngine"/>
+</bean>
+
+----

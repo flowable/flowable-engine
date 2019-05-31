@@ -130,6 +130,10 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected boolean asyncHistoryJsonGroupingEnabled;
     protected boolean asyncHistoryExecutorMessageQueueMode;
     protected int asyncHistoryJsonGroupingThreshold = 10;
+    
+    public JobServiceConfiguration(String engineName) {
+        super(engineName);
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -460,7 +464,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     
     public JobServiceConfiguration addJobHandler(String type, JobHandler jobHandler) {
         if (this.jobHandlers == null) {
-            this.jobHandlers = new HashMap<String, JobHandler>();
+            this.jobHandlers = new HashMap<>();
         }
         this.jobHandlers.put(type, jobHandler);
         return this;

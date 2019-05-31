@@ -1,0 +1,403 @@
+
+== 配置
+
+[[configuration]]
+
+=== 创建 DMN 引擎
+
+_Flowable DMN 引擎的构造方式和 Flowable 工作流引擎非常相似。因此，部分文档非常类似流程引擎的相应内容。_
+
+Flowable DMN 引擎是通过名为 +flowable.dmn.cfg.xml+ 的XML文件进行配置的。请注意，如果你使用 <<springintegration,Spring 风格构建 DMN 引擎>>，则不适用。
+
+获取一个 +DmnEngine+ 的最简单的方式是使用 +org.flowable.dmn.engine.DmnEngines+ 类：
+
+[source,java,linenums]
+----
+DmnEngine dmnEngine = DMNEngines.getDefaultDmnEngine()
+----
+
+上述代码将会从classpath寻找 +flowable.dmn.cfg.xml+ 文件，并根据文件中的配置构造引擎。下面的代码片段展示了实例配置。后续章节将详细介绍配置属性。
+
+[source,xml,linenums]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+
+    <property name="databaseSchemaUpdate" value="true" />
+
+    <property name="strictMode" value="false"/>
+
+  </bean>
+
+</beans>
+----
+
+可以注意到这个 XML 配置实际上是个 Spring 配置。 *这并不代表 Flowable DMN 只能在 Spring 环境中使用！* 我们只是在内部借助 Spring 的解析和依赖注入能力来构建引擎。
+
+也可以通过编程的方式使用配置文件创建 DMNEngineConfiguration 对象。也可以使用不同的 bean ID（比如第三行）。
+
+[source,java,linenums]
+----
+DmnEngineConfiguration.
+  createDmnEngineConfigurationFromResourceDefault();
+  createDmnEngineConfigurationFromResource(String resource);
+  createDmnEngineConfigurationFromResource(String resource, String beanName);
+  createDmnEngineConfigurationFromInputStream(InputStream inputStream);
+  createDmnEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
+----
+
+
+不使用配置文件也是可行的，这将基于默认值创建配置（更多信息请参阅 <<configurationClasses,已支持的其他配置类>> ）。
+
+[source,java,linenums]
+----
+DmnEngineConfiguration.createStandaloneDmnEngineConfiguration();
+DmnEngineConfiguration.createStandaloneInMemDmnEngineConfiguration();
+----
+
+所有的 +DmnEngineConfiguration.createXXX()+ 方法返回一个可做进一步调整的 +DmnEngineConfiguration+ 。调用 +buildDmnEngine()+ 方法之后将创建一个 +DmnEngine+ ：
+
+[source,java,linenums]
+----
+DmnEngine dmnEngine = DmnEngineConfiguration.createStandaloneInMemDmnEngineConfiguration()
+  .setDatabaseSchemaUpdate(DmnEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+  .setJdbcUrl("jdbc:h2:mem:my-own-db;DB_CLOSE_DELAY=1000")
+  .buildDmnEngine();
+----
+
+[[configurationRoot]]
+
+
+=== DmnEngineConfiguration bean
+
++flowable.dmn.cfg.xml+ 必须包含一个 ID 为 +$$'dmnEngineConfiguration'$$+ 的 bean。
+
+[source,xml,linenums]
+----
+ <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+----
+
+
+这个 bean 将被用于构造 +DmnEngine+。有多个可选的类可以用来定义 +dmnEngineConfiguration+。这些类代表了不同的环境，并根据环境设置相应的默认值。最佳方式是选择最符合你的环境的类，尽可能地减少配置引擎所需要的属性。目前有下面这些类可供使用： [[configurationClasses]]
+
+* *org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration*: 引擎以单机方式运行。Flowable 将自行处理事务。默认情况下，仅在引擎启动时检查数据库（如果 Flowable DMN 相关表不存在，或者版本不正确，将抛出异常）。
+* *org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration*: 这是一个方便进行单元测试的类。Flowable DMN 将自行处理事务。默认使用 H2 内存数据库。数据库将随着引擎的启动和关闭进行创建和销毁。使用此类时一般无需进行额外配置。
+* *org.flowable.dmn.spring.SpringDmnEngineConfiguration*: 在 Spring 环境中使用 DMN 引擎时使用此类。详见 <<springintegration,与 Spring 集成章节>>。
+
+=== 植入到流程引擎
+
+除了以独立方式运行，DMN 引擎还可以植入到流程引擎中。这使得流程引擎能够识别它和其他引擎。例如，除了 BPMN 模型，还可以将 DMN 模型部署到流程引擎部署服务 API。
+
+要让流程引擎能够识别出 DMN 引擎，需要在流程引擎配置中将 *org.flowable.dmn.engine.configurator.DmnEngineConfigurator* 添加到流程引擎配置 bean 的 configurators list 中
+
+[source,xml,linenums]
+----
+<bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+    ...
+</bean>
+
+<bean id="dmnEngineConfigurator" class="org.flowable.dmn.engine.configurator.DmnEngineConfigurator">
+    <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration" />
+</bean>
+
+<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    <property name="configurators">
+      <list>
+        <ref bean="dmnEngineConfigurator" />
+      </list>
+    </property>
+    ...
+</bean>
+----
+
+
+[[databaseConfiguration]]
+
+=== 数据库配置
+
+Flowable DMN 引擎有两种方式进行数据库配置。第一种方式是定义数据库的 JDBC 属性：
+
+* *jdbcUrl*: 数据库的 JDBC Url。
+* *jdbcDriver*: 特定类型数据库的驱动。
+* *jdbcUsername*: 连接数据库所使用的用户名。
+* *jdbcPassword*: 连接数据库所使用的密码。
+
+基于所提供的 JDBC 属性构造的数据源将使用默认的 link:$$http://www.mybatis.org/$$[MyBatis] 连接池设置。下面这些可选属性可以用来对连接池进行调整（引自 Mybatis 文档）：
+
+* *jdbcMaxActiveConnections*: 连接池在任意时间可以持有的最大活动连接数。
+* *jdbcMaxIdleConnections*: 连接池在任意时间可以持有的最大空闲连接数。
+* *jdbcMaxCheckoutTime*: 在被强制返回之前，连接池中的连接可被“借用”的时长（以毫秒为单位）。默认值是20000（20秒）。
+* *jdbcMaxWaitTime*: 这是一个低级别设置，使池有机会打印日志状态，并在获取连接耗时太久时进行重新尝试（以避免池配置错误时永远静默地失败）。默认值是20000（20秒）。
+
+示例数据库配置：
+
+[source,xml,linenums]
+----
+<property name="jdbcUrl" value="jdbc:h2:mem:flowable_dmn;DB_CLOSE_DELAY=1000" />
+<property name="jdbcDriver" value="org.h2.Driver" />
+<property name="jdbcUsername" value="sa" />
+<property name="jdbcPassword" value="" />
+----
+
+我们的跑分显示 MyBatis 的连接池在处理大量并发请求时不是最高效的。因此，建议使用 javax.sql.DataSource 的实现（比如 HikariCP、Tomcat JDBC 连接池、等等），并将其注入到引擎配置中：
+
+[source,xml,linenums]
+----
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
+  <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+  <property name="url" value="jdbc:mysql://localhost:3306/flowable_dmn" />
+  <property name="username" value="flowable" />
+  <property name="password" value="flowable" />
+  <property name="defaultAutoCommit" value="false" />
+</bean>
+
+<bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+
+    <property name="dataSource" ref="dataSource" />
+    ...
+
+----
+
+要注意的是 Flowable DMN 并不自带定义这种数据源所需要的类库，所以你要确保这些类库在你的classpath中。
+
+无论你使用 JDBC 或数据源方式，都可以设置以下属性：
+
+* *databaseType*：一般情况下能从数据库连接中自动识别出来，没必要手工指定。应该仅当自动识别失败时指定。可选的值有：{h2、mysql、oracle、postgres、mssql、db2}。这项设置将决定使用哪些 create/drop 脚本。参见 <<supporteddatabases,“支持的数据库”章节>> 了解已支持哪些类型的数据库。
+* *databaseSchemaUpdate*：用来设置引擎启动和关闭时数据库表的操作策略。
+** +false+ （默认）：在创建引擎时检查数据库表的版本，如果不匹配则抛出异常。
+** ++true++：在构建引擎时进行检查，并在必要时更新数据库表。如果表不存在，则创建。
+** ++create-drop++：引擎创建时创建表，引擎关闭时删除表。
+
+
+[[jndiDatasourceConfig]]
+
+=== JNDI 数据源配置
+
+默认情况下，Flowable DMN 的数据库配置包含在每个 web 应用的 WEB-INF/classes 下的 db.properties 文件中。但是这样并不理想，因为它使得用户要么修改 Flowable 代码中的 db.properties 并重新编译 WAR 文件，要么在每一次项目部署时解压 WAR 并修改 db.properties。
+
+通过 JNDI （Java Naming and Directory Interface）获取数据库连接，这个连接将完全由 Servlet 容器管理，且配置可以在 war 包外部进行管理。而且相比 db.properties 文件，这种方式还能对连接参数进行更多的控制。
+
+[[jndi_configuration]]
+
+==== 配置
+
+JNDI 数据源的配置将视你所使用的 servlet 容器而有所不同。下面的说明适用于 Tomcat，至于其他的容器，请参阅各容器的文档。
+
+如果使用 Tomcat，JNDI 资源配置在 $CATALINA_BASE/conf/[enginename]/[hostname]/[warname].xml 中（Flowable UI 的配置通常在 $CATALINA_BASE/conf/Catalina/localhost/flowable-app.xml）。默认的 context 是在应用初次部署时从 Flowable WAR 文件中复制过来的，所以如果已经存在的话你需要进行替换。比如，要使用 MySql 而不是 H2，可如下修改 JNDI 资源：
+
+[source,xml,linenums]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+    <Context antiJARLocking="true" path="/flowable-app">
+        <Resource auth="Container"
+            name="jdbc/flowableDB"
+            type="javax.sql.DataSource"
+            description="JDBC DataSource"
+            url="jdbc:mysql://localhost:3306/flowable"
+            driverClassName="com.mysql.jdbc.Driver"
+            username="sa"
+            password=""
+            defaultAutoCommit="false"
+            initialSize="5"
+            maxWait="5000"
+            maxActive="120"
+            maxIdle="5"/>
+        </Context>
+----
+
+
+==== JNDI 属性
+
+要配置 JNDI 数据源，使用下面这些 Flowable UI 的 properties 文件中的属性：
+
+* spring.datasource.jndi-name=：数据源的 JNDI 名称。
+* datasource.jndi.resourceRef：设置查询是否发生在 J2EE 容器中，换句话说，JNDI 名称中不包含前缀“java:comp/env/”时是否要把它加上。默认“true”。
+
+
+[[supporteddatabases]]
+
+
+=== 支持的数据库
+
+下面列出了 Flowable 所使用的数据库的类型（区分大小写！）。
+
+[[databaseTypes]]
+[options="header"]
+|===============
+|Flowable DMN 数据库类型| JDBC URL 示例|备注
+|h2|jdbc:h2:tcp://localhost/flowable_dmn|默认数据库
+|mysql|jdbc:mysql://localhost:3306/flowable_dmn?autoReconnect=true|已使用 mysql-connector-java 数据库驱动进行测试
+|oracle|jdbc:oracle:thin:@localhost:1521:xe|
+|postgres|jdbc:postgresql://localhost:5432/flowable_dmn|
+|db2|jdbc:db2://localhost:50000/flowable_dmn|
+|mssql|jdbc:sqlserver://localhost:1433;databaseName=flowable_dmn (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) _OR_ jdbc:jtds:sqlserver://localhost:1433/flowable_dmn (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)|已使用 Microsoft JDBC Driver 4.0（sqljdbc4.jar）和 JTDS 驱动进行测试
+|===============
+
+
+[[creatingDatabaseTable]]
+
+=== 创建数据库表
+
+Flowable DMN 使用 link:$$http://www.liquibase.org$$[Liquibase] 跟踪、管理和应用数据库表的变更。
+
+创建数据库表的最简单的方式是：
+
+* 将 flowable-dmn-engine 相关JAR包添加到 classpath
+* 添加合适的数据库驱动
+* 添加 Flowable 配置文件（__flowable.dmn.cfg.xml__）到 classpath，指向你的数据库（参阅 <<databaseConfiguration,“数据库配置”章节>>）
+* 执行 _DbSchemaCreate_ 类的 main 方法
+
+[[database.tables.explained]]
+
+
+=== 数据库表名称说明
+
+Flowable DMN 的表名全部以 *ACT_DMN_* 开头。
+
+* ACT_DMN_DATABASECHANGELOG：此表用于 Liquibase 对已运行的变更进行追踪。
+* ACT_DMN_DATABASECHANGELOGLOCK：此表用于 Liquibase 确保同时只有一个 Liquibase 实例在运行。
+* ACT_DMN_DECISION_TABLE：此表包含了已部署的决策表的元数据。
+* ACT_DMN_DEPLOYMENT：此表包含了每次部署行为的元数据。
+* ACT_DMN_DEPLOYMENT_RESOURCE：此表包含了 DMN 定义的资源和元数据。
+
+[[databaseUpgrade]]
+
+
+=== 数据库升级
+
+请确保在升级前已对数据库进行备份。
+
+每当引擎被创建时默认都会进行版本检查。版本检查通常在你的应用程序或者 Flowable web 应用启动时发生。如果 Flowable 库发现库版本和数据库表版本不同，则抛出异常。
+
+要进行升级，你首先需要在 flowable.dmn.cfg.xml 配置文件中加入如下配置属性：
+
+[source,xml,linenums]
+----
+<beans >
+
+  <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+    <!-- ... -->
+    <property name="databaseSchemaUpdate" value="true" />
+    <!-- ... -->
+  </bean>
+
+</beans>
+----
+
+*另外，在classpath中引入适合你数据库的驱动。* 升级应用程序中的 Flowable DMN 类库，或者启动一个新版本的 Flowable DMN 并将其指向旧版本的数据库。当 databaseSchemaUpdate 设置为 true 时，Flowable DMN 将会在首次发现类库版本和数据库表版本不同时升级到新版本。
+
+[[processDefinitionCacheConfiguration]]
+
+
+=== 部署缓存配置
+
+为了避免每次需要决策表时都去访问数据库，同时也因为决策表不会改变，所有的决策都是被缓存的（在它们经过解析之后）。缓存默认是没有限制的。可添加如下属性对决策缓存进行限制：
+
+[source,xml,linenums]
+----
+<property name="decisionCacheLimit" value="10" />
+----
+
+这项设置将使用给定了硬性限制的 LRU 缓存替代默认的 hashmap 缓存。当然，最合适的取值取决于决策总数以及运行时实际使用到的决策数。
+
+你还可以注入你自己的缓存实现。必须是一个实现了 org.flowable.dmn.engine.impl.persistence.deploy.DeploymentCache 接口的 bean：
+
+[source,xml,linenums]
+----
+<property name="decisionCache">
+  <bean class="org.flowable.MyCache" />
+</property>
+----
+
+[[strictMode]]
+
+=== 严格模式
+
+严格模式是默认 *启用* 的。就是说命中策略（hit policies）将按照 DMN 1.1 标准执行。也可以禁用严格模式。
+
+[source,xml,linenums]
+----
+<beans>
+
+  <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+    <!-- ... -->
+      <property name="strictMode" value="false"/>
+    <!-- ... -->
+  </bean>
+
+</beans>
+----
+
+这样做的影响是违反了命中策略约束时，结果不会作废。可能的违规将被作为验证信息记录到审核日志中。
+
+=== 自定义 Flowable 函数委托（Function Delegates）
+
+Flowable DMN 内置了一些 JUEL 函数委托。通过设置 dmnEngineConfiguration bean 的 *customFlowableFunctionDelegates* 属性，你可以使用自己的实现。这些（函数委托）可以在表达式（expressions）中执行你自己的逻辑。
+
+[source,xml,linenums]
+----
+<beans>
+
+  <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+    <!-- ... -->
+    <property name="customFlowableFunctionDelegates">
+      <list>
+          <bean ref="myOwnFunctionDelegateOne" />
+          <bean ref="myOwnFunctionDelegateTwo" />
+      </list>
+    </property>
+    <!-- ... -->
+  </bean>
+
+  <bean id="myOwnFunctionDelegateOne" class="org.acme.MyOwnFunctionDelegateOne" />
+  <bean id="myOwnFunctionDelegateTwo" class="org.acme.MyOwnFunctionDelegateTwo" />
+
+</beans>
+----
+
+请注意，自定义函数委托必须继承自 org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate。
+
+[[loggingConfiguration]]
+
+
+=== 日志
+
+所有日志（flowable、spring、mybatis、...）都通过 slf4j 门面进行记录，所以你可以自行选择日志框架。
+
+*flowable 引擎依赖项中默认没有包含具体的日志实现框架；你应该将你选择的日志框架添加到你的项目中。* 如果没有引入日志实现框架的 jar 包，slf4j 不会记录任何日志，只会给出一个不会记录任何内容的警告。
+
+举个例子，使用 maven 时，像这样添加依赖（以使用 log4j 为例），请注意这里省略了版本：
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>slf4j-log4j12</artifactId>
+</dependency>
+----
+
+flowable-ui 和 flowable-rest webapps 使用 log4j。运行所有的 flowable-* mudules 测试时同样使用 log4j。
+
+*所用容器的 classpath 中带有 commons-logging 时的重要注意事项：* 为了能通过 slf4j 能调用到 spring-logging，使用了一个桥（a bridge is used）（详见 link:$$http://www.slf4j.org/legacy.html#jclOverSLF4J$$[http://www.slf4j.org/legacy.html#jclOverSLF4J]）。如果你的容器提供了 commons-logging 实现，请按此页面的说明进行操作，以确保稳定：link:$$http://www.slf4j.org/codes.html#release$$[http://www.slf4j.org/codes.html#release]。
+
+Maven 示例（忽略了版本）:
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>jcl-over-slf4j</artifactId>
+</dependency>
+----

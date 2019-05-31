@@ -22,7 +22,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -30,6 +29,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -87,7 +87,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                CommandContextUtil.getEventSubscriptionEntityManager(commandContext).update(eventSubscription);
+                CommandContextUtil.getEventSubscriptionService(commandContext).updateEventSubscription(eventSubscription);
                 return null;
             }
         });

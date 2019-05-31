@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.history;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
@@ -53,7 +54,7 @@ public interface HistoryManager {
     /**
      * Record a process-instance ended. Updates the historic process instance if activity history is enabled.
      */
-    void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId);
+    void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime);
 
     /**
      * Record a process-instance started and record start-event if activity history is enabled.
@@ -92,7 +93,7 @@ public interface HistoryManager {
     /**
      * Record activity end in the case when runtime activity instance does not exist.
      */
-    void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason);
+    void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime);
 
     /**
      * Finds the {@link HistoricActivityInstanceEntity} that is active in the given execution.
@@ -112,28 +113,28 @@ public interface HistoryManager {
     /**
      * Record task as ended, if audit history is enabled.
      */
-    void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason);
+    void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason, Date endTime);
 
     /**
      * Record task name change, if audit history is enabled.
      */
-    void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId);
+    void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime);
 
     /**
      * Record a variable has been created, if audit history is enabled.
      */
-    void recordVariableCreate(VariableInstanceEntity variable);
+    void recordVariableCreate(VariableInstanceEntity variable, Date createTime);
 
     /**
      * Record a variable has been created, if audit history is enabled.
      */
     void recordHistoricDetailVariableCreate(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution, boolean useActivityId,
-        String activityInstanceId);
+        String activityInstanceId, Date createTime);
 
     /**
      * Record a variable has been updated, if audit history is enabled.
      */
-    void recordVariableUpdate(VariableInstanceEntity variable);
+    void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime);
 
     /**
      * Record a variable has been deleted, if audit history is enabled.
@@ -183,7 +184,7 @@ public interface HistoryManager {
     /**
      * Report form properties submitted, if audit history is enabled.
      */
-    void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId);
+    void recordFormPropertiesSubmitted(ExecutionEntity processInstance, Map<String, String> properties, String taskId, Date createTime);
 
     /**
      * Record the creation of a new {@link IdentityLink}, if audit history is enabled.
@@ -219,8 +220,9 @@ public interface HistoryManager {
      * @param oldActivityId previous activityId
      * @param newFlowElement new flowElement
      * @param task new user task
+     * @param updateTime
      */
-    void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task);
+    void updateActivity(ExecutionEntity executionEntity, String oldActivityId, FlowElement newFlowElement, TaskEntity task, Date updateTime);
 
     /**
      * Update historic activity instance according to changes done in the runtime activity

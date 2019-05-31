@@ -37,6 +37,7 @@ import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -77,6 +78,30 @@ public class ProcessEngineAutoConfigurationTest {
         ))
         .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class)
         .withClassLoader(new FilteredClassLoader(EntityManagerFactory.class));
+
+    @Test
+    public void httpProperties() {
+        contextRunner.withPropertyValues(
+            "flowable.http.useSystemProperties=true",
+            "flowable.http.connectTimeout=PT0.250S",
+            "flowable.http.socketTimeout=PT0.500S",
+            "flowable.http.connectionRequestTimeout=PT1S",
+            "flowable.http.requestRetryLimit=1",
+            "flowable.http.disableCertVerify=true"
+        ).run(context -> {
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+            HttpClientConfig httpClientConfig = processEngine.getProcessEngineConfiguration().getHttpClientConfig();
+
+            assertThat(httpClientConfig.isUseSystemProperties()).isTrue();
+            assertThat(httpClientConfig.getConnectTimeout()).isEqualTo(250);
+            assertThat(httpClientConfig.getSocketTimeout()).isEqualTo(500);
+            assertThat(httpClientConfig.getConnectionRequestTimeout()).isEqualTo(1000);
+            assertThat(httpClientConfig.getRequestRetryLimit()).isEqualTo(1);
+            assertThat(httpClientConfig.isDisableCertVerify()).isTrue();
+
+            deleteDeployments(processEngine);
+        });
+    }
 
     @Test
     public void standaloneProcessEngineWithBasicDatasource() {
@@ -290,7 +315,7 @@ public class ProcessEngineAutoConfigurationTest {
         List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().list();
         assertThat(definitions)
             .extracting(ProcessDefinition::getKey)
-            .containsExactly("integrationGatewayProcess", "simpleTasks", "vacationRequest", "waiter");
+            .containsExactly("inclusiveGateway", "integrationGatewayProcess", "simpleTasks", "vacationRequest", "waiter");
         
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().latestVersion().processDefinitionKey("simpleTasks").singleResult();
         assertThat(processDefinition.getVersion()).isOne();
@@ -300,9 +325,9 @@ public class ProcessEngineAutoConfigurationTest {
         
         List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
 
-        assertThat(deployments).hasSize(3)
+        assertThat(deployments).hasSize(4)
             .extracting(Deployment::getName)
-            .contains("SpringBootAutoDeployment", "simple.bar", "vacationRequest.zip");
+            .contains("SpringBootAutoDeployment", "simple.bar", "vacationRequest.zip", "processTask.bar");
         
         AppRepositoryService appRepositoryService = context.getBean(AppRepositoryService.class);
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().list();
@@ -318,9 +343,9 @@ public class ProcessEngineAutoConfigurationTest {
         assertThat(appDefinition.getVersion()).isOne();
         
         List<AppDeployment> appDeployments = appRepositoryService.createDeploymentQuery().list();
-        assertThat(appDeployments).hasSize(2)
+        assertThat(appDeployments).hasSize(3)
             .extracting(AppDeployment::getName)
-            .contains("simple.bar", "vacationRequest.zip");
+            .contains("simple.bar", "vacationRequest.zip", "processTask.bar");
     }
     
     private static ProcessEngineConfiguration processEngine(AppEngine appEngine) {

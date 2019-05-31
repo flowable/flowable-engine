@@ -1,0 +1,128 @@
+[[springintegration]]
+== 集成Spring
+
+虽然你可以在没有Spring的情况下使用Flowable 表单，但我们提供了一些非常好的集成功能，本章将对此进行说明。
+
+=== FormEngineFactoryBean
+
+表单引擎可以按照常规的Spring bean方式进行配置.整合引用到的类是org.flowable.form.spring.FormEngineFactoryBean.该bean持有一个表单引擎配置类并创建表单引擎.这意味着Spring属性的创建和配置与 <<configuration,configuration section>> 中记录的相同.关于Spring集成和配置引擎bean如下所示
+[source,xml,linenums]
+----
+<bean id="formEngineConfiguration" class="org.flowable.form.spring.SpringFormEngineConfiguration">
+    ...
+</bean>
+
+<bean id="formEngine" class="org.flowable.form.spring.FormEngineFactoryBean">
+  <property name="formEngineConfiguration" ref="formEngineConfiguration" />
+</bean>
+
+----
+
+注意，formEngineConfiguration bean现在使用的是 +org.flowable.form.spring.SpringFormEngineConfiguration+ 类。
+
+=== 自动部署资源
+集成Spring还具有部署资源的特性。在配置表单引擎时，您可以指定一组资源.当表单引擎被创建时，将扫描和部署这些资源并过滤防止重复部署。只有资源被更改时，才会将重新部署部署到Flowable 表单数据库.这在经常重启包含大量表单资源的Spring容器中具有很大的意义（例如，测试）
+
+例如:
+[source,xml,linenums]
+----
+<bean id="formEngineConfiguration" class="org.flowable.spring.SpringFormEngineConfiguration">
+  ...
+  <property name="deploymentResources"
+    value="classpath*:/org/flowable/spring/test/autodeployment/autodeploy/*.form" />
+</bean>
+
+<bean id="formEngine" class="org.flowable.form.spring.FormEngineFactoryBean">
+  <property name="formEngineConfiguration" ref="formEngineConfiguration" />
+</bean>
+----
+
+默认情况下，上面的配置会将匹配过滤后的所有资源进行分组并单独部署到Flowable 表单引擎中,在整个部署过程中重复过滤以防止重新部署未更改的资源.在某些情况下，你可能并不想这么做.例如，如果以这种方式部署一组表单资源，并且这些资源中只有一个表单定义更改了，整个流程定义部署将被视为新的并且被重新部署,尽管实际上只改变了一个但是每个表单都被定义为了新的版本,
+为了能够自定义部署的方式，您可以在 +SpringFormEngineConfiguration+ 中，指定 +deploymentMode+ 属性。该属性定义了从过滤器匹配的资源集合以及确定部署的方式。默认情况下，该属性提供3个默认属性：
+
+* ++default++: 将所有资源分组到单个部署中，并对该部署应用重复过滤。如果您未指定其他值，将默认使用它。
+* ++single-resource++: 为每个单独的资源单独部署，并对该部署应用重复过滤。适用于单独部署某个已更改表单定义的资源，仅创建该表单定义的新版本。
+* ++resource-parent-folder++: 为共享同一父文件夹的资源创建单独的部署，并对该部署应用重复过滤。适用于为大多数资源创建单独的部署，但仍可以通过将它们放在共享文件夹中来对其进行分组。以下是为 ++deploymentMode++ 属性指定 +single-resource+ 配置的示例：
+
+[source,xml,linenums]
+----
+<bean id="formEngineConfiguration"
+    class="org.flowable.form.spring.SpringFormEngineConfiguration">
+  ...
+  <property name="deploymentResources" value="classpath*:/flowable/*.form" />
+  <property name="deploymentMode" value="single-resource" />
+</bean>
+----
+
+除了使用上面列出的 +deploymentMode+ 属性之外，您还可以自定义属性来实现部署。如果需要，您可以创建 +SpringFormEngineConfiguration+ 的子类并重写+getAutoDeploymentStrategy（String deploymentMode）+ 方法。该法确定将哪个部署策略用于 +deploymentMode+ 配置的特定值。
+
+[[springUnitTest]]
+
+=== 单元测试
+
+与Spring集成时，使用标准的<<apiUnitTesting,Flowable testing facilities>>来测试表单将会变得非常简单.
+以下示例展示了如何在基于Spring的JUnit 4和5测试中测试表单：
+
+.JUnit 5 测试
+[source,java,linenums]
+----
+@ExtendWith(FlowableFormSpringExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = SpringJunitJupiterTest.TestConfiguration.class)
+public class SpringJunit4Test {
+
+    @Autowired
+    private FormEngine formEngine;
+
+    @Autowired
+    private FormService formService;
+
+    @Test
+    @FormDeploymentAnnotation
+    public void simpleFormInstanceTest() {
+        FormInstance result = formService.getFormInstanceModelById(
+            "f7689f79-f1cc-11e6-8549-acde48001122", null);
+
+        Assertions.assertNotNull(result));
+    }
+}
+----
+
+使用 +FlowableFormSpringExtension+ 时允许使用 +Deployment+ 注解。
+
+.JUnit 4 测试
+[source,java,linenums]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
+public class SpringJunit4Test {
+
+    @Autowired
+    private FormEngine formEngine;
+
+    @Autowired
+    private FormService formService;
+
+    @Autowired
+    @Rule
+    public FlowableFormRule flowableSpringRule;
+
+    @Test
+    @FormDeploymentAnnotation
+    public void simpleFormInstanceTest() {
+        FormInstance result = formService.getFormInstanceModelById(
+            "f7689f79-f1cc-11e6-8549-acde48001122", null);
+
+        Assert.assertNotNull(result));
+    }
+}
+----
+
+注意，在测试时，您需要在Spring配置中定义 _org.flowable.form.engine.test.FlowableFormRule_ bean（在上面的示例中通过自动装配注入）。
+[source,xml,linenums]
+----
+<bean id="flowableFormRule" class="org.flowable.form.engine.test.FlowableFormRule">
+    <property name="formEngine" ref="formEngine"/>
+</bean>
+
+----

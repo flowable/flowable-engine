@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,14 +46,14 @@ public class CaseDefinitionImageResource extends BaseCaseDefinitionResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the case definitions are returned"),
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
-    @GetMapping("/cmmn-repository/case-definitions/{caseDefinitionId}/image")
+    @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/image", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getImageResource(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
         CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
         InputStream imageStream = repositoryService.getCaseDiagram(caseDefinition.getId());
 
         if (imageStream != null) {
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Content-Type", "image/png");
+            responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
             try {
                 return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
             } catch (Exception e) {

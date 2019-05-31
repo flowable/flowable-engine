@@ -21,7 +21,7 @@
      
     <userTask id="task" />
 
-    <boundaryEvent id="escalationTimer" cancelActivity="true" attachedToRef="task">
+    <boundaryEvent id="escalationTimer" name="Escalation" cancelActivity="true" attachedToRef="task">
       <timerEventDefinition>
         <timeDuration>PT30M</timeDuration>
       </timerEventDefinition>

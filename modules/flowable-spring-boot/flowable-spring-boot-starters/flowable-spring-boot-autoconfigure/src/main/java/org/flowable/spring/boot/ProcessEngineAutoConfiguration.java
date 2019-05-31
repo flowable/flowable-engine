@@ -64,13 +64,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableMailProperties.class,
+    FlowableHttpProperties.class,
     FlowableProcessProperties.class,
     FlowableAppProperties.class,
     FlowableIdmProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfigureAfter(value = {
     FlowableJpaAutoConfiguration.class,
     AppEngineAutoConfiguration.class,
+}, name = {
+    "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"
 })
 @AutoConfigureBefore({
     AppEngineServicesAutoConfiguration.class,
@@ -84,15 +87,18 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     protected final FlowableAppProperties appProperties;
     protected final FlowableIdmProperties idmProperties;
     protected final FlowableMailProperties mailProperties;
+    protected final FlowableHttpProperties httpProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
-                    FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties) {
+        FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties,
+        FlowableHttpProperties httpProperties) {
         
         super(flowableProperties);
         this.processProperties = processProperties;
         this.appProperties = appProperties;
         this.idmProperties = idmProperties;
         this.mailProperties = mailProperties;
+        this.httpProperties = httpProperties;
     }
 
     /**
@@ -183,6 +189,13 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setMailServerUseSSL(mailProperties.isUseSsl());
         conf.setMailServerUseTLS(mailProperties.isUseTls());
 
+        conf.getHttpClientConfig().setUseSystemProperties(httpProperties.isUseSystemProperties());
+        conf.getHttpClientConfig().setConnectionRequestTimeout(httpProperties.getConnectionRequestTimeout());
+        conf.getHttpClientConfig().setConnectTimeout(httpProperties.getConnectTimeout());
+        conf.getHttpClientConfig().setDisableCertVerify(httpProperties.isDisableCertVerify());
+        conf.getHttpClientConfig().setRequestRetryLimit(httpProperties.getRequestRetryLimit());
+        conf.getHttpClientConfig().setSocketTimeout(httpProperties.getSocketTimeout());
+
         conf.setEnableProcessDefinitionHistoryLevel(processProperties.isEnableProcessDefinitionHistoryLevel());
         conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
@@ -192,6 +205,8 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setActivityFontName(flowableProperties.getActivityFontName());
         conf.setAnnotationFontName(flowableProperties.getAnnotationFontName());
         conf.setLabelFontName(flowableProperties.getLabelFontName());
+
+        conf.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
 
         IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
         if (idGenerator == null) {

@@ -40,6 +40,12 @@ public interface JobQuery extends Query<JobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     JobQuery processDefinitionId(String processDefinitionId);
     
+    /** Only select jobs which exist for the given element id */
+    JobQuery elementId(String elementId);
+    
+    /** Only select jobs which exist for the given element name */
+    JobQuery elementName(String elementName);
+    
     /** Only select tasks for the given scope identifier. */
     JobQuery scopeId(String scopeId);
 

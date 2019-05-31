@@ -171,6 +171,29 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         } catch (FlowableIllegalArgumentException e) {
         }
     }
+    
+    @Test
+    public void testQueryByElementId() {
+        TimerJobQuery query = managementService.createTimerJobQuery().elementId("escalationTimer");
+        verifyQueryResults(query, 3);
+    }
+    
+    @Test
+    public void testQueryByInvalidElementId() {
+        TimerJobQuery query = managementService.createTimerJobQuery().elementId("unknown");
+        verifyQueryResults(query, 0);
+    }
+    
+    @Test
+    public void testQueryByElementName() {
+        TimerJobQuery query = managementService.createTimerJobQuery().elementName("Escalation");
+        verifyQueryResults(query, 3);
+    }
+    
+    public void testQueryByInvalidElementName() {
+        TimerJobQuery query = managementService.createTimerJobQuery().elementName("unknown");
+        verifyQueryResults(query, 0);
+    }
 
     @Test
     public void testQueryByHandlerType() {

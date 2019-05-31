@@ -18,6 +18,7 @@ public class ExecuteDecisionInfo {
 
     protected String decisionKey;
     protected String decisionDefinitionId;
+    protected int decisionVersion;
     protected String deploymentId;
     protected String parentDeploymentId;
     protected String instanceId;
@@ -39,6 +40,12 @@ public class ExecuteDecisionInfo {
     }
     public void setDecisionDefinitionId(String decisionDefinitionId) {
         this.decisionDefinitionId = decisionDefinitionId;
+    }
+    public int getDecisionVersion() {
+        return decisionVersion;
+    }
+    public void setDecisionVersion(int decisionVersion) {
+        this.decisionVersion = decisionVersion;
     }
     public String getDeploymentId() {
         return deploymentId;

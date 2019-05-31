@@ -63,24 +63,25 @@ import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer.FlowElement
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.MoveActivityIdContainer;
 import org.flowable.engine.impl.runtime.MoveExecutionIdContainer;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.TaskService;
@@ -269,7 +270,6 @@ public abstract class AbstractDynamicStateManager {
 
                 moveExecutionContainer.setCallActivity(callActivity);
                 ProcessDefinition callActivityProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionIdOfCallActivity);
-                String deploymentId = callActivityProcessDefinition.getDeploymentId();
                 String tenantId = callActivityProcessDefinition.getTenantId();
                 Integer calledProcessVersion = moveExecutionContainer.getCallActivitySubProcessVersion();
                 String calledProcessDefKey = callActivity.getCalledElement();
@@ -604,7 +604,7 @@ public abstract class AbstractDynamicStateManager {
                         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newChildExecution);
 
                         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
-                        if (eventDispatcher.isEnabled()) {
+                        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                             eventDispatcher.dispatchEvent(
                                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
                                     newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement));
@@ -690,7 +690,7 @@ public abstract class AbstractDynamicStateManager {
         subProcessExecution.setScope(true);
 
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(
                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, subProcess.getId(), subProcess.getName(), subProcessExecution.getId(),
                     subProcessExecution.getProcessInstanceId(), subProcessExecution.getProcessDefinitionId(), subProcess));
@@ -780,7 +780,7 @@ public abstract class AbstractDynamicStateManager {
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
         }
 
@@ -813,7 +813,7 @@ public abstract class AbstractDynamicStateManager {
             subProcessInstance.setVariables(variables);
         }
 
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance));
         }
 
@@ -939,7 +939,7 @@ public abstract class AbstractDynamicStateManager {
 
     protected void processCreatedEventSubProcess(EventSubProcess eventSubProcess, ExecutionEntity eventSubProcessExecution, Set<String> movingExecutionIds, CommandContext commandContext) {
 
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
+        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
         List<StartEvent> allStartEvents = eventSubProcess.findAllSubFlowElementInFlowMapOfType(StartEvent.class);
@@ -953,9 +953,9 @@ public abstract class AbstractDynamicStateManager {
                 EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                 List<EventSubscriptionEntity> eventSubscriptions = null;
                 if (eventDefinition instanceof SignalEventDefinition) {
-                    eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(eventSubProcessExecution.getProcessInstanceId(), startEvent.getId(), SignalEventSubscriptionEntity.EVENT_TYPE);
+                    eventSubscriptions = eventSubscriptionService.findEventSubscriptionsByProcessInstanceAndActivityId(eventSubProcessExecution.getProcessInstanceId(), startEvent.getId(), SignalEventSubscriptionEntity.EVENT_TYPE);
                 } else if (eventDefinition instanceof MessageEventDefinition) {
-                    eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(eventSubProcessExecution.getProcessInstanceId(), startEvent.getId(), MessageEventSubscriptionEntity.EVENT_TYPE);
+                    eventSubscriptions = eventSubscriptionService.findEventSubscriptionsByProcessInstanceAndActivityId(eventSubProcessExecution.getProcessInstanceId(), startEvent.getId(), MessageEventSubscriptionEntity.EVENT_TYPE);
                 }
 
                 boolean isOnlyRemainingExecutionAtParentScope = isOnlyRemainingExecutionAtParentScope(eventSubProcessExecution, movingExecutionIds, commandContext);
@@ -963,7 +963,7 @@ public abstract class AbstractDynamicStateManager {
                 // If its an interrupting eventSubProcess we don't register a subscription or startEvent executions and we make sure that they are removed if existed
                 if (startEvent.isInterrupting() || isOnlyRemainingExecutionAtParentScope) { //Current eventSubProcess plus its startEvent
                     if (eventSubscriptions != null && !eventSubscriptions.isEmpty()) {
-                        eventSubscriptions.forEach(eventSubscriptionEntityManager::delete);
+                        eventSubscriptions.forEach(eventSubscriptionService::deleteEventSubscription);
                     }
                     if (eventDefinition instanceof TimerEventDefinition && startEventExecution.isPresent()) {
                         List<TimerJobEntity> timerJobsByExecutionId = timerJobService.findTimerJobsByExecutionId(startEventExecution.get().getId());
@@ -995,10 +995,22 @@ public abstract class AbstractDynamicStateManager {
                         messageExecution.setCurrentFlowElement(startEvent);
                         messageExecution.setEventScope(true);
                         messageExecution.setActive(false);
-                        MessageEventSubscriptionEntity messageSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution);
+                        EventSubscriptionEntity messageSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
+                                        .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
+                                        .eventName(messageEventDefinition.getMessageRef())
+                                        .executionId(messageExecution.getId())
+                                        .processInstanceId(messageExecution.getProcessInstanceId())
+                                        .activityId(messageExecution.getCurrentActivityId())
+                                        .processDefinitionId(messageExecution.getProcessDefinitionId())
+                                        .tenantId(messageExecution.getTenantId())
+                                        .create();
+                        
+                        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(messageSubscription);
+                        messageExecution.getEventSubscriptions().add(messageSubscription);
+                        
                         CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                             .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageSubscription.getActivityId(),
-                                messageSubscription.getEventName(), null, messageSubscription.getExecution().getId(),
+                                messageSubscription.getEventName(), null, messageSubscription.getExecutionId(),
                                 messageSubscription.getProcessInstanceId(), messageSubscription.getProcessDefinitionId()));
 
                     }
@@ -1015,10 +1027,23 @@ public abstract class AbstractDynamicStateManager {
                         signalExecution.setCurrentFlowElement(startEvent);
                         signalExecution.setEventScope(true);
                         signalExecution.setActive(false);
-                        SignalEventSubscriptionEntity signalSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertSignalEvent(signalEventDefinition.getSignalRef(), signal, signalExecution);
+                        EventSubscriptionEntity signalSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
+                                        .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
+                                        .eventName(signalEventDefinition.getSignalRef())
+                                        .signal(signal)
+                                        .executionId(signalExecution.getId())
+                                        .processInstanceId(signalExecution.getProcessInstanceId())
+                                        .activityId(signalExecution.getCurrentActivityId())
+                                        .processDefinitionId(signalExecution.getProcessDefinitionId())
+                                        .tenantId(signalExecution.getTenantId())
+                                        .create();
+                                        
+                        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(signalSubscription);
+                        signalExecution.getEventSubscriptions().add(signalSubscription);
+                        
                         CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                             .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalSubscription.getActivityId(),
-                                signalSubscription.getEventName(), null, signalSubscription.getExecution().getId(),
+                                signalSubscription.getEventName(), null, signalSubscription.getExecutionId(),
                                 signalSubscription.getProcessInstanceId(), signalSubscription.getProcessDefinitionId()));
 
                     }

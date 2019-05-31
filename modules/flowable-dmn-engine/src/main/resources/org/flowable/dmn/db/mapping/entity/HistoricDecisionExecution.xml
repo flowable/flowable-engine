@@ -150,6 +150,16 @@
       <if test="scopeType != null">
         and RES.SCOPE_TYPE_ = #{scopeType}
       </if>
+      <if test="processInstanceIdWithChildren != null">
+        and (RES.INSTANCE_ID_ = #{processInstanceIdWithChildren} or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
+            ELINK.SCOPE_ID_ = #{processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and 
+            ELINK.REF_SCOPE_ID_ = RES.INSTANCE_ID_))
+      </if>
+      <if test="caseInstanceIdWithChildren != null">
+        and (RES.INSTANCE_ID_ = #{caseInstanceIdWithChildren} or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
+            ELINK.SCOPE_ID_ = #{caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and 
+            ELINK.REF_SCOPE_ID_ = RES.INSTANCE_ID_))
+      </if>
       <if test="failed != null">
         and RES.FAILED_ = #{failed}
       </if>

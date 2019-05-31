@@ -835,7 +835,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         if (isPropagateToHistoricVariable()) {
             VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
-                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableRemoved(variableInstance);
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                    .recordVariableRemoved(variableInstance, variableServiceConfiguration.getClock().getCurrentTime());
             }
         }
     }
@@ -864,7 +865,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
-                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstance);
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                    .recordVariableUpdate(variableInstance, variableServiceConfiguration.getClock().getCurrentTime());
             }
         }
 
@@ -884,8 +886,10 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableType type = variableTypes.findVariableType(value);
 
         VariableInstanceEntityManager variableInstanceEntityManager = CommandContextUtil.getVariableInstanceEntityManager();
-        VariableInstanceEntity variableInstance = variableInstanceEntityManager.create(variableName, type, value);
+        VariableInstanceEntity variableInstance = variableInstanceEntityManager.create(variableName, type);
         initializeVariableInstanceBackPointer(variableInstance);
+        // Set the value after initializing the back pointer
+        variableInstance.setValue(value);
         variableInstanceEntityManager.insert(variableInstance);
 
         if (variableInstances != null) {
@@ -895,7 +899,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
-                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableCreate(variableInstance);
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                    .recordVariableCreate(variableInstance, variableServiceConfiguration.getClock().getCurrentTime());
             }
         }
 

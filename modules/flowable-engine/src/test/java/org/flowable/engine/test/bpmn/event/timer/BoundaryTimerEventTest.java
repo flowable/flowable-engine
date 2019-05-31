@@ -371,6 +371,10 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals("First Task", tasks.get(0).getName());
         jobList = managementService.createTimerJobQuery().list();
         assertEquals(1, jobList.size());
+        
+        Job job = managementService.createTimerJobQuery().singleResult();
+        assertEquals("boundaryTimerEvent", job.getElementId());
+        assertEquals("Timer event", job.getElementName());
 
         // after another 8 minutes (the timer will have to execute because it wasa set to be executed @ 10 minutes after process start)
         long tenMinutes = 8L * 60L * 1000L;

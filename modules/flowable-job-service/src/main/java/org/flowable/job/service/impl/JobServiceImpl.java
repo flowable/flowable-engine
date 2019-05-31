@@ -185,7 +185,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
         Collection<JobEntity> jobsForExecution = jobEntityManager.findJobsByExecutionId(executionId);
         for (JobEntity job : jobsForExecution) {
             getJobEntityManager().delete(job);
-            if (getEventDispatcher().isEnabled()) {
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                 getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
             }
         }
@@ -197,7 +197,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
         Collection<SuspendedJobEntity> suspendedJobsForExecution = suspendedJobEntityManager.findJobsByExecutionId(executionId);
         for (SuspendedJobEntity job : suspendedJobsForExecution) {
             suspendedJobEntityManager.delete(job);
-            if (getEventDispatcher().isEnabled()) {
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                 getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
             }
         }
@@ -209,7 +209,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
         Collection<DeadLetterJobEntity> deadLetterJobsForExecution = deadLetterJobEntityManager.findJobsByExecutionId(executionId);
         for (DeadLetterJobEntity job : deadLetterJobsForExecution) {
             deadLetterJobEntityManager.delete(job);
-            if (getEventDispatcher().isEnabled()) {
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                 getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
             }
         }

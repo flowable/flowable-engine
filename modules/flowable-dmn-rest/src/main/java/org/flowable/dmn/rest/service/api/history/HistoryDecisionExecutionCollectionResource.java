@@ -74,6 +74,8 @@ public class HistoryDecisionExecutionCollectionResource {
             @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return historic decision executions with the given execution id.", paramType = "query"),
             @ApiImplicitParam(name = "instanceId", dataType = "string", value = "Only return historic decision executions with the given instance id.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return historic decision executions with the given scope type.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIdWithChildren", dataType = "string", value = "Return all historic decision executions with the given process instance id or its entity link children.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIdWithChildren", dataType = "string", value = "Return all historic decision executions with the given case instance id or its entity link children.", paramType = "query"),
             @ApiImplicitParam(name = "failed", dataType = "string", value = "Only return historic decision executions with the failed state.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic decision executions with the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic decision executions like the given tenant id.", paramType = "query"),
@@ -112,8 +114,14 @@ public class HistoryDecisionExecutionCollectionResource {
         if (allRequestParams.containsKey("scopeType")) {
             historicDecisionExecutionQuery.scopeType(allRequestParams.get("scopeType"));
         }
+        if (allRequestParams.containsKey("processInstanceIdWithChildren")) {
+            historicDecisionExecutionQuery.processInstanceIdWithChildren(allRequestParams.get("processInstanceIdWithChildren"));
+        }
+        if (allRequestParams.containsKey("caseInstanceIdWithChildren")) {
+            historicDecisionExecutionQuery.caseInstanceIdWithChildren(allRequestParams.get("caseInstanceIdWithChildren"));
+        }
         if (allRequestParams.containsKey("failed")) {
-            historicDecisionExecutionQuery.failed(new Boolean(allRequestParams.get("failed")));
+            historicDecisionExecutionQuery.failed(Boolean.valueOf(allRequestParams.get("failed")));
         }
         if (allRequestParams.containsKey("tenantId")) {
             historicDecisionExecutionQuery.tenantId(allRequestParams.get("tenantId"));

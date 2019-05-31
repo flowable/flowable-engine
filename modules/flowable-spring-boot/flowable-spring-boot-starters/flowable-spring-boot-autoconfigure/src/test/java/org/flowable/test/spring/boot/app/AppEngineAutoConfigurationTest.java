@@ -175,9 +175,9 @@ public class AppEngineAutoConfigurationTest {
         List<AppDeployment> deployments = appRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().list();
 
         assertThat(deployments)
-            .hasSize(2)
+            .hasSize(3)
             .first()
-            .satisfies(deployment -> assertThat(deployment.getName()).isEqualTo("simple.bar"));
+            .satisfies(deployment -> assertThat(deployment.getName()).isEqualTo("processTask.bar"));
     }
     
     private static ProcessEngineConfiguration processEngine(AppEngine appEngine) {

@@ -18,10 +18,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ProcessTask;
 
-public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessTask> {
+public class ProcessTaskExport extends AbstractChildTaskExport<ProcessTask> {
 
     @Override
     protected Class<ProcessTask> getExportablePlanItemDefinitionClass() {
@@ -42,19 +41,6 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, String.valueOf(processTask.getFallbackToDefaultTenant()));
         }
     }
-    
-
-    @Override
-    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, ProcessTask processTask, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
-        boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, processTask, didWriteExtensionElement, xtw);
-
-        extensionElementWritten = writeIOParameters(ELEMENT_PROCESS_TASK_IN_PARAMETERS,
-                processTask.getInParameters(), extensionElementWritten, xtw);
-        extensionElementWritten = writeIOParameters(ELEMENT_PROCESS_TASK_OUT_PARAMETERS,
-                processTask.getOutParameters(), extensionElementWritten, xtw);
-        
-        return extensionElementWritten;
-    }
 
     @Override
     protected void writePlanItemDefinitionBody(CmmnModel model, ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
@@ -70,35 +56,5 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
             xtw.writeEndElement();
         }
     }
-
-    protected boolean writeIOParameters(String elementName, List<IOParameter> parameterList, boolean didWriteParameterStartElement, XMLStreamWriter xtw) throws Exception {
-
-        if (parameterList == null || parameterList.isEmpty()) {
-            return didWriteParameterStartElement;
-        }
-
-        for (IOParameter ioParameter : parameterList) {
-            if (!didWriteParameterStartElement) {
-                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
-                didWriteParameterStartElement = true;
-            }
-
-            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, elementName, FLOWABLE_EXTENSIONS_NAMESPACE);
-            if (StringUtils.isNotEmpty(ioParameter.getSource())) {
-                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource());
-            }
-            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, ioParameter.getSourceExpression());
-            }
-            if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
-                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget());
-            }
-
-            xtw.writeEndElement();
-        }
-
-        return didWriteParameterStartElement;
-    }
-
 
 }

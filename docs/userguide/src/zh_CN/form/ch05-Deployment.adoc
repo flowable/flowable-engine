@@ -1,0 +1,141 @@
+[[chDeployment]]
+
+== 部署
+
+=== 表单定义
+
+**表单定义**带有++.form++后缀名，可以被部署到**表单引擎**。
+
+当**表单引擎**接入**流程引擎**后，**表单定义**和与此流程相关其他资源，将被打包进一个业务存档(BAR, Business archive)中。若使用了 flowable-form-engine-configurator 或 flowable-form-spring-configurator 模块，**流程引擎**部署服务将负责把表单资源部署到**流程引擎**中。
+
+
+==== 表单定义
+
+每个**表单定义**由一个或多个表单字段定义组成。当部署一个**表单定义**时，其信息将会被插入到 ACT_FO_FORM_DEFINITION 表中。
+
+
+==== 编程方式部署
+
+可使用如下方式部署一个**表单定义**：
+
+[source,java,linenums]
+----
+String formDefinition = "path/to/definition-one.form";
+ZipInputStream inputStream = new ZipInputStream(new FileInputStream(barFileName));
+
+formRepositoryService.createDeployment()
+    .name("definition-one")
+    .addClasspathResource(formDefinition)
+    .deploy();
+
+----
+
+[[versioningOfFormDefinitions]]
+
+
+=== 表单定义的版本管理
+
+**表单定义**的版本会在部署期间创建，Flowable在将**表单定义**存储到表单数据库前，为其分配一个版本。
+
+对于每个**表单定义**，执行以下步骤来初始化这些属性++key++、++version++、 ++name++和++id++：
+
+* 表单定义JSON文件中的++key++属性，被用作数据库中表单定义信息表的++key++属性。
+* 表单定义JSON文件中的++name++属性，被用作数据库中表单定义信息表的++name++属性。
+* 当首次以一个特定的++key++属性部署表单定义时，将分配版本为1。对于具有相同++key++属性表单定义的所有后续部署，版本将设置为当前已部署的最大版本号加1。++key++属性用来区分不同的表单定义。
+* ++id++属性是一个唯一的编号，用以保证在集群环境下，流程定义缓存中，流程++id++的唯一性。
+
+表单定义示例如下：
+
+[source,json,linenums]
+----
+{
+    "key": "form1",
+    "name": "My first form",
+    "fields": [
+        {
+            "id": "input1",
+            "name": "Input1",
+            "type": "text",
+            "required": false,
+            "placeholder": "empty"
+        }
+    ]
+}
+----
+
+当部署此表单定义后，数据库中表单定义信息表将如下所示：
+
+[options="header"]
+|===============
+|id|key|name|version
+|e29d4126-ed4d-11e6-9e00-7282cbd6ce64|form1|My first form|1
+
+|===============
+
+
+假设我们现在部署相同表单定义的一个更新版本（例如，更改文本变量），但表单定义的++key++属性保持不变。数据库中表单定义信息表将包含以下条目：
+
+[options="header"]
+|===============
+|id|key|name|version
+|e29d4126-ed4d-11e6-9e00-7282cbd6ce64|form1|My first form|1
+|e9c2a6c0-c085-11e6-9096-6ab56fad108a|form1|My first form|2
+
+|===============
+
+如果我们创建第二个表单定义，如下所示，并将其部署到Flowable**表单引擎**，第三行将会添加到表中。
+
+[source,xml,linenums]
+----
+{
+    "key": "form2",
+    "name": "My second form",
+    "fields": [
+        {
+            "id": "input2",
+            "name": "Input2",
+            "type": "text",
+            "required": false,
+            "placeholder": "empty"
+        }
+    ]
+}
+----
+
+数据库中表单定义信息表将如下所示：
+
+[options="header"]
+|===============
+|id|key|name|version
+|e29d4126-ed4d-11e6-9e00-7282cbd6ce64|form1|My first form|1
+|e9c2a6c0-c085-11e6-9096-6ab56fad108a|form1|My first form|2
+|d317d3f7-e948-11e6-9ce6-b28c070b517d|form2|My second form|1
+
+|===============
+
+请注意新表单定义的++key++属性与第一个表单定义不同。 Flowable**表单引擎**仅使用++key++属性区分表单定义。因此，新的表单定义部署版本为1。
+
+
+[[deploymentCategory]]
+
+
+=== 类别
+
+**表单部署**和**表单定义**都可以具有用户定义的类别。
+部署类别可以在如下API中指定：
+
+[source,java,linenums]
+----
+formRepository
+    .createDeployment()
+    .category("yourCategory")
+    ...
+    .deploy();
+----
+
+表单定义类别可以在如下API中指定:
+
+[source,java,linenums]
+----
+formRepository.setFormDefinitionCategory("e9c2a6c0-c085-11e6-9096-6ab56fad108a", "yourCategory");
+----
