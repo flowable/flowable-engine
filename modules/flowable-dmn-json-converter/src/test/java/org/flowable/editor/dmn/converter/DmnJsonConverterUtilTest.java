@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class DmnJsonConverterUtilTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DmnJsonConverterTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnJsonConverterUtilTest.class);
 
     private static final String JSON_RESOURCE_1 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v2.json";
 
