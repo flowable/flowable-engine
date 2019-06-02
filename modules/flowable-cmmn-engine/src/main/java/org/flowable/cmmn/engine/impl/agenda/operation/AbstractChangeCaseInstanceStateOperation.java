@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import org.flowable.cmmn.engine.impl.listener.CaseLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -32,7 +33,9 @@ public abstract class AbstractChangeCaseInstanceStateOperation extends AbstractC
     @Override
     public void run() {
         super.run();
-        caseInstanceEntity.setState(getNewState());
+        String newState = getNewState();
+        CaseLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, caseInstanceEntity.getState(), newState);
+        caseInstanceEntity.setState(newState);
     }
     
     protected abstract String getNewState();
