@@ -42,6 +42,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
     protected ObjectMapper objectMapper;
 
     protected List<RestVariable> processVariables(Execution execution, String scope, int variableType) {
+        List<RestVariable> result = new ArrayList<>();
         Map<String, RestVariable> variableMap = new HashMap<>();
 
         // Check if it's a valid execution to get the variables for
@@ -60,7 +61,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
         }
 
         // Get unique variables from map
-        List<RestVariable> result = new ArrayList<>(variableMap.values());
+        result.addAll(variableMap.values());
         return result;
     }
 

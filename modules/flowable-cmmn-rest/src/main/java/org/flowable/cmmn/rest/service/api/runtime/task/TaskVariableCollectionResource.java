@@ -68,6 +68,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/variables", produces = "application/json")
     public List<RestVariable> getVariables(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
+        List<RestVariable> result = new ArrayList<>();
         Map<String, RestVariable> variableMap = new HashMap<>();
 
         // Check if it's a valid task to get the variables for
@@ -87,7 +88,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
         }
 
         // Get unique variables from map
-        List<RestVariable> result = new ArrayList<>(variableMap.values());
+        result.addAll(variableMap.values());
         return result;
     }
 
