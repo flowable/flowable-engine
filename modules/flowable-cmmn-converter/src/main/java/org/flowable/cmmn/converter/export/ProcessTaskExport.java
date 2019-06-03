@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import java.util.List;
-
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;

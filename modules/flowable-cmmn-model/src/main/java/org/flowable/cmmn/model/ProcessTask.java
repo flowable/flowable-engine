@@ -12,9 +12,6 @@
  */
 package org.flowable.cmmn.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Joram Barrez
  */
