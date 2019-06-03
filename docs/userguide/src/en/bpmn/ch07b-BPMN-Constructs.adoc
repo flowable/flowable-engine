@@ -4245,7 +4245,7 @@ The Shell task is configured by <<serviceTaskFieldInjection,field injection>>. A
 |===============
 |Property|Required?|Type|Description|Default
 |command|yes|String|Shell command to execute.|
-|arg0-5|no|String|Parameter 0 to Parameter 5|
+|arg1-5|no|String|Parameter 1 to Parameter 5|
 |wait|no|true/false|Wait if necessary, until the shell process has terminated.|true
 |redirectError|no|true/false|Merge standard error with the standard output.|false
 |cleanEnv|no|true/false|Shell process does not inherit current environment.|false

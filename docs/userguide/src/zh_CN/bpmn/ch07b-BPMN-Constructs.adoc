@@ -4225,7 +4225,7 @@ Shell任务通过<<serviceTaskFieldInjection,字段注入>>配置。这些参数
 |===============
 |参数|必填?|类型|描述|默认值
 |command|是|String|要执行的Shell命令。|
-|arg0-5|否|String|参数0至参数5|
+|arg1-5|否|String|参数1至参数5|
 |wait|否|true/false|是否等待Shell进程终止。|true
 |redirectError|否|true/false|是否将标准错误（standard error）并入标准输出（standard output）。|false
 |cleanEnv|否|true/false|是否避免Shell进程继承当前环境。|false
