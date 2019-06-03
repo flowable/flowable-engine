@@ -13,6 +13,7 @@
 package org.flowable.spring.test.components.scope;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -51,7 +52,7 @@ class ProcessScopeTestEngine {
 
         String statefulObjectVariableKey = keyForObjectType(runtimeVars, StatefulObject.class);
 
-        assertTrue(!runtimeVars.isEmpty());
+        assertFalse(runtimeVars.isEmpty());
         assertTrue(StringUtils.hasText(statefulObjectVariableKey));
 
         StatefulObject scopedObject = (StatefulObject) runtimeService.getVariable(processInstance.getId(), statefulObjectVariableKey);
