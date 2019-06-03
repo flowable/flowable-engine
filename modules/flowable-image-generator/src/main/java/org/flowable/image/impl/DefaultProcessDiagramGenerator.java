@@ -77,6 +77,8 @@ import org.flowable.image.ProcessDiagramGenerator;
  * 
  * @author Joram Barrez
  * @author Tijs Rademakers
+ * @author Zheng Ji
+ *
  */
 public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
@@ -741,7 +743,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
             if (defaultFlow != null && defaultFlow.equalsIgnoreCase(sequenceFlow.getId())) {
                 isDefault = true;
             }
-            boolean drawConditionalIndicator = sequenceFlow.getConditionExpression() != null && !(flowNode instanceof Gateway);
+            boolean drawConditionalIndicator = sequenceFlow.getConditionExpression() != null && sequenceFlow.getConditionExpression().trim().length() > 0 && !(flowNode instanceof Gateway);
 
             String sourceRef = sequenceFlow.getSourceRef();
             String targetRef = sequenceFlow.getTargetRef();

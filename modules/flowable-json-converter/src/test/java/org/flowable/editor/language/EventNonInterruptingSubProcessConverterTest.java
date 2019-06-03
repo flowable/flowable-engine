@@ -13,6 +13,7 @@
 package org.flowable.editor.language;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -60,7 +61,7 @@ public class EventNonInterruptingSubProcessConverterTest extends AbstractConvert
         assertTrue(signalStartEvent instanceof StartEvent);
         StartEvent startEvent = (StartEvent) signalStartEvent;
         assertEquals("eventSignalStart", startEvent.getId());
-        assertTrue(!startEvent.isInterrupting());
+        assertFalse(startEvent.isInterrupting());
         assertEquals(eventSubProcess.getId(), startEvent.getSubProcess().getId());
     }
 }

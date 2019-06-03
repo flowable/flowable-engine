@@ -479,15 +479,15 @@ The following code snippet shows an example of using the JUnit 4 style of testin
 public class MyBusinessProcessTest {
 
   @Rule
-  public FlowableRule FlowableRule = new FlowableRule();
+  public FlowableRule flowableRule = new FlowableRule();
 
   @Test
   @Deployment
   public void ruleUsageExample() {
-    RuntimeService runtimeService = FlowableRule.getRuntimeService();
+    RuntimeService runtimeService = flowableRule.getRuntimeService();
     runtimeService.startProcessInstanceByKey("ruleUsage");
 
-    TaskService taskService = FlowableRule.getTaskService();
+    TaskService taskService = flowableRule.getTaskService();
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("My Task", task.getName());
 

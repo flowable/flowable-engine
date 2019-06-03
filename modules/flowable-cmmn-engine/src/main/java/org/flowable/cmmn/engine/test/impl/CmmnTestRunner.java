@@ -96,7 +96,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
 
             @Override
             public void evaluate() throws Throwable {
-                List<Throwable> errors = new ArrayList<Throwable>();
+                List<Throwable> errors = new ArrayList<>();
                 try {
                     statement.evaluate();
                 } catch (Throwable e) {

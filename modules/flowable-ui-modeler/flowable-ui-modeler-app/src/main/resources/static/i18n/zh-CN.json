@@ -63,7 +63,7 @@
       },
       "NAMEPACKAGE" : {
         "NAME" : {
-          "TITLE" : "流程名称",
+          "TITLE" : "名称",
           "DESCRIPTION" : "BPMN元素的描述名称."
         }
       },
@@ -839,27 +839,27 @@
         "DESCRIPTION" : "BPMN 2.0 流程图."
       },
       "STARTNONEEVENT" : {
-        "TITLE" : "启动事件",
+        "TITLE" : "空启动事件",
         "DESCRIPTION" : "无特定触发器的启动事件"
       },
       "STARTTIMEREVENT" : {
-        "TITLE" : "启动定时器事件",
+        "TITLE" : "定时器启动事件",
         "DESCRIPTION" : "带定时器触发的启动事件"
       },
       "STARTSIGNALEVENT" : {
-        "TITLE" : "启动信号事件",
+        "TITLE" : "信号启动事件",
         "DESCRIPTION" : "通过信号触发启动事件"
       },
       "STARTMESSAGEEVENT" : {
-        "TITLE" : "启动消息事件",
+        "TITLE" : "消息启动事件",
         "DESCRIPTION" : "通过消息触发启动事件"
       },
       "STARTERROREVENT" : {
-        "TITLE" : "启动错误事件",
-        "DESCRIPTION" : "用于捕获BPMN抛出的错误的启动事件"
+        "TITLE" : "异常启动事件",
+        "DESCRIPTION" : "用于捕获BPMN抛出的异常启动事件"
       },
       "STARTESCALATIONEVENT" : {
-        "TITLE" : "开始升级事件",
+        "TITLE" : "升级开始事件",
         "DESCRIPTION" : "捕获抛出的BPMN升级的启动事件"
       },
       "USERTASK" : {

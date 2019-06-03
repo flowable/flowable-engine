@@ -411,7 +411,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                     }
                     
                     processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray, 
-                                    diagramInfo, currentElements, currentElements, newCollapsedNode);
+                                    diagramInfo, completedElements, currentElements, newCollapsedNode);
                 }
             }
         }

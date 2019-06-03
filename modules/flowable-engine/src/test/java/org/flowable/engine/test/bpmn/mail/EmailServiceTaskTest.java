@@ -57,6 +57,52 @@ public class EmailServiceTaskTest extends EmailTestCase {
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@activiti.org"), null);
         assertProcessEnded(procId);
     }
+    
+    @Test
+    @Deployment
+    public void testSkipExpression() throws Exception {
+        Map<String, Object> varMap = new HashMap<>();
+        varMap.put("skip", true);
+        varMap.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
+        String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly", varMap).getId();
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEquals(0, messages.size());
+
+        assertProcessEnded(procId);
+    }
+    
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testSkipExpression.bpmn20.xml")
+    public void testSkipExpressionEnabledFalse() throws Exception {
+        Map<String, Object> varMap = new HashMap<>();
+        varMap.put("skip", true);
+        varMap.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", false);
+        String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly", varMap).getId();
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEquals(1, messages.size());
+
+        WiserMessage message = messages.get(0);
+        assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@flowable.org"), null);
+        assertProcessEnded(procId);
+    }
+    
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testSkipExpression.bpmn20.xml")
+    public void testSkipExpressionSkipFalse() throws Exception {
+        Map<String, Object> varMap = new HashMap<>();
+        varMap.put("skip", false);
+        varMap.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
+        String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly", varMap).getId();
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEquals(1, messages.size());
+
+        WiserMessage message = messages.get(0);
+        assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@flowable.org"), null);
+        assertProcessEnded(procId);
+    }
 
     @Test
     public void testSimpleTextMailWhenMultiTenant() throws Exception {
