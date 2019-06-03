@@ -3461,7 +3461,7 @@ The Flowable engine sends e-mails trough an external mail server with SMTP capab
 |mailServerHost|no|The hostname of your mail server (for example, mail.mycorp.com). Default is +localhost+
 |mailServerPort|yes, if not on the default port|The port for SMTP traffic on the mail server. The default is _25_
 |mailServerForceTo|no|If set it will be used as a replacement of the configured to, cc and / or bcc in the Mail Task when sending out emails.
-|mailServerDefaultFrom|no|The default e-mail address of the sender of e-mails, when none is provided by the user. By default this is _flowable@flowable.org_
+|mailServerDefaultFrom|no|The default e-mail address of the sender of e-mails, when none is provided by the user. By default this is _flowable@localhost_
 |mailServerUsername|if applicable for your server|Some mail servers require credentials for sending e-mail. By default not set.
 |mailServerPassword|if applicable for your server|Some mail servers require credentials for sending e-mail. By default not set.
 |mailServerUseSSL|if applicable for your server|Some mail servers require ssl communication. By default set to false.
