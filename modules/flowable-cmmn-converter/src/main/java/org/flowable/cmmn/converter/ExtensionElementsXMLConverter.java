@@ -36,6 +36,7 @@ import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.FlowableHttpRequestHandler;
 import org.flowable.cmmn.model.FlowableHttpResponseHandler;
 import org.flowable.cmmn.model.FlowableListener;
+import org.flowable.cmmn.model.HasLifecycleListeners;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.IOParameter;
@@ -94,7 +95,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                     } else if (CmmnXmlConstants.ELEMENT_TASK_LISTENER.equals(xtr.getLocalName())) {
                         readTaskListener(xtr, conversionHelper);
 
-                    } else if (CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equals(xtr.getLocalName())) {
+                    } else if (CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equals(xtr.getLocalName()) ||
+                        CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER.equals(xtr.getLocalName())
+                    ) {
                         readLifecycleListener(xtr, conversionHelper);
 
                     } else {
@@ -104,7 +107,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
                 } else if (xtr.isEndElement()) {
                     if (CmmnXmlConstants.ELEMENT_TASK_LISTENER.equalsIgnoreCase(xtr.getLocalName())
-                        || CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())) {
+                        || CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())
+                        || CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())
+                    ) {
                         conversionHelper.removeCurrentCmmnElement();
                     } else if (CmmnXmlConstants.ELEMENT_EXTENSION_ELEMENTS.equalsIgnoreCase(xtr.getLocalName())) {
                         readyWithChildElements = true;
@@ -285,9 +290,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
         FlowableListener flowableListener = ListenerXmlConverterUtil.convertToListener(xtr);
         if (flowableListener != null) {
-            if (currentCmmnElement instanceof PlanItemDefinition) {
-                PlanItemDefinition planItemDefinition = (PlanItemDefinition) currentCmmnElement;
-                planItemDefinition.getLifecycleListeners().add(flowableListener);
+            if (currentCmmnElement instanceof HasLifecycleListeners) {
+                HasLifecycleListeners lifecycleListenersElement = (HasLifecycleListeners) currentCmmnElement;
+                lifecycleListenersElement.getLifecycleListeners().add(flowableListener);
             } else {
                 throw new FlowableException("Programmatic error: task listener added to an element that is not a plan item definition, but a " + currentCmmnElement.getClass());
             }

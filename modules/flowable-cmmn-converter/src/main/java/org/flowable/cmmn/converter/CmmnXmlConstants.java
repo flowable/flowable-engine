@@ -57,6 +57,7 @@ public interface CmmnXmlConstants {
 
     String ELEMENT_TASK_LISTENER = "taskListener";
     String ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER = "planItemLifecycleListener";
+    String ELEMENT_CASE_LIFECYCLE_LISTENER = "caseLifecycleListener";
     String ATTRIBUTE_LISTENER_CLASS = "class";
     String ATTRIBUTE_LISTENER_EXPRESSION = "expression";
     String ATTRIBUTE_LISTENER_DELEGATEEXPRESSION = "delegateExpression";

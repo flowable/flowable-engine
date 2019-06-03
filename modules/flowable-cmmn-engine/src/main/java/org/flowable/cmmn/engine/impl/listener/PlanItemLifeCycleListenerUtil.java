@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -83,7 +84,7 @@ public class PlanItemLifeCycleListenerUtil {
     }
 
     protected static boolean stateMatches(String listenerExpectedState, String actualState) {
-        return listenerExpectedState == null || Objects.equals(actualState, listenerExpectedState);
+        return StringUtils.isEmpty(listenerExpectedState) || Objects.equals(actualState, listenerExpectedState);
     }
 
 }

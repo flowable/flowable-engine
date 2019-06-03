@@ -187,6 +187,15 @@ public class CmmnXmlConverterTest {
     }
 
     @Test
+    public void testCaseLifecycleListener() {
+        CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("case-lifecycle-listeners.cmmn"));
+
+        assertThat(cmmnModel.getCases().size(), is(1));
+        Case aCase = cmmnModel.getCases().get(0);
+        assertThat(aCase.getLifecycleListeners().size(), is(1));
+    }
+
+    @Test
     public void testMissingIdsAdded() {
         CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("exit-criteria-on-planmodel.cmmn"));
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
