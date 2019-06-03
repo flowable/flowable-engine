@@ -929,7 +929,7 @@
         "DESCRIPTION" : "子流程范围"
       },
       "COLLAPSEDSUBPROCESS" : {
-        "TITLE" : "崩溃的子流程",
+        "TITLE" : "折叠子流程",
         "DESCRIPTION" : "子流程范围"
       },
       "EVENTSUBPROCESS" : {
