@@ -3438,7 +3438,7 @@ Flowable引擎使用支持SMTP的外部邮件服务器发送邮件。为了发�
 |参数|必填?|描述
 |mailServerHost|否|邮件服务器的主机名（如mail.mycorp.com）。默认为++localhost++
 |mailServerPort|是，如果不使用默认端口|邮件服务器的SMTP端口。默认值为__25__
-|mailServerDefaultFrom|否|若用户没有提供地址，默认使用的邮件发件人地址。默认为__flowable@flowable.org__
+|mailServerDefaultFrom|否|若用户没有提供地址，默认使用的邮件发件人地址。默认为__flowable@localhost___
 |mailServerUsername|若服务器需要|部分邮件服务器发信时需要进行认证。默认为空。
 |mailServerPassword|若服务器需要|部分邮件服务器发信时需要进行认证。默认为空。
 |mailServerUseSSL|若服务器需要|部分邮件服务器要求ssl通信。默认设置为false。
@@ -4225,7 +4225,7 @@ Shell任务通过<<serviceTaskFieldInjection,字段注入>>配置。这些参数
 |===============
 |参数|必填?|类型|描述|默认值
 |command|是|String|要执行的Shell命令。|
-|arg0-5|否|String|参数0至参数5|
+|arg1-5|否|String|参数1至参数5|
 |wait|否|true/false|是否等待Shell进程终止。|true
 |redirectError|否|true/false|是否将标准错误（standard error）并入标准输出（standard output）。|false
 |cleanEnv|否|true/false|是否避免Shell进程继承当前环境。|false

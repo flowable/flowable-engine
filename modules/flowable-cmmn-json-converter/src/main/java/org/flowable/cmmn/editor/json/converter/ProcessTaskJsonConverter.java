@@ -12,17 +12,13 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
 

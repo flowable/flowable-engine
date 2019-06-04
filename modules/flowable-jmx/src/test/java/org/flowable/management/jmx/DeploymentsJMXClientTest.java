@@ -171,7 +171,7 @@ public class DeploymentsJMXClientTest {
         // definition with version 2, first check it with API
         assertEquals(1, repositoryService.createDeploymentQuery().count());
 
-        assertTrue(!repositoryService.createDeploymentQuery().singleResult().getId().equals(firstDeploymentId));
+        assertFalse(repositoryService.createDeploymentQuery().singleResult().getId().equals(firstDeploymentId));
 
         // check if it is also affected in returned results.
 
@@ -179,7 +179,7 @@ public class DeploymentsJMXClientTest {
         assertNotNull(deployments);
         assertEquals(1, deployments.size());
         assertEquals(3, deployments.get(0).size());
-        assertTrue(!deployments.get(0).get(0).equals(firstDeploymentId));
+        assertFalse(deployments.get(0).get(0).equals(firstDeploymentId));
 
     }
 

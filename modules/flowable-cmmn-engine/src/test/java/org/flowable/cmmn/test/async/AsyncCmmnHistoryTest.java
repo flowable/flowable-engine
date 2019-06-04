@@ -907,4 +907,20 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         ).containsOnly(fixTime);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testBusinessKey() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("businessKeyCase")
+            .businessKey("someBusinessKey")
+            .start();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals("someBusinessKey", cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+        cmmnRuntimeService.updateBusinessKey(caseInstance.getId(), "newBusinessKey");
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals("newBusinessKey", cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+    }
+
 }

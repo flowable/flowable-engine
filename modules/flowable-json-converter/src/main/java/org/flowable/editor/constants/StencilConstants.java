@@ -14,6 +14,7 @@ package org.flowable.editor.constants;
 
 /**
  * @author Tijs Rademakers
+ * @author Zheng Ji
  */
 public interface StencilConstants {
 
@@ -193,8 +194,7 @@ public interface StencilConstants {
     final String PROPERTY_SERVICETASK_FIELD_STRING = "string";
     final String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
     final String PROPERTY_SERVICETASK_TRIGGERABLE = "servicetasktriggerable";
-    final String PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "servicetaskUseLocalScopeForResultVariable";
-
+    final String PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "servicetaskuselocalscopeforresultvariable";
     final String PROPERTY_FORM_PROPERTIES = "formproperties";
     final String PROPERTY_FORM_ID = "id";
     final String PROPERTY_FORM_NAME = "name";
@@ -226,7 +226,7 @@ public interface StencilConstants {
     final String PROPERTY_RULETASK_RULES = "ruletask_rules";
     final String PROPERTY_RULETASK_EXCLUDE = "ruletask_exclude";
 
-    String PROPERTY_MAILTASK_HEADERS = "mailtaskheaders";
+    final String PROPERTY_MAILTASK_HEADERS = "mailtaskheaders";
     final String PROPERTY_MAILTASK_TO = "mailtaskto";
     final String PROPERTY_MAILTASK_FROM = "mailtaskfrom";
     final String PROPERTY_MAILTASK_SUBJECT = "mailtasksubject";

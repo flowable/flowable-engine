@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author Joram Barrez
  */
-public class PlanItemDefinition extends CaseElement {
+public class PlanItemDefinition extends CaseElement implements HasLifecycleListeners {
     
     protected String planItemRef;
     protected PlanItemControl defaultControl;
@@ -40,10 +40,12 @@ public class PlanItemDefinition extends CaseElement {
         this.defaultControl = defaultControl;
     }
 
+    @Override
     public List<FlowableListener> getLifecycleListeners() {
         return lifecycleListeners;
     }
 
+    @Override
     public void setLifecycleListeners(List<FlowableListener> lifecycleListeners) {
         this.lifecycleListeners = lifecycleListeners;
     }

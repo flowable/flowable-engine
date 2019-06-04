@@ -82,6 +82,22 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void updateBusinessKey() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+
+        // default business key is empty
+        assertThat(caseInstance.getName(), nullValue());
+
+        cmmnRuntimeService.updateBusinessKey(caseInstance.getId(), "bzKey");
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("bzKey", caseInstance.getBusinessKey());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
     public void updateCaseNameSetEmpty() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").

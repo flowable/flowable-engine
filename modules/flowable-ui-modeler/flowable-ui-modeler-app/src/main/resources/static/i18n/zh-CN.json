@@ -63,7 +63,7 @@
       },
       "NAMEPACKAGE" : {
         "NAME" : {
-          "TITLE" : "流程名称",
+          "TITLE" : "名称",
           "DESCRIPTION" : "BPMN元素的描述名称."
         }
       },
@@ -679,6 +679,12 @@
           "DESCRIPTION" : "定义升级名称"
         }
       },
+      "CONDITIONALEVENTPACKAGE" : {
+        "CONDITION" : {
+          "TITLE" : "条件表达式",
+          "DESCRIPTION" : "定义条件表达式."
+        }
+      },
       "CANCELACTIVITYPACKAGE" : {
         "CANCELACTIVITY" : {
           "TITLE" : "取消活动",
@@ -839,27 +845,31 @@
         "DESCRIPTION" : "BPMN 2.0 流程图."
       },
       "STARTNONEEVENT" : {
-        "TITLE" : "启动事件",
+        "TITLE" : "空启动事件",
         "DESCRIPTION" : "无特定触发器的启动事件"
       },
       "STARTTIMEREVENT" : {
-        "TITLE" : "启动定时器事件",
+        "TITLE" : "定时器启动事件",
         "DESCRIPTION" : "带定时器触发的启动事件"
       },
       "STARTSIGNALEVENT" : {
-        "TITLE" : "启动信号事件",
+        "TITLE" : "信号启动事件",
         "DESCRIPTION" : "通过信号触发启动事件"
       },
       "STARTMESSAGEEVENT" : {
-        "TITLE" : "启动消息事件",
+        "TITLE" : "消息启动事件",
         "DESCRIPTION" : "通过消息触发启动事件"
       },
+      "STARTCONDITIONALEVENT" : {
+        "TITLE" : "条件启动事件",
+        "DESCRIPTION" : "通过条件触发启动事件"
+      },
       "STARTERROREVENT" : {
-        "TITLE" : "启动错误事件",
-        "DESCRIPTION" : "用于捕获BPMN抛出的错误的启动事件"
+        "TITLE" : "异常启动事件",
+        "DESCRIPTION" : "用于捕获BPMN抛出的异常启动事件"
       },
       "STARTESCALATIONEVENT" : {
-        "TITLE" : "开始升级事件",
+        "TITLE" : "升级开始事件",
         "DESCRIPTION" : "捕获抛出的BPMN升级的启动事件"
       },
       "USERTASK" : {
@@ -919,7 +929,7 @@
         "DESCRIPTION" : "子流程范围"
       },
       "COLLAPSEDSUBPROCESS" : {
-        "TITLE" : "崩溃的子流程",
+        "TITLE" : "折叠子流程",
         "DESCRIPTION" : "子流程范围"
       },
       "EVENTSUBPROCESS" : {
@@ -945,6 +955,10 @@
       "EVENTGATEWAY" : {
         "TITLE" : "事件网关",
         "DESCRIPTION" : "一个事件网关"
+      },
+      "BOUNDARYCONDITIONALEVENT" : {
+        "TITLE" : "边界条件事件",
+        "DESCRIPTION" : "捕获指定条件的边界事件"
       },
       "BOUNDARYERROREVENT" : {
         "TITLE" : "边界错误事件",
@@ -985,6 +999,10 @@
       "CATCHMESSAGEEVENT" : {
         "TITLE" : "中间消息捕获事件",
         "DESCRIPTION" : "带有消息触发器的中间捕获事件"
+      },
+      "CATCHCONDITIONALEVENT" : {
+        "TITLE" : "中间条件捕获事件",
+        "DESCRIPTION" : "带有条件触发器的中间捕获事件"
       },
       "THROWNONEEVENT" : {
         "TITLE" : "中间无抛出事件",
