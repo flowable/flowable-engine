@@ -506,6 +506,13 @@
         }
       },
       "HTTPTASKRESULTVARIABLEPREFIXPACKAGE" : {
+        "HTTPTASKACTIVITYBEHAVIORCLASSPACKAGE" : {
+          "HTTPTASKACTIVITYBEHAVIORCLASS" : {
+            "TITLE" : "自定义HttpActivityBehavior类",
+            "DESCRIPTION" : "Full class name of custom extension of org.flowable.http.HttpActivityBehavior."
+          }
+        },
+      "HTTPTASKRESULTVARIABLEPREFIXPACKAGE" : {
         "HTTPTASKRESULTVARIABLEPREFIX" : {
           "TITLE" : "结果变量的前缀",
           "DESCRIPTION" : "执行变量名称的前缀。"

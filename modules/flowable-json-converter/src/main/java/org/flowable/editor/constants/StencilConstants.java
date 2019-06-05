@@ -120,11 +120,11 @@ public interface StencilConstants {
     final String PROPERTY_MESSAGEREF = "messageref";
 
     final String PROPERTY_SIGNALREF = "signalref";
-    
+
     final String PROPERTY_CONDITIONAL_EVENT_CONDITION = "conditionaleventcondition";
 
     final String PROPERTY_ERRORREF = "errorref";
-    
+
     final String PROPERTY_ESCALATION_DEFINITIONS = "escalationdefinitions";
     final String PROPERTY_ESCALATION_DEFINITION_ID = "id";
     final String PROPERTY_ESCALATION_DEFINITION_NAME = "name";
@@ -302,6 +302,7 @@ public interface StencilConstants {
     final String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
     final String PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT = "httptasksaveresponseparameterstransient";
     final String PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON = "httptasksaveresponseasjson";
+    final String PROPERTY_HTTPTASK_ACTIVITY_BEHAVIOR_CLASS = "httptaskactivitybehaviorclass";
 
     final String PROPERTY_SKIP_EXPRESSION = "skipexpression";
 
