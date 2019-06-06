@@ -49,6 +49,7 @@ public class HttpServiceTaskActivitybehaviorClassConverterTest extends AbstractC
     }
 
     private void validateModel(BpmnModel model) {
+
         FlowElement flowElement = model.getMainProcess().getFlowElement("shareniuHttpTask", true);
         assertNotNull(flowElement);
         assertTrue(flowElement instanceof HttpServiceTask);
