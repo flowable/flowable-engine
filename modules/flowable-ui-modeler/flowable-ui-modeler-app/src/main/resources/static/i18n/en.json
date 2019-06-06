@@ -503,12 +503,6 @@
             "DESCRIPTION" : "Flag to save response status, headers etc."
           }
         },
-        "HTTPTASKACTIVITYBEHAVIORCLASSPACKAGE" : {
-          "HTTPTASKACTIVITYBEHAVIORCLASS" : {
-            "TITLE" : "custom HttpActivityBehavior class",
-            "DESCRIPTION" : "Full class name of custom extension of org.flowable.http.HttpActivityBehavior."
-          }
-        },
         "HTTPTASKRESULTVARIABLEPREFIXPACKAGE" : {
           "HTTPTASKRESULTVARIABLEPREFIX" : {
             "TITLE" : "Result variable prefix",
@@ -1692,7 +1686,7 @@
             "NAME-DESC": "Name, Z-A"
         }
     },
-
+    
     "CASE-LIST" : {
         "TITLE" : "Case Models",
         "SEARCH-PLACEHOLDER": "Search",
@@ -1883,7 +1877,7 @@
             "CREATE-DESCRIPTION": "You need to give a name for the new sub process and you may want to add a description at the same time."
         }
     },
-
+    
     "CASE": {
       "NAME": "Model name",
       "KEY": "Model key",
@@ -2173,7 +2167,7 @@
             "GENERAL": "General",
             "OPTIONS": "Options",
             "UPLOAD-OPTIONS": "Upload options",
-	    "ADVANCED-OPTIONS":"Advanced"
+	    "ADVANCED-OPTIONS":"Advanced" 
         },
         "VERSION": "Version {{version}}",
         "LAST-UPDATED": "Last updated by {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
@@ -2549,7 +2543,7 @@
     "PROPERTY.MESSAGEDEFINITIONS.EMPTY" : "No message definitions configured",
     "PROPERTY.MESSAGEDEFINITIONS.ID" : "Id",
     "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Name",
-
+    
     "PROPERTY.ESCALATIONDEFINITIONS.DISPLAY" : "{{length}} escalation definitions",
     "PROPERTY.ESCALATIONDEFINITIONS.EMPTY" : "No escalation definitions configured",
     "PROPERTY.ESCALATIONDEFINITIONS.ID" : "Id",
@@ -2611,7 +2605,7 @@
     "PROPERTY.DECISIONTABLEREFERENCE.ERROR.FORM" : "There was an error loading the decision tables. Try again later",
     "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING" : "Loading decision tables...",
     "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "This folder contains no decision tables",
-
+    
     "PROPERTY.CASEREFERENCE.EMPTY" : "No reference selected",
     "PROPERTY.CASEREFERENCE.TITLE" : "Case model reference",
     "PROPERTY.CASEREFERENCE.ERROR.FORM" : "There was an error loading the case models. Try again later",

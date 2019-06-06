@@ -72,7 +72,6 @@ public class HttpTaskJsonConverter extends BaseCmmnJsonConverter {
         addField("resultVariablePrefix", PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX, elementNode, task);
         addField("saveResponseParametersTransient", PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT, elementNode, task);
         addField("saveResponseVariableAsJson", PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON, elementNode, task);
-        addField("httpActivityBehaviorClass", PROPERTY_HTTPTASK_ACTIVITY_BEHAVIOR_CLASS, elementNode, task);
 
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
 
