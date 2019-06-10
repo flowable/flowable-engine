@@ -50,7 +50,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class FormEngineAutoConfigurationTest {
 
@@ -242,13 +241,6 @@ public class FormEngineAutoConfigurationTest {
         assertThat(appDeployments).hasSize(3)
             .extracting(AppDeployment::getName)
             .contains("simple.bar", "vacationRequest.zip", "processTask.bar");
-    }
-
-    private AnnotationConfigApplicationContext context(Class<?>... clazz) {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext();
-        annotationConfigApplicationContext.register(clazz);
-        annotationConfigApplicationContext.refresh();
-        return annotationConfigApplicationContext;
     }
 
     private static FormEngineConfigurationApi formEngine(ProcessEngine processEngine) {
