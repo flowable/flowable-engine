@@ -47,6 +47,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -56,6 +57,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebClient(registerRestTemplate = true)
 @Import(FlowableIdmApplicationSecurityTest.TestBootstrapConfiguration.class)
+// workaround for https://github.com/spring-projects/spring-ldap/issues/473 until spring-ldap 2.3.3 is released
+@TestPropertySource(properties= {"management.health.ldap.enabled=false"})
 public class FlowableIdmApplicationSecurityTest {
 
     private static final Set<String> ACTUATOR_LINKS = new HashSet<>(
