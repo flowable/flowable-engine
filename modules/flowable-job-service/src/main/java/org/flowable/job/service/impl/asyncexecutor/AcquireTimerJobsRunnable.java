@@ -48,7 +48,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     @Override
     public synchronized void run() {
         LOGGER.info("starting to acquire async jobs due");
-        Thread.currentThread().setName("flowable-acquire-timer-jobs");
+        Thread.currentThread().setName("flowable-" + asyncExecutor.getJobServiceConfiguration().getEngineName() + "-acquire-timer-jobs");
 
         final CommandExecutor commandExecutor = asyncExecutor.getJobServiceConfiguration().getCommandExecutor();
 
