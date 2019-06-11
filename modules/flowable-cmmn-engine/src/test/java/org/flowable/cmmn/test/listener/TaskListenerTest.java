@@ -87,6 +87,17 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
     }
 
+    @Test
+    @CmmnDeployment
+    public void testAssignEventOriginalAssignee() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTaskListeners").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.setAssignee(task.getId(), "testAssignee");
+
+        assertVariable(caseInstance, "previousAssignee", "defaultAssignee");
+        assertVariable(caseInstance, "currentAssignee", "testAssignee");
+    }
+
     private void assertVariable(CaseInstance caseInstance, String varName, String value) {
         String variable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), varName);
         assertThat(variable).isEqualTo(value);
