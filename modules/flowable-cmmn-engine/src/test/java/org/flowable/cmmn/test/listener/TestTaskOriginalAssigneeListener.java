@@ -23,6 +23,7 @@ public class TestTaskOriginalAssigneeListener implements TaskListener {
 
     @Override
     public void notify(DelegateTask delegateTask) {
+        delegateTask.setVariable("taskId", delegateTask.getId());
         delegateTask.setVariable("previousAssignee", ((TaskEntityImpl) delegateTask).getOriginalAssignee());
         delegateTask.setVariable("currentAssignee", delegateTask.getAssignee());
     }
