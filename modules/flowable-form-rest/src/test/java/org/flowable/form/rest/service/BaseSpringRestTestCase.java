@@ -281,8 +281,6 @@ public abstract class BaseSpringRestTestCase extends TestCase {
      * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
      */
     protected void assertResultsPresentInDataResponse(String url, String submittedBy, String... expectedResourceIds) throws IOException {
-        int numberOfResultsExpected = expectedResourceIds.length;
-
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
