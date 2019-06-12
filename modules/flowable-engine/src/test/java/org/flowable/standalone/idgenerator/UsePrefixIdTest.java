@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.api.Assertions;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
@@ -124,4 +125,43 @@ public class UsePrefixIdTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Test
+    void testUUIDGeneratorProcessDefinitionId() {
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/standalone/idgenerator/prefixidtest.bpmn20.xml")
+            .deploy();
+
+        try {
+
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("simpleProcess")
+                .singleResult();
+
+            Assertions.assertThat(processDefinition.getId()).startsWith("PRC-simpleProcess:1:");
+
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    void testUUIDGeneratorProcessDefinitionIdWithLongDefinitionKey() {
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/standalone/idgenerator/prefixidtest-long-key.bpmn20.xml")
+            .deploy();
+
+        try {
+
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("simpleProcessWithAVeryLongKey")
+                .singleResult();
+
+            Assertions.assertThat(processDefinition.getId())
+                .startsWith("PRC-")
+                .doesNotContain("simpleProcess");
+
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
 }
