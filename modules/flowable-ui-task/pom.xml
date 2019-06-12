@@ -24,16 +24,6 @@
         <dependencies>
             <dependency>
                 <groupId>org.flowable</groupId>
-                <artifactId>flowable-content-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.flowable</groupId>
-                <artifactId>flowable-content-engine</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.flowable</groupId>
                 <artifactId>flowable-ui-task-logic</artifactId>
                 <version>${project.version}</version>
             </dependency>
