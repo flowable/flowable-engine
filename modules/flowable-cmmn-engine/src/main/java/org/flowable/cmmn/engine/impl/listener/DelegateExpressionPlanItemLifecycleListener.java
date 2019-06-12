@@ -21,7 +21,6 @@ import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.task.service.delegate.TaskListener;
 
 /**
  * @author Joram Barrez
