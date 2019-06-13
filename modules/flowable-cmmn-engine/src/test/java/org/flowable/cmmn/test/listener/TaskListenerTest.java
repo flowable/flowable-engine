@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
 import org.junit.Test;
@@ -87,8 +88,36 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
     }
 
+    @Test
+    @CmmnDeployment
+    public void testAssignEventOriginalAssignee() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTaskListeners").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.setAssignee(task.getId(), "testAssignee");
+
+        assertVariable(task, "taskId", task.getId());
+        assertVariable(task, "previousAssignee", "defaultAssignee");
+        assertVariable(task, "currentAssignee", "testAssignee");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/listener/TaskListenerTest.testAssignEventOriginalAssignee.cmmn")
+    public void testAssignEventOnCreateByHumanTaskActivityBehaviour() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTaskListeners").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        assertVariable(task, "taskId", task.getId());
+        assertVariable(task, "previousAssignee", "defaultAssignee");
+        assertVariable(task, "currentAssignee", "defaultAssignee");
+    }
+
     private void assertVariable(CaseInstance caseInstance, String varName, String value) {
         String variable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), varName);
+        assertThat(variable).isEqualTo(value);
+    }
+
+    private void assertVariable(TaskInfo task, String varName, String value) {
+        String variable = (String) cmmnTaskService.getVariable(task.getId(), varName);
         assertThat(variable).isEqualTo(value);
     }
 

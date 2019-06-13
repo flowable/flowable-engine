@@ -633,10 +633,9 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment(resources = "org/flowable/rest/service/api/runtime/TaskQueryResourceTest.testQueryTasks.bpmn20.xml", tenantId = "testTenant")
     public void testQueryTasksWithTenant() throws Exception {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", "myBusinessKey",
+        runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", "myBusinessKey",
             Collections.singletonMap("var1", "var1Value"),
             "testTenant");
-        Task processTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         // Check filter-less to fetch all tasks
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_QUERY);

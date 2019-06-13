@@ -73,10 +73,8 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             
             if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
 
-                if (originalTaskEntity instanceof TaskEntity) {
-                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-                        .executeTaskListeners((TaskEntity) originalTaskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
-                }
+                CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+                    .executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
 
                 if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
                     CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));

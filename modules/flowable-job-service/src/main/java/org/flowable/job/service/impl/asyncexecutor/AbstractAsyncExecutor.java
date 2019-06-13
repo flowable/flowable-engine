@@ -134,12 +134,14 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
                 ? jobEntityManager : CommandContextUtil.getJobServiceConfiguration().getJobEntityManager();
 
         if (resetExpiredJobsRunnable == null) {
-            String resetRunnableName = resetExpiredRunnableName != null ? resetExpiredRunnableName : "flowable-reset-expired-jobs";
+            String resetRunnableName = resetExpiredRunnableName != null ?
+                    resetExpiredRunnableName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-reset-expired-jobs";
             resetExpiredJobsRunnable = new ResetExpiredJobsRunnable(resetRunnableName, this, jobEntityManagerToUse);
         }
 
         if (!isMessageQueueMode && asyncJobsDueRunnable == null) {
-            String acquireJobsRunnableName = acquireRunnableThreadName != null ? acquireRunnableThreadName : "flowable-acquire-async-jobs";
+            String acquireJobsRunnableName = acquireRunnableThreadName != null ?
+                    acquireRunnableThreadName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-acquire-async-jobs";
             asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse);
         }
     }

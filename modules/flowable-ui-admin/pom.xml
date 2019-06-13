@@ -16,9 +16,6 @@
     <properties>
         <!-- Maven build properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!-- Web container version -->
-        <tomcat.version>7.0.53</tomcat.version>
     </properties>
 
     <modules>
@@ -48,7 +45,6 @@
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
-                <version>3.1.0</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>

@@ -321,7 +321,8 @@ public class BpmnDeployer implements EngineDeployer {
         String result = prefixId + processDefinition.getKey() + ":" + processDefinition.getVersion() + ":" + nextId; // ACT-505
         // ACT-115: maximum id length is 64 characters
         if (result.length() > 64) {
-            result = nextId;
+            // The length is exceeded due to the long process definition key
+            result = prefixId + nextId;
         }
 
         return result;

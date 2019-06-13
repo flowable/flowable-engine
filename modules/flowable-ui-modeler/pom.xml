@@ -12,10 +12,6 @@
     <relativePath>../flowable-spring-boot/pom.xml</relativePath>
     <version>6.5.0-SNAPSHOT</version>
   </parent>
-  
-  <properties>
-		<!-- Web container version -->		<tomcat.version>7.0.53</tomcat.version>
-  </properties>
 
 	<modules>
 		<module>flowable-ui-modeler-logic</module>

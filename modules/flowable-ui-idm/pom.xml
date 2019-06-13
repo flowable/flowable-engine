@@ -13,10 +13,6 @@
         <version>6.5.0-SNAPSHOT</version>
     </parent>
 
-    <properties>
-        <tomcat.version>7.0.53</tomcat.version>
-    </properties>
-
     <modules>
         <module>flowable-ui-idm-logic</module>
         <module>flowable-ui-idm-rest</module>
@@ -44,7 +40,6 @@
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
-                <version>3.1.0</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>

@@ -41,7 +41,6 @@ import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemControl;
-import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.slf4j.Logger;
