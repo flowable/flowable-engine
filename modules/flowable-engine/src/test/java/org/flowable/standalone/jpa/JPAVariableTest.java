@@ -591,4 +591,27 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
         assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
         assertEquals("updatedValue", ((FieldAccessJPAEntity) updatedEntity).getValue());
     }
+    
+    @Test
+    @Deployment(resources = "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml")
+    public void testStoreJPAEntityProxyAsVariable() {
+        EntityManager manager = entityManagerFactory.createEntityManager();
+        manager.getTransaction().begin();
+
+        FieldAccessJPAEntity simpleEntityFieldAccessAsProxy = manager.getReference(FieldAccessJPAEntity.class, 1L); // Hibernate will return a proxy for entity
+        assertEquals("Entity proxy has no/wrong identifier", 1L, entityManagerFactory.getPersistenceUnitUtil().getIdentifier(simpleEntityFieldAccessAsProxy)); // make sure the proxy as an id
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("simpleEntityFieldAccessAsProxy", simpleEntityFieldAccessAsProxy);
+
+        // Start the process with the JPA-entities as variables. They will be
+        // stored in the DB.
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
+
+        // Read entity with @Id on field
+        Object fieldAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccessAsProxy");
+        assertTrue(fieldAccessResult instanceof FieldAccessJPAEntity);
+        assertEquals(1L, ((FieldAccessJPAEntity) fieldAccessResult).getId().longValue());
+        assertEquals("value1", ((FieldAccessJPAEntity) fieldAccessResult).getValue());
+    }
 }
