@@ -235,12 +235,12 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery startedAfter(Date date);
 
     /**
-     * Only select historic process instances that were started before the given date.
+     * Only select historic process instances that were finished before the given date.
      */
     HistoricProcessInstanceQuery finishedBefore(Date date);
 
     /**
-     * Only select historic process instances that were started after the given date.
+     * Only select historic process instances that were finished after the given date.
      */
     HistoricProcessInstanceQuery finishedAfter(Date date);
 
