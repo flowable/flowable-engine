@@ -1787,6 +1787,20 @@ assertProcessEnded(procId);
         }
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testZeroLoopCardinalityOnParallelUserTaskWithEventSubscription.bpmn20.xml" })
+    public void testZeroLoopCardinalityOnParallelUserTaskWithEventSubscription() {
+        String procId = runtimeService.startProcessInstanceByKey("parallelUserTaskMi_withEventSubscription").getId();
+        assertProcessEnded(procId);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testZeroLoopCardinalityOnParallelSubprocessWithEventSubscription.bpmn20.xml" })
+    public void testZeroLoopCardinalityOnParallelSubprocessWithEventSubscription() {
+        String procId = runtimeService.startProcessInstanceByKey("parallelSubprocessMi_withEventSubscription").getId();
+        assertProcessEnded(procId);
+    }
+
     protected void resetTestCounts() {
         TestStartExecutionListener.countWithLoopCounter.set(0);
         TestStartExecutionListener.countWithoutLoopCounter.set(0);

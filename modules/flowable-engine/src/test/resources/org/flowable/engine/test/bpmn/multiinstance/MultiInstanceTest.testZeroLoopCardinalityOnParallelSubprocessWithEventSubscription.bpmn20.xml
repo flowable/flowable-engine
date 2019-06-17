@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <message id="Abort" name="Abort"></message>
+  <process id="parallelSubprocessMi_withEventSubscription" isExecutable="true">
+    <startEvent id="theStart"></startEvent>
+    <endEvent id="theEnd"></endEvent>
+    <manualTask id="manualtask1" name="Manual Task"></manualTask>
+    <sequenceFlow id="flow8" sourceRef="theStart" targetRef="subprocess1"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="subprocess1" targetRef="theEnd"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="manualtask1" targetRef="theEnd"></sequenceFlow>
+    <subProcess id="subprocess1" name="Sub Process">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>0</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      <userTask id="usertask1" name="User Task"></userTask>
+      <startEvent id="startevent1" name="Start"></startEvent>
+      <endEvent id="endevent1" name="End"></endEvent>
+      <sequenceFlow id="flow12" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+      <sequenceFlow id="flow13" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+    </subProcess>
+    <boundaryEvent id="boundarymessage1" name="Message" attachedToRef="subprocess1" cancelActivity="true">
+      <messageEventDefinition messageRef="Abort"></messageEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow14" sourceRef="boundarymessage1" targetRef="manualtask1"></sequenceFlow>
+  </process>
+
+</definitions>
