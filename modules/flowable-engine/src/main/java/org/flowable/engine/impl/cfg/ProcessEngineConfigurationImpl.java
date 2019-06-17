@@ -43,6 +43,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
@@ -731,6 +732,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     
     protected String jobExecutionScope;
     protected String historyJobExecutionScope;
+    
+    private String asyncExecutorTenantId = AbstractEngineConfiguration.NO_TENANT_ID;
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
@@ -2054,6 +2057,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             // Shutdown
             defaultAsyncExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
 
+            // Tenant
+            defaultAsyncExecutor.setTenantId(asyncExecutorTenantId);
+            
             asyncExecutor = defaultAsyncExecutor;
         }
 
@@ -4670,5 +4676,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobServiceConfiguration = jobServiceConfiguration;
         return this;
     }
+
+    public String getAsyncExecutorTenantId() {
+        return asyncExecutorTenantId;
+    }
+
+    public void setAsyncExecutorTenantId(String asyncExecutorTenantId) {
+        this.asyncExecutorTenantId = asyncExecutorTenantId;
+    }
+    
+    
     
 }
