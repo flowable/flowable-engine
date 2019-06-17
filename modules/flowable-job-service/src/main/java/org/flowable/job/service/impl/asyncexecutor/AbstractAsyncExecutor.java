@@ -33,6 +33,8 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAsyncExecutor.class);
 
+    private String tenantId;
+    
     protected boolean timerRunnableNeeded = true; // default true for backwards compatibility (History Async executor came later)
     protected AcquireTimerJobsRunnable timerJobRunnable;
     protected String acquireRunnableThreadName;
@@ -91,7 +93,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected abstract boolean executeAsyncJob(final JobInfo job, Runnable runnable);
 
     protected void unlockOwnedJobs() {
-        jobServiceConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, null));
+        jobServiceConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, tenantId));
     }
 
     protected Runnable createRunnableForJob(final JobInfo job) {
@@ -385,6 +387,10 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public ResetExpiredJobsRunnable getResetExpiredJobsRunnable() {
         return resetExpiredJobsRunnable;
+    }
+    
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
     
 }
