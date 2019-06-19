@@ -32,9 +32,9 @@
                 <constraints nullable="true" />
             </column>
            	<column name="CONTENT_AVAILABLE_" type="boolean" defaultValueBoolean="false" />
-            <column name="CREATED_" type="timestamp(6)" />
+            <column name="CREATED_" type="timestamp" />
             <column name="CREATED_BY_" type="varchar(255)" />
-            <column name="LAST_MODIFIED_" type="timestamp(6)" />
+            <column name="LAST_MODIFIED_" type="timestamp" />
             <column name="LAST_MODIFIED_BY_" type="varchar(255)" />
             <column name="CONTENT_SIZE_" type="bigint" defaultValueNumeric="0" />
             <column name="TENANT_ID_" type="varchar(255)" />
