@@ -17,9 +17,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
-  
+
   <!-- HISTORIC TASK INSTANCE INSERT -->
-  
+
   <insert id="insertHistoricTaskInstance" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
       insert into ${prefix}ACT_HI_TASKINST (
         ID_,
@@ -28,9 +28,9 @@
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
-        SCOPE_ID_, 
-        SUB_SCOPE_ID_, 
-        SCOPE_TYPE_, 
+        SCOPE_ID_,
+        SUB_SCOPE_ID_,
+        SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
         NAME_,
         PARENT_TASK_ID_,
@@ -88,9 +88,9 @@
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
-        SCOPE_ID_, 
-        SUB_SCOPE_ID_, 
-        SCOPE_TYPE_, 
+        SCOPE_ID_,
+        SUB_SCOPE_ID_,
+        SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
         NAME_,
         PARENT_TASK_ID_,
@@ -109,7 +109,7 @@
         CATEGORY_,
         TENANT_ID_,
         LAST_UPDATED_TIME_
-      ) values 
+      ) values
         <foreach collection="list" item="historicTask" index="index" separator=",">
           (#{historicTask.id ,jdbcType=VARCHAR},
            1,
@@ -142,7 +142,7 @@
   </insert>
 
   <insert id="bulkInsertHistoricTaskInstance" databaseId="oracle" parameterType="java.util.List">
-      INSERT ALL 
+      INSERT ALL
         <foreach collection="list" item="historicTask" index="index">
           INTO ${prefix}ACT_HI_TASKINST (
             ID_,
@@ -151,9 +151,9 @@
             PROC_DEF_ID_,
             PROC_INST_ID_,
             EXECUTION_ID_,
-            SCOPE_ID_, 
-            SUB_SCOPE_ID_, 
-            SCOPE_TYPE_, 
+            SCOPE_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_TYPE_,
             SCOPE_DEFINITION_ID_,
             NAME_,
             PARENT_TASK_ID_,
@@ -172,9 +172,9 @@
             CATEGORY_,
             TENANT_ID_,
             LAST_UPDATED_TIME_
-          ) VALUES 
+          ) VALUES
             (#{historicTask.id ,jdbcType=VARCHAR},
-             1, 
+             1,
              #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processInstanceId, jdbcType=VARCHAR},
@@ -205,17 +205,17 @@
   </insert>
 
   <!-- HISTORIC TASK INSTANCE UPDATE -->
-  
+
   <update id="updateHistoricTaskInstance" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
     update ${prefix}ACT_HI_TASKINST
       <set>
       	  REV_ = #{revisionNext, jdbcType=INTEGER},
 	      <if test="originalPersistentState.taskDefinitionId != taskDefinitionId">
 	      	TASK_DEF_ID_ = #{taskDefinitionId, jdbcType=VARCHAR},
-	      </if>	
+	      </if>
 	      <if test="originalPersistentState.processDefinitionId != processDefinitionId">
 	      	PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-	      </if>	
+	      </if>
 	      <if test="originalPersistentState.executionId != executionId">
 	      	EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
 	      </if>
@@ -282,18 +282,18 @@
   </update>
 
   <!-- HISTORIC TASK INSTANCE DELETE -->
-  
+
   <delete id="deleteHistoricTaskInstance" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
     delete from ${prefix}ACT_HI_TASKINST where ID_ = #{id}
   </delete>
-  
+
   <delete id="bulkDeleteHistoricTaskInstance" parameterType="java.util.Collection">
     delete from ${prefix}ACT_HI_TASKINST where
     <foreach item="task" collection="list" index="index" separator=" or ">
         ID_ = #{task.id, jdbcType=VARCHAR}
     </foreach>
   </delete>
-  
+
   <!-- HISTORIC TASK INSTANCE RESULT MAP -->
 
   <resultMap id="historicTaskInstanceResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
@@ -325,7 +325,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="lastUpdateTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
-  
+
   <resultMap id="historicTaskAndRelatedEntitiesResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
@@ -380,18 +380,18 @@
   </resultMap>
 
   <!-- HISTORIC TASK INSTANCE SELECT -->
-  
+
   <select id="selectHistoricTaskInstance" resultMap="historicTaskInstanceResultMap">
     select * from ${prefix}ACT_HI_TASKINST where ID_ = #{historicTaskInstanceId, jdbcType=VARCHAR}
   </select>
-  
+
   <select id="selectHistoricTasksByParentTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap">
     select * from ${prefix}ACT_HI_TASKINST where PARENT_TASK_ID_ = #{parameter}
   </select>
-  
+
   <select id="selectHistoricTaskInstancesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap" >
     select *
-    from ${prefix}ACT_HI_TASKINST 
+    from ${prefix}ACT_HI_TASKINST
     where PROC_INST_ID_ = #{parameter}
   </select>
 
@@ -402,24 +402,24 @@
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
-  
+
   <select id="selectHistoricTaskInstanceCountByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultType="long">
     select count(distinct RES.ID_)
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectHistoricTaskInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_TASKINST RES
     <include refid="commonSelectHistoricTaskInstancesByQueryCriteriaSql"/>
   </sql>
-  
+
   <select id="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskAndRelatedEntitiesResultMap">
     <include refid="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaColumns"/>
     <include refid="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
-  
+
   <sql id="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaColumns">
     <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     <if test="_databaseId != 'db2' and _databaseId != 'mssql'">
@@ -441,8 +441,8 @@
       <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
     </if>
     <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
-      select distinct TEMPRES_ID_ as ID_, TEMPRES_REV_ as REV_, 
-      TEMPRES_TASK_DEF_ID_ as TASK_DEF_ID_, TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_, TEMPRES_PROC_INST_ID_ as PROC_INST_ID_, 
+      select distinct TEMPRES_ID_ as ID_, TEMPRES_REV_ as REV_,
+      TEMPRES_TASK_DEF_ID_ as TASK_DEF_ID_, TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_, TEMPRES_PROC_INST_ID_ as PROC_INST_ID_,
       TEMPRES_EXECUTION_ID_ as EXECUTION_ID_, TEMPRES_NAME_ as NAME_, TEMPRES_PARENT_TASK_ID_ as PARENT_TASK_ID_,
       TEMPRES_DESCRIPTION_ as DESCRIPTION_, TEMPRES_OWNER_ as OWNER_, TEMPRES_ASSIGNEE_ as ASSIGNEE_,
       TEMPRES_START_TIME_ as START_TIME_, TEMPRES_CLAIM_TIME_ as CLAIM_TIME_, TEMPRES_END_TIME_ as END_TIME_,
@@ -487,7 +487,7 @@
       </if>
     </if>
   </sql>
-  
+
   <sql id="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaSql">
     from ${prefix}ACT_HI_TASKINST RES
     <choose>
@@ -508,7 +508,7 @@
     </if>
     <include refid="commonSelectHistoricTaskInstancesByQueryCriteriaSql"/>
   </sql>
-  
+
   <sql id="commonSelectHistoricTaskInstancesByQueryCriteriaSql">
     <if test="processFinished || processUnfinished || processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null || processInstanceBusinessKeyLikeIgnoreCase != null">
       inner join ${prefix}ACT_HI_PROCINST HPI ON RES.PROC_INST_ID_ = HPI.ID_
@@ -526,13 +526,13 @@
       <if test="!var.operator.equals('EXISTS') &amp;&amp; !var.operator.equals('NOT_EXISTS')">
           <choose>
             <when test="var.local">
-              inner join ${prefix}ACT_HI_VARINST A${index} on RES.ID_ = A${index}.TASK_ID_ 
+              inner join ${prefix}ACT_HI_VARINST A${index} on RES.ID_ = A${index}.TASK_ID_
             </when>
             <otherwise>
-              inner join ${prefix}ACT_HI_VARINST A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_ 
+              inner join ${prefix}ACT_HI_VARINST A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
             </otherwise>
           </choose>
-      </if>       
+      </if>
     </foreach>
     <foreach collection="orQueryObjects" index="orIndex" item="orQueryObject">
       <if test="orQueryObject.processFinished || orQueryObject.processUnfinished || orQueryObject.processInstanceBusinessKey != null || orQueryObject.processInstanceBusinessKeyLike != null || orQueryObject.processInstanceBusinessKeyLikeIgnoreCase != null">
@@ -608,7 +608,7 @@
       </if>
       <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0 &amp;&amp; cmmnDeploymentIds == null">
         and DEPLOY_P.DEPLOYMENT_ID_ IN
-        <foreach item="deployment" index="index" collection="deploymentIds" 
+        <foreach item="deployment" index="index" collection="deploymentIds"
                  open="(" separator="," close=")">
           #{deployment}
         </foreach>
@@ -618,7 +618,7 @@
       </if>
       <if test="cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0 &amp;&amp; deploymentIds == null">
         and DEPLOY_C.DEPLOYMENT_ID_ IN
-        <foreach item="deployment" index="index" collection="cmmnDeploymentIds" 
+        <foreach item="deployment" index="index" collection="cmmnDeploymentIds"
                  open="(" separator="," close=")">
           #{deployment}
         </foreach>
@@ -644,7 +644,7 @@
       </if>
       <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() &gt; 0">
         and RES.PROC_INST_ID_ IN
-        <foreach item="processInstance" index="index" collection="processInstanceIds" 
+        <foreach item="processInstance" index="index" collection="processInstanceIds"
                  open="(" separator="," close=")">
           #{processInstance}
         </foreach>
@@ -680,13 +680,13 @@
         and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
       </if>
       <if test="processInstanceIdWithChildren != null">
-        and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
-            ELINK.SCOPE_ID_ = #{processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and 
+        and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
+            ELINK.SCOPE_ID_ = #{processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and
             ELINK.REF_SCOPE_ID_ = RES.ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
       </if>
       <if test="caseInstanceIdWithChildren != null">
-        and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
-            ELINK.SCOPE_ID_ = #{caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and 
+        and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
+            ELINK.SCOPE_ID_ = #{caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and
             ELINK.REF_SCOPE_ID_ = RES.ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
       </if>
       <if test="taskName != null">
@@ -750,7 +750,7 @@
       </if>
       <if test="taskAssigneeIds != null &amp;&amp; taskAssigneeIds.size() &gt; 0">
         and RES.ASSIGNEE_ IN
-        <foreach item="assigneeId" index="index" collection="taskAssigneeIds" 
+        <foreach item="assigneeId" index="index" collection="taskAssigneeIds"
                  open="(" separator="," close=")">
           #{assigneeId}
         </foreach>
@@ -824,6 +824,9 @@
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
+      <if test="withoutDeleteReason">
+        and (RES.DELETE_REASON_ = '' or RES.DELETE_REASON_ is null)
+      </if>
       <if test="candidateUser != null || candidateGroups != null">
         <if test="!ignoreAssigneeValue">
             and RES.ASSIGNEE_ is null
@@ -870,7 +873,7 @@
                     and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
                 </if>
                 <if test="queryVar.local">
-                    and RES.ID_ = TASK_ID_ 
+                    and RES.ID_ = TASK_ID_
                 </if>
               )
             </when>
@@ -881,7 +884,7 @@
                     and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
                 </if>
                 <if test="queryVar.local">
-                    and RES.ID_ = TASK_ID_ 
+                    and RES.ID_ = TASK_ID_
                 </if>
               )
             </when>
@@ -906,22 +909,22 @@
                     <otherwise>
                       and A${index}.TEXT_
                     </otherwise>
-                  </choose> 
+                  </choose>
                   <choose>
                       <when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                       <otherwise><include refid="executionVariableOperator" /></otherwise>
-                  </choose>          
+                  </choose>
                   #{queryVar.textValue}
                   <choose>
         			<when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
         		  </choose>
                 </if>
                 <if test="queryVar.textValue2 != null">
-                  and A${index}.TEXT2_ 
+                  and A${index}.TEXT2_
                   <choose>
                     <when test="queryVar.operator.equals('LIKE')">LIKE</when>
                     <otherwise><include refid="executionVariableOperator" /></otherwise>
-                  </choose>          
+                  </choose>
                   #{queryVar.textValue2}
                   <choose>
         			<when test="queryVar.operator.equals('LIKE')">${wildcardEscapeClause}</when>
@@ -933,7 +936,7 @@
                   #{queryVar.longValue}
                 </if>
                 <if test="queryVar.doubleValue != null">
-                  and A${index}.DOUBLE_ 
+                  and A${index}.DOUBLE_
                   <include refid="executionVariableOperator" />
                   #{queryVar.doubleValue}
                 </if>
@@ -946,13 +949,13 @@
                     <otherwise>
                       and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
                     </otherwise>
-                  </choose>          
+                  </choose>
                 </if>
             </otherwise>
         </choose>
       </foreach>
       <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
-        and 
+        and
         <trim prefix="(" prefixOverrides="OR" suffix=")">
           <if test="orQueryObject.taskId != null">
             RES.ID_ = #{orQueryObject.taskId}
@@ -1003,7 +1006,7 @@
           </if>
           <if test="orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0">
             or DEPLOY_P_OR${orIndex}.DEPLOYMENT_ID_ IN
-            <foreach item="deployment" index="index" collection="orQueryObject.deploymentIds" 
+            <foreach item="deployment" index="index" collection="orQueryObject.deploymentIds"
                      open="(" separator="," close=")">
               #{deployment}
             </foreach>
@@ -1013,7 +1016,7 @@
           </if>
           <if test="orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0">
             or DEPLOY_C_OR${orIndex}.DEPLOYMENT_ID_ IN
-            <foreach item="deployment" index="index" collection="orQueryObject.cmmnDeploymentIds" 
+            <foreach item="deployment" index="index" collection="orQueryObject.cmmnDeploymentIds"
                      open="(" separator="," close=")">
               #{deployment}
             </foreach>
@@ -1023,7 +1026,7 @@
           </if>
           <if test="orQueryObject.processInstanceIds != null &amp;&amp; orQueryObject.processInstanceIds.size() &gt; 0">
             or RES.PROC_INST_ID_ IN
-            <foreach item="processInstance" index="index" collection="orQueryObject.processInstanceIds" 
+            <foreach item="processInstance" index="index" collection="orQueryObject.processInstanceIds"
                      open="(" separator="," close=")">
               #{processInstance}
             </foreach>
@@ -1059,13 +1062,13 @@
             or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
           </if>
           <if test="orQueryObject.processInstanceIdWithChildren != null">
-            or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
-                ELINK.SCOPE_ID_ = #{orQueryObject.processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and 
+            or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
+                ELINK.SCOPE_ID_ = #{orQueryObject.processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and
                 ELINK.REF_SCOPE_ID_ = RES.ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
           </if>
           <if test="orQueryObject.caseInstanceIdWithChildren != null">
-            or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
-                ELINK.SCOPE_ID_ = #{orQueryObject.caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and 
+            or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
+                ELINK.SCOPE_ID_ = #{orQueryObject.caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and
                 ELINK.REF_SCOPE_ID_ = RES.ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
           </if>
           <if test="orQueryObject.taskName != null">
@@ -1129,7 +1132,7 @@
           </if>
           <if test="orQueryObject.taskAssigneeIds != null &amp;&amp; orQueryObject.taskAssigneeIds.size() &gt; 0">
 	        or RES.ASSIGNEE_ IN
-	        <foreach item="assigneeId" index="index" collection="orQueryObject.taskAssigneeIds" 
+	        <foreach item="assigneeId" index="index" collection="orQueryObject.taskAssigneeIds"
 	                 open="(" separator="," close=")">
 	          #{assigneeId}
 	        </foreach>
@@ -1203,6 +1206,9 @@
           <if test="orQueryObject.withoutTenantId">
             or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
           </if>
+          <if test="orQueryObject.withoutDeleteReason">
+            or (RES.DELETE_REASON_ = '' or RES.DELETE_REASON_ is null)
+          </if>
           <if test="orQueryObject.candidateUser != null || orQueryObject.candidateGroups != null">
             or (EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TYPE_ = 'candidate' and LINK.TASK_ID_ = RES.ID_
                 and
@@ -1253,7 +1259,7 @@
                         and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
                     </if>
                     <if test="queryVar.local">
-                        and RES.ID_ = TASK_ID_ 
+                        and RES.ID_ = TASK_ID_
                     </if>
                     )
                 </when>
@@ -1264,7 +1270,7 @@
                         and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
                     </if>
                     <if test="queryVar.local">
-                        and RES.ID_ = TASK_ID_ 
+                        and RES.ID_ = TASK_ID_
                     </if>
                     )
                 </when>
@@ -1295,11 +1301,11 @@
                       <otherwise>
                         and A_${orLocal}OR${orIndex}.TEXT_
                       </otherwise>
-                    </choose> 
+                    </choose>
                     <choose>
                         <when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                         <otherwise><include refid="executionVariableOperator" /></otherwise>
-                    </choose>          
+                    </choose>
                     #{queryVar.textValue}
                     <choose>
                       <when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
@@ -1310,7 +1316,7 @@
                     <choose>
                       <when test="queryVar.operator.equals('LIKE')">LIKE</when>
                       <otherwise><include refid="executionVariableOperator" /></otherwise>
-                    </choose>          
+                    </choose>
                     #{queryVar.textValue2}
                     <choose>
                       <when test="queryVar.operator.equals('LIKE')">${wildcardEscapeClause}</when>
@@ -1322,7 +1328,7 @@
                     #{queryVar.longValue}
                   </if>
                   <if test="queryVar.doubleValue != null">
-                    and A_OR${orIndex}_${index}.DOUBLE_ 
+                    and A_OR${orIndex}_${index}.DOUBLE_
                     <include refid="executionVariableOperator" />
                     #{queryVar.doubleValue}
                   </if>
@@ -1335,7 +1341,7 @@
                       <otherwise>
                         and A_${orLocal}OR${orIndex}.TEXT_ is null and A_${orLocal}OR${orIndex}.TEXT2_ is null and A_${orLocal}OR${orIndex}.LONG_ is null and A_${orLocal}OR${orIndex}.DOUBLE_ is null and A_${orLocal}OR${orIndex}.BYTEARRAY_ID_ is null
                       </otherwise>
-                    </choose>          
+                    </choose>
                   </if>
               </otherwise>
              </choose>
@@ -1345,7 +1351,7 @@
       </foreach>
     </where>
   </sql>
-  
+
   <sql id="executionVariableOperator">
     <choose>
       <when test="queryVar.operator.equals('EQUALS')">=</when>
@@ -1362,7 +1368,7 @@
   <select id="selectHistoricTaskInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicTaskInstanceResultMap">
     <include refid="org.flowable.task.service.db.common.selectByNativeQuery"/>
   </select>
-  
+
   <select id="selectHistoricTaskInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>

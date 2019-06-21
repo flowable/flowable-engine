@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,7 @@ import org.flowable.task.api.TaskInfoQuery;
 
 /**
  * Allows programmatic querying for {@link HistoricTaskInstance}s.
- * 
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  */
@@ -70,6 +70,11 @@ public interface HistoricTaskInstanceQuery extends TaskInfoQuery<HistoricTaskIns
      * Only select select historic task instances which are completed after the given date
      */
     HistoricTaskInstanceQuery taskCompletedAfter(Date endDate);
+
+    /**
+     * Only select historic tasks without a delete reason (completed normally)
+     */
+    HistoricTaskInstanceQuery taskWithoutDeleteReason();
 
     // ORDERING
 
