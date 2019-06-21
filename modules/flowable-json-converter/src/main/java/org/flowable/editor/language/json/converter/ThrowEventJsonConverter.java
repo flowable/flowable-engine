@@ -68,6 +68,9 @@ public class ThrowEventJsonConverter extends BaseBpmnJsonConverter {
     @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         ThrowEvent throwEvent = (ThrowEvent) baseElement;
+        if (throwEvent.isAsynchronous()) {
+            propertiesNode.put(PROPERTY_ASYNCHRONOUS, true);
+        }
         addEventProperties(throwEvent, propertiesNode);
     }
 
@@ -75,6 +78,10 @@ public class ThrowEventJsonConverter extends BaseBpmnJsonConverter {
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         ThrowEvent throwEvent = new ThrowEvent();
         String stencilId = BpmnJsonConverterUtil.getStencilId(elementNode);
+        boolean isAsync = getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, elementNode);
+        if (isAsync) {
+            throwEvent.setAsynchronous(isAsync);
+        }
         if (STENCIL_EVENT_THROW_SIGNAL.equals(stencilId)) {
             convertJsonToSignalDefinition(elementNode, throwEvent);
         } else if (STENCIL_EVENT_THROW_ESCALATION.equals(stencilId)) {

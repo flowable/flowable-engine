@@ -489,6 +489,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         if (eventDefinitions.size() == 1) {
 
             EventDefinition eventDefinition = eventDefinitions.get(0);
+            if (eventDefinition instanceof SignalEventDefinition && ((SignalEventDefinition) eventDefinition).isAsync()) {
+                event.setAsynchronous(true);
+            }
             if (eventDefinition instanceof ErrorEventDefinition) {
                 ErrorEventDefinition errorDefinition = (ErrorEventDefinition) eventDefinition;
                 if (StringUtils.isNotEmpty(errorDefinition.getErrorCode())) {
