@@ -20,15 +20,20 @@ import org.flowable.bpmn.model.Activity;
 
 public class FailedJobRetryCountExport implements BpmnXMLConstants {
 
-    public static void writeFailedJobRetryCount(Activity activity, XMLStreamWriter xtw) throws Exception {
+    public static boolean writeFailedJobRetryCount(Activity activity, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         String failedJobRetryCycle = activity.getFailedJobRetryTimeCycleValue();
         if (failedJobRetryCycle != null) {
 
             if (StringUtils.isNotEmpty(failedJobRetryCycle)) {
+                if (!didWriteExtensionStartElement) {
+                    xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                    didWriteExtensionStartElement = true;
+                }
                 xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, FAILED_JOB_RETRY_TIME_CYCLE, FLOWABLE_EXTENSIONS_NAMESPACE);
                 xtw.writeCharacters(failedJobRetryCycle);
                 xtw.writeEndElement();
             }
         }
+        return didWriteExtensionStartElement;
     }
 }
