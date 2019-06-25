@@ -297,8 +297,7 @@
             "EXPRESSION": "Expression",
             "SCRIPT": "Script",
             "RESULT": "Result",
-            "VARIABLES": "Variables",
-            "LOG": "Log"
+            "VARIABLES": "Variables"
         },
         "FILTER": {
             "CREATED-DESC": "Newest first",
@@ -351,7 +350,6 @@
             "SHOW-DIAGRAM": "Show diagram",
             "CANCEL": "Cancel case",
             "DELETE": "Delete case",
-            "GENERATE-TEST": "Generate test",
             "TRIGGER-USER-EVENT-LISTENER": "Trigger",
             "AUDIT-LOG": "Audit Log"
         },

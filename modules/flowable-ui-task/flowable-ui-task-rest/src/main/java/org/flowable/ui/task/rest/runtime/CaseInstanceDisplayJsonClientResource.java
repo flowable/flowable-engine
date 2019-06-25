@@ -95,11 +95,17 @@ public class CaseInstanceDisplayJsonClientResource {
         }
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new BadRequestException("No case instance found with id " + caseInstanceId);
-        }
+        CmmnModel pojoModel;
 
-        CmmnModel pojoModel = cmmnRepositoryService.getCmmnModel(caseInstance.getCaseDefinitionId());
+        if (caseInstance == null) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+            if (historicCaseInstance == null) {
+                throw new BadRequestException("No case instance found with id " + caseInstanceId);
+            }
+            pojoModel = cmmnRepositoryService.getCmmnModel(historicCaseInstance.getCaseDefinitionId());
+        } else {
+            pojoModel = cmmnRepositoryService.getCmmnModel(caseInstance.getCaseDefinitionId());
+        }
 
         if (pojoModel == null || pojoModel.getLocationMap().isEmpty()) {
             throw new InternalServerErrorException("Case definition could not be found with id " + caseInstance.getCaseDefinitionId());

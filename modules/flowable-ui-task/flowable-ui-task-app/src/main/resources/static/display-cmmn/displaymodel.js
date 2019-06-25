@@ -345,7 +345,6 @@ function _breakpointRestCall(actionType, elementId) {
         }),
         success: function () {
             paper.clear();
-            angular.element(document.querySelector('#cmmnModel')).scope().getEventLog();
             _showCmmnDiagram();
         }
     })
@@ -433,10 +432,10 @@ function _drawContinuePlanItem(x, y , planItemId, elementId) {
                     scope.getPlanItems();
                     scope.model.variables = [];
                     scope.loadVariables();
-                    scope.getEventLog();
 
                     // Reload case Tasks after continue
                     scope.loadCaseTasks();
+                    scope.getCaseInstance(scope.model.caseInstance.id);
                     _showCmmnDiagram();
                 },
                 error: function () {

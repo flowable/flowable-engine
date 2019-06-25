@@ -324,7 +324,6 @@ angular.module('flowableApp')
                 $scope.model.isDebuggerEnabled = data;
                 $scope.loadVariables();
                 $scope.getPlanItems();
-                $scope.getEventLog();
             });
 
             $scope.model.planItems = undefined;
@@ -335,8 +334,7 @@ angular.module('flowableApp')
             $scope.tabData = {
                 tabs: [
                     {id: 'variables', name: 'CASE.TITLE.VARIABLES'},
-                    {id: 'planItems', name: 'CASE.TITLE.PLANITEMS'},
-                    {id: 'log', name: 'CASE.TITLE.LOG'}
+                    {id: 'planItems', name: 'CASE.TITLE.PLANITEMS'}
                 ],
                 activeTab: 'variables'
             };
@@ -481,26 +479,12 @@ angular.module('flowableApp')
                 }
             };
 
-            $scope.getEventLog = function () {
-                if ($scope.model.isDebuggerEnabled) {
-                    $http({
-                        method: 'GET',
-                        url: '../app/rest/cmmn-debugger/eventlog/' + $scope.model.caseInstance.id
-                    }).success(function (data) {
-                        $scope.gridLog.data = data;
-                        if ($scope.gridLogApi) {
-                            $scope.gridLogApi.core.refresh();
-                        }
-                    });
-                }
-            };
-
             $scope.evaluateExpression = function () {
                 if ($scope.model.isDebuggerEnabled) {
                     $scope.model.errorMessage = '';
                     $scope.model.result = '';
 
-                    var planItem = $scope.model.selectedPlanItemId;
+                    var planItem = $scope.model.selectedPlanItem;
                     $http({
                         method: 'POST',
                         url: '../app/rest/cmmn-debugger/evaluate/expression/' + planItem,
@@ -517,7 +501,7 @@ angular.module('flowableApp')
                 if ($scope.model.isDebuggerEnabled) {
                     $scope.model.errorMessage = '';
 
-                    var planItem = $scope.model.selectedPlanItemId;
+                    var planItem = $scope.model.selectedPlanItem;
                     $http({
                         method: 'POST',
                         url: '../app/rest/cmmn-debugger/evaluate/' + $scope.model.scriptLanguage + '/' + planItem,

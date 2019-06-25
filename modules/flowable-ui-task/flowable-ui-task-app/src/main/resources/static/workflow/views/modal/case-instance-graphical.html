@@ -58,16 +58,7 @@
                             </div>
 
                             <div class="grid-wrapper grid-wrapper-compact"
-                                 ng-if="gridLog && tabData.activeTab == tabData.tabs[2].id">
-                                <div class="ui-grid-contents-wrapper">
-                                    <div id="logUi" ui-grid="gridLog" style="height: 200px; width: 100%"
-                                         ui-grid-selection
-                                         ui-grid-auto-resize></div>
-                                </div>
-
-                            </div>
-                            <div class="grid-wrapper grid-wrapper-compact"
-                                 ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[3].id">
+                                 ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[2].id">
                                 <div class="pull-left" ng-show="model.selectedPlanItemId">
                                     <label for="expressionPlanItemId">{{'CASE.TITLE.PLANITEM' | translate}}</label>
                                     <span id="expressionPlanItemId"
@@ -91,7 +82,7 @@
                                 </div>
                             </div>
                             <div class="grid-wrapper grid-wrapper-compact"
-                                 ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[4].id">
+                                 ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[3].id">
                                 <div class="pull-left" ng-show="model.selectedPlanItemId">
                                     <label for="scriptPlanItemId">{{'CASE.TITLE.PLANITEM' | translate}}</label>
                                     <span id="scriptPlanItemId"
@@ -114,12 +105,12 @@
                     </div>
                 </div>
 
-                <div class="pull-left" ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[3].id">
+                <div class="pull-left" ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[2].id">
                     <button type="button" class="btn btn-sm btn-default" ng-click="evaluateExpression()">
                         {{'CASE.ACTION.EXECUTE' | translate}}
                     </button>
                 </div>
-                <div class="pull-left" ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[4].id">
+                <div class="pull-left" ng-if="!model.caseInstance.ended && tabData.activeTab == tabData.tabs[3].id">
                     <button type="button" class="btn btn-sm btn-default" ng-click="evaluateScript()">
                         {{'CASE.ACTION.EXECUTE' | translate}}
                     </button>
