@@ -17,7 +17,8 @@ import org.junit.Test;
  */
 public class DebugStartPlanItemInstanceOperationTest extends CustomCmmnConfigurationFlowableTestCase {
 
-    private TestCmmnDebugger debugger;
+    protected static TestCmmnDebugger debugger;
+
     @Override
     protected String getEngineName() {
         return "DebugCmmnEngineTest";
