@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
@@ -94,7 +95,7 @@ public class FormModelTest extends AbstractFlowableFormTest {
     @Test
     @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form", tenantId="defaultFlowable")
     public void getSimpleFormModelWithFallbackCustomTenantWithVariables() throws Exception {
-        String originalDefaultTenantValue = formEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantValue = formEngineConfiguration.getDefaultTenantProvider();
         formEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
             String formDefinitionId = repositoryService.getFormModelByKey("form1", "flowable", true).getId();
@@ -108,14 +109,14 @@ public class FormModelTest extends AbstractFlowableFormTest {
             assertFormModel(formInfo);
             
         } finally {
-            formEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            formEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
         }
     }
     
     @Test
     @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form", tenantId="flowable")
     public void getSimpleFormModelWithFallbackCustomTenantNotExistingWithVariables() throws Exception {
-        String originalDefaultTenantValue = formEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = formEngineConfiguration.getDefaultTenantProvider();
         formEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
             try {
@@ -138,14 +139,14 @@ public class FormModelTest extends AbstractFlowableFormTest {
             }
             
         } finally {
-            formEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            formEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
         }
     }
     
     @Test
     @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form", tenantId="defaultFlowable")
     public void getSimpleFormModelWithGlobalFallbackCustomTenantWithVariables() throws Exception {
-        String originalDefaultTenantValue = formEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = formEngineConfiguration.getDefaultTenantProvider();
         formEngineConfiguration.setFallbackToDefaultTenant(true);
         formEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
@@ -161,14 +162,14 @@ public class FormModelTest extends AbstractFlowableFormTest {
             
         } finally {
             formEngineConfiguration.setFallbackToDefaultTenant(false);
-            formEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            formEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
         }
     }
     
     @Test
     @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form", tenantId="flowable")
     public void getSimpleFormModelWithGlobalFallbackCustomTenantNotExistingWithVariables() throws Exception {
-        String originalDefaultTenantValue = formEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = formEngineConfiguration.getDefaultTenantProvider();
         formEngineConfiguration.setFallbackToDefaultTenant(true);
         formEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
@@ -193,7 +194,7 @@ public class FormModelTest extends AbstractFlowableFormTest {
             
         } finally {
             formEngineConfiguration.setFallbackToDefaultTenant(false);
-            formEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            formEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
         }
     }
     

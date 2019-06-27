@@ -41,6 +41,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -793,7 +794,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             tenantId("defaultFlowable").
             deploy();
         
-        String originalDefaultTenantValue = this.processEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = this.processEngineConfiguration.getDefaultTenantProvider();
         this.processEngineConfiguration.setFallbackToDefaultTenant(true);
         this.processEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         
@@ -822,7 +823,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             
         } finally {
             this.processEngineConfiguration.setFallbackToDefaultTenant(false);
-            this.processEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            this.processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
@@ -838,7 +839,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             tenantId("tenant1").
             deploy();
         
-        String originalDefaultTenantValue = this.processEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = this.processEngineConfiguration.getDefaultTenantProvider();
         this.processEngineConfiguration.setFallbackToDefaultTenant(true);
         this.processEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         
@@ -851,7 +852,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             
         } finally {
             this.processEngineConfiguration.setFallbackToDefaultTenant(false);
-            this.processEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            this.processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }

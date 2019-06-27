@@ -328,10 +328,11 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         } else {
             processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
             if (processDefinition == null && ((this.fallbackToDefaultTenant != null && this.fallbackToDefaultTenant) || processEngineConfiguration.isFallbackToDefaultTenant())) {
-                
-                if (StringUtils.isNotEmpty(processEngineConfiguration.getDefaultTenantValue())) {
+
+                String defaultTenant = processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);
+                if (StringUtils.isNotEmpty(defaultTenant)) {
                     processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(
-                                    processDefinitionKey, processEngineConfiguration.getDefaultTenantValue());
+                                    processDefinitionKey, defaultTenant);
                 } else {
                     processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
                 }
