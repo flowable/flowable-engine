@@ -28,7 +28,7 @@
 		<spring.boot.version>2.1.6.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
-		<junit.jupiter.version>5.3.2</junit.jupiter.version>
+		<junit.jupiter.version>5.5.0</junit.jupiter.version>
 		<mockito.version>2.27.0</mockito.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
