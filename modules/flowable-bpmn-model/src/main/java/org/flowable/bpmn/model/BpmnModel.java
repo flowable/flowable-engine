@@ -448,7 +448,7 @@ public class BpmnModel {
     }
     
     public void addEscalation(Escalation escalation) {
-        if (StringUtils.isNotEmpty(escalation.getEscalationCode()) && StringUtils.isNotEmpty(escalation.getEscalationCode())) {
+        if (StringUtils.isNotEmpty(escalation.getEscalationCode())) {
             escalationMap.put(escalation.getEscalationCode(), escalation);
         }
     }

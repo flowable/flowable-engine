@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.listener;
 
+import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -85,6 +86,21 @@ public class CmmnListenerNotificationHelper {
             lifecycleListener = listenerFactory.createExpressionLifeCycleListener(listener);
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
             lifecycleListener = listenerFactory.createDelegateExpressionLifeCycleListener(listener);
+        }
+
+        return lifecycleListener;
+    }
+
+    protected CaseInstanceLifecycleListener createCaseLifecycleListener(FlowableListener listener) {
+        CaseInstanceLifecycleListener lifecycleListener = null;
+
+        CmmnListenerFactory listenerFactory = CommandContextUtil.getCmmnEngineConfiguration().getListenerFactory();
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(listener.getImplementationType())) {
+            lifecycleListener = listenerFactory.createClassDelegateCaseLifeCycleListener(listener);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
+            lifecycleListener = listenerFactory.createExpressionCaseLifeCycleListener(listener);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
+            lifecycleListener = listenerFactory.createDelegateExpressionCaseLifeCycleListener(listener);
         }
 
         return lifecycleListener;

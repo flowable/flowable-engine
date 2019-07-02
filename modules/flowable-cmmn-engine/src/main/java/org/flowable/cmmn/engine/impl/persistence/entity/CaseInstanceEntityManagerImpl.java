@@ -199,4 +199,11 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         caseInstanceDataManager.clearLockTime(caseInstanceId);
     }
 
+    @Override
+    public void updateCaseInstanceBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey) {
+        if (businessKey != null) {
+            caseInstanceEntity.setBusinessKey(businessKey);
+            getCmmnEngineConfiguration().getCmmnHistoryManager().recordUpdateBusinessKey(caseInstanceEntity, businessKey);
+        }
+    }
 }

@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.listener;
 
+import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.FlowableListener;
@@ -59,6 +60,22 @@ public class DefaultCmmnListenerFactory implements CmmnListenerFactory {
     @Override
     public PlanItemInstanceLifecycleListener createDelegateExpressionLifeCycleListener(FlowableListener listener) {
         return new DelegateExpressionPlanItemLifecycleListener(listener.getSourceState(), listener.getTargetState(),
+            expressionManager.createExpression(listener.getImplementation()), listener.getFieldExtensions());
+    }
+
+    @Override
+    public CaseInstanceLifecycleListener createClassDelegateCaseLifeCycleListener(FlowableListener listener) {
+        return classDelegateFactory.create(listener.getImplementation(), listener.getFieldExtensions());
+    }
+
+    @Override
+    public CaseInstanceLifecycleListener createExpressionCaseLifeCycleListener(FlowableListener listener) {
+        return new ExpressionCaseLifecycleListener(listener.getSourceState(), listener.getTargetState(), expressionManager.createExpression(listener.getImplementation()));
+    }
+
+    @Override
+    public CaseInstanceLifecycleListener createDelegateExpressionCaseLifeCycleListener(FlowableListener listener) {
+        return new DelegateExpressionCaseLifecycleListener(listener.getSourceState(), listener.getTargetState(),
             expressionManager.createExpression(listener.getImplementation()), listener.getFieldExtensions());
     }
 

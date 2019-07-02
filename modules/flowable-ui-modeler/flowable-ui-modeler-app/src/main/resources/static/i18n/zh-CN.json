@@ -679,6 +679,12 @@
           "DESCRIPTION" : "定义升级名称"
         }
       },
+      "CONDITIONALEVENTPACKAGE" : {
+        "CONDITION" : {
+          "TITLE" : "条件表达式",
+          "DESCRIPTION" : "定义条件表达式."
+        }
+      },
       "CANCELACTIVITYPACKAGE" : {
         "CANCELACTIVITY" : {
           "TITLE" : "取消活动",
@@ -854,6 +860,10 @@
         "TITLE" : "消息启动事件",
         "DESCRIPTION" : "通过消息触发启动事件"
       },
+      "STARTCONDITIONALEVENT" : {
+        "TITLE" : "条件启动事件",
+        "DESCRIPTION" : "通过条件触发启动事件"
+      },
       "STARTERROREVENT" : {
         "TITLE" : "异常启动事件",
         "DESCRIPTION" : "用于捕获BPMN抛出的异常启动事件"
@@ -919,7 +929,7 @@
         "DESCRIPTION" : "子流程范围"
       },
       "COLLAPSEDSUBPROCESS" : {
-        "TITLE" : "崩溃的子流程",
+        "TITLE" : "折叠子流程",
         "DESCRIPTION" : "子流程范围"
       },
       "EVENTSUBPROCESS" : {
@@ -945,6 +955,10 @@
       "EVENTGATEWAY" : {
         "TITLE" : "事件网关",
         "DESCRIPTION" : "一个事件网关"
+      },
+      "BOUNDARYCONDITIONALEVENT" : {
+        "TITLE" : "边界条件事件",
+        "DESCRIPTION" : "捕获指定条件的边界事件"
       },
       "BOUNDARYERROREVENT" : {
         "TITLE" : "边界错误事件",
@@ -985,6 +999,10 @@
       "CATCHMESSAGEEVENT" : {
         "TITLE" : "中间消息捕获事件",
         "DESCRIPTION" : "带有消息触发器的中间捕获事件"
+      },
+      "CATCHCONDITIONALEVENT" : {
+        "TITLE" : "中间条件捕获事件",
+        "DESCRIPTION" : "带有条件触发器的中间捕获事件"
       },
       "THROWNONEEVENT" : {
         "TITLE" : "中间无抛出事件",

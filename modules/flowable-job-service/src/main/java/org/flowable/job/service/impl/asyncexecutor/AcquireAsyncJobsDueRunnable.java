@@ -62,13 +62,13 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 millisToWait = acquireAndExecuteJobs(commandExecutor, remainingCapacity);
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("acquired and queued new jobs; sleeping for {} ms", millisToWait);
+                    LOGGER.debug("acquired and queued new jobs for engine {}; sleeping for {} ms", asyncExecutor.getJobServiceConfiguration().getEngineName(), millisToWait);
                 }
             } else {
                 millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("queue is full; sleeping for {} ms", millisToWait);
+                    LOGGER.debug("queue is full for engine {}; sleeping for {} ms", asyncExecutor.getJobServiceConfiguration().getEngineName(), millisToWait);
                 }
             }
 
@@ -76,7 +76,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 sleep(millisToWait);
             }
         }
-        LOGGER.info("stopped async job due acquisition");
+        LOGGER.info("stopped async job due acquisition for engine {}", asyncExecutor.getJobServiceConfiguration().getEngineName());
     }
 
     protected long acquireAndExecuteJobs(CommandExecutor commandExecutor, int remainingCapacity) {
@@ -85,7 +85,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
             List<JobInfoEntity> rejectedJobs = offerJobs(acquiredJobs);
 
-            LOGGER.debug("Jobs acquired: {}, rejected: {}", acquiredJobs.size(), rejectedJobs.size());
+            LOGGER.debug("Jobs acquired: {}, rejected: {}, for engine {}", acquiredJobs.size(), rejectedJobs.size(), asyncExecutor.getJobServiceConfiguration().getEngineName());
             if (rejectedJobs.size() > 0) {
                 // some jobs were rejected, so the queue was full; wait until attempting to acquire more.
                 return asyncExecutor.getDefaultQueueSizeFullWaitTimeInMillis();
@@ -100,11 +100,12 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 LOGGER.debug("Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, "
                         + "this exception means that this thread tried to acquire a due async job, which already was acquired by another async executor acquisition thread."
                         + "This is expected behavior in a clustered environment. "
-                        + "You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. " + "Exception message: {}",
+                        + "You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. "
+                        + "for engine " + asyncExecutor.getJobServiceConfiguration().getEngineName() + ". Exception message: {}",
                         optimisticLockingException.getMessage());
             }
         } catch (Throwable e) {
-            LOGGER.error("exception during async job acquisition: {}", e.getMessage(), e);
+            LOGGER.error("exception for engine {} during async job acquisition: {}", asyncExecutor.getJobServiceConfiguration().getEngineName(), e.getMessage(), e);
         }
 
         return asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
@@ -134,7 +135,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         if (millisToWait > 0) {
             try {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("async job acquisition thread sleeping for {} millis", millisToWait);
+                    LOGGER.debug("async job acquisition for engine {}, thread sleeping for {} millis", asyncExecutor.getJobServiceConfiguration().getEngineName(), millisToWait);
                 }
                 synchronized (MONITOR) {
                     if (!isInterrupted) {
@@ -144,11 +145,11 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 }
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("async job acquisition thread woke up");
+                    LOGGER.debug("async job acquisition for engine {}, thread woke up", asyncExecutor.getJobServiceConfiguration().getEngineName());
                 }
             } catch (InterruptedException e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("async job acquisition wait interrupted");
+                    LOGGER.debug("async job acquisition for engine {}, wait interrupted", asyncExecutor.getJobServiceConfiguration().getEngineName());
                 }
             } finally {
                 isWaiting.set(false);

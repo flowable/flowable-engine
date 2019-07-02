@@ -16,10 +16,13 @@ import java.util.List;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemJavaDelegateActivityBehavior;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -33,7 +36,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 /**
  * @author Joram Barrez
  */
-public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, PlanItemInstanceLifecycleListener {
+public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, PlanItemInstanceLifecycleListener, CaseInstanceLifecycleListener {
 
     protected String sourceState;
     protected String targetState;
@@ -94,6 +97,12 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
         planItemLifeCycleListenerInstance.stateChanged(planItemInstance, oldState, newState);
     }
 
+    @Override
+    public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
+        CaseInstanceLifecycleListener caseLifeCycleListenerInstance = getCaseLifeCycleListenerInstance(caseInstance);
+        caseLifeCycleListenerInstance.stateChanged(caseInstance, oldState, newState);
+    }
+
     protected PlanItemInstanceLifecycleListener getPlanItemLifeCycleListenerInstance(PlanItemInstance planItemInstance) {
         Object delegateInstance = instantiate(className);
         applyFieldExtensions(fieldExtensions, delegateInstance, (DelegatePlanItemInstance) planItemInstance, false);
@@ -101,6 +110,16 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
             return (PlanItemInstanceLifecycleListener) delegateInstance;
         } else {
             throw new FlowableIllegalArgumentException(delegateInstance.getClass().getName() + " doesn't implement " + PlanItemInstanceLifecycleListener.class);
+        }
+    }
+
+    protected CaseInstanceLifecycleListener getCaseLifeCycleListenerInstance(CaseInstance caseInstance) {
+        Object delegateInstance = instantiate(className);
+        applyFieldExtensions(fieldExtensions, delegateInstance, (CaseInstanceEntity) caseInstance, false);
+        if (delegateInstance instanceof CaseInstanceLifecycleListener) {
+            return (CaseInstanceLifecycleListener) delegateInstance;
+        } else {
+            throw new FlowableIllegalArgumentException(delegateInstance.getClass().getName() + " doesn't implement " + CaseInstanceLifecycleListener.class);
         }
     }
 

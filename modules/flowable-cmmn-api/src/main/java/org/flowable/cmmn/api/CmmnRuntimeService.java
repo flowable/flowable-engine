@@ -203,5 +203,14 @@ public interface CmmnRuntimeService {
      * Create a {@link ChangePlanItemStateBuilder}, that allows to set various options for changing the state of a process instance.
      */
     ChangePlanItemStateBuilder createChangePlanItemStateBuilder();
-    
+
+    /**
+     * Updates the business key for the provided case instance
+     *
+     * @param caseInstanceId
+     *     id of the case instance to set the business key, cannot be null
+     * @param businessKey
+     *     new businessKey value
+     */
+    void updateBusinessKey(String caseInstanceId, String businessKey);
 }

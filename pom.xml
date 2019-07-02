@@ -18,14 +18,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<spring.framework.version>5.1.7.RELEASE</spring.framework.version>
+		<spring.framework.version>5.1.8.RELEASE</spring.framework.version>
 		<spring.security.version>5.1.5.RELEASE</spring.security.version>
 		<jackson.version>2.9.9</jackson.version>
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.24.0</camel.version>
 		<cxf.version>3.3.2</cxf.version>
 		<slf4j.version>1.7.26</slf4j.version>
-		<spring.boot.version>2.1.5.RELEASE</spring.boot.version>
+		<spring.boot.version>2.1.6.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
 		<junit.jupiter.version>5.3.2</junit.jupiter.version>
@@ -121,7 +121,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.5.8</version>
+				<version>4.5.9</version>
 			</dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -131,7 +131,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.5.8</version>
+				<version>4.5.9</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.jdbc</groupId>
@@ -698,7 +698,6 @@
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
 				<version>5.3.5.Final</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
@@ -914,7 +913,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>27.1-jre</version>
+				<version>28.0-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>

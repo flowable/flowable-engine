@@ -15,6 +15,7 @@ package org.flowable.management.jmx;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -171,7 +172,7 @@ public class DeploymentsJMXClientTest {
         // definition with version 2, first check it with API
         assertEquals(1, repositoryService.createDeploymentQuery().count());
 
-        assertTrue(!repositoryService.createDeploymentQuery().singleResult().getId().equals(firstDeploymentId));
+        assertNotEquals(repositoryService.createDeploymentQuery().singleResult().getId(), firstDeploymentId);
 
         // check if it is also affected in returned results.
 
@@ -179,7 +180,7 @@ public class DeploymentsJMXClientTest {
         assertNotNull(deployments);
         assertEquals(1, deployments.size());
         assertEquals(3, deployments.get(0).size());
-        assertTrue(!deployments.get(0).get(0).equals(firstDeploymentId));
+        assertNotEquals(deployments.get(0).get(0), firstDeploymentId);
 
     }
 

@@ -284,8 +284,6 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithStage").start();
 
-        final String baseUrl = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCES);
-
         //There should be 6 planItems
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE_QUERY));
         ObjectNode requestNode = objectMapper.createObjectNode();
