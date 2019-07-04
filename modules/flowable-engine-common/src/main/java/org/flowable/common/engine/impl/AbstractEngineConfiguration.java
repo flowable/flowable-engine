@@ -259,11 +259,11 @@ public abstract class AbstractEngineConfiguration {
      * Set to true if by default lookups should fallback to the default tenant (an empty string by default or a defined tenant value)
      */
     protected boolean fallbackToDefaultTenant;
-    
+
     /**
-     * Default tenant value that is used when looking up definitions when the global or local fallback to default tenant value is true
+     * Default tenant provider that is executed when looking up definitions, in case the global or local fallback to default tenant value is true
      */
-    protected String defaultTenantValue = NO_TENANT_ID;
+    protected DefaultTenantProvider defaultTenantProvider = (tenantId, scope, scopeKey) -> NO_TENANT_ID;
 
     /**
      * Enables the MyBatis plugin that logs the execution time of sql statements.
@@ -1477,12 +1477,26 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    /**
+     * @return name of the default tenant
+     * @deprecated use {@link AbstractEngineConfiguration#getDefaultTenantProvider()} instead
+     */
+    @Deprecated
     public String getDefaultTenantValue() {
-        return defaultTenantValue;
+        return getDefaultTenantProvider().getDefaultTenant(null, null, null);
     }
 
     public AbstractEngineConfiguration setDefaultTenantValue(String defaultTenantValue) {
-        this.defaultTenantValue = defaultTenantValue;
+        this.defaultTenantProvider = (tenantId, scope, scopeKey) -> defaultTenantValue;
+        return this;
+    }
+
+    public DefaultTenantProvider getDefaultTenantProvider() {
+        return defaultTenantProvider;
+    }
+
+    public AbstractEngineConfiguration setDefaultTenantProvider(DefaultTenantProvider defaultTenantProvider) {
+        this.defaultTenantProvider = defaultTenantProvider;
         return this;
     }
 

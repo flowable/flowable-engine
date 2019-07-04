@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
@@ -228,7 +229,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) processEngineConfiguration.getEngineConfigurations().get(
                         EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         
-        String originalDefaultTenantValue = dmnEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = dmnEngineConfiguration.getDefaultTenantProvider();
         dmnEngineConfiguration.setFallbackToDefaultTenant(true);
         dmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         
@@ -258,7 +259,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             
         } finally {
             dmnEngineConfiguration.setFallbackToDefaultTenant(false);
-            dmnEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            dmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
             this.repositoryService.deleteDeployment(deployment.getId(), true);
             deleteAllDmnDeployments();
         }
