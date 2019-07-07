@@ -37,12 +37,12 @@ public class ProcessInstanceResource {
     @Autowired
     protected FlowableProcessInstanceService processInstanceService;
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/{processInstanceId}", produces = "application/json")
     public ProcessInstanceRepresentation getProcessInstance(@PathVariable String processInstanceId, HttpServletResponse response) {
         return processInstanceService.getProcessInstance(processInstanceId, response);
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/{processInstanceId}/start-form", produces = "application/json")
     public FormModelRepresentation getProcessInstanceStartForm(@PathVariable String processInstanceId, HttpServletResponse response) {
         FormInfo formInfo = processInstanceService.getProcessInstanceStartForm(processInstanceId, response);
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();

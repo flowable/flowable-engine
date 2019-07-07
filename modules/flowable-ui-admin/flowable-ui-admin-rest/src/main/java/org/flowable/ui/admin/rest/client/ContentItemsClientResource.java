@@ -22,7 +22,6 @@ import org.flowable.ui.admin.service.engine.ContentItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +43,7 @@ public class ContentItemsClientResource extends AbstractClientResource {
     /**
      * GET a list of content items.
      */
-    @RequestMapping(value = "/rest/admin/content-items", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/content-items", produces = "application/json")
     public JsonNode listFormDefinitions(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
@@ -54,7 +53,7 @@ public class ContentItemsClientResource extends AbstractClientResource {
     /**
      * GET process instance's list of content items.
      */
-    @RequestMapping(value = "/rest/admin/process-instance-content-items/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-instance-content-items/{processInstanceId}", produces = "application/json")
     public JsonNode getProcessDefinitionForms(@PathVariable String processInstanceId, HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);
 

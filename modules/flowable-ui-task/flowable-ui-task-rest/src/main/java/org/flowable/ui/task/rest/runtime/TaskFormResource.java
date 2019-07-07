@@ -37,7 +37,7 @@ public class TaskFormResource {
     @Autowired
     protected FlowableTaskFormService taskFormService;
 
-    @RequestMapping(value = "/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/{taskId}", produces = "application/json")
     public FormModelRepresentation getTaskForm(@PathVariable String taskId) {
         FormInfo formInfo = taskFormService.getTaskForm(taskId);
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();

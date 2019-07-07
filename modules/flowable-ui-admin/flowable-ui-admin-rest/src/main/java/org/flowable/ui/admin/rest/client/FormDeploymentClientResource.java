@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.ui.admin.domain.EndpointType;
@@ -29,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * @author Yvo Swillens
  */
@@ -41,7 +41,7 @@ public class FormDeploymentClientResource extends AbstractClientResource {
     @Autowired
     protected FormDeploymentService clientService;
 
-    @RequestMapping(value = "/rest/admin/form-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/form-deployments/{deploymentId}", produces = "application/json")
     public JsonNode getDeployment(@PathVariable String deploymentId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);

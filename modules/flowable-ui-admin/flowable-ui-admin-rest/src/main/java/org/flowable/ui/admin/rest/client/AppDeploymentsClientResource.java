@@ -49,7 +49,7 @@ public class AppDeploymentsClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/app-deployments -> get a list of form deployments.
      */
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(produces = "application/json")
     public JsonNode listAppDeployments(HttpServletRequest request) {
         LOGGER.debug("REST request to get a list of form deployments");
 

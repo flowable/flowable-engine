@@ -12,9 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.TaskService;
@@ -32,6 +29,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * REST controller for managing the current user's account.
  */
@@ -47,7 +47,7 @@ public class TaskClientResource extends AbstractClientResource {
     /**
      * GET /rest/authenticate -> check if the user is authenticated, and return its login.
      */
-    @RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/tasks/{taskId}", produces = "application/json")
     public JsonNode getTask(@PathVariable String taskId, @RequestParam(required = false, defaultValue = "false") boolean runtime) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -95,7 +95,7 @@ public class TaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/tasks/{taskId}/subtasks", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/tasks/{taskId}/subtasks")
     public JsonNode getSubtasks(@PathVariable String taskId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -106,7 +106,7 @@ public class TaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/tasks/{taskId}/variables", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/tasks/{taskId}/variables")
     public JsonNode getVariables(@PathVariable String taskId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -116,7 +116,7 @@ public class TaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/tasks/{taskId}/identitylinks", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/tasks/{taskId}/identitylinks")
     public JsonNode getIdentityLinks(@PathVariable String taskId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {

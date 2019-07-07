@@ -41,7 +41,7 @@ public class CmmnTaskClientResource extends AbstractClientResource {
     @Autowired
     protected CmmnTaskService clientService;
 
-    @RequestMapping(value = "/rest/admin/cmmn-tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/cmmn-tasks/{taskId}", produces = "application/json")
     public JsonNode getTask(@PathVariable String taskId, @RequestParam(required = false, defaultValue = "false") boolean runtime) {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -89,7 +89,7 @@ public class CmmnTaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/cmmn-tasks/{taskId}/subtasks", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/cmmn-tasks/{taskId}/subtasks")
     public JsonNode getSubtasks(@PathVariable String taskId) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -100,7 +100,7 @@ public class CmmnTaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/cmmn-tasks/{taskId}/variables", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/cmmn-tasks/{taskId}/variables")
     public JsonNode getVariables(@PathVariable String taskId) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -110,7 +110,7 @@ public class CmmnTaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/cmmn-tasks/{taskId}/identitylinks", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/cmmn-tasks/{taskId}/identitylinks")
     public JsonNode getIdentityLinks(@PathVariable String taskId) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {

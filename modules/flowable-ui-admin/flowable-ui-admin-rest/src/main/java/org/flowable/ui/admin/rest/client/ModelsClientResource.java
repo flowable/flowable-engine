@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,8 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Bassam Al-Sarori
@@ -45,7 +44,7 @@ public class ModelsClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/models -> get a list of apps.
      */
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(produces = "application/json")
     public JsonNode listModels(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);

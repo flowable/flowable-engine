@@ -44,7 +44,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
     @Autowired
     protected ProcessInstanceService clientService;
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}", produces = "application/json")
     public JsonNode getProcessInstance(@PathVariable String processInstanceId, @RequestParam(required = false, defaultValue = "false") boolean runtime) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -56,7 +56,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/tasks", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/tasks")
     public JsonNode getSubtasks(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -67,7 +67,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables")
     public JsonNode getVariables(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -114,7 +114,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/subprocesses", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/subprocesses")
     public JsonNode getSubProcesses(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -125,7 +125,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/jobs", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/jobs")
     public JsonNode getJobs(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -172,7 +172,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/decision-executions", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/decision-executions")
     public JsonNode getDecisionExecutions(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         try {

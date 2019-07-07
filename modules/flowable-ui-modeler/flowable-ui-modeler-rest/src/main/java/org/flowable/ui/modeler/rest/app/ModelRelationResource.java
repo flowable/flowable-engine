@@ -22,7 +22,6 @@ import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,7 +34,7 @@ public class ModelRelationResource {
     @Autowired
     protected ModelRelationService modelRelationService;
 
-    @RequestMapping(value = "/rest/models/{modelId}/parent-relations", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models/{modelId}/parent-relations", produces = "application/json")
     public List<ModelInformation> getModelRelations(@PathVariable String modelId) {
         Model model = modelService.getModel(modelId);
         if (model == null) {

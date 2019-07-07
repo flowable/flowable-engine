@@ -54,7 +54,7 @@ public class CaseDefinitionClientResource extends AbstractClientResource {
     /**
      * GET /rest/authenticate -> check if the user is authenticated, and return its login.
      */
-    @RequestMapping(value = "/rest/admin/case-definitions/{definitionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/case-definitions/{definitionId}", produces = "application/json")
     public JsonNode getCaseDefinition(@PathVariable String definitionId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -65,7 +65,7 @@ public class CaseDefinitionClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-definitions/{definitionId}/case-instances", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/case-definitions/{definitionId}/case-instances", produces = "application/json")
     public JsonNode getProcessInstances(@PathVariable String definitionId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -79,7 +79,7 @@ public class CaseDefinitionClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-definitions/{definitionId}/jobs", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/case-definitions/{definitionId}/jobs", produces = "application/json")
     public JsonNode getJobs(@PathVariable String definitionId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {

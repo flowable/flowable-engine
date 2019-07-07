@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,8 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -55,7 +54,7 @@ public class FormsResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(produces = "application/json")
     public ResultListDataRepresentation getForms(HttpServletRequest request) {
 
         // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.

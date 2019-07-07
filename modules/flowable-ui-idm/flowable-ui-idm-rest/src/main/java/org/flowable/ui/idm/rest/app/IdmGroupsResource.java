@@ -41,7 +41,7 @@ public class IdmGroupsResource {
     @Autowired
     private GroupService groupService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping()
     public List<GroupRepresentation> getGroups(@RequestParam(required = false) String filter) {
         List<GroupRepresentation> result = new ArrayList<>();
         for (Group group : groupService.getGroups(filter)) {
@@ -50,12 +50,12 @@ public class IdmGroupsResource {
         return result;
     }
 
-    @RequestMapping(value = "/{groupId}", method = RequestMethod.GET)
+    @GetMapping(value = "/{groupId}")
     public GroupRepresentation getGroup(@PathVariable String groupId) {
         return new GroupRepresentation(groupService.getGroup(groupId));
     }
 
-    @RequestMapping(value = "/{groupId}/users", method = RequestMethod.GET)
+    @GetMapping(value = "/{groupId}/users")
     public ResultListDataRepresentation getGroupUsers(@PathVariable String groupId,
                                                       @RequestParam(required = false) String filter,
                                                       @RequestParam(required = false) Integer page,

@@ -23,8 +23,8 @@ import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -37,7 +37,7 @@ public class RemoteAccountResource {
     /**
      * GET /rest/account -> get the current user.
      */
-    @RequestMapping(value = "/rest/account", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/account", produces = "application/json")
     public UserRepresentation getAccount() {
         UserRepresentation userRepresentation = null;
         String currentUserId = SecurityUtils.getCurrentUserId();

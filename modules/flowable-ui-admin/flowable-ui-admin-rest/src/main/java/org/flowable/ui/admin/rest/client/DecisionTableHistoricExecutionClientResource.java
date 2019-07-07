@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.DecisionHistoricExecutionService;
@@ -24,8 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Yvo Swillens
@@ -39,7 +38,7 @@ public class DecisionTableHistoricExecutionClientResource extends AbstractClient
     @Autowired
     protected DecisionHistoricExecutionService clientService;
 
-    @RequestMapping(value = "/rest/admin/decision-tables/history/{executionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/decision-tables/history/{executionId}", produces = "application/json")
     public JsonNode getDecisionTableHistoricExecution(@PathVariable String executionId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
@@ -51,7 +50,7 @@ public class DecisionTableHistoricExecutionClientResource extends AbstractClient
         }
     }
 
-    @RequestMapping(value = "/rest/admin/decision-tables/history/{executionId}/auditdata", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/decision-tables/history/{executionId}/auditdata", produces = "application/json")
     public JsonNode getDecisionTableHistoricExecutionAuditData(@PathVariable String executionId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);

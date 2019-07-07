@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.modeler.rest.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.ui.common.model.ResultListDataRepresentation;
@@ -34,6 +32,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RestController
 public class ApiModelsResource {
 
@@ -48,7 +48,7 @@ public class ApiModelsResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @RequestMapping(value = "/editor/models", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/editor/models", produces = "application/json")
     public ResultListDataRepresentation getModels(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) Integer modelType,
             HttpServletRequest request) {
 

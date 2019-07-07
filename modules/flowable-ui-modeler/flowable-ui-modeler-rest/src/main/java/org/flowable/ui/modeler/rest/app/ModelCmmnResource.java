@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,7 +30,7 @@ public class ModelCmmnResource extends AbstractModelCmmnResource {
     /**
      * GET /rest/models/{modelId}/cmmn -> Get CMMN 1.1 xml
      */
-    @RequestMapping(value = "/rest/models/{caseModelId}/cmmn", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/models/{caseModelId}/cmmn")
     public void getProcessModelCmmnXml(HttpServletResponse response, @PathVariable String caseModelId) throws IOException {
         super.getCaseModelCmmnXml(response, caseModelId);
     }
@@ -39,7 +38,7 @@ public class ModelCmmnResource extends AbstractModelCmmnResource {
     /**
      * GET /rest/models/{modelId}/history/{caseModelHistoryId}/cmmn -> Get CMMN 1.1 xml
      */
-    @RequestMapping(value = "/rest/models/{caseModelId}/history/{caseModelHistoryId}/cmmn", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/models/{caseModelId}/history/{caseModelHistoryId}/cmmn")
     public void getHistoricProcessModelCmmnXml(HttpServletResponse response, @PathVariable String caseModelId, @PathVariable String caseModelHistoryId) throws IOException {
         super.getHistoricCaseModelCmmnXml(response, caseModelId, caseModelHistoryId);
     }

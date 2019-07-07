@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.ui.common.model.ResultListDataRepresentation;
@@ -29,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Frederik Heremans
  */
@@ -40,17 +40,17 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/content", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/tasks/{taskId}/content")
     public ResultListDataRepresentation getContentItemsForTask(@PathVariable("taskId") String taskId) {
         return super.getContentItemsForTask(taskId);
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/content", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/process-instances/{processInstanceId}/content")
     public ResultListDataRepresentation getContentItemsForProcessInstance(@PathVariable("processInstanceId") String processInstanceId) {
         return super.getContentItemsForProcessInstance(processInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/content", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/content")
     public ResultListDataRepresentation getContentItemsForCase(@PathVariable("caseInstanceId") String caseInstanceId) {
         return super.getContentItemsForCase(caseInstanceId);
     }
@@ -165,12 +165,12 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         super.deleteContent(contentId, response);
     }
 
-    @RequestMapping(value = "/rest/content/{contentId}", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/content/{contentId}")
     public ContentItemRepresentation getContent(@PathVariable("contentId") String contentId) {
         return super.getContent(contentId);
     }
 
-    @RequestMapping(value = "/rest/content/{contentId}/raw", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/content/{contentId}/raw")
     public void getRawContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
         super.getRawContent(contentId, response);
     }

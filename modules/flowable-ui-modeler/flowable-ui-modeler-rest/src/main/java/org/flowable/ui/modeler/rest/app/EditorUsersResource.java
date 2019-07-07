@@ -21,7 +21,6 @@ import org.flowable.ui.common.model.UserRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +31,7 @@ public class EditorUsersResource {
     @Autowired
     protected RemoteIdmService remoteIdmService;
 
-    @RequestMapping(value = "/rest/editor-users", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/editor-users")
     public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter) {
         List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
         List<UserRepresentation> userRepresentations = new ArrayList<>(matchingUsers.size());

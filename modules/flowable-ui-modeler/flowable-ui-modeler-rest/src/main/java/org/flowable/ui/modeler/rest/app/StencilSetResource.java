@@ -12,16 +12,15 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/app")
@@ -32,7 +31,7 @@ public class StencilSetResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @RequestMapping(value = "/rest/stencil-sets/editor", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/stencil-sets/editor", produces = "application/json")
     public JsonNode getStencilSetForEditor() {
         try {
             JsonNode stencilNode = objectMapper.readTree(this.getClass().getClassLoader().getResourceAsStream("stencilset_bpmn.json"));
@@ -43,7 +42,7 @@ public class StencilSetResource {
         }
     }
     
-    @RequestMapping(value = "/rest/stencil-sets/cmmneditor", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/stencil-sets/cmmneditor", produces = "application/json")
     public JsonNode getCmmnStencilSetForEditor() {
         try {
             JsonNode stencilNode = objectMapper.readTree(this.getClass().getClassLoader().getResourceAsStream("stencilset_cmmn.json"));

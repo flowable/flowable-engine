@@ -19,7 +19,6 @@ import org.flowable.ui.task.service.runtime.FlowableCaseDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,7 +28,7 @@ public class CaseDefinitionResource {
     @Autowired
     protected FlowableCaseDefinitionService caseDefinitionService;
 
-    @RequestMapping(value = "/rest/case-definitions/{caseDefinitionId}/start-form", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-definitions/{caseDefinitionId}/start-form", produces = "application/json")
     public FormModelRepresentation getCaseDefinitionStartForm(@PathVariable String caseDefinitionId) {
         FormInfo formInfo = caseDefinitionService.getCaseDefinitionStartForm(caseDefinitionId);
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();

@@ -41,7 +41,7 @@ public class CmmnDeploymentClientResource extends AbstractClientResource {
     @Autowired
     protected CmmnDeploymentService clientService;
 
-    @RequestMapping(value = "/rest/admin/cmmn-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/cmmn-deployments/{deploymentId}", produces = "application/json")
     public JsonNode getCmmnDeployment(@PathVariable String deploymentId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
