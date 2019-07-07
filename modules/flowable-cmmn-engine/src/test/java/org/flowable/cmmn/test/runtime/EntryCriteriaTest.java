@@ -327,7 +327,7 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testRepeatingCrossBoundary3() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("myCase")
             .variable("myVar", true)
             .start();

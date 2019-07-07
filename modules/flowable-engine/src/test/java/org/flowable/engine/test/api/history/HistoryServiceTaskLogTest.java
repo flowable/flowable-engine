@@ -595,7 +595,7 @@ public class HistoryServiceTaskLogTest {
                         .type("USER_TASK_IDENTITY_LINK_ADDED")
                         .list();
                 assertThat(logEntries).size().isEqualTo(1);
-                assertThat(new String(logEntries.get(0).getData())).contains(
+                assertThat(logEntries.get(0).getData()).contains(
                         "\"type\":\"participant\"",
                         "\"userId\":\"newCandidateUser\""
                 );
@@ -628,7 +628,7 @@ public class HistoryServiceTaskLogTest {
                         .type("USER_TASK_IDENTITY_LINK_ADDED")
                         .list();
                 assertThat(logEntries).size().isEqualTo(1);
-                assertThat(new String(logEntries.get(0).getData())).contains(
+                assertThat(logEntries.get(0).getData()).contains(
                         "\"type\":\"candidate\"",
                         "\"groupId\":\"newCandidateGroup\""
                 );
@@ -661,7 +661,7 @@ public class HistoryServiceTaskLogTest {
                         .type("USER_TASK_IDENTITY_LINK_ADDED")
                         .list();
                 assertThat(logEntries).size().isEqualTo(1);
-                assertThat(new String(logEntries.get(0).getData())).contains(
+                assertThat(logEntries.get(0).getData()).contains(
                         "\"type\":\"participant\"",
                         "\"groupId\":\"newCandidateGroup\""
                 );
@@ -694,7 +694,7 @@ public class HistoryServiceTaskLogTest {
                         .type("USER_TASK_IDENTITY_LINK_REMOVED")
                         .list();
                 assertThat(logEntries).size().isEqualTo(1);
-                assertThat(new String(logEntries.get(0).getData())).contains(
+                assertThat(logEntries.get(0).getData()).contains(
                         "\"type\":\"candidate\"",
                         "\"groupId\":\"newCandidateGroup\""
                 );
@@ -728,7 +728,7 @@ public class HistoryServiceTaskLogTest {
                         .type("USER_TASK_IDENTITY_LINK_REMOVED")
                         .list();
                 assertThat(logEntries).size().isEqualTo(1);
-                assertThat(new String(logEntries.get(0).getData())).contains(
+                assertThat(logEntries.get(0).getData()).contains(
                         "\"type\":\"candidate\"",
                         "\"userId\":\"newCandidateUser\""
                 );

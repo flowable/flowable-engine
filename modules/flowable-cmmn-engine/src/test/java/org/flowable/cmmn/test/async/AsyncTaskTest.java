@@ -52,7 +52,7 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
       
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task after service task", task.getName());
-        assertEquals("executed", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
+        assertEquals("executed", cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
     }
     
     @Test
@@ -74,7 +74,7 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         cmmnManagementService.executeJob(job.getId());
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task after service task", task.getName());
-        assertEquals("executed", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
+        assertEquals("executed", cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
     }
     
     @Test

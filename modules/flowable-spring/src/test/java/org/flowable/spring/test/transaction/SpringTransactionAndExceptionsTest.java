@@ -55,7 +55,7 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
     @Deployment
     public void testExceptionDoesRollback() {
         try {
-            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("testProcess").start();
+            runtimeService.createProcessInstanceBuilder().processDefinitionKey("testProcess").start();
             fail();
         } catch (Exception e) {
             // exception expected

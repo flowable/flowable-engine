@@ -170,7 +170,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            extracting(assigneeTaskLogEntry -> assigneeTaskLogEntry.getData()).
             isEqualTo("{\"newAssigneeId\":\"newAssignee\",\"previousAssigneeId\":\"initialAssignee\"}");
         assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
@@ -474,7 +474,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-            assertThat(new String(logEntries.get(1).getData())).contains(
+            assertThat(logEntries.get(1).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"groupId\":\"newCandidateGroup\""
             );
@@ -501,7 +501,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-            assertThat(new String(logEntries.get(2).getData())).contains(
+            assertThat(logEntries.get(2).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"groupId\":\"newCandidateGroup\""
             );
@@ -526,7 +526,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-            assertThat(new String(logEntries.get(2).getData())).contains(
+            assertThat(logEntries.get(2).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"userId\":\"newCandidateUser\""
             );
