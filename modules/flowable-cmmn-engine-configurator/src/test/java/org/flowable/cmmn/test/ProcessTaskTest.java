@@ -517,7 +517,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testProcessTaskWithSkipExpressions() {
-        Deployment deployment = processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithSkipExpressions.bpmn20.xml").deploy();
+        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithSkipExpressions.bpmn20.xml").deploy();
 
         ProcessDefinition processDefinition = processEngineRepositoryService.createProcessDefinitionQuery().processDefinitionKey("testSkipExpressionProcess").singleResult();
         ObjectNode infoNode = processEngineDynamicBpmnService.enableSkipExpression();
@@ -526,7 +526,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         processEngineDynamicBpmnService.changeSkipExpression("sequenceflow2", "${true}", infoNode);
         processEngineDynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("skipExpressionCaseTest").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("skipExpressionCaseTest").start();
 
         assertTrue(processEngineTaskService.createTaskQuery().list().isEmpty());
         assertTrue(processEngineRuntimeService.createProcessInstanceQuery().list().isEmpty());
@@ -879,7 +879,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
     public void testDeleteProcessTaskShouldNotBePossible() {
-        CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
+        startCaseInstanceWithOneTaskProcess();
 
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
 

@@ -117,7 +117,7 @@ public class RestApiSecurityApplicationTest {
             }
         });
 
-        ResponseEntity<String> response = restTemplate.getForEntity(authenticationChallenge, String.class);
+        restTemplate.getForEntity(authenticationChallenge, String.class);
         latch401.await(500, TimeUnit.MILLISECONDS);
         assertThat(latch401.getCount())
             .as("401 Latch")

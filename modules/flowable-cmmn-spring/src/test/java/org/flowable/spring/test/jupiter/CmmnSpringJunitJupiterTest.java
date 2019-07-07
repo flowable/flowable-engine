@@ -63,7 +63,7 @@ public class CmmnSpringJunitJupiterTest {
     @Test
     @CmmnDeployment
     public void simpleCaseTest(FlowableCmmnTestHelper flowableTestHelper, @CmmnDeploymentId String deploymentId, CmmnEngine extensionCmmnEngine) {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("junitJupiterCase").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("junitJupiterCase").start();
 
         assertThat(flowableTestHelper.getDeploymentIdFromDeploymentAnnotation())
             .isEqualTo(deploymentId)

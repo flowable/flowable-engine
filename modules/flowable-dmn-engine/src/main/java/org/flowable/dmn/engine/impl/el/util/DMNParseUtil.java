@@ -46,7 +46,7 @@ public class DMNParseUtil {
     }
 
     public static boolean isParseableCollection(Object value) {
-        if (value instanceof String == false || value.equals("")) {
+        if (value instanceof String == false || "".equals(value)) {
             return false;
         }
         String stringValue = String.valueOf(value);

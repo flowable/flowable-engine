@@ -271,7 +271,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
             formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
             
             if (formDefinitionEntity == null && (fallbackToDefaultTenant || formEngineConfiguration.isFallbackToDefaultTenant())) {
-                String defaultTenant = formEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.FORM, formDefinitionKey);;
+                String defaultTenant = formEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.FORM, formDefinitionKey);
                 if (StringUtils.isNotEmpty(defaultTenant)) {
                     formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, defaultTenant);
                 } else {
@@ -316,7 +316,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
             }
             
             if (formDefinitionEntity == null && (fallbackToDefaultTenant || formEngineConfiguration.isFallbackToDefaultTenant())) {
-                String defaultTenant = formEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.FORM, formDefinitionKey);;
+                String defaultTenant = formEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.FORM, formDefinitionKey);
                 if (StringUtils.isNotEmpty(defaultTenant)) {
                     formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, defaultTenant);
                 } else {

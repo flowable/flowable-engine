@@ -13,7 +13,6 @@
 
 package org.flowable.engine.test.bpmn.callactivity;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

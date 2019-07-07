@@ -31,7 +31,7 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
     @Test
     @CmmnDeployment
     public void testTrigger() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
         assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNotNull();
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
@@ -119,7 +119,7 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
     @Test
     @CmmnDeployment
     public void testEnable() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).enable();
@@ -227,7 +227,7 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
     @Test
     @CmmnDeployment
     public void testDisable() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
 
         // Need to enable before disabling
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
@@ -337,7 +337,7 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
     @Test
     @CmmnDeployment
     public void testTerminate() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         assertThat(planItemInstanceA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
