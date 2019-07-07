@@ -70,7 +70,7 @@
         "DOCUMENTATIONPACKAGE" : {
           "DOCUMENTATION" : {
             "TITLE" : "Documentation",
-            "DESCRIPTION" : "The descriptive name of the BPMN element."
+            "DESCRIPTION" : "Documentation of the BPMN element."
           }
         },
         "CATEGORYPACKAGE" : {
