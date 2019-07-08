@@ -246,7 +246,7 @@ public class ProcessWithFormTest {
     public void completeTaskWithoutValidationOnModelLevelBadExpression(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService,
         TaskService taskService, RepositoryService repositoryService) {
 
-        Deployment deployment = repositoryService.createDeployment().
+        repositoryService.createDeployment().
             addString("oneTaskWithFormKeySideEffectProcess.bpmn20.xml",
                 ONE_TASK_PROCESS.
                     replace("START_EVENT_VALIDATION", "true").
@@ -280,7 +280,7 @@ public class ProcessWithFormTest {
     public void completeTaskWithValidationOnModelLevelStringExpression(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService,
         TaskService taskService, RepositoryService repositoryService) {
 
-        Deployment deployment = repositoryService.createDeployment().
+        repositoryService.createDeployment().
             addString("oneTaskWithFormKeySideEffectProcess.bpmn20.xml",
                 ONE_TASK_PROCESS.
                     replace("START_EVENT_VALIDATION", "true").
@@ -313,7 +313,7 @@ public class ProcessWithFormTest {
     public void completeTaskWithValidationOnMissingModelLevel(ProcessEngineConfiguration processEngineConfiguration, RuntimeService runtimeService,
         TaskService taskService, RepositoryService repositoryService) {
 
-        Deployment deployment = repositoryService.createDeployment().
+        repositoryService.createDeployment().
             addString("oneTaskWithFormKeySideEffectProcess.bpmn20.xml",
                 ONE_TASK_PROCESS.
                     replace("flowable:formFieldValidation=\"START_EVENT_VALIDATION\"", "").

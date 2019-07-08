@@ -102,7 +102,7 @@ public class IfPartTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testIfPartConditionTriggerOnSetVariables() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleCondition").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleCondition").start();
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().list();
         assertEquals(1, planItemInstances.size());
         assertEquals("A", planItemInstances.get(0).getName());

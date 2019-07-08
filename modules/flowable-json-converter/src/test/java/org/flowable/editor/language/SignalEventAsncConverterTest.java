@@ -13,7 +13,7 @@
 package org.flowable.editor.language;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -43,14 +43,14 @@ public class SignalEventAsncConverterTest extends AbstractConverterTest {
 
         ThrowEvent throwEvent = (ThrowEvent) model.getMainProcess().getFlowElement("throwEvent", true);
         List<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
-        assertNotNull(eventDefinitions.size());
+        assertThat(eventDefinitions).isNotNull();
+        assertThat(eventDefinitions.size()).isNotEqualTo(0);
 
         EventDefinition eventDefinition = eventDefinitions.get(0);
-        assertNotNull(eventDefinitions);
+        assertThat(eventDefinitions).isNotNull();
 
         SignalEventDefinition signalEventDefinition= (SignalEventDefinition) eventDefinition;
         assertTrue(signalEventDefinition.isAsync());
-
     }
 
 }
