@@ -1,4 +1,4 @@
-= Flowable DMN DOCS (v 6.5.0-SNAPSHOT)
+= Flowable DMN DOCS (v 6.4.2-SNAPSHOT)
 :doctype: book
 :toc: left
 :toclevels: 4
