@@ -685,7 +685,7 @@ GET form-management/engine
 ----
 {
    "name":"default",
-   "version":"6.5.0-SNAPSHOT",
+   "version":"6.4.2-SNAPSHOT",
    "resourceUrl":"file://flowable/flowable.form.cfg.xml",
    "exception":null
 }

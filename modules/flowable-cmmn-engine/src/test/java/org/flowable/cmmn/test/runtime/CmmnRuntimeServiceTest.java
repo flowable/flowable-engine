@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -190,7 +191,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn", tenantId="defaultFlowable")
     public void createCaseInstanceWithGlobalFallbackAndDefaultTenantValue() {
-        String originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = cmmnEngineConfiguration.getDefaultTenantProvider();
         cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
         cmmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
@@ -204,7 +205,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
             
         } finally {
             cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
-            cmmnEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            cmmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
         }
     }
 
@@ -223,7 +224,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn", tenantId="tenant1")
     public void createCaseInstanceWithGlobalFallbackDefinitionNotFound() {
-        String originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = cmmnEngineConfiguration.getDefaultTenantProvider();
         cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
         cmmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         
@@ -237,7 +238,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
             
         } finally {
             cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
-            cmmnEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            cmmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
         }
     }
 
