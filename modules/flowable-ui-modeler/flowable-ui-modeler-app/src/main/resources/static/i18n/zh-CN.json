@@ -941,7 +941,7 @@
         "DESCRIPTION" : "一个调用活动"
       },
       "EXCLUSIVEGATEWAY" : {
-        "TITLE" : "互斥网关",
+        "TITLE" : "排他网关",
         "DESCRIPTION" : "一个选择的网关"
       },
       "PARALLELGATEWAY" : {
@@ -949,7 +949,7 @@
         "DESCRIPTION" : "一个并行的网关"
       },
       "INCLUSIVEGATEWAY" : {
-        "TITLE" : "包容性网关",
+        "TITLE" : "包容网关",
         "DESCRIPTION" : "一个包容性网关"
       },
       "EVENTGATEWAY" : {
@@ -1041,8 +1041,8 @@
         "DESCRIPTION" : "用于构造流程定义的池"
       },
       "LANE" : {
-        "TITLE" : "通道",
-        "DESCRIPTION" : "构建流程定义的通道"
+        "TITLE" : "泳道",
+        "DESCRIPTION" : "构建流程定义的泳道"
       },
       "SEQUENCEFLOW" : {
         "TITLE" : "顺序流",
