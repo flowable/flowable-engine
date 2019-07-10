@@ -41,21 +41,6 @@ angular.module('flowableModeler').controller('FlowableExceptionsPopupCtrl',
             // this to cope with the fact that the user can click the cancel button and no changes should have happened
             $scope.exceptions = angular.copy($scope.property.value.exceptions);
 
-            console.log($scope.exceptions );
-
-            // for (var i = 0; i < $scope.exceptions.length; i++) {
-            //     var exception = $scope.exceptions[i];
-            //     if (exception.stringValue !== undefined && exception.stringValue !== '') {
-            //         exception.implementation = exception.stringValue;
-            //     }
-            //     else if (exception.expression !== undefined && exception.expression !== '') {
-            //         exception.implementation = exception.expression;
-            //     }
-            //     else if (field.string !== undefined && field.string !== '') {
-            //         field.implementation = field.string;
-            //     }
-            // }
-
         } else {
             $scope.exceptions = [];
         }
