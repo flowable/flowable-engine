@@ -16,7 +16,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.export.FieldExtensionExport;
 import org.flowable.bpmn.converter.export.MapExceptionExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.AbstractFlowableHttpHandler;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CaseServiceTask;
+import org.flowable.bpmn.model.CustomProperty;
+import org.flowable.bpmn.model.HttpServiceTask;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.ServiceTask;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;

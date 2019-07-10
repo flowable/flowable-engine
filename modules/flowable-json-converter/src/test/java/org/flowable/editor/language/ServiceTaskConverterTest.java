@@ -12,7 +12,13 @@
  */
 package org.flowable.editor.language;
 
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.bpmn.model.ServiceTask;
 import org.junit.Test;
 
 import java.util.List;

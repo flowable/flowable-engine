@@ -12,12 +12,20 @@
  */
 package org.flowable.editor.language.xml;
 
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.bpmn.model.ServiceTask;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServiceTaskConverterTest extends AbstractConverterTest {
 

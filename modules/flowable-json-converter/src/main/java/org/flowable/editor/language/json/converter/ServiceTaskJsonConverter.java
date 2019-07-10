@@ -16,7 +16,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.HttpServiceTask;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.editor.language.json.model.ModelInfo;
 
 import java.util.Map;
