@@ -23,6 +23,10 @@ public class MapExceptionEntry {
     protected boolean andChildren;
     protected String rootCause;
 
+    public MapExceptionEntry(){
+        
+    }
+
     public MapExceptionEntry(String errorCode, String className, boolean andChildren, String rootCause) {
         this.errorCode = errorCode;
         this.className = className;

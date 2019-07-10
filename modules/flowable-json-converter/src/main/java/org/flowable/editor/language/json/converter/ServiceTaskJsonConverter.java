@@ -12,20 +12,14 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.FieldExtension;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.HttpServiceTask;
-import org.flowable.bpmn.model.ImplementationType;
-import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.editor.language.json.model.ModelInfo;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.*;
+import org.flowable.editor.language.json.model.ModelInfo;
+
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -156,6 +150,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             }
 
             addFieldExtensions(serviceTask.getFieldExtensions(), propertiesNode);
+            addMapException(serviceTask.getMapExceptions(), propertiesNode);
         }
     }
 
@@ -208,6 +203,24 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
                         }
                         task.getFieldExtensions().add(field);
                     }
+                }
+            }
+        }
+
+        JsonNode exceptionsNode = getProperty(PROPERTY_SERVICETASK_EXCEPTIONS, elementNode);
+        if (exceptionsNode != null) {
+            JsonNode itemsArrayNode = exceptionsNode.get("exceptions");
+            if (itemsArrayNode != null) {
+                for (JsonNode itemNode : itemsArrayNode) {
+
+                    MapExceptionEntry exception = new MapExceptionEntry();
+
+
+                    exception.setClassName(getValueAsString(PROPERTY_SERVICETASK_EXCEPTION_CLASS, itemNode));
+                    exception.setErrorCode(getValueAsString(PROPERTY_SERVICETASK_EXCEPTION_CODE, itemNode));
+                    exception.setAndChildren(getValueAsBoolean(PROPERTY_SERVICETASK_EXCEPTION_CHILDREN, itemNode));
+                    task.getMapExceptions().add(exception);
+
                 }
             }
         }
