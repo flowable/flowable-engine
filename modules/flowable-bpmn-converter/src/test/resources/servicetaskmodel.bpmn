@@ -11,6 +11,8 @@
         <activiti:executionListener event="end" expression="${testExpression}"></activiti:executionListener>
         <activiti:executionListener event="start" delegateExpression="${delegateExpression}"></activiti:executionListener>
         <activiti:failedJobRetryTimeCycle>R5/PT5M</activiti:failedJobRetryTimeCycle>
+        <activiti:mapException errorCode="java"></activiti:mapException>
+        <activiti:mapException errorCode="java" includeChildExceptions="true">MyClass</activiti:mapException>
       </extensionElements>
     </serviceTask>
     <startEvent id="sid-F62B554B-FF4F-475E-94FF-A3F44EDA6A6A"></startEvent>
