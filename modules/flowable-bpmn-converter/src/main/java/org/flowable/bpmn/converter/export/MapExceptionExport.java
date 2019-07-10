@@ -31,7 +31,6 @@ public class MapExceptionExport implements BpmnXMLConstants {
                 xtw.writeEndElement(); //end MAP_EXCEPTION
             }
         }
-
         return didWriteExtensionStartElement;
     }
 
