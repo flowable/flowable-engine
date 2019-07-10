@@ -8,6 +8,8 @@ CREATE TABLE ACT_RU_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    ELEMENT_ID_ varchar(255),
+    ELEMENT_NAME_ varchar(255),
     SCOPE_ID_ varchar(255),
     SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
@@ -35,6 +37,8 @@ CREATE TABLE ACT_RU_TIMER_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    ELEMENT_ID_ varchar(255),
+    ELEMENT_NAME_ varchar(255),
     SCOPE_ID_ varchar(255),
     SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
@@ -60,6 +64,8 @@ CREATE TABLE ACT_RU_SUSPENDED_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    ELEMENT_ID_ varchar(255),
+    ELEMENT_NAME_ varchar(255),
     SCOPE_ID_ varchar(255),
     SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
@@ -85,6 +91,8 @@ CREATE TABLE ACT_RU_DEADLETTER_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    ELEMENT_ID_ varchar(255),
+    ELEMENT_NAME_ varchar(255),
     SCOPE_ID_ varchar(255),
     SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
@@ -190,6 +198,6 @@ alter table ACT_RU_DEADLETTER_JOB
     references ACT_GE_BYTEARRAY (ID_);
 
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.0', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.1', 1);
 
 -- force-commit

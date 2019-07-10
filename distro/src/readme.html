@@ -33,9 +33,10 @@
 
 <ul>
     <li>Support has been added for CockroachDB (<a href="https://github.com/cockroachdb/cockroach">https://github.com/cockroachdb/cockroach</a>) as an alternative DB option.
+    A blog post with more details and getting started can be found <a href="http://blog.flowable.org/2019/07/10/getting-started-with-flowable-and-cockroachdb/">here</a>.
     The full list of changes can be found here <a href="https://github.com/flowable/flowable-engine/pull/1716">https://github.com/flowable/flowable-engine/pull/1716</a>.</li>
     <li>Extracted the event subscription logic from the BPMN engine into a service (similar to the variable and job service for example), so that event subscriptions
-    can also be used from the CMMN engine and possibly other engines.</li>
+    can also be used from the CMMN engine and possibly other engines in the future.</li>
     <li>The manual sql scripts that can be found in the distro download are updated to include convenient scripts that will update and create the engines in one sql script.</li>
     <li>Various small bugfixes and improvements all around.</li>
 </ul>
@@ -44,14 +45,14 @@
 	
 <ul>
     <li>Added support for BPMN escalation events.</li>
-</ul
+</ul>
 	
 <h4>CMMN</h4>
 	
 <ul>
     <li>Added support to listen to signal events in a CMMN case model. This enables more options to interact from a BPMN process instance with a CMMN case instance.</li>
-    <li>Added availability condition to CMMN event listeners (e.g. timer event listener) to provide an option to dismiss an event listener.</li>
-</ul
+    <li>Added 'available condition' to CMMN event listeners (e.g. user or timer event listener) to guard precisely when an event listener becomes available. See the documentation for examples.</li>
+</ul>
 
 <h4>Highlights</h4>
 	
