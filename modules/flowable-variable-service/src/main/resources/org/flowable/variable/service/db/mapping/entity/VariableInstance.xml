@@ -85,7 +85,7 @@
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR}
+                NAME_ = #{name, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.executionId != executionId">
                 EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
