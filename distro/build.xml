@@ -4,11 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-<<<<<<< HEAD
-	<property name="flowable.version" value="6.4.2.13" />
-=======
-	<property name="flowable.version" value="6.4.2" />
->>>>>>> 97ed29e8cef0ff145483133a3d85d5a60b16b1bd
+    <property name="flowable.version" value="6.4.2" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="flowable.website" value="../../flowable-website" />
 
