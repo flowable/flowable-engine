@@ -198,22 +198,26 @@ public class ContinueProcessOperation extends AbstractOperation {
             execution = createMultiInstanceRootExecution(execution);
         }
 
-        // Create any boundary events, sub process boundary events will be created from the activity behavior
-        List<ExecutionEntity> boundaryEventExecutions = null;
-        List<BoundaryEvent> boundaryEvents = null;
-        if (!inCompensation && flowNode instanceof Activity) { // Only activities can have boundary events
-            boundaryEvents = ((Activity) flowNode).getBoundaryEvents();
-            if (CollectionUtil.isNotEmpty(boundaryEvents)) {
-                boundaryEventExecutions = createBoundaryEvents(boundaryEvents, execution);
-            }
-        }
-
         // Execute the multi instance behavior
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
 
         if (activityBehavior != null) {
             executeActivityBehavior(activityBehavior, flowNode);
-            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+            
+            if (!execution.isDeleted() && !execution.isEnded()) {
+                // Create any boundary events, sub process boundary events will be created from the activity behavior
+                List<ExecutionEntity> boundaryEventExecutions = null;
+                List<BoundaryEvent> boundaryEvents = null;
+                if (!inCompensation && flowNode instanceof Activity) { // Only activities can have boundary events
+                    boundaryEvents = ((Activity) flowNode).getBoundaryEvents();
+                    if (CollectionUtil.isNotEmpty(boundaryEvents)) {
+                        boundaryEventExecutions = createBoundaryEvents(boundaryEvents, execution);
+                    }
+                }
+                
+                executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+            }
+            
         } else {
             throw new FlowableException("Expected an activity behavior in flow node " + flowNode.getId());
         }

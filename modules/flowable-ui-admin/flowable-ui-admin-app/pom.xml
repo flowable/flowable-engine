@@ -9,7 +9,11 @@
     <parent>
       <groupId>org.flowable</groupId>
       <artifactId>flowable-ui-admin</artifactId>
+<<<<<<< HEAD
       <version>6.4.2.13</version>
+=======
+      <version>6.4.2</version>
+>>>>>>> 97ed29e8cef0ff145483133a3d85d5a60b16b1bd
     </parent>
 
     <properties>
@@ -361,20 +365,6 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-admin-logic</artifactId>
-        </dependency>
-
-		<!-- Flowable -->
-		<dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-common</artifactId>
-        </dependency>
-		<dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-bpmn-model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-bpmn-converter</artifactId>
         </dependency>
 
 		<!-- DATABASE -->

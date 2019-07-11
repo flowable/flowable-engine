@@ -236,7 +236,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
     protected int getExtensionElementValueAsInt(String name, HumanTask humanTask) {
         int intValue = 0;
         String value = getExtensionElementValue(name, humanTask);
-        if (value != null && NumberUtils.isCreatable(value)) {
+        if (NumberUtils.isCreatable(value)) {
             intValue = Integer.valueOf(value);
         }
         return intValue;

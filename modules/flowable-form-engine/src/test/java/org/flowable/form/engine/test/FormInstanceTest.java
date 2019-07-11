@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
@@ -146,7 +147,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
     @Test
     @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form", tenantId="defaultFlowable")
     public void submitSimpleFormWithGlobalFallbackTenant() throws Exception {
-        String originalDefaultTenantValue = formEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = formEngineConfiguration.getDefaultTenantProvider();
         formEngineConfiguration.setFallbackToDefaultTenant(true);
         formEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
@@ -185,7 +186,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
             
         } finally {
             formEngineConfiguration.setFallbackToDefaultTenant(false);
-            formEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            formEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
         }
     }
 

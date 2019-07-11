@@ -106,7 +106,7 @@
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR}
+                NAME_ = #{name, jdbcType=VARCHAR},
             </if>
             <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},

@@ -10,12 +10,8 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot</artifactId>
         <relativePath>../flowable-spring-boot/pom.xml</relativePath>
-        <version>6.4.2.13</version>
+<version>6.4.2</version>
     </parent>
-
-    <properties>
-        <tomcat.version>7.0.53</tomcat.version>
-    </properties>
 
     <modules>
         <module>flowable-ui-idm-logic</module>
@@ -40,12 +36,6 @@
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-ui-idm-conf</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>3.1.0</version>
-                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,4 +1,4 @@
-= Flowable Form 用户手册 (v 6.5.0-SNAPSHOT)
+= Flowable Form 用户手册 (v 6.4.2)
 :doctype: book
 :docinfodir: ../base
 :docinfo1: header

@@ -7,7 +7,11 @@
 	<parent>
 		<groupId>org.flowable</groupId>
     	<artifactId>flowable-ui-modeler</artifactId>
+<<<<<<< HEAD
     	<version>6.4.2.13</version>
+=======
+    	<version>6.4.2</version>
+>>>>>>> 97ed29e8cef0ff145483133a3d85d5a60b16b1bd
 	</parent>
 	<packaging>jar</packaging>
 

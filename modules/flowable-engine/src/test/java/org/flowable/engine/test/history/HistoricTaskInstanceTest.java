@@ -220,6 +220,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         // Delete reason
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDeleteReason("deleted").count());
+        assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskWithoutDeleteReason().count());
 
         // org.flowable.task.service.Task definition ID
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("task").count());
@@ -591,6 +592,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         // Delete reason
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().taskDeleteReason("deleted").endOr().count());
+        assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskWithoutDeleteReason().endOr().count());
 
         // org.flowable.task.service.Task definition ID
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("task").endOr().count());

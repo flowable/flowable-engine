@@ -48,16 +48,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class TaskHelper {
 
     public static void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {
+        CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
+
         if (taskEntity.getOwner() != null) {
             addOwnerIdentityLink(taskEntity);
         }
-        
+
         if (taskEntity.getAssignee() != null) {
             addAssigneeIdentityLinks(taskEntity);
             CommandContextUtil.getCmmnEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
         }
 
-        CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
     }
 
     public static void deleteTask(String taskId, String deleteReason, boolean cascade) {

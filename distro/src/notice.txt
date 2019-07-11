@@ -96,7 +96,7 @@ com.fasterxml.jackson.core      jackson-databind            2.9.9           The 
 com.fasterxml.jackson.datatype  jackson-datatype-hppc       2.9.9           The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-joda       2.9.9           The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-json-org   2.9.9           The Apache Software License, Version 2.0
-com.google.guava                guava                       27.1-jre        The Apache Software License, Version 2.0
+com.google.guava                guava                       28.0-jre        The Apache Software License, Version 2.0
 com.h2database                  h2                          1.4.199         The H2 License, Version 1.0
 com.fasterxml.uuid              java-uuid-generator         3.2.0           The Apache Software License, Version 2.0
 com.sun.mail                    javax.mail                  1.6.2           CDDL/GPLv2+CE
@@ -115,13 +115,13 @@ io.swagger                      swagger-annotations         1.5.22          Apac
 io.swagger                      swagger-models              1.5.22          Apache License 2.0
 javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
-joda-time                       joda-time                   2.10.2          Apache 2
+joda-time                       joda-time                   2.10.3          Apache 2
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
 org.apache.commons              commons-email               1.5             Apache License, Version 2.0
 org.apache.commons              commons-lang3               3.9             The Apache Software License, Version 2.0
-org.apache.httpcomponents       httpclient                  4.5.8           Apache License, Version 2.0
+org.apache.httpcomponents       httpclient                  4.5.9           Apache License, Version 2.0
 org.apache.httpcomponents       httpcore                    4.4.11          Apache License, Version 2.0
-org.apache.httpcomponents       httpmime                    4.5.8           Apache License, Version 2.0
+org.apache.httpcomponents       httpmime                    4.5.9           Apache License, Version 2.0
 org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
 org.codehaus.groovy             groovy                      2.5.7           The Apache Software License, Version 2.0
 org.codehaus.groovy             groovy-jsr223               2.5.7           The Apache Software License, Version 2.0
@@ -132,18 +132,18 @@ org.mvel                        mvel2                       2.2.6.Final     The 
 org.slf4j                       jcl-over-slf4j              1.7.26          MIT License
 org.slf4j                       slf4j-api                   1.7.26          MIT License
 org.slf4j                       slf4j-log4j12               1.7.26          MIT License
-org.springframework             spring-beans                5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-context              5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-context-support      5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-tx                   5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-web                  5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-aop                  5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-expression           5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework             spring-orm                  5.1.7.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-beans                5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-context              5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-context-support      5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-tx                   5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-web                  5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-aop                  5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-expression           5.1.8.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-orm                  5.1.8.RELEASE   The Apache Software License, Version 2.0
 org.springframework.security    spring-security-config      5.1.5.RELEASE   The Apache Software License, Version 2.0
 org.springframework.security    spring-security-core        5.1.5.RELEASE   The Apache Software License, Version 2.0
 org.springframework.security    spring-security-crypto      5.1.5.RELEASE   The Apache Software License, Version 2.0

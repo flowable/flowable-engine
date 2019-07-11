@@ -10,12 +10,8 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-spring-boot</artifactId>
     <relativePath>../flowable-spring-boot/pom.xml</relativePath>
-    <version>6.4.2.13</version>
+    <version>6.4.2</version>
   </parent>
-  
-  <properties>
-		<!-- Web container version -->		<tomcat.version>7.0.53</tomcat.version>
-  </properties>
 
 	<modules>
 		<module>flowable-ui-modeler-logic</module>

@@ -1,4 +1,4 @@
-= Flowable CMMN 用户手册 (v 6.5.0-SNAPSHOT)
+= Flowable CMMN 用户手册 (v 6.4.2)
 :doctype: book
 :toc: left
 :toclevels: 4
