@@ -586,7 +586,7 @@ GET dmn-management/engine
 ----
 {
    "name":"default",
-   "version":"6.4.2-SNAPSHOT",
+   "version":"6.4.2",
    "resourceUrl":"file://flowable-dmn/flowable.dmn.cfg.xml",
    "exception":null
 }
