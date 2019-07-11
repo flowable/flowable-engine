@@ -28,7 +28,7 @@ public class MapExceptionExport implements BpmnXMLConstants {
                 if (StringUtils.isNotEmpty(mapException.getClassName())) {
                     xtw.writeCData(mapException.getClassName());
                 }
-                xtw.writeEndElement(); //end MAP_EXCEPTION
+                xtw.writeEndElement(); //end flowable:mapException
             }
         }
         return didWriteExtensionStartElement;
