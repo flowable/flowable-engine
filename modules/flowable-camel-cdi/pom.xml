@@ -49,6 +49,7 @@
       <dependency>
           <groupId>org.jboss.arquillian.junit</groupId>
           <artifactId>arquillian-junit-container</artifactId>
+          <version>1.1.15.Final</version>
           <scope>test</scope>
       </dependency>
       <dependency>
@@ -62,17 +63,10 @@
           <scope>test</scope>
       </dependency>
       <dependency>
-          <groupId>org.jboss.spec</groupId>
-          <artifactId>jboss-javaee-6.0</artifactId>
-          <version>2.0.0.Final</version>
-          <type>pom</type>
-          <scope>provided</scope>
-          <exclusions>
-              <exclusion>
-                  <artifactId>xalan</artifactId>
-                  <groupId>org.apache.xalan</groupId>
-              </exclusion>
-          </exclusions>
+        <groupId>javax.enterprise</groupId>
+        <artifactId>cdi-api</artifactId>
+        <version>2.0</version>
+        <scope>provided</scope>
       </dependency>
   </dependencies>
 
@@ -92,32 +86,28 @@
       <dependencies>
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
-          <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+          <artifactId>arquillian-weld-embedded</artifactId>
+          <version>2.0.0.Final</version>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.weld</groupId>
-          <artifactId>weld-core</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.weld</groupId>
-          <artifactId>weld-api</artifactId>
+          <artifactId>weld-core-impl</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-simple</artifactId>
+          <version>${slf4j.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
-      
       <dependencyManagement>
         <dependencies>
           <dependency>
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-core-bom</artifactId>
-            <version>1.1.33.Final</version>
+            <version>3.1.1.Final</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>
