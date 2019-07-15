@@ -1,0 +1,2 @@
+create index ACT_IDX_RU_VAR_NAME on ACT_RU_VARIABLE(NAME_);
+create index ACT_IDX_VAR_TYPE on ACT_RU_VARIABLE(TYPE_);
