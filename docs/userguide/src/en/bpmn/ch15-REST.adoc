@@ -6017,6 +6017,7 @@ GET management/jobs/{jobId}
 |===============
 
 
+
 *Success response body:*
 
 [source,json,linenums]
@@ -6139,6 +6140,7 @@ GET management/jobs/{jobId}/exception-stacktrace
 |===============
 
 
+
 ==== Get a list of jobs
 
 
@@ -6206,6 +6208,220 @@ GET management/jobs
 
 
 .Get a list of jobs - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the requested jobs were returned.
+|400|Indicates an illegal value has been used in a url query parameter or the both +$$'messagesOnly'$$+ and +$$'timersOnly'$$+ are used as parameters. Status description contains additional details about the error.
+
+|===============
+
+
+
+==== Get a single deadletter job
+
+----
+GET management/deadletter-jobs/{jobId}
+----
+
+.Get a single dead letter job - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|jobId|Yes|String|The id of the dead letter job to get.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+   "id":"8",
+   "url":"http://localhost:8182/management/jobs/8",
+   "processInstanceId":"5",
+   "processInstanceUrl":"http://localhost:8182/runtime/process-instances/5",
+   "processDefinitionId":"timerProcess:1:4",
+   "processDefinitionUrl":"http://localhost:8182/repository/process-definitions/timerProcess%3A1%3A4",
+   "executionId":"7",
+   "executionUrl":"http://localhost:8182/runtime/executions/7",
+   "retries":0,
+   "exceptionMessage":"Can't find scripting engine for 'unexistinglanguage'",
+   "dueDate":"2013-06-04T22:05:05.474+0000",
+   "tenantId":null
+}
+----
+
+.Get a single dead letter job - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the dead letter job exists and is returned.
+|404|Indicates the requested dead letter job does not exist.
+
+|===============
+
+
+
+==== Delete a dead letter job
+
+----
+DELETE management/deadletter-jobs/{jobId}
+----
+
+
+.Delete a dead letter job - URL parameters
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|jobId|Yes|String|The id of the dead letter job to delete.
+
+|===============
+
+
+.Delete a dead letter job - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|204|Indicates the dead letter job was found and has been deleted. Response-body is intentionally empty.
+|404|Indicates the requested dead letter job was not found.
+
+|===============
+
+
+
+==== Resume and execute a dead letter job
+
+----
+POST management/deadletter-jobs/{jobId}
+----
+
+
+*Body JSON:*
+
+[source,json,linenums]
+----
+{
+  "action" : "execute"
+}
+----
+
+
+.Resume and execute a dead letter job - JSON Body parameters
+[options="header"]
+|===============
+|Parameter|Description|Required
+|action|Action to perform. Only +execute+ is supported.|Yes
+
+|===============
+
+
+.Resume and execute a dead letter job - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|204|Indicates the dead letter job was executed. Response-body is intentionally empty.
+|404|Indicates the requested dead letter job was not found.
+|500|Indicates the an exception occurred while executing the dead letter job. The status-description contains additional detail about the error. The full error-stacktrace can be fetched later on if needed.
+
+|===============
+
+
+
+==== Get the exception stacktrace for a deadletter job
+
+----
+GET management/deadletter-jobs/{jobId}/exception-stacktrace
+----
+
+
+.Get the exception stacktrace for a dead letter job - URL parameters
+[options="header"]
+|===============
+|Parameter|Description|Required
+|jobId|Id of the dead letter job to get the stacktrace for.|Yes
+
+|===============
+
+
+.Get the exception stacktrace for a dead letter job - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the requested dead letter job was not found and the stacktrace has been returned. The response contains the raw stacktrace and always has a Content-type of +text/plain+.
+|404|Indicates the requested dead letter job was not found or the job doesn't have an exception stacktrace. Status-description contains additional information about the error.
+
+|===============
+
+
+
+==== Get a list of dead letterjobs
+
+
+----
+GET management/deadletter-jobs
+----
+
+
+.Get a list of dead letter jobs - URL query parameters
+[options="header"]
+|===============
+|Parameter|Description|Type
+|id|Only return job with the given id|String
+|processInstanceId|Only return jobs part of a process with the given id|String
+|executionId|Only return jobs part of an execution with the given id|String
+|processDefinitionId|Only return jobs with the given process definition id|String
+|executable|If +true+, only return jobs which are executable. If +false+, this parameter is ignored.|Boolean
+|timersOnly|If +true+, only return jobs which are timers. If +false+, this parameter is ignored. Cannot be used together with +$$'messagesOnly'$$+.|Boolean
+|messagesOnly|If +true+, only return jobs which are messages. If +false+, this parameter is ignored. Cannot be used together with +$$'timersOnly'$$+|Boolean
+|withException|If +true+, only return jobs for which an exception occurred while executing it. If +false+, this parameter is ignored.|Boolean
+|dueBefore|Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.|Date
+|dueAfter|Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.|Date
+|withException|If +true+, for which an exception occurred while executing it. If +false+, this parameter is ignored.|Boolean
+|tenantId|String|Only return jobs with exception.
+|tenantIdLike|String|Only return jobs with a tenantId like the given value.
+|withoutTenantId|Boolean|If +true+, only returns jobs without a tenantId set. If +false+, this parameter is ignored.
+|locked|Boolean|If +true+, only returns jobs which are locked. If +false+, this parameter is ignored.
+|unlocked|Boolean|If +true+, only returns jobs which are unlocked. If +false+, this parameter is ignored.
+|sort|Field to sort results on, should be one of +id+, +dueDate+, +executionId+, +processInstanceId+, +retries+ or +tenantId+.|String
+|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+
+|===============
+
+
+*Success response body:*
+
+[source,json,linenums]
+----
+{
+   "data":[
+      {
+         "id":"13",
+         "url":"http://localhost:8182/management/jobs/13",
+         "processInstanceId":"5",
+         "processInstanceUrl":"http://localhost:8182/runtime/process-instances/5",
+         "processDefinitionId":"timerProcess:1:4",
+         "processDefinitionUrl":"http://localhost:8182/repository/process-definitions/timerProcess%3A1%3A4",
+         "executionId":"12",
+         "executionUrl":"http://localhost:8182/runtime/executions/12",
+         "retries":0,
+         "withException":"Can't find scripting engine for 'unexistinglanguage'",
+         "dueDate":"2013-06-07T10:00:24.653+0000",
+         "createTime":"2013-06-06T08:08:24.007+0000"
+         "tenantId":null
+      }
+   ],
+   "total":2,
+   "start":0,
+   "sort":"id",
+   "order":"asc",
+   "size":2
+}
+----
+
+
+.Get a list of dead letter jobs - Response codes
 [options="header"]
 |===============
 |Response code|Description
