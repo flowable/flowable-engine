@@ -67,6 +67,16 @@ public class HistoricEntityLinkEntityManagerImpl extends AbstractEntityManager<H
     public void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
         historicEntityLinkDataManager.deleteHistoricEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
     }
+    
+    @Override
+    public void deleteHistoricEntityLinksForNonExistingProcessInstances() {
+        historicEntityLinkDataManager.deleteHistoricEntityLinksForNonExistingProcessInstances();
+    }
+    
+    @Override
+    public void deleteHistoricEntityLinksForNonExistingCaseInstances() {
+        historicEntityLinkDataManager.deleteHistoricEntityLinksForNonExistingCaseInstances();
+    }
 
     public HistoricEntityLinkDataManager getHistoricEntityLinkDataManager() {
         return historicEntityLinkDataManager;

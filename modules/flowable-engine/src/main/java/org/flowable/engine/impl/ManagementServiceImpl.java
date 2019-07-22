@@ -37,6 +37,7 @@ import org.flowable.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.engine.impl.cmd.GetTableNameCmd;
+import org.flowable.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.engine.impl.cmd.RescheduleTimerJobCmd;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.DeadLetterJobQuery;
@@ -236,6 +237,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public String getDeadLetterJobExceptionStacktrace(String jobId) {
         return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.DEADLETTER));
+    }
+    
+    @Override
+    public void handleHistoryCleanupTimerJob() {
+        commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
     }
 
     @Override

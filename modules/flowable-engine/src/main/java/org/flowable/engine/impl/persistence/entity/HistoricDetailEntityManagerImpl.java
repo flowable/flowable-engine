@@ -135,6 +135,11 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
             }
         }
     }
+    
+    @Override
+    public void deleteHistoricDetailForNonExistingProcessInstances() {
+        historicDetailDataManager.deleteHistoricDetailForNonExistingProcessInstances();
+    }
 
     @Override
     public List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap) {

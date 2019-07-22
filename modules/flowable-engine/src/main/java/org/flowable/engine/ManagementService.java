@@ -321,6 +321,8 @@ public interface ManagementService {
      *             when no job exists with the given id.
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
+    
+    void handleHistoryCleanupTimerJob();
 
     /** get the list of properties. */
     Map<String, String> getProperties();

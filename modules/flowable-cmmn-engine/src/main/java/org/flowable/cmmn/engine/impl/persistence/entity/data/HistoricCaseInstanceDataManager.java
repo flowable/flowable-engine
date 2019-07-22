@@ -34,4 +34,5 @@ public interface HistoricCaseInstanceDataManager extends DataManager<HistoricCas
 
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
+    void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery);
 }

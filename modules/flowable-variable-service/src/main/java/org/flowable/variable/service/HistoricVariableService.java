@@ -48,4 +48,7 @@ public interface HistoricVariableService {
     
     void deleteHistoricVariableInstancesByTaskId(String taskId);
     
+    void deleteHistoricVariableInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricVariableInstancesForNonExistingCaseInstances();
 }

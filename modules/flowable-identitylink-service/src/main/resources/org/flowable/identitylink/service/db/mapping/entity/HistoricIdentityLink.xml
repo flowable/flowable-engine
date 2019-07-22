@@ -90,6 +90,36 @@
     delete from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
   
+  <delete id="bulkDeleteHistoricProcessIdentityLinks" parameterType="java.util.Map">
+    delete LINK from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ is not null and LINK.PROC_INST_ID_ != '' and 
+    NOT EXISTS (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC where LINK.PROC_INST_ID_ = PROC.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricProcessIdentityLinks" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+    PROC_INST_ID_ NOT IN (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricCaseIdentityLinks" parameterType="java.util.Map">
+    delete LINK from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.SCOPE_ID_ is not null and LINK.SCOPE_ID_ != '' and LINK.SCOPE_TYPE_ = 'cmmn' and
+    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where LINK.SCOPE_ID_ = CASEINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricCaseIdentityLinks" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
+    SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricTaskIdentityLinks" parameterType="java.util.Map">
+    delete LINK from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ is not null and LINK.TASK_ID_ != '' and 
+    NOT EXISTS (select TASK.ID_ from ${prefix}ACT_HI_TASKINST TASK where LINK.TASK_ID_ = TASK.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricTaskIdentityLinks" databaseId="h2"  parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ is not null and TASK_ID_ != '' and 
+    TASK_ID_ NOT IN (select TASK.ID_ from ${prefix}ACT_HI_TASKINST TASK)
+  </delete>
+  
   <!-- HISTORIC IDENTITY LINK RESULTMAP -->
 
   <resultMap id="historicIdentityLinkResultMap" type="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">

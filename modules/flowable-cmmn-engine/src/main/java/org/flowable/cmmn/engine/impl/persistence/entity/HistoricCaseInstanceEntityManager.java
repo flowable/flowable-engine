@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
+import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
@@ -34,4 +35,5 @@ public interface HistoricCaseInstanceEntityManager extends EntityManager<Histori
 
     long countByCriteria(HistoricCaseInstanceQuery query);
     
+    void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery);
 }

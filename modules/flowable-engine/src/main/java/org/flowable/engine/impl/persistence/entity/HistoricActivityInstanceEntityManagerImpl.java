@@ -82,6 +82,16 @@ public class HistoricActivityInstanceEntityManagerImpl extends AbstractEntityMan
     public long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
         return historicActivityInstanceDataManager.findHistoricActivityInstanceCountByNativeQuery(parameterMap);
     }
+    
+    @Override
+    public void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        historicActivityInstanceDataManager.deleteHistoricActivityInstances(historicActivityInstanceQuery);
+    }
+    
+    @Override
+    public void deleteHistoricActivityInstancesForNonExistingProcessInstances() {
+        historicActivityInstanceDataManager.deleteHistoricActivityInstancesForNonExistingProcessInstances();
+    }
 
     public HistoricActivityInstanceDataManager getHistoricActivityInstanceDataManager() {
         return historicActivityInstanceDataManager;

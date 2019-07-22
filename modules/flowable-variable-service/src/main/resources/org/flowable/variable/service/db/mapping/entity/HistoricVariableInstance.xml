@@ -146,6 +146,26 @@
             ID_ = #{variable.id, jdbcType=VARCHAR}
         </foreach>
     </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
+        delete VARINST from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and VARINST.PROC_INST_ID_ != '' and 
+        NOT EXISTS (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC where VARINST.PROC_INST_ID_ = PROC.ID_)
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
+        delete from ${prefix}ACT_HI_VARINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+        PROC_INST_ID_ NOT IN (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC)
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
+        delete VARINST from ${prefix}ACT_HI_VARINST VARINST where VARINST.SCOPE_ID_ is not null and VARINST.SCOPE_ID_ != '' and VARINST.SCOPE_TYPE_ = 'cmmn' and
+        NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where VARINST.SCOPE_ID_ = CASEINST.ID_)
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" databaseId="h2" parameterType="java.util.Map">
+        delete from ${prefix}ACT_HI_VARINST where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
+        SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)
+    </delete>
 
     <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->
     <resultMap id="historicProcessVariableResultMap" type="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">

@@ -95,8 +95,13 @@ public class ProcessEngineImpl implements ProcessEngine {
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
         }
+        
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isAutoActivate()) {
             asyncHistoryExecutor.start();
+        }
+        
+        if (processEngineConfiguration.isEnableHistoryCleaning()) {
+            managementService.handleHistoryCleanupTimerJob();
         }
     }
 

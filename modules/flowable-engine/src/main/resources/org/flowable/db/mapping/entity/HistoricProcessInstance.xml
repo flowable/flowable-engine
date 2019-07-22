@@ -153,31 +153,31 @@
   <update id="updateHistoricProcessInstance" parameterType="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
     update ${prefix}ACT_HI_PROCINST
       <set>
-      	REV_ = #{revisionNext, jdbcType=INTEGER},
-      	<if test="originalPersistentState.processDefinitionId != processDefinitionId">
-	      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-	    </if>
-	    <if test="originalPersistentState.businessKey != businessKey">
-	      BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
-	    </if>
-	    <if test="originalPersistentState.startTime != startTime">
-	      START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
-	    </if>
-	    <if test="originalPersistentState.endTime != endTime">
-	      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-	    </if>
-	    <if test="originalPersistentState.durationInMillis != durationInMillis">
-	      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
-	    </if>
-	    <if test="originalPersistentState.endActivityId != endActivityId">
-	      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+        REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+          PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.businessKey != businessKey">
+          BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.startTime != startTime">
+          START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.endTime != endTime">
+          END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.durationInMillis != durationInMillis">
+          DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
+        </if>
+        <if test="originalPersistentState.endActivityId != endActivityId">
+          END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.deleteReason != deleteReason">
-	      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
-	    </if>
-	    <if test="originalPersistentState.name != name">
-	      NAME_ = #{name, jdbcType=VARCHAR},
-	    </if>
+          DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.name != name">
+          NAME_ = #{name, jdbcType=VARCHAR},
+        </if>
         <if test="originalPersistentState.callbackId != callbackId">
           CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
         </if> 
@@ -278,7 +278,7 @@
     where PROC_DEF_ID_ = #{parameter}
   </select>
   
-    <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicProcessInstanceResultMap">
+  <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicProcessInstanceResultMap">
     select *
     from ${prefix}ACT_HI_PROCINST 
     where SUPER_PROCESS_INSTANCE_ID_ = #{parameter}
@@ -286,7 +286,7 @@
   
 
   <select id="selectHistoricProcessInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -407,6 +407,23 @@
     <include refid="commonSelectHistoricProcessInstancesByQueryCriteriaSql"/>
   </sql>
   
+  <delete id="bulkDeleteHistoricProcessInstances">
+    delete from ${prefix}ACT_HI_PROCINST
+    <where>
+      <include refid="commonInstanceQuerySql">
+        <property name="queryTablePrefix" value=""/>
+      </include>
+      <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
+        and
+        <trim prefix="(" prefixOverrides="OR" suffix=")">
+          <include refid="commonInstanceOrQuerySql">
+            <property name="queryTablePrefix" value=""/>
+          </include>
+        </trim>
+      </foreach>
+    </where>
+  </delete>
+  
   <sql id="commonSelectHistoricProcessInstancesByQueryCriteriaSql">
     <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
       <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
@@ -430,18 +447,9 @@
       left outer join ${prefix}ACT_RU_TIMER_JOB JOB ON RES.PROC_INST_ID_ = JOB.PROCESS_INSTANCE_ID_
     </if>
     <where>
-      <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
-      </if>
-      <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
-        and RES.PROC_INST_ID_ in
-        <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
-      </if>
+      <include refid="commonInstanceQuerySql">
+        <property name="queryTablePrefix" value="RES."/>
+      </include>
       <if test="processDefinitionKey != null">
         and DEF.KEY_ = #{processDefinitionKey}
       </if>
@@ -461,9 +469,6 @@
       <if test="processDefinitionName != null">
         and DEF.NAME_ = #{processDefinitionName}
       </if>
-      <if test="businessKey != null">
-        and RES.BUSINESS_KEY_ = #{businessKey}
-      </if>
       <if test="deploymentId != null">
         and DEF.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
@@ -474,80 +479,10 @@
           #{deployment}
         </foreach>
       </if>
-      <if test="startedBefore != null">
-        and RES.START_TIME_ &lt;= #{startedBefore}
-      </if>
-      <if test="startedAfter != null">
-        and RES.START_TIME_ &gt;= #{startedAfter}
-      </if>
-      <if test="finishedBefore != null">
-        and RES.END_TIME_ &lt;= #{finishedBefore}
-      </if>
-      <if test="finishedAfter != null">
-        and RES.END_TIME_ &gt;= #{finishedAfter}
-      </if>
       <if test="processKeyNotIn != null">
         <foreach collection="processKeyNotIn" index="index" item="procDefKey">
-        and DEF.KEY_ not like #{procDefKey}${wildcardEscapeClause}
-      </foreach>
-      </if>
-      <if test="unfinished">
-        and RES.END_TIME_ IS NULL
-      </if>
-      <if test="finished">
-        and RES.END_TIME_ is not NULL
-      </if>
-      <if test="notDeleted">
-        and RES.DELETE_REASON_ IS NULL
-      </if>
-      <if test="deleted">
-        and RES.DELETE_REASON_ IS NOT NULL
-      </if>
-      <if test="involvedUser != null">
-        and (
-          exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{involvedUser} and LINK.PROC_INST_ID_ = RES.ID_)
-        )
-      </if>
-        <if test="involvedGroups != null">
-            and EXISTS(
-            select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = RES.ID_ and LINK.GROUP_ID_ in
-            <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
-                #{involvedGroup}
-            </foreach>
-            )
-        </if>
-        <if test="startedBy != null">
-        and RES.START_USER_ID_ = #{startedBy}
-      </if>
-      <if test="superProcessInstanceId != null">
-        and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
-      </if>
-      <if test="excludeSubprocesses">
-        and RES.SUPER_PROCESS_INSTANCE_ID_ is null
-      </if>
-      <if test="callbackId != null">
-        and CALLBACK_ID_ = #{callbackId}
-      </if>
-      <if test="callbackType != null">
-        and CALLBACK_TYPE_ = #{callbackType}
-      </if>
-      <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
-      </if>
-      <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
-      </if>
-      <if test="withoutTenantId">
-        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
-      </if>
-       <if test="name != null">
-        and RES.NAME_ = #{name}
-      </if>
-      <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
-      </if>
-        <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
+            and DEF.KEY_ not like #{procDefKey}${wildcardEscapeClause}
+        </foreach>
       </if>
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         <choose>
@@ -581,8 +516,8 @@
                   </choose>
                   #{queryVariableValue.textValue}
                   <choose>
-        			<when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
-        		  </choose>
+                    <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                  </choose>
                 </if>
                 <if test="queryVariableValue.textValue2 != null">
                 and A${index}.TEXT2_
@@ -592,8 +527,8 @@
                 </choose>
                   #{queryVariableValue.textValue2}
                   <choose>
-        			<when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
-        		  </choose>
+                    <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+                  </choose>
                 </if>
                 <if test="queryVariableValue.longValue != null">
                     and A${index}.LONG_
@@ -622,18 +557,9 @@
       <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
         and
         <trim prefix="(" prefixOverrides="OR" suffix=")">
-          <if test="orQueryObject.processInstanceId != null">
-            RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId}
-          </if>
-          <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.isEmpty()">
-            or RES.PROC_INST_ID_ in
-            <foreach item="item" index="index" collection="orQueryObject.processInstanceIds" open="(" separator="," close=")">
-              #{item}
-            </foreach>
-          </if>
-          <if test="orQueryObject.processDefinitionId != null">
-            or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}
-          </if>
+          <include refid="commonInstanceOrQuerySql">
+            <property name="queryTablePrefix" value="RES."/>
+          </include>
           <if test="orQueryObject.processDefinitionKey != null">
             or DEF_OR${orIndex}.KEY_ = #{orQueryObject.processDefinitionKey}
           </if>
@@ -653,9 +579,6 @@
           <if test="orQueryObject.processDefinitionName != null">
             or DEF_OR${orIndex}.NAME_ = #{orQueryObject.processDefinitionName}
           </if>
-          <if test="orQueryObject.businessKey != null">
-            or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey}
-          </if>
           <if test="orQueryObject.deploymentId != null">
             or DEPLOY_P_OR${orIndex}.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
           </if>
@@ -666,18 +589,6 @@
               #{deployment}
             </foreach>
           </if>
-          <if test="orQueryObject.startedBefore != null">
-            or RES.START_TIME_ &lt;= #{orQueryObject.startedBefore}
-          </if>
-          <if test="orQueryObject.startedAfter != null">
-            or RES.START_TIME_ &gt;= #{orQueryObject.startedAfter}
-          </if>
-          <if test="orQueryObject.finishedBefore != null">
-            or (RES.END_TIME_ is not NULL and RES.END_TIME_ &lt;= #{orQueryObject.finishedBefore})
-          </if>
-          <if test="orQueryObject.finishedAfter != null">
-            or (RES.END_TIME_ is not NULL and RES.END_TIME_ &gt;= #{orQueryObject.finishedAfter})
-          </if>
           <if test="orQueryObject.processKeyNotIn != null">
             or
             <trim prefix="(" prefixOverrides="AND" suffix=")">
@@ -685,64 +596,6 @@
                 and DEF_OR${orIndex}.KEY_ not like #{procDefKey}${wildcardEscapeClause}
               </foreach>
             </trim>
-          </if>
-          <if test="orQueryObject.unfinished">
-            or RES.END_TIME_ IS NULL
-          </if>
-          <if test="orQueryObject.finished">
-            or RES.END_TIME_ is not NULL
-          </if>
-          <if test="orQueryObject.notDeleted">
-            or RES.DELETE_REASON_ IS NULL
-          </if>
-          <if test="orQueryObject.deleted">
-            or RES.DELETE_REASON_ IS NOT NULL
-          </if>
-          <if test="orQueryObject.involvedUser != null">
-            or (
-              exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{orQueryObject.involvedUser} and LINK.PROC_INST_ID_ = RES.ID_)
-            )
-          </if>
-            <if test="orQueryObject.involvedGroups != null">
-              or EXISTS(
-                    select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = RES.ID_ and LINK.GROUP_ID_ in
-                    <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
-                        #{involvedGroup}
-                    </foreach>
-              )
-            </if>
-          <if test="orQueryObject.startedBy != null">
-            or RES.START_USER_ID_ = #{orQueryObject.startedBy}
-          </if>
-          <if test="orQueryObject.superProcessInstanceId != null">
-            or RES.SUPER_PROCESS_INSTANCE_ID_ = #{orQueryObject.superProcessInstanceId}
-          </if>
-          <if test="orQueryObject.excludeSubprocesses">
-            or RES.SUPER_PROCESS_INSTANCE_ID_ is null
-          </if>
-          <if test="orQueryObject.callbackId != null">
-            or CALLBACK_ID_ = #{orQueryObject.callbackId}
-          </if>
-          <if test="orQueryObject.callbackType != null">
-            or CALLBACK_TYPE_ = #{orQueryObject.callbackType}
-          </if>
-          <if test="orQueryObject.tenantId != null">
-            or RES.TENANT_ID_ = #{orQueryObject.tenantId}
-          </if>
-          <if test="orQueryObject.tenantIdLike != null">
-            or RES.TENANT_ID_ like #{orQueryObject.tenantIdLike}${wildcardEscapeClause}
-          </if>
-          <if test="orQueryObject.withoutTenantId">
-            or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
-          </if>
-           <if test="orQueryObject.name != null">
-            or RES.NAME_ = #{orQueryObject.name}
-          </if>
-          <if test="orQueryObject.nameLike != null">
-            or RES.NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
-          </if>
-          <if test="orQueryObject.nameLikeIgnoreCase != null">
-            or lower(RES.NAME_) like #{orQueryObject.nameLikeIgnoreCase}${wildcardEscapeClause}
           </if>
           <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
             or
@@ -778,8 +631,8 @@
                     </choose>
                     #{queryVariableValue.textValue}
                     <choose>
-    				  <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
-    				</choose>
+                      <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                    </choose>
                   </if>
                   <if test="queryVariableValue.textValue2 != null">
                     and A_OR${orIndex}.TEXT2_
@@ -789,8 +642,8 @@
                     </choose>
                     #{queryVariableValue.textValue2}
                     <choose>
-    				  <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
-    				</choose>
+                      <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+                    </choose>
                   </if>
                   <if test="queryVariableValue.longValue != null">
                     and A_OR${orIndex}.LONG_
@@ -825,6 +678,182 @@
     </where>
   </sql>
   
+  <sql id="commonInstanceQuerySql">
+    <if test="processInstanceId != null">
+        ${queryTablePrefix}PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
+        and ${queryTablePrefix}PROC_INST_ID_ in
+        <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="processDefinitionId != null">
+        and ${queryTablePrefix}PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="businessKey != null">
+        and ${queryTablePrefix}BUSINESS_KEY_ = #{businessKey}
+      </if>
+      <if test="startedBefore != null">
+        and ${queryTablePrefix}START_TIME_ &lt;= #{startedBefore}
+      </if>
+      <if test="startedAfter != null">
+        and ${queryTablePrefix}START_TIME_ &gt;= #{startedAfter}
+      </if>
+      <if test="finishedBefore != null">
+        and ${queryTablePrefix}END_TIME_ &lt;= #{finishedBefore}
+      </if>
+      <if test="finishedAfter != null">
+        and ${queryTablePrefix}END_TIME_ &gt;= #{finishedAfter}
+      </if>
+      <if test="unfinished">
+        and ${queryTablePrefix}END_TIME_ IS NULL
+      </if>
+      <if test="finished">
+        and ${queryTablePrefix}END_TIME_ is not NULL
+      </if>
+      <if test="notDeleted">
+        and ${queryTablePrefix}DELETE_REASON_ IS NULL
+      </if>
+      <if test="deleted">
+        and ${queryTablePrefix}DELETE_REASON_ IS NOT NULL
+      </if>
+      <if test="involvedUser != null">
+        and (
+          exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{involvedUser} and LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_)
+        )
+      </if>
+        <if test="involvedGroups != null">
+            and EXISTS(
+            select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_ and LINK.GROUP_ID_ in
+            <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
+                #{involvedGroup}
+            </foreach>
+            )
+        </if>
+        <if test="startedBy != null">
+        and ${queryTablePrefix}START_USER_ID_ = #{startedBy}
+      </if>
+      <if test="superProcessInstanceId != null">
+        and ${queryTablePrefix}SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
+      </if>
+      <if test="excludeSubprocesses">
+        and ${queryTablePrefix}SUPER_PROCESS_INSTANCE_ID_ is null
+      </if>
+      <if test="callbackId != null">
+        and ${queryTablePrefix}CALLBACK_ID_ = #{callbackId}
+      </if>
+      <if test="callbackType != null">
+        and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType}
+      </if>
+      <if test="tenantId != null">
+        and ${queryTablePrefix}TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and ${queryTablePrefix}TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+      </if>
+      <if test="withoutTenantId">
+        and (${queryTablePrefix}TENANT_ID_ = '' or ${queryTablePrefix}TENANT_ID_ is null)
+      </if>
+       <if test="name != null">
+        and ${queryTablePrefix}NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and ${queryTablePrefix}NAME_ like #{nameLike}${wildcardEscapeClause}
+      </if>
+        <if test="nameLikeIgnoreCase != null">
+        and lower(${queryTablePrefix}NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+  </sql>
+  
+  <sql id="commonInstanceOrQuerySql">
+      <if test="orQueryObject.processInstanceId != null">
+        ${queryTablePrefix}PROC_INST_ID_ = #{orQueryObject.processInstanceId}
+      </if>
+      <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.isEmpty()">
+        or ${queryTablePrefix}PROC_INST_ID_ in
+        <foreach item="item" index="index" collection="orQueryObject.processInstanceIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="orQueryObject.processDefinitionId != null">
+        or ${queryTablePrefix}PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}
+      </if>
+      <if test="orQueryObject.businessKey != null">
+        or ${queryTablePrefix}BUSINESS_KEY_ = #{orQueryObject.businessKey}
+      </if>
+      <if test="orQueryObject.startedBefore != null">
+        or ${queryTablePrefix}START_TIME_ &lt;= #{orQueryObject.startedBefore}
+      </if>
+      <if test="orQueryObject.startedAfter != null">
+        or ${queryTablePrefix}START_TIME_ &gt;= #{orQueryObject.startedAfter}
+      </if>
+      <if test="orQueryObject.finishedBefore != null">
+        or (${queryTablePrefix}END_TIME_ is not NULL and ${queryTablePrefix}END_TIME_ &lt;= #{orQueryObject.finishedBefore})
+      </if>
+      <if test="orQueryObject.finishedAfter != null">
+        or (${queryTablePrefix}END_TIME_ is not NULL and ${queryTablePrefix}END_TIME_ &gt;= #{orQueryObject.finishedAfter})
+      </if>
+      <if test="orQueryObject.unfinished">
+        or ${queryTablePrefix}END_TIME_ IS NULL
+      </if>
+      <if test="orQueryObject.finished">
+        or ${queryTablePrefix}END_TIME_ is not NULL
+      </if>
+      <if test="orQueryObject.notDeleted">
+        or ${queryTablePrefix}DELETE_REASON_ IS NULL
+      </if>
+      <if test="orQueryObject.deleted">
+        or ${queryTablePrefix}DELETE_REASON_ IS NOT NULL
+      </if>
+      <if test="orQueryObject.involvedUser != null">
+        or (
+          exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{orQueryObject.involvedUser} and LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_)
+        )
+      </if>
+        <if test="orQueryObject.involvedGroups != null">
+          or EXISTS(
+                select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_ and LINK.GROUP_ID_ in
+                <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
+                    #{involvedGroup}
+                </foreach>
+          )
+        </if>
+      <if test="orQueryObject.startedBy != null">
+        or ${queryTablePrefix}START_USER_ID_ = #{orQueryObject.startedBy}
+      </if>
+      <if test="orQueryObject.superProcessInstanceId != null">
+        or ${queryTablePrefix}SUPER_PROCESS_INSTANCE_ID_ = #{orQueryObject.superProcessInstanceId}
+      </if>
+      <if test="orQueryObject.excludeSubprocesses">
+        or ${queryTablePrefix}SUPER_PROCESS_INSTANCE_ID_ is null
+      </if>
+      <if test="orQueryObject.callbackId != null">
+        or ${queryTablePrefix}CALLBACK_ID_ = #{orQueryObject.callbackId}
+      </if>
+      <if test="orQueryObject.callbackType != null">
+        or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType}
+      </if>
+      <if test="orQueryObject.tenantId != null">
+        or ${queryTablePrefix}TENANT_ID_ = #{orQueryObject.tenantId}
+      </if>
+      <if test="orQueryObject.tenantIdLike != null">
+        or ${queryTablePrefix}TENANT_ID_ like #{orQueryObject.tenantIdLike}${wildcardEscapeClause}
+      </if>
+      <if test="orQueryObject.withoutTenantId">
+        or (${queryTablePrefix}TENANT_ID_ = '' or ${queryTablePrefix}TENANT_ID_ is null)
+      </if>
+       <if test="orQueryObject.name != null">
+        or ${queryTablePrefix}NAME_ = #{orQueryObject.name}
+      </if>
+      <if test="orQueryObject.nameLike != null">
+        or ${queryTablePrefix}NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
+      </if>
+      <if test="orQueryObject.nameLikeIgnoreCase != null">
+        or lower(${queryTablePrefix}NAME_) like #{orQueryObject.nameLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+  </sql>
+  
   <sql id="executionVariableOperator">
     <choose>
       <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
@@ -839,7 +868,7 @@
   </sql>
  
    <select id="selectHistoricProcessInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">
-   	<include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
   </select>
   
   <select id="selectHistoricProcessInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">

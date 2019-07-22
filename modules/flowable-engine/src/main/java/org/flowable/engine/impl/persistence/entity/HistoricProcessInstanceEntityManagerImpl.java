@@ -91,6 +91,11 @@ public class HistoricProcessInstanceEntityManagerImpl extends AbstractEntityMana
     public long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
         return historicProcessInstanceDataManager.findHistoricProcessInstanceCountByNativeQuery(parameterMap);
     }
+    
+    @Override
+    public void deleteHistoricProcessInstances(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        historicProcessInstanceDataManager.deleteHistoricProcessInstances(historicProcessInstanceQuery);
+    }
 
     public HistoricProcessInstanceDataManager getHistoricProcessInstanceDataManager() {
         return historicProcessInstanceDataManager;

@@ -46,4 +46,5 @@ public interface HistoricDetailDataManager extends DataManager<HistoricDetailEnt
 
     long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap);
 
+    void deleteHistoricDetailForNonExistingProcessInstances();
 }

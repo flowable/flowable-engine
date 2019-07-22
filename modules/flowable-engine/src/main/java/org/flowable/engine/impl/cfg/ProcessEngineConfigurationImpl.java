@@ -93,10 +93,12 @@ import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DefaultCandidateManager;
+import org.flowable.engine.DefaultHistoryCleaningManager;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryCleaningManager;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
@@ -248,6 +250,7 @@ import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
+import org.flowable.engine.impl.jobexecutor.BpmnHistoryCleanupJobHandler;
 import org.flowable.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
@@ -733,7 +736,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected String jobExecutionScope;
     protected String historyJobExecutionScope;
     
-    private String asyncExecutorTenantId = AbstractEngineConfiguration.NO_TENANT_ID;
+    protected String asyncExecutorTenantId = AbstractEngineConfiguration.NO_TENANT_ID;
+    
+    protected boolean enableHistoryCleaning = false;
+    protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
+    protected int cleanInstancesEndedAfterNumberOfDays = 365;
+    protected HistoryCleaningManager historyCleaningManager;
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
@@ -1015,6 +1023,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initAsyncHistoryExecutor();
         configuratorsAfterInit();
         afterInitTaskServiceConfiguration();
+        
+        initHistoryCleaningManager();
     }
 
     // failedJobCommandFactory
@@ -1629,6 +1639,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
     
+    public void initHistoryCleaningManager() {
+        if (historyCleaningManager == null) {
+            historyCleaningManager = new DefaultHistoryCleaningManager(this);
+        }
+    }
+    
     public void removeHistoryJobHandler(String historyJobHandlerType) {
         this.historyJobHandlers.remove(historyJobHandlerType);
         if (this.jobServiceConfiguration != null) {
@@ -1931,6 +1947,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         AsyncCompleteCallActivityJobHandler asyncCompleteCallActivityJobHandler = new AsyncCompleteCallActivityJobHandler();
         jobHandlers.put(asyncCompleteCallActivityJobHandler.getType(), asyncCompleteCallActivityJobHandler);
+        
+        BpmnHistoryCleanupJobHandler bpmnHistoryCleanupJobHandler = new BpmnHistoryCleanupJobHandler();
+        jobHandlers.put(bpmnHistoryCleanupJobHandler.getType(), bpmnHistoryCleanupJobHandler);
 
         // if we have custom job handlers, register them
         if (getCustomJobHandlers() != null) {
@@ -4684,7 +4703,36 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void setAsyncExecutorTenantId(String asyncExecutorTenantId) {
         this.asyncExecutorTenantId = asyncExecutorTenantId;
     }
-    
-    
-    
+
+    public boolean isEnableHistoryCleaning() {
+        return enableHistoryCleaning;
+    }
+
+    public void setEnableHistoryCleaning(boolean enableHistoryCleaning) {
+        this.enableHistoryCleaning = enableHistoryCleaning;
+    }
+
+    public String getHistoryCleaningTimeCycleConfig() {
+        return historyCleaningTimeCycleConfig;
+    }
+
+    public void setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
+        this.historyCleaningTimeCycleConfig = historyCleaningTimeCycleConfig;
+    }
+
+    public int getCleanInstancesEndedAfterNumberOfDays() {
+        return cleanInstancesEndedAfterNumberOfDays;
+    }
+
+    public void setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
+        this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+    }
+
+    public HistoryCleaningManager getHistoryCleaningManager() {
+        return historyCleaningManager;
+    }
+
+    public void setHistoryCleaningManager(HistoryCleaningManager historyCleaningManager) {
+        this.historyCleaningManager = historyCleaningManager;
+    }
 }
