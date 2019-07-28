@@ -63,6 +63,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -128,6 +129,7 @@ public class BaseSpringRestTestCase {
     protected DynamicBpmnService dynamicBpmnService;
     protected FormRepositoryService formRepositoryService;
     protected org.flowable.form.api.FormService formEngineFormService;
+    protected ProcessMigrationService processInstanceMigrationService;
 
     protected static CloseableHttpClient client;
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
@@ -176,6 +178,7 @@ public class BaseSpringRestTestCase {
         dynamicBpmnService = appContext.getBean(DynamicBpmnService.class);
         formRepositoryService = appContext.getBean(FormRepositoryService.class);
         formEngineFormService = appContext.getBean(org.flowable.form.api.FormService.class);
+        processInstanceMigrationService = appContext.getBean(ProcessMigrationService.class);
         
         if (server == null) {
             TestServer testServer = TestServerUtil.createAndStartServer(appContext);

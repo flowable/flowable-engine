@@ -12,10 +12,6 @@
  */
 package org.flowable.ui.admin.service.engine;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
@@ -26,6 +22,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
@@ -38,6 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Service for invoking Flowable REST services.
@@ -91,6 +92,19 @@ public class ProcessDefinitionService {
     public BpmnModel getProcessDefinitionModel(ServerConfig serverConfig, String definitionId) {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/process-definitions/" + definitionId + "/resourcedata"));
         return executeRequestForXML(get, serverConfig, HttpStatus.SC_OK);
+    }
+    
+    public void migrateInstancesOfProcessDefinition(ServerConfig serverConfig, String processDefinitionId, String migrationDocument) throws FlowableServiceException {
+        try {
+            URIBuilder builder = clientUtil.createUriBuilder("repository/process-definitions/" + processDefinitionId + "/batch-migrate");
+            HttpPost post = clientUtil.createPost(builder.build().toString(), serverConfig);
+
+            post.setEntity(clientUtil.createStringEntity(migrationDocument));
+            clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_OK);
+
+        } catch (Exception e) {
+            throw new FlowableServiceException(e.getMessage(), e);
+        }
     }
 
     protected BpmnModel executeRequestForXML(HttpUriRequest request, ServerConfig serverConfig, int expectedStatusCode) {

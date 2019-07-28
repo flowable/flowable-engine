@@ -16,69 +16,58 @@ package org.flowable.engine.impl.cmd;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
+import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
 
-/**
- * @author Dennis Federico
- */
 public class ProcessInstanceMigrationValidationCmd implements Command<ProcessInstanceMigrationValidationResult> {
-
-    protected ProcessInstanceMigrationDocument processInstanceMigrationDocument;
+    
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String processDefinitionKey;
     protected int processDefinitionVersion;
     protected String processDefinitionTenantId;
+    protected ProcessInstanceMigrationDocument processInstanceMigrationDocument;
 
-    public static ProcessInstanceMigrationValidationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-
+    public ProcessInstanceMigrationValidationCmd(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         if (processInstanceId == null) {
             throw new FlowableException("Must specify a process instance id to migrate");
         }
+        
         if (processInstanceMigrationDocument == null) {
-            throw new FlowableException("Must specify a process instance migration document");
+            throw new FlowableException("Must specify a process migration document to migrate");
         }
-        ProcessInstanceMigrationValidationCmd cmd = new ProcessInstanceMigrationValidationCmd();
-        cmd.processInstanceId = processInstanceId;
-        cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
-        return cmd;
+
+        this.processInstanceId = processInstanceId;
+        this.processInstanceMigrationDocument = processInstanceMigrationDocument;
     }
 
-    public static ProcessInstanceMigrationValidationCmd forProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-
+    public ProcessInstanceMigrationValidationCmd(ProcessInstanceMigrationDocument processInstanceMigrationDocument, String processDefinitionId) {
         if (processDefinitionId == null) {
             throw new FlowableException("Must specify a process definition id to migrate");
         }
+        
         if (processInstanceMigrationDocument == null) {
-            throw new FlowableException("Must specify a process instance migration document");
+            throw new FlowableException("Must specify a process migration document to migrate");
         }
-        ProcessInstanceMigrationValidationCmd cmd = new ProcessInstanceMigrationValidationCmd();
-        cmd.processDefinitionId = processDefinitionId;
-        cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
-        return cmd;
+
+        this.processDefinitionId = processDefinitionId;
+        this.processInstanceMigrationDocument = processInstanceMigrationDocument;
     }
 
-    public static ProcessInstanceMigrationValidationCmd forProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId,
-        ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-
+    public ProcessInstanceMigrationValidationCmd(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         if (processDefinitionKey == null) {
-            throw new FlowableException("Must specify the process definition key to migrate");
+            throw new FlowableException("Must specify a process definition key to migrate");
         }
-        if (processDefinitionVersion < 0) {
-            throw new FlowableException("Must specify a valid version number to migrate");
-        }
+        
         if (processInstanceMigrationDocument == null) {
-            throw new FlowableException("Must specify a process instance migration document");
+            throw new FlowableException("Must specify a process migration document to migrate");
         }
-        ProcessInstanceMigrationValidationCmd cmd = new ProcessInstanceMigrationValidationCmd();
-        cmd.processDefinitionKey = processDefinitionKey;
-        cmd.processDefinitionVersion = processDefinitionVersion;
-        cmd.processDefinitionTenantId = processDefinitionTenantId;
-        cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
-        return cmd;
+
+        this.processDefinitionKey = processDefinitionKey;
+        this.processDefinitionVersion = processDefinitionVersion;
+        this.processDefinitionTenantId = processDefinitionTenantId;
     }
 
     @Override

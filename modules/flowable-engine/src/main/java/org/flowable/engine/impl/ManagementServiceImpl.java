@@ -16,6 +16,12 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
+import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchQuery;
+import org.flowable.batch.service.impl.BatchBuilderImpl;
+import org.flowable.batch.service.impl.BatchQueryImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.management.TableMetaData;
@@ -30,8 +36,15 @@ import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.DeleteBatchCmd;
 import org.flowable.engine.impl.cmd.DeleteEventLogEntry;
 import org.flowable.engine.impl.cmd.ExecuteCustomSqlCmd;
+import org.flowable.engine.impl.cmd.FindBatchPartsByBatchIdCmd;
+import org.flowable.engine.impl.cmd.FindBatchesBySearchKeyCmd;
+import org.flowable.engine.impl.cmd.GetAllBatchesCmd;
+import org.flowable.engine.impl.cmd.GetBatchDocumentCmd;
+import org.flowable.engine.impl.cmd.GetBatchPartCmd;
+import org.flowable.engine.impl.cmd.GetBatchPartDocumentCmd;
 import org.flowable.engine.impl.cmd.GetEventLogEntriesCmd;
 import org.flowable.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.engine.impl.cmd.GetTableCountCmd;
@@ -242,6 +255,56 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public void handleHistoryCleanupTimerJob() {
         commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
+    }
+    
+    @Override
+    public List<Batch> getAllBatches() {
+        return commandExecutor.execute(new GetAllBatchesCmd());
+    }
+    
+    @Override
+    public List<Batch> findBatchesBySearchKey(String searchKey) {
+        return commandExecutor.execute(new FindBatchesBySearchKeyCmd(searchKey));
+    }
+    
+    @Override
+    public String getBatchDocument(String batchId) {
+        return commandExecutor.execute(new GetBatchDocumentCmd(batchId));
+    }
+    
+    @Override
+    public BatchPart getBatchPart(String batchPartId) {
+        return commandExecutor.execute(new GetBatchPartCmd(batchPartId));
+    }
+    
+    @Override
+    public List<BatchPart> findBatchPartsByBatchId(String batchId) {
+        return commandExecutor.execute(new FindBatchPartsByBatchIdCmd(batchId));
+    }
+    
+    @Override
+    public List<BatchPart> findBatchPartsByBatchIdAndStatus(String batchId, String status) {
+        return commandExecutor.execute(new FindBatchPartsByBatchIdCmd(batchId, status));
+    }
+    
+    @Override
+    public String getBatchPartDocument(String batchPartId) {
+        return commandExecutor.execute(new GetBatchPartDocumentCmd(batchPartId));
+    }
+    
+    @Override
+    public BatchQuery createBatchQuery() {
+        return new BatchQueryImpl(commandExecutor);
+    }
+    
+    @Override
+    public BatchBuilder createBatchBuilder() {
+        return new BatchBuilderImpl(commandExecutor);
+    }
+    
+    @Override
+    public void deleteBatch(String batchId) {
+        commandExecutor.execute(new DeleteBatchCmd(batchId));
     }
 
     @Override

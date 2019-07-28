@@ -25,11 +25,11 @@ import java.util.stream.Collectors;
 
 import org.assertj.core.api.Condition;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
+import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -74,12 +74,10 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefCallActivity.getId());
 
         //Prepare migration and validate
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefSimpleOneTask.getId());
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefSimpleOneTask.getId());
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
-
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages())
-            .containsAnyOf("Call activity 'callActivity' does not exist in the new model. It must be mapped explicitly for migration (or all its child activities)");
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEqualTo(Collections.singletonList("Call activity 'callActivity' does not exist in the new model. It must be mapped explicitly for migration (or all its child activities)"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -118,12 +116,10 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefSubProcess.getId());
 
         //Prepare migration and validate
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefWithoutCallActivity.getId());
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefWithoutCallActivity.getId());
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
-
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages())
-            .containsAnyOf("Call activity 'callActivity' is not a Call Activity in the new model. It must be mapped explicitly for migration (or all its child activities)");
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEqualTo(Collections.singletonList("Call activity 'callActivity' is not a Call Activity in the new model. It must be mapped explicitly for migration (or all its child activities)"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -165,14 +161,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefSubProcessV1.getId());
 
         //Prepare migration and validate
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivityV2.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("evenFlowTask2", "anyTask").inParentProcessOfCallActivityId("callActivity"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
-
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
         assertThat(processInstanceMigrationValidationResult.getValidationMessages())
-            .containsAnyOf("Incomplete migration mapping for call activity. The call activity 'callActivity' called element is different in the new model. Running subProcess activities '[oddFlowTask1]' should also be mapped for migration (or the call activity itself)");
+            .isEqualTo(Collections.singletonList("Incomplete migration mapping for call activity. The call activity 'callActivity' called element is different in the new model. Running subProcess activities '[oddFlowTask1]' should also be mapped for migration (or the call activity itself)"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -204,12 +199,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSimpleOneTask.getId());
 
         //Prepare and action the migration - to a new ProcessDefinition containing a call activity subProcess
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "wrongActivityId").inSubProcessOfCallActivityId("callActivity"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).contains("Invalid mapping for 'userTask1Id' to 'wrongActivityId', cannot be found in the process definition with id 'oneTaskProcess'");
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages())
+            .isEqualTo(Collections.singletonList("Invalid mapping for 'userTask1Id' to 'wrongActivityId', cannot be found in the process definition with id 'oneTaskProcess'"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -240,12 +236,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSimpleOneTask.getId());
 
         //Prepare and action the migration - to a new ProcessDefinition containing a call activity subProcess
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask").inSubProcessOfCallActivityId("wrongCallActivity"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).contains("There's no call activity element with id 'wrongCallActivity' in the process definition with id 'twoTasksParentProcess'");
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages())
+            .isEqualTo(Collections.singletonList("There's no call activity element with id 'wrongCallActivity' in the process definition with id 'twoTasksParentProcess'"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -277,12 +274,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSimpleOneTask.getId());
 
         //First migration attempt using latest "latest" version (default) - The first version of the subProcess contains "userTaskId" but the latest version does not
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "userTask1Id").inSubProcessOfCallActivityId("callActivity"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).contains("Invalid mapping for 'theTask' to 'userTask1Id', cannot be found in the process definition with id 'MP'");
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages())
+            .isEqualTo(Collections.singletonList("Invalid mapping for 'theTask' to 'userTask1Id', cannot be found in the process definition with id 'MP'"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -292,12 +290,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         }
 
         //Second migration attempt using and invalid "unExistent" version
-        processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "userTask1Id").inSubProcessOfCallActivityId("callActivity", 5));
         processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).contains("Invalid mapping for 'theTask' to 'userTask1Id', cannot be found in the process definition with id 'MP'");
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages())
+            .isEqualTo(Collections.singletonList("Invalid mapping for 'theTask' to 'userTask1Id', cannot be found in the process definition with id 'MP'"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -307,12 +306,12 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         }
 
         //Second migration attempt specifies the version of the call activity subProcess
-        processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "userTask1Id").inSubProcessOfCallActivityId("callActivity", 1));
         processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -354,14 +353,14 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask");
 
         //First migration attempt fails because the callElement expression cannot be evaluated
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "theTask").inSubProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
         assertThat(processInstanceMigrationValidationResult.getValidationMessages())
-            .contains("no processes deployed with key '${simpleSubProcessExpression}' for call activity element with id 'callActivity' in the process definition with id 'twoTasksParentProcess'");
+            .isEqualTo(Collections.singletonList("no processes deployed with key '${simpleSubProcessExpression}' for call activity element with id 'callActivity' in the process definition with id 'twoTasksParentProcess'"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -371,14 +370,14 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         }
 
         //Now we do the migration specifying the process variable to resolve the calledElement
-        processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "theTask").inSubProcessOfCallActivityId("callActivity", 2))
             .withProcessInstanceVariable("simpleSubProcessExpression", "oneTaskProcess");
 
         processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -430,13 +429,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefSubProcess.getId());
 
         //Prepare and action the migration - to a new ProcessDefinition containing a call activity subProcess
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("callActivity", "userTask1Id"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -502,13 +501,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefSubProcess.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelMICallActivity", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
 
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -556,13 +555,14 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefSubProcess.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefMITask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("callActivity", "subTask2"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isTrue();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).contains("Invalid mapping for 'callActivity' to 'subTask2', cannot migrate arbitrarily inside a Multi Instance container 'parallelMISubProcess' inside process definition with id 'parallelMultiInstanceSubProcess'");
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isFalse();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages())
+            .isEqualTo(Collections.singletonList("Invalid mapping for 'callActivity' to 'subTask2', cannot migrate arbitrarily inside a Multi Instance container 'parallelMISubProcess' inside process definition with id 'parallelMultiInstanceSubProcess'"));
 
         try {
             processInstanceMigrationBuilder.migrate(processInstance.getId());
@@ -591,13 +591,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSimpleOneTask.getId());
 
         //Prepare and action the migration - to a new ProcessDefinition containing a call activity subProcess
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask").inSubProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -649,12 +649,12 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSimpleOneTask.getId());
 
         //Prepare and action the migration - to a new ProcessDefinition containing a call activity subProcess
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask2Id").inSubProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -705,13 +705,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefSimpleOneTask.getId());
 
         //Prepare and action the migration - to a new ProcessDefinition containing a call activity subProcess
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask").inSubProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -772,11 +772,11 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(subProcessTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefCallActivity.getId());
 
         //Prepare and action the migration - to a new ProcessDefinition containing a call activity subProcess
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefSimpleOneTask.getId())
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "userTask1Id").inParentProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -821,14 +821,14 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefParallelGateway.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefParallelCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("oddFlowTask1", "callActivity1"))
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("evenFlowTask2", "callActivity2"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -883,14 +883,14 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefParallelGateway.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefParallelCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("oddFlowTask1", "userTask1Id").inSubProcessOfCallActivityId("callActivity1"))
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("evenFlowTask2", "theTask").inSubProcessOfCallActivityId("callActivity2"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -944,13 +944,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefParallelGateway.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("oddFlowTask1", "evenFlowTask2"), "theTask").inSubProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1005,13 +1005,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("processTask", "parallelTask"), "theTask").inSubProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1078,13 +1078,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefCallActivity.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor(Arrays.asList("oddFlowTask1", "evenFlowTask2"), "theTask").inParentProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1123,13 +1123,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefWithCallActivity.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", Arrays.asList("oddFlowTask1", "evenFlowTask4")).inSubProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1184,13 +1184,13 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("theTask");
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefParallelTasks.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", Arrays.asList("oddFlowTask1", "evenFlowTask4")).inParentProcessOfCallActivityId("callActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1243,14 +1243,14 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsExactlyInAnyOrder(procDefCallActivity1.getId(), procDefCallActivity2.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefParallelGateway.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("callActivity1", "oddFlowTask1"))
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("callActivity2", "evenFlowTask2"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1302,14 +1302,14 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsExactlyInAnyOrder(procDefCallActivity1.getId(), procDefCallActivity2.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefParallelGateway.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "oddFlowTask1").inParentProcessOfCallActivityId("callActivity1"))
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "evenFlowTask2").inParentProcessOfCallActivityId("callActivity2"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1357,10 +1357,10 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
 
         //Prepare migration and validate
         //Call activity is not mapped explicitly or by auto-map since the call activity element exists by id and refers to the same discernible subProcess (call element)
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefWithCallActivityV2.getId());
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder().migrateToProcessDefinition(procDefWithCallActivityV2.getId());
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.hasErrors()).isFalse();
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm migration
@@ -1421,12 +1421,12 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         assertThat(parallelTasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefCallActivity.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procDefTwoTasks.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("theTask", "userTask2Id").inParentProcessOfCallActivityId("parallelMICallActivity"));
 
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isNullOrEmpty();
 
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
@@ -1448,5 +1448,4 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
         completeProcessInstanceTasks(processInstance.getId());
         assertProcessEnded(processInstance.getId());
     }
-
 }

@@ -577,6 +577,16 @@
                 <artifactId>flowable-job-spring-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-batch-service-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-batch-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-camel</artifactId>
@@ -1007,6 +1017,19 @@
 		<module>modules/flowable-engine-common</module>
 		<module>modules/flowable-entitylink-service-api</module>
 		<module>modules/flowable-entitylink-service</module>
+		<module>modules/flowable-variable-service-api</module>
+		<module>modules/flowable-variable-service</module>
+        <module>modules/flowable-identitylink-service-api</module>
+		<module>modules/flowable-identitylink-service</module>
+		<module>modules/flowable-eventsubscription-service-api</module>
+		<module>modules/flowable-eventsubscription-service</module>
+        <module>modules/flowable-task-service-api</module>
+        <module>modules/flowable-task-service</module>
+        <module>modules/flowable-job-service-api</module>
+        <module>modules/flowable-job-service</module>
+        <module>modules/flowable-job-spring-service</module>
+        <module>modules/flowable-batch-service-api</module>
+        <module>modules/flowable-batch-service</module>
 		<module>modules/flowable-idm-api</module>
 		<module>modules/flowable-idm-engine</module>
 		<module>modules/flowable-idm-engine-configurator</module>
@@ -1024,17 +1047,6 @@
         <module>modules/flowable-cmmn-image-generator</module>
         <module>modules/flowable-cmmn-engine</module>
 		<module>modules/flowable-cmmn-engine-configurator</module>
-        <module>modules/flowable-variable-service-api</module>
-		<module>modules/flowable-variable-service</module>
-        <module>modules/flowable-identitylink-service-api</module>
-		<module>modules/flowable-identitylink-service</module>
-		<module>modules/flowable-eventsubscription-service-api</module>
-		<module>modules/flowable-eventsubscription-service</module>
-        <module>modules/flowable-task-service-api</module>
-        <module>modules/flowable-task-service</module>
-        <module>modules/flowable-job-service-api</module>
-        <module>modules/flowable-job-service</module>
-        <module>modules/flowable-job-spring-service</module>
 		<module>modules/flowable-engine</module>
 		<module>modules/flowable-app-engine-api</module>
 		<module>modules/flowable-app-engine</module>

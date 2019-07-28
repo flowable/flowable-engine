@@ -306,7 +306,7 @@ alter table ACT_PROCDEF_INFO
 alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
-
+    
 insert into ACT_GE_PROPERTY
 values ('schema.version', '6.5.0.2', 1);
 

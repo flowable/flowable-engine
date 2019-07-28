@@ -12,10 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Collections;
 
 import org.flowable.ui.admin.domain.EndpointType;
@@ -28,11 +24,17 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * REST controller for managing the current user's account.
@@ -114,6 +116,18 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
 
         } catch (FlowableServiceException e) {
             LOGGER.error("Error getting jobs for process definition {}", definitionId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+    
+    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}/batch-migrate", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void migrateInstancesOfProcessDefinition(@PathVariable String definitionId, @RequestBody String migrationDocument) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
+        try {
+            clientService.migrateInstancesOfProcessDefinition(serverConfig, definitionId, migrationDocument);
+        } catch (FlowableServiceException e) {
+            LOGGER.error("Error migrating instances of process definition {}", definitionId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

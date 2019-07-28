@@ -37,6 +37,7 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -82,6 +83,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected IdentityService identityService;
     protected ManagementService managementService;
     protected DynamicBpmnService dynamicBpmnService;
+    protected ProcessMigrationService processMigrationService;
 
     @BeforeEach
     public final void initializeServices(ProcessEngine processEngine) {
@@ -95,6 +97,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         identityService = processEngine.getIdentityService();
         managementService = processEngine.getManagementService();
         dynamicBpmnService = processEngine.getDynamicBpmnService();
+        processMigrationService = processEngine.getProcessMigrationService();
     }
 
     protected static void cleanDeployments(ProcessEngine processEngine) {
@@ -215,7 +218,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         }
 
         // runtime activities
-        assertEquals(0L, runtimeService.createActivityInstanceQuery().count());
+        assertEquals(0L, runtimeService.createActivityInstanceQuery().processInstanceId(processInstanceId).count());
     }
 
     public static void assertActivityInstancesAreSame(HistoricActivityInstance historicActInst, ActivityInstance activityInstance) {
