@@ -1,15 +1,15 @@
 [[cdiintegration]]
 
-== CDI integration
+== 集成CDI
 
-The flowable-cdi modules leverages both the configurability of Flowable and the extensibility of cdi. The most prominent features of flowable-cdi are:
+flowable-cdi模块结合了Flowable的可配置性及CDI(上下文和依赖注入, Contexts and Dependency Injection, J2EE)的可扩展性。flowable-cdi最突出的特点是：
 
-* Support for @BusinessProcessScoped beans (CDI beans whose lifecycle is bound to a process instance),
-* A custom El-Resolver for resolving CDI beans (including EJBs) from the process,
-* Declarative control over a process instance using annotations,
-* Flowable is hooked-up to the CDI event bus,
-* Works with both Java EE and Java SE, works with Spring,
-* Support for unit testing.
+* 支持@BusinessProcessScoped bean（生命周期绑定至流程实例的CDI bean），
+* 从流程中解析CDI bean（包括EJB）的自定义El解析器，
+* 使用注解对流程实例进行声明式控制，
+* Flowable关联至CDI事件总线，
+* 可以与Java EE，Java SE，以及Spring一起工作，
+* 支持单元测试。
 
 [source,xml,linenums]
 ----
@@ -20,31 +20,35 @@ The flowable-cdi modules leverages both the configurability of Flowable and the 
 </dependency>
 ----
 
-=== Setting up flowable-cdi
+[[_setting_up_flowable_cdi]]
+=== 安装flowable-cdi
 
-Flowable-cdi can be set up in different environments. In this section we briefly walk through the configuration options.
+Flowable CDI可以安装在不同环境中。在这个章节我们主要介绍配置选项。
 
+[[_looking_up_a_process_engine]]
+==== 查找流程引擎
 
-==== Looking up a Process Engine
+CDI扩展需要访问流程引擎，在运行时会查找++org.flowable.cdi.spi.ProcessEngineLookup++接口的实现。CDI模块提供了默认的名为++org.flowable.cdi.impl.LocalProcessEngineLookup++的实现，使用++ProcessEngines++-Utility类查找流程引擎，默认配置下用 +$$ProcessEngines#NAME_DEFAULT$$+ 查找流程引擎。如果需要使用自定义的名字，需要扩展这个类。请注意：需要将++flowable.cfg.xml++配置文件放在classpath中。
 
-The CDI extension needs to get access to a +ProcessEngine+. To achieve this, an implementation of the interface +org.flowable.cdi.spi.ProcessEngineLookup+ is looked up at runtime. The CDI module ships with a default implementation named +org.flowable.cdi.impl.LocalProcessEngineLookup+, which uses the ++ProcessEngines++-Utility class for looking up the ProcessEngine. In the default configuration +$$ProcessEngines#NAME_DEFAULT$$+ is used to look up the +ProcessEngine+. This class might be subclassed to set a custom name. NOTE: You need a +flowable.cfg.xml+ configuration on the classpath.
-	
-Flowable-cdi uses a +java.util.ServiceLoader+ SPI for resolving an instance of +org.flowable.cdi.spi.ProcessEngineLookup+. In order to provide a custom implementation of the interface, we need to add a plain text file named +META-INF/services/org.flowable.cdi.spi.ProcessEngineLookup+ to our deployment, in which we specify the fully qualified class name of the implementation. 
+Flowable cdi使用java.util.ServiceLoader SPI解析++org.flowable.cdi.spi.ProcessEngineLookup++实例。为了提供接口的自定义实现，需要在部署中添加名为++META-INF/services/org.flowable.cdi.spi.ProcessEngineLookup++的纯文本文件，并在其中设置实现的全限定类名。
 
 [NOTE]
 ====
-If you do not provide a custom +org.flowable.cdi.spi.ProcessEngineLookup+ implementation, Flowable will use the default +LocalProcessEngineLookup+ implementation. In that case, all you need to do is providing a flowable.cfg.xml file on the classpath (see next section).
+如果不提供自定义的++org.flowable.cdi.spi.ProcessEngineLookup++实现，则Flowable会使用默认的++LocalProcessEngineLookup++实现。在这种情况下，只需要在classpath中提供flowable.cfg.xml（参见下一章节）即可。
 ====
 
+[[_configuring_the_process_engine]]
+==== 配置流程引擎
 
-==== Configuring the Process Engine
+配置方式取决于所选用的流程引擎查找策略（上一章节）。这章介绍与LocalProcessEngineLookup一起使用的可用配置选项，并需要在classpath中提供一个Spring flowable.cfg.xml文件。
 
-Configuration depends on the selected +ProcessEngineLookup+-Strategy (cf. previous section). Here, we focus on the configuration options available in combination with the +LocalProcessEngineLookup+, which requires us to provide a Spring +flowable.cfg.xml+ file on the classpath.
+根据底层事务管理策略的不同，Flowable提供了不同的ProcessEngineConfiguration实现。flowable-cdi模块不关注事务，也就意味着可以使用任何事务管理策略（甚至是Spring抽象事务）。按照约定，CDI模块提供两个自定义的ProcessEngineConfiguration实现：
 
-Flowable offers different +ProcessEngineConfiguration+ implementations mostly dependent on the underlying transaction management strategy. The flowable-cdi module is not concerned with transactions, which means that potentially any transaction management strategy  can be used (even the Spring transaction abstraction). As a convenience, the CDI module provides two custom +ProcessEngineConfiguration+ implementations: 
+* ++org.flowable.cdi.CdiJtaProcessEngineConfiguration++: Flowable JtaProcessEngineConfiguration的子类，可用于Flowable使用JTA管理事务的情况
 
-* ++org.flowable.cdi.CdiJtaProcessEngineConfiguration++: a subclass of the Flowable JtaProcessEngineConfiguration can be used if JTA-managed transactions should be used for Flowable
-* ++org.flowable.cdi.CdiStandaloneProcessEngineConfiguration++: a subclass of the Flowable +StandaloneProcessEngineConfiguration+ can be used if plain JDBC transactions should be used for Flowable. The following is an example +flowable.cfg.xml+ file for JBoss 7:
+* ++org.flowable.cdi.CdiStandaloneProcessEngineConfiguration++: StandaloneProcessEngineConfiguration的子类，可用于Flowable使用简单JDBC事务的情况。
+
+下面是一个JBoss 7的flowable.cfg.xml文件示例：
 
 [source,xml,linenums]
 ----
@@ -53,56 +57,57 @@ Flowable offers different +ProcessEngineConfiguration+ implementations mostly de
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<!-- lookup the JTA-Transaction manager -->
+	<!-- 查找JTA事务管理器 -->
 	<bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="java:jboss/TransactionManager"></property>
 		<property name="resourceRef" value="true" />
 	</bean>
 
-	<!-- process engine configuration -->
+	<!-- 流程定义配置 -->
 	<bean id="processEngineConfiguration"
 		class="org.flowable.cdi.CdiJtaProcessEngineConfiguration">
-		<!-- lookup the default Jboss datasource -->
+		<!-- 查找默认的Jboss数据源 -->
 		<property name="dataSourceJndiName" value="java:jboss/datasources/ExampleDS" />
 		<property name="databaseType" value="h2" />
 		<property name="transactionManager" ref="transactionManager" />
-		<!-- using externally managed transactions -->
+		<!-- 使用外部管理事务 -->
 		<property name="transactionsExternallyManaged" value="true" />
 		<property name="databaseSchemaUpdate" value="true" />
 	</bean>
 </beans>
-     	
+
 ----
 
-And this is how it would look like for Glassfish 3.1.1 (assuming a datasource named +jdbc/flowable+ is properly configured):
+这是Glassfish 3.1.1中的配置（假设已正确配置了名为jdbc/flowable的数据源）：
 
-[source,xml,linenums]     	
+
+[source,xml,linenums]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<!-- lookup the JTA-Transaction manager -->
+	<!-- 查找JTA事务管理器 -->
 	<bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
 		<property name="jndiName" value="java:appserver/TransactionManager"></property>
 		<property name="resourceRef" value="true" />
 	</bean>
 
-	<!-- process engine configuration -->
+	<!-- 流程定义配置 -->
 	<bean id="processEngineConfiguration"
 		class="org.flowable.cdi.CdiJtaProcessEngineConfiguration">
 		<property name="dataSourceJndiName" value="jdbc/flowable" />
 		<property name="transactionManager" ref="transactionManager" />
-		<!-- using externally managed transactions -->
+		<!-- 使用外部管理事务 -->
 		<property name="transactionsExternallyManaged" value="true" />
 		<property name="databaseSchemaUpdate" value="true" />
 	</bean>
 </beans>
-     	
+
 ----
 
-Note that the above configuration requires the "spring-context" module:
+请注意上面的配置需要"spring-context"模块：
 
 [source,xml,linenums]
 ----
@@ -113,87 +118,88 @@ Note that the above configuration requires the "spring-context" module:
 </dependency>
 ----
 
-The configuration in a Java SE environment looks exactly like the examples provided in section <<configuration,Creating a ProcessEngine>>, substitute +CdiStandaloneProcessEngineConfiguration+ for +StandaloneProcessEngineConfiguration+. 	 
-     	
-==== Deploying Processes
+Java SE环境中的配置与<<configuration,创建流程引擎>>章节中的示例一样，只是用"CdiStandaloneProcessEngineConfiguration"代替"StandaloneProcessEngineConfiguration"。
 
-Processes can be deployed using the standard Flowable API (+RepositoryService+). In addition, flowable-cdi offers the possibility to auto-deploy processes listed in a file named +processes.xml+ located top-level in the classpath. This is an example +processes.xml+ file:
-     
+[[_deploying_processes]]
+==== 部署流程
+
+可以使用标准的Flowable API（++RepositoryService++）部署流程。另外，flowable-cdi也提供了自动部署流程的功能，部署classpath中的++processes.xml++文件提供的流程列表。这是一个processes.xml文件的例子：
+
 [source,xml,linenums]
 ----
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- list the processes to be deployed -->
+<!-- 需要部署的流程列表 -->
 <processes>
 	<process resource="diagrams/myProcess.bpmn20.xml" />
 	<process resource="diagrams/myOtherProcess.bpmn20.xml" />
-</processes> 
+</processes>
 ----
 
-     
-=== Contextual Process Execution with CDI
+[[_contextual_process_execution_with_cdi]]
+=== 使用CDI的基于上下文的流程执行
 
-In this section we briefly look at the contextual process execution model used by the Flowable CDI extension. A BPMN business process is typically a long-running interaction, comprised of both user and system tasks. At runtime, a process is split-up into a set of individual units of work, performed by users and/or application logic. In flowable-cdi, a process instance can be associated with a CDI scope, the association representing a unit of work. This is particularly useful, if a unit of work is complex, for instance if the implementation of a user task is a complex sequence of different forms and "non-process-scoped" state needs to be kept during this interaction.
+本章节将介绍Flowable CDI扩展使用的基于上下文的流程执行模型（contextual process execution model）。BPMN业务流程通常是一个长期运行的交互动作，包含用户与系统的任务。在运行时，流程分割为独立工作单元的集合，由用户与/或应用逻辑操作。在flowable-cdi中，流程实例可以关联至一个CDI作用域，代表了一个工作单元。在工作单元很复杂的时候特别有用，比如用户任务由多个不同表单的复杂顺序组成，并需要在交互过程中保持"非流程作用域（non-process-scoped）"状态的场景。
 
-In the default configuration, process instances are associated with the "broadest" active scope, starting with the conversation and falling back to the request if the conversation context is not active.	 
+[[_associating_a_conversation_with_a_process_instance]]
+==== 将一个会话关联至一个流程实例
 
-==== Associating a Conversation with a Process Instance 
-	
-When resolving @BusinessProcessScoped beans, or injecting process variables, we rely on an existing association between an active CDI scope and a process instance. flowable-cdi provides the +org.flowable.cdi.BusinessProcess+ bean for controlling the association, most prominently:
-		
-* The _startProcessBy(...)_ methods, mirroring the respective methods exposed by the Flowable +RuntimeService+ allowing to start and subsequently associating a business process.
-* +resumeProcessById(String processInstanceId)+, allowing to associate the process instance with the provided id.
-* +resumeTaskById(String taskId)+, allowing to associate the task with the provided id (and by extension, the corresponding process instance).
+解析@BusinessProcessScoped bean或注入流程变量，都依赖活动的CDI作用域与流程实例的关联。flowable-cdi提供了++org.flowable.cdi.BusinessProcess++ bean用于控制该关联，并提供：
 
-Once a unit of work (for example a user task) is completed, the +completeTask()+ method can be called to disassociate the conversation/request from the process instance. This signals the engine that the current task is completed and makes the process instance proceed.
+* __startProcessBy(...)__方法，镜像了Flowable ++RuntimeService++服务暴露的对应方法，用于启动并关联一个业务流程，
+* ++resumeProcessById(String processInstanceId)++，用于将给定id关联至流程实例，
+* ++resumeTaskById(String taskId)++，用于将给定id关联至任务（以及扩展至相关的流程实例）。
 
-Note that the +BusinessProcess+ bean is a ++@Named++ bean, which means that the exposed methods can be invoked using expression language, for example from a JSF page. The following JSF2 snippet begins a new conversation and associates it with a user task instance, the id of which is passed as a request parameter (e.g. ++pageName.jsf?taskId=XX++):
+当完成了一个工作单元（例如一个用户任务）时，可以调用++completeTask()++方法，解除流程实例与会话/请求的关联。这将通知Flowable完成当前任务，并继续运行流程实例。
+
+请注意++BusinessProcess++ bean是一个++@Named++ bean，意味着可以使用表达式（比如在JSF页面中）调用它。下面的JSF2代码片段启动了一个新的会话，并将其关联至一个用户任务实例，其id作为请求参数传递（例如++pageName.jsf?taskId=XX++）：
 
 [source,xml,linenums]
 ----
 <f:metadata>
-	<f:viewParam name="taskId" />
-	<f:event type="preRenderView" listener="#{businessProcess.startTask(taskId, true)}" />
+<f:viewParam name="taskId" />
+<f:event type="preRenderView" listener="#{businessProcess.startTask(taskId, true)}" />
 </f:metadata>
 ----
 
-==== Declaratively controlling the Process
+[[_declaratively_controlling_the_process]]
+==== 声明式控制流程
 
-Flowable-cdi allows declaratively starting process instances and completing tasks using annotations. The ++@org.flowable.cdi.annotation.StartProcess++ annotation allows to start a process instance either by "key" or by "name". Note that the process instance is started _after_ the annotated method returns. Example:
-		
+Flowable可以使用注解，声明式地启动流程实例以及完成任务。++@org.flowable.cdi.annotation.StartProcess++注解可以通过"key"或"name"启动一个流程实例。请注意流程实例在注解的方法返回__之后__启动。例如：
+
 [source,java,linenums]
 ----
 @StartProcess("authorizeBusinessTripRequest")
 public String submitRequest(BusinessTripRequest request) {
-	// do some work
+	// 进行一些操作
 	return "success";
-}			
+}
 ----
 
-Depending on the configuration of Flowable, the code of the annotated method and the starting of the process instance will be combined in the same transaction. The ++@org.flowable.cdi.annotation.CompleteTask++-annotation works in the same way:
+按照Flowable的配置，被注解的方法代码以及流程实例的启动将处于同一个事务中。++@org.flowable.cdi.annotation.CompleteTask++的使用方式相同：
 
 [source,java,linenums]
 ----
 @CompleteTask(endConversation=false)
 public String authorizeBusinessTrip() {
-	// do some work
+	// 进行一些操作
 	return "success";
 }
 ----
 
-The ++@CompleteTask++ annotation offers the possibility to end the current conversation. The default behavior is to end the conversation after the call to Flowable returns. Ending the conversation can be disabled, as shown in the example above.
+++@CompleteTask++注解可以结束当前会话。默认行为是在调用Flowable返回后结束回话。但可以像上面的例子一样，禁用结束会话。
 
+[[_referencing_beans_from_the_process]]
+==== 从流程中引用Bean
 
-==== Referencing Beans from the Process
-
-Flowable-cdi exposes CDI beans to Flowable El, using a custom resolver. This makes it possible to reference beans from the process:
+flowable-cdi使用自定义解析器，将CDI bean暴露给Flowable El。因此可以像这样在流程中引用bean：
 
 [source,xml,linenums]
 ----
-<userTask id="authorizeBusinessTrip" name="Authorize Business Trip"			 
+<userTask id="authorizeBusinessTrip" name="Authorize Business Trip"
 			flowable:assignee="#{authorizingManager.account.username}" />
 ----
 
-Where +authorizingManager+ could be a bean provided by a producer method:
+其中"authorizingManager"可以是生产者方法提供的bean：
 
 [source,java,linenums]
 ----
@@ -210,11 +216,12 @@ public Employee authorizingManager() {
 
 ----
 
-We can use the same feature to call a business method of an EJB in a service task, using the ++flowable:expression="myEjb.method()"++-extension. Note that this requires a ++@Named++-annotation on the ++MyEjb++-class.
+可以使用++flowable:expression="myEjb.method()"++扩展，在服务任务中调用一个EJB中的业务方法。请注意这需要在++MyEjb++类上使用++@Named++注解。
 
-==== Working with @BusinessProcessScoped beans
+[[_working_with_businessprocessscoped_beans]]
+==== 使用@BusinessProcessScoped bean
 
-Using flowable-cdi, the lifecycle of a bean can be bound to a process instance. To this extent, a custom context implementation is provided, namely the +BusinessProcessContext+. Instances of +BusinessProcessScoped+ beans are stored as process variables in the current process instance. +BusinessProcessScoped+ beans need to be +PassivationCapable+ (for example +Serializable+). The following is an example of a process scoped bean:
+可以使用flowable-cdi将一个bean的生命周期绑定在一个流程实例上。为此提供名为BusinessProcessContext的自定义的上下文实现。BusinessProcessScoped bean实例将作为流程变量存储在当前流程实例中。BusinessProcessScoped bean需要是可持久化（PassivationCapable，例如Serializable）的。下面是一个流程作用域bean的例子：
 
 [source,java,linenums]
 ----
@@ -228,14 +235,15 @@ public class BusinessTripRequest implements Serializable {
 }
 ----
 
-Sometimes, we want to work with process scoped beans, in the absence of an association with a process instance, for example before starting a process. If no process instance is currently active, instances of +BusinessProcessScoped+ beans are temporarily stored in a local scope, i.e. the +Conversation+ or the +Request+, depending on the context. If this scope is later associated with a business process instance, the bean instances are flushed to the process instance.
+有时也需要在没有关联至流程实例的情况下（例如在流程启动前）使用流程作用域bean。如果当前没有激活的流程实例，则BusinessProcessScoped bean的实例将临时存储在本地作用域（也就是会话或请求中，取决于上下文）。如果该作用域之后关联至一个业务流程实例，则会将bean实例刷入该流程实例。
 
-==== Injecting Process Variables
+[[_injecting_process_variables]]
+==== 注入流程变量
 
-Process variables are available for injection. flowable-cdi supports 
- 	
-* type-safe injection of +@BusinessProcessScoped+ beans using +@Inject \[additional qualifiers\] Type fieldName+
-* unsafe injection of other process variables using the +@ProcessVariable(name?)+ qualifier: 
+flowable-cdi支持以下方式注入流程变量
+
+* 使用++@Inject [additional qualifiers] Type fieldName++类型安全地注入++@BusinessProcessScoped++ bean
+* 使用++@ProcessVariable(name?)++限定名不安全地注入其它流程变量：
 
 [source,java,linenums]
 ----
@@ -243,19 +251,19 @@ Process variables are available for injection. flowable-cdi supports
 @Inject @ProcessVariable("accountNumber") Object account
 ----
 
-In order to reference process variables using EL, there are similar options:
+要在EL中引用流程变量，有类似的选择：
 
-* +@Named @BusinessProcessScoped+ beans can be referenced directly,
-* other process variables can be referenced using the ++ProcessVariables++-bean:
-
+* 可以直接引用++@Named @BusinessProcessScoped++ bean，
+* 可以通过++ProcessVariables++ bean引用其它流程变量：
 
 ----
 #{processVariables['accountNumber']}
 ----
 
-==== Receiving Process Events
+[[_receiving_process_events]]
+==== 接收流程事件
 
-Flowable can be hooked-up to the CDI event bus. This allows us to be notified of process events using standard CDI event mechanisms. In order to enable CDI event support for Flowable, enable the corresponding parse listener in the configuration:
+Flowable可以关联至CDI事件总线。这样就可以使用标准CDI事件机制获取流程事件。要为Flowable启用CDI事件支持，需要在配置中启用相应的处理监听器：
 
 [source,xml,linenums]
 ----
@@ -266,58 +274,54 @@ Flowable can be hooked-up to the CDI event bus. This allows us to be notified of
 </property>
 ----
 
-
-Now Flowable is configured for publishing events using the CDI event bus. The following gives an overview of how process events can be received in CDI beans. In CDI, we can declaratively specify event observers using the ++@Observes++-annotation. Event notification is type-safe. The type of
-process events is ++org.flowable.cdi.BusinessProcessEvent++.
-The following is an example of a simple event observer method:
+这样Flowable就被配置为使用CDI事件总线发布事件。下面介绍如何在CDI bean中接收流程事件。事件通知是类型安全的。流程事件的类型是++org.flowable.cdi.BusinessProcessEvent++。
+下面是一个简单的事件观察者方法的例子：
 
 [source,java,linenums]
 ----
 public void onProcessEvent(@Observes BusinessProcessEvent businessProcessEvent) {
-	// handle event
+	// 处理事件
 }
 ----
 
+所有事件都会通知观察者。如果需要限制观察者接收的事件，可以添加限定注解：
 
-This observer would be notified of all events. If we want to restrict the set of events the observer receives, we can add qualifier annotations:
-		
-* ++@BusinessProcess++: restricts the set of events to a certain process definition. Example: +@Observes @BusinessProcess("billingProcess") BusinessProcessEvent evt+
-* ++@StartActivity++: restricts the set of events by a certain activity. For example: +@Observes @StartActivity("shipGoods") BusinessProcessEvent evt+ is invoke whenever an activity with the id "shipGoods" is entered.
-* ++@EndActivity++: restricts the set of events by a certain activity. For example: +@Observes @EndActivity("shipGoods") BusinessProcessEvent evt+ is invoke whenever an activity with the id "shipGoods" is left.	
-* ++@TakeTransition++: restricts the set of events by a certain transition.
-* ++@CreateTask++: restricts the set of events by a certain task's creation.
-* ++@DeleteTask++: restricts the set of events by a certain task's deletion.
-* ++@AssignTask++: restricts the set of events by a certain task's assignment.
-* ++@CompleteTask++: restricts the set of events by a certain task's completion.
-	
-The qualifiers named above can be combined freely. For example, in order to receive all events generated when leaving the "shipGoods" activity in the "shipmentProcess", we could write the following observer method:
+* ++@BusinessProcess++: 限制事件为特定的流程定义。例如：++@Observes @BusinessProcess("billingProcess") BusinessProcessEvent evt++
+* ++@StartActivity++: 使用特定的活动限制事件。例如：++@Observes @StartActivity("shipGoods") BusinessProcessEvent evt++将在进入id为"shipGoods"的活动时调用。
+* ++@EndActivity++: 使用特定的活动限制事件。例如：++@Observes @EndActivity("shipGoods") BusinessProcessEvent evt++将在离开id为"shipGoods"的活动时调用。
+* ++@TakeTransition++: 使用特定的路径限制事件。
+* ++@CreateTask++: 使用特定任务的创建限制事件。
+* ++@DeleteTask++: 使用特定任务的删除限制事件。
+* ++@AssignTask++: 使用特定任务的指派限制事件。
+* ++@CompleteTask++: 使用特定任务的完成限制事件。
+
+上面的限定名可以自由组合。例如，要接收离开"shipmentProcess"中的"shipGoods"活动时生成的所有事件，可以撰写下面的观察者方法：
 
 [source,java,linenums]
 ----
 public void beforeShippingGoods(@Observes @BusinessProcess("shippingProcess") @EndActivity("shipGoods") BusinessProcessEvent evt) {
-	// handle event
+	// 处理事件
 }
 ----
 
-In the default configuration, event listeners are invoked synchronously and in the context of the same transaction. CDI transactional observers (only available in combination with JavaEE/EJB), allow to control when the event is handed to the observer method. Using transactional observers, we can for example assure that an observer is only notified if the transaction in which the event is fired succeeds: 
+在默认配置下，事件监听器将在上下文相同的事务中同步调用。CDI事务性观察者（CDI transactional observer，只能与JavaEE/EJB一起使用）可以在将事件交给观察者方法时进行控制。使用事务性观察者，可以保证比如只在触发事件的事务成功时才通知观察者：
 
 [source,java,linenums]
 ----
-public void onShipmentSucceeded(@Observes(during=TransactionPhase.AFTER_SUCCESS) @BusinessProcess("shippingProcess") @EndActivity("shipGoods") BusinessProcessEvent evt) {
-	// send email to customer.
-}	
+public void onShipmentSuceeded(@Observes(during=TransactionPhase.AFTER_SUCCESS) @BusinessProcess("shippingProcess") @EndActivity("shipGoods") BusinessProcessEvent evt) {
+	// 给客户发送邮件。
+}
 ----
 
+[[_additional_features]]
+==== 其他功能
 
-==== Additional Features
+* 可以注入流程引擎与服务：++@Inject ProcessEngine, RepositoryService, TaskService++, ...
+* 可以注入当前的流程实例与任务：++@Inject ProcessInstance, Task++,
+* 可以注入当前的businessKey：++@Inject @BusinessKey String businessKey++,
+* 可以注入当前的流程实例id：+@Inject @ProcessInstanceId String pid++
 
+[[_known_limitations]]
+=== 已知限制
 
-* The +ProcessEngine+ as well as the services are available for injection: +@Inject ProcessEngine, RepositoryService, TaskService+, ...
-* The current process instance and task can be injected: +@Inject ProcessInstance, Task+,
-* The current business key can be injected: +@Inject @BusinessKey String businessKey+,
-* The current process instance id be injected: +@Inject @ProcessInstanceId String pid+,
-
-=== Known Limitations
-
-
-Although flowable-cdi is implemented against the SPI and designed to be a "portable-extension" it is only tested using Weld.
+尽管flowable-cdi遵循SPI，并设计为“可插拔扩展”，但只在Weld下进行了测试。
