@@ -74,7 +74,7 @@ include::../form/ch05-Deployment.adoc[leveloffset=+2]
 
 === Integration
 
-include::../bpmn/ch15-Cdi.adoc[leveloffset=+2]
+include::../bpmn/ch16-Cdi.adoc[leveloffset=+2]
 
 include::../bpmn/ch16-Ldap.adoc[leveloffset=+2]
 
