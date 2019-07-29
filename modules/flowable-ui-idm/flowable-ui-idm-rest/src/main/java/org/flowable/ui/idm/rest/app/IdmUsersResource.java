@@ -42,7 +42,7 @@ public class IdmUsersResource {
     @Autowired
     protected UserService userService;
 
-    @RequestMapping(value = "/rest/admin/users", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/users")
     public ResultListDataRepresentation getUsers(
             @RequestParam(required = false) String filter,
             @RequestParam(required = false) String sort,

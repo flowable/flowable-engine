@@ -41,7 +41,7 @@ public class AppDeploymentClientResource extends AbstractClientResource {
     @Autowired
     protected AppDeploymentService clientService;
 
-    @RequestMapping(value = "/rest/admin/app-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/app-deployments/{deploymentId}", produces = "application/json")
     public JsonNode getAppDeployment(@PathVariable String deploymentId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.APP);

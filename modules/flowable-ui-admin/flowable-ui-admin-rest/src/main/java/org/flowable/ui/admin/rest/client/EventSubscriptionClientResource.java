@@ -12,9 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.EventSubscriptionService;
@@ -31,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * REST controller for managing an event subscription.
  */
@@ -46,7 +46,7 @@ public class EventSubscriptionClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/event-subscriptions/{eventSubscriptionId} -> return event subscription data
      */
-    @RequestMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", produces = "application/json")
     public JsonNode getEventSubscription(@PathVariable String eventSubscriptionId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

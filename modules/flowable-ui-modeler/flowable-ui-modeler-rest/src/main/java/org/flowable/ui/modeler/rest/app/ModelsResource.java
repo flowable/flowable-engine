@@ -58,19 +58,19 @@ public class ModelsResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @RequestMapping(value = "/rest/models", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models", produces = "application/json")
     public ResultListDataRepresentation getModels(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) Integer modelType,
             HttpServletRequest request) {
 
         return modelQueryService.getModels(filter, sort, modelType, request);
     }
 
-    @RequestMapping(value = "/rest/models-for-app-definition", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models-for-app-definition", produces = "application/json")
     public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
         return modelQueryService.getModelsToIncludeInAppDefinition();
     }
     
-    @RequestMapping(value = "/rest/cmmn-models-for-app-definition", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/cmmn-models-for-app-definition", produces = "application/json")
     public ResultListDataRepresentation getCmmnModelsToIncludeInAppDefinition() {
         return modelQueryService.getCmmnModelsToIncludeInAppDefinition();
     }

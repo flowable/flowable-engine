@@ -48,7 +48,6 @@ import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -80,7 +79,7 @@ public class CaseInstanceDisplayJsonClientResource {
 
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelJSON(@PathVariable String caseInstanceId) {
 
         User currentUser = SecurityUtils.getCurrentUserObject();
@@ -139,7 +138,7 @@ public class CaseInstanceDisplayJsonClientResource {
         return displayNode;
     }
 
-    @RequestMapping(value = "/rest/case-definitions/{caseDefinitionId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-definitions/{caseDefinitionId}/model-json", produces = "application/json")
     public JsonNode getModelJSONForCaseDefinition(@PathVariable String caseDefinitionId) {
 
         CmmnModel pojoModel = cmmnRepositoryService.getCmmnModel(caseDefinitionId);
@@ -151,7 +150,7 @@ public class CaseInstanceDisplayJsonClientResource {
         return processCaseElements(pojoModel, null, null, null);
     }
 
-    @RequestMapping(value = "/rest/case-instances/history/{caseInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/history/{caseInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelHistoryJSON(@PathVariable String caseInstanceId) {
 
         User currentUser = SecurityUtils.getCurrentUserObject();

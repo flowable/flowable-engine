@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * REST controller for managing the current user's account.
  */
@@ -47,7 +47,7 @@ public class JobClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/jobs/{jobId} -> return job data
      */
-    @RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/jobs/{jobId}", produces = "application/json")
     public JsonNode getJob(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -113,7 +113,7 @@ public class JobClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/jobs/{jobId}/exception-stracktrace -> return job stacktrace
      */
-    @RequestMapping(value = "/rest/admin/jobs/{jobId}/stacktrace", method = RequestMethod.GET, produces = "text/plain")
+    @GetMapping(value = "/rest/admin/jobs/{jobId}/stacktrace", produces = "text/plain")
     public String getJobStacktrace(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

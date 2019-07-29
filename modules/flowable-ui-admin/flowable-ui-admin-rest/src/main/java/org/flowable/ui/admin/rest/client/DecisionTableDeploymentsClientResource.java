@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -34,6 +32,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * @author Yvo Swillens
  */
@@ -49,7 +49,7 @@ public class DecisionTableDeploymentsClientResource extends AbstractClientResour
     /**
      * GET /rest/admin/decision-table-deployments -> get a list of deployments.
      */
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(produces = "application/json")
     public JsonNode listDeployments(HttpServletRequest request) {
         LOGGER.debug("REST request to get a list of decision table deployments");
 

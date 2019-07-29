@@ -31,6 +31,7 @@ import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.flowable.idm.rest.service.api.group.GroupResponse;
 import org.flowable.idm.rest.service.api.user.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,7 +74,7 @@ public class PrivilegeCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested privileges were returned.")
     })
-    @RequestMapping(value = "/privileges", method = RequestMethod.GET)
+    @GetMapping(value = "/privileges")
     public DataResponse<PrivilegeResponse> getPrivileges(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         PrivilegeQuery query = identityService.createPrivilegeQuery();
         
@@ -101,7 +102,7 @@ public class PrivilegeCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the privilege exists and its users are returned.")
     })
-    @RequestMapping(value = "/privileges/{privilegeId}/users", method = RequestMethod.GET)
+    @GetMapping(value = "/privileges/{privilegeId}/users")
     public List<UserResponse> getUsers(@PathVariable String privilegeId) {
         Privilege privilege = getPrivilegeById(privilegeId);
         
@@ -147,7 +148,7 @@ public class PrivilegeCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the privilege exists and its groups are returned.")
     })
-    @RequestMapping(value = "/privileges/{privilegeId}/groups", method = RequestMethod.GET)
+    @GetMapping(value = "/privileges/{privilegeId}/groups")
     public List<GroupResponse> getGroups(@PathVariable String privilegeId) {
         Privilege privilege = getPrivilegeById(privilegeId);
         

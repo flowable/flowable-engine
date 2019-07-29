@@ -21,7 +21,6 @@ import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +34,7 @@ public class EditorGroupsResource {
     @Autowired
     protected RemoteIdmService remoteIdmService;
 
-    @RequestMapping(value = "/rest/editor-groups", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/editor-groups")
     public ResultListDataRepresentation getGroups(@RequestParam(required = false, value = "filter") String filter) {
         List<GroupRepresentation> result = new ArrayList<>();
         List<RemoteGroup> groups = remoteIdmService.findGroupsByNameFilter(filter);

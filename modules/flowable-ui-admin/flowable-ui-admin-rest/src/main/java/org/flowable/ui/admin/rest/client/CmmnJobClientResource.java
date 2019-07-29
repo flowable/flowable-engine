@@ -47,7 +47,7 @@ public class CmmnJobClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/cmmn-jobs/{jobId} -> return job data
      */
-    @RequestMapping(value = "/rest/admin/cmmn-jobs/{jobId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/cmmn-jobs/{jobId}", produces = "application/json")
     public JsonNode getCmmnJob(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -113,7 +113,7 @@ public class CmmnJobClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/cmmn-jobs/{jobId}/exception-stracktrace -> return job stacktrace
      */
-    @RequestMapping(value = "/rest/admin/cmmn-jobs/{jobId}/stacktrace", method = RequestMethod.GET, produces = "text/plain")
+    @GetMapping(value = "/rest/admin/cmmn-jobs/{jobId}/stacktrace", produces = "text/plain")
     public String getCmmnJobStacktrace(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);

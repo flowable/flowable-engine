@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author yvoswillens
  * @author erikwinlof
@@ -52,7 +52,7 @@ public class DecisionTableResource {
     @Autowired
     protected FlowableDecisionTableService decisionTableService;
 
-    @RequestMapping(value = "/values", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/values", produces = "application/json")
     public List<DecisionTableRepresentation> getDecisionTables(HttpServletRequest request) {
         String[] decisionTableIds = request.getParameterValues("decisionTableId");
         if (decisionTableIds == null || decisionTableIds.length == 0) {
@@ -61,12 +61,12 @@ public class DecisionTableResource {
         return decisionTableService.getDecisionTables(decisionTableIds);
     }
 
-    @RequestMapping(value = "/{decisionTableId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/{decisionTableId}", produces = "application/json")
     public DecisionTableRepresentation getDecisionTable(@PathVariable String decisionTableId) {
         return decisionTableService.getDecisionTable(decisionTableId);
     }
 
-    @RequestMapping(value = "/{decisionTableId}/export", method = RequestMethod.GET)
+    @GetMapping(value = "/{decisionTableId}/export")
     public void exportDecisionTable(HttpServletResponse response, @PathVariable String decisionTableId) {
         decisionTableService.exportDecisionTable(response, decisionTableId);
     }
@@ -89,16 +89,16 @@ public class DecisionTableResource {
         return json;
     }
 
-    @RequestMapping(value = "/history/{historyModelId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/history/{historyModelId}", produces = "application/json")
     public DecisionTableRepresentation getHistoricDecisionTable(@PathVariable String historyModelId) {
         return decisionTableService.getHistoricDecisionTable(historyModelId);
     }
 
-    @RequestMapping(value = "{modelId}/history/{historyModelId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "{modelId}/history/{historyModelId}", produces = "application/json")
     public DecisionTableRepresentation getHistoricDecisionTable(@PathVariable String modelId, @PathVariable String historyModelId) {
         return decisionTableService.getHistoricDecisionTable(historyModelId);
     }
-    @RequestMapping(value = "/history/{historyModelId}/export", method = RequestMethod.GET)
+    @GetMapping(value = "/history/{historyModelId}/export")
     public void exportHistoricDecisionTable(HttpServletResponse response, @PathVariable String historyModelId) {
         decisionTableService.exportHistoricDecisionTable(response, historyModelId);
     }

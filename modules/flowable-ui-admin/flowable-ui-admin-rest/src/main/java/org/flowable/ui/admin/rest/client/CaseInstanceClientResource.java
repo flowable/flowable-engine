@@ -41,7 +41,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
     @Autowired
     protected CaseInstanceService clientService;
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}", produces = "application/json")
     public JsonNode getProcessInstance(@PathVariable String caseInstanceId, @RequestParam(required = false, defaultValue = "false") boolean runtime) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -53,7 +53,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/tasks", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/tasks")
     public JsonNode getSubtasks(@PathVariable String caseInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -64,7 +64,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables")
     public JsonNode getVariables(@PathVariable String caseInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -111,7 +111,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/jobs", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/jobs")
     public JsonNode getJobs(@PathVariable String caseInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -134,7 +134,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/decision-executions", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/decision-executions")
     public JsonNode getDecisionExecutions(@PathVariable String caseInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         try {

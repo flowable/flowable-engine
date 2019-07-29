@@ -69,7 +69,6 @@ import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -121,7 +120,7 @@ public class RuntimeDisplayJsonClientResource {
         propertyMappers.put("UserTask", new UserTaskInfoMapper());
     }
 
-    @RequestMapping(value = "/rest/process-instances/debugger/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/debugger/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getDebuggerModelJSON(@PathVariable String processInstanceId) {
         if (runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).count() > 0 ) {
             return getModelJSON(processInstanceId);
@@ -129,7 +128,7 @@ public class RuntimeDisplayJsonClientResource {
         return getModelHistoryJSON(processInstanceId);
     }
     
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelJSON(@PathVariable String processInstanceId) {
 
         User currentUser = SecurityUtils.getCurrentUserObject();
@@ -215,7 +214,7 @@ public class RuntimeDisplayJsonClientResource {
         return displayNode;
     }
 
-    @RequestMapping(value = "/rest/process-definitions/{processDefinitionId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-definitions/{processDefinitionId}/model-json", produces = "application/json")
     public JsonNode getModelJSONForProcessDefinition(@PathVariable String processDefinitionId) {
 
         BpmnModel pojoModel = repositoryService.getBpmnModel(processDefinitionId);
@@ -227,7 +226,7 @@ public class RuntimeDisplayJsonClientResource {
         return processProcessElements(pojoModel, null, null, Collections.EMPTY_LIST, "");
     }
 
-    @RequestMapping(value = "/rest/process-instances/history/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/history/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelHistoryJSON(@PathVariable String processInstanceId) {
 
         User currentUser = SecurityUtils.getCurrentUserObject();

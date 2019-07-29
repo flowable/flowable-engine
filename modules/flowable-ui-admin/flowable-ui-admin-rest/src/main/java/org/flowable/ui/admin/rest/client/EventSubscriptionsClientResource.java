@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,8 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @RestController
 @RequestMapping("/app")
@@ -42,7 +41,7 @@ public class EventSubscriptionsClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/event-subscriptions -> Get a list of event subscriptions.
      */
-    @RequestMapping(value = "/rest/admin/event-subscriptions", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/event-subscriptions", produces = "application/json")
     public JsonNode listEventSubscriptions(HttpServletRequest request) {
         LOGGER.debug("REST request to get a list of event subscriptions");
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

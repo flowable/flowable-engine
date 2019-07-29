@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.service.engine.ProcessEngineInfoService;
 import org.flowable.ui.admin.service.engine.exception.FlowableServiceException;
@@ -23,8 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Frederik Heremans
@@ -39,7 +38,7 @@ public class ProcessEngineInfoClientResource extends AbstractClientResource {
     @Autowired
     protected ProcessEngineInfoService clientService;
 
-    @RequestMapping(value = "/rest/admin/engine-info/{endpointTypeCode}", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/engine-info/{endpointTypeCode}")
     public JsonNode getEngineInfo(@PathVariable Integer endpointTypeCode) throws BadRequestException {
         EndpointType endpointType = EndpointType.valueOf(endpointTypeCode);
 

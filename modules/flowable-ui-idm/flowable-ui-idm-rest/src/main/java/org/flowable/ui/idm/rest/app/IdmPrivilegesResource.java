@@ -42,7 +42,7 @@ public class IdmPrivilegesResource {
     @Autowired
     protected PrivilegeService privilegeService;
 
-    @RequestMapping(value = "/rest/admin/privileges", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/privileges")
     public List<PrivilegeRepresentation> getPrivileges() {
         List<Privilege> privileges = privilegeService.findPrivileges();
         List<PrivilegeRepresentation> representations = new ArrayList<>(privileges.size());
@@ -52,7 +52,7 @@ public class IdmPrivilegesResource {
         return representations;
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/privileges/{privilegeId}")
     public PrivilegeRepresentation getPrivilege(@PathVariable String privilegeId) {
 
         Privilege privilege = privilegeService.findPrivilege(privilegeId);
@@ -78,7 +78,7 @@ public class IdmPrivilegesResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/privileges/{privilegeId}/users")
     public List<UserRepresentation> getUsers(@PathVariable String privilegeId) {
         return getPrivilege(privilegeId).getUsers();
     }
@@ -94,7 +94,7 @@ public class IdmPrivilegesResource {
         privilegeService.deleteUserPrivilege(privilegeId, userId);
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/privileges/{privilegeId}/groups")
     public List<GroupRepresentation> getGroups(@PathVariable String privilegeId) {
         return getPrivilege(privilegeId).getGroups();
     }

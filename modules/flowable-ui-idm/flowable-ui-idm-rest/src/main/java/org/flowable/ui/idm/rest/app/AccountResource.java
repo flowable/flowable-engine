@@ -24,7 +24,6 @@ import org.flowable.ui.idm.model.UserInformation;
 import org.flowable.ui.idm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +47,7 @@ public class AccountResource {
     /**
      * GET /rest/authenticate -> check if the user is authenticated, and return its full name.
      */
-    @RequestMapping(value = "/rest/authenticate", method = RequestMethod.GET, produces = { "application/json" })
+    @GetMapping(value = "/rest/authenticate", produces = { "application/json" })
     public ObjectNode isAuthenticated(HttpServletRequest request) {
         String user = request.getRemoteUser();
 
@@ -64,7 +63,7 @@ public class AccountResource {
     /**
      * GET /rest/account -> get the current user.
      */
-    @RequestMapping(value = "/rest/account", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/account", produces = "application/json")
     public UserRepresentation getAccount() {
         String userId = SecurityUtils.getCurrentFlowableAppUser().getUserObject().getId();
         UserInformation userInformation = userService.getUserInformation(userId);

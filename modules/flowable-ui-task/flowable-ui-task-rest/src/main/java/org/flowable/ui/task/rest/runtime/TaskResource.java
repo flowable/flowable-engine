@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
+import java.util.List;
+
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.flowable.ui.task.model.runtime.TaskUpdateRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableTaskService;
@@ -22,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/app")
 public class TaskResource {
@@ -31,7 +31,7 @@ public class TaskResource {
     @Autowired
     protected FlowableTaskService taskService;
 
-    @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/tasks/{taskId}", produces = "application/json")
     public TaskRepresentation getTask(@PathVariable String taskId   ) {
         return taskService.getTask(taskId);
     }
@@ -41,7 +41,7 @@ public class TaskResource {
         return taskService.updateTask(taskId, updated);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/subtasks", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/tasks/{taskId}/subtasks", produces = "application/json")
     public List<TaskRepresentation> getSubTasks(@PathVariable String taskId) {
         return taskService.getSubTasks(taskId);
     }

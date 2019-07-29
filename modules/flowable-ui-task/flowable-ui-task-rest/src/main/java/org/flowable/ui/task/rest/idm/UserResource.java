@@ -21,7 +21,6 @@ import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -34,7 +33,7 @@ public class UserResource {
     @Autowired
     protected RemoteIdmService remoteIdmService;
 
-    @RequestMapping(value = "/rest/users/{userId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/users/{userId}", produces = "application/json")
     public UserRepresentation getUser(@PathVariable String userId, HttpServletResponse response) {
         User user = remoteIdmService.getUser(userId);
 

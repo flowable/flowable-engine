@@ -24,8 +24,6 @@ import org.flowable.ui.idm.model.UserInformation;
 import org.flowable.ui.idm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +33,7 @@ public class ApiUsersResource {
     @Autowired
     protected UserService userService;
 
-    @RequestMapping(value = "/idm/users/{userId}", method = RequestMethod.GET, produces = {"application/json"})
+    @GetMapping(value = "/idm/users/{userId}", produces = {"application/json"})
     public UserRepresentation getUserInformation(@PathVariable String userId) {
         UserInformation userInformation = userService.getUserInformation(userId);
         if (userInformation != null) {
@@ -56,7 +54,7 @@ public class ApiUsersResource {
         }
     }
 
-    @RequestMapping(value = "/idm/users", method = RequestMethod.GET, produces = {"application/json"})
+    @GetMapping(value = "/idm/users", produces = {"application/json"})
     public List<UserRepresentation> findUsersByFilter(@RequestParam("filter") String filter) {
         List<User> users = userService.getUsers(filter, null, null);
         List<UserRepresentation> result = new ArrayList<>();

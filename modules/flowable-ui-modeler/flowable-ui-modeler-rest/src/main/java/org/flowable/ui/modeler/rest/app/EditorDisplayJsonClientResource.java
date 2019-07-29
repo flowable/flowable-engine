@@ -22,7 +22,6 @@ import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +43,7 @@ public class EditorDisplayJsonClientResource {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    @RequestMapping(value = "/rest/models/{modelId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models/{modelId}/model-json", produces = "application/json")
     public JsonNode getModelJSON(@PathVariable String modelId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
         Model model = modelService.getModel(modelId);
@@ -56,7 +55,7 @@ public class EditorDisplayJsonClientResource {
         return displayNode;
     }
 
-    @RequestMapping(value = "/rest/models/{processModelId}/history/{processModelHistoryId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models/{processModelId}/history/{processModelHistoryId}/model-json", produces = "application/json")
     public JsonNode getModelHistoryJSON(@PathVariable String processModelId, @PathVariable String processModelHistoryId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
         ModelHistory model = modelService.getModelHistory(processModelId, processModelHistoryId);

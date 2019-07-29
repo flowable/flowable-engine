@@ -44,12 +44,12 @@ public class ServerConfigsResource {
     @Autowired
     protected ServerConfigService serverConfigService;
 
-    @RequestMapping(value = "/rest/server-configs", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/server-configs", produces = "application/json")
     public List<ServerConfigRepresentation> getServers() {
         return serverConfigService.findAll();
     }
 
-    @RequestMapping(value = "/rest/server-configs/default/{endpointTypeCode}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/server-configs/default/{endpointTypeCode}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public ServerConfigRepresentation getDefaultServerConfig(@PathVariable Integer endpointTypeCode) {

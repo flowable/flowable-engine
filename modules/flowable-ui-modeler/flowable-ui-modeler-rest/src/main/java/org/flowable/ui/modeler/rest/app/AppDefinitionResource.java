@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RestController
 @RequestMapping("/app")
 public class AppDefinitionResource {
@@ -61,12 +61,12 @@ public class AppDefinitionResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionResource.class);
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/app-definitions/{modelId}", produces = "application/json")
     public AppDefinitionRepresentation getAppDefinition(@PathVariable("modelId") String modelId) {
         return appDefinitionService.getAppDefinition(modelId);
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/history/{modelHistoryId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/app-definitions/{modelId}/history/{modelHistoryId}", produces = "application/json")
     public AppDefinitionRepresentation getAppDefinitionHistory(@PathVariable String modelId, @PathVariable String modelHistoryId) {
         return appDefinitionService.getAppDefinitionHistory(modelId, modelHistoryId);
     }
@@ -97,12 +97,12 @@ public class AppDefinitionResource {
         return resultRepresentation;
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/export", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/app-definitions/{modelId}/export")
     public void exportAppDefinition(HttpServletResponse response, @PathVariable String modelId) throws IOException {
         appDefinitionExportService.exportAppDefinition(response, modelId);
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/export-bar", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/app-definitions/{modelId}/export-bar")
     public void exportDeployableAppDefinition(HttpServletResponse response, @PathVariable String modelId) throws IOException {
         appDefinitionExportService.exportDeployableAppDefinition(response, modelId);
     }

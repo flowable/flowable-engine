@@ -21,7 +21,6 @@ import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +31,7 @@ public class WorkflowGroupsResource {
     @Autowired
     private RemoteIdmService remoteIdmService;
 
-    @RequestMapping(value = "/rest/workflow-groups", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/workflow-groups")
     public ResultListDataRepresentation getGroups(@RequestParam(value = "filter", required = false) String filter) {
 
         List<? extends Group> matchingGroups = remoteIdmService.findGroupsByNameFilter(filter);

@@ -69,7 +69,7 @@ public class ApiModelResource {
     /**
      * GET /editor/models/{modelId} -> Get process model
      */
-    @RequestMapping(value = "/editor/models/{modelId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/editor/models/{modelId}", produces = "application/json")
     public ModelRepresentation getModel(@PathVariable String modelId) {
         return modelService.getModelRepresentation(modelId);
     }
@@ -77,7 +77,7 @@ public class ApiModelResource {
     /**
      * GET /editor/models/{modelId}/thumbnail -> Get process model thumbnail
      */
-    @RequestMapping(value = "/editor/models/{modelId}/thumbnail", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(value = "/editor/models/{modelId}/thumbnail", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getModelThumbnail(@PathVariable String modelId) {
         Model model = modelService.getModel(modelId);
         return model.getThumbnail();
@@ -130,7 +130,7 @@ public class ApiModelResource {
     /**
      * GET /editor/models/{modelId}/editor/json -> get the JSON model
      */
-    @RequestMapping(value = "/editor/models/{modelId}/editor/json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/editor/models/{modelId}/editor/json", produces = "application/json")
     public ObjectNode getModelJSON(@PathVariable String modelId) {
         Model model = modelService.getModel(modelId);
         ObjectNode modelNode = objectMapper.createObjectNode();

@@ -38,44 +38,44 @@ public class CaseInstanceResource {
     @Autowired
     protected FlowableCaseInstanceService caseInstanceService;
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}", produces = "application/json")
     public CaseInstanceRepresentation getCaseInstance(@PathVariable String caseInstanceId) {
         return caseInstanceService.getCaseInstance(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/start-form", produces = "application/json")
     public FormModelRepresentation getCaseInstanceStartForm(@PathVariable String caseInstanceId, HttpServletResponse response) {
         FormInfo formInfo = caseInstanceService.getCaseInstanceStartForm(caseInstanceId);
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
         return new FormModelRepresentation(formInfo, formModel);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/active-stages", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/active-stages", produces = "application/json")
     public ResultListDataRepresentation getCaseInstanceActiveStages(@PathVariable String caseInstanceId) {
         return caseInstanceService.getCaseInstanceActiveStages(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/ended-stages", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/ended-stages", produces = "application/json")
     public ResultListDataRepresentation getCaseInstanceEndedStages(@PathVariable String caseInstanceId) {
         return caseInstanceService.getCaseInstanceEndedStages(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/available-milestones", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/available-milestones", produces = "application/json")
     public ResultListDataRepresentation getCaseInstanceAvailableMilestones(@PathVariable String caseInstanceId) {
         return caseInstanceService.getCaseInstanceAvailableMilestones(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/ended-milestones", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/ended-milestones", produces = "application/json")
     public ResultListDataRepresentation getCaseInstanceEndedMilestones(@PathVariable String caseInstanceId) {
         return caseInstanceService.getCaseInstanceEndedMilestones(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/available-user-event-listeners", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/available-user-event-listeners", produces = "application/json")
     public ResultListDataRepresentation getCaseInstanceAvailableUserEventListeners(@PathVariable String caseInstanceId) {
         return caseInstanceService.getCaseInstanceAvailableUserEventListeners(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/completed-user-event-listeners", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/completed-user-event-listeners", produces = "application/json")
     public ResultListDataRepresentation getCaseInstanceCompletedUserEventListeners(@PathVariable String caseInstanceId) {
         return caseInstanceService.getCaseInstanceCompletedUserEventListeners(caseInstanceId);
     }
@@ -86,7 +86,7 @@ public class CaseInstanceResource {
         caseInstanceService.triggerUserEventListener(caseInstanceId, userEventListenerId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/enabled-planitem-instances", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/case-instances/{caseInstanceId}/enabled-planitem-instances")
     @ResponseStatus(value = HttpStatus.OK)
     public ResultListDataRepresentation getCaseInstanceEnabledPlanItemInstances(@PathVariable String caseInstanceId) {
         return caseInstanceService.getCaseInstanceEnabledPlanItemInstances(caseInstanceId);

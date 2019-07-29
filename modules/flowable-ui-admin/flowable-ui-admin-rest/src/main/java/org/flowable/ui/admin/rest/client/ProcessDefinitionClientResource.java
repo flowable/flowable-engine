@@ -60,7 +60,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
     /**
      * GET /rest/authenticate -> check if the user is authenticated, and return its login.
      */
-    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-definitions/{definitionId}", produces = "application/json")
     public JsonNode getProcessDefinition(@PathVariable String definitionId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -94,7 +94,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}/process-instances", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-definitions/{definitionId}/process-instances", produces = "application/json")
     public JsonNode getProcessInstances(@PathVariable String definitionId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -108,7 +108,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}/jobs", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-definitions/{definitionId}/jobs", produces = "application/json")
     public JsonNode getJobs(@PathVariable String definitionId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {

@@ -35,7 +35,7 @@ public class CommentsResource {
     @Autowired
     protected FlowableCommentService commentService;
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/comments", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/tasks/{taskId}/comments", produces = "application/json")
     public ResultListDataRepresentation getTaskComments(@PathVariable("taskId") String taskId) {
         return commentService.getTaskComments(taskId);
     }
@@ -45,7 +45,7 @@ public class CommentsResource {
         return commentService.addTaskComment(commentRequest, taskId);
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/comments", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/{processInstanceId}/comments", produces = "application/json")
     public ResultListDataRepresentation getProcessInstanceComments(@PathVariable("processInstanceId") String processInstanceId) {
         return commentService.getProcessInstanceComments(processInstanceId);
     }

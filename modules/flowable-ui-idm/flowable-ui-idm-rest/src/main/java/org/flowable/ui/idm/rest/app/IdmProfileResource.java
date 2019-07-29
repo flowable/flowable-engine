@@ -54,7 +54,7 @@ public class IdmProfileResource {
     @Autowired
     protected GroupService groupService;
 
-    @RequestMapping(value = "/profile", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/profile", produces = "application/json")
     public UserRepresentation getProfile() {
         User user = SecurityUtils.getCurrentFlowableAppUser().getUserObject();
         UserRepresentation userRepresentation = new UserRepresentation(user);
@@ -77,7 +77,7 @@ public class IdmProfileResource {
         profileService.changePassword(changePasswordRepresentation.getOriginalPassword(), changePasswordRepresentation.getNewPassword());
     }
 
-    @RequestMapping(value = "/profile-picture", method = RequestMethod.GET)
+    @GetMapping(value = "/profile-picture")
     public void getProfilePicture(HttpServletResponse response) {
         try {
             Pair<String, InputStream> picture = profileService.getProfilePicture();
