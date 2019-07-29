@@ -98,7 +98,7 @@ public class CaseInstanceResource {
         caseInstanceService.startEnabledPlanItemInstance(caseInstanceId, planItemInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/case-instances/{caseInstanceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteCaseInstance(@PathVariable String caseInstanceId) {
         caseInstanceService.deleteCaseInstance(caseInstanceId);

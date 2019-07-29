@@ -69,7 +69,7 @@ public class IdmUsersResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/rest/admin/users/{userId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/users/{userId}")
     public void updateUserDetails(@PathVariable String userId, @RequestBody UpdateUsersRepresentation updateUsersRepresentation) {
         userService.updateUserDetails(userId, updateUsersRepresentation.getFirstName(),
                 updateUsersRepresentation.getLastName(),
@@ -78,13 +78,13 @@ public class IdmUsersResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/rest/admin/users", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/users")
     public void bulkUpdateUserDetails(@RequestBody UpdateUsersRepresentation updateUsersRepresentation) {
         userService.bulkUpdatePassword(updateUsersRepresentation.getUsers(), updateUsersRepresentation.getPassword());
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/rest/admin/users/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/users/{userId}")
     public void deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
     }

@@ -79,13 +79,13 @@ public class IdmGroupsResource {
         return new GroupRepresentation(groupService.createNewGroup(groupRepresentation.getId(), groupRepresentation.getName(), groupRepresentation.getType()));
     }
 
-    @RequestMapping(value = "/{groupId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/{groupId}")
     public GroupRepresentation updateGroup(@PathVariable String groupId, @RequestBody GroupRepresentation groupRepresentation) {
         return new GroupRepresentation(groupService.updateGroupName(groupId, groupRepresentation.getName()));
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/{groupId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{groupId}")
     public void deleteGroup(@PathVariable String groupId) {
         groupService.deleteGroup(groupId);
     }
@@ -97,7 +97,7 @@ public class IdmGroupsResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/{groupId}/members/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{groupId}/members/{userId}")
     public void deleteGroupMember(@PathVariable String groupId, @PathVariable String userId) {
         groupService.deleteGroupMember(groupId, userId);
     }

@@ -89,7 +89,7 @@ public class IdmPrivilegesResource {
         privilegeService.addUserPrivilege(privilegeId, representation.getUserId());
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/privileges/{privilegeId}/users/{userId}")
     public void deleteUserPrivilege(@PathVariable String privilegeId, @PathVariable String userId) {
         privilegeService.deleteUserPrivilege(privilegeId, userId);
     }
@@ -105,7 +105,7 @@ public class IdmPrivilegesResource {
         privilegeService.addGroupPrivilege(privilegeId, representation.getGroupId());
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups/{groupId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/privileges/{privilegeId}/groups/{groupId}")
     public void deleteGroupPrivilege(@PathVariable String privilegeId, @PathVariable String groupId) {
         privilegeService.deleteGroupPrivilege(privilegeId, groupId);
     }

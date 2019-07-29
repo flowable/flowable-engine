@@ -71,7 +71,7 @@ public class AppDefinitionResource {
         return appDefinitionService.getAppDefinitionHistory(modelId, modelHistoryId);
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/rest/app-definitions/{modelId}", produces = "application/json")
     public AppDefinitionUpdateResultRepresentation updateAppDefinition(@PathVariable("modelId") String modelId, @RequestBody AppDefinitionSaveRepresentation updatedModel) {
         AppDefinitionUpdateResultRepresentation resultRepresentation = null;
         try {

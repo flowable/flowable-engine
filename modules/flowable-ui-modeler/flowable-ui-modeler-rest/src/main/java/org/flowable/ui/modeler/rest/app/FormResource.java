@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -52,7 +51,7 @@ public class FormResource {
         return formService.getFormHistory(formId, formHistoryId);
     }
 
-    @RequestMapping(value = "/{formId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/{formId}", produces = "application/json")
     public FormRepresentation saveForm(@PathVariable String formId, @RequestBody FormSaveRepresentation saveRepresentation) {
         return formService.saveForm(formId, saveRepresentation);
     }

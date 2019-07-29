@@ -77,7 +77,7 @@ public class BatchClientResource extends AbstractClientResource {
     /**
      * DELETE /rest/admin/batches/{batchId} -> delete batch
      */
-    @RequestMapping(value = "/rest/admin/batches/{batchId}", method = RequestMethod.DELETE, produces = "application/json")
+    @DeleteMapping(value = "/rest/admin/batches/{batchId}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteJob(@PathVariable String batchId, HttpServletRequest request) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

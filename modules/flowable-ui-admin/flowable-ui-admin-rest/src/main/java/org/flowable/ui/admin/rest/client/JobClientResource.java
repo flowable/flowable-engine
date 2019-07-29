@@ -63,7 +63,7 @@ public class JobClientResource extends AbstractClientResource {
     /**
      * DELETE /rest/admin/jobs/{jobId} -> delete job
      */
-    @RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.DELETE, produces = "application/json")
+    @DeleteMapping(value = "/rest/admin/jobs/{jobId}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteJob(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 
