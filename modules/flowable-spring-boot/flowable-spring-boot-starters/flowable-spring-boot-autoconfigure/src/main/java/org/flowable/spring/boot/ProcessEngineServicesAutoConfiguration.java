@@ -20,6 +20,7 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -133,6 +134,12 @@ public class ProcessEngineServicesAutoConfiguration {
     @ConditionalOnMissingBean
     public DynamicBpmnService dynamicBpmnServiceBean(ProcessEngine processEngine) {
         return processEngine.getDynamicBpmnService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProcessMigrationService processInstanceMigrationService(ProcessEngine processEngine) {
+        return processEngine.getProcessMigrationService();
     }
 
     @Bean

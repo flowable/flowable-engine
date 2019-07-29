@@ -91,6 +91,21 @@ public class HistoricTaskInstanceEntityManagerImpl extends AbstractEntityManager
     public long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
         return historicTaskInstanceDataManager.findHistoricTaskInstanceCountByNativeQuery(parameterMap);
     }
+    
+    @Override
+    public void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        historicTaskInstanceDataManager.deleteHistoricTaskInstances(historicTaskInstanceQuery);
+    }
+    
+    @Override
+    public void deleteHistoricTaskInstancesForNonExistingProcessInstances() {
+        historicTaskInstanceDataManager.deleteHistoricTaskInstancesForNonExistingProcessInstances();
+    }
+    
+    @Override
+    public void deleteHistoricTaskInstancesForNonExistingCaseInstances() {
+        historicTaskInstanceDataManager.deleteHistoricTaskInstancesForNonExistingCaseInstances();
+    }
 
     public HistoricTaskInstanceDataManager getHistoricTaskInstanceDataManager() {
         return historicTaskInstanceDataManager;

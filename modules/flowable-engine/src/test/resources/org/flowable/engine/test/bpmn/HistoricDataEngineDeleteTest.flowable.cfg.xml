@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+    <property name="databaseSchemaUpdate" value="true"/>
+    <property name="asyncExecutorActivate" value="false" />
+    <property name="enableHistoryCleaning" value="true"/>
+    
+    <property name="history" value="full" />
+    <property name="asyncHistoryEnabled" value="false" />
+    <property name="enableEntityLinks" value="true" />
+    <property name="clock">
+        <bean class="org.flowable.common.engine.impl.util.TestClockImpl" />
+    </property>
+    <property name="enableHistoricTaskLogging" value="true"/>
+  </bean>
+
+</beans>

@@ -19,6 +19,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
+import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
@@ -171,6 +172,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public String getDeadLetterJobExceptionStacktrace(String jobId) {
         return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.DEADLETTER));
+    }
+    
+    @Override
+    public void handleHistoryCleanupTimerJob() {
+        commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
     }
     
     @Override

@@ -28,7 +28,7 @@
 		<spring.boot.version>2.1.6.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
-		<junit.jupiter.version>5.5.0</junit.jupiter.version>
+		<junit.jupiter.version>5.5.1</junit.jupiter.version>
 		<mockito.version>2.27.0</mockito.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
@@ -116,7 +116,7 @@
 			<dependency>
 			    <groupId>commons-codec</groupId>
 			    <artifactId>commons-codec</artifactId>
-			    <version>1.12</version>
+			    <version>1.13</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -577,6 +577,16 @@
                 <artifactId>flowable-job-spring-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-batch-service-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-batch-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-camel</artifactId>
@@ -881,7 +891,7 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>3.6.3</version>
+				<version>3.7.0</version>
 				<exclusions>
 					<exclusion>
 						<groupId>ch.qos.logback</groupId>
@@ -929,7 +939,7 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
-				<version>${jackson.version}</version>
+				<version>2.9.9.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.datatype</groupId>
@@ -986,7 +996,7 @@
 			<dependency>
 				<groupId>net.javacrumbs.json-unit</groupId>
 				<artifactId>json-unit-assertj</artifactId>
-				<version>2.6.1</version>
+				<version>2.8.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -1007,6 +1017,19 @@
 		<module>modules/flowable-engine-common</module>
 		<module>modules/flowable-entitylink-service-api</module>
 		<module>modules/flowable-entitylink-service</module>
+		<module>modules/flowable-variable-service-api</module>
+		<module>modules/flowable-variable-service</module>
+        <module>modules/flowable-identitylink-service-api</module>
+		<module>modules/flowable-identitylink-service</module>
+		<module>modules/flowable-eventsubscription-service-api</module>
+		<module>modules/flowable-eventsubscription-service</module>
+        <module>modules/flowable-task-service-api</module>
+        <module>modules/flowable-task-service</module>
+        <module>modules/flowable-job-service-api</module>
+        <module>modules/flowable-job-service</module>
+        <module>modules/flowable-job-spring-service</module>
+        <module>modules/flowable-batch-service-api</module>
+        <module>modules/flowable-batch-service</module>
 		<module>modules/flowable-idm-api</module>
 		<module>modules/flowable-idm-engine</module>
 		<module>modules/flowable-idm-engine-configurator</module>
@@ -1024,17 +1047,6 @@
         <module>modules/flowable-cmmn-image-generator</module>
         <module>modules/flowable-cmmn-engine</module>
 		<module>modules/flowable-cmmn-engine-configurator</module>
-        <module>modules/flowable-variable-service-api</module>
-		<module>modules/flowable-variable-service</module>
-        <module>modules/flowable-identitylink-service-api</module>
-		<module>modules/flowable-identitylink-service</module>
-		<module>modules/flowable-eventsubscription-service-api</module>
-		<module>modules/flowable-eventsubscription-service</module>
-        <module>modules/flowable-task-service-api</module>
-        <module>modules/flowable-task-service</module>
-        <module>modules/flowable-job-service-api</module>
-        <module>modules/flowable-job-service</module>
-        <module>modules/flowable-job-spring-service</module>
 		<module>modules/flowable-engine</module>
 		<module>modules/flowable-app-engine-api</module>
 		<module>modules/flowable-app-engine</module>

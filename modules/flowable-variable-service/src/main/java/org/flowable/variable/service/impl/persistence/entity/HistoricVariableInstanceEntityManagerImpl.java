@@ -134,6 +134,20 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
             }
         }
     }
+    
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
+        if (getVariableServiceConfiguration().isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+            historicVariableInstanceDataManager.deleteHistoricVariableInstancesForNonExistingProcessInstances();
+        }
+    }
+    
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
+        if (getVariableServiceConfiguration().isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+            historicVariableInstanceDataManager.deleteHistoricVariableInstancesForNonExistingCaseInstances();
+        }
+    }
 
     @Override
     public List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap) {

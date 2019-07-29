@@ -41,5 +41,7 @@ public interface HistoricProcessInstanceDataManager extends DataManager<Historic
     List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+    
+    void deleteHistoricProcessInstances(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
 
 }

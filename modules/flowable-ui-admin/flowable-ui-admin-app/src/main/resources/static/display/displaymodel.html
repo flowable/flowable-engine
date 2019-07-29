@@ -659,37 +659,73 @@
                     
                     migrationDocumentPayload.activityMappings = mappingPayload;
                     
-                    $.confirm({
-                        title: 'Migrate process instance',
-                        content: 'Are you sure you want to migrate the process instance with the defined mappings',
-                        buttons: {
-                            confirm: function () {
-                                $.ajax({
-                                    type: 'post',
-                                    url: './app/rest/admin/process-instances/' + instanceId + '/migrate',
-                                    contentType: 'application/json; charset=utf-8',
-                                    data: JSON.stringify(migrationDocumentPayload),
-                                    success: function() {
-                                        paper.clear();
-                                        migrationPaper.clear();
-                                        $('#targetModel').removeAttr('data-migration-definition-id');
-                                        definitionId = migrationDefinitionId;
-                                        migrationDefinitionId = undefined;
-                                        migrationMappedElementsText = new Array();
-                                        migrationMappedElements = new Array();
-                                        $('#targetModel').hide();
-                                        $('#migrationDivider').hide();
-                                        $('#executeMigrationDocument').hide();
-                                        $('#currentMappingValues').hide();
-                                        _showProcessDiagram();
-                                    }
-                                });
-                            },
-                            cancel: function () {
-                                
+                    if (instanceId != null) {
+                    
+                        $.confirm({
+                            title: 'Migrate process instance',
+                            content: 'Are you sure you want to migrate the process instance with the defined mappings',
+                            buttons: {
+                                confirm: function () {
+                                    $.ajax({
+                                        type: 'post',
+                                        url: './app/rest/admin/process-instances/' + instanceId + '/migrate',
+                                        contentType: 'application/json; charset=utf-8',
+                                        data: JSON.stringify(migrationDocumentPayload),
+                                        success: function() {
+                                            paper.clear();
+                                            migrationPaper.clear();
+                                            $('#targetModel').removeAttr('data-migration-definition-id');
+                                            definitionId = migrationDefinitionId;
+                                            migrationDefinitionId = undefined;
+                                            migrationMappedElementsText = new Array();
+                                            migrationMappedElements = new Array();
+                                            $('#targetModel').hide();
+                                            $('#migrationDivider').hide();
+                                            $('#executeMigrationDocument').hide();
+                                            $('#currentMappingValues').hide();
+                                            _showProcessDiagram();
+                                        }
+                                    });
+                                },
+                                cancel: function () {
+                                    
+                                }
                             }
-                        }
-                    });
+                        });
+                        
+                    } else {
+                    
+                        $.confirm({
+                            title: 'Migrate all instances of process definition',
+                            content: 'Are you sure you want to migrate all instances of the process definition with the defined mappings',
+                            buttons: {
+                                confirm: function () {
+                                    $.ajax({
+                                        type: 'post',
+                                        url: './app/rest/admin/process-definitions/' + definitionId + '/batch-migrate',
+                                        contentType: 'application/json; charset=utf-8',
+                                        data: JSON.stringify(migrationDocumentPayload),
+                                        success: function() {
+                                            paper.clear();
+                                            migrationPaper.clear();
+                                            $('#targetModel').removeAttr('data-migration-definition-id');
+                                            definitionId = migrationDefinitionId;
+                                            migrationDefinitionId = undefined;
+                                            migrationMappedElementsText = new Array();
+                                            migrationMappedElements = new Array();
+                                            $('#targetModel').hide();
+                                            $('#migrationDivider').hide();
+                                            $('#executeMigrationDocument').hide();
+                                            $('#currentMappingValues').hide();
+                                        }
+                                    });
+                                },
+                                cancel: function () {
+                                    
+                                }
+                            }
+                        });
+                    }
                  });
 			     
 			});

@@ -42,4 +42,9 @@ public interface HistoricTaskInstanceDataManager extends DataManager<HistoricTas
 
     long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap);
 
+    void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+    
+    void deleteHistoricTaskInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricTaskInstancesForNonExistingCaseInstances();
 }

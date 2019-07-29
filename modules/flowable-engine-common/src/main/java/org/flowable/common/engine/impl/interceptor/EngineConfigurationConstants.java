@@ -40,6 +40,8 @@ public interface EngineConfigurationConstants {
     
     String KEY_JOB_SERVICE_CONFIG = "cfg.jobService";
     
+    String KEY_BATCH_SERVICE_CONFIG = "cfg.batchService";
+    
     int PRIORITY_ENGINE_PROCESS = 50000;
     
     int PRIORITY_ENGINE_IDM = 100000;

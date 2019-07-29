@@ -31,4 +31,10 @@ public interface HistoricIdentityLinkDataManager extends DataManager<HistoricIde
     void deleteHistoricIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
     
     void deleteHistoricIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+    
+    void deleteHistoricProcessIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricCaseIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricTaskIdentityLinksForNonExistingInstances();
 }

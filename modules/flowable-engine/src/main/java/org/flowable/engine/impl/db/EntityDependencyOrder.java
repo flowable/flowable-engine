@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl;
+import org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl;
+import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
@@ -91,6 +94,9 @@ public class EntityDependencyOrder {
          * FK to Deployment FK to ByteArray
          */
         DELETE_ORDER.add(ModelEntityImpl.class);
+        
+        DELETE_ORDER.add(BatchPartEntityImpl.class);
+        DELETE_ORDER.add(BatchEntityImpl.class);
 
         /*
          * FK to ByteArray
@@ -123,6 +129,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(ByteArrayEntityImpl.class);
         DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
         DELETE_ORDER.add(JobByteArrayEntityImpl.class);
+        DELETE_ORDER.add(BatchByteArrayEntityImpl.class);
 
         /*
          * FK from ModelEntity FK from JobEntity FK from VariableInstanceEntity

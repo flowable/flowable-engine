@@ -13,14 +13,14 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
-
-import java.util.List;
 
 /**
  * @author Dennis Federico
@@ -57,5 +57,10 @@ public class HistoricPlanItemInstanceEntityManagerImpl extends AbstractCmmnEntit
     @Override
     public long countByCriteria(HistoricPlanItemInstanceQuery query) {
         return historicPlanItemInstanceDataManager.countByCriteria((HistoricPlanItemInstanceQueryImpl) query);
+    }
+    
+    @Override
+    public void deleteHistoricPlanItemInstancesForNonExistingCaseInstances() {
+        historicPlanItemInstanceDataManager.deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
     }
 }

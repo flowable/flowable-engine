@@ -1,6 +1,6 @@
 #!/bin/sh
 BASE_PWD="$PWD"
-FLOWABLE_VERSION=6.4.2-SNAPSHOT
+FLOWABLE_VERSION=6.5.0-SNAPSHOT
 
 echo "Initializing for version $FLOWABLE_VERSION"
 

@@ -11,14 +11,11 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.migration;
+package org.flowable.engine.migration;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Dennis Federico
- */
 public class ProcessInstanceMigrationValidationResult {
 
     protected List<String> validationMessages = new ArrayList<>();

@@ -23,6 +23,7 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -166,5 +167,10 @@ public class EngineConfiguration {
     @Bean
     public org.flowable.form.api.FormService formEngineFormService(ProcessEngine processEngine) {
         return formEngineConfiguration().getFormService();
+    }
+
+    @Bean
+    public ProcessMigrationService processInstanceMigrationService() {
+        return processEngine().getProcessMigrationService();
     }
 }

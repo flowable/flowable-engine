@@ -29,6 +29,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CandidateManager;
 import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
+import org.flowable.cmmn.api.CmmnHistoryCleaningManager;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -40,6 +41,7 @@ import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnTaskServiceImpl;
+import org.flowable.cmmn.engine.impl.DefaultCmmnHistoryCleaningManager;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
@@ -101,6 +103,7 @@ import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.interceptor.DefaultCmmnIdentityLinkInterceptor;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
+import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerFactory;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerNotificationHelper;
@@ -696,6 +699,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled = true;
     protected boolean isAsyncHistoryExecutorResetExpiredJobsEnabled = true;
     
+    protected boolean enableHistoryCleaning = false;
+    protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
+    protected int cleanInstancesEndedAfterNumberOfDays = 365;
+    protected CmmnHistoryCleaningManager cmmnHistoryCleaningManager;
+    
     protected Map<String, HistoryJobHandler> historyJobHandlers;
     protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected List<HistoryJsonTransformer> customHistoryJsonTransformers;
@@ -813,6 +821,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initAsyncHistoryExecutor();
         initScriptingEngines();
         configuratorsAfterInit();
+        
+        initHistoryCleaningManager();
     }
 
     public void initCaseDiagramGenerator() {
@@ -1305,6 +1315,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
         }
     }
+    
+    public void initHistoryCleaningManager() {
+        if (cmmnHistoryCleaningManager == null) {
+            cmmnHistoryCleaningManager = new DefaultCmmnHistoryCleaningManager(this);
+        }
+    }
 
     @Override
     public String getEngineCfgKey() {
@@ -1501,6 +1517,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobHandlers.put(TriggerTimerEventJobHandler.TYPE, new TriggerTimerEventJobHandler());
         jobHandlers.put(AsyncActivatePlanItemInstanceJobHandler.TYPE, new AsyncActivatePlanItemInstanceJobHandler());
         jobHandlers.put(AsyncInitializePlanModelJobHandler.TYPE, new AsyncInitializePlanModelJobHandler());
+        jobHandlers.put(CmmnHistoryCleanupJobHandler.TYPE, new CmmnHistoryCleanupJobHandler());
 
         // if we have custom job handlers, register them
         if (customJobHandlers != null) {
@@ -3397,5 +3414,37 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void setEnableHistoricTaskLogging(boolean enableHistoricTaskLogging) {
         this.enableHistoricTaskLogging = enableHistoricTaskLogging;
+    }
+
+    public boolean isEnableHistoryCleaning() {
+        return enableHistoryCleaning;
+    }
+
+    public void setEnableHistoryCleaning(boolean enableHistoryCleaning) {
+        this.enableHistoryCleaning = enableHistoryCleaning;
+    }
+
+    public String getHistoryCleaningTimeCycleConfig() {
+        return historyCleaningTimeCycleConfig;
+    }
+
+    public void setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
+        this.historyCleaningTimeCycleConfig = historyCleaningTimeCycleConfig;
+    }
+
+    public int getCleanInstancesEndedAfterNumberOfDays() {
+        return cleanInstancesEndedAfterNumberOfDays;
+    }
+
+    public void setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
+        this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+    }
+
+    public CmmnHistoryCleaningManager getCmmnHistoryCleaningManager() {
+        return cmmnHistoryCleaningManager;
+    }
+
+    public void setCmmnHistoryCleaningManager(CmmnHistoryCleaningManager cmmnHistoryCleaningManager) {
+        this.cmmnHistoryCleaningManager = cmmnHistoryCleaningManager;
     }
 }

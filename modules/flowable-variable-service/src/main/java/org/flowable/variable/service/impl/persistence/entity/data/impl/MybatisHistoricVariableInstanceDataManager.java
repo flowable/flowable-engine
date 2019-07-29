@@ -112,5 +112,14 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     public long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectHistoricVariableInstanceCountByNativeQuery", parameterMap);
     }
+    
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances", null, HistoricVariableInstanceEntity.class);
+    }
 
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances", null, HistoricVariableInstanceEntity.class);
+    }
 }

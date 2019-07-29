@@ -39,5 +39,8 @@ public interface HistoricActivityInstanceEntityManager extends EntityManager<His
     long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);
 
     void deleteHistoricActivityInstancesByProcessInstanceId(String historicProcessInstanceId);
+    
+    void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery);
 
+    void deleteHistoricActivityInstancesForNonExistingProcessInstances();
 }

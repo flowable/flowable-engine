@@ -44,4 +44,5 @@ public interface HistoricDetailEntityManager extends EntityManager<HistoricDetai
 
     void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId);
 
+    void deleteHistoricDetailForNonExistingProcessInstances();
 }
