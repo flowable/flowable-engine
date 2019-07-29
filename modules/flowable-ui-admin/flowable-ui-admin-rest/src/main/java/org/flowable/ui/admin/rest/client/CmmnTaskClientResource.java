@@ -53,7 +53,7 @@ public class CmmnTaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/cmmn-tasks/{taskId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/cmmn-tasks/{taskId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteTask(@PathVariable String taskId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -77,7 +77,7 @@ public class CmmnTaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/cmmn-tasks/{taskId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/cmmn-tasks/{taskId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void updateTask(@PathVariable String taskId, @RequestBody ObjectNode actionBody) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);

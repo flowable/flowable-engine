@@ -55,13 +55,13 @@ public class DebuggerResource {
         debuggerService.addBreakpoint(breakpointRepresentation);
     }
 
-    @RequestMapping(value = "/rest/debugger/breakpoints/{executionId}/continue", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/debugger/breakpoints/{executionId}/continue")
     public void continueExecution(@PathVariable String executionId) {
         assertDebuggerEnabled();
         debuggerService.continueExecution(executionId);
     }
 
-    @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/debugger/breakpoints")
     public void deleteBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
         assertDebuggerEnabled();
         debuggerService.removeBreakpoint(breakpointRepresentation);

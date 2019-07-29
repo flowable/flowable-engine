@@ -78,7 +78,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}")
     @ResponseStatus(value = HttpStatus.OK)
     public void updateVariable(@PathVariable String processInstanceId, @PathVariable String variableName, @RequestBody ObjectNode body) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -102,7 +102,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteVariable(@PathVariable String processInstanceId, @PathVariable String variableName) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

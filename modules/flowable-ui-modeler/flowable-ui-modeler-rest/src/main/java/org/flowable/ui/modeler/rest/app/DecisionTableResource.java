@@ -103,7 +103,7 @@ public class DecisionTableResource {
         decisionTableService.exportHistoricDecisionTable(response, historyModelId);
     }
 
-    @RequestMapping(value = "/{decisionTableId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/{decisionTableId}", produces = "application/json")
     public DecisionTableRepresentation saveDecisionTable(@PathVariable String decisionTableId, @RequestBody DecisionTableSaveRepresentation saveRepresentation) {
         return decisionTableService.saveDecisionTable(decisionTableId, saveRepresentation);
     }

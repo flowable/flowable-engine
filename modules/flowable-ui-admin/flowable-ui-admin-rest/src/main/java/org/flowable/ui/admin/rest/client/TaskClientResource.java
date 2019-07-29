@@ -59,7 +59,7 @@ public class TaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/tasks/{taskId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteTask(@PathVariable String taskId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -83,7 +83,7 @@ public class TaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/tasks/{taskId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/tasks/{taskId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void updateTask(@PathVariable String taskId, @RequestBody ObjectNode actionBody) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

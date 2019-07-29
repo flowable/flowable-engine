@@ -75,7 +75,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables/{variableName}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables/{variableName}")
     @ResponseStatus(value = HttpStatus.OK)
     public void updateVariable(@PathVariable String caseInstanceId, @PathVariable String variableName, @RequestBody ObjectNode body) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -99,7 +99,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables/{variableName}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteVariable(@PathVariable String caseInstanceId, @PathVariable String variableName) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);

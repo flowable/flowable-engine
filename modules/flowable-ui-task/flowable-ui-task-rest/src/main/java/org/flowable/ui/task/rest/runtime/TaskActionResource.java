@@ -32,30 +32,30 @@ public class TaskActionResource {
     @Autowired
     protected FlowableTaskActionService taskActionService;
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/action/complete", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/tasks/{taskId}/action/complete")
     @ResponseStatus(value = HttpStatus.OK)
     public void completeTask(@PathVariable String taskId) {
         taskActionService.completeTask(taskId);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/action/assign", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/tasks/{taskId}/action/assign")
     public TaskRepresentation assignTask(@PathVariable String taskId, @RequestBody ObjectNode requestNode) {
         return taskActionService.assignTask(taskId, requestNode);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/action/involve", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/rest/tasks/{taskId}/action/involve", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void involveUser(@PathVariable("taskId") String taskId, @RequestBody ObjectNode requestNode) {
         taskActionService.involveUser(taskId, requestNode);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/action/remove-involved", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/rest/tasks/{taskId}/action/remove-involved", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void removeInvolvedUser(@PathVariable("taskId") String taskId, @RequestBody ObjectNode requestNode) {
         taskActionService.removeInvolvedUser(taskId, requestNode);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/action/claim", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/tasks/{taskId}/action/claim")
     @ResponseStatus(value = HttpStatus.OK)
     public void claimTask(@PathVariable String taskId) {
         taskActionService.claimTask(taskId);

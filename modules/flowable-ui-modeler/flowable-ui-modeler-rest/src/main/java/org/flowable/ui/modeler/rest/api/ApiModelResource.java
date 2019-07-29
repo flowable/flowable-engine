@@ -86,7 +86,7 @@ public class ApiModelResource {
     /**
      * PUT /rest/models/{modelId} -> update process model properties
      */
-    @RequestMapping(value = "/editor/models/{modelId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/editor/models/{modelId}")
     public ModelRepresentation updateModel(@PathVariable String modelId, @RequestBody ModelRepresentation updatedModel) {
         // Get model, write-permission required if not a favorite-update
         Model model = modelService.getModel(modelId);
@@ -112,7 +112,7 @@ public class ApiModelResource {
      * DELETE /editor/models/{modelId} -> delete process model or, as a non-owner, remove the share info link for that user specifically
      */
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/editor/models/{modelId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/editor/models/{modelId}")
     public void deleteModel(@PathVariable String modelId) {
 
         // Get model to check if it exists, read-permission required for delete

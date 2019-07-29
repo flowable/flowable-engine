@@ -49,7 +49,7 @@ public class ProcessInstanceResource {
         return new FormModelRepresentation(formInfo, formModel);
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/process-instances/{processInstanceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteProcessInstance(@PathVariable String processInstanceId) {
         processInstanceService.deleteProcessInstance(processInstanceId);

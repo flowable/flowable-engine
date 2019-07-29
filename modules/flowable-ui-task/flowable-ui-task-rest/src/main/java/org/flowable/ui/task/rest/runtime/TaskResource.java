@@ -36,7 +36,7 @@ public class TaskResource {
         return taskService.getTask(taskId);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/rest/tasks/{taskId}", produces = "application/json")
     public TaskRepresentation updateTask(@PathVariable("taskId") String taskId, @RequestBody TaskUpdateRepresentation updated) {
         return taskService.updateTask(taskId, updated);
     }

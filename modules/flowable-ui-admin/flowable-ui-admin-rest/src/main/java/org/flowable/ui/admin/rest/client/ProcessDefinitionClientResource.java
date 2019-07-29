@@ -71,7 +71,7 @@ public class ProcessDefinitionClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-definitions/{definitionId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/rest/admin/process-definitions/{definitionId}", produces = "application/json")
     public JsonNode updateProcessDefinitionCategory(@PathVariable String definitionId,
             @RequestBody ObjectNode updateBody) throws BadRequestException {
 

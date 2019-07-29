@@ -160,7 +160,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return addContentItem(contentItem, null, null, false);
     }
 
-    @RequestMapping(value = "/rest/content/{contentId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/content/{contentId}")
     public void deleteContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
         super.deleteContent(contentId, response);
     }

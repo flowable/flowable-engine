@@ -31,6 +31,7 @@ import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.flowable.idm.rest.service.api.group.GroupResponse;
 import org.flowable.idm.rest.service.api.user.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -118,7 +119,7 @@ public class PrivilegeCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the user privilege has been deleted")
     })
-    @RequestMapping(value = "/privileges/{privilegeId}/users/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/privileges/{privilegeId}/users/{userId}")
     public void deleteUserPrivilege(@PathVariable String privilegeId, @PathVariable String userId) {
         Privilege privilege = getPrivilegeById(privilegeId);
         
@@ -164,7 +165,7 @@ public class PrivilegeCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the group privilege has been deleted")
     })
-    @RequestMapping(value = "/privileges/{privilegeId}/group/{groupId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/privileges/{privilegeId}/group/{groupId}")
     public void deleteGroupPrivilege(@PathVariable String privilegeId, @PathVariable String groupId) {
         Privilege privilege = getPrivilegeById(privilegeId);
         
