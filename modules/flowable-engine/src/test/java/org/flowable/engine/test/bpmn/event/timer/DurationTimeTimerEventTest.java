@@ -72,7 +72,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
 
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday.plus(200, ChronoUnit.SECONDS)));
 
-        waitForJobExecutorToProcessAllJobs(7000L, 200L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 200L);
 
         jobQuery = managementService.createTimerJobQuery();
         assertThat(jobQuery.count()).isEqualTo(0);
