@@ -12,10 +12,10 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.Artifact;
@@ -40,6 +40,7 @@ import org.flowable.bpmn.model.FormValue;
 import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.Lane;
+import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.MessageFlow;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
@@ -59,10 +60,9 @@ import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -463,6 +463,28 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
         formPropertiesNode.set("formProperties", propertiesArrayNode);
         propertiesNode.set(PROPERTY_FORM_PROPERTIES, formPropertiesNode);
+    }
+
+    protected void addMapException(List<MapExceptionEntry> exceptions, ObjectNode propertiesNode) {
+        ObjectNode exceptionsNode = objectMapper.createObjectNode();
+        ArrayNode itemsNode = objectMapper.createArrayNode();
+        for (MapExceptionEntry exception : exceptions) {
+            ObjectNode propertyItemNode = objectMapper.createObjectNode();
+
+            if (StringUtils.isNotEmpty(exception.getClassName())) {
+                propertyItemNode.put(PROPERTY_SERVICETASK_EXCEPTION_CLASS, exception.getClassName());
+            }
+            if (StringUtils.isNotEmpty(exception.getErrorCode())) {
+                propertyItemNode.put(PROPERTY_SERVICETASK_EXCEPTION_CODE, exception.getErrorCode());
+            }
+            propertyItemNode.put(PROPERTY_SERVICETASK_EXCEPTION_CHILDREN, Boolean.toString(exception.isAndChildren()));
+
+
+            itemsNode.add(propertyItemNode);
+        }
+
+        exceptionsNode.set("exceptions", itemsNode);
+        propertiesNode.set(PROPERTY_SERVICETASK_EXCEPTIONS, exceptionsNode);
     }
 
     protected void addFieldExtensions(List<FieldExtension> extensions, ObjectNode propertiesNode) {
