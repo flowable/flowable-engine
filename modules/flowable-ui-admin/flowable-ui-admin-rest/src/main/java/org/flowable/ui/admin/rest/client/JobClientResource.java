@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -80,7 +79,7 @@ public class JobClientResource extends AbstractClientResource {
     /**
      * POST /rest/admin/jobs/{jobId} -> execute job
      */
-    @RequestMapping(value = "/rest/admin/jobs/{jobId}", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/admin/jobs/{jobId}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void executeJob(@PathVariable String jobId) throws BadRequestException {
 
@@ -96,7 +95,7 @@ public class JobClientResource extends AbstractClientResource {
     /**
      * POST /rest/admin/move-jobs/{jobId} -> move job
      */
-    @RequestMapping(value = "/rest/admin/move-jobs/{jobId}", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/admin/move-jobs/{jobId}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void moveJob(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {
 

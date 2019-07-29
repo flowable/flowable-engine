@@ -302,7 +302,7 @@ public class MyRestController {
     @Autowired
     private MyService myService;
 
-    @RequestMapping(value="/process", method= RequestMethod.POST)
+    @PostMapping(value="/process")
     public void startProcessInstance() {
         myService.startProcess();
     }
@@ -537,7 +537,7 @@ public class MyRestController {
     @Autowired
     private MyService myService;
 
-    @RequestMapping(value="/process", method= RequestMethod.POST)
+    @PostMapping(value="/process")
     public void startProcessInstance(@RequestBody StartProcessRepresentation startProcessRepresentation) {
         myService.startProcess(startProcessRepresentation.getAssignee());
     }

@@ -24,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,7 +64,7 @@ public class CmmnTaskClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/cmmn-tasks/{taskId}", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/cmmn-tasks/{taskId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void executeTaskAction(@PathVariable String taskId, @RequestBody ObjectNode actionBody) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);

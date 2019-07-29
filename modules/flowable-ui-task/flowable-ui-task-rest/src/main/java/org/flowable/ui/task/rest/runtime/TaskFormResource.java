@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,13 +44,13 @@ public class TaskFormResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/{taskId}", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/{taskId}", produces = "application/json")
     public void completeTaskForm(@PathVariable String taskId, @RequestBody CompleteFormRepresentation completeTaskFormRepresentation) {
         taskFormService.completeTaskForm(taskId, completeTaskFormRepresentation);
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/{taskId}/save-form", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/{taskId}/save-form", produces = "application/json")
     public void saveTaskForm(@PathVariable String taskId, @RequestBody SaveFormRepresentation saveFormRepresentation) {
         taskFormService.saveTaskForm(taskId, saveFormRepresentation);
     }

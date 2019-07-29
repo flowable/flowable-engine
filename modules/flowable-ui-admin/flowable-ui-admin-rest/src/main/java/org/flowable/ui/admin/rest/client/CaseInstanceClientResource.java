@@ -24,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -87,7 +86,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables")
     @ResponseStatus(value = HttpStatus.OK)
     public void createVariable(@PathVariable String caseInstanceId, @RequestBody ObjectNode body) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -122,7 +121,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/case-instances/{caseInstanceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void executeAction(@PathVariable String caseInstanceId, @RequestBody JsonNode actionBody) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);

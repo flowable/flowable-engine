@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,12 +70,12 @@ public class DecisionTableResource {
         decisionTableService.exportDecisionTable(response, decisionTableId);
     }
 
-    @RequestMapping(value = "/import-decision-table", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/import-decision-table", produces = "application/json")
     public ModelRepresentation importDecisionTable(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return decisionTableService.importDecisionTable(request, file);
     }
 
-    @RequestMapping(value = "/import-decision-table-text", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/import-decision-table-text", produces = "application/json")
     public String importDecisionTableText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         ModelRepresentation decisionTableRepresentation = decisionTableService.importDecisionTable(request, file);
         String json = null;

@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,7 +41,7 @@ public class BatchesClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/batches -> Get a list of batches.
      */
-    @RequestMapping(value = "/rest/admin/batches", method = RequestMethod.GET, produces = "application/json")
+    @GetRequest(value = "/rest/admin/batches", produces = "application/json")
     public JsonNode listBatches(HttpServletRequest request) {
         LOGGER.debug("REST request to get a list of batches");
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

@@ -38,7 +38,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -187,7 +186,7 @@ public class ModelResource {
     /**
      * POST /rest/models/{modelId}/editor/json -> save the JSON model
      */
-    @RequestMapping(value = "/rest/models/{modelId}/editor/json", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/models/{modelId}/editor/json")
     public ModelRepresentation saveModel(@PathVariable String modelId, @RequestBody MultiValueMap<String, String> values) {
 
         // Validation: see if there was another update in the meantime
@@ -245,9 +244,9 @@ public class ModelResource {
     }
 
     /**
-     * POST /rest/models/{modelId}/editor/newversion -> create a new model version
+     * POST /rest/models/{modelId}/newversion -> create a new model version
      */
-    @RequestMapping(value = "/rest/models/{modelId}/newversion", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/models/{modelId}/newversion")
     public ModelRepresentation importNewVersion(@PathVariable String modelId, @RequestParam("file") MultipartFile file) {
         InputStream modelStream = null;
         try {

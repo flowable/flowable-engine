@@ -32,7 +32,6 @@ import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -51,7 +50,7 @@ public class HistoricTaskQueryResource {
     @Autowired
     protected PermissionService permissionService;
 
-    @RequestMapping(value = "/rest/query/history/tasks", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/query/history/tasks", produces = "application/json")
     public ResultListDataRepresentation listTasks(@RequestBody ObjectNode requestNode) {
         if (requestNode == null) {
             throw new BadRequestException("No request found");

@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -84,7 +83,7 @@ public class AppDefinitionResource {
         return resultRepresentation;
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/publish", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/app-definitions/{modelId}/publish", produces = "application/json")
     public AppDefinitionUpdateResultRepresentation publishAppDefinition(@PathVariable("modelId") String modelId, @RequestBody AppDefinitionPublishRepresentation publishModel) {
         AppDefinitionUpdateResultRepresentation resultRepresentation = null;
         try {
@@ -108,13 +107,13 @@ public class AppDefinitionResource {
     }
 
     @Transactional
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/import", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/app-definitions/{modelId}/import", produces = "application/json")
     public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, @PathVariable String modelId, @RequestParam("file") MultipartFile file) {
         return appDefinitionImportService.importAppDefinitionNewVersion(request, file, modelId);
     }
 
     @Transactional
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/text/import", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/app-definitions/{modelId}/text/import")
     public String importAppDefinitionText(HttpServletRequest request, @PathVariable String modelId, @RequestParam("file") MultipartFile file) {
 
         AppDefinitionRepresentation appDefinitionRepresentation = appDefinitionImportService.importAppDefinitionNewVersion(request, file, modelId);
@@ -130,13 +129,13 @@ public class AppDefinitionResource {
     }
 
     @Transactional
-    @RequestMapping(value = "/rest/app-definitions/import", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/app-definitions/import", produces = "application/json")
     public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return appDefinitionImportService.importAppDefinition(request, file);
     }
 
     @Transactional
-    @RequestMapping(value = "/rest/app-definitions/text/import", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/app-definitions/text/import")
     public String importAppDefinitionText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         AppDefinitionRepresentation appDefinitionRepresentation = appDefinitionImportService.importAppDefinition(request, file);
         String appDefinitionRepresentationJson = null;

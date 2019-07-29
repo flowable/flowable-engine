@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -80,7 +79,7 @@ public class CaseInstanceResource {
         return caseInstanceService.getCaseInstanceCompletedUserEventListeners(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/trigger-user-event-listener/{userEventListenerId}", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/case-instances/{caseInstanceId}/trigger-user-event-listener/{userEventListenerId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void triggerUserEventListener(@PathVariable String caseInstanceId, @PathVariable String userEventListenerId) {
         caseInstanceService.triggerUserEventListener(caseInstanceId, userEventListenerId);
@@ -92,7 +91,7 @@ public class CaseInstanceResource {
         return caseInstanceService.getCaseInstanceEnabledPlanItemInstances(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/enabled-planitem-instances/{planItemInstanceId}", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/case-instances/{caseInstanceId}/enabled-planitem-instances/{planItemInstanceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void startEnabledPlanItemInstance(@PathVariable String caseInstanceId, @PathVariable String planItemInstanceId) {
         caseInstanceService.startEnabledPlanItemInstance(caseInstanceId, planItemInstanceId);

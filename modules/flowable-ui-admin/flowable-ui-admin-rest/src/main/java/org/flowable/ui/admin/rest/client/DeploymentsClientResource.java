@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,7 +68,7 @@ public class DeploymentsClientResource extends AbstractClientResource {
     /**
      * POST /rest/admin/deployments: upload a deployment
      */
-    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(produces = "application/json")
     public JsonNode handleFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {

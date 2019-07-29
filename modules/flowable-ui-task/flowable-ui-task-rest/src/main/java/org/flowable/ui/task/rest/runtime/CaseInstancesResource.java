@@ -18,7 +18,6 @@ import org.flowable.ui.task.service.runtime.FlowableCaseInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,7 +27,7 @@ public class CaseInstancesResource {
     @Autowired
     protected FlowableCaseInstanceService caseInstanceService;
 
-    @RequestMapping(value = "/rest/case-instances", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/case-instances")
     public CaseInstanceRepresentation startNewCaseInstance(@RequestBody CreateCaseInstanceRepresentation startRequest) {
         return caseInstanceService.startNewCaseInstance(startRequest);
     }
