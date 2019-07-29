@@ -336,7 +336,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
             timerJob.setDuedate(businessCalendar.resolveDuedate(processEngineConfiguration.getBatchStatusTimeCycleConfig()));
-            timerJob.setRepeat(processEngineConfiguration.getHistoryCleaningTimeCycleConfig());
+            timerJob.setRepeat(processEngineConfiguration.getBatchStatusTimeCycleConfig());
             
             timerJobService.scheduleTimerJob(timerJob);
         }
