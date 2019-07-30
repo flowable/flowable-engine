@@ -26,8 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,12 +53,12 @@ public class ApiModelsResource {
         return modelQueryService.getModels(filter, sort, modelType, request);
     }
 
-    @RequestMapping(value = "/editor/import-process-model", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/editor/import-process-model", produces = "application/json")
     public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return modelQueryService.importProcessModel(request, file);
     }
 
-    @RequestMapping(value = "/editor/models", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/editor/models", produces = "application/json")
     public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
 

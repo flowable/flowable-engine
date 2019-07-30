@@ -24,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,7 +61,7 @@ public class EventSubscriptionClientResource extends AbstractClientResource {
     /**
      * POST /rest/admin/event-subscriptions/{eventSubscriptionId} -> trigger event
      */
-    @RequestMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void triggerEvent(@PathVariable String eventSubscriptionId, @RequestBody ObjectNode eventBody) throws BadRequestException {
 

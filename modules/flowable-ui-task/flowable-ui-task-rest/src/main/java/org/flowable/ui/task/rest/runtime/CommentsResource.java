@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -40,7 +39,7 @@ public class CommentsResource {
         return commentService.getTaskComments(taskId);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/comments", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/tasks/{taskId}/comments", produces = "application/json")
     public CommentRepresentation addTaskComment(@RequestBody CommentRepresentation commentRequest, @PathVariable("taskId") String taskId) {
         return commentService.addTaskComment(commentRequest, taskId);
     }
@@ -50,7 +49,7 @@ public class CommentsResource {
         return commentService.getProcessInstanceComments(processInstanceId);
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/comments", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/process-instances/{processInstanceId}/comments", produces = "application/json")
     public CommentRepresentation addProcessInstanceComment(@RequestBody CommentRepresentation commentRequest,
             @PathVariable("processInstanceId") String processInstanceId) {
         return commentService.addProcessInstanceComment(commentRequest, processInstanceId);

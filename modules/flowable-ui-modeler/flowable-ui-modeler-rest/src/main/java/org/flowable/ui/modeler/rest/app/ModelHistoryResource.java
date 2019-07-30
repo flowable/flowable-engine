@@ -22,7 +22,6 @@ import org.flowable.ui.modeler.model.ReviveModelResultRepresentation;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,7 +39,7 @@ public class ModelHistoryResource extends AbstractModelHistoryResource {
         return super.getProcessModelHistory(modelId, modelHistoryId);
     }
 
-    @RequestMapping(value = "/rest/models/{modelId}/history/{modelHistoryId}", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/models/{modelId}/history/{modelHistoryId}", produces = "application/json")
     public ReviveModelResultRepresentation executeProcessModelHistoryAction(@PathVariable String modelId, @PathVariable String modelHistoryId,
             @RequestBody(required = true) BaseRestActionRepresentation action) {
 

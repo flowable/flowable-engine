@@ -36,8 +36,6 @@ import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -165,7 +163,7 @@ public class ApiModelResource {
     /**
      * POST /editor/models/{modelId}/editor/json -> save the JSON model
      */
-    @RequestMapping(value = "/editor/models/{modelId}/editor/json", method = RequestMethod.POST)
+    @PostMapping(value = "/editor/models/{modelId}/editor/json")
     public ModelRepresentation saveModel(@PathVariable String modelId, @RequestBody MultiValueMap<String, String> values) {
 
         // Validation: see if there was another update in the meantime

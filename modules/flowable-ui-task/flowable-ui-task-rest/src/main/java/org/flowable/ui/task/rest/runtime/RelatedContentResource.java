@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +54,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return super.getContentItemsForCase(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/raw-content", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/tasks/{taskId}/raw-content")
     public ContentItemRepresentation createContentItemOnTask(@PathVariable("taskId") String taskId, @RequestParam("file") MultipartFile file) {
         return super.createContentItemOnTask(taskId, file);
     }
@@ -63,7 +62,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
     /*
      * specific endpoint for IE9 flash upload component
      */
-    @RequestMapping(value = "/rest/tasks/{taskId}/raw-content/text", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/tasks/{taskId}/raw-content/text")
     public String createContentItemOnTaskText(@PathVariable("taskId") String taskId, @RequestParam("file") MultipartFile file) {
         ContentItemRepresentation contentItem = super.createContentItemOnTask(taskId, file);
         String contentItemJson = null;
@@ -77,17 +76,17 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return contentItemJson;
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/content", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/tasks/{taskId}/content")
     public ContentItemRepresentation createContentItemOnTask(@PathVariable("taskId") String taskId, @RequestBody ContentItemRepresentation contentItem) {
         return super.createContentItemOnTask(taskId, contentItem);
     }
 
-    @RequestMapping(value = "/rest/processes/{processInstanceId}/content", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/processes/{processInstanceId}/content")
     public ContentItemRepresentation createContentItemOnProcessInstance(@PathVariable("processInstanceId") String processInstanceId, @RequestBody ContentItemRepresentation contentItem) {
         return super.createContentItemOnProcessInstance(processInstanceId, contentItem);
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/raw-content", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/process-instances/{processInstanceId}/raw-content")
     public ContentItemRepresentation createContentItemOnProcessInstance(@PathVariable("processInstanceId") String processInstanceId, @RequestParam("file") MultipartFile file) {
         return super.createContentItemOnProcessInstance(processInstanceId, file);
     }
@@ -95,7 +94,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
     /*
      * specific endpoint for IE9 flash upload component
      */
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/raw-content/text", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/process-instances/{processInstanceId}/raw-content/text")
     public String createContentItemOnProcessInstanceText(@PathVariable("processInstanceId") String processInstanceId, @RequestParam("file") MultipartFile file) {
         ContentItemRepresentation contentItem = super.createContentItemOnProcessInstance(processInstanceId, file);
 
@@ -110,7 +109,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return contentItemJson;
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseId}/raw-content", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/case-instances/{caseId}/raw-content")
     public ContentItemRepresentation createContentItemOnCase(@PathVariable("caseId") String caseId, @RequestParam("file") MultipartFile file) {
         return super.createContentItemOnCase(caseId, file);
     }
@@ -118,7 +117,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
     /*
      * specific endpoint for IE9 flash upload component
      */
-    @RequestMapping(value = "/rest/case-instances/{caseId}/raw-content/text", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/case-instances/{caseId}/raw-content/text")
     public String createContentItemOnCaseText(@PathVariable("caseId") String caseId, @RequestParam("file") MultipartFile file) {
         ContentItemRepresentation contentItem = super.createContentItemOnCase(caseId, file);
 
@@ -133,7 +132,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return contentItemJson;
     }
 
-    @RequestMapping(value = "/rest/content/raw", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/content/raw")
     public ContentItemRepresentation createTemporaryRawContentItem(@RequestParam("file") MultipartFile file) {
         return super.createTemporaryRawContentItem(file);
     }
@@ -141,7 +140,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
     /*
      * specific endpoint for IE9 flash upload component
      */
-    @RequestMapping(value = "/rest/content/raw/text", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/content/raw/text")
     public String createTemporaryRawContentItemText(@RequestParam("file") MultipartFile file) {
         ContentItemRepresentation contentItem = super.createTemporaryRawContentItem(file);
         String contentItemJson = null;
@@ -155,7 +154,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return contentItemJson;
     }
 
-    @RequestMapping(value = "/rest/content", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/content")
     public ContentItemRepresentation createTemporaryRelatedContent(@RequestBody ContentItemRepresentation contentItem) {
         return addContentItem(contentItem, null, null, false);
     }

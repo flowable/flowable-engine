@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,7 +63,7 @@ public class IdmProfileResource {
         return userRepresentation;
     }
 
-    @RequestMapping(value = "/profile", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/profile", produces = "application/json")
     public UserRepresentation updateProfile(@RequestBody UserRepresentation userRepresentation) {
         return new UserRepresentation(profileService.updateProfile(userRepresentation.getFirstName(),
                 userRepresentation.getLastName(),
@@ -72,7 +71,7 @@ public class IdmProfileResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/profile-password", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/profile-password", produces = "application/json")
     public void changePassword(@RequestBody ChangePasswordRepresentation changePasswordRepresentation) {
         profileService.changePassword(changePasswordRepresentation.getOriginalPassword(), changePasswordRepresentation.getNewPassword());
     }
@@ -104,7 +103,7 @@ public class IdmProfileResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/profile-picture", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/profile-picture", produces = "application/json")
     public void uploadProfilePicture(@RequestParam("file") MultipartFile file) {
         try {
             profileService.uploadProfilePicture(file.getContentType(), file.getBytes());

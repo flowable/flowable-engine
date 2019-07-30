@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,7 +47,7 @@ public class BatchClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/batches/{batchId} -> return batch data
      */
-    @RequestMapping(value = "/rest/admin/batches/{batchId}", method = RequestMethod.GET, produces = "application/json")
+    @GetRequest(value = "/rest/admin/batches/{batchId}", produces = "application/json")
     public JsonNode getBatch(@PathVariable String batchId, HttpServletRequest request) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -62,7 +61,7 @@ public class BatchClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/batches/{batchId}/batch-parts
      */
-    @RequestMapping(value = "/rest/admin/batches/{batchId}/batch-parts", method = RequestMethod.GET, produces = "application/json")
+    @GetRequest(value = "/rest/admin/batches/{batchId}/batch-parts", produces = "application/json")
     public JsonNode getBatchParts(@PathVariable String batchId, HttpServletRequest request) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -92,7 +91,7 @@ public class BatchClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/batches/{batchId}/batch-document
      */
-    @RequestMapping(value = "/rest/admin/batches/{batchId}/batch-document", method = RequestMethod.GET, produces = "text/plain")
+    @GetRequest(value = "/rest/admin/batches/{batchId}/batch-document", produces = "text/plain")
     public String getBatchDocument(@PathVariable String batchId, HttpServletRequest request) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {

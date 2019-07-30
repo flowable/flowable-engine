@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,7 +74,7 @@ public class ModelsResource {
         return modelQueryService.getCmmnModelsToIncludeInAppDefinition();
     }
 
-    @RequestMapping(value = "/rest/import-process-model", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/import-process-model", produces = "application/json")
     public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return modelQueryService.importProcessModel(request, file);
     }
@@ -83,7 +82,7 @@ public class ModelsResource {
     /*
      * specific endpoint for IE9 flash upload component
      */
-    @RequestMapping(value = "/rest/import-process-model/text", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/import-process-model/text")
     public String importProcessModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
 
         ModelRepresentation modelRepresentation = modelQueryService.importProcessModel(request, file);
@@ -98,7 +97,7 @@ public class ModelsResource {
         return modelRepresentationJson;
     }
     
-    @RequestMapping(value = "/rest/import-case-model", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/import-case-model", produces = "application/json")
     public ModelRepresentation importCaseModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return modelQueryService.importCaseModel(request, file);
     }
@@ -106,7 +105,7 @@ public class ModelsResource {
     /*
      * specific endpoint for IE9 flash upload component
      */
-    @RequestMapping(value = "/rest/import-case-model/text", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/import-case-model/text")
     public String importCaseModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
 
         ModelRepresentation modelRepresentation = modelQueryService.importCaseModel(request, file);
@@ -121,7 +120,7 @@ public class ModelsResource {
         return modelRepresentationJson;
     }
 
-    @RequestMapping(value = "/rest/models", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/models", produces = "application/json")
     public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
         checkForDuplicateKey(modelRepresentation);
@@ -139,7 +138,7 @@ public class ModelsResource {
         }
     }
 
-    @RequestMapping(value = "/rest/models/{modelId}/clone", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/models/{modelId}/clone", produces = "application/json")
     public ModelRepresentation duplicateModel(@PathVariable String modelId, @RequestBody ModelRepresentation modelRepresentation) {
 
         String json = null;

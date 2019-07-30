@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -83,7 +82,7 @@ public class IdmPrivilegesResource {
         return getPrivilege(privilegeId).getUsers();
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/privileges/{privilegeId}/users")
     public void addUserPrivilege(@PathVariable String privilegeId,
                                  @RequestBody AddUserPrivilegeRepresentation representation) {
         privilegeService.addUserPrivilege(privilegeId, representation.getUserId());
@@ -99,7 +98,7 @@ public class IdmPrivilegesResource {
         return getPrivilege(privilegeId).getGroups();
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/privileges/{privilegeId}/groups")
     public void addGroupPrivilege(@PathVariable String privilegeId,
                                   @RequestBody AddGroupPrivilegeRepresentation representation) {
         privilegeService.addGroupPrivilege(privilegeId, representation.getGroupId());

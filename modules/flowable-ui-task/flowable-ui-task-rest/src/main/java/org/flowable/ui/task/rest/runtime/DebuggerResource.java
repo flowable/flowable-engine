@@ -25,7 +25,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -49,7 +48,7 @@ public class DebuggerResource {
         return debuggerService.getBreakpoints();
     }
 
-    @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/debugger/breakpoints")
     public void addBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
         assertDebuggerEnabled();
         debuggerService.addBreakpoint(breakpointRepresentation);
@@ -85,13 +84,13 @@ public class DebuggerResource {
         return debuggerService.getExecutions(processInstanceId);
     }
 
-    @RequestMapping(value = "/rest/debugger/evaluate/expression/{executionId}", method = RequestMethod.POST, produces = "application/text")
+    @PostMapping(value = "/rest/debugger/evaluate/expression/{executionId}", produces = "application/text")
     public String evaluateExpression(@PathVariable String executionId, @RequestBody String expression) {
         assertDebuggerEnabled();
         return debuggerService.evaluateExpression(executionId, expression).toString();
     }
 
-    @RequestMapping(value = "/rest/debugger/evaluate/{scriptLanguage}/{executionId}", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/debugger/evaluate/{scriptLanguage}/{executionId}")
     public void evaluateScript(@PathVariable String executionId, @PathVariable String scriptLanguage, @RequestBody String script) {
         assertDebuggerEnabled();
         debuggerService.evaluateScript(executionId, scriptLanguage, script);

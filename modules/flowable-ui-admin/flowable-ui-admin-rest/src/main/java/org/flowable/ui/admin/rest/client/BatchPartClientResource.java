@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +43,7 @@ public class BatchPartClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/batch-parts/{batchPartId} -> return batch part data
      */
-    @RequestMapping(value = "/rest/admin/batch-parts/{batchPartId}", method = RequestMethod.GET, produces = "application/json")
+    @GetRequest(value = "/rest/admin/batch-parts/{batchPartId}", produces = "application/json")
     public JsonNode getBatchPart(@PathVariable String batchPartId, HttpServletRequest request) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -58,7 +57,7 @@ public class BatchPartClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/batch-parts/{batchPartId}/batch-part-document
      */
-    @RequestMapping(value = "/rest/admin/batch-parts/{batchPartId}/batch-part-document", method = RequestMethod.GET, produces = "text/plain")
+    @GetRequest(value = "/rest/admin/batch-parts/{batchPartId}/batch-part-document", produces = "text/plain")
     public String getBatchPartDocument(@PathVariable String batchPartId, HttpServletRequest request) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {

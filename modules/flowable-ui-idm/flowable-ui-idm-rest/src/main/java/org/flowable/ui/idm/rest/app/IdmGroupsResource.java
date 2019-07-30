@@ -26,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -74,7 +73,7 @@ public class IdmGroupsResource {
         return resultListDataRepresentation;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping()
     public GroupRepresentation createNewGroup(@RequestBody GroupRepresentation groupRepresentation) {
         return new GroupRepresentation(groupService.createNewGroup(groupRepresentation.getId(), groupRepresentation.getName(), groupRepresentation.getType()));
     }
@@ -91,7 +90,7 @@ public class IdmGroupsResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/{groupId}/members/{userId}", method = RequestMethod.POST)
+    @PostMapping(value = "/{groupId}/members/{userId}")
     public void addGroupMember(@PathVariable String groupId, @PathVariable String userId) {
         groupService.addGroupMember(groupId, userId);
     }
