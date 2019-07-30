@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.repository;
 
 import org.flowable.bpmn.model.BpmnModel;
@@ -30,7 +29,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionModelResource extends BaseProcessDefinitionResource {
 
     @ApiOperation(value = "Get a process definition BPMN model", tags = { "Process Definitions" }, nickname = "getBpmnModelResource")

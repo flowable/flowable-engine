@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.management;
 
 import java.util.List;
@@ -40,7 +39,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 @RestController
-@Api(tags = { "Batch parts" }, description = "Manage Batch parts", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Batch parts" }, authorizations = { @Authorization(value = "basicAuth") })
 public class BatchPartCollectionResource {
 
     @Autowired

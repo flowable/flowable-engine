@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.runtime.process;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionResource extends ExecutionBaseResource {
 
     @ApiOperation(value = "Get an execution", tags = { "Executions" })

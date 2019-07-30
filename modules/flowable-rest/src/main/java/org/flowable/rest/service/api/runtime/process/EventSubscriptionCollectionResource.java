@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.runtime.process;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
@@ -43,7 +42,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event subscriptions" }, description = "Query event subscriptions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event subscriptions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class EventSubscriptionCollectionResource {
 
     @Autowired

@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.idm.rest.service.api.user;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
@@ -54,7 +53,7 @@ import io.swagger.annotations.Authorization;
  * @author Filip Hrisafov
  */
 @RestController
-@Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Users" }, authorizations = { @Authorization(value = "basicAuth") })
 public class UserCollectionResource {
 
     protected static HashMap<String, QueryProperty> properties = new HashMap<>();

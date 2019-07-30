@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.idm.rest.service.api.privilege;
 
 import java.util.List;
@@ -40,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Privileges" }, description = "Manage Privileges", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Privileges" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PrivilegeResource {
     
     @Autowired

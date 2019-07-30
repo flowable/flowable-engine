@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.runtime.task;
 
 import java.io.InputStream;
@@ -41,7 +40,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Attachments" }, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Attachments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskAttachmentContentResource extends TaskBaseResource {
 
     @ApiOperation(value = "Get the content for an attachment", tags = { "Task Attachments" },

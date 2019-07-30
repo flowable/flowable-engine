@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.runtime.process;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +33,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableDataResource extends BaseExecutionVariableResource {
 
     @ApiOperation(value = "Get the binary data for a variable", tags = { "Process Instance Variables" }, nickname = "getProcessInstanceVariableData")

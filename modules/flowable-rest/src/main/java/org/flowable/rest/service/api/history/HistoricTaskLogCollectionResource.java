@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.history;
 
 import java.util.Map;
@@ -34,7 +33,7 @@ import io.swagger.annotations.Authorization;
  * @author Luis Belloch
  */
 @RestController
-@Api(tags = { "Historic Task Log Entries" }, description = "Manage Historic Task Log Entries", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Historic Task Log Entries" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskLogCollectionResource extends HistoricTaskLogEntryBaseResource {
 
     @ApiOperation(value = "List historic task log entries", tags = { "History Task" }, nickname = "getHistoricTaskLogEntries")

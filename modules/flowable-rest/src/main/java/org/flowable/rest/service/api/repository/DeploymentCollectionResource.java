@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.repository;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
@@ -60,7 +59,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DeploymentCollectionResource {
 
     protected static final String DEPRECATED_API_DEPLOYMENT_SEGMENT = "deployment";
