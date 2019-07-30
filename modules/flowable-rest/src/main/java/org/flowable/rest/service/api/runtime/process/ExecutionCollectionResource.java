@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.runtime.process;
 
 import java.util.Map;
@@ -40,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionCollectionResource extends ExecutionBaseResource {
 
     // FIXME naming issue ?

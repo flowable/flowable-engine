@@ -10,8 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.history;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.common.rest.api.DataResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -22,18 +30,10 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
-import org.flowable.common.rest.api.DataResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
-
 /**
  * @author Tijs Rademakers
  */
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History" }, authorizations = { @Authorization(value = "basicAuth") })
 @RestController
 public class HistoricActivityInstanceCollectionResource extends HistoricActivityInstanceBaseResource {
 

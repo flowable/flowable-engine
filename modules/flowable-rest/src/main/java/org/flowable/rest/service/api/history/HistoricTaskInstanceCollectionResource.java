@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.history;
 
 import java.util.Map;
@@ -36,7 +35,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Task" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstanceBaseResource {
 
     @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances")

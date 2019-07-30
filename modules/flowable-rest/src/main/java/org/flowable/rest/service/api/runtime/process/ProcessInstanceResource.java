@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.runtime.process;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +49,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceResource extends BaseProcessInstanceResource {
     
     @Autowired

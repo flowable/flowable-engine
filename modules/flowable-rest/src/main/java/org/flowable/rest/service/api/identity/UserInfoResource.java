@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.identity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +40,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Users" }, authorizations = { @Authorization(value = "basicAuth") })
 public class UserInfoResource extends BaseUserResource {
 
     @Autowired

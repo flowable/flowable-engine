@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.management;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -33,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage Engine", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Engine" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessEngineResource {
 
     @Autowired

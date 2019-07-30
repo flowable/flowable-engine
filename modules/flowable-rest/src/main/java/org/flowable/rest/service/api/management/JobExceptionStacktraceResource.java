@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.management;
 
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Jobs" }, authorizations = { @Authorization(value = "basicAuth") })
 public class JobExceptionStacktraceResource extends JobBaseResource {
 
     @ApiOperation(value = "Get the exception stacktrace for a job", tags = { "Jobs" })

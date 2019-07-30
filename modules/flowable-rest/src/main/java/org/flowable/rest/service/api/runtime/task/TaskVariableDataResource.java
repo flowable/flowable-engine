@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.rest.service.api.runtime.task;
 
 import java.io.ByteArrayOutputStream;
@@ -43,7 +42,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Variables" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskVariableDataResource extends TaskVariableBaseResource {
 
     @ApiOperation(value = "Get the binary data for a variable", tags = {"Task Variables" }, nickname = "getTaskVariableData",

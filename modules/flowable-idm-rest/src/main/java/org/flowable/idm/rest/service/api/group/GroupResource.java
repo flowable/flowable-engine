@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.idm.rest.service.api.group;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Groups" }, authorizations = { @Authorization(value = "basicAuth") })
 public class GroupResource extends BaseGroupResource {
 
     @ApiOperation(value = "Get a single group", tags = { "Groups" })
