@@ -12,12 +12,6 @@
  */
 package org.flowable.ui.idm.rest.app;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
@@ -37,9 +31,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 /**
- * 
+ *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */

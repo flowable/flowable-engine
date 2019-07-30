@@ -12,9 +12,6 @@
  */
 package org.flowable.ui.idm.rest.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.GroupRepresentation;
@@ -23,10 +20,13 @@ import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.idm.model.UserInformation;
 import org.flowable.ui.idm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
 @RestController
 public class ApiUsersResource {
 

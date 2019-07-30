@@ -16,6 +16,7 @@ import org.flowable.ui.task.model.runtime.CaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.CreateCaseInstanceRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableCaseInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

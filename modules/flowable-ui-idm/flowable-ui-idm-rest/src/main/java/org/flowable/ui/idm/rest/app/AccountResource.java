@@ -12,8 +12,8 @@
  */
 package org.flowable.ui.idm.rest.app;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.idm.api.Group;
 import org.flowable.ui.common.model.GroupRepresentation;
 import org.flowable.ui.common.model.UserRepresentation;
@@ -23,15 +23,14 @@ import org.flowable.ui.common.service.exception.UnauthorizedException;
 import org.flowable.ui.idm.model.UserInformation;
 import org.flowable.ui.idm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import javax.servlet.http.HttpServletRequest;
 /**
  * REST controller for managing the current user's account.
- * 
+ *
  * @author Joram Barrez
  */
 @RestController

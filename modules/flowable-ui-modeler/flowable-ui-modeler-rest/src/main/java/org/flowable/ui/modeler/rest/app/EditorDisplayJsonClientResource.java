@@ -12,6 +12,9 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.ui.modeler.domain.AbstractModel;
 import org.flowable.ui.modeler.domain.Model;
@@ -20,13 +23,10 @@ import org.flowable.ui.modeler.service.BpmnDisplayJsonConverter;
 import org.flowable.ui.modeler.service.CmmnDisplayJsonConverter;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 @RequestMapping("/app")

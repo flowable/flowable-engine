@@ -12,17 +12,18 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import java.util.List;
-
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.domain.ModelInformation;
 import org.flowable.ui.modeler.service.ModelRelationService;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app")

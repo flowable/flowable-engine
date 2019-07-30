@@ -16,14 +16,16 @@ import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.task.model.runtime.CommentRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST resource related to comment collection on tasks and process instances.
- * 
+ *
  * @author Frederik Heremans
  * @author Joram Barrez
  */

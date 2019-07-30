@@ -13,10 +13,6 @@
 package org.flowable.ui.modeler.rest.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.domain.ModelHistory;
@@ -25,6 +21,9 @@ import org.flowable.ui.modeler.repository.ModelHistoryRepository;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class AbstractModelHistoryResource {

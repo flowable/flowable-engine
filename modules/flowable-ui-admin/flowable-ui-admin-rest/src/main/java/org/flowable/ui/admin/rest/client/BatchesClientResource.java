@@ -12,10 +12,7 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.BatchService;
@@ -24,10 +21,12 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/app")
@@ -41,7 +40,7 @@ public class BatchesClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/batches -> Get a list of batches.
      */
-    @GetRequest(value = "/rest/admin/batches", produces = "application/json")
+    @GetMapping(value = "/rest/admin/batches", produces = "application/json")
     public JsonNode listBatches(HttpServletRequest request) {
         LOGGER.debug("REST request to get a list of batches");
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

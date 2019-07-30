@@ -12,13 +12,6 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.BaseModelerRestException;
@@ -30,6 +23,12 @@ import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  * @author Tijs Rademakers

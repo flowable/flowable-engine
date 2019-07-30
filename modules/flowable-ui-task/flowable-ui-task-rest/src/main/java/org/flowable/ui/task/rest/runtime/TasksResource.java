@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -22,9 +20,12 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.task.model.runtime.CreateTaskRepresentation;
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * REST controller for managing the current user's account.
