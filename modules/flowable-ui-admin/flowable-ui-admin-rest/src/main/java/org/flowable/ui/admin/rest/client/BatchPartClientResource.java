@@ -12,8 +12,7 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.BatchService;
@@ -22,11 +21,12 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * REST controller for managing the batch.
@@ -43,7 +43,7 @@ public class BatchPartClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/batch-parts/{batchPartId} -> return batch part data
      */
-    @GetRequest(value = "/rest/admin/batch-parts/{batchPartId}", produces = "application/json")
+    @GetMapping(value = "/rest/admin/batch-parts/{batchPartId}", produces = "application/json")
     public JsonNode getBatchPart(@PathVariable String batchPartId, HttpServletRequest request) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -53,11 +53,11 @@ public class BatchPartClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
-    
+
     /**
      * GET /rest/admin/batch-parts/{batchPartId}/batch-part-document
      */
-    @GetRequest(value = "/rest/admin/batch-parts/{batchPartId}/batch-part-document", produces = "text/plain")
+    @GetMapping(value = "/rest/admin/batch-parts/{batchPartId}/batch-part-document", produces = "text/plain")
     public String getBatchPartDocument(@PathVariable String batchPartId, HttpServletRequest request) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {

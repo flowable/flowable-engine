@@ -12,18 +12,18 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import java.nio.charset.Charset;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.modeler.service.FlowableDecisionTableService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * @author Tijs Rademakers

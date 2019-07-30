@@ -12,14 +12,6 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.URLEncoder;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.BaseModelerRestException;
@@ -31,6 +23,13 @@ import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  * @author jbarrez
@@ -70,12 +69,12 @@ public class AbstractModelBpmnResource {
         } catch (Exception e) {
             LOGGER.warn("Failed to encode name " + name);
         }
-        
+
         String contentDispositionValue = "attachment; filename=" + name;
         if (encodedName != null) {
             contentDispositionValue += "; filename*=" + encodedName;
         }
-        
+
         response.setHeader("Content-Disposition", contentDispositionValue);
         if (model.getModelEditorJson() != null) {
             try {

@@ -12,6 +12,7 @@
  */
 package org.flowable.ui.admin.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.AppDefinitionService;
@@ -20,12 +21,11 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 @RestController
 @RequestMapping("/app")
@@ -58,7 +58,7 @@ public class AppDefinitionClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
-    
+
     @GetMapping(value = "/rest/admin/app-definitions/{definitionId}/case-definitions", produces = "application/json")
     public JsonNode getCaseDefinitions(@PathVariable String definitionId, @RequestParam(name="deploymentId", required=true) String deploymentId) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -82,7 +82,7 @@ public class AppDefinitionClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
-    
+
     @GetMapping(value = "/rest/admin/app-definitions/{definitionId}/form-definitions", produces = "application/json")
     public JsonNode getFormDefinitions(@PathVariable String definitionId, @RequestParam(name="deploymentId", required=true) String deploymentId) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
@@ -94,5 +94,5 @@ public class AppDefinitionClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
-    
+
 }

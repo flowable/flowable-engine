@@ -12,10 +12,10 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
@@ -30,17 +30,17 @@ import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/app")
@@ -68,7 +68,7 @@ public class ModelsResource {
     public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
         return modelQueryService.getModelsToIncludeInAppDefinition();
     }
-    
+
     @GetMapping(value = "/rest/cmmn-models-for-app-definition", produces = "application/json")
     public ResultListDataRepresentation getCmmnModelsToIncludeInAppDefinition() {
         return modelQueryService.getCmmnModelsToIncludeInAppDefinition();
@@ -96,7 +96,7 @@ public class ModelsResource {
 
         return modelRepresentationJson;
     }
-    
+
     @PostMapping(value = "/rest/import-case-model", produces = "application/json")
     public ModelRepresentation importCaseModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return modelQueryService.importCaseModel(request, file);
@@ -151,11 +151,11 @@ public class ModelsResource {
         if (model == null) {
             throw new InternalServerErrorException("Error duplicating model : Unknown original model");
         }
-        
+
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
         checkForDuplicateKey(modelRepresentation);
-        
-        if (modelRepresentation.getModelType() == null || modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_BPMN)) {            
+
+        if (modelRepresentation.getModelType() == null || modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_BPMN)) {
             // BPMN model
             ObjectNode editorNode = null;
             try {

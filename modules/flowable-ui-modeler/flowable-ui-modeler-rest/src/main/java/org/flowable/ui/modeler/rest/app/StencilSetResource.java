@@ -12,15 +12,15 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/app")
@@ -41,7 +41,7 @@ public class StencilSetResource {
             throw new InternalServerErrorException("Error reading bpmn stencil set json");
         }
     }
-    
+
     @GetMapping(value = "/rest/stencil-sets/cmmneditor", produces = "application/json")
     public JsonNode getCmmnStencilSetForEditor() {
         try {

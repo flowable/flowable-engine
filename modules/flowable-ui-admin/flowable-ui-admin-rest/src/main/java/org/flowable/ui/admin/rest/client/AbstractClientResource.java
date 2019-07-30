@@ -12,17 +12,16 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.repository.ServerConfigRepository;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractClientResource {
 

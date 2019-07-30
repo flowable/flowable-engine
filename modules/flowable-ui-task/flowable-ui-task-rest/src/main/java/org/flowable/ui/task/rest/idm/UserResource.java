@@ -12,16 +12,17 @@
  */
 package org.flowable.ui.task.rest.idm;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.UserRepresentation;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * REST controller for managing users.

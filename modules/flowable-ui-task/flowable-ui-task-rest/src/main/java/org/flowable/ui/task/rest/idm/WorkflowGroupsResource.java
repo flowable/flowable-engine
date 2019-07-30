@@ -12,17 +12,18 @@
  */
 package org.flowable.ui.task.rest.idm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.idm.api.Group;
 import org.flowable.ui.common.model.GroupRepresentation;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/app")

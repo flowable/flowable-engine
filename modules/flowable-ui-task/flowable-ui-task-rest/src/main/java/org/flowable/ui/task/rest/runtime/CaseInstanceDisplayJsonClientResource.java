@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -46,14 +50,10 @@ import org.flowable.ui.common.service.exception.NotPermittedException;
 import org.flowable.ui.task.service.editor.mapper.InfoMapper;
 import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 @RequestMapping("/app")
@@ -108,10 +108,10 @@ public class CaseInstanceDisplayJsonClientResource {
             for (PlanItemInstance planItemInstance : planItemInstances) {
                 if (planItemInstance.getCompletedTime() != null || planItemInstance.getTerminatedTime() != null || planItemInstance.getOccurredTime() != null) {
                     completedPlanItemInstances.add(planItemInstance.getPlanItemDefinitionId());
-                    
+
                 } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
                     activePlanItemInstances.add(planItemInstance.getPlanItemDefinitionId());
-                    
+
                 } else if (PlanItemInstanceState.AVAILABLE.equals(planItemInstance.getState())) {
                     availablePlanItemInstances.add(planItemInstance.getPlanItemDefinitionId());
                 }
@@ -129,7 +129,7 @@ public class CaseInstanceDisplayJsonClientResource {
         for (String current : activePlanItemInstances) {
             currentActivities.add(current);
         }
-        
+
         ArrayNode availableActivities = displayNode.putArray("availableActivities");
         for (String available : availablePlanItemInstances) {
             availableActivities.add(available);
@@ -179,10 +179,10 @@ public class CaseInstanceDisplayJsonClientResource {
             for (HistoricPlanItemInstance planItemInstance : planItemInstances) {
                 if (planItemInstance.getCompletedTime() != null || planItemInstance.getTerminatedTime() != null || planItemInstance.getOccurredTime() != null) {
                     completedPlanItemInstances.add(planItemInstance.getPlanItemDefinitionId());
-                    
+
                 } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
                     activePlanItemInstances.add(planItemInstance.getPlanItemDefinitionId());
-                    
+
                 } else if (PlanItemInstanceState.AVAILABLE.equals(planItemInstance.getState())) {
                     availablePlanItemInstances.add(planItemInstance.getPlanItemDefinitionId());
                 }
@@ -199,7 +199,7 @@ public class CaseInstanceDisplayJsonClientResource {
 
         ArrayNode elementArray = objectMapper.createArrayNode();
         ArrayNode associationArray = objectMapper.createArrayNode();
-        
+
         diagramInfo.setX(9999);
         diagramInfo.setY(1000);
 
@@ -219,10 +219,10 @@ public class CaseInstanceDisplayJsonClientResource {
 
             processCriteria(caseObject.getPlanModel().getExitCriteria(), "ExitCriterion", pojoModel, elementArray);
 
-            processElements(caseObject.getPlanModel().getPlanItems(), pojoModel, elementArray, associationArray, 
+            processElements(caseObject.getPlanModel().getPlanItems(), pojoModel, elementArray, associationArray,
                             completedElements, activeElements, availableElements, diagramInfo);
         }
-        
+
         for (Association association : pojoModel.getAssociations()) {
             ObjectNode elementNode = objectMapper.createObjectNode();
             elementNode.put("id", association.getId());
@@ -253,27 +253,27 @@ public class CaseInstanceDisplayJsonClientResource {
         displayNode.put("diagramHeight", diagramInfo.getHeight());
         return displayNode;
     }
-    
-    protected void processElements(List<PlanItem> planItemList, CmmnModel model, ArrayNode elementArray, ArrayNode flowArray, 
+
+    protected void processElements(List<PlanItem> planItemList, CmmnModel model, ArrayNode elementArray, ArrayNode flowArray,
                     Set<String> completedElements, Set<String> activeElements, Set<String> availableElements, GraphicInfo diagramInfo) {
 
         for (PlanItem planItem : planItemList) {
             ObjectNode elementNode = objectMapper.createObjectNode();
             elementNode.put("id", planItem.getId());
             elementNode.put("name", planItem.getName());
-            
+
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             String className = planItemDefinition.getClass().getSimpleName();
             elementNode.put("type", className);
-            
+
             if (completedElements != null) {
                 elementNode.put("completed", completedElements.contains(planItemDefinition.getId()));
             }
-            
+
             if (activeElements != null) {
                 elementNode.put("current", activeElements.contains(planItemDefinition.getId()));
             }
-            
+
             if (availableElements != null) {
                 elementNode.put("available", availableElements.contains(planItemDefinition.getId()));
             }
@@ -288,10 +288,10 @@ public class CaseInstanceDisplayJsonClientResource {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
                 if (ServiceTask.MAIL_TASK.equals(serviceTask.getType())) {
                     elementNode.put("taskType", "mail");
-                    
+
                 } else if (HttpServiceTask.HTTP_TASK.equals(serviceTask.getType())) {
                     elementNode.put("taskType", "http");
-                } 
+                }
             }
 
             elementArray.add(elementNode);
@@ -302,12 +302,12 @@ public class CaseInstanceDisplayJsonClientResource {
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
 
-                processElements(stage.getPlanItems(), model, elementArray, flowArray, completedElements, 
+                processElements(stage.getPlanItems(), model, elementArray, flowArray, completedElements,
                                 activeElements, availableElements, diagramInfo);
             }
         }
     }
-    
+
     protected void processCriteria(List<Criterion> criteria, String type, CmmnModel model, ArrayNode elementArray) {
         for (Criterion criterion : criteria) {
             ObjectNode criterionNode = objectMapper.createObjectNode();
