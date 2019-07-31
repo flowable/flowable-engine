@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.app.properties;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
@@ -19,6 +22,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
  * Properties for the rest app.
  *
  * @author Filip Hrisafov
+ * @author Tim Stephenson
  */
 @ConfigurationProperties(prefix = "flowable.rest.app")
 public class RestAppProperties {
@@ -40,6 +44,26 @@ public class RestAppProperties {
      * Enable/disable whether the docs are available on /docs
      */
     private boolean swaggerDocsEnabled = true;
+
+    /**
+     * Allow/disallow CORS credentials.
+     */
+    private boolean corsAllowCredentials = false;
+
+    /**
+     * Allowed CORS origins, use * for all, but not in production. Default empty.
+     */
+    private Set<String> corsAllowedOrigins;
+
+    /**
+     * Allowed CORS headers, use * for all, but not in production. Default empty.
+     */
+    private Set<String> corsAllowedHeaders;
+
+    /**
+     * Allowed CORS methods, use * for all, but not in production. Default empty.
+     */
+    private Set<String> corsAllowedMethods;
 
     @NestedConfigurationProperty
     private final Admin admin = new Admin();
@@ -71,6 +95,38 @@ public class RestAppProperties {
 
     public void setSwaggerDocsEnabled(boolean swaggerDocsEnabled) {
         this.swaggerDocsEnabled = swaggerDocsEnabled;
+    }
+
+    public boolean isCorsAllowCredentials() {
+        return corsAllowCredentials;
+    }
+
+    public void setCorsAllowCredentials(boolean corsCorsAllowCredentials) {
+        this.corsAllowCredentials = corsCorsAllowCredentials;
+    }
+
+    public Set<String> getCorsAllowedOrigins() {
+        return corsAllowedOrigins == null ? Collections.emptySet() : corsAllowedOrigins;
+    }
+
+    public void setCorsAllowedOrigins(Set<String> corsAllowedOrigins) {
+        this.corsAllowedOrigins = corsAllowedOrigins;
+    }
+
+    public Set<String> getCorsAllowedHeaders() {
+        return corsAllowedHeaders == null ? Collections.emptySet() : corsAllowedHeaders;
+    }
+
+    public void setCorsAllowedHeaders(Set<String> corsAllowedHeaders) {
+        this.corsAllowedHeaders = corsAllowedHeaders;
+    }
+
+    public Set<String> getCorsAllowedMethods() {
+        return corsAllowedMethods == null ? Collections.emptySet() : corsAllowedMethods;
+    }
+
+    public void setCorsAllowedMethods(Set<String> corsAllowedMethods) {
+        this.corsAllowedMethods = corsAllowedMethods;
     }
 
     public Admin getAdmin() {
