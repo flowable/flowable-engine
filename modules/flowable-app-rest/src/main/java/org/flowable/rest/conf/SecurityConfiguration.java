@@ -50,10 +50,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .apply(new PropertyBasedCorsFilter(restAppProperties))
-                .and()
                 .csrf().disable();
 
+        if (restAppProperties.isCorsEnabled()) {
+            httpSecurity.apply(new PropertyBasedCorsFilter(restAppProperties));
+        }
 
         // Swagger docs
         if (isSwaggerDocsEnabled()) {

@@ -1,4 +1,4 @@
-z
+
 [[springSpringBoot]]
 
 
@@ -784,6 +784,7 @@ flowable.http.request-retry-limit=3 # Request retry limit for the http client
 flowable.http.disable-cert-verify=false # Whether to disable certificate validation for the http client
 
 # Flowable REST
+flowable.rest.app.corsEnabled=true # Whether to enable CORS requests at all. If false, the other properties have no effect
 flowable.rest.app.corsAllowCredentials=true # Whether to include credentials in a CORS request
 flowable.rest.app.corsAllowedOrigins=* # Comma-separated URLs to accept CORS requests from
 flowable.rest.app.corsAllowedHeaders=* # Comma-separated HTTP headers to allow in a CORS request

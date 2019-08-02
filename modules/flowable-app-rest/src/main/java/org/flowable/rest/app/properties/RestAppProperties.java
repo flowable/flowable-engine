@@ -46,6 +46,11 @@ public class RestAppProperties {
     private boolean swaggerDocsEnabled = true;
 
     /**
+     * Enable/disable CORS filter.
+     */
+    private boolean corsEnabled = false;
+
+    /**
      * Allow/disallow CORS credentials.
      */
     private boolean corsAllowCredentials = false;
@@ -59,6 +64,11 @@ public class RestAppProperties {
      * Allowed CORS headers, use * for all, but not in production. Default empty.
      */
     private Set<String> corsAllowedHeaders;
+
+    /**
+     * Exposed CORS headers, use * for all, but not in production. Default empty.
+     */
+    private Set<String> corsExposedHeaders;
 
     /**
      * Allowed CORS methods, use * for all, but not in production. Default empty.
@@ -97,6 +107,14 @@ public class RestAppProperties {
         this.swaggerDocsEnabled = swaggerDocsEnabled;
     }
 
+    public boolean isCorsEnabled() {
+        return corsEnabled;
+    }
+
+    public void setCorsEnabled(boolean corsEnabled) {
+        this.corsEnabled = corsEnabled;
+    }
+
     public boolean isCorsAllowCredentials() {
         return corsAllowCredentials;
     }
@@ -119,6 +137,14 @@ public class RestAppProperties {
 
     public void setCorsAllowedHeaders(Set<String> corsAllowedHeaders) {
         this.corsAllowedHeaders = corsAllowedHeaders;
+    }
+
+    public Set<String> getCorsExposedHeaders() {
+        return corsExposedHeaders;
+    }
+
+    public void setCorsExposedHeaders(Set<String> corsExposedHeaders) {
+        this.corsExposedHeaders = corsExposedHeaders;
     }
 
     public Set<String> getCorsAllowedMethods() {

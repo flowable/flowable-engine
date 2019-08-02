@@ -39,10 +39,13 @@ public class PropertyBasedCorsFilter extends AbstractHttpConfigurer<PropertyBase
         for (String header : restAppProperties.getCorsAllowedHeaders()) {
             config.addAllowedHeader(header);
         }
+        for (String exposedHeader : restAppProperties.getCorsExposedHeaders()) {
+            config.addExposedHeader(exposedHeader);
+        }
         for (String method : restAppProperties.getCorsAllowedMethods()) {
             config.addAllowedMethod(method);
         }
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
