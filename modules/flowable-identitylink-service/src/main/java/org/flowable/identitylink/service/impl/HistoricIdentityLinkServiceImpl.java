@@ -84,6 +84,21 @@ public class HistoricIdentityLinkServiceImpl extends CommonServiceImpl<IdentityL
     public void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
         getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
+    
+    @Override
+    public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {
+        getHistoricIdentityLinkEntityManager().deleteHistoricProcessIdentityLinksForNonExistingInstances();
+    }
+    
+    @Override
+    public void deleteHistoricCaseIdentityLinksForNonExistingInstances() {
+        getHistoricIdentityLinkEntityManager().deleteHistoricCaseIdentityLinksForNonExistingInstances();
+    }
+    
+    @Override
+    public void deleteHistoricTaskIdentityLinksForNonExistingInstances() {
+        getHistoricIdentityLinkEntityManager().deleteHistoricTaskIdentityLinksForNonExistingInstances();
+    }
 
     public HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
         return configuration.getHistoricIdentityLinkEntityManager();

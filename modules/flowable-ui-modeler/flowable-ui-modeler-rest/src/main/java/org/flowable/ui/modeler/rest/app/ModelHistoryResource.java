@@ -19,10 +19,11 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.modeler.domain.ModelHistory;
 import org.flowable.ui.modeler.model.ModelRepresentation;
 import org.flowable.ui.modeler.model.ReviveModelResultRepresentation;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,17 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/app")
 public class ModelHistoryResource extends AbstractModelHistoryResource {
 
-    @RequestMapping(value = "/rest/models/{modelId}/history", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models/{modelId}/history", produces = "application/json")
     public ResultListDataRepresentation getModelHistoryCollection(@PathVariable String modelId, @RequestParam(value = "includeLatestVersion", required = false) Boolean includeLatestVersion) {
         return super.getModelHistoryCollection(modelId, includeLatestVersion);
     }
 
-    @RequestMapping(value = "/rest/models/{modelId}/history/{modelHistoryId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models/{modelId}/history/{modelHistoryId}", produces = "application/json")
     public ModelRepresentation getProcessModelHistory(@PathVariable String modelId, @PathVariable String modelHistoryId) {
         return super.getProcessModelHistory(modelId, modelHistoryId);
     }
 
-    @RequestMapping(value = "/rest/models/{modelId}/history/{modelHistoryId}", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/models/{modelId}/history/{modelHistoryId}", produces = "application/json")
     public ReviveModelResultRepresentation executeProcessModelHistoryAction(@PathVariable String modelId, @PathVariable String modelHistoryId,
             @RequestBody(required = true) BaseRestActionRepresentation action) {
 

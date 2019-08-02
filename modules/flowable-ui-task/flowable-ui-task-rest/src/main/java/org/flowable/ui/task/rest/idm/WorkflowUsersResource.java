@@ -26,8 +26,8 @@ import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.model.UserRepresentation;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,7 +47,7 @@ public class WorkflowUsersResource {
     @Autowired
     private TaskService taskService;
 
-    @RequestMapping(value = "/rest/workflow-users", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/workflow-users")
     public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter,
                                                  @RequestParam(value = "excludeTaskId", required = false) String excludeTaskId,
                                                  @RequestParam(value = "excludeProcessId", required = false) String excludeProcessId) {

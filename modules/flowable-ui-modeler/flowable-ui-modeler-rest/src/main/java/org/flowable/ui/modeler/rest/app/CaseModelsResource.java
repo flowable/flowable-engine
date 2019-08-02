@@ -12,19 +12,18 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import java.nio.charset.Charset;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.modeler.service.FlowableCaseModelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -36,7 +35,7 @@ public class CaseModelsResource {
     @Autowired
     protected FlowableCaseModelService caseService;
 
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(produces = "application/json")
     public ResultListDataRepresentation getDecisionTables(HttpServletRequest request) {
         // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.
         String filter = null;

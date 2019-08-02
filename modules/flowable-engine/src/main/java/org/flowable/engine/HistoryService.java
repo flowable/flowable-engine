@@ -27,17 +27,20 @@ import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
+import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
+import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
-import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
+import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.history.NativeHistoricVariableInstanceQuery;
@@ -95,6 +98,44 @@ public interface HistoryService {
      * Deletes historic process instance. All historic activities, historic task and historic details (variable updates, form properties) are deleted as well.
      */
     void deleteHistoricProcessInstance(String processInstanceId);
+    
+    /**
+     * Deletes matching historic process instances
+     * 
+     * @param processInstanceQuery the query to match process instances to delete
+     */
+    void deleteHistoricProcessInstances(HistoricProcessInstanceQueryImpl processInstanceQuery);
+    
+    /**
+     * Deletes matching historic process instances
+     * 
+     * @param processInstanceQuery the query to match process instances to delete
+     */
+    void deleteHistoricProcessInstancesAndRelatedData(HistoricProcessInstanceQueryImpl processInstanceQuery);
+    
+    /**
+     * Deletes matching historic activity instances
+     * 
+     * @param activityInstanceQuery the query to match activity instances to delete
+     */
+    void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl activityInstanceQuery);
+    
+    /**
+     * Deletes matching historic task instances
+     * 
+     * @param taskInstanceQuery the query to match task to delete
+     */
+    void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl taskInstanceQuery);
+    
+    /**
+     * Deletes historic task and activity data for removed process instances
+     */
+    void deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();
+    
+    /**
+     * Deletes historic identity links, detail info, variable data and entity links for removed process instances
+     */
+    void deleteRelatedDataOfRemovedHistoricProcessInstances();
 
     /**
      * creates a native query to search for {@link HistoricProcessInstance}s via SQL

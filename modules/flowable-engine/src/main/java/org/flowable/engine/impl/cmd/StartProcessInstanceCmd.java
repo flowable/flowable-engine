@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -207,9 +208,9 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
             processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
             if (processDefinition == null) {
                 if (fallbackToDefaultTenant || processEngineConfiguration.isFallbackToDefaultTenant()) {
-                    if (StringUtils.isNotEmpty(processEngineConfiguration.getDefaultTenantValue())) {
-                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, 
-                                        processEngineConfiguration.getDefaultTenantValue());
+                    String defaultTenant = processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);
+                    if (StringUtils.isNotEmpty(defaultTenant)) {
+                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, defaultTenant);
                         if (processDefinition != null) {
                             overrideDefinitionTenantId = tenantId;
                         }

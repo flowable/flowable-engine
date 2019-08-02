@@ -12,12 +12,12 @@
  */
 package org.flowable.ui.task.rest.runtime.variable;
 
-import java.util.List;
-
 import org.flowable.ui.task.model.runtime.RestVariable;
 import org.flowable.ui.task.model.runtime.RestVariable.RestVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author Tijs Rademakers

@@ -12,20 +12,18 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.DecisionTableService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -41,7 +39,7 @@ public class DecisionTablesClientResource extends AbstractClientResource {
     /**
      * GET list of deployed decision tables.
      */
-    @RequestMapping(value = "/rest/admin/decision-tables", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/decision-tables", produces = "application/json")
     public JsonNode listDecisionTables(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         Map<String, String[]> parameterMap = getRequestParametersWithoutServerId(request);
@@ -51,15 +49,15 @@ public class DecisionTablesClientResource extends AbstractClientResource {
     /**
      * GET process definition's list of deployed decision tables.
      */
-    @RequestMapping(value = "/rest/admin/process-definition-decision-tables/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-definition-decision-tables/{processDefinitionId}", produces = "application/json")
     public JsonNode getProcessDefinitionDecisionTables(@PathVariable String processDefinitionId, HttpServletRequest request) {
         return clientService.getProcessDefinitionDecisionTables(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
     }
-    
+
     /**
      * GET case definition's list of deployed decision tables.
      */
-    @RequestMapping(value = "/rest/admin/case-definition-decision-tables/{caseDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/case-definition-decision-tables/{caseDefinitionId}", produces = "application/json")
     public JsonNode getCaseDefinitionDecisionTables(@PathVariable String caseDefinitionId, HttpServletRequest request) {
         return clientService.getCaseDefinitionDecisionTables(retrieveServerConfig(EndpointType.CMMN), caseDefinitionId);
     }

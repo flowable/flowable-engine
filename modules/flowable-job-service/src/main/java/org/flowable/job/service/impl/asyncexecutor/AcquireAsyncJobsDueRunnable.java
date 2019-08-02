@@ -97,12 +97,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
         } catch (FlowableOptimisticLockingException optimisticLockingException) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, "
-                        + "this exception means that this thread tried to acquire a due async job, which already was acquired by another async executor acquisition thread."
-                        + "This is expected behavior in a clustered environment. "
-                        + "You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. "
-                        + "for engine " + asyncExecutor.getJobServiceConfiguration().getEngineName() + ". Exception message: {}",
-                        optimisticLockingException.getMessage());
+                LOGGER.debug("Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, this exception means that this thread tried to acquire a due async job, which already was acquired by another async executor acquisition thread.This is expected behavior in a clustered environment. You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. for engine {}. Exception message: {}", asyncExecutor.getJobServiceConfiguration().getEngineName(), optimisticLockingException.getMessage());
             }
         } catch (Throwable e) {
             LOGGER.error("exception for engine {} during async job acquisition: {}", asyncExecutor.getJobServiceConfiguration().getEngineName(), e.getMessage(), e);

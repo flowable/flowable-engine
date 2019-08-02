@@ -79,7 +79,7 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
 
         // This tests verifies that the ifPart of an onEvent triggered sentry doesn't get called unless the event happens
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("testIfPartTriggeredOnce")
             .variable("var", new TestCondition())
             .start();

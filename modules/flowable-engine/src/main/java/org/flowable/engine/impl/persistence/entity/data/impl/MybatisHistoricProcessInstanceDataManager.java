@@ -119,4 +119,9 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
         return (Long) getDbSqlSession().selectOne("selectHistoricProcessInstanceCountByNativeQuery", parameterMap);
     }
 
+    @Override
+    public void deleteHistoricProcessInstances(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        getDbSqlSession().delete("bulkDeleteHistoricProcessInstances", historicProcessInstanceQuery, HistoricProcessInstanceEntityImpl.class);
+    }
+
 }

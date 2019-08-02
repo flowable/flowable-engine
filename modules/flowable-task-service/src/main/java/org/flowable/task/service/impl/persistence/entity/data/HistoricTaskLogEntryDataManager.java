@@ -40,4 +40,8 @@ public interface HistoricTaskLogEntryDataManager extends DataManager<HistoricTas
     void deleteHistoricTaskLogEntriesByScopeDefinitionId(String scopeType, String scopeDefinitionId);
 
     void deleteHistoricTaskLogEntriesByTaskId(String taskId);
+    
+    void deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
+    
+    void deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
 }

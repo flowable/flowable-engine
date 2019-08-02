@@ -12,10 +12,9 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
@@ -25,14 +24,13 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @author Bassam Al-Sarori
@@ -50,7 +48,7 @@ public class FormInstancesClientResource extends AbstractClientResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @RequestMapping(value = "/rest/admin/form-definition-form-instances/{formDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/form-definition-form-instances/{formDefinitionId}", produces = "application/json")
     public JsonNode listFormInstances(HttpServletRequest request, @PathVariable String formDefinitionId) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
@@ -65,7 +63,7 @@ public class FormInstancesClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-form-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-form-instances/{processInstanceId}", produces = "application/json")
     public JsonNode getProcessFormInstances(@PathVariable String processInstanceId) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
@@ -79,8 +77,8 @@ public class FormInstancesClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
-    
-    @RequestMapping(value = "/rest/admin/case-form-instances/{caseInstanceId}", method = RequestMethod.GET, produces = "application/json")
+
+    @GetMapping(value = "/rest/admin/case-form-instances/{caseInstanceId}", produces = "application/json")
     public JsonNode getCaseFormInstances(@PathVariable String caseInstanceId) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 
@@ -96,7 +94,7 @@ public class FormInstancesClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/form-instances", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/form-instances", produces = "application/json")
     public JsonNode getSubmittedForm(HttpServletRequest request) {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
 

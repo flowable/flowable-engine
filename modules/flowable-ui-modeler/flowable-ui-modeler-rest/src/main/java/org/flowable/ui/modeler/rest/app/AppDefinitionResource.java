@@ -13,12 +13,6 @@
 package org.flowable.ui.modeler.rest.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.modeler.model.AppDefinitionPublishRepresentation;
 import org.flowable.ui.modeler.model.AppDefinitionRepresentation;
@@ -32,13 +26,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/app")
@@ -61,17 +61,17 @@ public class AppDefinitionResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionResource.class);
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/app-definitions/{modelId}", produces = "application/json")
     public AppDefinitionRepresentation getAppDefinition(@PathVariable("modelId") String modelId) {
         return appDefinitionService.getAppDefinition(modelId);
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/history/{modelHistoryId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/app-definitions/{modelId}/history/{modelHistoryId}", produces = "application/json")
     public AppDefinitionRepresentation getAppDefinitionHistory(@PathVariable String modelId, @PathVariable String modelHistoryId) {
         return appDefinitionService.getAppDefinitionHistory(modelId, modelHistoryId);
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/rest/app-definitions/{modelId}", produces = "application/json")
     public AppDefinitionUpdateResultRepresentation updateAppDefinition(@PathVariable("modelId") String modelId, @RequestBody AppDefinitionSaveRepresentation updatedModel) {
         AppDefinitionUpdateResultRepresentation resultRepresentation = null;
         try {
@@ -84,7 +84,7 @@ public class AppDefinitionResource {
         return resultRepresentation;
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/publish", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/app-definitions/{modelId}/publish", produces = "application/json")
     public AppDefinitionUpdateResultRepresentation publishAppDefinition(@PathVariable("modelId") String modelId, @RequestBody AppDefinitionPublishRepresentation publishModel) {
         AppDefinitionUpdateResultRepresentation resultRepresentation = null;
         try {
@@ -97,24 +97,24 @@ public class AppDefinitionResource {
         return resultRepresentation;
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/export", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/app-definitions/{modelId}/export")
     public void exportAppDefinition(HttpServletResponse response, @PathVariable String modelId) throws IOException {
         appDefinitionExportService.exportAppDefinition(response, modelId);
     }
 
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/export-bar", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/app-definitions/{modelId}/export-bar")
     public void exportDeployableAppDefinition(HttpServletResponse response, @PathVariable String modelId) throws IOException {
         appDefinitionExportService.exportDeployableAppDefinition(response, modelId);
     }
 
     @Transactional
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/import", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/app-definitions/{modelId}/import", produces = "application/json")
     public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, @PathVariable String modelId, @RequestParam("file") MultipartFile file) {
         return appDefinitionImportService.importAppDefinitionNewVersion(request, file, modelId);
     }
 
     @Transactional
-    @RequestMapping(value = "/rest/app-definitions/{modelId}/text/import", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/app-definitions/{modelId}/text/import")
     public String importAppDefinitionText(HttpServletRequest request, @PathVariable String modelId, @RequestParam("file") MultipartFile file) {
 
         AppDefinitionRepresentation appDefinitionRepresentation = appDefinitionImportService.importAppDefinitionNewVersion(request, file, modelId);
@@ -130,13 +130,13 @@ public class AppDefinitionResource {
     }
 
     @Transactional
-    @RequestMapping(value = "/rest/app-definitions/import", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/app-definitions/import", produces = "application/json")
     public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return appDefinitionImportService.importAppDefinition(request, file);
     }
 
     @Transactional
-    @RequestMapping(value = "/rest/app-definitions/text/import", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/app-definitions/text/import")
     public String importAppDefinitionText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         AppDefinitionRepresentation appDefinitionRepresentation = appDefinitionImportService.importAppDefinition(request, file);
         String appDefinitionRepresentationJson = null;

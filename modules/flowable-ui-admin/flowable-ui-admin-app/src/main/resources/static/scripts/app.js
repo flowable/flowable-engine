@@ -109,6 +109,21 @@ flowableAdminApp
                 	controller: 'JobController',
                   	reloadOnSearch: true
                 })
+                .when('/batches', {
+                    templateUrl: 'views/batches.html',
+                    controller: 'BatchesController',
+                    reloadOnSearch: true
+                })
+                .when('/batch/:batchId', {
+                    templateUrl: 'views/batch.html',
+                    controller: 'BatchController',
+                    reloadOnSearch: true
+                })
+                .when('/batch-part/:batchPartId', {
+                    templateUrl: 'views/batch-part.html',
+                    controller: 'BatchPartController',
+                    reloadOnSearch: true
+                })
                 .when('/event-subscriptions', {
                 	templateUrl: 'views/event-subscriptions.html',
                 	controller: 'EventSubscriptionsController',

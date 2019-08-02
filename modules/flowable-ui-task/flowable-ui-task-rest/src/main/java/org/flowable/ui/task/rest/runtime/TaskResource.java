@@ -16,10 +16,11 @@ import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.flowable.ui.task.model.runtime.TaskUpdateRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -31,17 +32,17 @@ public class TaskResource {
     @Autowired
     protected FlowableTaskService taskService;
 
-    @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/tasks/{taskId}", produces = "application/json")
     public TaskRepresentation getTask(@PathVariable String taskId   ) {
         return taskService.getTask(taskId);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/rest/tasks/{taskId}", produces = "application/json")
     public TaskRepresentation updateTask(@PathVariable("taskId") String taskId, @RequestBody TaskUpdateRepresentation updated) {
         return taskService.updateTask(taskId, updated);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/subtasks", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/tasks/{taskId}/subtasks", produces = "application/json")
     public List<TaskRepresentation> getSubTasks(@PathVariable String taskId) {
         return taskService.getSubTasks(taskId);
     }

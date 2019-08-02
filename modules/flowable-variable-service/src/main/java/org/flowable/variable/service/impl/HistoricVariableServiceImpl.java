@@ -106,6 +106,16 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
     public void deleteHistoricVariableInstancesByTaskId(String taskId) {
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByTaskId(taskId);
     }
+    
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
+        getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesForNonExistingProcessInstances();
+    }
+    
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
+        getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesForNonExistingCaseInstances();
+    }
 
     public HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
         return configuration.getHistoricVariableInstanceEntityManager();

@@ -21,11 +21,11 @@
                     </div>
                     <div class="btn-group btn-group-sm pull-right">
                     	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                                translate="GENERAL.ACTION.SHOW-RESULTS" translate-value-size="{{'GENERAL.RESULT-SIZES.' + filter.resultSize | translate}}">
-						    &nbsp;
+                                translate="GENERAL.ACTION.SORT-BY" translate-value-sort="{{filter.sort.name | translate}}">
+                            &nbsp;
                             <span class="caret"></span>
                         </button>
-                    	<ul class="dropdown-menu">
+                        <ul class="dropdown-menu">
                            <li ng-repeat="sort in filter.sortObjects"><a href="" ng-click="filter.setSort(sort)">{{sort.name | translate}}</a></li>
                         </ul>
                     </div>

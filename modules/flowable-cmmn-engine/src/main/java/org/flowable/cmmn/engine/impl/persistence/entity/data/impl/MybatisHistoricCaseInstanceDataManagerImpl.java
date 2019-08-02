@@ -103,4 +103,8 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
         getDbSqlSession().delete("deleteHistoricCaseInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
     }
 
+    @Override
+    public void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
+        getDbSqlSession().delete("bulkDeleteHistoricCaseInstances", historicCaseInstanceQuery, getManagedEntityClass());
+    }
 }

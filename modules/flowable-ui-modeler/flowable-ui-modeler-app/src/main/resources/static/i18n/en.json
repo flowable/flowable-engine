@@ -70,7 +70,7 @@
         "DOCUMENTATIONPACKAGE" : {
           "DOCUMENTATION" : {
             "TITLE" : "Documentation",
-            "DESCRIPTION" : "The descriptive name of the BPMN element."
+            "DESCRIPTION" : "Documentation of the BPMN element."
           }
         },
         "CATEGORYPACKAGE" : {
@@ -221,6 +221,12 @@
           "SERVICETASKFIELDS" : {
             "TITLE" : "Class fields",
             "DESCRIPTION" : "Field extensions"
+          }
+        },
+        "SERVICETASKEXCEPTIONSPACKAGE" : {
+          "SERVICETASKEXCEPTIONS" : {
+            "TITLE" : "Exceptions",
+            "DESCRIPTION" : "Mapped Exceptions"
           }
         },
         "SERVICETASKRESULTVARIABLEPACKAGE" : {
@@ -2403,6 +2409,14 @@
     "PROPERTY.FIELDS.STRING" : "String",
     "PROPERTY.FIELDS.STRING.PLACEHOLDER" : "Enter a string",
     "PROPERTY.FIELDS.IMPLEMENTATION" : "Implementation",
+
+    "PROPERTY.EXCEPTIONS" : "{{length}} exceptions",
+    "PROPERTY.EXCEPTIONS.EMPTY" : "No exceptions selected",
+    "PROPERTY.EXCEPTIONS.CODE" : "Code",
+    "PROPERTY.EXCEPTIONS.CODE.PLACEHOLDER" : "Enter a code",
+    "PROPERTY.EXCEPTIONS.CLASS" : "Class",
+    "PROPERTY.EXCEPTIONS.CLASS.PLACEHOLDER" : "Enter an class",
+    "PROPERTY.EXCEPTIONS.CHILDREN" : "Include child exceptions",
 
     "PROPERTY.DATAPROPERTIES.VALUES" : "{{length}} data objects",
     "PROPERTY.DATAPROPERTIES.EMPTY" : "No data objects configured",

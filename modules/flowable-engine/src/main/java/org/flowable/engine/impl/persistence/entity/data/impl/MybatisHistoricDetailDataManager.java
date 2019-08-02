@@ -98,4 +98,8 @@ public class MybatisHistoricDetailDataManager extends AbstractProcessDataManager
         return (Long) getDbSqlSession().selectOne("selectHistoricDetailCountByNativeQuery", parameterMap);
     }
 
+    @Override
+    public void deleteHistoricDetailForNonExistingProcessInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricDetailForNonExistingProcessInstances", null, HistoricDetailEntity.class);
+    }
 }

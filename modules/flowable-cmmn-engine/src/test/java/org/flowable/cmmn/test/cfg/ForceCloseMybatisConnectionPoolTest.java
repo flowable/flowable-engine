@@ -61,7 +61,7 @@ public class ForceCloseMybatisConnectionPoolTest {
         standaloneInMemCmmnEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-cmmn-" + this.getClass().getName());
         standaloneInMemCmmnEngineConfiguration.setForceCloseMybatisConnectionPool(false);
 
-        CmmnEngine cmmnEngine = standaloneInMemCmmnEngineConfiguration.buildCmmnEngine();
+        standaloneInMemCmmnEngineConfiguration.buildCmmnEngine();
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemCmmnEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();

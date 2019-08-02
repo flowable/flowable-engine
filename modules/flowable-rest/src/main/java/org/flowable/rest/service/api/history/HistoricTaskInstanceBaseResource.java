@@ -255,6 +255,10 @@ public class HistoricTaskInstanceBaseResource {
             query.taskWithoutTenantId();
         }
 
+        if (Boolean.TRUE.equals(queryRequest.getWithoutDeleteReason())) {
+            query.taskWithoutDeleteReason();
+        }
+
         if (queryRequest.getTaskCandidateGroup() != null) {
             query.taskCandidateGroup(queryRequest.getTaskCandidateGroup());
         }

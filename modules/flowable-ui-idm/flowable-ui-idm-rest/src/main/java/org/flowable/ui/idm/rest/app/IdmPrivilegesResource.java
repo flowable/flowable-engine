@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,9 +11,6 @@
  * limitations under the License.
  */
 package org.flowable.ui.idm.rest.app;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;
@@ -29,9 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.ArrayList;
+import java.util.List;
 /**
  * @author Joram Barrez
  */
@@ -42,7 +44,7 @@ public class IdmPrivilegesResource {
     @Autowired
     protected PrivilegeService privilegeService;
 
-    @RequestMapping(value = "/rest/admin/privileges", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/privileges")
     public List<PrivilegeRepresentation> getPrivileges() {
         List<Privilege> privileges = privilegeService.findPrivileges();
         List<PrivilegeRepresentation> representations = new ArrayList<>(privileges.size());
@@ -52,7 +54,7 @@ public class IdmPrivilegesResource {
         return representations;
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/privileges/{privilegeId}")
     public PrivilegeRepresentation getPrivilege(@PathVariable String privilegeId) {
 
         Privilege privilege = privilegeService.findPrivilege(privilegeId);
@@ -78,34 +80,34 @@ public class IdmPrivilegesResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/privileges/{privilegeId}/users")
     public List<UserRepresentation> getUsers(@PathVariable String privilegeId) {
         return getPrivilege(privilegeId).getUsers();
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/privileges/{privilegeId}/users")
     public void addUserPrivilege(@PathVariable String privilegeId,
                                  @RequestBody AddUserPrivilegeRepresentation representation) {
         privilegeService.addUserPrivilege(privilegeId, representation.getUserId());
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/users/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/privileges/{privilegeId}/users/{userId}")
     public void deleteUserPrivilege(@PathVariable String privilegeId, @PathVariable String userId) {
         privilegeService.deleteUserPrivilege(privilegeId, userId);
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/privileges/{privilegeId}/groups")
     public List<GroupRepresentation> getGroups(@PathVariable String privilegeId) {
         return getPrivilege(privilegeId).getGroups();
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/privileges/{privilegeId}/groups")
     public void addGroupPrivilege(@PathVariable String privilegeId,
                                   @RequestBody AddGroupPrivilegeRepresentation representation) {
         privilegeService.addGroupPrivilege(privilegeId, representation.getGroupId());
     }
 
-    @RequestMapping(value = "/rest/admin/privileges/{privilegeId}/groups/{groupId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/privileges/{privilegeId}/groups/{groupId}")
     public void deleteGroupPrivilege(@PathVariable String privilegeId, @PathVariable String groupId) {
         privilegeService.deleteGroupPrivilege(privilegeId, groupId);
     }

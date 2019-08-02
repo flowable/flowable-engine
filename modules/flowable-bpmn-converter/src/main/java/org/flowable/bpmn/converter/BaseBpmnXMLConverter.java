@@ -212,8 +212,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(baseElement, didWriteExtensionStartElement, model.getNamespaces(), xtw);
         if (baseElement instanceof Activity) {
             final Activity activity = (Activity) baseElement;
-            FailedJobRetryCountExport.writeFailedJobRetryCount(activity, xtw);
-
+            didWriteExtensionStartElement = FailedJobRetryCountExport.writeFailedJobRetryCount(activity, didWriteExtensionStartElement, xtw);
         }
 
         if (didWriteExtensionStartElement) {

@@ -13,15 +13,6 @@
 package org.flowable.ui.modeler.rest.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -34,9 +25,16 @@ import org.flowable.ui.modeler.repository.ModelSort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -55,7 +53,7 @@ public class FormsResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(produces = "application/json")
     public ResultListDataRepresentation getForms(HttpServletRequest request) {
 
         // need to parse the filterText parameter ourselves, due to encoding issues with the default parsing.

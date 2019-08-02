@@ -61,5 +61,7 @@ public interface ProcessEngine {
 
     DynamicBpmnService getDynamicBpmnService();
 
+    ProcessMigrationService getProcessMigrationService();
+
     ProcessEngineConfiguration getProcessEngineConfiguration();
 }

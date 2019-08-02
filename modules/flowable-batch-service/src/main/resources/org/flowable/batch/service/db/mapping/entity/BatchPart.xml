@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl">
+
+    <resultMap id="batchPartMap" type="org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="revision" column="REV_" jdbcType="INTEGER"/>
+        <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR"/>
+        <result property="batchType" column="TYPE_" jdbcType="VARCHAR"/>
+        <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+        <result property="batchSearchKey" column="SEARCH_KEY_" jdbcType="VARCHAR"/>
+        <result property="batchSearchKey2" column="SEARCH_KEY2_" jdbcType="VARCHAR"/>
+        <result property="status" column="STATUS_" jdbcType="VARCHAR"/>
+        <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="completeTime" column="COMPLETE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="resultDocRefId" column="RESULT_DOC_ID_" typeHandler="BatchByteArrayRefTypeHandler"/>
+        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- BatchPart INSERTS -->
+    <insert id="insertBatchPart" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl">
+        INSERT INTO ${prefix}FLW_RU_BATCH_PART(ID_, REV_, BATCH_ID_, TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, RESULT_DOC_ID_, TENANT_ID_)
+        VALUES (#{id, jdbcType=VARCHAR},
+            #{revision, jdbcType=INTEGER},
+            #{batchId, jdbcType=VARCHAR},
+            #{batchType, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
+            #{batchSearchKey, jdbcType=VARCHAR},
+            #{batchSearchKey2, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP},
+            #{completeTime, jdbcType=TIMESTAMP},
+            #{resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
+            #{tenantId, jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="bulkInsertBatchPart" parameterType="java.util.List">
+        INSERT INTO ${prefix}FLW_RU_BATCH_PART(ID_, REV_, BATCH_ID_, TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, RESULT_DOC_ID_, TENANT_ID_)
+        VALUES
+        <foreach collection="list" item="batchPart" index="index" separator=",">
+            (#{batchPart.id, jdbcType=VARCHAR},
+            #{batchPart.revision, jdbcType=INTEGER},
+            #{batchPart.batchId, jdbcType=VARCHAR},
+            #{batchPart.batchType, jdbcType=VARCHAR},
+            #{batchPart.scopeId, jdbcType=VARCHAR},
+            #{batchPart.subScopeId, jdbcType=VARCHAR},
+            #{batchPart.scopeType, jdbcType=VARCHAR},
+            #{batchPart.batchSearchKey, jdbcType=VARCHAR},
+            #{batchPart.batchSearchKey2, jdbcType=VARCHAR},
+            #{batchPart.createTime, jdbcType=TIMESTAMP},
+            #{batchPart.completeTime, jdbcType=TIMESTAMP},
+            #{batchPart.resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
+            #{batchPart.tenantId, jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertBatchPart" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="batchPart" index="index">
+            INTO ${prefix}FLW_RU_BATCH_PART(ID_, REV_, BATCH_ID_, TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, RESULT_DOC_ID_, TENANT_ID_) VALUES
+            (#{batchPart.id, jdbcType=VARCHAR},
+            #{batchPart.revision, jdbcType=INTEGER},
+            #{batchPart.parentBatchId, jdbcType=VARCHAR},
+            #{batchPart.scopeId, jdbcType=VARCHAR},
+            #{batchPart.subScopeId, jdbcType=VARCHAR},
+            #{batchPart.scopeType, jdbcType=VARCHAR},
+            #{batchPart.processInstanceId, jdbcType=VARCHAR},
+            #{batchPart.batchSearchKey, jdbcType=VARCHAR},
+            #{batchPart.batchSearchKey2, jdbcType=VARCHAR},
+            #{batchPart.createTime, jdbcType=TIMESTAMP},
+            #{batchPart.completeTime, jdbcType=TIMESTAMP},
+            #{batchPart.resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
+            #{batchPart.tenantId, jdbcType=VARCHAR})
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <!-- BatchPart UPDATE -->
+    <update id="updateBatchPart" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl">
+        update ${prefix}FLW_RU_BATCH_PART
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.resultDocRefId != null">
+                RESULT_DOC_ID_ = #{resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
+            </if>
+            <if test="originalPersistentState.completeTime != completeTime">
+                COMPLETE_TIME_ = #{completeTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.status != status">
+                STATUS_ = #{status, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.tenantId != tenantId">
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+            </if>
+        </set>
+        where ID_ = #{id, jdbcType=VARCHAR}
+        and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+
+    <!-- BatchPart DELETE -->
+    <delete id="deleteBatchPart" parameterType="string">
+      delete from ${prefix}FLW_RU_BATCH_PART where ID_ = #{id, jdbcType=VARCHAR}
+    </delete>
+    
+    <delete id="deleteBatchPartByBatchId" parameterType="string">
+      delete from ${prefix}FLW_RU_BATCH_PART where BATCH_ID_ = #{batchId, jdbcType=VARCHAR}
+    </delete>
+
+    <!-- BatchPart SELECT -->
+    <select id="selectBatchPart" parameterType="string" resultMap="batchPartMap">
+      select * from ${prefix}FLW_RU_BATCH_PART where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectBatchPartsByBatchId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
+      select * from ${prefix}FLW_RU_BATCH_PART where BATCH_ID_ = #{parameter.batchId, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectBatchPartsByBatchIdAndStatus" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
+      select * from ${prefix}FLW_RU_BATCH_PART where BATCH_ID_ = #{parameter.batchId, jdbcType=VARCHAR} and STATUS_ = #{parameter.status, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectBatchPartsBySearchKey" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
+      select * from ${prefix}FLW_RU_BATCH_PART where SEARCH_KEY_ = #{parameter.searchKey, jdbcType=VARCHAR} or SEARCH_KEY2_ = #{parameter.searchKey2, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectBatchPartsByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
+      select * from ${prefix}FLW_RU_BATCH_PART where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} or SCOPE_Type_ = #{parameter.scopeType, jdbcType=VARCHAR}
+    </select>
+
+</mapper>

@@ -18,9 +18,9 @@ import org.flowable.ui.task.service.runtime.FlowableAppDefinitionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -35,12 +35,12 @@ public class AppDefinitionsResource {
     @Autowired
     protected FlowableAppDefinitionService appDefinitionService;
 
-    @RequestMapping(value = "/rest/runtime/app-definitions", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/runtime/app-definitions")
     public ResultListDataRepresentation getAppDefinitions() {
         return appDefinitionService.getAppDefinitions();
     }
 
-    @RequestMapping(value = "/rest/runtime/app-definitions/{appDefinitionKey}", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/runtime/app-definitions/{appDefinitionKey}")
     public AppDefinitionRepresentation getAppDefinition(@PathVariable("appDefinitionKey") String appDefinitionKey) {
         return appDefinitionService.getAppDefinition(appDefinitionKey);
     }

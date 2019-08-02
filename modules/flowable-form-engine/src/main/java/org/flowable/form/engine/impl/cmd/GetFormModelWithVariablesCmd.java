@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -233,8 +234,9 @@ public class GetFormModelWithVariablesCmd implements Command<FormInfo>, Serializ
             formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
             
             if (formDefinitionEntity == null && (fallbackToDefaultTenant || formEngineConfiguration.isFallbackToDefaultTenant())) {
-                if (StringUtils.isNotEmpty(formEngineConfiguration.getDefaultTenantValue())) {
-                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, formEngineConfiguration.getDefaultTenantValue());
+                String defaultTenant = formEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.FORM, formDefinitionKey);
+                if (StringUtils.isNotEmpty(defaultTenant)) {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, defaultTenant);
                 } else {
                     formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
                 }
@@ -277,8 +279,9 @@ public class GetFormModelWithVariablesCmd implements Command<FormInfo>, Serializ
             }
             
             if (formDefinitionEntity == null && (fallbackToDefaultTenant || formEngineConfiguration.isFallbackToDefaultTenant())) {
-                if (StringUtils.isNotEmpty(formEngineConfiguration.getDefaultTenantValue())) {
-                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, formEngineConfiguration.getDefaultTenantValue());
+                String defaultTenant = formEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.FORM, formDefinitionKey);
+                if (StringUtils.isNotEmpty(defaultTenant)) {
+                    formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, defaultTenant);
                 } else {
                     formDefinitionEntity = formDefinitionEntityManager.findLatestFormDefinitionByKey(formDefinitionKey);
                 }

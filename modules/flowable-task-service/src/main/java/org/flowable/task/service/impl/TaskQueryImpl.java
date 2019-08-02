@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -76,6 +76,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected boolean withoutDeleteReason;
     protected String processInstanceId;
     protected List<String> processInstanceIds;
     protected String executionId;
@@ -592,7 +593,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery ignoreAssigneeValue() {
         if (orActive) {
@@ -635,6 +636,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.withoutTenantId = true;
         } else {
             this.withoutTenantId = true;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskWithoutDeleteReason() {
+        if (orActive) {
+            currentOrQueryObject.withoutDeleteReason = true;
+        } else {
+            this.withoutDeleteReason = true;
         }
         return this;
     }
@@ -710,7 +721,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery caseInstanceId(String caseInstanceId) {
         if (orActive) {
@@ -722,7 +733,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery caseDefinitionId(String caseDefinitionId) {
         if (orActive) {
@@ -734,7 +745,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery processInstanceIdWithChildren(String processInstanceId) {
         if (orActive) {
@@ -766,7 +777,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQueryImpl scopeId(String scopeId) {
         if (orActive) {
@@ -776,7 +787,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQueryImpl subScopeId(String subScopeId) {
         if (orActive) {
@@ -786,7 +797,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQueryImpl scopeType(String scopeType) {
         if (orActive) {
@@ -796,7 +807,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQueryImpl scopeDefinitionId(String scopeDefinitionId) {
         if (orActive) {
@@ -1009,8 +1020,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
-    
+
+
     @Override
     public TaskQuery taskVariableExists(String name) {
         if (orActive) {
@@ -1020,7 +1031,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery taskVariableNotExists(String name) {
         if (orActive) {
@@ -1140,7 +1151,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery processVariableExists(String name) {
         if (orActive) {
@@ -1150,7 +1161,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery processVariableNotExists(String name) {
         if (orActive) {
@@ -1294,7 +1305,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery cmmnDeploymentId(String cmmnDeploymentId) {
         if (orActive) {
@@ -1304,7 +1315,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
-    
+
     @Override
     public TaskQuery cmmnDeploymentIdIn(List<String> cmmnDeploymentIds) {
         if (orActive) {
@@ -1622,7 +1633,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
             taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
         }
-        
+
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksWithRelatedEntitiesByQueryCriteria(this);
         } else {
@@ -1634,7 +1645,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
                 taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
         }
-        
+
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
             taskServiceConfiguration.getTaskQueryInterceptor().afterTaskQueryExecute(this, tasks);
         }
@@ -1645,12 +1656,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        
+
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
             taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
         }
-        
+
         return CommandContextUtil.getTaskEntityManager(commandContext).findTaskCountByQueryCriteria(this);
     }
 
@@ -1715,7 +1726,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public String getExecutionId() {
         return executionId;
     }
-    
+
     public String getScopeId() {
         return scopeId;
     }
@@ -1787,7 +1798,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public String getProcessInstanceBusinessKey() {
         return processInstanceBusinessKey;
     }
-    
+
     public String getProcessInstanceIdWithChildren() {
         return processInstanceIdWithChildren;
     }
@@ -1895,7 +1906,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public List<String> getDeploymentIds() {
         return deploymentIds;
     }
-    
+
     public String getCmmnDeploymentId() {
         return cmmnDeploymentId;
     }

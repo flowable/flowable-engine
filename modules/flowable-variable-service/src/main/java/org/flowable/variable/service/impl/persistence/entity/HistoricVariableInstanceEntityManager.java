@@ -47,4 +47,7 @@ public interface HistoricVariableInstanceEntityManager extends EntityManager<His
 
     void deleteHistoricVariableInstanceByProcessInstanceId(String historicProcessInstanceId);
 
+    void deleteHistoricVariableInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricVariableInstancesForNonExistingCaseInstances();
 }

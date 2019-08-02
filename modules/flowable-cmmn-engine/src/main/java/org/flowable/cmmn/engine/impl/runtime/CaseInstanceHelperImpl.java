@@ -103,9 +103,9 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
                 if (caseDefinition == null) {
                     if (caseInstanceBuilder.isFallbackToDefaultTenant() || cmmnEngineConfiguration.isFallbackToDefaultTenant()) {
-                        if (StringUtils.isNotEmpty(cmmnEngineConfiguration.getDefaultTenantValue())) {
-                            caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, 
-                                            cmmnEngineConfiguration.getDefaultTenantValue());
+                        String defaultTenant = cmmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.CMMN, caseDefinitionKey);
+                        if (StringUtils.isNotEmpty(defaultTenant)) {
+                            caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, defaultTenant);
                             caseInstanceBuilder.overrideCaseDefinitionTenantId(tenantId);
                             
                         } else {

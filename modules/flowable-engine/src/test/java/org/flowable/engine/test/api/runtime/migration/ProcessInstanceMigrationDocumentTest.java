@@ -29,9 +29,6 @@ import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Dennis Federico
- */
 public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
     @Test
@@ -95,7 +92,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
         String jsonAsStr = IoUtil.readFileAsString("org/flowable/engine/test/api/runtime/migration/completeProcessInstanceMigrationDocument.json");
 
-        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(jsonAsStr);
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(jsonAsStr);
         assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
         assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey());
         assertEquals(definitionVer, migrationDocument.getMigrateToProcessDefinitionVersion());
@@ -187,7 +184,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String serializedDocument = document.asJsonString();
 
         //DeSerialize the document
-        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(serializedDocument);
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(serializedDocument);
 
         assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
         assertNull(migrationDocument.getMigrateToProcessDefinitionKey());
@@ -224,7 +221,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String jsonAsStr = IoUtil.readFileAsString("org/flowable/engine/test/api/runtime/migration/duplicatedFromActivitiesInFromMappingMigrationDocument.json");
 
         try {
-            ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(jsonAsStr);
+            ProcessInstanceMigrationDocumentImpl.fromJson(jsonAsStr);
             fail("Should not allow duplicated values in 'from' activity");
         } catch (FlowableException e) {
             assertTextPresent("From activity '[originalActivity1, originalActivity2]' is mapped more than once", e.getMessage());
@@ -252,7 +249,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String serializedDocument = document.asJsonString();
 
         //DeSerialize the document
-        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(serializedDocument);
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(serializedDocument);
 
         assertNull(migrationDocument.getMigrateToProcessDefinitionId());
         assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey());
@@ -294,7 +291,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         String serializedDocument = document.asJsonString();
 
         //DeSerialize the document
-        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(serializedDocument);
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(serializedDocument);
 
         assertNull(migrationDocument.getMigrateToProcessDefinitionId());
         assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey());
@@ -377,7 +374,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
         String jsonAsStr = IoUtil.readFileAsString("org/flowable/engine/test/api/runtime/migration/withCallActivityProcessInstanceMigrationDocument.json");
 
-        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(jsonAsStr);
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(jsonAsStr);
         assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
         assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey());
         assertEquals(definitionVer, migrationDocument.getMigrateToProcessDefinitionVersion());

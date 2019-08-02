@@ -72,6 +72,16 @@ public class MyBatisHistoricTaskLogEntryDataManager extends AbstractDataManager<
     }
 
     @Override
+    public void deleteHistoricTaskLogEntriesForNonExistingProcessInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskLogEntriesForNonExistingProcessInstances", null, HistoricTaskLogEntryEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteHistoricTaskLogEntriesForNonExistingCaseInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskLogEntriesForNonExistingCaseInstances", null, HistoricTaskLogEntryEntityImpl.class);
+    }
+    
+    @Override
     public long findHistoricTaskLogEntriesCountByNativeQueryCriteria(Map<String, Object> nativeHistoricTaskLogEntryQuery) {
         return (Long) getDbSqlSession().selectOne("selectHistoricTaskLogEntriesCountByNativeQueryCriteria", nativeHistoricTaskLogEntryQuery);
     }

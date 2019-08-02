@@ -52,4 +52,9 @@ public class MybatisHistoricMilestoneInstanceDataManager extends AbstractCmmnDat
         return (Long) getDbSqlSession().selectOne("selectHistoricMilestoneInstanceCountByQueryCriteria", query);
     }
     
+    @Override
+    public void deleteHistoricMilestoneInstancesForNonExistingCaseInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricMilestoneInstancesForNonExistingCaseInstances", null, getManagedEntityClass());
+    }
+    
 }

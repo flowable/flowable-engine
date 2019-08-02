@@ -16,6 +16,10 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
+import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
@@ -321,6 +325,31 @@ public interface ManagementService {
      *             when no job exists with the given id.
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
+    
+    void handleHistoryCleanupTimerJob();
+    
+    List<Batch> getAllBatches();
+    
+    List<Batch> findBatchesBySearchKey(String searchKey);
+    
+    String getBatchDocument(String batchId);
+    
+    BatchPart getBatchPart(String batchPartId);
+    
+    List<BatchPart> findBatchPartsByBatchId(String batchId);
+    
+    List<BatchPart> findBatchPartsByBatchIdAndStatus(String batchId, String status);
+    
+    String getBatchPartDocument(String batchPartId);
+    
+    /**
+     * Returns a new BatchQuery implementation, that can be used to dynamically query the batches.
+     */
+    BatchQuery createBatchQuery();
+    
+    BatchBuilder createBatchBuilder();
+    
+    void deleteBatch(String batchId);
 
     /** get the list of properties. */
     Map<String, String> getProperties();

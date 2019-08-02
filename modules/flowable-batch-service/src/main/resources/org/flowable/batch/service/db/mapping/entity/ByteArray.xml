@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl">
+
+  <!-- BYTE ARRAY INSERT -->
+
+  <insert id="insertBatchByteArray" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl">
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
+    values (
+      #{id, jdbcType=VARCHAR},
+      1, 
+      #{name, jdbcType=VARCHAR}, 
+      #{bytes, jdbcType=${blobType}}
+    )  
+  </insert>
+
+  <insert id="bulkInsertBatchByteArray" parameterType="java.util.List">
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
+    values
+      <foreach collection="list" item="byteArray" index="index" separator=","> 
+         (#{byteArray.id, jdbcType=VARCHAR},
+          1, 
+          #{byteArray.name, jdbcType=VARCHAR}, 
+          #{byteArray.bytes, jdbcType=${blobType}})
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertBatchByteArray" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+      <foreach collection="list" item="byteArray" index="index">
+        into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_) VALUES 
+         (#{byteArray.id, jdbcType=VARCHAR},
+          1, 
+          #{byteArray.name, jdbcType=VARCHAR}, 
+          #{byteArray.bytes, jdbcType=${blobType}})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <!-- BYTE ARRAY UPDATE -->
+
+  <update id="updateBatchByteArray" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl">
+    update ${prefix}ACT_GE_BYTEARRAY 
+    set
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      BYTES_ = #{bytes, jdbcType=${blobType}}
+    where ID_ = #{id}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+  
+  <!-- BYTE ARRAY DELETE -->
+
+  <select id="selectBytesOfBatchByteArray" parameterType="string" resultType="hashmap">
+    select BYTES_ from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
+  </select>
+  
+  <delete id="deleteBatchByteArray" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl">
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+  
+  <delete id="deleteBatchByteArrayNoRevisionCheck" parameterType="string">
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
+  </delete>
+
+  <!-- BYTE ARRAY RESULTMAP -->
+  
+  <resultMap id="batchByteArrayResultMap" type="org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
+    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="bytes" column="BYTES_" jdbcType="${blobType}"/>  
+  </resultMap>
+
+  <!-- BYTE ARRAY SELECT -->
+  
+  <select id="selectBatchByteArrays" resultMap="batchByteArrayResultMap">
+    select * from ${prefix}ACT_GE_BYTEARRAY 
+  </select>
+  
+  <select id="selectBatchByteArray" parameterType="string" resultMap="batchByteArrayResultMap">
+   select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+
+</mapper>

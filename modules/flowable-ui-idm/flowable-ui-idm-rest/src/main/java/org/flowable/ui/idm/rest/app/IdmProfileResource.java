@@ -12,12 +12,6 @@
  */
 package org.flowable.ui.idm.rest.app;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
@@ -33,14 +27,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 /**
- * 
+ *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
@@ -54,7 +55,7 @@ public class IdmProfileResource {
     @Autowired
     protected GroupService groupService;
 
-    @RequestMapping(value = "/profile", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/profile", produces = "application/json")
     public UserRepresentation getProfile() {
         User user = SecurityUtils.getCurrentFlowableAppUser().getUserObject();
         UserRepresentation userRepresentation = new UserRepresentation(user);
@@ -64,7 +65,7 @@ public class IdmProfileResource {
         return userRepresentation;
     }
 
-    @RequestMapping(value = "/profile", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/profile", produces = "application/json")
     public UserRepresentation updateProfile(@RequestBody UserRepresentation userRepresentation) {
         return new UserRepresentation(profileService.updateProfile(userRepresentation.getFirstName(),
                 userRepresentation.getLastName(),
@@ -72,12 +73,12 @@ public class IdmProfileResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/profile-password", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/profile-password", produces = "application/json")
     public void changePassword(@RequestBody ChangePasswordRepresentation changePasswordRepresentation) {
         profileService.changePassword(changePasswordRepresentation.getOriginalPassword(), changePasswordRepresentation.getNewPassword());
     }
 
-    @RequestMapping(value = "/profile-picture", method = RequestMethod.GET)
+    @GetMapping(value = "/profile-picture")
     public void getProfilePicture(HttpServletResponse response) {
         try {
             Pair<String, InputStream> picture = profileService.getProfilePicture();
@@ -104,7 +105,7 @@ public class IdmProfileResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/profile-picture", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/profile-picture", produces = "application/json")
     public void uploadProfilePicture(@RequestParam("file") MultipartFile file) {
         try {
             profileService.uploadProfilePicture(file.getContentType(), file.getBytes());

@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.service.api;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricDetail;
@@ -103,6 +106,8 @@ public interface BpmnRestApiInterceptor {
     
     void migrateProcessInstance(String processInstanceId, String migrationDocument);
     
+    void migrateInstancesOfProcessDefinition(ProcessDefinition processDefinition, String migrationDocument);
+    
     void injectActivity(InjectActivityRequest injectActivityRequest);
     
     void accessEventSubscriptionById(EventSubscription eventSubscription);
@@ -140,6 +145,16 @@ public interface BpmnRestApiInterceptor {
     void accessDeadLetterJobInfoWithQuery(DeadLetterJobQuery jobQuery);
     
     void deleteJob(Job job);
+    
+    void accessBatchInfoById(Batch batch);
+    
+    void accessBatchInfoWithQuery(BatchQuery batchQuery);
+    
+    void deleteBatch(Batch batch);
+    
+    void accessBatchPartInfoOfBatch(Batch batch);
+    
+    void accessBatchPartInfoById(BatchPart batchPart);
     
     void accessManagementInfo();
     

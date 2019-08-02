@@ -1,0 +1,63 @@
+update ACT_GE_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'common.schema.version';
+
+update ACT_GE_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'entitylink.schema.version';
+
+update ACT_GE_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'identitylink.schema.version';
+
+alter table ACT_RU_JOB add ELEMENT_ID_ nvarchar(255);
+alter table ACT_RU_JOB add ELEMENT_NAME_ nvarchar(255);
+
+alter table ACT_RU_TIMER_JOB add ELEMENT_ID_ nvarchar(255);
+alter table ACT_RU_TIMER_JOB add ELEMENT_NAME_ nvarchar(255);
+
+alter table ACT_RU_SUSPENDED_JOB add ELEMENT_ID_ nvarchar(255);
+alter table ACT_RU_SUSPENDED_JOB add ELEMENT_NAME_ nvarchar(255);
+
+alter table ACT_RU_DEADLETTER_JOB add ELEMENT_ID_ nvarchar(255);
+alter table ACT_RU_DEADLETTER_JOB add ELEMENT_NAME_ nvarchar(255);
+
+update ACT_GE_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'job.schema.version';
+update ACT_GE_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'task.schema.version';
+
+update ACT_GE_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'variable.schema.version';
+
+alter table ACT_RU_EVENT_SUBSCR add SUB_SCOPE_ID_ nvarchar(64);
+alter table ACT_RU_EVENT_SUBSCR add SCOPE_ID_ nvarchar(64);
+alter table ACT_RU_EVENT_SUBSCR add SCOPE_DEFINITION_ID_ nvarchar(64);
+alter table ACT_RU_EVENT_SUBSCR add SCOPE_TYPE_ nvarchar(64);
+insert into ACT_GE_PROPERTY values ('eventsubscription.schema.version', '6.5.0.0', 1);
+
+update ACT_GE_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'eventsubscription.schema.version';
+
+update ACT_GE_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'schema.version';
+
+update ACT_ID_PROPERTY set VALUE_ = '6.5.0.1' where NAME_ = 'schema.version';
+
+UPDATE [ACT_APP_DATABASECHANGELOGLOCK] SET [LOCKED] = 1, [LOCKEDBY] = '192.168.10.1 (192.168.10.1)', [LOCKGRANTED] = '2019-06-02T20:38:49.583' WHERE [ID] = 1 AND [LOCKED] = 0
+
+UPDATE [ACT_APP_DATABASECHANGELOGLOCK] SET [LOCKED] = 0, [LOCKEDBY] = NULL, [LOCKGRANTED] = NULL WHERE [ID] = 1
+
+
+
+UPDATE [ACT_CMMN_DATABASECHANGELOGLOCK] SET [LOCKED] = 1, [LOCKEDBY] = '192.168.10.1 (192.168.10.1)', [LOCKGRANTED] = '2019-06-02T20:38:57.345' WHERE [ID] = 1 AND [LOCKED] = 0
+
+UPDATE [ACT_CMMN_DATABASECHANGELOGLOCK] SET [LOCKED] = 0, [LOCKEDBY] = NULL, [LOCKGRANTED] = NULL WHERE [ID] = 1
+
+
+
+UPDATE [ACT_DMN_DATABASECHANGELOGLOCK] SET [LOCKED] = 1, [LOCKEDBY] = '192.168.10.1 (192.168.10.1)', [LOCKGRANTED] = '2019-06-02T20:39:04.393' WHERE [ID] = 1 AND [LOCKED] = 0
+
+UPDATE [ACT_DMN_DATABASECHANGELOGLOCK] SET [LOCKED] = 0, [LOCKEDBY] = NULL, [LOCKGRANTED] = NULL WHERE [ID] = 1
+
+
+
+UPDATE [ACT_FO_DATABASECHANGELOGLOCK] SET [LOCKED] = 1, [LOCKEDBY] = '192.168.10.1 (192.168.10.1)', [LOCKGRANTED] = '2019-06-02T20:39:11.412' WHERE [ID] = 1 AND [LOCKED] = 0
+
+UPDATE [ACT_FO_DATABASECHANGELOGLOCK] SET [LOCKED] = 0, [LOCKEDBY] = NULL, [LOCKGRANTED] = NULL WHERE [ID] = 1
+
+
+
+UPDATE [ACT_CO_DATABASECHANGELOGLOCK] SET [LOCKED] = 1, [LOCKEDBY] = '192.168.10.1 (192.168.10.1)', [LOCKGRANTED] = '2019-06-02T20:39:18.572' WHERE [ID] = 1 AND [LOCKED] = 0
+
+UPDATE [ACT_CO_DATABASECHANGELOGLOCK] SET [LOCKED] = 0, [LOCKEDBY] = NULL, [LOCKGRANTED] = NULL WHERE [ID] = 1
+

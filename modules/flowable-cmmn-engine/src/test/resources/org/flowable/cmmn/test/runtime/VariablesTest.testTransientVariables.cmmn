@@ -15,7 +15,7 @@
                 <entryCriterion id="criterion1" sentryRef="sentryMileStoneOne" />
             </planItem>
             
-             <sentry id="sentryMileStoneOne">
+            <sentry id="sentryMileStoneOne">
                 <planItemOnPart id="onPart1" sourceRef="planItem1">
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>

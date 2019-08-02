@@ -20,60 +20,54 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 
-/**
- * @author Dennis Federico
- */
 public class ProcessInstanceMigrationCmd implements Command<Void> {
-
-    protected ProcessInstanceMigrationDocument processInstanceMigrationDocument;
+    
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String processDefinitionKey;
     protected int processDefinitionVersion;
     protected String processDefinitionTenantId;
+    protected ProcessInstanceMigrationDocument processInstanceMigrationDocument;
 
-    public static ProcessInstanceMigrationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public ProcessInstanceMigrationCmd(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         if (processInstanceId == null) {
             throw new FlowableException("Must specify a process instance id to migrate");
         }
+        
         if (processInstanceMigrationDocument == null) {
-            throw new FlowableException("Must specify a process instance migration document");
+            throw new FlowableException("Must specify a process migration document to migrate");
         }
-        ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
-        cmd.processInstanceId = processInstanceId;
-        cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
-        return cmd;
+
+        this.processInstanceId = processInstanceId;
+        this.processInstanceMigrationDocument = processInstanceMigrationDocument;
     }
 
-    public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public ProcessInstanceMigrationCmd(ProcessInstanceMigrationDocument processInstanceMigrationDocument, String processDefinitionId) {
         if (processDefinitionId == null) {
             throw new FlowableException("Must specify a process definition id to migrate");
         }
+        
         if (processInstanceMigrationDocument == null) {
-            throw new FlowableException("Must specify a process instance migration document");
+            throw new FlowableException("Must specify a process migration document to migrate");
         }
-        ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
-        cmd.processDefinitionId = processDefinitionId;
-        cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
-        return cmd;
+
+        this.processDefinitionId = processDefinitionId;
+        this.processInstanceMigrationDocument = processInstanceMigrationDocument;
     }
 
-    public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public ProcessInstanceMigrationCmd(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         if (processDefinitionKey == null) {
-            throw new FlowableException("Must specify the process definition key to migrate");
+            throw new FlowableException("Must specify a process definition key to migrate");
         }
-        if (processDefinitionVersion < 0) {
-            throw new FlowableException("Must specify a positive definition version number to migrate");
-        }
+        
         if (processInstanceMigrationDocument == null) {
-            throw new FlowableException("Must specify a process instance migration document");
+            throw new FlowableException("Must specify a process migration document to migrate");
         }
-        ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
-        cmd.processDefinitionKey = processDefinitionKey;
-        cmd.processDefinitionVersion = processDefinitionVersion;
-        cmd.processDefinitionTenantId = processDefinitionTenantId;
-        cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
-        return cmd;
+
+        this.processDefinitionKey = processDefinitionKey;
+        this.processDefinitionVersion = processDefinitionVersion;
+        this.processDefinitionTenantId = processDefinitionTenantId;
+        this.processInstanceMigrationDocument = processInstanceMigrationDocument;
     }
 
     @Override

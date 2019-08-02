@@ -68,7 +68,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
         Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertTrue(variablesFromGet.containsKey("stringVar"));
-        assertEquals("Hello World", (String) variablesFromGet.get("stringVar"));
+        assertEquals("Hello World", variablesFromGet.get("stringVar"));
         assertTrue(variablesFromGet.containsKey("intVar"));
         assertEquals(42, ((Integer) variablesFromGet.get("intVar")).intValue());
 

@@ -1,0 +1,97 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="batchPart">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'BATCH-PART.ACTION.RETURN-TO-BATCH' | translate}}</a>
+					</div>
+					<h2>{{batchPart.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="BATCH-PART.ID"></td>
+							<td>{{batchPart.id}}</td>
+							<td class="property-name" translate="BATCH-PART.TYPE"></td>
+							<td>{{batchPart.batchType}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="BATCH-PART.SEARCH-KEY"></td>
+							<td ng-if="batchPart.batchType == 'processMigration'"><a ng-click="openProcessDefinition(batch.searchKey)"><i class="glyphicon glyphicon-zoom-in"></i>
+                                {{sourceDefinition.name &amp;&amp; (sourceDefinition.name + ' (v' + sourceDefinition.version + ')')  || batchPart.searchKey}}</a></td>
+							<td ng-if="batchPart.batchType != 'processMigration'">{{batch.searchKey}}</td>
+							<td class="property-name" translate="BATCH-PART.SEARCH-KEY2"></td>
+							<td ng-if="batchPart.batchType == 'processMigration'"><a ng-click="openProcessDefinition(batch.searchKey2)"><i class="glyphicon glyphicon-zoom-in"></i>
+                                {{targetDefinition.name &amp;&amp; (targetDefinition.name + ' (v' + targetDefinition.version + ')') || batchPart.searchKey2}}</a></td>
+                            <td ng-if="batchPart.batchType != 'processMigration'">{{batch.searchKey2}}</td>
+						</tr>
+						<tr class="property">
+                            <td class="property-name" translate="BATCH-PART.CREATE-TIME"></td>
+                            <td>{{batchPart.createTime}}</td>
+                            <td class="property-name" translate="BATCH-PART.COMPLETE-TIME"></td>
+                            <td>{{batchPart.completeTime}}</td>
+                        </tr>
+						<tr class="property">
+							<td class="property-name" translate="BATCH-PART.STATUS"></td>
+                            <td>{{batchPart.status}}</td>
+                            <td class="property-name" translate="BATCH-PART.TENANT"></td>
+                            <td>{{batchPart.tenantId | empty}}</td>
+                        </tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+				<ul class="list-group">
+					  
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component">
+				<div class="tabs-wrapper">
+		       		<div class="tabs clearfix">
+		       			<div class="tab" ng-repeat="tab in tabData.tabs" ng-class="{'active': tabData.activeTab == tab.id}">
+		       				<a ng-click="tabData.activeTab = tab.id">
+		       					{{tab.name | translate:node}}&nbsp;
+		    					<span class="badge" ng-if="tab.info != undefined">{{tab.info}}</span>
+		    				</a>
+		       			</div>
+		       		</div>
+		        	<div class="title"></div>
+
+                    <div class="property-wrapper" ng-if="batchPartDocument && tabData.activeTab == tabData.tabs[0].id">
+                        <table>
+                            <tr class="property" ng-if="batchPartDocument.resultStatus == 'success'">
+                                <td class="property-name" translate="BATCH-PART.STATUS"></td>
+                                <td translate="BATCH-PART.STATUS-SUCCESS"></td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr class="property" ng-if="batchPartDocument.resultStatus == 'fail'">
+                                <td class="property-name" translate="BATCH-PART.STATUS"></td>
+                                <td translate="BATCH-PART.STATUS-FAIL"></td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr class="property" ng-if="batchPartDocument.resultStatus == 'fail'">
+                                <td class="property-name" translate="BATCH-PART.STATUS-MESSAGE"></td>
+                                <td>{{batchPartDocument.migrationMessage}}</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </table>
+                    </div>
+
+	        	</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div>
+</div>

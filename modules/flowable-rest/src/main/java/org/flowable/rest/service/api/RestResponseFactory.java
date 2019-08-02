@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
@@ -80,6 +82,8 @@ import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.identity.MembershipResponse;
 import org.flowable.rest.service.api.identity.UserInfoResponse;
 import org.flowable.rest.service.api.identity.UserResponse;
+import org.flowable.rest.service.api.management.BatchPartResponse;
+import org.flowable.rest.service.api.management.BatchResponse;
 import org.flowable.rest.service.api.management.JobResponse;
 import org.flowable.rest.service.api.management.TableResponse;
 import org.flowable.rest.service.api.repository.DecisionTableResponse;
@@ -1059,6 +1063,69 @@ public class RestResponseFactory {
         if (job.getExecutionId() != null) {
             response.setExecutionUrl(urlBuilder.buildUrl(RestUrls.URL_EXECUTION, job.getExecutionId()));
         }
+
+        return response;
+    }
+    
+    public List<BatchResponse> createBatchResponse(List<Batch> batches) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<BatchResponse> responseList = new ArrayList<>();
+        for (Batch instance : batches) {
+            responseList.add(createBatchResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public BatchResponse createBatchResponse(Batch batch) {
+        return createBatchResponse(batch, createUrlBuilder());
+    }
+
+    public BatchResponse createBatchResponse(Batch batch, RestUrlBuilder urlBuilder) {
+        BatchResponse response = new BatchResponse();
+        response.setId(batch.getId());
+        response.setBatchType(batch.getBatchType());
+        response.setSearchKey(batch.getBatchSearchKey());
+        response.setSearchKey2(batch.getBatchSearchKey2());
+        response.setCreateTime(batch.getCreateTime());
+        response.setCompleteTime(batch.getCompleteTime());
+        response.setStatus(batch.getStatus());
+        response.setTenantId(batch.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_BATCH, batch.getId()));
+
+        return response;
+    }
+    
+    public List<BatchPartResponse> createBatchPartResponse(List<BatchPart> batchParts) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<BatchPartResponse> responseList = new ArrayList<>();
+        for (BatchPart instance : batchParts) {
+            responseList.add(createBatchPartResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public BatchPartResponse createBatchPartResponse(BatchPart batchPart) {
+        return createBatchPartResponse(batchPart, createUrlBuilder());
+    }
+
+    public BatchPartResponse createBatchPartResponse(BatchPart batchPart, RestUrlBuilder urlBuilder) {
+        BatchPartResponse response = new BatchPartResponse();
+        response.setId(batchPart.getId());
+        response.setBatchId(batchPart.getBatchId());
+        response.setBatchType(batchPart.getBatchType());
+        response.setSearchKey(batchPart.getBatchSearchKey());
+        response.setSearchKey2(batchPart.getBatchSearchKey2());
+        response.setScopeId(batchPart.getScopeId());
+        response.setSubScopeId(batchPart.getSubScopeId());
+        response.setScopeType(batchPart.getScopeType());
+        response.setCreateTime(batchPart.getCreateTime());
+        response.setCompleteTime(batchPart.getCompleteTime());
+        response.setStatus(batchPart.getStatus());
+        response.setTenantId(batchPart.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_BATCH_PART, batchPart.getId()));
+        response.setBatchUrl(urlBuilder.buildUrl(RestUrls.URL_BATCH, batchPart.getBatchId()));
 
         return response;
     }
