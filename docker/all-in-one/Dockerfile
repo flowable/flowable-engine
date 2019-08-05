@@ -1,6 +1,7 @@
-FROM adoptopenjdk/openjdk8:alpine-slim
+FROM adoptopenjdk/openjdk11:alpine-slim
 ADD wait-for-something.sh .
 
+RUN apk add --no-cache ttf-dejavu && rm -rf /var/cache/apk/*
 RUN addgroup tomcat && adduser -s /bin/false -G tomcat -h /opt/tomcat -D tomcat
 
 RUN wget http://archive.apache.org/dist/tomcat/tomcat-9/v9.0.14/bin/apache-tomcat-9.0.14.tar.gz -O /tmp/tomcat.tar.gz
