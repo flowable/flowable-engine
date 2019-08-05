@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
@@ -22,13 +20,16 @@ import org.flowable.ui.admin.service.engine.ServerConfigService;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * REST controller for managing the server configs.
@@ -44,12 +45,12 @@ public class ServerConfigsResource {
     @Autowired
     protected ServerConfigService serverConfigService;
 
-    @RequestMapping(value = "/rest/server-configs", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/server-configs", produces = "application/json")
     public List<ServerConfigRepresentation> getServers() {
         return serverConfigService.findAll();
     }
 
-    @RequestMapping(value = "/rest/server-configs/default/{endpointTypeCode}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/server-configs/default/{endpointTypeCode}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public ServerConfigRepresentation getDefaultServerConfig(@PathVariable Integer endpointTypeCode) {
@@ -62,7 +63,7 @@ public class ServerConfigsResource {
         return new ServerConfigRepresentation(serverConfigService.getDefaultServerConfig(endpointType));
     }
 
-    @RequestMapping(value = "/rest/server-configs/{serverId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/rest/server-configs/{serverId}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void updateServer(@PathVariable String serverId, @RequestBody ServerConfigRepresentation configRepresentation) {
         ServerConfig config = serverConfigService.findOne(serverId);

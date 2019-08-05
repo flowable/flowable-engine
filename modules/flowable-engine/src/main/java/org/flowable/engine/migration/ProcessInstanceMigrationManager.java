@@ -13,12 +13,9 @@
 
 package org.flowable.engine.migration;
 
+import org.flowable.batch.api.Batch;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 
-/**
- * @author Dennis Federico
- */
 public interface ProcessInstanceMigrationManager {
 
     ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenant, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
@@ -32,4 +29,8 @@ public interface ProcessInstanceMigrationManager {
     void migrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
 
     void migrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
+
+    Batch batchMigrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
+
+    Batch batchMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
 }

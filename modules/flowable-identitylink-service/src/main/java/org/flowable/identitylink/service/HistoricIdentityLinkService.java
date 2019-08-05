@@ -44,4 +44,10 @@ public interface HistoricIdentityLinkService {
     void deleteHistoricIdentityLinksByTaskId(String taskId);
     
     void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    void deleteHistoricProcessIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricCaseIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricTaskIdentityLinksForNonExistingInstances();
 }

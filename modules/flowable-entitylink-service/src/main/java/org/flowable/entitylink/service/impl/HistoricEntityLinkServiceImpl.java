@@ -79,6 +79,16 @@ public class HistoricEntityLinkServiceImpl extends CommonServiceImpl<EntityLinkS
     public void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
         getHistoricEntityLinkEntityManager().deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
     }
+    
+    @Override
+    public void deleteHistoricEntityLinksForNonExistingProcessInstances() {
+        getHistoricEntityLinkEntityManager().deleteHistoricEntityLinksForNonExistingProcessInstances();
+    }
+    
+    @Override
+    public void deleteHistoricEntityLinksForNonExistingCaseInstances() {
+        getHistoricEntityLinkEntityManager().deleteHistoricEntityLinksForNonExistingCaseInstances();
+    }
 
     public HistoricEntityLinkEntityManager getHistoricEntityLinkEntityManager() {
         return configuration.getHistoricEntityLinkEntityManager();

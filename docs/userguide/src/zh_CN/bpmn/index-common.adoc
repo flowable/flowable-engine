@@ -38,9 +38,9 @@ include::ch13-UI.adoc[]
 
 include::../base/header-REST.adoc[]
 
-include::ch14-REST.adoc[]
+include::ch15-REST.adoc[]
 
-include::ch15-Cdi.adoc[]
+include::ch16-Cdi.adoc[]
 
 include::ch16-Ldap.adoc[]
 

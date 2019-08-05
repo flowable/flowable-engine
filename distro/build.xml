@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.4.2-SNAPSHOT" />
+	<property name="flowable.version" value="6.5.0-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="flowable.website" value="../../flowable-website" />
 
@@ -123,6 +123,12 @@
             </fileset>
 			<fileset dir="../modules/flowable-job-spring-service/target">
                 <include name="flowable-job-spring-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-batch-service-api/target">
+                <include name="flowable-batch-service-api-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-batch-service/target">
+                <include name="flowable-batch-service-*.jar" />
             </fileset>
 			<fileset dir="../modules/flowable-task-service-api/target">
                 <include name="flowable-task-service-api-*.jar" />

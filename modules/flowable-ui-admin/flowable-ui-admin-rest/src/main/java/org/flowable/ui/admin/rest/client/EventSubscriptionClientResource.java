@@ -14,7 +14,6 @@ package org.flowable.ui.admin.rest.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.EventSubscriptionService;
@@ -24,10 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,7 +46,7 @@ public class EventSubscriptionClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/event-subscriptions/{eventSubscriptionId} -> return event subscription data
      */
-    @RequestMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", produces = "application/json")
     public JsonNode getEventSubscription(@PathVariable String eventSubscriptionId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -62,7 +62,7 @@ public class EventSubscriptionClientResource extends AbstractClientResource {
     /**
      * POST /rest/admin/event-subscriptions/{eventSubscriptionId} -> trigger event
      */
-    @RequestMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/admin/event-subscriptions/{eventSubscriptionId}", produces = "application/json")
     @ResponseStatus(value = HttpStatus.OK)
     public void triggerEvent(@PathVariable String eventSubscriptionId, @RequestBody ObjectNode eventBody) throws BadRequestException {
 

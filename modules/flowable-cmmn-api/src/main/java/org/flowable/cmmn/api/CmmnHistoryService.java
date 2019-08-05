@@ -21,12 +21,12 @@ import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
-import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 
 /**
  * @author Joram Barrez
@@ -50,6 +50,20 @@ public interface CmmnHistoryService {
      * historic task instance doesn't exist, no exception is thrown and the method returns normal.
      */
     void deleteHistoricTaskInstance(String taskId);
+    
+    /**
+     * Deletes matching historic case instances
+     * 
+     * @param caseInstanceQuery the query to match case instances to delete
+     */
+    void deleteHistoricCaseInstances(HistoricCaseInstanceQuery caseInstanceQuery);
+    
+    /**
+     * Deletes matching historic case instances
+     * 
+     * @param caseInstanceQuery the query to match case instances to delete
+     */
+    void deleteHistoricCaseInstancesAndRelatedData(HistoricCaseInstanceQuery caseInstanceQuery);
     
     /**
      * Retrieves the {@link HistoricIdentityLink}s associated with the given task. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a certain task

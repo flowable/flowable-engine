@@ -9,7 +9,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.4.2-SNAPSHOT</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -135,7 +135,7 @@
         <dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable5-test</artifactId>
-			<version>6.4.2-SNAPSHOT</version>
+			<version>6.5.0-SNAPSHOT</version>
 		</dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>

@@ -2,9 +2,9 @@ language: java
 
 matrix:
   include:
-  - jdk: oraclejdk8
+  - jdk: openjdk8
   - name: "Flowable 5 tests"
-    jdk: oraclejdk8
+    jdk: openjdk8
     install: true
     script:
       cd scripts && ./run-flowable5-tests.sh

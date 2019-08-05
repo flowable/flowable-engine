@@ -13,11 +13,6 @@
 package org.flowable.ui.admin.rest.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.DeploymentService;
@@ -26,11 +21,15 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @author jbarrez
@@ -47,7 +46,7 @@ public class DeploymentsClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/deployments -> get a list of deployments.
      */
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(produces = "application/json")
     public JsonNode listDeployments(HttpServletRequest request) {
         LOGGER.debug("REST request to get a list of deployments");
 
@@ -69,7 +68,7 @@ public class DeploymentsClientResource extends AbstractClientResource {
     /**
      * POST /rest/admin/deployments: upload a deployment
      */
-    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(produces = "application/json")
     public JsonNode handleFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             try {

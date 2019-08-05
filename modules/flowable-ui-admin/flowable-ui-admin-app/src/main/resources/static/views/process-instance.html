@@ -27,8 +27,7 @@
 							<td>{{process.endTime &amp;&amp; ('PROCESS-INSTANCE.STATUS-COMPLETED' | translate) || ('PROCESS-INSTANCE.STATUS-ACTIVE' | translate)}}</td>
 							<td class="property-name">Process definition:</td>
 							<td><a ng-click="openProcessDefinition(process.processDefinitionId)"><i class="glyphicon glyphicon-zoom-in"></i>
-							 	{{definition.name &amp;&amp; definition.name || process.processDefinitionId}}
-							 </a></td>
+							 	{{definition.name &amp;&amp; definition.name || process.processDefinitionId}}</a></td>
 						</tr>
 						<tr class="property">
 							<td class="property-name" translate="PROCESS-INSTANCE.ACTIVITY-ID-STARTED"></td>
@@ -37,7 +36,7 @@
 							<td>{{process.startUserId | empty}}</td>
 						</tr>
 						<tr class="property">
-						    <td class="property-tenantId" translate="PROCESS-INSTANCE.TENANT-ID"></td>
+						    <td class="property-name" translate="PROCESS-INSTANCE.TENANT-ID"></td>
                             <td>{{process.tenantId | empty}}</td>
 							<td class="property-name" translate="PROCESS-INSTANCE.SUPER-PROCESS-INSTANCE-ID"></td>
 							<td ng-if="process.superProcessInstanceId"><a ng-click="openProcessInstance(process.superProcessInstanceId)"><i class="glyphicon glyphicon-zoom-in"></i> {{process.superProcessInstanceId | empty}}</a></td>

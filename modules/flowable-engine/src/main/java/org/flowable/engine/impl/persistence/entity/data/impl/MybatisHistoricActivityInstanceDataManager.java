@@ -99,4 +99,14 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
         return (Long) getDbSqlSession().selectOne("selectHistoricActivityInstanceCountByNativeQuery", parameterMap);
     }
 
+    @Override
+    public void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        getDbSqlSession().delete("bulkDeleteHistoricActivityInstances", historicActivityInstanceQuery, HistoricActivityInstanceEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteHistoricActivityInstancesForNonExistingProcessInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances", null, HistoricActivityInstanceEntityImpl.class);
+    }
+
 }

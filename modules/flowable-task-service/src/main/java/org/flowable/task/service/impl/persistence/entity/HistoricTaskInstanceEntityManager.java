@@ -39,5 +39,10 @@ public interface HistoricTaskInstanceEntityManager extends EntityManager<Histori
     List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+    
+    void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
 
+    void deleteHistoricTaskInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricTaskInstancesForNonExistingCaseInstances();
 }

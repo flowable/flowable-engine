@@ -20,9 +20,9 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.task.model.runtime.CreateTaskRepresentation;
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +37,7 @@ public class TasksResource {
     @Autowired
     protected TaskService taskService;
 
-    @RequestMapping(value = "/rest/tasks", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/tasks")
     public TaskRepresentation createNewTask(@RequestBody CreateTaskRepresentation taskRepresentation, HttpServletRequest request) {
         if (StringUtils.isEmpty(taskRepresentation.getName())) {
             throw new BadRequestException("Task name is required");

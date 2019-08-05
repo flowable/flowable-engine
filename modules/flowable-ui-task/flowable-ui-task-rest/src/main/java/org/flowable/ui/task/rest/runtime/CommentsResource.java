@@ -16,15 +16,16 @@ import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.task.model.runtime.CommentRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST resource related to comment collection on tasks and process instances.
- * 
+ *
  * @author Frederik Heremans
  * @author Joram Barrez
  */
@@ -35,22 +36,22 @@ public class CommentsResource {
     @Autowired
     protected FlowableCommentService commentService;
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/comments", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/tasks/{taskId}/comments", produces = "application/json")
     public ResultListDataRepresentation getTaskComments(@PathVariable("taskId") String taskId) {
         return commentService.getTaskComments(taskId);
     }
 
-    @RequestMapping(value = "/rest/tasks/{taskId}/comments", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/tasks/{taskId}/comments", produces = "application/json")
     public CommentRepresentation addTaskComment(@RequestBody CommentRepresentation commentRequest, @PathVariable("taskId") String taskId) {
         return commentService.addTaskComment(commentRequest, taskId);
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/comments", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/{processInstanceId}/comments", produces = "application/json")
     public ResultListDataRepresentation getProcessInstanceComments(@PathVariable("processInstanceId") String processInstanceId) {
         return commentService.getProcessInstanceComments(processInstanceId);
     }
 
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/comments", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/rest/process-instances/{processInstanceId}/comments", produces = "application/json")
     public CommentRepresentation addProcessInstanceComment(@RequestBody CommentRepresentation commentRequest,
             @PathVariable("processInstanceId") String processInstanceId) {
         return commentService.addProcessInstanceComment(commentRequest, processInstanceId);

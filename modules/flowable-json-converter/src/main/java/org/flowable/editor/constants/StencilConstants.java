@@ -188,6 +188,10 @@ public interface StencilConstants {
     final String PROPERTY_SERVICETASK_EXPRESSION = "servicetaskexpression";
     final String PROPERTY_SERVICETASK_DELEGATE_EXPRESSION = "servicetaskdelegateexpression";
     final String PROPERTY_SERVICETASK_RESULT_VARIABLE = "servicetaskresultvariable";
+    final String PROPERTY_SERVICETASK_EXCEPTIONS = "servicetaskexceptions";
+    final String PROPERTY_SERVICETASK_EXCEPTION_CLASS = "class";
+    final String PROPERTY_SERVICETASK_EXCEPTION_CODE = "code";
+    final String PROPERTY_SERVICETASK_EXCEPTION_CHILDREN = "children";
     final String PROPERTY_SERVICETASK_FIELDS = "servicetaskfields";
     final String PROPERTY_SERVICETASK_FIELD_NAME = "name";
     final String PROPERTY_SERVICETASK_FIELD_STRING_VALUE = "stringValue";

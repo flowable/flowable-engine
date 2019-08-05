@@ -81,6 +81,16 @@ public class HistoricTaskLogEntryEntityManagerImpl extends AbstractEntityManager
     public void deleteHistoricTaskLogEntriesForTaskId(String taskId) {
         getDataManager().deleteHistoricTaskLogEntriesByTaskId(taskId);
     }
+    
+    @Override
+    public void deleteHistoricTaskLogEntriesForNonExistingProcessInstances() {
+        getDataManager().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
+    }
+    
+    @Override
+    public void deleteHistoricTaskLogEntriesForNonExistingCaseInstances() {
+        getDataManager().deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
+    }
 
     @Override
     public void createHistoricTaskLogEntry(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder) {

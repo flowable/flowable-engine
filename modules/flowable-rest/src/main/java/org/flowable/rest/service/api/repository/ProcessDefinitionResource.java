@@ -25,7 +25,10 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableConflictException;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormInfo;
@@ -36,6 +39,7 @@ import org.flowable.rest.service.api.FormModelResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,6 +60,9 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     
     @Autowired
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    
+    @Autowired
+    protected ProcessMigrationService processMigrationService;
     
     @Autowired(required=false)
     protected FormRepositoryService formRepositoryService;
@@ -140,6 +147,44 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
             SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
             return restResponseFactory.getFormModelString(new FormModelResponse(formInfo, formModel));
         }
+    }
+    
+    @ApiOperation(value = "Migrate all instances of process definition", tags = { "Process Definitions" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates process instances were found and migration was executed."),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+    })
+    @PostMapping(value = "/repository/process-definitions/{processDefinitionId}/migrate", produces = "application/json")
+    public void migrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
+            @RequestBody String migrationDocumentJson, HttpServletRequest request) {
+        
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateInstancesOfProcessDefinition(processDefinition, migrationDocumentJson);
+        }
+
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        processMigrationService.migrateProcessInstancesOfProcessDefinition(processDefinitionId, migrationDocument);
+    }
+    
+    @ApiOperation(value = "Batch migrate all instances of process definition", tags = { "Process Definitions" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates process instances were found and batch migration was started."),
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+    })
+    @PostMapping(value = "/repository/process-definitions/{processDefinitionId}/batch-migrate", produces = "application/json")
+    public void batchMigrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
+            @RequestBody String migrationDocumentJson, HttpServletRequest request) {
+        
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateInstancesOfProcessDefinition(processDefinition, migrationDocumentJson);
+        }
+
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        processMigrationService.batchMigrateProcessInstancesOfProcessDefinition(processDefinitionId, migrationDocument);
     }
     
     protected FormInfo getStartForm(ProcessDefinition processDefinition) {

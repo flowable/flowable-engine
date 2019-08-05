@@ -6,7 +6,7 @@ include::../bpmn/ch02-GettingStarted.adoc[tags=getting.started.rest]
 
 === BPMN
 
-include::../bpmn/ch14-REST.adoc[leveloffset=+1]
+include::../bpmn/ch15-REST.adoc[leveloffset=+1]
 
 === DMN
 

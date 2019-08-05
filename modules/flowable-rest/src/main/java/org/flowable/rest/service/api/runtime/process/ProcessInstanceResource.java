@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
@@ -57,6 +58,9 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     
     @Autowired
     protected RepositoryService repositoryService;
+
+    @Autowired
+    protected ProcessMigrationService migrationService;
 
     @ApiOperation(value = "Get a process instance", tags = { "Process Instances" }, nickname = "getProcessInstance")
     @ApiResponses(value = {
@@ -162,7 +166,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/migrate", produces = "application/json")
-    public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
+    public void migrateProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
             @RequestBody String migrationDocumentJson, HttpServletRequest request) {
         
         if (restApiInterceptor != null) {
@@ -170,7 +174,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
         }
 
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
-        runtimeService.migrateProcessInstance(processInstanceId, migrationDocument);
+        migrationService.migrateProcessInstance(processInstanceId, migrationDocument);
     }
     
     @ApiOperation(value = "Inject activity in a process instance", tags = { "Process Instances" },

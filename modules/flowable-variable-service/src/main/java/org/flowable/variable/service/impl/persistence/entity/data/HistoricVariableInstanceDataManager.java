@@ -43,4 +43,7 @@ public interface HistoricVariableInstanceDataManager extends DataManager<Histori
 
     long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);
 
+    void deleteHistoricVariableInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricVariableInstancesForNonExistingCaseInstances();
 }

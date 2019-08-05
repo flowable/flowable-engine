@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
@@ -59,23 +63,13 @@ import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
 import org.flowable.ui.task.model.debugger.BreakpointRepresentation;
 import org.flowable.ui.task.service.debugger.DebuggerService;
-import org.flowable.ui.task.service.editor.mapper.EventInfoMapper;
-import org.flowable.ui.task.service.editor.mapper.InfoMapper;
-import org.flowable.ui.task.service.editor.mapper.ReceiveTaskInfoMapper;
-import org.flowable.ui.task.service.editor.mapper.SequenceFlowInfoMapper;
-import org.flowable.ui.task.service.editor.mapper.ServiceTaskInfoMapper;
-import org.flowable.ui.task.service.editor.mapper.UserTaskInfoMapper;
+import org.flowable.ui.task.service.editor.mapper.*;
 import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 @RequestMapping("/app")
@@ -121,15 +115,15 @@ public class RuntimeDisplayJsonClientResource {
         propertyMappers.put("UserTask", new UserTaskInfoMapper());
     }
 
-    @RequestMapping(value = "/rest/process-instances/debugger/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/debugger/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getDebuggerModelJSON(@PathVariable String processInstanceId) {
         if (runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).count() > 0 ) {
             return getModelJSON(processInstanceId);
-        } 
+        }
         return getModelHistoryJSON(processInstanceId);
     }
-    
-    @RequestMapping(value = "/rest/process-instances/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+
+    @GetMapping(value = "/rest/process-instances/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelJSON(@PathVariable String processInstanceId) {
 
         User currentUser = SecurityUtils.getCurrentUserObject();
@@ -215,7 +209,7 @@ public class RuntimeDisplayJsonClientResource {
         return displayNode;
     }
 
-    @RequestMapping(value = "/rest/process-definitions/{processDefinitionId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-definitions/{processDefinitionId}/model-json", produces = "application/json")
     public JsonNode getModelJSONForProcessDefinition(@PathVariable String processDefinitionId) {
 
         BpmnModel pojoModel = repositoryService.getBpmnModel(processDefinitionId);
@@ -227,7 +221,7 @@ public class RuntimeDisplayJsonClientResource {
         return processProcessElements(pojoModel, null, null, Collections.EMPTY_LIST, "");
     }
 
-    @RequestMapping(value = "/rest/process-instances/history/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/process-instances/history/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getModelHistoryJSON(@PathVariable String processInstanceId) {
 
         User currentUser = SecurityUtils.getCurrentUserObject();
@@ -323,7 +317,7 @@ public class RuntimeDisplayJsonClientResource {
         }
 
         for (org.flowable.bpmn.model.Process process : pojoModel.getProcesses()) {
-            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, collapsedArray, 
+            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, collapsedArray,
                             diagramInfo, completedElements, currentElements, breakpoints, null, processInstanceId);
             processArtifacts(process.getArtifacts(), pojoModel, elementArray, flowArray, diagramInfo);
         }
@@ -339,8 +333,8 @@ public class RuntimeDisplayJsonClientResource {
         return displayNode;
     }
 
-    protected void processElements(Collection<FlowElement> elementList, BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, 
-                    ArrayNode collapsedArray, GraphicInfo diagramInfo, Set<String> completedElements, 
+    protected void processElements(Collection<FlowElement> elementList, BpmnModel model, ArrayNode elementArray, ArrayNode flowArray,
+                    ArrayNode collapsedArray, GraphicInfo diagramInfo, Set<String> completedElements,
                     Set<String> currentElements, Collection<String> breakpoints, ObjectNode collapsedNode, String processInstanceId) {
 
         for (FlowElement element : elementList) {
@@ -450,7 +444,7 @@ public class RuntimeDisplayJsonClientResource {
                         collapsedArray.add(newCollapsedNode);
                     }
 
-                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray, 
+                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray,
                                     diagramInfo, completedElements, currentElements, breakpoints, newCollapsedNode, processInstanceId);
                     processArtifacts(subProcess.getArtifacts(), model, elementArray, flowArray, diagramInfo);
                 }
@@ -526,7 +520,7 @@ public class RuntimeDisplayJsonClientResource {
                     if (StringUtils.isNotEmpty(timerDef.getTimeDuration())) {
                         eventNode.put("timeDuration", timerDef.getTimeDuration());
                     }
-                    
+
                 } else if (eventDef instanceof ConditionalEventDefinition) {
                     ConditionalEventDefinition conditionalDef = (ConditionalEventDefinition) eventDef;
                     eventNode.put("type", "conditional");
@@ -540,7 +534,7 @@ public class RuntimeDisplayJsonClientResource {
                     if (StringUtils.isNotEmpty(errorDef.getErrorCode())) {
                         eventNode.put("errorCode", errorDef.getErrorCode());
                     }
-                    
+
                 } else if (eventDef instanceof EscalationEventDefinition) {
                     EscalationEventDefinition escalationDef = (EscalationEventDefinition) eventDef;
                     eventNode.put("type", "escalation");

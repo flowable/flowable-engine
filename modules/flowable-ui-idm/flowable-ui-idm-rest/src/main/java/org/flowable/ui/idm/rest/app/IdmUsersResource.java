@@ -12,9 +12,6 @@
  */
 package org.flowable.ui.idm.rest.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.model.UserRepresentation;
@@ -26,11 +23,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.ArrayList;
+import java.util.List;
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
@@ -42,7 +44,7 @@ public class IdmUsersResource {
     @Autowired
     protected UserService userService;
 
-    @RequestMapping(value = "/rest/admin/users", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/users")
     public ResultListDataRepresentation getUsers(
             @RequestParam(required = false) String filter,
             @RequestParam(required = false) String sort,
@@ -69,7 +71,7 @@ public class IdmUsersResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/rest/admin/users/{userId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/users/{userId}")
     public void updateUserDetails(@PathVariable String userId, @RequestBody UpdateUsersRepresentation updateUsersRepresentation) {
         userService.updateUserDetails(userId, updateUsersRepresentation.getFirstName(),
                 updateUsersRepresentation.getLastName(),
@@ -78,18 +80,18 @@ public class IdmUsersResource {
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/rest/admin/users", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/users")
     public void bulkUpdateUserDetails(@RequestBody UpdateUsersRepresentation updateUsersRepresentation) {
         userService.bulkUpdatePassword(updateUsersRepresentation.getUsers(), updateUsersRepresentation.getPassword());
     }
 
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/rest/admin/users/{userId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/users/{userId}")
     public void deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
     }
 
-    @RequestMapping(value = "/rest/admin/users", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/users")
     public UserRepresentation createNewUser(@RequestBody CreateUserRepresentation userRepresentation) {
         return new UserRepresentation(userService.createNewUser(
                 userRepresentation.getId(),

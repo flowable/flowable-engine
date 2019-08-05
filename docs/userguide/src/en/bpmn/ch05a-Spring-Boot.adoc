@@ -300,7 +300,7 @@ public class MyRestController {
     @Autowired
     private MyService myService;
 
-    @RequestMapping(value="/process", method= RequestMethod.POST)
+    @PostMapping(value="/process")
     public void startProcessInstance() {
         myService.startProcess();
     }
@@ -535,7 +535,7 @@ public class MyRestController {
     @Autowired
     private MyService myService;
 
-    @RequestMapping(value="/process", method= RequestMethod.POST)
+    @PostMapping(value="/process")
     public void startProcessInstance(@RequestBody StartProcessRepresentation startProcessRepresentation) {
         myService.startProcess(startProcessRepresentation.getAssignee());
     }
@@ -625,7 +625,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 ----
 {
   "flowable": {
-    "version": "6.4.2-SNAPSHOT"
+    "version": "6.5.0-SNAPSHOT"
   }
 }
 ----

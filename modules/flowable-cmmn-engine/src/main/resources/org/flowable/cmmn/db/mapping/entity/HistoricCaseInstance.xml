@@ -291,6 +291,23 @@
         </if>
         <include refid="commonSelectHistoricCaseInstancesByQueryCriteriaSql"/>
     </sql>
+    
+    <delete id="bulkDeleteHistoricCaseInstances">
+        delete from ${prefix}ACT_CMMN_HI_CASE_INST
+        <where>
+          <include refid="commonCaseInstanceQuerySql">
+            <property name="queryTablePrefix" value=""/>
+          </include>
+          <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
+            and
+            <trim prefix="(" prefixOverrides="OR" suffix=")">
+              <include refid="commonCaseInstanceOrQuerySql">
+                <property name="queryTablePrefix" value=""/>
+              </include>
+            </trim>
+          </foreach>
+        </where>
+    </delete>
 
     <sql id="commonSelectHistoricCaseInstancesByQueryCriteriaSql">
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
@@ -314,28 +331,9 @@
             </if>
         </foreach>
         <where>
-            <if test="caseInstanceId != null">
-                RES.ID_ = #{caseInstanceId}
-            </if>
-            <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() &gt; 0">
-                and RES.ID_ IN
-                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds"
-                         open="(" separator="," close=")">
-                  #{caseInstanceId}
-                </foreach>
-            </if>
-            <if test="caseInstanceNameLikeIgnoreCase != null">
-	            and lower(RES.NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
-            </if>
-            <if test="caseDefinitionId != null">
-                and RES.CASE_DEF_ID_ = #{caseDefinitionId}
-            </if>
-            <if test="caseDefinitionIds != null">
-                and RES.CASE_DEF_ID_ IN
-                <foreach item="caseDefinitionId" index="index" collection="caseDefinitionIds" open="(" separator="," close=")">
-                    #{caseDefinitionId}
-                </foreach>
-            </if>
+            <include refid="commonCaseInstanceQuerySql">
+                <property name="queryTablePrefix" value="RES."/>
+            </include>
             <if test="caseDefinitionKey != null">
                 and CASE_DEF.KEY_ = #{caseDefinitionKey}
             </if>
@@ -351,9 +349,6 @@
             <if test="caseDefinitionName != null">
                 and CASE_DEF.NAME_ = #{caseDefinitionName}
             </if>
-            <if test="caseInstanceParentId != null">
-                and RES.PARENT_ID_ = #{caseInstanceParentId}
-            </if>
             <if test="deploymentId != null">
                 and CASE_DEF.DEPLOYMENT_ID_ = #{deploymentId}
             </if>
@@ -363,54 +358,6 @@
                          open="(" separator="," close=")">
                   #{deploymentId}
                 </foreach>
-            </if>
-            <if test="businessKey != null">
-                and RES.BUSINESS_KEY_ = #{businessKey}
-            </if>
-            <if test="finished">
-                and RES.END_TIME_ is not null
-            </if>
-            <if test="unfinished">
-                and RES.END_TIME_ is null
-            </if>
-            <if test="startedBefore != null">
-                and RES.START_TIME_ &lt;= #{startedBefore}
-            </if>
-            <if test="startedAfter != null">
-                and RES.START_TIME_ &gt;= #{startedAfter}
-            </if>
-            <if test="finishedBefore != null">
-                and RES.END_TIME_ &lt;= #{finishedBefore}
-            </if>
-            <if test="finishedAfter != null">
-                and RES.END_TIME_ &gt;= #{finishedAfter}
-            </if>
-            <if test="startedBy != null">
-                and RES.START_USER_ID_ = #{startedBy}
-            </if>
-            <if test="callbackId != null">
-                and RES.CALLBACK_ID_ = #{callbackId}
-            </if>
-            <if test="callbackType != null">
-                and RES.CALLBACK_TYPE_ = #{callbackType}
-            </if>
-            <if test="tenantId != null">
-                and RES.TENANT_ID_ = #{tenantId}
-            </if>
-            <if test="withoutTenantId">
-                and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
-            </if>
-            <if test="involvedUser != null">
-                and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
-                #{involvedUser})
-            </if>
-            <if test="involvedGroups != null">
-                and EXISTS(
-                    select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
-                    <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
-                        #{involvedGroup}
-                    </foreach>
-                )
             </if>
             <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
                 <choose>
@@ -487,25 +434,9 @@
             <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
             and
                 <trim prefix="(" prefixOverrides="OR" suffix=")">
-                    <if test="orQueryObject.caseInstanceId != null">
-                        RES.ID_ = #{orQueryObject.caseInstanceId}
-                    </if>
-                    <if test="orQueryObject.caseInstanceIds != null &amp;&amp; orQueryObject.caseInstanceIds.size() &gt; 0">
-                        or RES.ID_ IN
-                        <foreach item="caseInstanceId" index="index" collection="orQueryObject.caseInstanceIds"
-                                 open="(" separator="," close=")">
-                            #{caseInstanceId}
-                        </foreach>
-                    </if>
-                    <if test="orQueryObject.caseDefinitionId != null">
-                        or RES.CASE_DEF_ID_ = #{orQueryObject.caseDefinitionId}
-                    </if>
-                    <if test="orQueryObject.caseDefinitionIds != null">
-                        or RES.CASE_DEF_ID_ IN
-                        <foreach item="caseDefinitionId" index="index" collection="orQueryObject.caseDefinitionIds" open="(" separator="," close=")">
-                            #{caseDefinitionId}
-                        </foreach>
-                    </if>
+                    <include refid="commonCaseInstanceOrQuerySql">
+                        <property name="queryTablePrefix" value="RES."/>
+                    </include>
                     <if test="orQueryObject.caseDefinitionKey != null">
                         or CASE_DEF_OR${orIndex}.KEY_ = #{orQueryObject.caseDefinitionKey}
                     </if>
@@ -524,9 +455,6 @@
                     <if test="orQueryObject.caseDefinitionVersion != null">
                         or CASE_DEF_OR${orIndex}.VERSION_ = #{orQueryObject.caseDefinitionVersion}
                     </if>
-                    <if test="orQueryObject.caseInstanceParentId != null">
-                        or RES.PARENT_ID_ = #{orQueryObject.caseInstanceParentId}
-                    </if>
                     <if test="orQueryObject.deploymentId != null">
                         or CASE_DEF_OR${orIndex}.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
                     </if>
@@ -537,55 +465,6 @@
                             #{deploymentId}
                         </foreach>
                     </if>
-                    <if test="orQueryObject.businessKey != null">
-                        or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey}
-                    </if>
-                    <if test="orQueryObject.finished">
-                        or RES.END_TIME_ is not null
-                    </if>
-                    <if test="orQueryObject.unfinished">
-                        or RES.END_TIME_ is null
-                    </if>
-                    <if test="orQueryObject.startedBefore != null">
-                        or RES.START_TIME_ &lt;= #{orQueryObject.startedBefore}
-                    </if>
-                    <if test="orQueryObject.startedAfter != null">
-                        or RES.START_TIME_ &gt;= #{orQueryObject.startedAfter}
-                    </if>
-                    <if test="orQueryObject.finishedBefore != null">
-                        or RES.END_TIME_ &lt;= #{orQueryObject.finishedBefore}
-                    </if>
-                    <if test="orQueryObject.finishedAfter != null">
-                        or RES.END_TIME_ &gt;= #{orQueryObject.finishedAfter}
-                    </if>
-                    <if test="orQueryObject.startedBy != null">
-                        or RES.START_USER_ID_ = #{orQueryObject.startedBy}
-                    </if>
-                    <if test="orQueryObject.callbackId != null">
-                        or RES.CALLBACK_ID_ = #{orQueryObject.callbackId}
-                    </if>
-                    <if test="orQueryObject.callbackType != null">
-                        or RES.CALLBACK_TYPE_ = #{orQueryObject.callbackType}
-                    </if>
-                    <if test="orQueryObject.tenantId != null">
-                        or RES.TENANT_ID_ = #{orQueryObject.tenantId}
-                    </if>
-                    <if test="orQueryObject.withoutTenantId">
-                        or (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
-                    </if>
-                    <if test="orQueryObject.involvedUser != null">
-                        or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
-                        #{orQueryObject.involvedUser})
-                    </if>
-                    <if test="orQueryObject.involvedGroups != null">
-                        or EXISTS(
-                        select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
-                        <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
-                            #{involvedGroup}
-                        </foreach>
-                        )
-                    </if>
-
                     <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
                         or
                         <trim prefix="(" prefixOverrides="AND" suffix=")">
@@ -667,6 +546,155 @@
                 </trim>
             </foreach>
         </where>
+    </sql>
+
+    <sql id="commonCaseInstanceQuerySql">
+        <if test="caseInstanceId != null">
+            ${queryTablePrefix}ID_ = #{caseInstanceId}
+        </if>
+        <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() &gt; 0">
+            and ${queryTablePrefix}ID_ IN
+            <foreach item="caseInstanceId" index="index" collection="caseInstanceIds"
+                     open="(" separator="," close=")">
+              #{caseInstanceId}
+            </foreach>
+        </if>
+        <if test="caseInstanceNameLikeIgnoreCase != null">
+            and lower(${queryTablePrefix}NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
+        </if>
+        <if test="caseDefinitionId != null">
+            and ${queryTablePrefix}CASE_DEF_ID_ = #{caseDefinitionId}
+        </if>
+        <if test="caseDefinitionIds != null">
+            and ${queryTablePrefix}CASE_DEF_ID_ IN
+            <foreach item="caseDefinitionId" index="index" collection="caseDefinitionIds" open="(" separator="," close=")">
+                #{caseDefinitionId}
+            </foreach>
+        </if>
+        <if test="caseInstanceParentId != null">
+            and ${queryTablePrefix}PARENT_ID_ = #{caseInstanceParentId}
+        </if>
+        <if test="businessKey != null">
+            and ${queryTablePrefix}BUSINESS_KEY_ = #{businessKey}
+        </if>
+        <if test="finished">
+            and ${queryTablePrefix}END_TIME_ is not null
+        </if>
+        <if test="unfinished">
+            and ${queryTablePrefix}END_TIME_ is null
+        </if>
+        <if test="startedBefore != null">
+            and ${queryTablePrefix}START_TIME_ &lt;= #{startedBefore}
+        </if>
+        <if test="startedAfter != null">
+            and ${queryTablePrefix}START_TIME_ &gt;= #{startedAfter}
+        </if>
+        <if test="finishedBefore != null">
+            and ${queryTablePrefix}END_TIME_ &lt;= #{finishedBefore}
+        </if>
+        <if test="finishedAfter != null">
+            and ${queryTablePrefix}END_TIME_ &gt;= #{finishedAfter}
+        </if>
+        <if test="startedBy != null">
+            and ${queryTablePrefix}START_USER_ID_ = #{startedBy}
+        </if>
+        <if test="callbackId != null">
+            and ${queryTablePrefix}CALLBACK_ID_ = #{callbackId}
+        </if>
+        <if test="callbackType != null">
+            and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType}
+        </if>
+        <if test="tenantId != null">
+            and ${queryTablePrefix}TENANT_ID_ = #{tenantId}
+        </if>
+        <if test="withoutTenantId">
+            and (${queryTablePrefix}TENANT_ID_ is null or ${queryTablePrefix}TENANT_ID_ = '')
+        </if>
+        <if test="involvedUser != null">
+            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
+            #{involvedUser})
+        </if>
+        <if test="involvedGroups != null">
+            and EXISTS(
+                select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
+                <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
+                    #{involvedGroup}
+                </foreach>
+            )
+        </if>
+    </sql>
+    
+    <sql id="commonCaseInstanceOrQuerySql">
+        <if test="orQueryObject.caseInstanceId != null">
+            ${queryTablePrefix}ID_ = #{orQueryObject.caseInstanceId}
+        </if>
+        <if test="orQueryObject.caseInstanceIds != null &amp;&amp; orQueryObject.caseInstanceIds.size() &gt; 0">
+            or ${queryTablePrefix}ID_ IN
+            <foreach item="caseInstanceId" index="index" collection="orQueryObject.caseInstanceIds"
+                     open="(" separator="," close=")">
+                #{caseInstanceId}
+            </foreach>
+        </if>
+        <if test="orQueryObject.caseDefinitionId != null">
+            or ${queryTablePrefix}CASE_DEF_ID_ = #{orQueryObject.caseDefinitionId}
+        </if>
+        <if test="orQueryObject.caseDefinitionIds != null">
+            or ${queryTablePrefix}CASE_DEF_ID_ IN
+            <foreach item="caseDefinitionId" index="index" collection="orQueryObject.caseDefinitionIds" open="(" separator="," close=")">
+                #{caseDefinitionId}
+            </foreach>
+        </if>
+        <if test="orQueryObject.caseInstanceParentId != null">
+            or ${queryTablePrefix}PARENT_ID_ = #{orQueryObject.caseInstanceParentId}
+        </if>
+        <if test="orQueryObject.businessKey != null">
+            or ${queryTablePrefix}BUSINESS_KEY_ = #{orQueryObject.businessKey}
+        </if>
+        <if test="orQueryObject.finished">
+            or ${queryTablePrefix}END_TIME_ is not null
+        </if>
+        <if test="orQueryObject.unfinished">
+            or ${queryTablePrefix}END_TIME_ is null
+        </if>
+        <if test="orQueryObject.startedBefore != null">
+            or ${queryTablePrefix}START_TIME_ &lt;= #{orQueryObject.startedBefore}
+        </if>
+        <if test="orQueryObject.startedAfter != null">
+            or ${queryTablePrefix}START_TIME_ &gt;= #{orQueryObject.startedAfter}
+        </if>
+        <if test="orQueryObject.finishedBefore != null">
+            or ${queryTablePrefix}END_TIME_ &lt;= #{orQueryObject.finishedBefore}
+        </if>
+        <if test="orQueryObject.finishedAfter != null">
+            or ${queryTablePrefix}END_TIME_ &gt;= #{orQueryObject.finishedAfter}
+        </if>
+        <if test="orQueryObject.startedBy != null">
+            or ${queryTablePrefix}START_USER_ID_ = #{orQueryObject.startedBy}
+        </if>
+        <if test="orQueryObject.callbackId != null">
+            or ${queryTablePrefix}CALLBACK_ID_ = #{orQueryObject.callbackId}
+        </if>
+        <if test="orQueryObject.callbackType != null">
+            or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType}
+        </if>
+        <if test="orQueryObject.tenantId != null">
+            or ${queryTablePrefix}TENANT_ID_ = #{orQueryObject.tenantId}
+        </if>
+        <if test="orQueryObject.withoutTenantId">
+            or (${queryTablePrefix}TENANT_ID_ is null or ${queryTablePrefix}TENANT_ID_ = '')
+        </if>
+        <if test="orQueryObject.involvedUser != null">
+            or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
+            #{orQueryObject.involvedUser})
+        </if>
+        <if test="orQueryObject.involvedGroups != null">
+            or EXISTS(
+            select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
+            <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
+                #{involvedGroup}
+            </foreach>
+            )
+        </if>
     </sql>
 
     <select id="selectHistoricCaseInstancesByCaseDefinitionId" resultMap="historicCaseInstanceResultMap">

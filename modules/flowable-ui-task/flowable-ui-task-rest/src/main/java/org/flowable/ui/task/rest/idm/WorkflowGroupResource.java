@@ -12,17 +12,17 @@
  */
 package org.flowable.ui.task.rest.idm;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.idm.api.Group;
 import org.flowable.ui.common.model.GroupRepresentation;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/app")
@@ -31,7 +31,7 @@ public class WorkflowGroupResource {
     @Autowired
     private RemoteIdmService remoteIdmService;
 
-    @RequestMapping(value = "/rest/workflow-groups/{groupId}", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/workflow-groups/{groupId}")
     public GroupRepresentation getGroup(@PathVariable String groupId, HttpServletResponse response) {
         Group group = remoteIdmService.getGroup(groupId);
 

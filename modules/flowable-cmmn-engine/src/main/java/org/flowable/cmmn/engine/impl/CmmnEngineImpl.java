@@ -70,6 +70,10 @@ public class CmmnEngineImpl implements CmmnEngine {
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isAutoActivate()) {
             asyncHistoryExecutor.start();
         }
+        
+        if (cmmnEngineConfiguration.isEnableHistoryCleaning()) {
+            cmmnManagementService.handleHistoryCleanupTimerJob();
+        }
 
         LOGGER.info("CmmnEngine {} created", name);
         

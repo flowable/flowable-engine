@@ -60,10 +60,13 @@ public class HistoricCaseInstanceEntityManagerImpl extends AbstractCmmnEntityMan
         return historicCaseInstanceDataManager.findWithVariablesByQueryCriteria((HistoricCaseInstanceQueryImpl) query);
     }
 
-
     @Override
-   public long countByCriteria(HistoricCaseInstanceQuery query) {
+    public long countByCriteria(HistoricCaseInstanceQuery query) {
         return historicCaseInstanceDataManager.countByCriteria((HistoricCaseInstanceQueryImpl) query);
     }
     
+    @Override
+    public void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
+        historicCaseInstanceDataManager.deleteHistoricCaseInstances(historicCaseInstanceQuery);
+    }
 }

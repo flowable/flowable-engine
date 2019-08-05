@@ -79,5 +79,14 @@ public interface HistoricTaskService {
     void deleteHistoricTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId);
 
     void deleteHistoricTaskLogEntriesForTaskId(String taskId);
+    
+    void deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
+    
+    void deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
+    
+    void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
 
+    void deleteHistoricTaskInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricTaskInstancesForNonExistingCaseInstances();
 }

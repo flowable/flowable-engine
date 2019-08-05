@@ -12,19 +12,20 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
-
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
 import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServiceTaskConverterTest extends AbstractConverterTest {
 
@@ -63,6 +64,15 @@ public class ServiceTaskConverterTest extends AbstractConverterTest {
         field = fields.get(1);
         assertEquals("testField2", field.getFieldName());
         assertEquals("${test}", field.getExpression());
+
+        List<MapExceptionEntry> exceptions = serviceTask.getMapExceptions();
+        assertEquals(2, exceptions.size());
+        MapExceptionEntry exception = exceptions.get(0);
+        assertEquals("java", exception.getErrorCode());
+        exception = exceptions.get(1);
+        assertEquals("java", exception.getErrorCode());
+        assertEquals("MyClass", exception.getClassName());
+        assertEquals(true, exception.isAndChildren());
 
         List<FlowableListener> listeners = serviceTask.getExecutionListeners();
         assertEquals(3, listeners.size());

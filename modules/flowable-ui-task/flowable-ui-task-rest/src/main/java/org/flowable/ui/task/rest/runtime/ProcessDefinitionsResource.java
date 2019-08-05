@@ -15,8 +15,8 @@ package org.flowable.ui.task.rest.runtime;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableProcessDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,7 +30,7 @@ public class ProcessDefinitionsResource {
     @Autowired
     protected FlowableProcessDefinitionService processDefinitionService;
 
-    @RequestMapping(value = "/rest/process-definitions", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/process-definitions")
     public ResultListDataRepresentation getProcessDefinitions(@RequestParam(value = "latest", required = false) Boolean latest,
             @RequestParam(value = "appDefinitionKey", required = false) String appDefinitionKey) {
 

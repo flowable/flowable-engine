@@ -1,0 +1,115 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="batch">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{batch.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="BATCH.ID"></td>
+							<td>{{batch.id}}</td>
+							<td class="property-name" translate="BATCH.TYPE"></td>
+							<td>{{batch.batchType}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="BATCH.SEARCH-KEY"></td>
+							<td ng-if="batch.batchType == 'processMigration'"><a ng-click="openProcessDefinition(batch.searchKey)"><i class="glyphicon glyphicon-zoom-in"></i>
+                                {{sourceDefinition.name &amp;&amp; (sourceDefinition.name + ' (v' + sourceDefinition.version + ')')  || batch.searchKey}}</a></td>
+							<td ng-if="batch.batchType != 'processMigration'">{{batch.searchKey}}</td>
+							<td class="property-name" translate="BATCH.SEARCH-KEY2"></td>
+							<td ng-if="batch.batchType == 'processMigration'"><a ng-click="openProcessDefinition(batch.searchKey2)"><i class="glyphicon glyphicon-zoom-in"></i>
+                                {{targetDefinition.name &amp;&amp; (targetDefinition.name + ' (v' + targetDefinition.version + ')') || batch.searchKey2}}</a></td>
+                            <td ng-if="batch.batchType != 'processMigration'">{{batch.searchKey2}}</td>
+						</tr>
+						<tr class="property">
+                            <td class="property-name" translate="BATCH.CREATE-TIME"></td>
+                            <td>{{batch.createTime}}</td>
+                            <td class="property-name" translate="BATCH.COMPLETE-TIME"></td>
+                            <td>{{batch.completeTime}}</td>
+                        </tr>
+						<tr class="property">
+							<td class="property-name" translate="BATCH.STATUS"></td>
+                            <td>{{batch.status}}</td>
+                            <td class="property-name" translate="BATCH.TENANT"></td>
+                            <td>{{batch.tenantId | empty}}</td>
+                        </tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+				<ul class="list-group">
+					  
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component">
+				<div class="tabs-wrapper">
+		       		<div class="tabs clearfix">
+		       			<div class="tab" ng-repeat="tab in tabData.tabs" ng-class="{'active': tabData.activeTab == tab.id}">
+		       				<a ng-click="tabData.activeTab = tab.id">
+		       					{{tab.name | translate:node}}&nbsp;
+		    					<span class="badge" ng-if="tab.info != undefined">{{tab.info}}</span>
+		    				</a>
+		       			</div>
+		       		</div>
+		        	<div class="title"></div>
+
+                    <div class="property-wrapper" ng-if="batchDocument && tabData.activeTab == tabData.tabs[0].id">
+                        <table>
+                            <tr class="property" ng-if="batchDocument.toProcessDefinitionId">
+                                <td class="property-name" translate="BATCH.TO-PROCESS-DEFINITION"></td>
+                                <td><a ng-click="openProcessDefinition(batchDocument.toProcessDefinitionId)"><i class="glyphicon glyphicon-zoom-in"></i>
+                                {{targetDefinition.name &amp;&amp; (targetDefinition.name + ' (v' + targetDefinition.version + ')') || batchDocument.toProcessDefinitionId}}</a></td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr class="property" ng-if="batchDocument.activityMappings">
+                                <td class="property-name" translate="BATCH.ACTIVITY-MAPPINGS"></td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr class="property" ng-if="batchDocument.activityMappings" ng-repeat="activityMapping in batchDocument.activityMappings">
+                                <td colspan="3">{{activityMapping.fromActivityId}} -> {{activityMapping.toActivityId}}</td>
+                            </tr>
+                        </table>
+                    </div>
+		        	<div class="grid-wrapper grid-wrapper-compact" ng-if="successParts && tabData.activeTab == tabData.tabs[1].id">
+						<div class="grid-message" ng-if="successParts.length > 0">
+	                        <span>{{'BATCH.SUCCESS-BATCH-PARTS-SIZE' | translate:successParts}}</span>
+	                    </div>
+	                     <div class="grid-message" ng-if="successParts.length == 0">
+	                        <span>{{'BATCH.SUCCESS-BATCH-PARTS-EMPTY' | translate}}</span>
+	                    </div>
+						<div ng-grid="gridSuccessParts" class="gridStyle" ng-if="successParts" ng-show="successParts.length > 0"></div>
+					</div>
+					
+					<div class="grid-wrapper grid-wrapper-compact" ng-if="failParts && tabData.activeTab == tabData.tabs[2].id">
+                        <div class="grid-message" ng-if="failParts.length > 0">
+                            <span>{{'BATCH.FAIL-BATCH-PARTS-SIZE' | translate:failParts}}</span>
+                        </div>
+                         <div class="grid-message" ng-if="successParts.length == 0">
+                            <span>{{'BATCH.FAIL-BATCH-PARTS-EMPTY' | translate}}</span>
+                        </div>
+                        <div ng-grid="gridFailParts" class="gridStyle" ng-if="failParts" ng-show="failParts.length > 0"></div>
+                    </div>
+
+	        	</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div>
+</div>

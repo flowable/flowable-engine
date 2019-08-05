@@ -13,11 +13,6 @@
 package org.flowable.ui.admin.rest.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.JobService;
@@ -26,9 +21,12 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/app")
@@ -42,7 +40,7 @@ public class JobsClientResource extends AbstractClientResource {
     /**
      * GET /rest/admin/jobs -> Get a list of jobs.
      */
-    @RequestMapping(value = "/rest/admin/jobs", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/jobs", produces = "application/json")
     public JsonNode listJobs(HttpServletRequest request) {
         LOGGER.debug("REST request to get a list of jobs");
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);

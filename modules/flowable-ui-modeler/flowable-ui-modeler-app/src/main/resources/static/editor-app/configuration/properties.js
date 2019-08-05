@@ -70,6 +70,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/fields-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/fields-write-template.html"
     },
+    "oryx-servicetaskexceptions-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/exceptions-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/exceptions-write-template.html"
+    },
     "oryx-callactivityinparameters-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/in-parameters-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/in-parameters-write-template.html"

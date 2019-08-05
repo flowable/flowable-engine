@@ -89,6 +89,18 @@
                   ],
                 "totalCount" : 2
               },
+            "servicetaskexceptions": {
+              "exceptions": [
+                {
+                  "code": "java"
+                },
+                {
+                  "code": "java",
+                  "class": "MyClass",
+                  "children" : true
+                }
+              ]
+            },
             "servicetaskresultvariable" : "resultVariable",
             "tasklisteners" : "",
             "type" : "http://b3mn.org/stencilset/bpmn2.0#UserTask",

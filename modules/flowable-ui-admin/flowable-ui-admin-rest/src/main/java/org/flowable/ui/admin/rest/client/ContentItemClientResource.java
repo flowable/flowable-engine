@@ -13,7 +13,6 @@
 package org.flowable.ui.admin.rest.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.ContentItemService;
@@ -22,9 +21,9 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,7 +38,7 @@ public class ContentItemClientResource extends AbstractClientResource {
     @Autowired
     protected ContentItemService clientService;
 
-    @RequestMapping(value = "/rest/admin/content-items/{contentItemId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/content-items/{contentItemId}", produces = "application/json")
     public JsonNode getContentItem(@PathVariable String contentItemId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CONTENT);

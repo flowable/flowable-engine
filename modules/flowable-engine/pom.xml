@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.4.2-SNAPSHOT</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -57,6 +57,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-job-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-batch-service</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -275,6 +279,7 @@
         </flowable.osgi.import.additional>
         <exclude.tests>nothing-to-exclude</exclude.tests>
         <exclude.tests2>nothing-to-exclude</exclude.tests2>
+        <exclude.tests3>nothing-to-exclude</exclude.tests3>
     </properties>
 
     <build>
@@ -287,6 +292,7 @@
                         <exclude>**/RepeatingServiceTaskTest.java</exclude>
                         <exclude>${exclude.tests}</exclude>
                         <exclude>${exclude.tests2}</exclude>
+                        <exclude>${exclude.tests3}</exclude>
                     </excludes>
                     <argLine>${argLine} -Xmx3g</argLine>
                 </configuration>
@@ -583,6 +589,7 @@
             <properties>
                 <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
                 <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+                <exclude.tests3>**/Historic*DeleteTest.java</exclude.tests3>
             </properties>
             <build>
                 <plugins>
@@ -643,6 +650,7 @@
             <properties>
                 <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
                 <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+                <exclude.tests3>**/Historic*DeleteTest.java</exclude.tests3>
             </properties>
             <build>
                 <plugins>
@@ -704,6 +712,7 @@
             <properties>
                 <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
                 <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+                <exclude.tests3>**/Historic*DeleteTest.java</exclude.tests3>
             </properties>
             <build>
                 <plugins>

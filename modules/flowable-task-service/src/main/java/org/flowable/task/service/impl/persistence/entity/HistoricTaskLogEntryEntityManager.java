@@ -42,4 +42,8 @@ public interface HistoricTaskLogEntryEntityManager extends EntityManager<Histori
     void deleteHistoricTaskLogEntriesForScopeDefinition(String scopeType, String scopeDefinitionId);
 
     void deleteHistoricTaskLogEntriesForTaskId(String taskId);
+    
+    void deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
+    
+    void deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
 }

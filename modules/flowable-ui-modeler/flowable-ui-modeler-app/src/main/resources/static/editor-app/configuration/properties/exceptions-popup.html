@@ -1,0 +1,55 @@
+
+<div class="modal" ng-controller="FlowableExceptionsPopupCtrl">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+			<div class="modal-header">
+			    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+			    <h3>{{'PROPERTY.PROPERTY.EDIT.TITLE' | translate}} "{{property.title | translate}}"</h3>
+			</div>
+			<div class="modal-body">
+
+			    <div class="row row-no-gutter">
+			        <div class="col-xs-6">
+			            <div ng-if="translationsRetrieved" class="kis-listener-grid" ui-grid="gridOptions" ui-grid-selection></div>
+			            <div class="pull-right">
+			                <div class="btn-group">
+			                    <a class="btn btn-icon btn-lg" rel="tooltip" data-title="{{'ACTION.MOVE.UP' | translate}}" data-placement="bottom" data-original-title="" title="" ng-click="moveExceptionUp()"><i class="glyphicon glyphicon-arrow-up"></i></a>
+			                    <a class="btn btn-icon btn-lg" rel="tooltip" data-title="{{'ACTION.MOVE.DOWN' | translate}}" data-placement="bottom" data-original-title="" title="" ng-click="moveExceptionDown()"><i class="glyphicon glyphicon-arrow-down"></i></a>
+			                </div>
+			                <div class="btn-group">
+			                    <a class="btn btn-icon btn-lg" rel="tooltip" data-title="{{'ACTION.ADD' | translate}}" data-placement="bottom" data-original-title="" title="" ng-click="addNewException()"><i class="glyphicon glyphicon-plus"></i></a>
+			                    <a class="btn btn-icon btn-lg" rel="tooltip" data-title="{{'ACTION.REMOVE' | translate}}" data-placement="bottom" data-original-title="" title="" ng-click="removeException()"><i class="glyphicon glyphicon-minus"></i></a>
+			                </div>
+			            </div>
+			        </div>
+
+			        <div class="col-xs-6">
+			             <div ng-show="selectedException">
+
+			                 <div class="form-group">
+			                     <label translate>PROPERTY.EXCEPTIONS.CODE</label>
+			                     <input type="text" class="form-control" ng-model="selectedException.code" placeholder="{{'PROPERTY.EXCEPTIONS.CODE.PLACEHOLDER' | translate}}" />
+			                 </div>
+			                 <div class="form-group">
+			                     <label translate>PROPERTY.EXCEPTIONS.CLASS</label>
+			                     <input type="text" class="form-control" ng-model="selectedException.class" placeholder="{{'PROPERTY.EXCEPTIONS.CLASS.PLACEHOLDER' | translate}}" />
+			                 </div>
+							 <div>
+								 <label for="children" translate>PROPERTY.EXCEPTIONS.CHILDREN</label>
+								 <input id="children" type="checkbox" class="form-property-checkbox" ng-model="selectedException.children" />
+							 </div>
+
+
+			            </div>
+			            <div ng-show="!selectedException" class="muted no-property-selected" translate>PROPERTY.EXCEPTIONS.EMPTY</div>
+			        </div>
+			    </div>
+
+			</div>
+			<div class="modal-footer">
+			    <button ng-click="cancel()" class="btn btn-primary" translate>ACTION.CANCEL</button>
+			    <button ng-click="save()" class="btn btn-primary" translate>ACTION.SAVE</button>
+			</div>
+		</div>
+	</div>
+</div>
