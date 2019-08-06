@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine-slim
+FROM adoptopenjdk/openjdk11:alpine
 RUN apk add --no-cache ttf-dejavu && rm -rf /var/cache/apk/*
 ARG WAR_FILE
 ADD ${WAR_FILE} app.war
