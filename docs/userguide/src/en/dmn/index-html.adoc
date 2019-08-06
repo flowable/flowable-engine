@@ -1,4 +1,4 @@
-= Flowable DMN DOCS (v 6.5.0-SNAPSHOT)
+= Flowable DMN DOCS (v 6.4.3.0)
 :doctype: book
 :docinfodir: ../base
 :docinfo1: header
