@@ -1118,4 +1118,29 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(456, processInstanceVariables.get("processVar3"));
     }
 
+    @Test
+    @CmmnDeployment
+    public void testExitAvailableProcessTaskThroughExitSentryOnStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testExitAvailableProcessTaskThroughExitSentryOnStage")
+            .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemInstanceStateAvailable()
+            .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+            .singleResult();
+        assertEquals("theProcess", planItemInstance.getName());
+
+        assertNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+
+        // When the event listener now occurs, the stage should be exited, also exiting the process task plan item
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertNotNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult());
+    }
+
 }

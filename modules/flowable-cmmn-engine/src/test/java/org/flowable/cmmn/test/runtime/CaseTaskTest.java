@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -431,6 +432,29 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.terminateCaseInstance(childCaseInstance.getId());
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+        "org/flowable/cmmn/test/runtime/CaseTaskTest.terminateAvailableCaseTask.cmmn",
+        "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testTerminateAvailableCaseTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("terminateAvailableCaseTask").start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionType(PlanItemDefinitionType.CASE_TASK)
+            .planItemInstanceStateAvailable().singleResult();
+        assertEquals("myCase", planItemInstance.getName());
+
+        // When the event listener now occurs, the stage should be exited, also exiting the case task plan item
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertCaseInstanceEnded(caseInstance);
     }
 
     @Test

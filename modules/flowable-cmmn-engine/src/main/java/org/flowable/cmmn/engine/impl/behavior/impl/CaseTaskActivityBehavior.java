@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -34,9 +37,6 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -113,18 +113,22 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
-        if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
-            // The plan item will be deleted by the regular TerminatePlanItemOperation
-            CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
-        } else if (PlanItemTransition.COMPLETE.equals(transition)) {
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-            CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-            CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
-            handleOutParameters(
+        if (PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
+            if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
+                // The plan item will be deleted by the regular TerminatePlanItemOperation
+                CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+
+            } else if (PlanItemTransition.COMPLETE.equals(transition)) {
+                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+                CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+                CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
+                handleOutParameters(
                     planItemInstance,
                     caseInstance,
                     cmmnEngineConfiguration.getCmmnRuntimeService(),
                     cmmnEngineConfiguration);
+            }
+
         }
     }
 
