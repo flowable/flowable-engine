@@ -35,7 +35,7 @@
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
 
         <!-- JVM params for test execution -->
-		<argLine>-Duser.language=en -XX:+UseParallelGC</argLine>
+		<argLine>-Duser.language=en -XX:+UseParallelGC -Djavax.xml.stream.XMLInputFactory=com.sun.xml.internal.stream.XMLInputFactoryImpl -Djavax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema=com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory</argLine>
 
 		<!-- OSGi bundles properties -->
 		<flowable.artifact />
