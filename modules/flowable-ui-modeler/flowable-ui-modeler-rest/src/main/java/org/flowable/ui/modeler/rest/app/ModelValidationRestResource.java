@@ -12,7 +12,9 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.validation.ProcessValidator;
@@ -24,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Endpoint for the Flowable modeler to validate the current model.
@@ -37,10 +39,19 @@ public class ModelValidationRestResource {
 
     @PostMapping(value = "/rest/model/validate", consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<ValidationError> validate(@RequestBody JsonNode body){
-        BpmnModel bpmnModel = new BpmnJsonConverter().convertToBpmnModel(body);
-        ProcessValidator validator = new ProcessValidatorFactory().createDefaultProcessValidator();
-        List<ValidationError> errors = validator.validate(bpmnModel);
-        return errors;
+        if (body != null && body.has("stencilset")) {
+            JsonNode stencilset = body.get("stencilset");
+            if (stencilset.has("namespace")) {
+                String namespace = stencilset.get("namespace").asText();
+                if (namespace.endsWith("bpmn2.0#")) {
+                    BpmnModel bpmnModel = new BpmnJsonConverter().convertToBpmnModel(body);
+                    ProcessValidator validator = new ProcessValidatorFactory().createDefaultProcessValidator();
+                    List<ValidationError> errors = validator.validate(bpmnModel);
+                    return errors;
+                }
+            }
+        }
+        return Collections.emptyList();
     }
 
 }
