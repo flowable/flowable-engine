@@ -47,5 +47,10 @@ public class CaseExport implements CmmnXmlConstants {
             xtw.writeCharacters(caseModel.getDocumentation());
             xtw.writeEndElement();
         }
+        
+        boolean didWriteExtensionStartElement = FlowableListenerExport.writeFlowableListeners(xtw, CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER, caseModel.getLifecycleListeners(), false);
+        if (didWriteExtensionStartElement) {
+            xtw.writeEndElement();
+        }
     }
 }
