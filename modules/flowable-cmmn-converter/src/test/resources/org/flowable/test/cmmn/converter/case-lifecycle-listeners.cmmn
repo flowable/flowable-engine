@@ -6,7 +6,7 @@
 
     <case id="myCase">
         <extensionElements>
-            <flowable:caseLifecycleListener targetState="completed" expression="${caseInstance.setVariable('stageThree', false)}"/>
+            <flowable:caseLifecycleListener sourceState="active" targetState="completed" expression="${caseInstance.setVariable('stageThree', false)}"/>
         </extensionElements>
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
             <planItem id="planItem1" name="Task One" definitionRef="rootTask" />
