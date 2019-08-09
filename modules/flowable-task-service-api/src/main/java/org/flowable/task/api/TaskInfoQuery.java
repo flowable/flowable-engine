@@ -655,7 +655,13 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     /**
      * All query clauses called will be added to a single or-statement. This or-statement will be included with the other already existing clauses in the query, joined by an 'and'.
      * 
-     * Calling endOr() will add all clauses to the regular query again. Calling or() after endOr() has been called will result in an exception.
+     * Calling endOr() will add all clauses to the regular query again. Calling or() after or() has been called or calling endOr() after endOr() has been called will result in an exception.
+     * It is possible to call or() endOr() several times if each or() has a matching endOr(), e.g.:
+     * query.<ConditionA>
+     *  .or().<conditionB>.<conditionC>.endOr()
+     *  .<conditionD>.<conditionE>
+     *  .or().<conditionF>.<conditionG>.endOr()
+     * will result in: conditionA & (conditionB | conditionC) & conditionD & conditionE & (conditionF | conditionG)
      */
     T or();
 
