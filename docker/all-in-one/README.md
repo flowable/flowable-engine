@@ -13,7 +13,7 @@ docker run -p 8080:8080 flowable/all-in-one
 * Flowable Admin  (http://localhost:8080/flowable-admin)
 
 ### Base image
-[adoptopenjdk/openjdk8:alpine-slim](https://github.com/AdoptOpenJDK/openjdk-docker/tree/master/8/jdk/alpine)
+[adoptopenjdk/openjdk11:alpine-jre](https://github.com/AdoptOpenJDK/openjdk-docker/blob/master/11/jre/alpine/Dockerfile.hotspot.releases.full)
 
 ### Tomcat
 

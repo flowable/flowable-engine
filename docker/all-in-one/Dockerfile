@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 ADD wait-for-something.sh .
 
 RUN apk add --no-cache ttf-dejavu && rm -rf /var/cache/apk/*
