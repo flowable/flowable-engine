@@ -32,7 +32,17 @@ public class ProcessTaskXmlConverter extends TaskXmlConverter {
         ProcessTask processTask = new ProcessTask();
         convertCommonTaskAttributes(xtr, processTask);
         processTask.setProcessRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_PROCESS_REF));
-        
+
+        String businessKey = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_BUSINESS_KEY);
+        if (businessKey != null) {
+            processTask.setBusinessKey(businessKey);
+        }
+
+        String inheritBusinessKey = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_INHERIT_BUSINESS_KEY);
+        if (inheritBusinessKey != null) {
+            processTask.setInheritBusinessKey(Boolean.parseBoolean(inheritBusinessKey));
+        }
+
         String fallbackToDefaultTenantValue = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT);
         if (fallbackToDefaultTenantValue != null) {
             processTask.setFallbackToDefaultTenant(Boolean.parseBoolean(fallbackToDefaultTenantValue));

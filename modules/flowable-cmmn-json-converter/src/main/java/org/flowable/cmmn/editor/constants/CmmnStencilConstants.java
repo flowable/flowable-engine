@@ -139,6 +139,8 @@ public interface CmmnStencilConstants {
     String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
     String PROPERTY_CASE_IN_PARAMETERS = "casetaskinparameters";
     String PROPERTY_CASE_OUT_PARAMETERS = "casetaskoutparameters";
+    String PROPERTY_CASE_BUSINESS_KEY = "casetaskbusinesskey";
+    String PROPERTY_CASE_INHERIT_BUSINESS_KEY = "casetaskinheritbusinesskey";
 
     String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
     String PROPERTY_PROCESS_IN_PARAMETERS = "processtaskinparameters";

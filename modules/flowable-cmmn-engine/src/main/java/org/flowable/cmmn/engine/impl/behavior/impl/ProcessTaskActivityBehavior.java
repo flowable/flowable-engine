@@ -48,6 +48,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     protected Expression processRefExpression;
     protected String processRef;
     protected Boolean fallbackToDefaultTenant;
+    protected ProcessTask processTask;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
         super(processTask.isBlocking(), processTask.getBlockingExpression(), processTask.getInParameters(), processTask.getOutParameters());
@@ -55,6 +56,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         this.processRefExpression = processRefExpression;
         this.processRef = processTask.getProcessRef();
         this.fallbackToDefaultTenant = processTask.getFallbackToDefaultTenant();
+        this.processTask = processTask;
     }
 
     @Override
@@ -93,13 +95,15 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             EntityLinkUtil.createNewEntityLink(planItemInstanceEntity.getCaseInstanceId(), processInstanceId, ScopeTypes.BPMN);
         }
 
+        String businessKey = getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, processTask);
+
         boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
         if (blocking) {
             processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap);
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
         } else {
             processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId,
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap);
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
         }
 
         if (!blocking) {

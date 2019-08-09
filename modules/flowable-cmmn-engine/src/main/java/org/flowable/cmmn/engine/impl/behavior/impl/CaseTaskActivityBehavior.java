@@ -47,11 +47,13 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
     protected Expression caseRefExpression;
     protected Boolean fallbackToDefaultTenant;
+    protected CaseTask caseTask;
 
     public CaseTaskActivityBehavior(Expression caseRefExpression, CaseTask caseTask) {
         super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters());
         this.caseRefExpression = caseRefExpression;
         this.fallbackToDefaultTenant = caseTask.getFallbackToDefaultTenant();
+        this.caseTask = caseTask;
     }
 
     @Override
@@ -78,6 +80,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
             finalVariableMap.putAll(variables);
         }
 
+        caseInstanceBuilder.businessKey(getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, caseTask));
         caseInstanceBuilder.variables(finalVariableMap);
         caseInstanceBuilder.callbackType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
         caseInstanceBuilder.callbackId(planItemInstanceEntity.getId());
