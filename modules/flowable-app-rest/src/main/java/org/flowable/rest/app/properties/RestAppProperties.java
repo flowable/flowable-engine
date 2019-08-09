@@ -140,7 +140,7 @@ public class RestAppProperties {
     }
 
     public Set<String> getCorsExposedHeaders() {
-        return corsExposedHeaders;
+        return corsExposedHeaders == null ? Collections.emptySet() : corsExposedHeaders;
     }
 
     public void setCorsExposedHeaders(Set<String> corsExposedHeaders) {
