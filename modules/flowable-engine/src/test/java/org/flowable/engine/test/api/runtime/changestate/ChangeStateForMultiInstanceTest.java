@@ -78,9 +78,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("seqTasks");
@@ -95,9 +95,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("seqTasks");
@@ -227,9 +227,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(3);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(3);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("parallelTasks", "parallelTasks", "parallelTasks");
@@ -245,9 +245,9 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(2);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(2);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         //Two executions are inactive, the completed before and the MI root
         assertThat(executions).haveExactly(2, new Condition<>((Execution execution) -> !((ExecutionEntity) execution).isActive(), "inactive"));
