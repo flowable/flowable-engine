@@ -785,6 +785,14 @@ flowable.http.connection-request-timeout=5s #  http客户端的连接请求超�
 flowable.http.request-retry-limit=3 #  请求http客户端的重试限制
 flowable.http.disable-cert-verify=false # 是否禁用http客户端的证书验证
 
+# Flowable REST
+flowable.rest.app.cors-enabled=true # Whether to enable CORS requests at all. If false, the other properties have no effect
+flowable.rest.app.cors-allow-credentials=true # Whether to include credentials in a CORS request
+flowable.rest.app.cors-allowed-origins=* # Comma-separated URLs to accept CORS requests from
+flowable.rest.app.cors-allowed-headers=* # Comma-separated HTTP headers to allow in a CORS request
+flowable.rest.app.cors-allowed-methods=DELETE,GET,PATCH,POST,PUT # Comma-separated HTTP verbs to allow in a CORS request
+flowable.rest.app.cors-exposed-headers=* # Comma-separated list of headers to expose in CORS response
+
 # Actuator
 management.endpoint.flowable.cache.time-to-live=0ms # 缓存响应的最大时间。
 management.endpoint.flowable.enabled=true # 是否启用flowable端点。
