@@ -73,6 +73,12 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
             ArrayNode outParametersArray = outParametersNode.putArray("outParameters");
             readIOParameters(caseTask.getOutParameters(), outParametersArray);
         }
+        if (caseTask.getBusinessKey() != null) {
+            propertiesNode.put(PROPERTY_CASE_BUSINESS_KEY, caseTask.getBusinessKey());
+        }
+        if (caseTask.isInheritBusinessKey()) {
+            propertiesNode.put(PROPERTY_CASE_INHERIT_BUSINESS_KEY, caseTask.isInheritBusinessKey());
+        }
     }
 
     @Override
@@ -101,6 +107,16 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
         if (caseTaskOutParametersNode != null && caseTaskOutParametersNode.has("outParameters") && !caseTaskOutParametersNode.get("outParameters").isNull()) {
             JsonNode outParametersNode =  caseTaskOutParametersNode.get("outParameters");
             task.setOutParameters(readIOParameters(outParametersNode));
+        }
+
+        JsonNode caseTaskBusinessKey = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_CASE_BUSINESS_KEY, elementNode);
+        if (caseTaskBusinessKey != null) {
+            task.setBusinessKey(caseTaskBusinessKey.asText());
+        }
+
+        JsonNode caseTaskInheritBusinessKey = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_CASE_INHERIT_BUSINESS_KEY, elementNode);
+        if (caseTaskInheritBusinessKey != null) {
+            task.setInheritBusinessKey(caseTaskInheritBusinessKey.asBoolean());
         }
 
         boolean fallbackToDefaultTenant = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, elementNode, false);
