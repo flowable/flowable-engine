@@ -113,11 +113,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
 
         // ADVANCE THE CLOCK SO that all 10 repeats to be executed (last execution)
         moveByMinutes(60 * 24);
-        try {
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
-        } catch (Exception e) {
-            fail("Because the maximum number of repeats is reached it will not be executed other jobs");
-        }
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000, 200);
 
         // After the 10nth startEvent Execution should have 10 process instances started
         // (since the first one was not completed)

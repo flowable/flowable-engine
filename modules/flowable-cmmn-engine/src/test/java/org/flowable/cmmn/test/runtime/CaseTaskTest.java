@@ -613,4 +613,98 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         cmmnRepositoryService.deleteDeployment(innerCaseDeploymentId, true);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testWithSpecifiedBusinessKey() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+
+        assertThat(subCase)
+                .isNotNull()
+                .extracting(CaseInstance::getBusinessKey)
+                .isEqualTo("myBusinessKey");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(subCase.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testWithSpecifiedBusinessKeyAndInheritBusinessKey() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .businessKey("dummyBusinessKey")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+
+        assertThat(subCase)
+                .isNotNull()
+                .extracting(CaseInstance::getBusinessKey)
+                .isEqualTo("myBusinessKey");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(subCase.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testWithInheritBusinessKey() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .businessKey("myBusinessKey")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+
+        assertThat(subCase)
+                .isNotNull()
+                .extracting(CaseInstance::getBusinessKey)
+                .isEqualTo("myBusinessKey");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(subCase.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/CaseTaskTest.testWithInheritBusinessKey.cmmn")
+    public void testWithInheritBusinessKeyButWithoutBusinessKey() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+
+        assertThat(subCase)
+                .isNotNull()
+                .extracting(CaseInstance::getBusinessKey)
+                .isNull();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(subCase.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+    }
+
 }

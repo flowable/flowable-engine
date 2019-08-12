@@ -14,6 +14,16 @@ import java.util.List;
 public abstract class AbstractChildTaskExport<T extends ChildTask> extends AbstractPlanItemDefinitionExport<T> {
 
     @Override
+    protected void writePlanItemDefinitionSpecificAttributes(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+        if (StringUtils.isNotEmpty(planItemDefinition.getBusinessKey())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_BUSINESS_KEY, planItemDefinition.getBusinessKey());
+        }
+        if (planItemDefinition.isInheritBusinessKey()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INHERIT_BUSINESS_KEY, String.valueOf(planItemDefinition.isInheritBusinessKey()));
+        }
+    }
+
+    @Override
     protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, T planItemDefinition, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
         boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, planItemDefinition, didWriteExtensionElement, xtw);
         extensionElementWritten = writeIOParameters(ELEMENT_CHILD_TASK_IN_PARAMETERS, planItemDefinition.getInParameters(), extensionElementWritten, xtw);

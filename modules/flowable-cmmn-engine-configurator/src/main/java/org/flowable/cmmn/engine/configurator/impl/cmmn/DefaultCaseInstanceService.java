@@ -73,6 +73,10 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
         if (fallbackToDefaultTenant) {
             caseInstanceBuilder.fallbackToDefaultTenant();
         }
+
+        if (businessKey != null) {
+            caseInstanceBuilder.businessKey(businessKey);
+        }
         
         CaseInstance caseInstance = caseInstanceBuilder.start();
         return caseInstance.getId();

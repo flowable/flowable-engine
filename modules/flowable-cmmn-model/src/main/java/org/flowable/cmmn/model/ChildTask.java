@@ -8,8 +8,26 @@ import java.util.List;
  */
 public class ChildTask extends Task {
 
+    protected String businessKey;
+    protected boolean inheritBusinessKey;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
+
+    public String getBusinessKey() {
+        return businessKey;
+    }
+
+    public void setBusinessKey(String businessKey) {
+        this.businessKey = businessKey;
+    }
+
+    public boolean isInheritBusinessKey() {
+        return inheritBusinessKey;
+    }
+
+    public void setInheritBusinessKey(boolean inheritBusinessKey) {
+        this.inheritBusinessKey = inheritBusinessKey;
+    }
 
     public List<IOParameter> getInParameters() {
         return inParameters;

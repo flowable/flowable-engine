@@ -783,6 +783,14 @@ flowable.http.connection-request-timeout=5s # Connection Request Timeout for the
 flowable.http.request-retry-limit=3 # Request retry limit for the http client
 flowable.http.disable-cert-verify=false # Whether to disable certificate validation for the http client
 
+# Flowable REST
+flowable.rest.app.cors-enabled=true # Whether to enable CORS requests at all. If false, the other properties have no effect
+flowable.rest.app.cors-allow-credentials=true # Whether to include credentials in a CORS request
+flowable.rest.app.cors-allowed-origins=* # Comma-separated URLs to accept CORS requests from
+flowable.rest.app.cors-allowed-headers=* # Comma-separated HTTP headers to allow in a CORS request
+flowable.rest.app.cors-allowed-methods=DELETE,GET,PATCH,POST,PUT # Comma-separated HTTP verbs to allow in a CORS request
+flowable.rest.app.cors-exposed-headers=* # Comma-separated list of headers to expose in CORS response
+
 # Actuator
 management.endpoint.flowable.cache.time-to-live=0ms # Maximum time that a response can be cached.
 management.endpoint.flowable.enabled=true # Whether to enable the flowable endpoint.
