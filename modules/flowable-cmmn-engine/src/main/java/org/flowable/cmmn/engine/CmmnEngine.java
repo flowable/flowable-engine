@@ -31,6 +31,8 @@ public interface CmmnEngine {
 
     String getName();
 
+    void handleExecutors();
+
     void close();
     
     CmmnRuntimeService getCmmnRuntimeService();

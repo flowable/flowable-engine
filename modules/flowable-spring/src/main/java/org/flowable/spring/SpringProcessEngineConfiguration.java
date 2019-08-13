@@ -62,6 +62,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
 
     public SpringProcessEngineConfiguration() {
         this.transactionsExternallyManaged = true;
+        this.handleProcessEngineExecutorsAfterEngineCreate = false;
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
@@ -201,7 +202,11 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     public void start() {
         synchronized (lifeCycleMonitor) {
             if (!isRunning()) {
-                enginesBuild.forEach(name -> autoDeployResources(ProcessEngines.getProcessEngine(name)));
+                enginesBuild.forEach(name -> {
+                    ProcessEngine processEngine = ProcessEngines.getProcessEngine(name);
+                    processEngine.handleExecutors();
+                    autoDeployResources(processEngine);
+                });
                 running = true;
             }
         }

@@ -58,6 +58,7 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
 
     public SpringCmmnEngineConfiguration() {
         this.transactionsExternallyManaged = true;
+        this.handleCmmnEngineExecutorsAfterEngineCreate = false;
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
@@ -189,7 +190,11 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     public void start() {
         synchronized (lifeCycleMonitor) {
             if (!isRunning()) {
-                enginesBuild.forEach(name -> autoDeployResources(CmmnEngines.getCmmnEngine(name)));
+                enginesBuild.forEach(name -> {
+                    CmmnEngine cmmnEngine = CmmnEngines.getCmmnEngine(name);
+                    cmmnEngine.handleExecutors();
+                    autoDeployResources(cmmnEngine);
+                });
                 running = true;
             }
         }

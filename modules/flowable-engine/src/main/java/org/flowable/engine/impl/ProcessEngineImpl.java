@@ -94,7 +94,10 @@ public class ProcessEngineImpl implements ProcessEngine {
         }
 
         processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
+    }
 
+    @Override
+    public void handleExecutors() {
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
         }
