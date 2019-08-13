@@ -907,6 +907,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected SchemaManager jobSchemaManager;
     protected SchemaManager batchSchemaManager;
 
+    protected boolean handleProcessEngineExecutorsAfterEngineCreate = true;
+
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
     protected boolean flowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
@@ -932,6 +934,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngine buildProcessEngine() {
         init();
         ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
+
+        if (handleProcessEngineExecutorsAfterEngineCreate) {
+            processEngine.handleExecutors();
+        }
 
         // trigger build of Flowable 5 Engine
         if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
@@ -4236,6 +4242,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setEnableEntityLinks(boolean enableEntityLinks) {
         this.enableEntityLinks = enableEntityLinks;
         return this;
+    }
+
+    public boolean isHandleProcessEngineExecutorsAfterEngineCreate() {
+        return handleProcessEngineExecutorsAfterEngineCreate;
+    }
+
+    public void setHandleProcessEngineExecutorsAfterEngineCreate(boolean handleProcessEngineExecutorsAfterEngineCreate) {
+        this.handleProcessEngineExecutorsAfterEngineCreate = handleProcessEngineExecutorsAfterEngineCreate;
     }
 
     // Flowable 5
