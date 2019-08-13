@@ -1960,6 +1960,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return taskAssigneeLikeIgnoreCase;
     }
 
+    public boolean isWithoutDeleteReason() {
+        return withoutDeleteReason;
+    }
+
     public String getLocale() {
         return locale;
     }
