@@ -52,7 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable();
 
-        if (restAppProperties.isCorsEnabled()) {
+        if (restAppProperties.getCors().isEnabled()) {
             httpSecurity.apply(new PropertyBasedCorsFilter(restAppProperties));
         }
 

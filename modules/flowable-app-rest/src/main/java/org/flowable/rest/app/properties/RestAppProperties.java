@@ -45,35 +45,8 @@ public class RestAppProperties {
      */
     private boolean swaggerDocsEnabled = true;
 
-    /**
-     * Enable/disable CORS filter.
-     */
-    private boolean corsEnabled = false;
-
-    /**
-     * Allow/disallow CORS credentials.
-     */
-    private boolean corsAllowCredentials = false;
-
-    /**
-     * Allowed CORS origins, use * for all, but not in production. Default empty.
-     */
-    private Set<String> corsAllowedOrigins;
-
-    /**
-     * Allowed CORS headers, use * for all, but not in production. Default empty.
-     */
-    private Set<String> corsAllowedHeaders;
-
-    /**
-     * Exposed CORS headers, use * for all, but not in production. Default empty.
-     */
-    private Set<String> corsExposedHeaders;
-
-    /**
-     * Allowed CORS methods, use * for all, but not in production. Default empty.
-     */
-    private Set<String> corsAllowedMethods;
+    @NestedConfigurationProperty
+    private final Cors cors = new Cors();
 
     @NestedConfigurationProperty
     private final Admin admin = new Admin();
@@ -107,52 +80,8 @@ public class RestAppProperties {
         this.swaggerDocsEnabled = swaggerDocsEnabled;
     }
 
-    public boolean isCorsEnabled() {
-        return corsEnabled;
-    }
-
-    public void setCorsEnabled(boolean corsEnabled) {
-        this.corsEnabled = corsEnabled;
-    }
-
-    public boolean isCorsAllowCredentials() {
-        return corsAllowCredentials;
-    }
-
-    public void setCorsAllowCredentials(boolean corsCorsAllowCredentials) {
-        this.corsAllowCredentials = corsCorsAllowCredentials;
-    }
-
-    public Set<String> getCorsAllowedOrigins() {
-        return corsAllowedOrigins == null ? Collections.emptySet() : corsAllowedOrigins;
-    }
-
-    public void setCorsAllowedOrigins(Set<String> corsAllowedOrigins) {
-        this.corsAllowedOrigins = corsAllowedOrigins;
-    }
-
-    public Set<String> getCorsAllowedHeaders() {
-        return corsAllowedHeaders == null ? Collections.emptySet() : corsAllowedHeaders;
-    }
-
-    public void setCorsAllowedHeaders(Set<String> corsAllowedHeaders) {
-        this.corsAllowedHeaders = corsAllowedHeaders;
-    }
-
-    public Set<String> getCorsExposedHeaders() {
-        return corsExposedHeaders == null ? Collections.emptySet() : corsExposedHeaders;
-    }
-
-    public void setCorsExposedHeaders(Set<String> corsExposedHeaders) {
-        this.corsExposedHeaders = corsExposedHeaders;
-    }
-
-    public Set<String> getCorsAllowedMethods() {
-        return corsAllowedMethods == null ? Collections.emptySet() : corsAllowedMethods;
-    }
-
-    public void setCorsAllowedMethods(Set<String> corsAllowedMethods) {
-        this.corsAllowedMethods = corsAllowedMethods;
+    public Cors getCors() {
+        return cors;
     }
 
     public Admin getAdmin() {
@@ -207,6 +136,86 @@ public class RestAppProperties {
 
         public void setLastName(String lastName) {
             this.lastName = lastName;
+        }
+    }
+
+    public static class Cors {
+        /**
+         * Enable/disable CORS filter.
+         */
+        private boolean enabled = false;
+
+        /**
+         * Allow/disallow CORS credentials.
+         */
+        private boolean allowCredentials = false;
+
+        /**
+         * Allowed CORS origins, use * for all, but not in production. Default empty.
+         */
+        private Set<String> allowedOrigins;
+
+        /**
+         * Allowed CORS headers, use * for all, but not in production. Default empty.
+         */
+        private Set<String> allowedHeaders;
+
+        /**
+         * Exposed CORS headers, use * for all, but not in production. Default empty.
+         */
+        private Set<String> exposedHeaders;
+
+        /**
+         * Allowed CORS methods, use * for all, but not in production. Default empty.
+         */
+        private Set<String> allowedMethods;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public boolean isAllowCredentials() {
+            return allowCredentials;
+        }
+
+        public void setAllowCredentials(boolean allowCredentials) {
+            this.allowCredentials = allowCredentials;
+        }
+
+        public Set<String> getAllowedOrigins() {
+            return allowedOrigins == null ? Collections.emptySet() : allowedOrigins;
+        }
+
+        public void setAllowedOrigins(Set<String> allowedOrigins) {
+            this.allowedOrigins = allowedOrigins;
+        }
+
+        public Set<String> getAllowedHeaders() {
+            return allowedHeaders == null ? Collections.emptySet() : allowedHeaders;
+        }
+
+        public void setAllowedHeaders(Set<String> allowedHeaders) {
+            this.allowedHeaders = allowedHeaders;
+        }
+
+        public Set<String> getExposedHeaders() {
+            return exposedHeaders == null ? Collections.emptySet() : exposedHeaders;
+        }
+
+        public void setExposedHeaders(Set<String> exposedHeaders) {
+            this.exposedHeaders = exposedHeaders;
+        }
+
+        public Set<String> getAllowedMethods() {
+            return allowedMethods == null ? Collections.emptySet() : allowedMethods;
+        }
+
+        public void setAllowedMethods(Set<String> allowedMethods) {
+            this.allowedMethods = allowedMethods;
         }
     }
 }
