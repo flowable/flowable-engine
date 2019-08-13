@@ -1,21 +1,25 @@
 {
   "name": "jquery",
-  "version": "2.0.3",
-  "description": "jQuery component",
+  "main": "dist/jquery.js",
+  "license": "MIT",
+  "ignore": [
+    "package.json"
+  ],
   "keywords": [
     "jquery",
-    "component"
+    "javascript",
+    "browser",
+    "library"
   ],
-  "main": "jquery.js",
-  "license": "MIT",
   "homepage": "https://github.com/jquery/jquery-dist",
-  "_release": "2.0.3",
+  "version": "3.4.1",
+  "_release": "3.4.1",
   "_resolution": {
     "type": "version",
-    "tag": "2.0.3",
-    "commit": "f852e631ba85af7da4ad7594785e122504e7b233"
+    "tag": "3.4.1",
+    "commit": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
   },
   "_source": "https://github.com/jquery/jquery-dist.git",
-  "_target": "2.0.3",
+  "_target": ">= 1.9.0",
   "_originalSource": "jquery"
 }

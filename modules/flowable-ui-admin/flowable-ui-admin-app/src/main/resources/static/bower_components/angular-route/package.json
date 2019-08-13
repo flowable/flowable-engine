@@ -1,8 +1,8 @@
 {
   "name": "angular-route",
-  "version": "1.3.13",
+  "version": "1.4.14",
   "description": "AngularJS router module",
-  "main": "angular-route.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,5 +22,12 @@
   "bugs": {
     "url": "https://github.com/angular/angular.js/issues"
   },
-  "homepage": "http://angularjs.org"
+  "homepage": "http://angularjs.org",
+  "jspm": {
+    "shim": {
+      "angular-route": {
+        "deps": ["angular"]
+      }
+    }
+  }
 }
