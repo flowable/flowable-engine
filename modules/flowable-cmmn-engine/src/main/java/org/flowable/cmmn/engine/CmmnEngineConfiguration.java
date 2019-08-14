@@ -723,6 +723,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected TaskPostProcessor taskPostProcessor;
 
+    protected boolean handleCmmnEngineExecutorsAfterEngineCreate = true;
+
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -753,7 +755,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngine buildCmmnEngine() {
         init();
-        return new CmmnEngineImpl(this);
+        CmmnEngineImpl cmmnEngine = new CmmnEngineImpl(this);
+
+        if (handleCmmnEngineExecutorsAfterEngineCreate) {
+            cmmnEngine.handleExecutors();
+        }
+
+        return cmmnEngine;
     }
 
     protected void init() {
@@ -3446,5 +3454,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void setCmmnHistoryCleaningManager(CmmnHistoryCleaningManager cmmnHistoryCleaningManager) {
         this.cmmnHistoryCleaningManager = cmmnHistoryCleaningManager;
+    }
+
+    public boolean isHandleCmmnEngineExecutorsAfterEngineCreate() {
+        return handleCmmnEngineExecutorsAfterEngineCreate;
+    }
+
+    public void setHandleCmmnEngineExecutorsAfterEngineCreate(boolean handleCmmnEngineExecutorsAfterEngineCreate) {
+        this.handleCmmnEngineExecutorsAfterEngineCreate = handleCmmnEngineExecutorsAfterEngineCreate;
     }
 }

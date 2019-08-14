@@ -402,7 +402,7 @@ flowableAdminApp.controller('ShowProcessDefinitionMigrationPopupCtrl',
         
         $http({
             method: 'GET',
-            url: '/app/rest/admin/process-definitions?key=' + $scope.processDefinition.key
+            url: '/app/rest/admin/process-definitions?key=' + $scope.processDefinition.key + '&size=1000'
         }).success(function (response, status, headers, config) {
             var definitionList = response.data;
             var finalResult = [];

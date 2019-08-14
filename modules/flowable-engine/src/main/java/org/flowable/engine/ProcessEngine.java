@@ -43,6 +43,8 @@ public interface ProcessEngine {
      */
     String getName();
 
+    void handleExecutors();
+
     void close();
 
     RepositoryService getRepositoryService();

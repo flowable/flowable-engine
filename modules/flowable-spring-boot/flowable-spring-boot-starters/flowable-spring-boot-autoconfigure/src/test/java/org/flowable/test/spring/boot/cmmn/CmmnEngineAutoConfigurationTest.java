@@ -207,7 +207,7 @@ public class CmmnEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, CmmnEngine cmmnEngine) {
         List<Method> methods = Stream.of(CmmnEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
+            .filter(method -> !(method.getReturnType().equals(void.class) || method.getName().equals("getName"))).collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {
             try {

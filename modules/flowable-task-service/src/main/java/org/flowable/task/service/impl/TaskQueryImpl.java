@@ -1979,6 +1979,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return processDefinitionKeyLikeIgnoreCase;
     }
 
+    public boolean isWithoutDeleteReason() {
+        return withoutDeleteReason;
+    }
+
     public String getLocale() {
         return locale;
     }

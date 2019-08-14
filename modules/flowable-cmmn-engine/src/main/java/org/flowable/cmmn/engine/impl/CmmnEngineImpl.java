@@ -60,6 +60,13 @@ public class CmmnEngineImpl implements CmmnEngine {
             commandExecutor.execute(cmmnEngineConfiguration.getSchemaCommandConfig(), cmmnEngineConfiguration.getSchemaManagementCmd());
         }
 
+        LOGGER.info("CmmnEngine {} created", name);
+        
+        CmmnEngines.registerCmmnEngine(this);
+    }
+    
+    @Override
+    public void handleExecutors() {
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
         }
@@ -74,10 +81,6 @@ public class CmmnEngineImpl implements CmmnEngine {
         if (cmmnEngineConfiguration.isEnableHistoryCleaning()) {
             cmmnManagementService.handleHistoryCleanupTimerJob();
         }
-
-        LOGGER.info("CmmnEngine {} created", name);
-        
-        CmmnEngines.registerCmmnEngine(this);
     }
     
     @Override
