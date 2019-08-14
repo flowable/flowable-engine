@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
@@ -119,16 +120,21 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             }
         }
 
-        setVariables(decisionExecutionAuditContainer.getDecisionResult(), externalRef, planItemInstanceEntity, 
-                        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getObjectMapper());
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (cmmnEngineConfiguration.getDecisionTableVariableManager() != null) {
+            cmmnEngineConfiguration.getDecisionTableVariableManager().setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), 
+                            externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            
+        } else {
+            setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(), externalRef, 
+                            planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+        }
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 
-    protected void setVariables(List<Map<String, Object>> executionResult,
-                                String decisionKey,
-                                PlanItemInstanceEntity planItemInstanceEntity,
-                                ObjectMapper objectMapper) {
+    protected void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, 
+                    PlanItemInstanceEntity planItemInstanceEntity, ObjectMapper objectMapper) {
         
         if (executionResult == null || executionResult.isEmpty()) {
             return;

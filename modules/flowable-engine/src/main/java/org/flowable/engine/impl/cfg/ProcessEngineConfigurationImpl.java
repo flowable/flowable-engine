@@ -94,6 +94,7 @@ import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.CandidateManager;
+import org.flowable.engine.DecisionTableVariableManager;
 import org.flowable.engine.DefaultCandidateManager;
 import org.flowable.engine.DefaultHistoryCleaningManager;
 import org.flowable.engine.DynamicBpmnService;
@@ -504,6 +505,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected DynamicStateManager dynamicStateManager;
 
     protected ProcessInstanceMigrationManager processInstanceMigrationManager;
+    
+    // Decision table variable manager
+    
+    protected DecisionTableVariableManager decisionTableVariableManager;
 
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
@@ -4086,6 +4091,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
     
+    public DecisionTableVariableManager getDecisionTableVariableManager() {
+        return decisionTableVariableManager;
+    }
+
+    public ProcessEngineConfigurationImpl setDecisionTableVariableManager(DecisionTableVariableManager decisionTableVariableManager) {
+        this.decisionTableVariableManager = decisionTableVariableManager;
+        return this;
+    }
+
     public IdentityLinkInterceptor getIdentityLinkInterceptor() {
         return identityLinkInterceptor;
     }
