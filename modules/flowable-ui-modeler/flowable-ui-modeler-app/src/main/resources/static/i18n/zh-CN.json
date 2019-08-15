@@ -808,19 +808,19 @@
       "COMPLETIONCONDITIONPACKAGE" : {
         "COMPLETIONCONDITION" : {
           "TITLE" : "完成条件",
-          "DESCRIPTION" : "临时子流程的完成条件"
+          "DESCRIPTION" : "自组网子流程的完成条件"
         }
       },
       "ORDERINGPACKAGE" : {
         "ORDERING" : {
           "TITLE" : "排序",
-          "DESCRIPTION" : "临时子流程的排序"
+          "DESCRIPTION" : "自组网子流程的排序"
         }
       },
       "CANCELREMAININGINSTANCESPACKAGE" : {
         "CANCELREMAININGINSTANCES" : {
           "TITLE" : "取消剩余的实例",
-          "DESCRIPTION" : "取消临时子流程的剩余实例？"
+          "DESCRIPTION" : "取消自组网子流程的剩余实例？"
         }
       }
 
@@ -1069,8 +1069,8 @@
         "DESCRIPTION" : "对数据存储的引用。"
       },
       "ADHOCSUBPROCESS" : {
-        "TITLE" : "临时子流程",
-        "DESCRIPTION" : "临时子流程"
+        "TITLE" : "自组网子流程",
+        "DESCRIPTION" : "自组网子流程"
       }
     }
   },
