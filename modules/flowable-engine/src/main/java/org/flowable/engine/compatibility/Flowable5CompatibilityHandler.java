@@ -36,6 +36,7 @@ import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -113,6 +114,8 @@ public interface Flowable5CompatibilityHandler {
     void deleteProcessInstance(String processInstanceId, String deleteReason);
 
     void deleteHistoricProcessInstance(String processInstanceId);
+
+    Task getTask(String taskId);
 
     void completeTask(TaskEntity taskEntity, Map<String, Object> variables, boolean localScope);
 

@@ -18,10 +18,13 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -43,7 +46,15 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
         TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
         
         if (task == null) {
-            throw new FlowableObjectNotFoundException("task not found");
+
+            List<IdentityLink> v5IdentityLinks = getIdentityLinksIfV5Task(commandContext, taskId);
+            if (v5IdentityLinks != null) {
+                return v5IdentityLinks;
+
+            } else {
+                throw new FlowableObjectNotFoundException("task not found");
+
+            }
         }
 
         List<IdentityLink> identityLinks = (List) task.getIdentityLinks();
@@ -72,6 +83,21 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
         }
 
         return identityLinks;
+    }
+
+    protected List<IdentityLink> getIdentityLinksIfV5Task(CommandContext commandContext, String taskId) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+
+        if (!processEngineConfiguration.isFlowable5CompatibilityEnabled()) {
+            return null;
+        }
+
+        Task task = processEngineConfiguration.getFlowable5CompatibilityHandler().getTask(taskId);
+        if (task != null  && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId()))  {
+            return (List<IdentityLink>) task.getIdentityLinks();
+        }
+
+        return null;
     }
 
 }

@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -29,6 +30,7 @@ import org.flowable.engine.runtime.ProcessInstance;
  * {@link Command} that changes the business key of an existing process instance.
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class SetProcessInstanceBusinessKeyCmd implements Command<Void>, Serializable {
 
@@ -52,15 +54,24 @@ public class SetProcessInstanceBusinessKeyCmd implements Command<Void>, Serializ
     @Override
     public Void execute(CommandContext commandContext) {
         ExecutionEntityManager executionManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+
         ExecutionEntity processInstance = executionManager.findById(processInstanceId);
         if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("No process instance found for id = '" + processInstanceId + "'.", ProcessInstance.class);
+
+            if (handledByV5Compatibility(commandContext, null)) {
+                return null;
+
+            } else {
+                throw new FlowableObjectNotFoundException("No process instance found for id = '" + processInstanceId + "'.", ProcessInstance.class);
+
+            }
+
         } else if (!processInstance.isProcessInstanceType()) {
             throw new FlowableIllegalArgumentException("A process instance id is required, but the provided id " + "'" + processInstanceId + "' " + "points to a child execution of process instance " + "'"
                     + processInstance.getProcessInstanceId() + "'. " + "Please invoke the " + getClass().getSimpleName() + " with a root execution id.");
         }
 
-        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processInstance.getProcessDefinitionId())) {
+        if (handledByV5Compatibility(commandContext, processInstance)) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().updateBusinessKey(processInstanceId, businessKey);
             return null;
         }
@@ -68,5 +79,27 @@ public class SetProcessInstanceBusinessKeyCmd implements Command<Void>, Serializ
         executionManager.updateProcessInstanceBusinessKey(processInstance, businessKey);
 
         return null;
+    }
+
+    protected boolean handledByV5Compatibility(CommandContext commandContext, ProcessInstance processInstance) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+
+        if (!processEngineConfiguration.isFlowable5CompatibilityEnabled()) {
+            return false;
+        }
+
+        ProcessInstance v5ProcessInstance = processInstance;
+        if (v5ProcessInstance ==  null) {
+            v5ProcessInstance = processEngineConfiguration.getFlowable5CompatibilityHandler().getProcessInstance(processInstanceId);
+        }
+
+        if (v5ProcessInstance != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, v5ProcessInstance.getProcessDefinitionId())) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                .getFlowable5CompatibilityHandler()
+                .updateBusinessKey(processInstanceId, businessKey);
+            return true;
+        }
+
+        return false;
     }
 }

@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -151,6 +152,9 @@ public class Flowable5TaskWrapper implements Task {
 
     @Override
     public List<? extends IdentityLinkInfo> getIdentityLinks() {
+        if (activiti5Task instanceof TaskEntity) {
+            return ((TaskEntity) activiti5Task).getIdentityLinks();
+        }
         return null;
     }
 

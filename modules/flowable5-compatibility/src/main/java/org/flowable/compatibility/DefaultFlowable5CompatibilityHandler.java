@@ -58,6 +58,7 @@ import org.flowable.compatibility.wrapper.Flowable5CommentWrapper;
 import org.flowable.compatibility.wrapper.Flowable5DeploymentWrapper;
 import org.flowable.compatibility.wrapper.Flowable5ProcessInstanceWrapper;
 import org.flowable.compatibility.wrapper.Flowable5TaskFormDataWrapper;
+import org.flowable.compatibility.wrapper.Flowable5TaskWrapper;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -76,6 +77,7 @@ import org.flowable.engine.task.Comment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -582,6 +584,25 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         } catch (org.activiti.engine.ActivitiException e) {
             handleActivitiException(e);
         }
+    }
+
+    @Override
+    public Task getTask(String taskId) {
+        org.activiti.engine.task.Task task = getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+
+            CommandContext commandContext = Context.getCommandContext();
+            if (commandContext != null) {
+                task = commandContext.getTaskEntityManager().findTaskById(taskId);
+            }
+
+        }
+
+        if (task != null) {
+            return new Flowable5TaskWrapper(task);
+        }
+
+        return null;
     }
 
     @Override
