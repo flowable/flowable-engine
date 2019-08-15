@@ -31,6 +31,8 @@ public class ELExecutionContext {
     protected DecisionExecutionAuditContainer auditContainer;
     protected Map<String, List<Object>> outputValues = new LinkedHashMap<>();
     protected BuiltinAggregator aggregator;
+    protected String instanceId;
+    protected String scopeType;
 
     public void checkExecutionContext(String variableId) {
 
@@ -88,5 +90,21 @@ public class ELExecutionContext {
 
     public void setAggregator(BuiltinAggregator aggregator) {
         this.aggregator = aggregator;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 }

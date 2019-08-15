@@ -1,6 +1,7 @@
 package org.flowable.rest.conf;
 
 import org.flowable.rest.app.properties.RestAppProperties;
+import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -23,26 +24,26 @@ public class PropertyBasedCorsFilter extends AbstractHttpConfigurer<PropertyBase
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        CorsFilter corsFilter = corsFilter(restAppProperties);
+        CorsFilter corsFilter = corsFilter(restAppProperties.getCors());
         http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
-    private CorsFilter corsFilter(RestAppProperties restAppProperties) {
+    protected CorsFilter corsFilter(RestAppProperties.Cors cors) {
         CorsConfiguration config = new CorsConfiguration();
-        if (restAppProperties.isCorsAllowCredentials()) {
+        if (cors.isAllowCredentials()) {
             config.setAllowCredentials(true);
         }
 
-        for (String origin : restAppProperties.getCorsAllowedOrigins()) {
+        for (String origin : cors.getAllowedOrigins()) {
             config.addAllowedOrigin(origin);
         }
-        for (String header : restAppProperties.getCorsAllowedHeaders()) {
+        for (String header : cors.getAllowedHeaders()) {
             config.addAllowedHeader(header);
         }
-        for (String exposedHeader : restAppProperties.getCorsExposedHeaders()) {
+        for (String exposedHeader : cors.getExposedHeaders()) {
             config.addExposedHeader(exposedHeader);
         }
-        for (String method : restAppProperties.getCorsAllowedMethods()) {
+        for (String method : cors.getAllowedMethods()) {
             config.addAllowedMethod(method);
         }
 

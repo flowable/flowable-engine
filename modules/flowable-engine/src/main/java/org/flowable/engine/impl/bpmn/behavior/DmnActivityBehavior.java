@@ -142,7 +142,14 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             }
         }
 
-        setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
+        if (processEngineConfiguration.getDecisionTableVariableManager() != null) {
+            processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), 
+                            finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
+            
+        } else {
+            setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, 
+                            execution, processEngineConfiguration.getObjectMapper());
+        }
 
         leave(execution);
     }

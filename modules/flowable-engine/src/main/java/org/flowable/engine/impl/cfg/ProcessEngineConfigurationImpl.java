@@ -94,6 +94,7 @@ import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.CandidateManager;
+import org.flowable.engine.DecisionTableVariableManager;
 import org.flowable.engine.DefaultCandidateManager;
 import org.flowable.engine.DefaultHistoryCleaningManager;
 import org.flowable.engine.DynamicBpmnService;
@@ -504,6 +505,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected DynamicStateManager dynamicStateManager;
 
     protected ProcessInstanceMigrationManager processInstanceMigrationManager;
+    
+    // Decision table variable manager
+    
+    protected DecisionTableVariableManager decisionTableVariableManager;
 
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
@@ -907,6 +912,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected SchemaManager jobSchemaManager;
     protected SchemaManager batchSchemaManager;
 
+    protected boolean handleProcessEngineExecutorsAfterEngineCreate = true;
+
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
     protected boolean flowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
@@ -932,6 +939,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngine buildProcessEngine() {
         init();
         ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
+
+        if (handleProcessEngineExecutorsAfterEngineCreate) {
+            processEngine.handleExecutors();
+        }
 
         // trigger build of Flowable 5 Engine
         if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
@@ -4080,6 +4091,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
     
+    public DecisionTableVariableManager getDecisionTableVariableManager() {
+        return decisionTableVariableManager;
+    }
+
+    public ProcessEngineConfigurationImpl setDecisionTableVariableManager(DecisionTableVariableManager decisionTableVariableManager) {
+        this.decisionTableVariableManager = decisionTableVariableManager;
+        return this;
+    }
+
     public IdentityLinkInterceptor getIdentityLinkInterceptor() {
         return identityLinkInterceptor;
     }
@@ -4236,6 +4256,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setEnableEntityLinks(boolean enableEntityLinks) {
         this.enableEntityLinks = enableEntityLinks;
         return this;
+    }
+
+    public boolean isHandleProcessEngineExecutorsAfterEngineCreate() {
+        return handleProcessEngineExecutorsAfterEngineCreate;
+    }
+
+    public void setHandleProcessEngineExecutorsAfterEngineCreate(boolean handleProcessEngineExecutorsAfterEngineCreate) {
+        this.handleProcessEngineExecutorsAfterEngineCreate = handleProcessEngineExecutorsAfterEngineCreate;
     }
 
     // Flowable 5

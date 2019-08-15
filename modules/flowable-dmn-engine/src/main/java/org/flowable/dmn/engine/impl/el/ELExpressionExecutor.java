@@ -53,7 +53,7 @@ public class ELExpressionExecutor {
         RuleExpressionCondition condition = new RuleExpressionCondition(expression);
         
         try {
-            return condition.evaluate(executionContext.getStackVariables());
+            return condition.evaluate(executionContext.getStackVariables(), executionContext);
         } catch (Exception ex) {
             LOGGER.warn("Error while executing input entry: {}", parsedExpression, ex);
             throw new FlowableDmnExpressionException("error while executing input entry", parsedExpression, ex);
