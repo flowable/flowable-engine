@@ -98,6 +98,25 @@ function _drawSubProcess(element, isMigrationModelElement, currentPaper)
     }
 }
 
+function _drawTransaction(element)
+{
+	var rect = paper.rect(element.x, element.y, element.width, element.height, 8);
+
+	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
+
+	rect.attr({"stroke-width": 1,
+		"stroke": strokeColor,
+		"fill": "white"
+ 	});
+
+	var borderRect = paper.rect(element.x + 4, element.y + 4, element.width - 8, element.height -8, 4);
+
+	borderRect.attr({"stroke-width": 1,
+		"stroke": strokeColor,
+		"fill": "none"
+ 	});
+}
+
 function _drawEventSubProcess(element, isMigrationModelElement, currentPaper)
 {
 	var rect = currentPaper.rect(element.x, element.y, element.width, element.height, 4);
@@ -532,7 +551,9 @@ function _drawFlow(flow, currentPaper){
 	polyline.element = currentPaper.path(polyline.path);
 	polyline.element.attr({"stroke-width":SEQUENCEFLOW_STROKE});
 	polyline.element.attr({"stroke":strokeColor});
-
+	if (flow.type == "association") {
+		polyline.element.attr({"stroke-dasharray": ". "});
+	}
 	polyline.element.id = flow.id;
 
 	var lastLineIndex = polyline.getLinesCount() - 1;
@@ -598,7 +619,9 @@ function _drawFlow(flow, currentPaper){
 		currentPaper.getById(polyline.element.id).attr({"stroke":strokeColor});
 	});
 
-	_drawArrowHead(line, strokeColor, currentPaper);
+	if (flow.type != "association") {
+		_drawArrowHead(line, strokeColor, currentPaper);
+	}
 }
 
 function _drawArrowHead(line, color, currentPaper)

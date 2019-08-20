@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.Artifact;
+import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
@@ -307,8 +309,8 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         }
 
         for (org.flowable.bpmn.model.Process process : pojoModel.getProcesses()) {
-            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray,
-                            collapsedArray, diagramInfo, completedElements, currentElements, null);
+            processElements(process.getFlowElements(), process.getArtifacts(), pojoModel, elementArray, flowArray, 
+                    collapsedArray, diagramInfo, completedElements, currentElements, null);
         }
 
         displayNode.set("elements", elementArray);
@@ -316,9 +318,10 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         displayNode.set("collapsed", collapsedArray);
     }
 
-    protected void processElements(Collection<FlowElement> elementList,
-                                   BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, ArrayNode collapsedArray,
-                                   GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements, ObjectNode collapsedNode) {
+    protected void processElements(Collection<FlowElement> elementList, Collection<Artifact> artifactList,
+            BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, ArrayNode collapsedArray,
+            GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements,
+            ObjectNode collapsedNode) {
 
         for (FlowElement element : elementList) {
 
@@ -408,9 +411,44 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                         newCollapsedNode.putArray("flows");
                         collapsedArray.add(newCollapsedNode);
                     }
+                    
+                    processElements(subProcess.getFlowElements(), subProcess.getArtifacts(), model, elementArray,
+                            flowArray, collapsedArray, diagramInfo, completedElements, currentElements,
+                            newCollapsedNode);
+                }
+            }
+        }
 
-                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray,
-                                    diagramInfo, completedElements, currentElements, newCollapsedNode);
+        for (Artifact artifact : artifactList) {
+            ObjectNode elementNode = objectMapper.createObjectNode();
+            if (completedElements != null) {
+                elementNode.put("completed", completedElements.contains(artifact.getId()));
+            }
+
+            if (currentElements != null) {
+                elementNode.put("current", currentElements.contains(artifact.getId()));
+            }
+
+            if (artifact instanceof Association) {
+                Association association = (Association) artifact;
+                elementNode.put("id", association.getId());
+                elementNode.put("type", "association");
+                elementNode.put("sourceRef", association.getSourceRef());
+                elementNode.put("targetRef", association.getTargetRef());
+
+                List<GraphicInfo> flowInfo = model.getFlowLocationGraphicInfo(association.getId());
+                ArrayNode waypointArray = objectMapper.createArrayNode();
+                for (GraphicInfo graphicInfo : flowInfo) {
+                    ObjectNode pointNode = objectMapper.createObjectNode();
+                    fillGraphicInfo(pointNode, graphicInfo, false);
+                    waypointArray.add(pointNode);
+                    fillDiagramInfo(graphicInfo, diagramInfo);
+                }
+                elementNode.set("waypoints", waypointArray);
+                if (collapsedNode != null) {
+                    ((ArrayNode) collapsedNode.get("flows")).add(elementNode);
+                } else {
+                    flowArray.add(elementNode);
                 }
             }
         }
