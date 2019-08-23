@@ -44,18 +44,3 @@ jobs:
       run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test
       run: ./mvnw verify -Pdistro,errorLogging -B -V
-
-  test_jdk14:
-    name: Linux (OpenJDK 14)
-    runs-on: ubuntu-latest
-    container: openjdk:14
-    steps:
-    - uses: actions/checkout@master
-      with:
-        fetch-depth: 10
-    - name: Install
-      # Need to do install first in order for the OSGi tests to work
-      run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-    - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging -B -V
-      continue-on-error: true
