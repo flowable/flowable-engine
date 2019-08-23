@@ -17,11 +17,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Tijs Rademakers
+ * @author Joram Barrez
+ */
 public class Case extends CmmnElement implements HasLifecycleListeners {
 
     protected String name;
     protected String initiatorVariableName;
     protected Stage planModel;
+    protected CaseFileModel fileModel;
     protected List<String> candidateStarterUsers = new ArrayList<>();
     protected List<String> candidateStarterGroups = new ArrayList<>();
     protected Map<String, CaseElement> allCaseElements = new HashMap<>();
@@ -41,6 +46,14 @@ public class Case extends CmmnElement implements HasLifecycleListeners {
 
     public void setInitiatorVariableName(String initiatorVariableName) {
         this.initiatorVariableName = initiatorVariableName;
+    }
+
+    public CaseFileModel getFileModel() {
+        return fileModel;
+    }
+
+    public void setFileModel(CaseFileModel fileModel) {
+        this.fileModel = fileModel;
     }
 
     public Stage getPlanModel() {
