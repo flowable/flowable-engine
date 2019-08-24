@@ -15,7 +15,7 @@ package org.flowable.cmmn.converter;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.cmmn.model.CmmnElement;
-import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 
 /**
  * @author Joram Barrez
@@ -34,13 +34,13 @@ public class PlanItemOnPartXmlConverter extends BaseCmmnXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        SentryOnPart sentryOnPart = new SentryOnPart();
-        sentryOnPart.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
-        sentryOnPart.setSourceRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_SOURCE_REF));
+        PlanItemSentryOnPart planItemSentryOnPart = new PlanItemSentryOnPart();
+        planItemSentryOnPart.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        planItemSentryOnPart.setSourceRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_SOURCE_REF));
         
-        conversionHelper.addSentryOnPartToCurrentSentry(sentryOnPart);
+        conversionHelper.addPlanItemSentryOnPartToCurrentSentry(planItemSentryOnPart);
         
-        return sentryOnPart;
+        return planItemSentryOnPart;
     }
     
 }

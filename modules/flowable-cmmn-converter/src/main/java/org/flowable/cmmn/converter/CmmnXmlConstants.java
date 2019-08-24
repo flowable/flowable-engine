@@ -68,6 +68,7 @@ public interface CmmnXmlConstants {
 
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
+    String ELEMENT_FILE_ITEM_ON_PART = "caseFileItemOnPart";
     String ELEMENT_STANDARD_EVENT = "standardEvent";
     String ELEMENT_ENTRY_CRITERION = "entryCriterion";
     String ELEMENT_EXIT_CRITERION = "exitCriterion";

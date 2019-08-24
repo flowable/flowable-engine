@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 
@@ -42,8 +43,13 @@ public class SentryExport implements CmmnXmlConstants {
         }
 
         for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
+
             // start sentry on part element
-            xtw.writeStartElement(ELEMENT_PLAN_ITEM_ON_PART);
+            if (sentryOnPart instanceof PlanItemSentryOnPart) {
+                xtw.writeStartElement(ELEMENT_PLAN_ITEM_ON_PART);
+            } else {
+                xtw.writeStartElement(ELEMENT_FILE_ITEM_ON_PART);
+            }
             
             xtw.writeAttribute(ATTRIBUTE_ID, sentryOnPart.getId());
             xtw.writeAttribute(ATTRIBUTE_SOURCE_REF, sentryOnPart.getSourceRef());

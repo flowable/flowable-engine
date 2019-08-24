@@ -12,18 +12,19 @@
  */
 package org.flowable.cmmn.editor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.List;
+
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class SentryOnPartConverterTest extends AbstractConverterTest {
 
@@ -49,7 +50,7 @@ public class SentryOnPartConverterTest extends AbstractConverterTest {
         List<SentryOnPart> onParts = sentry.getOnParts();
         assertNotNull(onParts);
         assertEquals(1, onParts.size());
-        SentryOnPart sentryOnPart = onParts.get(0);
+        PlanItemSentryOnPart sentryOnPart = (PlanItemSentryOnPart) onParts.get(0);
         assertEquals("taskA", sentryOnPart.getSource().getDefinitionRef());
         assertEquals(PlanItemTransition.COMPLETE, sentryOnPart.getStandardEvent());
     }

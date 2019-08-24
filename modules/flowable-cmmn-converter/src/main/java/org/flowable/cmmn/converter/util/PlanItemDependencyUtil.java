@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 
@@ -43,7 +44,9 @@ public class PlanItemDependencyUtil {
                 Sentry sentry = entryCriterion.getSentry();
                 if (sentry.getOnParts() != null && !sentry.getOnParts().isEmpty()) {
                     for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
-                        planItems.add(sentryOnPart.getSource());
+                        if (sentryOnPart instanceof PlanItemSentryOnPart) {
+                            planItems.add( ((PlanItemSentryOnPart) sentryOnPart).getSource());
+                        }
                     }
                 }
             }

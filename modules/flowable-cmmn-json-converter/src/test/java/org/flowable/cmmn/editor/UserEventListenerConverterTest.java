@@ -26,6 +26,7 @@ import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
@@ -62,7 +63,7 @@ public class UserEventListenerConverterTest extends AbstractConverterTest {
         assertEquals(1, onParts.size());
         SentryOnPart onPart = onParts.get(0);
         assertEquals(PlanItemTransition.OCCUR, onPart.getStandardEvent());
-        assertEquals("startTaskAUserEvent", onPart.getSource().getPlanItemDefinition().getId());
+        assertEquals("startTaskAUserEvent", ((PlanItemSentryOnPart) onPart).getSource().getPlanItemDefinition().getId());
         PlanItem task = model.findPlanItemInPlanFragmentOrUpwards(model.findPlanItemDefinitionInStageOrUpwards("taskA").getPlanItemRef());
         List<Criterion> criterions = task.getEntryCriteria();
         assertNotNull(criterions);
@@ -76,7 +77,7 @@ public class UserEventListenerConverterTest extends AbstractConverterTest {
         assertEquals(1, onParts.size());
         onPart = onParts.get(0);
         assertEquals(PlanItemTransition.OCCUR, onPart.getStandardEvent());
-        assertEquals("stopTaskBUserEvent", onPart.getSource().getPlanItemDefinition().getId());
+        assertEquals("stopTaskBUserEvent", ((PlanItemSentryOnPart) onPart).getSource().getPlanItemDefinition().getId());
         task = model.findPlanItemInPlanFragmentOrUpwards(model.findPlanItemDefinitionInStageOrUpwards("taskB").getPlanItemRef());
         criterions = task.getExitCriteria();
         assertNotNull(criterions);

@@ -24,6 +24,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
@@ -80,7 +81,8 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
             assertEquals(1, onParts.size());
             assertNotNull(onParts.get(0).getId());
             assertNotNull(onParts.get(0).getSourceRef());
-            assertNotNull(onParts.get(0).getSource());
+            assertTrue(onParts.get(0) instanceof PlanItemSentryOnPart);
+            assertNotNull(((PlanItemSentryOnPart) onParts.get(0)).getSource());
             assertNotNull(onParts.get(0).getStandardEvent());
         }
 

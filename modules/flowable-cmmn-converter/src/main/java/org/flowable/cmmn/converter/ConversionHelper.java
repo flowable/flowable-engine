@@ -33,6 +33,7 @@ import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
@@ -50,7 +51,7 @@ public class ConversionHelper {
     protected LinkedList<PlanFragment> planFragmentsStack = new LinkedList<>();
     protected LinkedList<Stage> stagesStack = new LinkedList<>();
     protected Sentry currentSentry;
-    protected SentryOnPart currentSentryOnPart;
+    protected PlanItemSentryOnPart currentPlanItemSentryOnPart;
     protected PlanItem currentPlanItem;
     protected CmmnDiShape currentDiShape;
     protected CmmnDiEdge currentDiEdge;
@@ -61,7 +62,7 @@ public class ConversionHelper {
     protected List<Criterion> entryCriteria = new ArrayList<>();
     protected List<Criterion> exitCriteria = new ArrayList<>();
     protected List<Sentry> sentries = new ArrayList<>();
-    protected List<SentryOnPart> sentryOnParts = new ArrayList<>();
+    protected List<PlanItemSentryOnPart> planItemSentryOnParts = new ArrayList<>();
     protected List<SentryIfPart> sentryIfParts = new ArrayList<>();
     protected List<PlanItem> planItems = new ArrayList<>();
     protected List<PlanItemDefinition> planItemDefinitions = new ArrayList<>();
@@ -161,14 +162,14 @@ public class ConversionHelper {
         getCurrentPlanFragment().addSentry(sentry);
     }
 
-    public void addSentryOnPart(SentryOnPart sentryOnPart) {
-        sentryOnParts.add(sentryOnPart);
+    public void addPlanItemSentryOnPart(PlanItemSentryOnPart planItemSentryOnPart) {
+        planItemSentryOnParts.add(planItemSentryOnPart);
     }
 
-    public void addSentryOnPartToCurrentSentry(SentryOnPart sentryOnPart) {
-        addSentryOnPart(sentryOnPart);
-        getCurrentSentry().addSentryOnPart(sentryOnPart);
-        setCurrentSentryOnPart(sentryOnPart);
+    public void addPlanItemSentryOnPartToCurrentSentry(PlanItemSentryOnPart planItemSentryOnPart) {
+        addPlanItemSentryOnPart(planItemSentryOnPart);
+        getCurrentSentry().addSentryOnPart(planItemSentryOnPart);
+        setCurrentPlanItemSentryOnPart(planItemSentryOnPart);
     }
 
     public void addSentryIfPart(SentryIfPart sentryIfPart) {
@@ -276,12 +277,12 @@ public class ConversionHelper {
         this.currentSentry = currentSentry;
     }
 
-    public SentryOnPart getCurrentSentryOnPart() {
-        return currentSentryOnPart;
+    public SentryOnPart getCurrentPlanItemSentryOnPart() {
+        return currentPlanItemSentryOnPart;
     }
 
-    public void setCurrentSentryOnPart(SentryOnPart currentSentryOnPart) {
-        this.currentSentryOnPart = currentSentryOnPart;
+    public void setCurrentPlanItemSentryOnPart(PlanItemSentryOnPart currentPlanItemSentryOnPart) {
+        this.currentPlanItemSentryOnPart = currentPlanItemSentryOnPart;
     }
 
     public PlanItem getCurrentPlanItem() {
@@ -328,8 +329,8 @@ public class ConversionHelper {
         return sentries;
     }
 
-    public List<SentryOnPart> getSentryOnParts() {
-        return sentryOnParts;
+    public List<PlanItemSentryOnPart> getPlanItemSentryOnParts() {
+        return planItemSentryOnParts;
     }
 
     public List<SentryIfPart> getSentryIfParts() {

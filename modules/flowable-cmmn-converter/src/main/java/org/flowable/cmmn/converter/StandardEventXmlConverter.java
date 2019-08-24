@@ -39,7 +39,7 @@ public class StandardEventXmlConverter extends CaseElementXmlConverter {
             TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
             timerEventListener.setTimerStartTriggerStandardEvent(event);
         } else {
-            conversionHelper.getCurrentSentryOnPart().setStandardEvent(xtr.getText());
+            conversionHelper.getCurrentPlanItemSentryOnPart().setStandardEvent(xtr.getText());
         }
         return null;
     }

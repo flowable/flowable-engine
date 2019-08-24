@@ -12,24 +12,25 @@
  */
 package org.flowable.cmmn.editor;
 
-import org.flowable.cmmn.model.Association;
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.Criterion;
-import org.flowable.cmmn.model.GraphicInfo;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.cmmn.model.Sentry;
-import org.flowable.cmmn.model.SentryOnPart;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.flowable.cmmn.model.Association;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
+import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.cmmn.model.Sentry;
+import org.flowable.cmmn.model.SentryOnPart;
 
 public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest {
 
@@ -101,10 +102,10 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
         List<SentryOnPart> onParts = sentry.getOnParts();
         assertNotNull(onParts);
         assertEquals(2, onParts.size());
-        SentryOnPart sentryOnPart = onParts.get(0);
+        PlanItemSentryOnPart sentryOnPart = (PlanItemSentryOnPart) onParts.get(0);
         assertEquals("taskA", sentryOnPart.getSource().getDefinitionRef());
         assertEquals(PlanItemTransition.COMPLETE, sentryOnPart.getStandardEvent());
-        sentryOnPart = onParts.get(1);
+        sentryOnPart = (PlanItemSentryOnPart) onParts.get(1);
         assertEquals("taskB", sentryOnPart.getSource().getDefinitionRef());
         assertEquals(PlanItemTransition.COMPLETE, sentryOnPart.getStandardEvent());
 
@@ -124,7 +125,7 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
         onParts = sentry.getOnParts();
         assertNotNull(onParts);
         assertEquals(1, onParts.size());
-        sentryOnPart = onParts.get(0);
+        sentryOnPart = (PlanItemSentryOnPart) onParts.get(0);
         assertEquals("stage1", sentryOnPart.getSource().getDefinitionRef());
         assertEquals(PlanItemTransition.TERMINATE, sentryOnPart.getStandardEvent());
 
@@ -139,7 +140,7 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
         onParts = sentry.getOnParts();
         assertNotNull(onParts);
         assertEquals(1, onParts.size());
-        sentryOnPart = onParts.get(0);
+        sentryOnPart = (PlanItemSentryOnPart) onParts.get(0);
         assertEquals("abortStageTask", sentryOnPart.getSource().getDefinitionRef());
         assertEquals(PlanItemTransition.COMPLETE, sentryOnPart.getStandardEvent());
 
@@ -158,7 +159,7 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
         onParts = sentry.getOnParts();
         assertNotNull(onParts);
         assertEquals(1, onParts.size());
-        sentryOnPart = onParts.get(0);
+        sentryOnPart = (PlanItemSentryOnPart) onParts.get(0);
         assertEquals("expireTimer", sentryOnPart.getSource().getDefinitionRef());
         assertEquals(PlanItemTransition.OCCUR, sentryOnPart.getStandardEvent());
 

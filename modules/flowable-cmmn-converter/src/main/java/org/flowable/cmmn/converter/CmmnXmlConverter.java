@@ -57,6 +57,7 @@ import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
@@ -333,7 +334,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         ensureIds(conversionHelper.getEntryCriteria(), "entryCriterion_");
         ensureIds(conversionHelper.getExitCriteria(), "exitCriterion_");
         ensureIds(conversionHelper.getSentries(), "sentry_");
-        ensureIds(conversionHelper.getSentryOnParts(), "onPart_");
+        ensureIds(conversionHelper.getPlanItemSentryOnParts(), "onPart_");
         ensureIds(conversionHelper.getSentryIfParts(), "ifPart_");
         ensureIds(conversionHelper.getPlanItems(), "planItem_");
         ensureIds(conversionHelper.getPlanItemDefinitions(), "planItemDefinition_");
@@ -348,10 +349,10 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
         // Now everything has an id, the sentry onParts are filled to have source PlanItems,
         // this is used later when determining the dependency information
-        for (SentryOnPart sentryOnPart : conversionHelper.getSentryOnParts()) {
-            Optional<PlanItem> planItem = conversionHelper.findPlanItem(sentryOnPart.getSourceRef());
+        for (PlanItemSentryOnPart planItemSentryOnPart : conversionHelper.getPlanItemSentryOnParts()) {
+            Optional<PlanItem> planItem = conversionHelper.findPlanItem(planItemSentryOnPart.getSourceRef());
             if (planItem.isPresent()) {
-                sentryOnPart.setSource(planItem.get());
+                planItemSentryOnPart.setSource(planItem.get());
             }
         }
 
@@ -492,14 +493,14 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     
                     Criterion criterion = new Criterion();
                     criterion.setEntryCriterion(true);
-                    
-                    SentryOnPart sentryOnPart = new SentryOnPart();
-                    sentryOnPart.setSourceRef(startTriggerPlanItem.getId());
-                    sentryOnPart.setSource(startTriggerPlanItem);
-                    sentryOnPart.setStandardEvent(timerEventListener.getTimerStartTriggerStandardEvent());
+
+                    PlanItemSentryOnPart planItemSentryOnPart = new PlanItemSentryOnPart();
+                    planItemSentryOnPart.setSourceRef(startTriggerPlanItem.getId());
+                    planItemSentryOnPart.setSource(startTriggerPlanItem);
+                    planItemSentryOnPart.setStandardEvent(timerEventListener.getTimerStartTriggerStandardEvent());
                     
                     Sentry sentry = new Sentry();
-                    sentry.addSentryOnPart(sentryOnPart);
+                    sentry.addSentryOnPart(planItemSentryOnPart);
                     
                     criterion.setSentry(sentry);
                     planItem.addEntryCriterion(criterion);
@@ -538,7 +539,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             for (SentryOnPart onPart : sentry.getOnParts()) {
                 PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrDownwards(onPart.getSourceRef());
                 if (planItem != null) {
-                    onPart.setSource(planItem);
+                    ((PlanItemSentryOnPart) onPart).setSource(planItem);
                 } else {
                     throw new FlowableException("Could not resolve on part source reference "
                             + onPart.getSourceRef() + " of sentry " + sentry.getId());

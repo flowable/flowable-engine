@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 
@@ -40,7 +41,9 @@ public class CriterionUtil {
         Sentry sentry = criterion.getSentry();
         if (sentry != null) {
             for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
-                if (sentryOnPart.getSource().getId().equals(planItem.getId()) && sentryOnPart.getStandardEvent().equals(event)) {
+                if (sentryOnPart instanceof PlanItemSentryOnPart
+                        && ((PlanItemSentryOnPart) sentryOnPart).getSource().getId().equals(planItem.getId())
+                        && sentryOnPart.getStandardEvent().equals(event)) {
                     return true;
                 }
             }

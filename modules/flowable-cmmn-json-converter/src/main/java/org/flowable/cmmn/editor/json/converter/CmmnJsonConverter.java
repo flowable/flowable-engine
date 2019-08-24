@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -44,7 +44,7 @@ import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.slf4j.Logger;
@@ -558,7 +558,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                         criterionPlanItem = (PlanItem) association.getSourceElement();
                     }
 
-                    SentryOnPart sentryOnPart = new SentryOnPart();
+                    PlanItemSentryOnPart sentryOnPart = new PlanItemSentryOnPart();
                     sentryOnPart.setId("sentryOnPart" + cmmnModelIdHelper.nextSentryOnPartId());
                     sentryOnPart.setSourceRef(criterionPlanItem.getId());
                     sentryOnPart.setSource(criterionPlanItem);

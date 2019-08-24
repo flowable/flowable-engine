@@ -31,6 +31,7 @@ import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.PlanItemSentryOnPart;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
@@ -85,10 +86,12 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
             List<SentryOnPart> onParts = sentry.getOnParts();
             if (onParts != null && !onParts.isEmpty()) {
                 assertEquals(1, onParts.size());
-                assertNotNull(onParts.get(0).getId());
-                assertNotNull(onParts.get(0).getSourceRef());
-                assertNotNull(onParts.get(0).getSource());
-                assertNotNull(onParts.get(0).getStandardEvent());
+                SentryOnPart sentryOnPart = onParts.get(0);
+                assertNotNull(sentryOnPart.getId());
+                assertNotNull(sentryOnPart.getSourceRef());
+                assertTrue(sentryOnPart instanceof PlanItemSentryOnPart);
+                assertNotNull(((PlanItemSentryOnPart)sentryOnPart).getSource());
+                assertNotNull(sentryOnPart.getStandardEvent());
             } else {
                 assertThat(sentry.getSentryIfPart().getCondition(), is("${true}"));
                 assertThat(sentry.getName(), is("criterion name"));
@@ -154,7 +157,7 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals(1, exitCriteria.size());
         Criterion criterion = exitCriteria.get(0);
         assertNotNull(criterion.getSentry());
-        assertEquals("planItemMileStoneOne", criterion.getSentry().getOnParts().get(0).getSource().getId());
+        assertEquals("planItemMileStoneOne", ((PlanItemSentryOnPart) criterion.getSentry().getOnParts().get(0)).getSource().getId());
     }
 
     @Test

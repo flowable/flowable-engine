@@ -15,29 +15,15 @@ package org.flowable.cmmn.model;
 /**
  * @author Joram Barrez
  */
-public abstract class SentryOnPart extends CmmnElement {
+public class FileItemSentryOnPart extends SentryOnPart {
     
-    protected String name;
-    protected String sourceRef;
-    protected String standardEvent;
-    
-    public String getName() {
-        return name;
+    protected CaseFileItem source;
+
+    public CaseFileItem getSource() {
+        return source;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getSourceRef() {
-        return sourceRef;
-    }
-    public void setSourceRef(String sourceRef) {
-        this.sourceRef = sourceRef;
-    }
-    public String getStandardEvent() {
-        return standardEvent;
-    }
-    public void setStandardEvent(String standardEvent) {
-        this.standardEvent = standardEvent;
+    public void setSource(CaseFileItem source) {
+        this.source = source;
     }
     
 }
