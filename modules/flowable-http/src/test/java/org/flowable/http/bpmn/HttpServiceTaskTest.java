@@ -20,7 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -495,6 +498,31 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         String processInstanceId = runtimeService.startProcessInstanceByKey("testDeleteResponse").getId();
         assertTrue(runtimeService.hasVariable(processInstanceId, "myResponse"));
         assertNull(runtimeService.getVariable(processInstanceId, "myResponse"));
+    }
+
+    @Test
+    @Deployment
+    public void testGetWithVariableNameAndSkipExpression() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+        variables.put("skip", false);
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testGetWithVariableNameAndSkipExpression", variables);
+        assertEquals("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}\n", runtimeService.getVariable(pi.getId(), "result"));
+
+        Map<String, Object> variables2 = new HashMap<>();
+        variables2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+        variables2.put("skip", true);
+        ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("testGetWithVariableNameAndSkipExpression", variables2);
+        assertNull(runtimeService.getVariable(pi2.getId(), "result"));
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi2.getId())
+                    .activityId("getHttpTask")
+                    .singleResult();
+            assertActivityInstancesAreSame(skipActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(skipActivityInstance .getId()).singleResult());
+
+            assertNotNull(skipActivityInstance);
+        }
     }
 
     private void assertEquals(final String processInstanceId, final Map<String, Object> vars) {
