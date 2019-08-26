@@ -17,6 +17,9 @@
 		<property name="ldif" value="classpath:users.ldif" />
 	</bean>
 
+	<!-- This bean is needed in context xml in order for the jdbc properties to work -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
 		<property name="driverClass" value="${jdbc.driver:org.h2.Driver}" />

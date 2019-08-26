@@ -4,6 +4,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <!-- This bean is needed in context xml in order for the jdbc properties to work -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
     <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
         <property name="driverClass" value="${jdbc.driver:org.h2.Driver}" />
         <property name="url" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />

@@ -8,6 +8,9 @@
         http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
+    <!-- This bean is needed in context xml in order for the jdbc properties to work -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
     <bean id="dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
         <property name="targetDataSource">
             <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
