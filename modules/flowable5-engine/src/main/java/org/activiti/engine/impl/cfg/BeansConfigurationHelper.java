@@ -14,8 +14,12 @@
 package org.activiti.engine.impl.cfg;
 
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
@@ -32,6 +36,17 @@ public class BeansConfigurationHelper {
         XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
         xmlBeanDefinitionReader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
         xmlBeanDefinitionReader.loadBeanDefinitions(springResource);
+
+        // Check non singleton beans for types
+        // Do not eagerly initialize FactorBeans when getting BeanFactoryPostProcessor beans
+        Collection<BeanFactoryPostProcessor> factoryPostProcessors = beanFactory.getBeansOfType(BeanFactoryPostProcessor.class, true, false).values();
+        if (factoryPostProcessors.isEmpty()) {
+            factoryPostProcessors = Collections.singleton(new PropertyPlaceholderConfigurer());
+        }
+        for (BeanFactoryPostProcessor factoryPostProcessor : factoryPostProcessors) {
+            factoryPostProcessor.postProcessBeanFactory(beanFactory);
+        }
+
         ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) beanFactory.getBean(beanName);
         processEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(beanFactory));
         return processEngineConfiguration;

@@ -206,6 +206,55 @@ To configure a JNDI data source, use following properties in the properties file
 * datasource.jndi.resourceRef: Set whether the lookup occurs in a J2EE container, for example, the prefix "java:comp/env/" needs to be added if the JNDI name doesn't already contain it. Default is "true".
 
 
+==== Custom properties
+
+System properties can also be used in the +flowable.cfg.xml+ by using them in the format `${propertyName:defaultValue}`.
+
+[source,xml,linenums]
+----
+<property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+<property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+<property name="jdbcUsername" value="${jdbc.username:sa}" />
+<property name="jdbcPassword" value="${jdbc.password:}" />
+----
+
+Using this configuration if the property `jdbc.url` is available then it would be used for the `jdbcUrl` of the `ProcessEngineConfiguration`.
+Otherwise the value after the first `:` would be used.
+
+It is also possible to define locations from where properties can be picked up from the system by using a bean of type +org.springframework.beans.factory.config.PropertyPlaceholderConfigurer+.
+
+Example configuration with custom location for properties
+
+[source,xml,linenums]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location" value="file:/opt/conf/flowable.properties" />
+  </bean>
+
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+    <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+    <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+    <property name="jdbcUsername" value="${jdbc.username:sa}" />
+    <property name="jdbcPassword" value="${jdbc.password:}" />
+
+    <property name="databaseSchemaUpdate" value="true" />
+
+    <property name="asyncExecutorActivate" value="false" />
+
+    <property name="mailServerHost" value="mail.my-corp.com" />
+    <property name="mailServerPort" value="5025" />
+  </bean>
+
+</beans>
+----
+
+With this configuration the properties would be first looked up in the +/opt/conf/flowable.properties+ file.
+
 [[supporteddatabases]]
 
 
