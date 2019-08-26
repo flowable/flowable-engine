@@ -1205,6 +1205,11 @@
 						</execution>
 					</executions>
 				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.6.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -1576,12 +1581,28 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>dmn</id>
+			<modules>
+				<module>modules/flowable-dmn-model</module>
+				<module>modules/flowable-dmn-api</module>
+				<module>modules/flowable-dmn-engine</module>
+				<module>modules/flowable-dmn-xml-converter</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>databasecontent</id>
 			<activation>
 				<property>
 					<name>databasecontent</name>
 				</property>
 			</activation>
+			<modules>
+				<module>modules/flowable-content-api</module>
+				<module>modules/flowable-content-engine</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>content</id>
 			<modules>
 				<module>modules/flowable-content-api</module>
 				<module>modules/flowable-content-engine</module>
