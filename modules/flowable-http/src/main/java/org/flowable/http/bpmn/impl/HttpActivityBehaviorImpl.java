@@ -157,7 +157,7 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
         boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionText,
                 execution.getCurrentActivityId(), execution, commandContext);
 
-        if (skipExpressionText == null || !isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText,
+        if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText,
                 execution.getCurrentActivityId(), execution, commandContext)) {
 
             HttpRequest request = new HttpRequest();

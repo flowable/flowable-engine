@@ -204,7 +204,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         } catch(Exception e) {
             // timeout exception expected
         }
-        
+
         // restore timeouts
         this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(defaultSocketTimeout);
         this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(defaultConnectTimeOut);
@@ -226,7 +226,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // execute test
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("requestTimeout");
         assertProcessEnded(processInstance.getId());
-        
+
         // restore timeouts
         this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(defaultSocketTimeout);
         this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(defaultConnectTimeOut);
@@ -468,19 +468,19 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertEquals(process.getId(), response);
         continueProcess(process);
     }
-    
+
     @Test
     @Deployment
     public void testTransientJsonResponseVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testTransientJsonResponseVariable");
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-        
+
         // There should be only one response variable from the second http task (the first one uses a transient variable)
         assertEquals(1, variables.size());
         assertTrue(variables.get("postResponse") instanceof JsonNode);
         assertEquals("Hello John", ((JsonNode) variables.get("postResponse")).get("result").asText());
     }
-    
+
     @Test
     @Deployment
     public void testArrayNodeResponse() {
@@ -504,16 +504,18 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     @Deployment
     public void testGetWithVariableNameAndSkipExpression() {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+        variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         variables.put("skip", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testGetWithVariableNameAndSkipExpression", variables);
         assertEquals("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}\n", runtimeService.getVariable(pi.getId(), "result"));
+        assertEquals("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}\n", runtimeService.getVariable(pi.getId(), "result2"));
 
         Map<String, Object> variables2 = new HashMap<>();
-        variables2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+        variables2.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         variables2.put("skip", true);
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("testGetWithVariableNameAndSkipExpression", variables2);
         assertNull(runtimeService.getVariable(pi2.getId(), "result"));
+        assertEquals("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}\n", runtimeService.getVariable(pi.getId(), "result2"));
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricActivityInstance skipActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi2.getId())

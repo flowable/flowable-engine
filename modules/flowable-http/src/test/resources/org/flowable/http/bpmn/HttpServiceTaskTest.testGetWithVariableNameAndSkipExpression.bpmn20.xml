@@ -29,6 +29,24 @@
         </serviceTask>
 
         <sequenceFlow sourceRef="getHttpTask"
+                      targetRef="getHttpTask2"/>
+
+        <serviceTask id="getHttpTask2"
+                     flowable:type="http">
+            <extensionElements>
+                <flowable:field name="requestMethod">
+                    <flowable:string><![CDATA[GET]]></flowable:string>
+                </flowable:field>
+                <flowable:field name="requestUrl">
+                    <flowable:string><![CDATA[http://localhost:9798/test]]></flowable:string>
+                </flowable:field>
+                <flowable:field name="responseVariableName">
+                    <flowable:string><![CDATA[result2]]></flowable:string>
+                </flowable:field>
+            </extensionElements>
+        </serviceTask>
+
+        <sequenceFlow sourceRef="getHttpTask2"
                       targetRef="waitState"/>
 
         <userTask id="waitState"/>
