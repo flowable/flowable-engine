@@ -53,9 +53,9 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         assertEquals(5, tasks.size());
         for (int i = 0; i < 5; i++) {
             Map<String, Object> task = tasks.get(i);
-            assertNotNull(task.get("ID"));
-            assertNotNull(task.get("NAME"));
-            assertNotNull(task.get("CREATETIME"));
+            assertNotNull(getValue(task, "id"));
+            assertNotNull(getValue(task, "name"));
+            assertNotNull(getValue(task, "createTime"));
         }
 
         // Cleanup
@@ -93,8 +93,8 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         assertEquals(5, results.size());
         for (int i = 0; i < 5; i++) {
             Map<String, Object> result = results.get(i);
-            Long id = Long.valueOf((String) result.get("TASKID"));
-            Long variableValue = ((Number) result.get("VARIABLEVALUE")).longValue();
+            Long id = Long.valueOf((String) getValue(result, "taskId"));
+            Long variableValue = ((Number) getValue(result, "variableValue")).longValue();
             assertEquals(id * 2, variableValue.longValue());
         }
 
@@ -103,6 +103,25 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
             taskService.deleteTask(task.getId(), true);
         }
 
+    }
+
+    protected Object getValue(Map<String, Object> map, String key) {
+        if (map.containsKey(key)) {
+            return map.get(key);
+        }
+
+        String upperCaseKey = key.toUpperCase();
+        if (map.containsKey(upperCaseKey)) {
+            return map.get(upperCaseKey);
+        }
+
+        String lowerCaseKey = key.toLowerCase();
+        if (map.containsKey(lowerCaseKey)) {
+            return map.get(lowerCaseKey);
+        }
+
+        fail("Map with keys " + map.keySet() + " does not contain key " + key);
+        return null;
     }
 
 }
