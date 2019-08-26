@@ -12,6 +12,8 @@
  */
 package org.flowable.rest.conf.engine;
 
+import java.sql.Driver;
+
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -36,6 +38,7 @@ import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -45,14 +48,27 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class EngineConfiguration {
 
+    @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}")
+    protected String jdbcUrl;
+
+    @Value("${jdbc.driver:org.h2.Driver}")
+    protected Class<? extends Driver> jdbcDriver;
+
+    @Value("${jdbc.username:sa}")
+    protected String jdbcUsername;
+
+    @Value("${jdbc.password:}")
+    protected String jdbcPassword;
+
     @Bean
     public DataSource dataSource() {
         SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setDriverClass(org.h2.Driver.class);
+        ds.setDriverClass(jdbcDriver);
 
         // Connection settings
         ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
-        ds.setUsername("sa");
+        ds.setUsername(jdbcUsername);
+        ds.setPassword(jdbcPassword);
 
         return ds;
     }

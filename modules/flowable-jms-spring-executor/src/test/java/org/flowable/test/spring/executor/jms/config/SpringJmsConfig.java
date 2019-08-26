@@ -25,6 +25,7 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.executor.jms.JobMessageListener;
 import org.flowable.spring.executor.jms.MessageBasedJobManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -39,13 +40,25 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 public class SpringJmsConfig {
 
+    @Value("${jdbc.url:jdbc:h2:mem:flowable-spring-jms-test;DB_CLOSE_DELAY=1000;MVCC=TRUE}")
+    protected String jdbcUrl;
+
+    @Value("${jdbc.driver:org.h2.Driver}")
+    protected String jdbcDriverClassName;
+
+    @Value("${jdbc.username:sa}")
+    protected String jdbcUsername;
+
+    @Value("${jdbc.password:}")
+    protected String jdbcPassword;
+
     @Bean
     public DataSource dataSource() {
         HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl("jdbc:h2:mem:flowable-spring-jms-test;DB_CLOSE_DELAY=1000");
-        dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("");
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setDriverClassName(jdbcDriverClassName);
+        dataSource.setUsername(jdbcUsername);
+        dataSource.setPassword(jdbcPassword);
         return dataSource;
     }
 

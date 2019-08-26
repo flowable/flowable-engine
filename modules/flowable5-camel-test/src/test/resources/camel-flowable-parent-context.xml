@@ -11,10 +11,10 @@
     <bean id="dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
         <property name="targetDataSource">
             <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-                <property name="driverClass" value="org.h2.Driver"/>
-                <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE"/>
-                <property name="username" value="alfresco"/>
-                <property name="password" value="alfresco"/>
+                <property name="driverClass" value="${jdbc.driver:org.h2.Driver}" />
+                <property name="url" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+                <property name="username" value="${jdbc.username:alfresco}" />
+                <property name="password" value="${jdbc.password:alfresco}" />
             </bean>
         </property>
     </bean>
