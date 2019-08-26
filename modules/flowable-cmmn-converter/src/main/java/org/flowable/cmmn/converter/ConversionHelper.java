@@ -18,16 +18,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
+import org.flowable.cmmn.model.CaseFileItem;
+import org.flowable.cmmn.model.CaseFileItemContainer;
+import org.flowable.cmmn.model.CaseFileItemDefinition;
 import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.FileItemSentryOnPart;
 import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
@@ -51,21 +56,29 @@ public class ConversionHelper {
     protected LinkedList<PlanFragment> planFragmentsStack = new LinkedList<>();
     protected LinkedList<Stage> stagesStack = new LinkedList<>();
     protected Sentry currentSentry;
-    protected PlanItemSentryOnPart currentPlanItemSentryOnPart;
+    protected SentryOnPart currentSentryOnPart;
     protected PlanItem currentPlanItem;
     protected CmmnDiShape currentDiShape;
     protected CmmnDiEdge currentDiEdge;
 
     protected Map<Case, List<CaseElement>> caseElements = new HashMap<>();
+
     protected List<Stage> stages = new ArrayList<>();
     protected List<PlanFragment> planFragments = new ArrayList<>();
+
+    protected List<Sentry> sentries = new ArrayList<>();
     protected List<Criterion> entryCriteria = new ArrayList<>();
     protected List<Criterion> exitCriteria = new ArrayList<>();
-    protected List<Sentry> sentries = new ArrayList<>();
     protected List<PlanItemSentryOnPart> planItemSentryOnParts = new ArrayList<>();
+    protected List<FileItemSentryOnPart> fileItemSentryOnParts = new ArrayList<>();
     protected List<SentryIfPart> sentryIfParts = new ArrayList<>();
+
     protected List<PlanItem> planItems = new ArrayList<>();
     protected List<PlanItemDefinition> planItemDefinitions = new ArrayList<>();
+
+    protected LinkedList<CaseFileItemContainer> fileItemContainerStack = new LinkedList<>();
+    protected List<CaseFileItem> fileItems = new ArrayList<>();
+    protected List<CaseFileItemDefinition> fileItemDefinitions = new ArrayList<>();
 
     protected List<CmmnDiShape> diShapes = new ArrayList<>();
     protected List<CmmnDiEdge> diEdges = new ArrayList<>();
@@ -168,8 +181,39 @@ public class ConversionHelper {
 
     public void addPlanItemSentryOnPartToCurrentSentry(PlanItemSentryOnPart planItemSentryOnPart) {
         addPlanItemSentryOnPart(planItemSentryOnPart);
-        getCurrentSentry().addSentryOnPart(planItemSentryOnPart);
-        setCurrentPlanItemSentryOnPart(planItemSentryOnPart);
+        addSentryOnPart(planItemSentryOnPart);
+    }
+
+    public void addFileItemSentryOnPart(FileItemSentryOnPart fileItemSentryOnPart) {
+        fileItemSentryOnParts.add(fileItemSentryOnPart);
+    }
+
+    public void addFileItemSentryOnPartToCurrentSentry(FileItemSentryOnPart fileItemSentryOnPart) {
+        addFileItemSentryOnPart(fileItemSentryOnPart);
+        addSentryOnPart(fileItemSentryOnPart);
+    }
+
+    public CaseFileItemContainer getCurrentFileItemContainer() {
+        if (!fileItemContainerStack.isEmpty()) {
+            return fileItemContainerStack.peekLast();
+        } else {
+            return currentCase.getFileModel();
+        }
+    }
+
+    public void setCurrentFileItemContainer(CaseFileItemContainer currentFileItemContainer) {
+        if (currentFileItemContainer != null) {
+            this.fileItemContainerStack.add(currentFileItemContainer);
+        }
+    }
+
+    public void removeCurrentFileItemContainer() {
+        this.fileItemContainerStack.removeLast();
+    }
+
+    protected void addSentryOnPart(SentryOnPart sentryOnPart) {
+        getCurrentSentry().addSentryOnPart(sentryOnPart);
+        setCurrentSentryOnPart(sentryOnPart);
     }
 
     public void addSentryIfPart(SentryIfPart sentryIfPart) {
@@ -207,7 +251,13 @@ public class ConversionHelper {
 
     public Optional<PlanItem> findPlanItem(String planItemId) {
         return planItems.stream()
-                        .filter(planItem -> planItem.getId().equals(planItemId))
+                        .filter(planItem -> Objects.equals(planItem.getId(), planItemId))
+                        .findFirst();
+    }
+
+    public Optional<CaseFileItem> findFileItem(String fileItemId) {
+        return fileItems.stream()
+                        .filter(fileItem -> Objects.equals(fileItem.getId(), fileItemId))
                         .findFirst();
     }
 
@@ -277,12 +327,12 @@ public class ConversionHelper {
         this.currentSentry = currentSentry;
     }
 
-    public SentryOnPart getCurrentPlanItemSentryOnPart() {
-        return currentPlanItemSentryOnPart;
+    public SentryOnPart getCurrentSentryOnPart() {
+        return currentSentryOnPart;
     }
 
-    public void setCurrentPlanItemSentryOnPart(PlanItemSentryOnPart currentPlanItemSentryOnPart) {
-        this.currentPlanItemSentryOnPart = currentPlanItemSentryOnPart;
+    public void setCurrentSentryOnPart(SentryOnPart sentryOnPart) {
+        this.currentSentryOnPart = sentryOnPart;
     }
 
     public PlanItem getCurrentPlanItem() {
@@ -333,6 +383,10 @@ public class ConversionHelper {
         return planItemSentryOnParts;
     }
 
+    public List<FileItemSentryOnPart> getFileItemSentryOnParts() {
+        return fileItemSentryOnParts;
+    }
+
     public List<SentryIfPart> getSentryIfParts() {
         return sentryIfParts;
     }
@@ -343,6 +397,14 @@ public class ConversionHelper {
 
     public List<PlanItemDefinition> getPlanItemDefinitions() {
         return planItemDefinitions;
+    }
+
+    public List<CaseFileItem> getFileItems() {
+        return fileItems;
+    }
+
+    public List<CaseFileItemDefinition> getFileItemDefinitions() {
+        return fileItemDefinitions;
     }
 
     public List<CmmnDiShape> getDiShapes() {

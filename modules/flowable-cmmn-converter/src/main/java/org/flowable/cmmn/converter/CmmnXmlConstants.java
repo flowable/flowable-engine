@@ -40,6 +40,9 @@ public interface CmmnXmlConstants {
     String ELEMENT_DEFINITIONS = "definitions";
     String ELEMENT_DOCUMENTATION = "documentation";
     String ELEMENT_CASE = "case";
+    String ELEMENT_FILE_MODEL = "caseFileModel";
+    String ELEMENT_FILE_ITEM = "caseFileItem";
+    String ELEMENT_FILE_ITEM_CHILDREN = "children";
     String ELEMENT_PLAN_MODEL = "casePlanModel";
     String ELEMENT_STAGE = "stage";
     String ELEMENT_MILESTONE = "milestone";
@@ -89,6 +92,9 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IMPLEMENTATION_TYPE = "implementationType";
     String ATTRIBUTE_EXTERNAL_REF = "externalRef";
 
+    String ATTRIBUTE_MULTIPLICITY = "multiplicity";
+    String ATTRIBUTE_CHILDREN = "children";
+
     String ATTRIBUTE_ID = "id";
     String ATTRIBUTE_NAME = "name";
     String ATTRIBUTE_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
@@ -97,6 +103,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_TEXT_FORMAT = "textFormat";
     String ATTRIBUTE_DEFINITION_REF = "definitionRef";
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
+    String ATTRIBUTE_TARGET_REFS = "targetRefs";
     String ATTRIBUTE_SENTRY_REF = "sentryRef";
     String ATTRIBUTE_IS_BLOCKING = "isBlocking";
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";

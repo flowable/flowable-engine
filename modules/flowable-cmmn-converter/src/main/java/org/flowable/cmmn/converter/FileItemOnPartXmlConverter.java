@@ -14,34 +14,33 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.FileItemSentryOnPart;
 
 /**
  * @author Joram Barrez
  */
-public class StandardEventXmlConverter extends CaseElementXmlConverter {
+public class FileItemOnPartXmlConverter extends BaseCmmnXmlConverter {
     
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_STANDARD_EVENT;
+        return CmmnXmlConstants.ELEMENT_FILE_ITEM_ON_PART;
     }
     
     @Override
     public boolean hasChildElements() {
-        return false;
+        return true;
     }
 
     @Override
-    protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String event = xtr.getText();
-        if (conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener) {
-            TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
-            timerEventListener.setTimerStartTriggerStandardEvent(event);
-        } else {
-            conversionHelper.getCurrentSentryOnPart().setStandardEvent(xtr.getText());
-        }
-        return null;
+    protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        FileItemSentryOnPart fileItemSentryOnPart = new FileItemSentryOnPart();
+        fileItemSentryOnPart.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        fileItemSentryOnPart.setSourceRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_SOURCE_REF));
+        
+        conversionHelper.addFileItemSentryOnPartToCurrentSentry(fileItemSentryOnPart);
+        
+        return fileItemSentryOnPart;
     }
     
 }

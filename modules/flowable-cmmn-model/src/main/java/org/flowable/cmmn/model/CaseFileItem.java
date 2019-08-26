@@ -12,13 +12,10 @@
  */
 package org.flowable.cmmn.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Joram Barrez
  */
-public class CaseFileItem extends CmmnElement {
+public class CaseFileItem extends AbstractCaseFileItemContainer {
 
     public static enum CaseFileItemMultiplicity {
       ZERO_OR_ONE, ZERO_OR_MORE, EXACTLY_ONE, ONE_OR_MORE, UNSPECIFIED, UNKNOWN
@@ -43,10 +40,9 @@ public class CaseFileItem extends CmmnElement {
      */
 
     protected String sourceCaseFileItemRef;
-    protected List<String> targetCaseFileItemRefs;
+    protected String targetCaseFileItemRefs;
 
-    protected CaseFileItem parent;
-    protected List<CaseFileItem> children = new ArrayList<>();
+    protected CaseFileItem parentCaseFileItem;
 
     public String getName() {
         return name;
@@ -78,25 +74,16 @@ public class CaseFileItem extends CmmnElement {
     public void setSourceCaseFileItemRef(String sourceCaseFileItemRef) {
         this.sourceCaseFileItemRef = sourceCaseFileItemRef;
     }
-    public List<String> getTargetCaseFileItemRefs() {
+    public String getTargetCaseFileItemRefs() {
         return targetCaseFileItemRefs;
     }
-    public void setTargetCaseFileItemRefs(List<String> targetCaseFileItemRefs) {
+    public void setTargetCaseFileItemRefs(String targetCaseFileItemRefs) {
         this.targetCaseFileItemRefs = targetCaseFileItemRefs;
     }
-    public CaseFileItem getParent() {
-        return parent;
+    public CaseFileItem getParentCaseFileItem() {
+        return parentCaseFileItem;
     }
-    public void setParent(CaseFileItem parent) {
-        this.parent = parent;
-    }
-    public void addChild(CaseFileItem caseFileItem) {
-        this.children.add(caseFileItem);
-    }
-    public List<CaseFileItem> getChildren() {
-        return children;
-    }
-    public void setChildren(List<CaseFileItem> children) {
-        this.children = children;
+    public void setParentCaseFileItem(CaseFileItem parentCaseFileItem) {
+        this.parentCaseFileItem = parentCaseFileItem;
     }
 }

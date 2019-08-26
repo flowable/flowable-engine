@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <caseFileItemDefinition id="fileItemDefinition1" name="My File Item Definition" />
+
+    <case id="myCase">
+
+        <caseFileModel id="myFileModel">
+            <caseFileItem id="fileItem1" name="My File Item" multiplicity="ExactlyOne" definitionRef="fileItemDefinition1"/>
+        </caseFileModel>
+
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItemTaskA" definitionRef="taskA">
+                <entryCriterion sentryRef="sentryTaskA" />
+            </planItem>
+
+            <sentry id="sentryTaskA">
+                <caseFileItemOnPart id="onPart1" sourceRef="fileItem1">
+                    <standardEvent>addChild</standardEvent>
+                </caseFileItemOnPart>
+            </sentry>
+
+            <task id="taskA" name="A" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

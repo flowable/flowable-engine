@@ -149,6 +149,16 @@ public class CmmnModel {
 
         return foundPlanItem;
     }
+
+    public CaseFileItem findFileItem(String id) {
+        for (Case caseModel : cases) {
+            CaseFileItem caseFileItem = caseModel.getFileModel().findFileItem(id);
+            if (caseFileItem != null) {
+                return caseFileItem;
+            }
+        }
+        return null;
+    }
     
     public PlanItem findPlanItemByPlanItemDefinitionId(String id) {
         PlanItem foundPlanItem = null;

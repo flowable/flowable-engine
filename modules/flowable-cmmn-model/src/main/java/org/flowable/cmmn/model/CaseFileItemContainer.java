@@ -12,13 +12,17 @@
  */
 package org.flowable.cmmn.model;
 
+import java.util.List;
+
 /**
- * Container for all case file items.
- *
  * @author Joram Barrez
  */
-public class CaseFileModel extends AbstractCaseFileItemContainer {
+public interface CaseFileItemContainer {
 
-    // Everything implemented by abstract super class
+    void addCaseFileItem(CaseFileItem caseFileItem);
+
+    List<CaseFileItem> getCaseFileItems();
+
+    CaseFileItem findFileItem(String itemId);
 
 }

@@ -47,11 +47,13 @@ import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
+import org.flowable.cmmn.model.CaseFileItem;
 import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.FileItemSentryOnPart;
 import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
@@ -88,6 +90,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new DefinitionsXmlConverter());
         addElementConverter(new DocumentationXmlConverter());
         addElementConverter(new CaseXmlConverter());
+        addElementConverter(new FileModelXmlConverter());
+        addElementConverter(new FileItemXmlConverter());
+        addElementConverter(new FileItemChildrenXmlConverter());
         addElementConverter(new PlanModelXmlConverter());
         addElementConverter(new StageXmlConverter());
         addElementConverter(new MilestoneXmlConverter());
@@ -103,6 +108,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new EntryCriterionXmlConverter());
         addElementConverter(new ExitCriterionXmlConverter());
         addElementConverter(new PlanItemOnPartXmlConverter());
+        addElementConverter(new FileItemOnPartXmlConverter());
         addElementConverter(new SentryIfPartXmlConverter());
         addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new ProcessXmlConverter());
@@ -335,6 +341,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         ensureIds(conversionHelper.getExitCriteria(), "exitCriterion_");
         ensureIds(conversionHelper.getSentries(), "sentry_");
         ensureIds(conversionHelper.getPlanItemSentryOnParts(), "onPart_");
+        ensureIds(conversionHelper.getFileItemSentryOnParts(), "fileItemOnPart_");
         ensureIds(conversionHelper.getSentryIfParts(), "ifPart_");
         ensureIds(conversionHelper.getPlanItems(), "planItem_");
         ensureIds(conversionHelper.getPlanItemDefinitions(), "planItemDefinition_");
@@ -347,12 +354,18 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             }
         }
 
-        // Now everything has an id, the sentry onParts are filled to have source PlanItems,
+        // Now everything has an id, the sentry onParts are filled to have source PlanItems/CaseFileItems,
         // this is used later when determining the dependency information
         for (PlanItemSentryOnPart planItemSentryOnPart : conversionHelper.getPlanItemSentryOnParts()) {
             Optional<PlanItem> planItem = conversionHelper.findPlanItem(planItemSentryOnPart.getSourceRef());
             if (planItem.isPresent()) {
                 planItemSentryOnPart.setSource(planItem.get());
+            }
+        }
+        for (FileItemSentryOnPart fileItemSentryOnPart : conversionHelper.getFileItemSentryOnParts()) {
+            Optional<CaseFileItem> fileItemOptional = conversionHelper.findFileItem(fileItemSentryOnPart.getSourceRef());
+            if (fileItemOptional.isPresent()) {
+                fileItemSentryOnPart.setSource(fileItemOptional.get());
             }
         }
 
@@ -379,31 +392,34 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             association.setId(diEdge.getId());
             association.setSourceRef(diEdge.getCmmnElementRef());
             association.setTargetRef(diEdge.getTargetCmmnElementRef());
+            addPlanItemAssociation(cmmnModel, association);
 
-            String planItemSourceRef = null;
-            PlanItem planItem = cmmnModel.findPlanItem(association.getSourceRef());
-            if (planItem == null) {
-                planItem = cmmnModel.findPlanItem(association.getTargetRef());
-                planItemSourceRef = association.getTargetRef();
-            } else {
-                planItemSourceRef = association.getSourceRef();
-            }
+            cmmnModel.addAssociation(association);
+            cmmnModel.addFlowGraphicInfoList(association.getId(), diEdge.getWaypoints());
+        }
+    }
 
-            if (planItem != null) {
-                for (Criterion criterion : planItem.getEntryCriteria()) {
-                    Sentry sentry = criterion.getSentry();
-                    if (sentry.getOnParts().size() > 0) {
-                        SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
+    protected void addPlanItemAssociation(CmmnModel cmmnModel, Association association) {
+        String planItemSourceRef = null;
+        PlanItem planItem = cmmnModel.findPlanItem(association.getSourceRef());
+        if (planItem == null) {
+            planItem = cmmnModel.findPlanItem(association.getTargetRef());
+            planItemSourceRef = association.getTargetRef();
+        } else {
+            planItemSourceRef = association.getSourceRef();
+        }
+
+        if (planItem != null) {
+            for (Criterion criterion : planItem.getEntryCriteria()) {
+                Sentry sentry = criterion.getSentry();
+                if (sentry.getOnParts().size() > 0) {
+                    for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
                         if (planItemSourceRef.equals(sentryOnPart.getSourceRef())) {
                             association.setTransitionEvent(sentryOnPart.getStandardEvent());
                         }
                     }
                 }
             }
-
-            cmmnModel.addAssociation(association);
-
-            cmmnModel.addFlowGraphicInfoList(association.getId(), diEdge.getWaypoints());
         }
     }
 
@@ -534,20 +550,40 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         }
     }
 
-    protected void processSentries(Stage planModelStage, PlanFragment planFragment) {
-        for (Sentry sentry : planFragment.getSentries()) {
+    protected void processSentries(Stage planModelStage, PlanFragment planFragmentToProcess) {
+        for (Sentry sentry : planFragmentToProcess.getSentries()) {
             for (SentryOnPart onPart : sentry.getOnParts()) {
-                PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrDownwards(onPart.getSourceRef());
-                if (planItem != null) {
-                    ((PlanItemSentryOnPart) onPart).setSource(planItem);
-                } else {
-                    throw new FlowableException("Could not resolve on part source reference "
+
+                if (onPart instanceof PlanItemSentryOnPart) {
+                    PlanItemSentryOnPart planItemSentryOnPart = (PlanItemSentryOnPart) onPart;
+                    PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrDownwards(planItemSentryOnPart.getSourceRef());
+                    if (planItem != null) {
+                        planItemSentryOnPart.setSource(planItem);
+                    } else {
+                        throw new FlowableException("Could not resolve on part source reference "
                             + onPart.getSourceRef() + " of sentry " + sentry.getId());
+                    }
+
+                } else if (onPart instanceof FileItemSentryOnPart) {
+                    FileItemSentryOnPart fileItemSentryOnPart = (FileItemSentryOnPart) onPart;
+                    CaseFileItem fileItem = planModelStage.getCase().getFileModel()
+                        .findFileItem(fileItemSentryOnPart.getSourceRef());
+                    if (fileItem != null) {
+                        fileItemSentryOnPart.setSource(fileItem);
+                    } else {
+                        throw  new FlowableException("Could not resolve file item on part source reference "
+                            + onPart.getSourceRef() + " of sentry " + sentry.getId());
+                    }
+
+                } else {
+                    throw new FlowableException("Invalid onPart class: " + onPart.getClass());
+
                 }
+
             }
         }
 
-        for (PlanItem planItem : planFragment.getPlanItems()) {
+        for (PlanItem planItem : planFragmentToProcess.getPlanItems()) {
             if (planItem.getPlanItemDefinition() instanceof PlanFragment) {
                 processSentries(planModelStage, (PlanFragment) planItem.getPlanItemDefinition());
             }
