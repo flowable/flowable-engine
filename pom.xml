@@ -909,7 +909,6 @@
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>42.2.6</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>
@@ -1744,6 +1743,15 @@
                     </plugin>
                 </plugins>
             </build>
+		</profile>
+		<profile>
+			<id>postgresql</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
 		</profile>
 	</profiles>
 
