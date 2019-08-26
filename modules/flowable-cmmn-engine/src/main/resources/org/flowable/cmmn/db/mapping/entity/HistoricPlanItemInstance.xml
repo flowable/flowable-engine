@@ -225,7 +225,7 @@
     </delete>
     
     <delete id="bulkDeleteHistoricPlanItemInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
-        delete PLANITEM from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST PLANITEM where PLANITEM.CASE_INST_ID_ is not null and PLANITEM.CASE_INST_ID_ != '' and
+        delete <if test="_databaseId != 'postgres'"> PLANITEM </if> from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST PLANITEM where PLANITEM.CASE_INST_ID_ is not null and PLANITEM.CASE_INST_ID_ != '' and
         NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where PLANITEM.CASE_INST_ID_ = CASEINST.ID_)
     </delete>
   

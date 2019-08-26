@@ -148,7 +148,7 @@
     </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
-        delete VARINST from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and VARINST.PROC_INST_ID_ != '' and 
+        delete <if test="_databaseId != 'postgres'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and VARINST.PROC_INST_ID_ != '' and
         NOT EXISTS (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC where VARINST.PROC_INST_ID_ = PROC.ID_)
     </delete>
     
@@ -158,7 +158,7 @@
     </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
-        delete VARINST from ${prefix}ACT_HI_VARINST VARINST where VARINST.SCOPE_ID_ is not null and VARINST.SCOPE_ID_ != '' and VARINST.SCOPE_TYPE_ = 'cmmn' and
+        delete <if test="_databaseId != 'postgres'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.SCOPE_ID_ is not null and VARINST.SCOPE_ID_ != '' and VARINST.SCOPE_TYPE_ = 'cmmn' and
         NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where VARINST.SCOPE_ID_ = CASEINST.ID_)
     </delete>
     
