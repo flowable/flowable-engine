@@ -1753,6 +1753,15 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		<profile>
+			<id>mysql</id>
+			<dependencies>
+				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
 	</profiles>
 
     <reporting>
