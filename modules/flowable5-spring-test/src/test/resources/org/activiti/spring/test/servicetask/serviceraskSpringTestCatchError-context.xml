@@ -3,12 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
     <bean id="dataSource"
           class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-        <property name="driverClass" value="org.h2.Driver"/>
-        <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000"/>
-        <property name="username" value="sa"/>
-        <property name="password" value=""/>
+        <property name="driverClass" value="${jdbc.driver:org.h2.Driver}" />
+        <property name="url" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+        <property name="username" value="${jdbc.username:sa}" />
+        <property name="password" value="${jdbc.password:}" />
     </bean>
 
     <bean id="transactionManager"

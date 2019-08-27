@@ -115,6 +115,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
         $scope.subTaskGridDefinitions = {
             data: 'subTasks.data',
             enableRowReordering: false,
+            enableColumnResize: true,
             multiSelect: false,
             keepLastSelected : false,
             enableSorting: false,
@@ -139,6 +140,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
         $scope.variableGridDefinitions = {
             data: 'variables.data',
             enableRowReordering: false,
+            enableColumnResize: true,
             multiSelect: false,
             keepLastSelected : false,
             enableSorting: false,

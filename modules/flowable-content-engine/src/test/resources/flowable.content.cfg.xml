@@ -5,9 +5,9 @@
 
     <bean id="contentEngineConfiguration" class="org.flowable.content.engine.impl.cfg.StandaloneContentEngineConfiguration">
 
-        <property name="jdbcUrl" value="jdbc:h2:mem:flowablecontent;DB_CLOSE_DELAY=1000" />
-        <property name="jdbcDriver" value="org.h2.Driver" />
-        <property name="jdbcUsername" value="sa" />
-        <property name="jdbcPassword" value="" />
+        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowablecontent;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+        <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+        <property name="jdbcUsername" value="${jdbc.username:sa}" />
+        <property name="jdbcPassword" value="${jdbc.password:}" />
     </bean>
 </beans>

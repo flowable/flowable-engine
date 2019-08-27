@@ -49,9 +49,9 @@ public class StageXmlConverter extends PlanItemDefinitionXmlConverter {
 
         String includeInStageOverviewString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW);
         if (StringUtils.isNotEmpty(includeInStageOverviewString)) {
-            stage.setIncludeInStageOverview(Boolean.valueOf(includeInStageOverviewString));
+            stage.setIncludeInStageOverview(includeInStageOverviewString);
         } else {
-            stage.setIncludeInStageOverview(true);  // True by default
+            stage.setIncludeInStageOverview("true");  // True by default
         }
 
         stage.setCase(conversionHelper.getCurrentCase());

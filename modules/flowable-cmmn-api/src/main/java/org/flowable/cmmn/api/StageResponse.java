@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.rest.service.api.history.caze;
+package org.flowable.cmmn.api;
 
 import java.util.Date;
 

@@ -457,5 +457,13 @@
 
 
     </changeSet>
+    
+    <changeSet id="8" author="flowable">
+    
+        <addColumn tableName="ACT_CMMN_HI_PLAN_ITEM_INST">
+            <column name="SHOW_IN_OVERVIEW_" type="boolean" />
+        </addColumn>
+    
+    </changeSet>
 
 </databaseChangeLog>

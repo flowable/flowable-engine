@@ -13,26 +13,19 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
-import org.flowable.cmmn.rest.service.api.history.caze.StageResponse;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,6 +49,9 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Case Instances" }, description = "Manage Case Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceResource extends BaseCaseInstanceResource {
+    
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @ApiOperation(value = "Get a case instance", tags = { "Case Instances" }, nickname = "getCaseInstance")
     @ApiResponses(value = {
@@ -140,61 +136,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             restApiInterceptor.accessStageOverview(caseInstance);
         }
 
-        List<PlanItemInstance> stagePlanItemInstances = runtimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstanceId)
-            .planItemDefinitionType(PlanItemDefinitionType.STAGE)
-            .includeEnded()
-            .orderByEndTime().asc()
-            .list();
-
-        CmmnModel cmmnModel = repositoryService.getCmmnModel(caseInstance.getCaseDefinitionId());
-        List<Stage> stages = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true);
-
-        // If one stage has a display order, they are ordered by that.
-        // Otherwise, the order as it comes back from the query is used.
-        stages.sort(Comparator.comparing(Stage::getDisplayOrder, Comparator.nullsFirst(Comparator.naturalOrder()))
-            .thenComparing(stage -> getPlanItemInstanceEndTime(stagePlanItemInstances, stage), Comparator.nullsLast(Comparator.naturalOrder()))
-        );
-        List<StageResponse> stageResponses = new ArrayList<>(stages.size());
-        for (Stage stage : stages) {
-            if (stage.isIncludeInStageOverview()) {
-                StageResponse stageResponse = new StageResponse(stage.getId(), stage.getName());
-                Optional<PlanItemInstance> planItemInstance = getPlanItemInstance(stagePlanItemInstances, stage);
-
-                // If not ended or current, it's implicitly a future one
-                if (planItemInstance.isPresent()) {
-                    stageResponse.setEnded(planItemInstance.get().getEndedTime() != null);
-                    stageResponse.setCurrent(PlanItemInstanceState.ACTIVE.equals(planItemInstance.get().getState()));
-                }
-
-                stageResponses.add(stageResponse);
-            }
-        }
-
-        return stageResponses;
+        return runtimeService.getStageOverview(caseInstanceId);
     }
-
-    protected Date getPlanItemInstanceEndTime(List<PlanItemInstance> stagePlanItemInstances, Stage stage) {
-        return getPlanItemInstance(stagePlanItemInstances, stage)
-            .map(PlanItemInstance::getEndedTime)
-            .orElse(null);
-    }
-
-    protected Optional<PlanItemInstance> getPlanItemInstance(List<PlanItemInstance> stagePlanItemInstances, Stage stage) {
-        PlanItemInstance planItemInstance = null;
-        for (PlanItemInstance p : stagePlanItemInstances) {
-            if (p.getPlanItemDefinitionId().equals(stage.getId())) {
-                if (p.getEndedTime() == null) {
-                    planItemInstance = p; // one that's not ended yet has precedence
-                } else {
-                    if (planItemInstance == null) {
-                        planItemInstance = p;
-                    }
-                }
-
-            }
-        }
-        return Optional.ofNullable(planItemInstance);
-    }
-
+    
 }

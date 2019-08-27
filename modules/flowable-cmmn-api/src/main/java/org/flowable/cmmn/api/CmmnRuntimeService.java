@@ -119,6 +119,17 @@ public interface CmmnRuntimeService {
     EventSubscriptionQuery createEventSubscriptionQuery();
     
     /**
+     * Gives back a stage overview of the case instance which includes the stage information of the case model.
+     * 
+     * @param caseInstanceId
+     *            id of the case instance, cannot be null.
+     * @return list of stage info objects 
+     * @throws FlowableObjectNotFoundException
+     *             when the case instance doesn't exist.
+     */
+    List<StageResponse> getStageOverview(String caseInstanceId);
+    
+    /**
      * Involves a user with a case instance. The type of identity link is defined by the given identityLinkType.
      * 
      * @param caseInstanceId
@@ -128,7 +139,7 @@ public interface CmmnRuntimeService {
      * @param identityLinkType
      *            type of identityLink, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when the process instance doesn't exist.
+     *             when the case instance doesn't exist.
      */
     void addUserIdentityLink(String caseInstanceId, String userId, String identityLinkType);
 

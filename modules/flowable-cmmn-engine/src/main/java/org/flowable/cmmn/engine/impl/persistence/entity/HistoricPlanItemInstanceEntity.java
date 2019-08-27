@@ -12,11 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Date;
+
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
-
-import java.util.Date;
 
 /**
  * @author Dennis Federico
@@ -78,6 +78,8 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
     void setEntryCriterionId(String entryCriterionId);
 
     void setExitCriterionId(String exitCriterionId);
+    
+    void setShowInOverview(boolean showInOverview);
 
     void setTenantId(String tenantId);
 

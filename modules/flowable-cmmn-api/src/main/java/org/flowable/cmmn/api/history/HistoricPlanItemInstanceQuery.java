@@ -38,6 +38,7 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     HistoricPlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
     HistoricPlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId);
+    HistoricPlanItemInstanceQuery onlyStages();
     HistoricPlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId();
     HistoricPlanItemInstanceQuery planItemInstanceTenantIdLike(String tenantIdLike);

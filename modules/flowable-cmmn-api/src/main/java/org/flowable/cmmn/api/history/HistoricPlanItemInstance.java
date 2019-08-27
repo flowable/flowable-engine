@@ -73,6 +73,8 @@ public interface HistoricPlanItemInstance {
     String getEntryCriterionId();
 
     String getExitCriterionId();
+    
+    boolean isShowInOverview();
 
     String getTenantId();
 

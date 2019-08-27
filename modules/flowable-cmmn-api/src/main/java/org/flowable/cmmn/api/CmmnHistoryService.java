@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -42,6 +43,17 @@ public interface CmmnHistoryService {
     HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
 
     HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery();
+    
+    /**
+     * Gives back a stage overview of the historic case instance which includes the stage information of the case model.
+     * 
+     * @param caseInstanceId
+     *            id of the case instance, cannot be null.
+     * @return list of stage info objects 
+     * @throws FlowableObjectNotFoundException
+     *             when the case instance doesn't exist.
+     */
+    List<StageResponse> getStageOverview(String caseInstanceId);
 
     void deleteHistoricCaseInstance(String caseInstanceId);
     

@@ -92,7 +92,7 @@ aopalliance                     aopalliance                 1.0             Publ
 com.carrotsearch                hppc                        0.7.1           The Apache Software License, Version 2.0
 com.fasterxml.jackson.core      jackson-annotations         2.9.9           The Apache Software License, Version 2.0
 com.fasterxml.jackson.core      jackson-core                2.9.9           The Apache Software License, Version 2.0
-com.fasterxml.jackson.core      jackson-databind            2.9.9           The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-databind            2.9.9.3         The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-hppc       2.9.9           The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-joda       2.9.9           The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-json-org   2.9.9           The Apache Software License, Version 2.0

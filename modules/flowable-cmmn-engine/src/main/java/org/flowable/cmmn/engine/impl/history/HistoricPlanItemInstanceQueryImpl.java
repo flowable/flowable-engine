@@ -19,9 +19,9 @@ import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 
 /**
  * @author Dennis Federico
@@ -69,6 +69,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected boolean notEnded;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected boolean onlyStages;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -183,6 +184,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
             throw new FlowableIllegalArgumentException("ExitCriterionId is null");
         }
         this.exitCriterionId = exitCriterionId;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery onlyStages() {
+        this.onlyStages = true;
         return this;
     }
 
@@ -492,6 +499,9 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public String getExitCriterionId() {
         return exitCriterionId;
+    }
+    public boolean isOnlyStages() {
+        return onlyStages;
     }
     public String getTenantId() {
         return tenantId;
