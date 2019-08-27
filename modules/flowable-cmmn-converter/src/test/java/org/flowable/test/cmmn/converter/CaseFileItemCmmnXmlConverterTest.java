@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.flowable.cmmn.model.CaseFileItem;
 import org.flowable.cmmn.model.CaseFileItemDefinition;
+import org.flowable.cmmn.model.CaseFileItemPropertyDefinition;
+import org.flowable.cmmn.model.CaseFileItemPropertyDefinitionTypes;
 import org.flowable.cmmn.model.CaseFileModel;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
@@ -39,12 +41,12 @@ public class CaseFileItemCmmnXmlConverterTest extends AbstractConverterTest {
         CaseFileModel fileModel = cmmnModel.getPrimaryCase().getFileModel();
         assertNotNull(fileModel);
         assertEquals("myFileModel", fileModel.getId());
-        assertEquals(14, fileModel.getXmlRowNumber());
+        assertEquals(17, fileModel.getXmlRowNumber());
 
         assertEquals(1, fileModel.getCaseFileItems().size());
 
         CaseFileItem caseFileItem = fileModel.getCaseFileItems().get(0);
-        assertEquals(15, caseFileItem.getXmlRowNumber());
+        assertEquals(18, caseFileItem.getXmlRowNumber());
         assertEquals("fileItem1", caseFileItem.getId());
         assertEquals("My File Item", caseFileItem.getName());
         assertEquals(CaseFileItem.CaseFileItemMultiplicity.EXACTLY_ONE, caseFileItem.getMultiplicity());
@@ -63,6 +65,19 @@ public class CaseFileItemCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("fileItemDefinition1", caseFileItemDefinition.getId());
         assertEquals("My File Item Definition", caseFileItemDefinition.getName());
         assertEquals("http://www.omg.org/spec/CMMN/DefinitionType/CMISFolder", caseFileItemDefinition.getDefinitionType());
+
+        List<CaseFileItemPropertyDefinition> propertyDefinitions = caseFileItemDefinition.getPropertyDefinitions();
+        assertEquals(2, propertyDefinitions.size());
+
+        CaseFileItemPropertyDefinition propertyDefinition1 = propertyDefinitions.get(0);
+        assertEquals("prop1", propertyDefinition1.getId());
+        assertEquals("Name", propertyDefinition1.getName());
+        assertEquals(CaseFileItemPropertyDefinitionTypes.TYPE_STRING, propertyDefinition1.getType());
+
+        CaseFileItemPropertyDefinition propertyDefinition2 = propertyDefinitions.get(1);
+        assertEquals("prop2", propertyDefinition2.getId());
+        assertEquals("Size", propertyDefinition2.getName());
+        assertEquals(CaseFileItemPropertyDefinitionTypes.TYPE_INTEGER, propertyDefinition2.getType());
     }
 
     @Test

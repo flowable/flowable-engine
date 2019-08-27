@@ -7,7 +7,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     targetNamespace="http://flowable.org/cmmn">
 
-    <caseFileItemDefinition id="fileItemDefinition1" name="My File Item Definition" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/CMISFolder"/>
+    <caseFileItemDefinition id="fileItemDefinition1" name="My File Item Definition" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/CMISFolder">
+        <property id="prop1" name="Name" type="http://www.omg.org/spec/CMMN/PropertyType/string" />
+        <property id="prop2" name="Size" type="http://www.omg.org/spec/CMMN/PropertyType/integer" />
+    </caseFileItemDefinition>
 
     <case id="myCase">
 
