@@ -41,6 +41,7 @@ import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
@@ -74,6 +75,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(EventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(EntityLinkEntityImpl.class);
         DELETE_ORDER.add(IdentityLinkEntityImpl.class);
+        DELETE_ORDER.add(TaskEntityImpl.class);
         DELETE_ORDER.add(MilestoneInstanceEntityImpl.class);
         DELETE_ORDER.add(SentryPartInstanceEntityImpl.class);
         DELETE_ORDER.add(PlanItemInstanceEntityImpl.class);

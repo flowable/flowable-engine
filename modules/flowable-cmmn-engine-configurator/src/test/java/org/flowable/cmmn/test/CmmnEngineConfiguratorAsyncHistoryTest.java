@@ -47,8 +47,17 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
     
     @After
     public void cleanup() {
+        processEngine.getRepositoryService()
+            .createDeploymentQuery()
+            .list()
+            .forEach(deployment -> processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true));
+        cmmnEngine.getCmmnRepositoryService()
+            .createDeploymentQuery()
+            .list()
+            .forEach(deployment -> cmmnEngine.getCmmnRepositoryService().deleteDeployment(deployment.getId(), true));
+        // Execute history jobs for the delete deployments
         processEngine.getManagementService().createHistoryJobQuery().list()
-            .forEach(historyJob -> processEngine.getManagementService().deleteHistoryJob(historyJob.getId()));
+            .forEach(historyJob -> processEngine.getManagementService().executeHistoryJob(historyJob.getId()));
         
         cmmnEngine.close();
         processEngine.close();
@@ -124,6 +133,7 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
         
         HistoryJob historyJob = processEngine.getManagementService().createHistoryJobQuery().singleResult();
         assertEquals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, historyJob.getJobHandlerType());
+        processEngine.getManagementService().executeHistoryJob(historyJob.getId());
     }
 
 }

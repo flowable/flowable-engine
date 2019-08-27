@@ -19,6 +19,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -90,6 +91,10 @@ public abstract class AbstractProcessEngineIntegrationTest {
     public void cleanup() {
         for (Deployment deployment : processEngineRepositoryService.createDeploymentQuery().list()) {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+
+        for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
+            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
     

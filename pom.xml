@@ -909,7 +909,6 @@
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>42.2.6</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>
@@ -1204,6 +1203,11 @@
 							</configuration>
 						</execution>
 					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.6.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -1576,12 +1580,28 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>dmn</id>
+			<modules>
+				<module>modules/flowable-dmn-model</module>
+				<module>modules/flowable-dmn-api</module>
+				<module>modules/flowable-dmn-engine</module>
+				<module>modules/flowable-dmn-xml-converter</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>databasecontent</id>
 			<activation>
 				<property>
 					<name>databasecontent</name>
 				</property>
 			</activation>
+			<modules>
+				<module>modules/flowable-content-api</module>
+				<module>modules/flowable-content-engine</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>content</id>
 			<modules>
 				<module>modules/flowable-content-api</module>
 				<module>modules/flowable-content-engine</module>
@@ -1723,6 +1743,15 @@
                     </plugin>
                 </plugins>
             </build>
+		</profile>
+		<profile>
+			<id>postgresql</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
 		</profile>
 	</profiles>
 
