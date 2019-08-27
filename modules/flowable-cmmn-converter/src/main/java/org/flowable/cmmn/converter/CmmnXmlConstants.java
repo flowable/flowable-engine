@@ -38,6 +38,8 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_CREATION_DATE = "creationDate";
 
     String ELEMENT_DEFINITIONS = "definitions";
+    String ELEMENT_FILE_DEFINITION = "caseFileItemDefinition";
+    String ELEMENT_FILE_DEFINITION_PROPERTY = "property";
     String ELEMENT_DOCUMENTATION = "documentation";
     String ELEMENT_CASE = "case";
     String ELEMENT_FILE_MODEL = "caseFileModel";
@@ -178,6 +180,8 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType";
     String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";
     String ATTRIBUTE_EVENT_LISTENER_SIGNAL_REF = "signalRef";
+
+    String ATTRIBUTE_DEFINITION_TYPE = "definitionType";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

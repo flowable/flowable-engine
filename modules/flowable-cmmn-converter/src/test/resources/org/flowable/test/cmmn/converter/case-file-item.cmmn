@@ -7,7 +7,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     targetNamespace="http://flowable.org/cmmn">
 
-    <caseFileItemDefinition id="fileItemDefinition1" name="My File Item Definition" />
+    <caseFileItemDefinition id="fileItemDefinition1" name="My File Item Definition" definitionType="http://www.omg.org/spec/CMMN/DefinitionType/CMISFolder"/>
 
     <case id="myCase">
 

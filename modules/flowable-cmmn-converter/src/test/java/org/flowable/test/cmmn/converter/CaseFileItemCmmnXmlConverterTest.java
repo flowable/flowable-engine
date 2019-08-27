@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.List;
 
 import org.flowable.cmmn.model.CaseFileItem;
+import org.flowable.cmmn.model.CaseFileItemDefinition;
 import org.flowable.cmmn.model.CaseFileModel;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
@@ -50,6 +51,18 @@ public class CaseFileItemCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals(0, caseFileItem.getCaseFileItems().size());
 
         assertEquals("fileItemDefinition1", caseFileItem.getCaseFileItemDefinitionRef());
+    }
+
+    @Test
+    public void testDefinitionPropertiesSet() throws Exception {
+        CmmnModel cmmnModel = readXMLFile("org/flowable/test/cmmn/converter/case-file-item.cmmn");
+        CaseFileItem caseFileItem = cmmnModel.getPrimaryCase().getFileModel().getCaseFileItems().get(0);
+        CaseFileItemDefinition caseFileItemDefinition = caseFileItem.getCaseFileItemDefinition();
+
+        assertNotNull(caseFileItemDefinition);
+        assertEquals("fileItemDefinition1", caseFileItemDefinition.getId());
+        assertEquals("My File Item Definition", caseFileItemDefinition.getName());
+        assertEquals("http://www.omg.org/spec/CMMN/DefinitionType/CMISFolder", caseFileItemDefinition.getDefinitionType());
     }
 
     @Test

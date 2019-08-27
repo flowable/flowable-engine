@@ -78,6 +78,7 @@ public class ConversionHelper {
 
     protected LinkedList<CaseFileItemContainer> fileItemContainerStack = new LinkedList<>();
     protected List<CaseFileItem> fileItems = new ArrayList<>();
+    protected CaseFileItemDefinition currentFileItemDefinition;
     protected List<CaseFileItemDefinition> fileItemDefinitions = new ArrayList<>();
 
     protected List<CmmnDiShape> diShapes = new ArrayList<>();
@@ -205,6 +206,27 @@ public class ConversionHelper {
         if (currentFileItemContainer != null) {
             this.fileItemContainerStack.add(currentFileItemContainer);
         }
+    }
+
+    public void addCaseFileItem(CaseFileItem caseFileItem) {
+        fileItems.add(caseFileItem);
+        CaseFileItemContainer currentFileItemContainer = getCurrentFileItemContainer();
+        currentFileItemContainer.addCaseFileItem(caseFileItem);
+    }
+
+    public void addFileItemDefinition(CaseFileItemDefinition fileItemDefinition) {
+        this.currentFileItemDefinition = fileItemDefinition;
+        fileItemDefinitions.add(fileItemDefinition);
+    }
+
+    public CaseFileItemDefinition getCurrentFileItemDefinition() {
+        return this.currentFileItemDefinition;
+    }
+
+    public Optional<CaseFileItemDefinition> findFileItemDefinition(String definitionId) {
+        return fileItemDefinitions.stream()
+            .filter(fileItemDefinition -> Objects.equals(definitionId, fileItemDefinition.getId()))
+            .findFirst();
     }
 
     public void removeCurrentFileItemContainer() {

@@ -74,7 +74,7 @@ public class FileItemXmlConverter extends CaseElementXmlConverter {
             }
         }
 
-        conversionHelper.getCurrentFileItemContainer().addCaseFileItem(caseFileItem);
+        conversionHelper.addCaseFileItem(caseFileItem);
 
         // The file item can have nested children
         // Children will be parsed in the FileItemChildXmlConverter

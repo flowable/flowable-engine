@@ -48,6 +48,7 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CaseFileItem;
+import org.flowable.cmmn.model.CaseFileItemDefinition;
 import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnModel;
@@ -90,6 +91,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new DefinitionsXmlConverter());
         addElementConverter(new DocumentationXmlConverter());
         addElementConverter(new CaseXmlConverter());
+        addElementConverter(new FileItemDefinitionXmlConverter());
+        addElementConverter(new FileItemDefinitionPropertyXmlConverter());
         addElementConverter(new FileModelXmlConverter());
         addElementConverter(new FileItemXmlConverter());
         addElementConverter(new FileItemChildrenXmlConverter());
@@ -351,6 +354,16 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             processSentries(caze.getPlanModel(), caze.getPlanModel());
             for (CaseElement caseElement : conversionHelper.getCaseElements().get(caze)) {
                 caze.getAllCaseElements().put(caseElement.getId(), caseElement);
+            }
+        }
+
+        // All case file item definitions are parsed, the file items can now get the reference resolved
+        for (CaseFileItem caseFileItem : conversionHelper.getFileItems()) {
+            if (caseFileItem.getId() != null) { // definition is optional for case file items
+                Optional<CaseFileItemDefinition> fileItemDefinition = conversionHelper.findFileItemDefinition(caseFileItem.getCaseFileItemDefinitionRef());
+                if (fileItemDefinition.isPresent()) {
+                    caseFileItem.setCaseFileItemDefinition(fileItemDefinition.get());
+                }
             }
         }
 

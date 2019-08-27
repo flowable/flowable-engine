@@ -21,7 +21,7 @@ import java.util.List;
 public class CaseFileItemDefinition extends CmmnElement {
 
     protected String name;
-    protected String definitionType;
+    protected String definitionType = CaseFileItemDefinitionTypes.TYPE_UNSPECIFIED;
     protected List<CaseFileItemPropertyDefinition> propertyDefinitions = new ArrayList<>();
 
     public String getName() {

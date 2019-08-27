@@ -14,38 +14,42 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.flowable.cmmn.model.CaseFileModel;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.model.CaseFileItemPropertyDefinition;
 import org.flowable.cmmn.model.CmmnElement;
 
 /**
  * @author Joram Barrez
  */
-public class FileModelXmlConverter extends BaseCmmnXmlConverter {
+public class FileItemDefinitionPropertyXmlConverter extends BaseCmmnXmlConverter {
 
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_FILE_MODEL;
+        return CmmnXmlConstants.ELEMENT_FILE_DEFINITION_PROPERTY;
     }
 
     @Override
     public boolean hasChildElements() {
-        return true;
+        return false;
     }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        CaseFileModel fileModel = new CaseFileModel();
+        CaseFileItemPropertyDefinition propertyDefinition = new CaseFileItemPropertyDefinition();
 
-        conversionHelper.setCurrentFileItemContainer(fileModel);
-        conversionHelper.getCurrentCase().setFileModel(fileModel);
+        String name = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME);
+        if (StringUtils.isNotEmpty(name)) {
+            propertyDefinition.setName(name);
+        }
 
-        return fileModel;
-    }
+        String type = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_TYPE);
+        if (StringUtils.isNotEmpty(type)) {
+            propertyDefinition.setType(type);
+        }
 
-    @Override
-    protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        conversionHelper.removeCurrentFileItemContainer();
-        super.elementEnd(xtr, conversionHelper);
+        conversionHelper.getCurrentFileItemDefinition().addPropertyDefinition(propertyDefinition);
+
+        return propertyDefinition;
     }
 
 }
