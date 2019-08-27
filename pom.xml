@@ -1753,6 +1753,15 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>mssql</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.microsoft.sqlserver</groupId>
+					<artifactId>mssql-jdbc</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
 			<id>mysql</id>
 			<dependencies>
 				<dependency>
