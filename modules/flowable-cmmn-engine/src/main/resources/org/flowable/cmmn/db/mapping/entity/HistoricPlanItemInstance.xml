@@ -6,9 +6,9 @@
 
     <insert id="insertHistoricPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
-        ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-        LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-        START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, TENANT_ID_)
+            ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
+            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -38,6 +38,7 @@
             #{referenceType ,jdbcType=VARCHAR},
             #{entryCriterionId, jdbcType=VARCHAR},
             #{exitCriterionId, jdbcType=VARCHAR},
+            #{showInOverview, jdbcType=BOOLEAN},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
@@ -46,7 +47,7 @@
         insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
         ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
         LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-        START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, TENANT_ID_)
+        START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, TENANT_ID_)
         values
         <foreach collection="list" item="historicPlanItemInstance" index="index" separator=",">
             (
@@ -78,6 +79,7 @@
             #{historicPlanItemInstance.referenceType ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.entryCriterionId, jdbcType=VARCHAR},
             #{historicPlanItemInstance.exitCriterionId, jdbcType=VARCHAR},
+            #{historicPlanItemInstance.showInOverview, jdbcType=BOOLEAN},
             #{historicPlanItemInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -89,7 +91,7 @@
             into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
             LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, TENANT_ID_)
+            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, TENANT_ID_)
             VALUES (
                 #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -119,6 +121,7 @@
                 #{historicPlanItemInstance.referenceType ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.entryCriterionId, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.exitCriterionId, jdbcType=VARCHAR},
+                #{historicPlanItemInstance.showInOverview, jdbcType=BOOLEAN},
                 #{historicPlanItemInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -208,6 +211,9 @@
             <if test="originalPersistentState.exitCriterionId != exitCriterionId">
                 EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.showInOverview != showInOverview">
+                SHOW_IN_OVERVIEW_ = #{showInOverview, jdbcType=VARCHAR}
+            </if>
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
             </if>
@@ -263,6 +269,7 @@
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR"/>
         <result property="entryCriterionId" column="ENTRY_CRITERION_ID_" jdbcType="VARCHAR" />
         <result property="exitCriterionId" column="EXIT_CRITERION_ID_" jdbcType="VARCHAR" />
+        <result property="showInOverview" column="SHOW_IN_OVERVIEW_" jdbcType="BOOLEAN" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     </resultMap>
 
@@ -407,6 +414,9 @@
             </if>
             <if test="exitCriterionId != null">
                 and RES.EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR}
+            </if>
+            <if test="onlyStages">
+                and RES.IS_STAGE_ = #{onlyStages, jdbcType=BOOLEAN}
             </if>
             <if test="tenantId != null">
                 and RES.TENANT_ID_ = #{tenantId}

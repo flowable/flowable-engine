@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl;
 import java.util.List;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
@@ -30,6 +31,7 @@ import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForCaseIns
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkParentsForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetHistoricStageOverviewCmd;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
@@ -73,6 +75,11 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery() {
         return configuration.getHistoricPlanItemInstanceEntityManager().createHistoricPlanItemInstanceQuery();
+    }
+
+    @Override
+    public List<StageResponse> getStageOverview(String caseInstanceId) {
+        return commandExecutor.execute(new GetHistoricStageOverviewCmd(caseInstanceId));
     }
 
     @Override
