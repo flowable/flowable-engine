@@ -40,7 +40,7 @@ jobs:
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
           -Djdbc.password=flowable
-          -Djdbc.driver=com.mysql.jdbc.Driver
+          -Djdbc.driver=com.mysql.cj.jdbc.Driver
   test_mysql_dmn:
     name: MySQL ${{ matrix.mysql }} DMN
     runs-on: ubuntu-latest
@@ -77,7 +77,7 @@ jobs:
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
           -Djdbc.password=flowable
-          -Djdbc.driver=com.mysql.jdbc.Driver
+          -Djdbc.driver=com.mysql.cj.jdbc.Driver
           -pl org.flowable:flowable-dmn-engine -am
   test_mysql_content:
     name: MySQL ${{ matrix.mysql }} Content
@@ -115,5 +115,5 @@ jobs:
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
           -Djdbc.password=flowable
-          -Djdbc.driver=com.mysql.jdbc.Driver
+          -Djdbc.driver=com.mysql.cj.jdbc.Driver
           -pl org.flowable:flowable-content-engine -am
