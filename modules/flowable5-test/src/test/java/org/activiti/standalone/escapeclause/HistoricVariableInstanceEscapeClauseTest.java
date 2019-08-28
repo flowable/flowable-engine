@@ -76,12 +76,12 @@ public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClau
 
     public void testQueryByVariableNameLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableNameLike("%\\%%").singleResult();
+            HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableNameLike("%|%%").singleResult();
             assertNotNull(historicVariable);
             assertEquals(processInstance1.getId(), historicVariable.getProcessInstanceId());
             assertEquals("One%", historicVariable.getValue());
 
-            historicVariable = historyService.createHistoricVariableInstanceQuery().variableNameLike("%\\_%").singleResult();
+            historicVariable = historyService.createHistoricVariableInstanceQuery().variableNameLike("%|_%").singleResult();
             assertNotNull(historicVariable);
             assertEquals(processInstance2.getId(), historicVariable.getProcessInstanceId());
             assertEquals("Two_", historicVariable.getValue());
@@ -90,11 +90,11 @@ public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClau
 
     public void testQueryLikeByQueryVariableValue() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLike("var%", "%\\%%").singleResult();
+            HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLike("var%", "%|%%").singleResult();
             assertNotNull(historicVariable);
             assertEquals(processInstance1.getId(), historicVariable.getProcessInstanceId());
 
-            historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLike("var_", "%\\_%").singleResult();
+            historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLike("var_", "%|_%").singleResult();
             assertNotNull(historicVariable);
             assertEquals(processInstance2.getId(), historicVariable.getProcessInstanceId());
         }
@@ -102,11 +102,11 @@ public class HistoricVariableInstanceEscapeClauseTest extends AbstractEscapeClau
 
     public void testQueryLikeByQueryVariableValueIgnoreCase() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLikeIgnoreCase("var%", "%\\%%").singleResult();
+            HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLikeIgnoreCase("var%", "%|%%").singleResult();
             assertNotNull(historicVariable);
             assertEquals(processInstance1.getId(), historicVariable.getProcessInstanceId());
 
-            historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLikeIgnoreCase("var_", "%\\_%").singleResult();
+            historicVariable = historyService.createHistoricVariableInstanceQuery().variableValueLikeIgnoreCase("var_", "%|_%").singleResult();
             assertNotNull(historicVariable);
             assertEquals(processInstance2.getId(), historicVariable.getProcessInstanceId());
         }

@@ -81,10 +81,10 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processKeyNotIn
             List<String> processDefinitionKeyNotIn1 = new ArrayList<>();
-            processDefinitionKeyNotIn1.add("%\\%%");
+            processDefinitionKeyNotIn1.add("%|%%");
 
             List<String> processDefinitionKeyNotIn2 = new ArrayList<>();
-            processDefinitionKeyNotIn2.add("%\\_%");
+            processDefinitionKeyNotIn2.add("%|_%");
 
             List<String> processDefinitionKeyNotIn3 = new ArrayList<>();
             processDefinitionKeyNotIn3.add("%");
@@ -131,20 +131,20 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     public void testQueryByTenantIdLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // tenantIdLike
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantIdLike("%\\%%").singleResult();
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantIdLike("%|%%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantIdLike("%\\_%").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantIdLike("%|_%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
 
             // orQuery
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceTenantIdLike("%\\%%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceTenantIdLike("%|%%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceTenantIdLike("%\\_%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceTenantIdLike("%|_%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
         }
@@ -154,20 +154,20 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     public void testQueryByProcessInstanceNameLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceNameLike
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLike("%\\%%").singleResult();
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLike("%|%%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLike("%\\_%").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLike("%|_%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
 
             // orQuery
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceNameLike("%\\%%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceNameLike("%|%%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceNameLike("%\\_%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceNameLike("%|_%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
         }
@@ -177,20 +177,20 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     public void testQueryByProcessInstanceNameLikeIgnoreCase() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // processInstanceNameLike
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%\\%%").singleResult();
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%|%%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%\\_%").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%|_%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
 
             // orQuery
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%\\%%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%|%%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%\\_%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%|_%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
         }
@@ -200,20 +200,20 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     public void testQueryLikeByQueryVariableValue() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // queryVariableValue
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLike("var1", "%\\%%").singleResult();
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLike("var1", "%|%%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLike("var1", "%\\_%").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLike("var1", "%|_%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
 
             // orQuery
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().variableValueLike("var1", "%\\%%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().variableValueLike("var1", "%|%%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().variableValueLike("var1", "%\\_%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().variableValueLike("var1", "%|_%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
         }
@@ -223,20 +223,20 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
     public void testQueryLikeIgnoreCaseByQueryVariableValue() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // queryVariableValueIgnoreCase
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%|%%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%\\_%").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%|_%").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
 
             // orQuery
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().variableValueLikeIgnoreCase("var1", "%\\%%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().variableValueLikeIgnoreCase("var1", "%|%%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance1.getId(), historicProcessInstance.getId());
 
-            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().variableValueLikeIgnoreCase("var1", "%\\_%").processDefinitionId("undefined").singleResult();
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().variableValueLikeIgnoreCase("var1", "%|_%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicProcessInstance);
             assertEquals(processInstance2.getId(), historicProcessInstance.getId());
         }

@@ -65,50 +65,50 @@ public class ExecutionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase
 
     @Test
     public void testQueryByTenantIdLike() {
-        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().executionTenantIdLike("%\\%%").singleResult();
+        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().executionTenantIdLike("%|%%").singleResult();
         assertNotNull(execution);
 
-        execution = runtimeService.createExecutionQuery().onlyChildExecutions().executionTenantIdLike("%\\_%").singleResult();
+        execution = runtimeService.createExecutionQuery().onlyChildExecutions().executionTenantIdLike("%|_%").singleResult();
         assertNotNull(execution);
     }
 
     @Test
     public void testQueryLikeByQueryVariableValue() {
-        Execution execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%\\%%").singleResult();
+        Execution execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%|%%").singleResult();
         assertNotNull(execution);
         assertEquals(processInstance1.getId(), execution.getId());
 
-        execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%\\_%").singleResult();
+        execution = runtimeService.createExecutionQuery().variableValueLike("var1", "%|_%").singleResult();
         assertNotNull(execution);
         assertEquals(processInstance2.getId(), execution.getId());
     }
 
     @Test
     public void testQueryLikeIgnoreCaseByQueryVariableValue() {
-        Execution execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
+        Execution execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%|%%").singleResult();
         assertNotNull(execution);
         assertEquals(processInstance1.getId(), execution.getId());
 
-        execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%\\_%").singleResult();
+        execution = runtimeService.createExecutionQuery().variableValueLikeIgnoreCase("var1", "%|_%").singleResult();
         assertNotNull(execution);
         assertEquals(processInstance2.getId(), execution.getId());
     }
 
     @Test
     public void testQueryLikeByQueryProcessVariableValue() {
-        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%\\%%").singleResult();
+        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%|%%").singleResult();
         assertNotNull(execution);
 
-        execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%\\_%").singleResult();
+        execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLike("var1", "%|_%").singleResult();
         assertNotNull(execution);
     }
 
     @Test
     public void testQueryLikeIgnoreCaseByQueryProcessVariableValue() {
-        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
+        Execution execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%|%%").singleResult();
         assertNotNull(execution);
 
-        execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%\\_%").singleResult();
+        execution = runtimeService.createExecutionQuery().onlyChildExecutions().processVariableValueLikeIgnoreCase("var1", "%|_%").singleResult();
         assertNotNull(execution);
     }
 }
