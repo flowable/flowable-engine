@@ -17,8 +17,7 @@ package org.flowable.cmmn.model;
  */
 public interface CaseFileItemDefinitionTypes {
 
-    // From the CMMN spec.
-    // Note the XSD/WSDL/UML types are not supported
+    // From the CMMN spec. Note the XSD/WSDL/UML types are not supported
 
     String TYPE_CMIS_FOLDER = "http://www.omg.org/spec/CMMN/DefinitionType/CMISFolder";
     String TYPE_CMIS_DOCUMENT = "http://www.omg.org/spec/CMMN/DefinitionType/CMISDocument";
@@ -26,4 +25,7 @@ public interface CaseFileItemDefinitionTypes {
     String TYPE_UNKNOWN = "http://www.omg.org/spec/CMMN/DefinitionType/Unknown";
     String TYPE_UNSPECIFIED = "http://www.omg.org/spec/CMMN/DefinitionType/Unspecified";
 
+    // Flowable specific
+    String TYPE_FOLDER = "http://flowable.org/cmmn/DefinitionType/Folder";
+    String TYPE_FILE = "http://flowable.org/cmmn/DefinitionType/File";
 }

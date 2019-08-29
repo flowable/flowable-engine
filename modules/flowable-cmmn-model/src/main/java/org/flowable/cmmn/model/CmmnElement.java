@@ -38,4 +38,9 @@ public class CmmnElement extends BaseElement {
         setDocumentationTextFormat(otherElement.getDocumentationTextFormat());
         setDocumentation(otherElement.getDocumentation());
     }
+
+    @Override
+    public String toString() {
+        return "CmmnElement[id='" + id + "']";
+    }
 }

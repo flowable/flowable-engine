@@ -338,16 +338,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
         // CMMN doesn't mandate ids on many elements ... adding generated ids
         // to those elements as this makes the logic much easier
-        ensureIds(conversionHelper.getPlanFragments(), "planFragment_");
-        ensureIds(conversionHelper.getStages(), "stage_");
-        ensureIds(conversionHelper.getEntryCriteria(), "entryCriterion_");
-        ensureIds(conversionHelper.getExitCriteria(), "exitCriterion_");
-        ensureIds(conversionHelper.getSentries(), "sentry_");
-        ensureIds(conversionHelper.getPlanItemSentryOnParts(), "onPart_");
-        ensureIds(conversionHelper.getFileItemSentryOnParts(), "fileItemOnPart_");
-        ensureIds(conversionHelper.getSentryIfParts(), "ifPart_");
-        ensureIds(conversionHelper.getPlanItems(), "planItem_");
-        ensureIds(conversionHelper.getPlanItemDefinitions(), "planItemDefinition_");
+        ensureIds(conversionHelper);
 
         // Now everything has an id, the map of all case elements can be filled
         for (Case caze : cmmnModel.getCases()) {
@@ -358,17 +349,54 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         }
 
         // All case file item definitions are parsed, the file items can now get the reference resolved
+        processCaseFileItems(conversionHelper);
+
+        // Now everything has an id, the sentry onParts are filled to have source PlanItems/CaseFileItems,
+        // This is used later when determining the dependency information
+        processSentryParts(conversionHelper);
+
+        // Now all sentries have a source, the plan items can be enriched with dependency information
+        processDependentPlanItems(conversionHelper);
+
+        // set DI elements
+        processDiagramInterchangeElements(conversionHelper, cmmnModel);
+    }
+
+    protected void ensureIds(ConversionHelper conversionHelper) {
+        ensureIds(conversionHelper.getPlanFragments(), "planFragment_");
+        ensureIds(conversionHelper.getStages(), "stage_");
+        ensureIds(conversionHelper.getEntryCriteria(), "entryCriterion_");
+        ensureIds(conversionHelper.getExitCriteria(), "exitCriterion_");
+        ensureIds(conversionHelper.getSentries(), "sentry_");
+        ensureIds(conversionHelper.getPlanItemSentryOnParts(), "onPart_");
+        ensureIds(conversionHelper.getFileItemSentryOnParts(), "fileItemOnPart_");
+        ensureIds(conversionHelper.getSentryIfParts(), "ifPart_");
+        ensureIds(conversionHelper.getPlanItems(), "planItem_");
+        ensureIds(conversionHelper.getPlanItemDefinitions(), "planItemDefinition_");
+        ensureIds(conversionHelper.getFileItemDefinitions(), "fileItemDefinition_");
+        ensureIds(conversionHelper.getFileItems(), "fileItem_");
+    }
+
+    protected void processCaseFileItems(ConversionHelper conversionHelper) {
         for (CaseFileItem caseFileItem : conversionHelper.getFileItems()) {
-            if (caseFileItem.getId() != null) { // definition is optional for case file items
+
+            // Definition ref
+            if (caseFileItem.getCaseFileItemDefinitionRef() != null) { // definition is optional for case file items
                 Optional<CaseFileItemDefinition> fileItemDefinition = conversionHelper.findFileItemDefinition(caseFileItem.getCaseFileItemDefinitionRef());
                 if (fileItemDefinition.isPresent()) {
                     caseFileItem.setCaseFileItemDefinition(fileItemDefinition.get());
                 }
             }
-        }
 
-        // Now everything has an id, the sentry onParts are filled to have source PlanItems/CaseFileItems,
-        // this is used later when determining the dependency information
+            // Parent-child relationship
+            if (!caseFileItem.getCaseFileItems().isEmpty()) {
+                caseFileItem.getCaseFileItems().forEach(child -> { child.setParentCaseFileItem(caseFileItem); });
+            }
+
+        }
+    }
+
+    protected void processSentryParts(ConversionHelper conversionHelper) {
         for (PlanItemSentryOnPart planItemSentryOnPart : conversionHelper.getPlanItemSentryOnParts()) {
             Optional<PlanItem> planItem = conversionHelper.findPlanItem(planItemSentryOnPart.getSourceRef());
             if (planItem.isPresent()) {
@@ -381,8 +409,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 fileItemSentryOnPart.setSource(fileItemOptional.get());
             }
         }
+    }
 
-        // Now all sentries have a source, the plan items can be enriched with dependency information
+    protected void processDependentPlanItems(ConversionHelper conversionHelper) {
         for (PlanItem planItem : conversionHelper.getPlanItems()) {
 
             // Dependencies
@@ -393,9 +422,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             planItem.getEntryDependencies().forEach(entryDependency -> entryDependency.addEntryDependentPlanItem(planItem));
             planItem.getExitDependencies().forEach(exitDependency -> exitDependency.addExitDependentPlanItem(planItem));
         }
+    }
 
-
-        // set DI elements
+    protected  void processDiagramInterchangeElements(ConversionHelper conversionHelper, CmmnModel cmmnModel) {
         for (CmmnDiShape diShape : conversionHelper.getDiShapes()) {
             cmmnModel.addGraphicInfo(diShape.getCmmnElementRef(), diShape.getGraphicInfo());
         }

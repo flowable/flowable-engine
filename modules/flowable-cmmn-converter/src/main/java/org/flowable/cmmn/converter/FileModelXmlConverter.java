@@ -20,7 +20,7 @@ import org.flowable.cmmn.model.CmmnElement;
 /**
  * @author Joram Barrez
  */
-public class FileModelXmlConverter extends BaseCmmnXmlConverter {
+public class FileModelXmlConverter extends CaseElementXmlConverter {
 
     @Override
     public String getXMLElementName() {

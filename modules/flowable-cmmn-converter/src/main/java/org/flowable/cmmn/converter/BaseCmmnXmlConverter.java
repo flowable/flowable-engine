@@ -33,9 +33,13 @@ public abstract class BaseCmmnXmlConverter {
      */
     public abstract boolean hasChildElements();
 
+    public boolean hasJavaModelRepresentation() {
+        return true;
+    }
+
     public BaseElement convertToCmmnModel(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         BaseElement baseElement = convert(xtr, conversionHelper);
-        if (baseElement != null) {
+        if (baseElement != null && hasJavaModelRepresentation()) {
 
             baseElement.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));
             Location location = xtr.getLocation();
@@ -59,7 +63,7 @@ public abstract class BaseCmmnXmlConverter {
     protected abstract BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper);
 
     protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (hasChildElements()) {
+        if (hasChildElements() && hasJavaModelRepresentation()) {
             conversionHelper.removeCurrentCmmnElement();
         }
     }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <caseFileItemDefinition id="pictureFolder" name="Pictures" definitionType="http://flowable.org/cmmn/DefinitionType/Folder" />
+    <caseFileItemDefinition id="otherFolder" name="Other" definitionType="http://flowable.org/cmmn/DefinitionType/Folder" />
+    <caseFileItemDefinition id="pictureFile" name="Picture file" definitionType="http://flowable.org/cmmn/DefinitionType/File" />
+
+    <case id="myCase">
+
+        <caseFileModel id="myFileModel">
+
+            <caseFileItem id="folder1" name="Pictures" multiplicity="ExactlyOne" definitionRef="pictureFolder">
+                <children>
+                    <caseFileItem id="folder2" name="Evidence" multiplicity="ExactlyOne" definitionRef="pictureFolder"/>
+                    <caseFileItem id="folder3" name="Invoices" multiplicity="ExactlyOne" definitionRef="pictureFolder">
+                        <children>
+                            <caseFileItem id="folder4" name="Last year" multiplicity="ExactlyOne" definitionRef="pictureFolder"/>
+                            <caseFileItem id="folder5" name="This year" multiplicity="ExactlyOne" definitionRef="pictureFolder"/>
+                            <caseFileItem id="file1" name="Overview" multiplicity="ZeroOrOne" definitionRef="pictureFile"/>
+                        </children>
+                    </caseFileItem>
+                </children>
+            </caseFileItem>
+
+            <caseFileItem id="folder6" name="Other" multiplicity="ExactlyOne" definitionRef="otherFolder"/>
+
+        </caseFileModel>
+
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItemTaskA" definitionRef="taskA">
+                <entryCriterion sentryRef="sentryTaskA" />
+            </planItem>
+
+            <sentry id="sentryTaskA">
+                <caseFileItemOnPart id="onPart1" sourceRef="file1">
+                    <standardEvent>update</standardEvent>
+                </caseFileItemOnPart>
+            </sentry>
+
+            <task id="taskA" name="A" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

@@ -19,7 +19,7 @@ import org.flowable.cmmn.model.CmmnElement;
 /**
  * @author Joram Barrez
  */
-public class FileItemChildrenXmlConverter extends CaseElementXmlConverter {
+public class FileItemChildrenXmlConverter extends BaseCmmnXmlConverter {
 
     @Override
     public String getXMLElementName() {
@@ -32,8 +32,12 @@ public class FileItemChildrenXmlConverter extends CaseElementXmlConverter {
     }
 
     @Override
+    public boolean hasJavaModelRepresentation() {
+        return false;
+    }
+
+    @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        // has no representation
         return null;
     }
 
