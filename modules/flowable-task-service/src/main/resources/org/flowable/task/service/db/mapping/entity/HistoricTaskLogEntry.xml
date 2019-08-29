@@ -208,12 +208,12 @@
   
   <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingProcessInstances" parameterType="java.util.Map">
     delete <if test="_databaseId != 'postgres'" > TSKLOG </if> from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.PROC_INST_ID_ is not null and TSKLOG.PROC_INST_ID_ != '' and
-    NOT EXISTS (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC where TSKLOG.PROC_INST_ID_ = PROC.ID_)
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TSKLOG.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   
   <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_TSK_LOG where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
-    PROC_INST_ID_ NOT IN (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC)
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
   </delete>
   
   <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingCaseInstances" parameterType="java.util.Map">

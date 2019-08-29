@@ -77,7 +77,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricProcessEntityLinks" parameterType="java.util.Map">
-    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_TYPE_ = 'bpmn' and NOT EXISTS (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC where SCOPE_ID_ = PROC.ID_)
+    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_TYPE_ = 'bpmn' and NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where SCOPE_ID_ = PROCINST.ID_)
   </delete>
   
   <delete id="bulkDeleteHistoricCaseEntityLinks" parameterType="java.util.Map">

@@ -92,12 +92,12 @@
   
   <delete id="bulkDeleteHistoricProcessIdentityLinks" parameterType="java.util.Map">
     delete <if test="_databaseId != 'postgres'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ is not null and LINK.PROC_INST_ID_ != '' and
-    NOT EXISTS (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC where LINK.PROC_INST_ID_ = PROC.ID_)
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where LINK.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   
   <delete id="bulkDeleteHistoricProcessIdentityLinks" databaseId="h2" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
-    PROC_INST_ID_ NOT IN (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC)
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
   </delete>
   
   <delete id="bulkDeleteHistoricCaseIdentityLinks" parameterType="java.util.Map">

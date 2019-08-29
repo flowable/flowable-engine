@@ -245,12 +245,12 @@
   
   <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
     delete <if test="_databaseId != 'postgres'"> ACTINST </if> from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and ACTINST.PROC_INST_ID_ != '' and
-    NOT EXISTS (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC where ACTINST.PROC_INST_ID_ = PROC.ID_)
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where ACTINST.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   
   <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
-    PROC_INST_ID_ NOT IN (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC)
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
   </delete>
   
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">

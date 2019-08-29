@@ -149,12 +149,12 @@
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
         delete <if test="_databaseId != 'postgres'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and VARINST.PROC_INST_ID_ != '' and
-        NOT EXISTS (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC where VARINST.PROC_INST_ID_ = PROC.ID_)
+        NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where VARINST.PROC_INST_ID_ = PROCINST.ID_)
     </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
         delete from ${prefix}ACT_HI_VARINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
-        PROC_INST_ID_ NOT IN (select PROC.ID_ from ${prefix}ACT_HI_PROCINST PROC)
+        PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
     </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
