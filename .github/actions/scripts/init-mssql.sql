@@ -1,5 +1,5 @@
 create database flowable
--- collate sql_latin1_general_cp1_cs_as
+collate sql_latin1_general_cp1_cs_as
 go
 use flowable
 go
