@@ -12,6 +12,14 @@
  */
 package org.flowable.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -59,9 +67,9 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
 
         processEngineConfiguration.setClock(testClock);
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2025, Calendar.DECEMBER, 10, 0, 0, 0);
-        testClock.setCurrentTime(calendar.getTime());
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Instant instant = LocalDate.of(2025, Month.DECEMBER, 10).atStartOfDay(ZoneId.systemDefault()).toInstant().truncatedTo(ChronoUnit.SECONDS).plusMillis(540);
+        testClock.setCurrentTime(Date.from(instant));
 
         // deploy the process
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventRepeatWithEndExpressionTest.testCycleDateStartTimerEvent.bpmn20.xml").deploy();
@@ -74,11 +82,10 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
         assertEquals(1, jobs.size());
 
         // dueDate should be after 24 hours from the process deployment
-        Calendar dueDateCalendar = Calendar.getInstance();
-        dueDateCalendar.set(2025, Calendar.DECEMBER, 11, 0, 0, 0);
+        Instant dueDateInstant = instant.plus(1, ChronoUnit.DAYS);
 
         // check the due date is inside the 2 seconds range
-        assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+        assertThat(Duration.between(jobs.get(0).getDuedate().toInstant(), dueDateInstant)).isLessThanOrEqualTo(Duration.ofSeconds(2));
 
         // No process instances
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
@@ -109,10 +116,9 @@ public class StartTimerEventRepeatWithEndExpressionTest extends PluggableFlowabl
         jobs = managementService.createTimerJobQuery().list();
         assertEquals(1, jobs.size());
 
-        dueDateCalendar = Calendar.getInstance();
-        dueDateCalendar.set(2025, Calendar.DECEMBER, 12, 0, 0, 0);
-
-        assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+        // 12th December 2025
+        dueDateInstant = instant.plus(2, ChronoUnit.DAYS);
+        assertThat(Duration.between(jobs.get(0).getDuedate().toInstant(), dueDateInstant)).isLessThanOrEqualTo(Duration.ofSeconds(2));
 
         // ADVANCE THE CLOCK SO THE END DATE WILL BE REACHED
         // 12 dec (last execution)

@@ -21,6 +21,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -90,7 +92,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testCreateTaskWithBuilder() {
-        Date todayDate = new Date();
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date todayDate = Date.from(Instant.now().plus(1, ChronoUnit.SECONDS).plusMillis(133));
         task = taskService.createTaskBuilder().
                         name("testName").
                         description("testDescription").
@@ -1609,7 +1612,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         // Set the due date to a non-null value
-        Date now = new Date();
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date now = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(843));
         taskService.setDueDate(task.getId(), now);
 
         // Fetch task to check if the due date was persisted
@@ -1625,7 +1629,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         // Call saveTask to update due date
         task = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-        now = new Date();
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        now = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(987));
         task.setDueDate(now);
         taskService.saveTask(task);
         task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
