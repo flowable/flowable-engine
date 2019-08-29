@@ -208,8 +208,7 @@
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.1.4.4</version>
-				<scope>test</scope>
+				<version>11.5.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
@@ -1767,6 +1766,15 @@
 				<dependency>
 					<groupId>mysql</groupId>
 					<artifactId>mysql-connector-java</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>db2</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.ibm.db2</groupId>
+					<artifactId>jcc</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>
