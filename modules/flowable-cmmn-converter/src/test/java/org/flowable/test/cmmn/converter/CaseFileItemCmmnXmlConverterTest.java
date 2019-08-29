@@ -14,6 +14,7 @@ package org.flowable.test.cmmn.converter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -110,6 +111,7 @@ public class CaseFileItemCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("Pictures", folder1.getName());
         assertEquals("pictureFolder", folder1.getCaseFileItemDefinition().getId());
         assertEquals(CaseFileItemDefinitionTypes.TYPE_FOLDER, folder1.getCaseFileItemDefinition().getDefinitionType());
+        assertNull(folder1.getParent());
 
         CaseFileItem folder6 = caseFileItems.get(1);
         assertEquals("folder6", folder6.getId());
@@ -120,6 +122,7 @@ public class CaseFileItemCmmnXmlConverterTest extends AbstractConverterTest {
         // Check children
         assertEquals(2, folder1.getCaseFileItems().size());
         folder1.getCaseFileItems().forEach(caseFileItem -> assertEquals(folder1.getId(), caseFileItem.getParentCaseFileItem().getId()));
+        folder1.getCaseFileItems().forEach(caseFileItem -> assertEquals(folder1.getId(), caseFileItem.getSourceCaseFileItemRef()));
 
         CaseFileItem folder2 = folder1.getCaseFileItems().get(0);
         assertEquals("folder2", folder2.getId());
@@ -131,7 +134,10 @@ public class CaseFileItemCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("Invoices", folder3.getName());
         assertEquals("pictureFolder", folder3.getCaseFileItemDefinition().getId());
 
+        assertEquals(folder2.getId() + "," + folder3.getId(), folder1.getTargetCaseFileItemRefs());
+
         assertEquals(3, folder3.getCaseFileItems().size());
+        folder3.getCaseFileItems().forEach(child -> assertEquals(folder3.getId(), child.getParentCaseFileItem().getId()));
 
         CaseFileItem folder4 = folder3.getCaseFileItems().get(0);
         assertEquals("folder4", folder4.getId());

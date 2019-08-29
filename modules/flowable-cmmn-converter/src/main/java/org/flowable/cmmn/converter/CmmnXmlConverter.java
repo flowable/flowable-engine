@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
@@ -390,7 +391,14 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
             // Parent-child relationship
             if (!caseFileItem.getCaseFileItems().isEmpty()) {
-                caseFileItem.getCaseFileItems().forEach(child -> { child.setParentCaseFileItem(caseFileItem); });
+
+                caseFileItem.getCaseFileItems().forEach(child -> {
+                    child.setParentCaseFileItem(caseFileItem);
+                    child.setSourceCaseFileItemRef(caseFileItem.getId());
+                });
+
+                caseFileItem.setTargetCaseFileItemRefs(caseFileItem.getCaseFileItems().stream().map(CaseFileItem::getId).collect(Collectors.joining(",")));
+
             }
 
         }
