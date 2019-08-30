@@ -244,7 +244,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres'"> ACTINST </if> from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and ACTINST.PROC_INST_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> ACTINST </if> from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and ACTINST.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where ACTINST.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   

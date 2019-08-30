@@ -295,7 +295,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.PROC_INST_ID_ is not null and TASK.PROC_INST_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.PROC_INST_ID_ is not null and TASK.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TASK.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   
@@ -305,7 +305,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.SCOPE_ID_ is not null and TASK.SCOPE_ID_ != '' and TASK.SCOPE_TYPE_ = 'cmmn' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.SCOPE_ID_ is not null and TASK.SCOPE_ID_ != '' and TASK.SCOPE_TYPE_ = 'cmmn' and
     NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where TASK.SCOPE_ID_ = CASEINST.ID_)
   </delete>
   

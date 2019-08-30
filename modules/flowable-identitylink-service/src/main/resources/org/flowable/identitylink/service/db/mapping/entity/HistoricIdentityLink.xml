@@ -91,7 +91,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricProcessIdentityLinks" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ is not null and LINK.PROC_INST_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ is not null and LINK.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where LINK.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   
@@ -101,7 +101,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricCaseIdentityLinks" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.SCOPE_ID_ is not null and LINK.SCOPE_ID_ != '' and LINK.SCOPE_TYPE_ = 'cmmn' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.SCOPE_ID_ is not null and LINK.SCOPE_ID_ != '' and LINK.SCOPE_TYPE_ = 'cmmn' and
     NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where LINK.SCOPE_ID_ = CASEINST.ID_)
   </delete>
   
@@ -111,7 +111,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricTaskIdentityLinks" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ is not null and LINK.TASK_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ is not null and LINK.TASK_ID_ != '' and
     NOT EXISTS (select TASK.ID_ from ${prefix}ACT_HI_TASKINST TASK where LINK.TASK_ID_ = TASK.ID_)
   </delete>
   
