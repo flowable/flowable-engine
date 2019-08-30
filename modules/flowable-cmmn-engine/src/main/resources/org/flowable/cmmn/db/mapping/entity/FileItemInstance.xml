@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityImpl">
+
+    <insert id="insertFileItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityImpl">
+        insert into ${prefix}ACT_CMMN_RU_FILE_ITEM_INST (ID_, REV_, CASE_INST_ID_, CASE_DEF_ID_, FILE_ITEM_KEY_, DEFINITION_TYPE_, CONTENT_ID_) values (
+            #{id ,jdbcType=VARCHAR},
+            1,
+            #{caseInstanceId ,jdbcType=VARCHAR},
+            #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{fileItemKey ,jdbcType=VARCHAR},
+            #{definitionType ,jdbcType=VARCHAR},
+            #{contentId ,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="bulkInsertFileItemInstance" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_RU_FILE (ID_, REV_, CASE_INST_ID_, CASE_DEF_ID_, FILE_ITEM_KEY_,  DEFINITION_TYPE_, CONTENT_ID_)
+        values
+        <foreach collection="list" item="fileItemInstance" index="index" separator=",">
+            (
+                #{fileItemInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{fileItemInstance.caseInstanceId ,jdbcType=VARCHAR},
+                #{fileItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{fileItemInstance.fileItemKey ,jdbcType=VARCHAR},
+                #{fileItemInstance.definitionType ,jdbcType=VARCHAR},
+                #{fileItemInstance.contentId ,jdbcType=VARCHAR},
+            )
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertFileItemInstance" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="fileItemInstance" index="index">
+            into ${prefix}ACT_CMMN_RU_FILE (ID_, REV_, CASE_INST_ID_, CASE_DEF_ID_, FILE_ITEM_KEY_,  DEFINITION_TYPE_, CONTENT_ID_) VALUES
+            (
+                #{fileItemInstance.id ,jdbcType=VARCHAR},
+                1,
+            #{fileItemInstance.caseInstanceId ,jdbcType=VARCHAR},
+            #{fileItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+            #{fileItemInstance.fileItemKey ,jdbcType=VARCHAR},
+            #{fileItemInstance.definitionType ,jdbcType=VARCHAR},
+            #{fileItemInstance.contentId ,jdbcType=VARCHAR},
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <update id="updateFileItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityImpl">
+        update ${prefix}ACT_CMMN_RU_FILE
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.caseInstanceId != caseInstanceId">
+                CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
+                CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.fileItemKey != fileItemKey">
+                FILE_ITEM_KEY_ = #{fileItemKey, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.definitionType != definitionType">
+                DEFINITION_TYPE_ = #{definitionType, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.contentId != contentId">
+                CONTENT_ID_ = #{contentId, jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteFileItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityImpl">
+        delete from ${prefix}ACT_CMMN_RU_FILE where ID_ = #{id} and REV_ = #{revision}
+    </delete>
+
+    <resultMap id="fileItemInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR" />
+        <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
+        <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="fileItemKey" column="FILE_ITEM_KEY_" jdbcType="VARCHAR" />
+        <result property="definitionType" column="DEFINITION_TYPE_" jdbcType="VARCHAR" />
+        <result property="contentId" column="CONTENT_ID_" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="selectFileItemInstance" parameterType="string" resultMap="fileItemInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_FILE where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectFileItemInstancesByCaseInstanceId" parameterType="string" resultMap="fileItemInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_FILE where CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
+    </select>
+
+</mapper>

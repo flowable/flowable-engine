@@ -18,6 +18,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
@@ -87,7 +88,11 @@ public abstract class AbstractCmmnManager {
     protected MilestoneInstanceEntityManager getMilestoneInstanceEntityManager() {
         return cmmnEngineConfiguration.getMilestoneInstanceEntityManager();
     }
-    
+
+    protected FileItemInstanceEntityManager getFileItemInstanceEntityManager() {
+        return cmmnEngineConfiguration.getFileItemInstanceEntityManager();
+    }
+
     protected HistoricCaseInstanceEntityManager getHistoricCaseInstanceEntityManager() {
         return cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
     }

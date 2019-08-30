@@ -19,6 +19,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
+import org.flowable.cmmn.api.runtime.FileItemInstance;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -213,4 +214,10 @@ public interface CmmnRuntimeService {
      *     new businessKey value
      */
     void updateBusinessKey(String caseInstanceId, String businessKey);
+
+    // TODO: New methods, review.
+
+    List<FileItemInstance> getCaseInstanceFileItemInstances(String caseInstanceId);
+
+    FileItemInstance associateFileItem(String caseInstanceId, String fileItemKey, String contentId);
 }

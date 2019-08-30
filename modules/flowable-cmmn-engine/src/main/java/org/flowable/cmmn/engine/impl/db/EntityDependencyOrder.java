@@ -20,6 +20,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl;
@@ -74,6 +76,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(EventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(EntityLinkEntityImpl.class);
         DELETE_ORDER.add(IdentityLinkEntityImpl.class);
+        DELETE_ORDER.add(FileItemInstanceEntityImpl.class);
         DELETE_ORDER.add(MilestoneInstanceEntityImpl.class);
         DELETE_ORDER.add(SentryPartInstanceEntityImpl.class);
         DELETE_ORDER.add(PlanItemInstanceEntityImpl.class);

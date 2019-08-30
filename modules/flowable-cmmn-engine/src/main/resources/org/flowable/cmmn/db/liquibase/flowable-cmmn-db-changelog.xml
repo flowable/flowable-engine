@@ -453,4 +453,22 @@
 
     </changeSet>
 
+    <changeSet id="8" author="flowable">
+
+        <createTable tableName="ACT_CMMN_RU_FILE_ITEM_INST">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_CMMN_RU_FILE_ITEM_INST" />
+            </column>
+            <column name="REV_" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="CASE_INST_ID_" type="varchar(255)" />
+            <column name="CASE_DEF_ID_" type="varchar(255)" />
+            <column name="FILE_ITEM_KEY_" type="varchar(255)" />
+            <column name="DEFINITION_TYPE_" type="varchar(255)" />
+            <column name="CONTENT_ID_" type="varchar(255)" />
+        </createTable>
+
+    </changeSet>
+
 </databaseChangeLog>

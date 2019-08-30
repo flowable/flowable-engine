@@ -139,6 +139,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.FileItemInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
@@ -155,6 +157,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataM
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.FileItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
@@ -165,6 +168,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisFileItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricPlanItemInstanceDataManager;
@@ -320,6 +324,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected PlanItemInstanceDataManager planItemInstanceDataManager;
     protected SentryPartInstanceDataManager sentryPartInstanceDataManager;
     protected MilestoneInstanceDataManager milestoneInstanceDataManager;
+    protected FileItemInstanceDataManager fileItemInstanceDataManager;
     protected HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager;
     protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
     protected HistoricPlanItemInstanceDataManager historicPlanItemInstanceDataManager;
@@ -331,6 +336,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected PlanItemInstanceEntityManager planItemInstanceEntityManager;
     protected SentryPartInstanceEntityManager sentryPartInstanceEntityManager;
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
+    protected FileItemInstanceEntityManager fileItemInstanceEntityManager;
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
     protected HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager;
@@ -1059,6 +1065,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (milestoneInstanceDataManager == null) {
             milestoneInstanceDataManager = new MybatisMilestoneInstanceDataManager(this);
         }
+        if (fileItemInstanceDataManager == null) {
+            fileItemInstanceDataManager = new MybatisFileItemInstanceDataManager(this);
+        }
         if (historicCaseInstanceDataManager == null) {
             historicCaseInstanceDataManager = new MybatisHistoricCaseInstanceDataManagerImpl(this);
         }
@@ -1091,6 +1100,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
         if (milestoneInstanceEntityManager == null) {
             milestoneInstanceEntityManager = new MilestoneInstanceEntityManagerImpl(this, milestoneInstanceDataManager);
+        }
+        if (fileItemInstanceEntityManager == null) {
+            fileItemInstanceEntityManager = new FileItemInstanceEntityManagerImpl(this, fileItemInstanceDataManager);
         }
         if (historicCaseInstanceEntityManager == null) {
             historicCaseInstanceEntityManager = new HistoricCaseInstanceEntityManagerImpl(this, historicCaseInstanceDataManager);
@@ -1992,6 +2004,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public FileItemInstanceDataManager getFileItemInstanceDataManager() {
+        return fileItemInstanceDataManager;
+    }
+
+    public CmmnEngineConfiguration setFileItemInstanceDataManager(FileItemInstanceDataManager fileItemInstanceDataManager) {
+        this.fileItemInstanceDataManager = fileItemInstanceDataManager;
+        return this;
+    }
+
     public HistoricCaseInstanceDataManager getHistoricCaseInstanceDataManager() {
         return historicCaseInstanceDataManager;
     }
@@ -2070,6 +2091,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setMilestoneInstanceEntityManager(MilestoneInstanceEntityManager milestoneInstanceEntityManager) {
         this.milestoneInstanceEntityManager = milestoneInstanceEntityManager;
+        return this;
+    }
+
+    public FileItemInstanceEntityManager getFileItemInstanceEntityManager() {
+        return fileItemInstanceEntityManager;
+    }
+
+    public CmmnEngineConfiguration setFileItemInstanceEntityManager(FileItemInstanceEntityManager fileItemInstanceEntityManager) {
+        this.fileItemInstanceEntityManager = fileItemInstanceEntityManager;
         return this;
     }
 

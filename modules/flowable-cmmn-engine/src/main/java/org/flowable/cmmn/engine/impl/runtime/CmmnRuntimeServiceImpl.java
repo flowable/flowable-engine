@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
+import org.flowable.cmmn.api.runtime.FileItemInstance;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -29,6 +30,7 @@ import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.AssociateFileItemCmd;
 import org.flowable.cmmn.engine.impl.cmd.ChangePlanItemStateCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
@@ -36,6 +38,7 @@ import org.flowable.cmmn.engine.impl.cmd.DeleteIdentityLinkForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DisablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EnablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetCaseInstanceFileItemInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkChildrenForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkParentsForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForCaseInstanceCmd;
@@ -313,4 +316,15 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public void changePlanItemState(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder) {
         commandExecutor.execute(new ChangePlanItemStateCmd(changePlanItemStateBuilder));
     }
+
+    @Override
+    public List<FileItemInstance> getCaseInstanceFileItemInstances(String caseInstanceId) {
+        return commandExecutor.execute(new GetCaseInstanceFileItemInstancesCmd(caseInstanceId));
+    }
+
+    @Override
+    public FileItemInstance associateFileItem(String caseInstanceId, String fileItemKey, String contentId) {
+        return commandExecutor.execute(new AssociateFileItemCmd(caseInstanceId, fileItemKey, contentId));
+    }
+
 }
