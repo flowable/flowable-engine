@@ -265,7 +265,7 @@ public static class FetchDataServiceTask implements JavaDelegate {
     String configParam01 = (String) execution.getVariable(configParam01);
     // ...
 
-    RestReponse restResponse = executeRestCall();
+    RestResponse restResponse = executeRestCall();
     execution.setTransientVariable("response", restResponse.getBody());
     execution.setTransientVariable("status", restResponse.getStatus());
   }

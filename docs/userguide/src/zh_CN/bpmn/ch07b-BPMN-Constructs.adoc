@@ -2266,7 +2266,7 @@ List<Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
 
 ===== 自定义身份关联类型
 
-在<<bpmnUserTaskAssignment,用户指派>>中已经介绍过，BPMN标准支持单个指派用户即**hunamPerformer**，或者由一组用户构成**potentialOwners**潜在用户池。另外，Flowable为用户任务定义了<<bpmnUserTaskUserAssignmentExtension,扩展属性元素>>，用于代表任务的**办理人**或者**候选用户**。
+在<<bpmnUserTaskAssignment,用户指派>>中已经介绍过，BPMN标准支持单个指派用户即**humanPerformer**，或者由一组用户构成**potentialOwners**潜在用户池。另外，Flowable为用户任务定义了<<bpmnUserTaskUserAssignmentExtension,扩展属性元素>>，用于代表任务的**办理人**或者**候选用户**。
 
 Flowable支持的身份关联（identity link）类型有：
 
@@ -3597,7 +3597,7 @@ Http任务实现为特殊的<<bpmnJavaServiceTask,服务任务>>，将服务任�
         </flowable:string>
     </flowable:field>
   </extensionElements>
-</sericeTask>
+</serviceTask>
 ----
 
 [[bpmnHttpTaskConfiguration]]

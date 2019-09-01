@@ -1085,7 +1085,7 @@ Take for example the following case definition:
 image::images/cmmn.user-event-listener-removal-1.png[align="center"]
 
 Here, the _First stage_ contains two human tasks (A and B) and it can be exited by a user when the _Stop first stage_ user event is triggered.
-However, when both taks A and B are completed, the stage will also complete. If now the user event listener would be triggered, there is nothing that listens to this event anymore.
+However, when both tasks A and B are completed, the stage will also complete. If now the user event listener would be triggered, there is nothing that listens to this event anymore.
 The engine will detect this and terminate the user event automatically.
 
 这里, 第一个阶段,包含两个人工任务(A 和 B), 并且当停止第一个阶段事件被触发, 该阶段会被终止. 然而, 当 A 和 B 都完成后, 该阶段stage 也会完成.
@@ -1144,7 +1144,7 @@ In some use case however, the event listener shouldn't be _available_ for the us
 
 在一些场景中,除非一个明确满足true的条件, 否则事件监听器不应该可供用户交互(或者当使用定时器监听时, 一个定时器不应该开始) .
 
-In the example above, we want to only create it when the stage doesn't have any active children (or required) anymore. Setting the *availableCondition* to *${cmmn:isStageCompletable()}* will allow the event listener to be created which makes it move immediately to _available_. Concretely in this model, when human task A is completed Stage 1 becomes _completable_ (as human task B is manually activated and non-required). This makes the _availbleCondition_ of the event listener _true_ and the event listener is now available for a user to decide to exit the stage.
+In the example above, we want to only create it when the stage doesn't have any active children (or required) anymore. Setting the *availableCondition* to *${cmmn:isStageCompletable()}* will allow the event listener to be created which makes it move immediately to _available_. Concretely in this model, when human task A is completed Stage 1 becomes _completable_ (as human task B is manually activated and non-required). This makes the _availableCondition_ of the event listener _true_ and the event listener is now available for a user to decide to exit the stage.
 
 在上述例子中, 我们想要只在该阶段没有任何活跃元素时创建它. 设置 *availableCondition* to *${cmmn:isStageCompletable()}* 将允许事件监听器被创建, 使得它状态立即变成可用.
 在这个模型中具体讲, 当人工任务 A 完成, stage 1 变成可完成(因为人工任务B是手动激活的，并且不是必需的)。这使得事件监听器的可用条件变为true, 同时用户也可以决定是否退出该阶段.
