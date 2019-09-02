@@ -20,6 +20,12 @@
             "name": "Date2",
             "type": "date",
             "required": false
+        },
+        {
+            "id": "date3",
+            "name": "Date3",
+            "type": "date",
+            "required": false
         }
     ]
 }
