@@ -239,6 +239,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
             $scope.gridProcessInstances = {
                 data: 'processInstances.data',
                 enableRowReordering: false,
+                enableColumnResize: true,
                 multiSelect: false,
                 keepLastSelected : false,
                 enableSorting: false,
@@ -264,6 +265,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
             $scope.gridJobs = {
                 data: 'jobs.data',
                 enableRowReordering: false,
+                enableColumnResize: true,
                 multiSelect: false,
                 keepLastSelected : false,
                 enableSorting: false,
@@ -288,6 +290,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
                 $scope.gridDecisionTables = {
                     data: 'decisionTables',
                     enableRowReordering: true,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     rowHeight: 36,
@@ -310,6 +313,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
                 $scope.gridFormDefinitions = {
                     data: 'formDefinitions',
                     enableRowReordering: true,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     rowHeight: 36,
