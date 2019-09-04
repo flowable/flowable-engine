@@ -91,6 +91,7 @@ flowableAdminApp.controller('BatchesController', ['$scope', '$rootScope', '$http
           $scope.gridBatches = {
               data: 'batchData.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               enableSorting: false,
