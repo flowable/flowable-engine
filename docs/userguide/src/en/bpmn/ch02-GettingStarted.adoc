@@ -512,7 +512,7 @@ During the server boot up, you'll notice some Flowable logging messages passing 
 
 In the following sections, we'll use cURL to demonstrate the various REST calls. All REST calls are by default protected with _basic authentication_. The user 'rest-admin' with password 'test' is used in all calls.
 
-After bootup, verify the application is running correctly by executing
+After boot up, verify the application is running correctly by executing
 
 ----
 curl --user rest-admin:test http://localhost:8080/flowable-rest/service/management/engine
