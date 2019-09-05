@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine</artifactId>
-			<version>5.22.0</version>
+			<version>5.23.0</version>
 			<exclusions>
 			 <exclusion>
 			   <!-- Can't get the shaded jar to work otherwise due to the signed activation jar -->
@@ -29,27 +29,27 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-bpmn-model</artifactId>
-			<version>5.22.0</version>
+			<version>5.23.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-bpmn-converter</artifactId>
-			<version>5.22.0</version>
+			<version>5.23.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-image-generator</artifactId>
-			<version>5.22.0</version>
+			<version>5.23.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-process-validation</artifactId>
-			<version>5.22.0</version>
+			<version>5.23.0</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<scope>test</scope>
+			<version>8.0.14</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
