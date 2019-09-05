@@ -25,7 +25,7 @@
         <camel.version>2.24.0</camel.version>
 		<cxf.version>3.3.3</cxf.version>
 		<slf4j.version>1.7.28</slf4j.version>
-		<spring.boot.version>2.1.7.RELEASE</spring.boot.version>
+		<spring.boot.version>2.1.8.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
 		<junit.jupiter.version>5.5.1</junit.jupiter.version>
