@@ -101,6 +101,7 @@ flowableAdminApp.controller('EventSubscriptionsController', ['$scope', '$rootSco
           $scope.gridEventSubscriptions = {
               data: 'eventSubscriptionData.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               enableSorting: false,

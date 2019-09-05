@@ -61,7 +61,7 @@ repositoryService.createDeployment()
 
 ==== 创建单应用
 
-不用确保所有DMN引擎claspath中包含所有代理类,并且使用了正确的spring配置,你可以考虑在自己的webapp里引入flowable-rest,这样就只有一个+Dmn引擎+.
+不用确保所有DMN引擎classpath中包含所有代理类,并且使用了正确的spring配置,你可以考虑在自己的webapp里引入flowable-rest,这样就只有一个+Dmn引擎+.
 
 [[versioningOfDMNDefinitions]]
 

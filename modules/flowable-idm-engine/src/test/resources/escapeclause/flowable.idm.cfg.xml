@@ -13,6 +13,6 @@
         <!-- Database configurations -->
     	<property name="databaseSchemaUpdate" value="drop-create" />
     	
-    	<property name="databaseWildcardEscapeCharacter" value="\" />
+    	<property name="databaseWildcardEscapeCharacter" value="|" />
     </bean>
 </beans>

@@ -418,7 +418,7 @@ With JUnit 5 you can also inject the id of the deployment (with +org.flowable.en
 @ConfigurationResource("flowable.custom.cfg.xml")
 class MyBusinessProcessTest {
 
-  private ProcessEngine procesEngine;
+  private ProcessEngine processEngine;
   private RuntimeService runtimeService;
   private TaskService taskService;
 

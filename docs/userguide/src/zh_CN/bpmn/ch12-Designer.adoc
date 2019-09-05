@@ -429,7 +429,7 @@ image::images/designer.palette.add.money.help.png[align="center"]
 
 [NOTE]
 ====
-请注意不应该在你的扩展JAR中包括运行时类，因为它与Flowable库是分离的。Flowable需要在运行时能够找到它们，因此需要将其放在Flowable引擎的clsspath中。
+请注意不应该在你的扩展JAR中包括运行时类，因为它与Flowable库是分离的。Flowable需要在运行时能够找到它们，因此需要将其放在Flowable引擎的classpath中。
 ====
 
 Designer代码树中的示例项目包含了配置++@Runtime++的不同选项的例子。可以从查看money-tasks项目开始。引用代理类的示例在money-delegates项目中。

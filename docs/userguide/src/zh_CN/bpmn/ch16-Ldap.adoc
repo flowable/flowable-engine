@@ -126,7 +126,7 @@
  比如：`(objectClass=groupOfUniqueNames)`
  返回LDAP中所有__groupOfUniqueNames__的对象。|string|
 |userIdAttribute|代表用户ID的LDAP属性名。用于查询并将LDAP用户对象映射至Flowable用户对象。|string|
-|userFirstNameAttribute|代表用户名字的LDAP属性名。用于查询并将LDAP用户对象映射至Flowabl用户对象。|string|
+|userFirstNameAttribute|代表用户名字的LDAP属性名。用于查询并将LDAP用户对象映射至Flowable用户对象。|string|
 |userLastNameAttribute|代表用户姓的LDAP属性名。用于查询并将LDAP用户对象映射至Flowable用户对象。|string|
 |groupIdAttribute|代表用户组ID的LDAP属性名。用于查询并将LDAP用户组对象映射至Flowable用户组对象。|string|
 |groupNameAttribute|代表用户组名称的LDAP属性名。用于查询并将LDAP用户组对象映射至Flowable用户组对象。|String|

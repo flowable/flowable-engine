@@ -203,14 +203,12 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.27</version>
-				<scope>test</scope>
+				<version>8.0.17</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.1.4.4</version>
-				<scope>test</scope>
+				<version>11.5.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
@@ -984,7 +982,7 @@
 			<dependency>
 				<groupId>com.microsoft.sqlserver</groupId>
 				<artifactId>mssql-jdbc</artifactId>
-				<version>6.4.0.jre8</version>
+				<version>7.4.1.jre8</version>
 			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>
@@ -1750,6 +1748,33 @@
 				<dependency>
 					<groupId>org.postgresql</groupId>
 					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>mssql</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.microsoft.sqlserver</groupId>
+					<artifactId>mssql-jdbc</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>mysql</id>
+			<dependencies>
+				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>db2</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.ibm.db2</groupId>
+					<artifactId>jcc</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>

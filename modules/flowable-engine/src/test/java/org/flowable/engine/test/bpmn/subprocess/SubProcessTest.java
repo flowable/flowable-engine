@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.subprocess;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -68,7 +70,8 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     @Deployment
     public void testSimpleSubProcessWithTimer() {
 
-        Date startTime = new Date();
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date startTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(677));
 
         // After staring the process, the task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
@@ -155,7 +158,8 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testNestedSimpleSubprocessWithTimerOnInnerSubProcess() {
-        Date startTime = new Date();
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date startTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(370));
 
         // After staring the process, the task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSubProcessWithTimer");

@@ -18,6 +18,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -193,18 +195,21 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
     @Test
     @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/form_with_dates.form")
     public void submitDateForm() throws Exception {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         FormInfo formInfo = repositoryService.getFormModelByKey("dateform");
 
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
         valuesMap.put("date1", "2016-01-01");
         valuesMap.put("date2", "2017-01-01");
+        valuesMap.put("date3", format.parse("2018-01-01"));
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "date");
         assertThat(formValues)
             .containsOnly(
                 entry("input1", "test"),
                 entry("date1", new LocalDate(2016, 1, 1)),
                 entry("date2", new LocalDate(2017, 1, 1)),
+                entry("date3", new LocalDate(2018, 1, 1)),
                 entry("form_dateform_outcome", "date")
             );
 
@@ -212,10 +217,11 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         JsonNode valuesNode = formNode.get("values");
-        assertEquals(3, valuesNode.size());
+        assertEquals(4, valuesNode.size());
         assertEquals("test", valuesNode.get("input1").asText());
         assertEquals("2016-01-01", valuesNode.get("date1").asText());
         assertEquals("2017-01-01", valuesNode.get("date2").asText());
+        assertEquals("2018-01-01", valuesNode.get("date3").asText());
         assertEquals("date", formNode.get("flowable_form_outcome").asText());
         
         assertEquals(1, formService.createFormInstanceQuery().id(formInstance.getId()).count());

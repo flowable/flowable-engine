@@ -47,6 +47,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
@@ -60,6 +61,7 @@ import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
+import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.interceptor.CrDbRetryInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
@@ -1569,6 +1571,46 @@ public abstract class AbstractEngineConfiguration {
     public AbstractEngineConfiguration setAdditionalEventDispatchActions(List<EventDispatchAction> additionalEventDispatchActions) {
         this.additionalEventDispatchActions = additionalEventDispatchActions;
         return this;
+    }
+
+    public void initEventDispatcher() {
+        if (this.eventDispatcher == null) {
+            this.eventDispatcher = new FlowableEventDispatcherImpl();
+        }
+
+        initAdditionalEventDispatchActions();
+
+        this.eventDispatcher.setEnabled(enableEventDispatcher);
+
+        initEventListeners();
+        initTypedEventListeners();
+    }
+
+    protected void initEventListeners() {
+        if (eventListeners != null) {
+            for (FlowableEventListener listenerToAdd : eventListeners) {
+                this.eventDispatcher.addEventListener(listenerToAdd);
+            }
+        }
+    }
+
+    protected void initAdditionalEventDispatchActions() {
+        if (this.additionalEventDispatchActions == null) {
+            this.additionalEventDispatchActions = new ArrayList<>();
+        }
+    }
+
+    protected void initTypedEventListeners() {
+        if (typedEventListeners != null) {
+            for (Map.Entry<String, List<FlowableEventListener>> listenersToAdd : typedEventListeners.entrySet()) {
+                // Extract types from the given string
+                FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(listenersToAdd.getKey());
+
+                for (FlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
+                    this.eventDispatcher.addEventListener(listenerToAdd, types);
+                }
+            }
+        }
     }
 
     public Clock getClock() {

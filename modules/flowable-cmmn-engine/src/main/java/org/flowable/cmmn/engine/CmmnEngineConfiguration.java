@@ -827,6 +827,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initJobHandlers();
         initHistoryJobHandlers();
         initFailedJobCommandFactory();
+        initEventDispatcher();
         initJobServiceConfiguration();
         initAsyncExecutor();
         initAsyncHistoryExecutor();
