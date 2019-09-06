@@ -293,4 +293,22 @@ public class VariableExpressionFunctionsTest extends PluggableFlowableTestCase{
         assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
     }
     
+    @Test
+    @Deployment
+    public void testVariableBase64() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
+        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        
+        processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testExpressionFunction")
+                .variable("myVar", "test")
+                .start();
+        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        
+        processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testExpressionFunction")
+                .variable("myVar", "hello")
+                .start();
+        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+    }
 }

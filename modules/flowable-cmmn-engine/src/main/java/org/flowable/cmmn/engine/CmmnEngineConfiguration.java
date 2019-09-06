@@ -214,6 +214,7 @@ import org.flowable.common.engine.impl.el.function.VariableEqualsExpressionFunct
 import org.flowable.common.engine.impl.el.function.VariableExistsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetOrDefaultExpressionFunction;
+import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGreaterThanExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGreaterThanOrEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableIsEmptyExpressionFunction;
@@ -940,6 +941,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             shortHandExpressionFunctions.add(new VariableLowerThanOrEqualsExpressionFunction(variableScopeName));
             shortHandExpressionFunctions.add(new VariableGreaterThanExpressionFunction(variableScopeName));
             shortHandExpressionFunctions.add(new VariableGreaterThanOrEqualsExpressionFunction(variableScopeName));
+
+            shortHandExpressionFunctions.add(new VariableBase64ExpressionFunction(variableScopeName));
 
             shortHandExpressionFunctions.add(new IsStageCompletableExpressionFunction());
         }
