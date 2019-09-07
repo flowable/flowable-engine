@@ -12,7 +12,6 @@
  */
 package org.flowable.common.engine.impl.el.function;
 
-import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -30,14 +29,20 @@ public class VariableBase64ExpressionFunction extends AbstractFlowableVariableEx
     public static Object base64(VariableScope variableScope, String variableName) {
         Object value = getVariableValue(variableScope, variableName);
 
-        if (value instanceof Byte[] || value instanceof byte[]) {
-            return java.util.Base64.getEncoder().encodeToString(byte[] value);
+        if (value == null) {
+            return null;
+        } else if (value instanceof Byte[] || value instanceof byte[]) {
+            return java.util.Base64.getEncoder().encodeToString( (byte[]) value);
         } else if (value instanceof String) {
-            return java.util.Base64.getEncoder().encodeToString(value.getBytes());
+            return java.util.Base64.getEncoder().encodeToString(((String) value).getBytes());
         } else {
             throw new FlowableIllegalArgumentException("Variable type must be byte[] or string");
         }
     }
-  
+
+    @Override
+    protected boolean isMultiParameterFunction() {
+        return false;
+    }
 
 }

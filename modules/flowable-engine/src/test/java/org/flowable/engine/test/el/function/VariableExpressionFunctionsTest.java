@@ -14,6 +14,7 @@ package org.flowable.engine.test.el.function;
 
 import java.util.Arrays;
 
+import org.apache.commons.codec.binary.Base64;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -310,5 +311,26 @@ public class VariableExpressionFunctionsTest extends PluggableFlowableTestCase{
                 .variable("myVar", "hello")
                 .start();
         assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+
+    }
+
+    @Test
+    @Deployment
+    public void testVariableBase64Binary() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
+        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        
+        processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testExpressionFunction")
+                .variable("myVar", Base64.decodeBase64("SGFsbG8sIGhhbGxvIC0gVGVzdCBXUk9ORyE="))
+                .start();
+        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        
+        processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testExpressionFunction")
+                .variable("myVar", Base64.decodeBase64("SGFsbG8sIGhhbGxvIC0gVGVzdA=="))
+                .start();
+        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+
     }
 }
