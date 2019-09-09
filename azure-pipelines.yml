@@ -15,4 +15,4 @@ steps:
     script: './mvnw clean package'
 - task: CmdLine@2
   inputs:
-    script: 'docker/build-all-images.sh'
+    script: 'cd docker && ./build-all-images.sh'
