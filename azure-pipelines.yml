@@ -12,8 +12,8 @@ pool:
 steps:
 - task: Ant@1
   inputs:
-    workingDirectory: 'flowable-engine/distro'
-    buildFile: 'build.xml'
+    workingDirectory: ''
+    buildFile: 'flowable-engine/distro/build.xml'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
