@@ -12,4 +12,4 @@ pool:
 steps:
 - task: CmdLine@2
   inputs:
-    script: './mvnw'
+    script: './mvnw clean package'
