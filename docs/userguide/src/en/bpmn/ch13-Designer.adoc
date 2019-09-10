@@ -484,7 +484,7 @@ This property type expects the class member you have annotated to also have an a
     displayHelpLong = "Choose the maximum daily amount that can be withdrawn from the account.")
 @PropertyItems({ LIMIT_LOW_LABEL, LIMIT_LOW_VALUE, LIMIT_MEDIUM_LABEL, LIMIT_MEDIUM_VALUE, 
     LIMIT_HIGH_LABEL, LIMIT_HIGH_VALUE })
-private String withdrawlLimit;
+private String withdrawalLimit;
 ----
 
 image::images/designer.property.radio.choice.png[align="center"]

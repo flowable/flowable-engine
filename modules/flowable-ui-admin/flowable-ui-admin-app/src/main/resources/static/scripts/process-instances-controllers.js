@@ -224,6 +224,7 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
           $scope.gridInstances = {
               data: 'processInstances.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               rowHeight: 36,

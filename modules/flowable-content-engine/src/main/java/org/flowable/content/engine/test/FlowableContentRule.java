@@ -195,6 +195,9 @@ public class FlowableContentRule implements TestRule {
     }
 
     protected void finished(Description description) {
+
+        // Reset internal clock
+        contentEngineConfiguration.getClock().reset();
     }
 
     public String getConfigurationResource() {

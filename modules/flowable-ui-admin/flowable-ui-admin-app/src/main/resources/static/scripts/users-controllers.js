@@ -33,6 +33,7 @@ flowableAdminApp.controller('UsersController', ['$scope', '$rootScope', '$http',
                   $scope.gridUsers = {
                       data: 'usersData',
                       enableRowReordering: true,
+                      enableColumnResize: true,
                       multiSelect: false,
                       keepLastSelected : false,
                       enableSorting: false,

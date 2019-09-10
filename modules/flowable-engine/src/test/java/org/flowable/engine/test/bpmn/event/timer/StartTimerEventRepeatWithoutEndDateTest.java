@@ -12,10 +12,20 @@
  */
 package org.flowable.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.runtime.Clock;
@@ -60,9 +70,9 @@ public class StartTimerEventRepeatWithoutEndDateTest extends PluggableFlowableTe
 
         processEngineConfiguration.setClock(testClock);
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2025, Calendar.DECEMBER, 10, 0, 0, 0);
-        testClock.setCurrentTime(calendar.getTime());
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Instant instant = LocalDate.of(2025, Month.DECEMBER, 10).atStartOfDay(ZoneId.systemDefault()).toInstant().truncatedTo(ChronoUnit.SECONDS).plusMillis(540);
+        testClock.setCurrentTime(Date.from(instant));
 
         // deploy the process
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventRepeatWithoutEndDateTest.testCycleDateStartTimerEvent.bpmn20.xml").deploy();
@@ -75,11 +85,10 @@ public class StartTimerEventRepeatWithoutEndDateTest extends PluggableFlowableTe
         assertEquals(1, jobs.size());
 
         // dueDate should be after 24 hours from the process deployment
-        Calendar dueDateCalendar = Calendar.getInstance();
-        dueDateCalendar.set(2025, Calendar.DECEMBER, 11, 0, 0, 0);
+        Instant dueDateInstant = instant.plus(1, ChronoUnit.DAYS);
 
         // check the due date is inside the 2 seconds range
-        assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+        assertThat(Duration.between(jobs.get(0).getDuedate().toInstant(), dueDateInstant)).isLessThanOrEqualTo(Duration.ofSeconds(2));
 
         // No process instances
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
@@ -112,9 +121,8 @@ public class StartTimerEventRepeatWithoutEndDateTest extends PluggableFlowableTe
 
         // check if the last job to be executed has the dueDate set correctly
         // (10'th repeat after 10 dec. => dueDate must have DueDate = 20 dec.)
-        dueDateCalendar = Calendar.getInstance();
-        dueDateCalendar.set(2025, Calendar.DECEMBER, 20, 0, 0, 0);
-        assertTrue(Math.abs(dueDateCalendar.getTime().getTime() - jobs.get(0).getDuedate().getTime()) < 2000);
+        dueDateInstant = instant.plus(10, ChronoUnit.DAYS);
+        assertThat(Duration.between(jobs.get(0).getDuedate().toInstant(), dueDateInstant)).isLessThanOrEqualTo(Duration.ofSeconds(2));
 
         // ADVANCE THE CLOCK SO that all 10 repeats to be executed
         // (last execution)

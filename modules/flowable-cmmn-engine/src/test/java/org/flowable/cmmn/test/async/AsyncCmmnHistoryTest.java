@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -669,7 +670,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
     @Test
     @CmmnDeployment
     public void testPlanItemInstancesStateChangesWithFixedTime() {
-        Date fixTime = Date.from(Instant.now());
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date fixTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(823));
         cmmnEngineConfiguration.getClock().setCurrentTime(fixTime);
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

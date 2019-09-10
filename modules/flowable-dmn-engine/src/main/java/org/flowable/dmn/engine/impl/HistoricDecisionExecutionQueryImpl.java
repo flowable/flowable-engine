@@ -17,9 +17,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -27,7 +28,8 @@ import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 /**
  * @author Tijs Rademakers
  */
-public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution> implements DmnHistoricDecisionExecutionQuery {
+public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution> 
+        implements DmnHistoricDecisionExecutionQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
     protected String id;

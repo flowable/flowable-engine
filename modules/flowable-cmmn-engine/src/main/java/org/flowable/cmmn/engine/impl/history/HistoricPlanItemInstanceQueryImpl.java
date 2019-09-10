@@ -19,6 +19,7 @@ import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
@@ -26,7 +27,8 @@ import org.flowable.common.engine.impl.query.AbstractQuery;
 /**
  * @author Dennis Federico
  */
-public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPlanItemInstanceQuery, HistoricPlanItemInstance> implements HistoricPlanItemInstanceQuery {
+public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPlanItemInstanceQuery, HistoricPlanItemInstance> 
+        implements HistoricPlanItemInstanceQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
 
@@ -384,6 +386,9 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     public String getPlanItemInstanceId() {
+        return planItemInstanceId;
+    }
+    public String getId() {
         return planItemInstanceId;
     }
     public String getPlanItemInstanceName() {

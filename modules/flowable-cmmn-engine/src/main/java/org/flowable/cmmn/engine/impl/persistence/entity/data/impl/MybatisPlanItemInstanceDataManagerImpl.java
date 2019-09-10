@@ -96,7 +96,7 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     @Override
     @SuppressWarnings("unchecked")
     public List<PlanItemInstance> findByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
-        return getDbSqlSession().selectList("selectPlanItemInstancesByQueryCriteria", planItemInstanceQuery);
+        return getDbSqlSession().selectList("selectPlanItemInstancesByQueryCriteria", planItemInstanceQuery, getManagedEntityClass());
     }
     
     @Override

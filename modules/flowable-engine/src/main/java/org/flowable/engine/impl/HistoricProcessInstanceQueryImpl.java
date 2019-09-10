@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnConstants;
@@ -42,7 +43,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Bernd Ruecker
  * @author Joram Barrez
  */
-public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> implements HistoricProcessInstanceQuery {
+public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> 
+        implements HistoricProcessInstanceQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
     
@@ -801,6 +803,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+    
+    public String getId() {
         return processInstanceId;
     }
 

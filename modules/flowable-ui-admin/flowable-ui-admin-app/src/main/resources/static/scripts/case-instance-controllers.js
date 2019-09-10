@@ -142,6 +142,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridTasks = {
                     data: 'tasks.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -171,6 +172,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridVariables = {
                     data: 'variables.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -195,6 +197,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridJobs = {
                     data: 'jobs.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -219,6 +222,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridDecisionTables = {
                     data: 'decisionTables.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -248,6 +252,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridFormInstances = {
                     data: 'formInstances.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,

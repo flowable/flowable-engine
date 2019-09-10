@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -41,7 +40,6 @@ import org.flowable.batch.service.impl.db.BatchDbSchemaManager;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
-import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -68,6 +66,7 @@ import org.flowable.common.engine.impl.el.function.VariableEqualsExpressionFunct
 import org.flowable.common.engine.impl.el.function.VariableExistsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetOrDefaultExpressionFunction;
+import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGreaterThanExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGreaterThanOrEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableIsEmptyExpressionFunction;
@@ -75,7 +74,6 @@ import org.flowable.common.engine.impl.el.function.VariableIsNotEmptyExpressionF
 import org.flowable.common.engine.impl.el.function.VariableLowerThanExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableLowerThanOrEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableNotEqualsExpressionFunction;
-import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
@@ -2436,39 +2434,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public void initEventDispatcher() {
-        if (this.eventDispatcher == null) {
-            this.eventDispatcher = new FlowableEventDispatcherImpl();
-        }
-
-        if (this.additionalEventDispatchActions == null) {
-            this.additionalEventDispatchActions = new ArrayList<>();
-            this.additionalEventDispatchActions.add(new BpmnModelEventDispatchAction());
-        }
-
-        this.eventDispatcher.setEnabled(enableEventDispatcher);
-
-        if (eventListeners != null) {
-            for (FlowableEventListener listenerToAdd : eventListeners) {
-                this.eventDispatcher.addEventListener(listenerToAdd);
-            }
-        }
-
-        if (typedEventListeners != null) {
-            for (Entry<String, List<FlowableEventListener>> listenersToAdd : typedEventListeners.entrySet()) {
-                // Extract types from the given string
-                FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(listenersToAdd.getKey());
-
-                for (FlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
-                    this.eventDispatcher.addEventListener(listenerToAdd, types);
-                }
-            }
-        }
-    }
-
     public void initProcessValidator() {
         if (this.processValidator == null) {
             this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator();
+        }
+    }
+
+    @Override
+    protected void initAdditionalEventDispatchActions() {
+        if (this.additionalEventDispatchActions == null) {
+            this.additionalEventDispatchActions = new ArrayList<>();
+            this.additionalEventDispatchActions.add(new BpmnModelEventDispatchAction());
         }
     }
 
@@ -2501,6 +2477,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             shortHandExpressionFunctions.add(new VariableLowerThanOrEqualsExpressionFunction(variableScopeName));
             shortHandExpressionFunctions.add(new VariableGreaterThanExpressionFunction(variableScopeName));
             shortHandExpressionFunctions.add(new VariableGreaterThanOrEqualsExpressionFunction(variableScopeName));
+
+            shortHandExpressionFunctions.add(new VariableBase64ExpressionFunction(variableScopeName));
         }
     }
 

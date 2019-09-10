@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
@@ -27,7 +28,7 @@ import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
 /**
  * @author Daniel Meyer
  */
-public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription> implements EventSubscriptionQuery {
+public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription> implements EventSubscriptionQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
 

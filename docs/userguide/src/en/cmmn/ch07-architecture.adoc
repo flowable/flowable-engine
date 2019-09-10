@@ -28,7 +28,7 @@ From a high level point of view:
 
 A big difference between the BPMN and the CMMN engine is that the BPMN engine is generally 'local': the engine looks at the current state, checks what is ahead in the process and continues (of course this is a simplification, there are plenty of operations where this doesn't apply, but for making a distinction conceptually, it is correct). The CMMN engine works differently: in CMMN, data plays an important role and the change of data can trigger many things in various places in the case definition. For this reason, the *EvaluateCriteriaOperation* is planned and executed often whenever changes happen. The engine does optimize these evaluations when it detects duplicates or useless evaluations.
 
-Core to the working of the CMMN engine is the concept of a *Plan item instance*, a representation of which _plan items_ currently are _live_ in the case and which state they have. Quite different from BPMN, CMMN defines a strict state lifecyle for the plan items. This is represented in the _CmmnRuntimeService_ methods, the query API's and the data fields part of the *PlanItemInstance* object.
+Core to the working of the CMMN engine is the concept of a *Plan item instance*, a representation of which _plan items_ currently are _live_ in the case and which state they have. Quite different from BPMN, CMMN defines a strict state life cycle for the plan items. This is represented in the _CmmnRuntimeService_ methods, the query API's and the data fields part of the *PlanItemInstance* object.
 
 The working of the agenda, the operations and how plan item instances are handled can be inspected by setting logging to debug for the agenda package. For example, when using log4j:
 

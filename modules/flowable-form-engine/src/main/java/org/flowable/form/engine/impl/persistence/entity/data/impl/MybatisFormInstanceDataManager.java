@@ -64,6 +64,6 @@ public class MybatisFormInstanceDataManager extends AbstractFormDataManager<Form
     @Override
     @SuppressWarnings("unchecked")
     public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
-        return getDbSqlSession().selectList("selectFormInstancesByQueryCriteria", formInstanceQuery);
+        return getDbSqlSession().selectList("selectFormInstancesByQueryCriteria", formInstanceQuery, getManagedEntityClass());
     }
 }

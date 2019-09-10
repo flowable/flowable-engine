@@ -12,6 +12,7 @@
  */
 package org.flowable.content.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -21,6 +22,9 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -276,18 +280,23 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         ContentItem initialContentItem = contentService.newContentItem();
         initialContentItem.setName("testItem");
         initialContentItem.setMimeType("text/plain");
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Instant createTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(153);
+        Date createDate = Date.from(createTime);
+        contentEngineConfiguration.getClock().setCurrentTime(createDate);
         contentService.saveContentItem(initialContentItem);
-        long initialTS = System.currentTimeMillis();
         assertNotNull(initialContentItem.getId());
-        assertNotNull(initialContentItem.getLastModified());
-        assertTrue(initialContentItem.getLastModified().getTime() <= System.currentTimeMillis());
+        assertThat(initialContentItem.getLastModified())
+            .isEqualTo(createDate);
 
         ContentItem storedContentItem = contentService.createContentItemQuery().id(initialContentItem.getId()).singleResult();
         assertNotNull(storedContentItem);
         assertEquals(initialContentItem.getId(), storedContentItem.getId());
-        assertEquals(initialContentItem.getLastModified().getTime(), storedContentItem.getLastModified().getTime());
+        assertThat(initialContentItem.getLastModified())
+            .isEqualTo(storedContentItem.getLastModified());
 
-        long storeTS = System.currentTimeMillis();
+        Date updateDate = Date.from(createTime.plusSeconds(557));
+        contentEngineConfiguration.getClock().setCurrentTime(updateDate);
         contentService.saveContentItem(storedContentItem, this.getClass().getClassLoader().getResourceAsStream("test.txt"));
         storedContentItem = contentService.createContentItemQuery().id(initialContentItem.getId()).singleResult();
         assertNotNull(storedContentItem);
@@ -296,7 +305,8 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         String contentValue = IOUtils.toString(contentStream, "utf-8");
         assertEquals("hello", contentValue);
 
-        assertTrue(initialContentItem.getLastModified().getTime() < storedContentItem.getLastModified().getTime());
+        assertThat(initialContentItem.getLastModified()).isNotEqualTo(storedContentItem.getLastModified());
+        assertThat(storedContentItem.getLastModified()).isEqualTo(updateDate);
 
         contentService.deleteContentItem(initialContentItem.getId());
     }

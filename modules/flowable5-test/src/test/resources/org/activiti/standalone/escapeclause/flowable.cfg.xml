@@ -47,7 +47,7 @@
 
     <property name="enableProcessDefinitionInfoCache" value="true" />
 
-    <property name="databaseWildcardEscapeCharacter" value="\" />
+    <property name="databaseWildcardEscapeCharacter" value="|" />
     
   </bean>
 

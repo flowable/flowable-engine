@@ -70,7 +70,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricMilestoneInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres'"> MILINST </if> from ${prefix}ACT_CMMN_HI_MIL_INST MILINST where MILINST.CASE_INST_ID_ is not null and MILINST.CASE_INST_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> MILINST </if> from ${prefix}ACT_CMMN_HI_MIL_INST MILINST where MILINST.CASE_INST_ID_ is not null and MILINST.CASE_INST_ID_ != '' and
     NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where MILINST.CASE_INST_ID_ = CASEINST.ID_)
   </delete>
 

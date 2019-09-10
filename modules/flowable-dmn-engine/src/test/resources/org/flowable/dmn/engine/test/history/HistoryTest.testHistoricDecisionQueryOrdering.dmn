@@ -1,0 +1,46 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="full" name="Full" namespace="http://www.flowable.org/dmn">
+  <decision id="decision1" name="Full Decision">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input>
+        <inputExpression id="inputVariable1" typeRef="double">
+          <text>inputVariable1</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Output 1" name="outputVariable1" typeRef="string"></output>
+      <output id="output2" label="Output 2" name="outputVariable2" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry1">
+          <text><![CDATA[< 10]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry1_1">
+          <text>'lt 10'</text>
+        </outputEntry>
+        <outputEntry id="outputEntry1_2">
+          <text>'result1'</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry2">
+          <text><![CDATA[> 10]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry2_1">
+          <text>'gt 10'</text>
+        </outputEntry>
+        <outputEntry id="outputEntry2_2">
+          <text>'result2'</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry3">
+          <text><![CDATA[< 20]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry3_1">
+          <text>'lt 20'</text>
+        </outputEntry>
+        <outputEntry id="outputEntry3_2">
+          <text>'result3'</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

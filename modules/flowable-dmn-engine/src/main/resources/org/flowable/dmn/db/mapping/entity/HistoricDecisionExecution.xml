@@ -105,7 +105,7 @@
 
   <select id="selectHistoricDecisionExecutionsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultMap="historicDecisionExecutionResultMap">
   	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.*, DEF.KEY_ as DEC_DEF_KEY_, DEF.NAME_ as DEC_DEF_NAME_, DEF.VERSION_ as DEC_DEF_VERSION_ <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>, DEF.KEY_ as DEC_DEF_KEY_, DEF.NAME_ as DEC_DEF_NAME_, DEF.VERSION_ as DEC_DEF_VERSION_
     <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>

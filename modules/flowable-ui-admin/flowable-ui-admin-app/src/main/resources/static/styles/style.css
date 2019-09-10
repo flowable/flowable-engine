@@ -110,6 +110,7 @@ body {
 	line-height: 35px;
     height: 35px;
     background: url(../images/flowable-logo.png) no-repeat 15px center;
+    background-size: cover;
     width: 180px;
 }
 

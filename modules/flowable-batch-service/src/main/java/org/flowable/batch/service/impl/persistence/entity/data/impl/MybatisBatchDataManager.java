@@ -53,7 +53,7 @@ public class MybatisBatchDataManager extends AbstractDataManager<BatchEntity> im
     @Override
     @SuppressWarnings("unchecked")
     public List<Batch> findBatchesByQueryCriteria(BatchQueryImpl batchQuery) {
-        return getDbSqlSession().selectList("selectBatchByQueryCriteria", batchQuery);
+        return getDbSqlSession().selectList("selectBatchByQueryCriteria", batchQuery, getManagedEntityClass());
     }
 
     @Override

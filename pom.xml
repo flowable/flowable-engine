@@ -25,7 +25,7 @@
         <camel.version>2.24.0</camel.version>
 		<cxf.version>3.3.3</cxf.version>
 		<slf4j.version>1.7.28</slf4j.version>
-		<spring.boot.version>2.1.7.RELEASE</spring.boot.version>
+		<spring.boot.version>2.1.8.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
 		<junit.jupiter.version>5.5.1</junit.jupiter.version>
@@ -203,14 +203,12 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.27</version>
-				<scope>test</scope>
+				<version>8.0.17</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.1.4.4</version>
-				<scope>test</scope>
+				<version>11.5.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
@@ -984,7 +982,7 @@
 			<dependency>
 				<groupId>com.microsoft.sqlserver</groupId>
 				<artifactId>mssql-jdbc</artifactId>
-				<version>6.4.0.jre8</version>
+				<version>7.4.1.jre8</version>
 			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>
@@ -1750,6 +1748,33 @@
 				<dependency>
 					<groupId>org.postgresql</groupId>
 					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>mssql</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.microsoft.sqlserver</groupId>
+					<artifactId>mssql-jdbc</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>mysql</id>
+			<dependencies>
+				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>db2</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.ibm.db2</groupId>
+					<artifactId>jcc</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>
