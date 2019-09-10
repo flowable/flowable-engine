@@ -16,6 +16,7 @@ package org.flowable.identitylink.service.impl.persistence.entity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -230,31 +231,31 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
         List<IdentityLinkEntity> identityLinks = findIdentityLinkByTaskUserGroupAndType(taskId, userId, groupId, type);
 
         List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<>();
-        List<String> identityLinkIds = new ArrayList<>();
         for (IdentityLinkEntity identityLink : identityLinks) {
             delete(identityLink);
-            identityLinkIds.add(identityLink.getId());
             removedIdentityLinkEntities.add(identityLink);
         }
 
-        // fix deleteCandidate() in create TaskListener
-        if (currentIdentityLinks != null) {
+        if (currentIdentityLinks != null) { // The currentIdentityLinks might contain identity links that are in the cache, but not yet in the db
             for (IdentityLinkEntity identityLinkEntity : currentIdentityLinks) {
-                if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType()) &&
-                        !identityLinkIds.contains(identityLinkEntity.getId())) {
-    
+                if (type.equals(identityLinkEntity.getType()) && !contains(removedIdentityLinkEntities, identityLinkEntity.getId())) {
+
                     if ((userId != null && userId.equals(identityLinkEntity.getUserId()))
                             || (groupId != null && groupId.equals(identityLinkEntity.getGroupId()))) {
-    
+
                         delete(identityLinkEntity);
                         removedIdentityLinkEntities.add(identityLinkEntity);
-    
+
                     }
                 }
             }
         }
         
         return removedIdentityLinkEntities;
+    }
+
+    protected boolean contains(List<IdentityLinkEntity> identityLinkEntities, String identityLinkId) {
+        return identityLinkEntities.stream().anyMatch(identityLinkEntity -> Objects.equals(identityLinkId, identityLinkEntity.getId()));
     }
 
     @Override
