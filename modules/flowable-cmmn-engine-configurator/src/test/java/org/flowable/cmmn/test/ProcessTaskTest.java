@@ -1143,4 +1143,28 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult());
     }
 
+    @Test
+    @CmmnDeployment
+    public void testExitCaseInstanceOnProcessInstanceComplete() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testExitCaseInstanceOnProcessInstanceComplete")
+            .start();
+
+        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertEquals(1, cmmnTaskService.createTaskQuery().count());
+
+        // Process task is manually activated
+        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult().getId());
+        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertEquals(2, cmmnTaskService.createTaskQuery().count());
+
+        // Completing the task from the process should terminate the case
+        Task userTaskFromProcess = processEngineTaskService.createTaskQuery()
+            .processInstanceId(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId())
+            .singleResult();
+        processEngineTaskService.complete(userTaskFromProcess.getId());
+
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+    }
+
 }
