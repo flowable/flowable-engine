@@ -19,15 +19,17 @@ import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 
 /**
  * @author Joram Barrez
  */
-public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQuery, MilestoneInstance> implements MilestoneInstanceQuery {
+public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQuery, MilestoneInstance> implements MilestoneInstanceQuery, QueryCacheValues {
     
+    protected String milestoneInstanceId;
     protected String name;
     protected String caseInstanceId;
     protected String caseDefinitionId;
@@ -43,6 +45,12 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
     
     public MilestoneInstanceQueryImpl(CommandExecutor commandExecutor) {
         super(commandExecutor);
+    }
+    
+    @Override
+    public MilestoneInstanceQuery milestoneInstanceId(String milestoneInstanceId) {
+        this.milestoneInstanceId = milestoneInstanceId;
+        return this;
     }
 
     @Override
@@ -117,6 +125,14 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
     @Override
     public List<MilestoneInstance> executeList(CommandContext commandContext) {
         return CommandContextUtil.getMilestoneInstanceEntityManager(commandContext).findMilestoneInstancesByQueryCriteria(this);
+    }
+
+    public String getMilestoneInstanceId() {
+        return milestoneInstanceId;
+    }
+    
+    public String getId() {
+        return milestoneInstanceId;
     }
 
     public String getName() {

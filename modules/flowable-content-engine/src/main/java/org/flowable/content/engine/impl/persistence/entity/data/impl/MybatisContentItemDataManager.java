@@ -51,8 +51,7 @@ public class MybatisContentItemDataManager extends AbstractContentDataManager<Co
     @Override
     @SuppressWarnings("unchecked")
     public List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery) {
-        final String query = "selectContentItemsByQueryCriteria";
-        return getDbSqlSession().selectList(query, contentItemQuery);
+        return getDbSqlSession().selectList("selectContentItemsByQueryCriteria", contentItemQuery, getManagedEntityClass());
     }
 
     @Override

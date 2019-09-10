@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -41,7 +42,7 @@ import org.flowable.variable.service.impl.QueryVariableValue;
  * @author Falko Menge
  * @author Tijs Rademakers
  */
-public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> implements TaskQuery {
+public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> implements TaskQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
 
@@ -1744,6 +1745,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     public String getTaskId() {
+        return taskId;
+    }
+    
+    public String getId() {
         return taskId;
     }
 

@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
@@ -27,7 +28,7 @@ import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery {
+public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery, QueryCacheValues {
     
     protected String caseDefinitionId;
     protected String caseInstanceId;
@@ -603,6 +604,9 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         return stageInstanceId;
     }
     public String getPlanItemInstanceId() {
+        return planItemInstanceId;
+    }
+    public String getId() {
         return planItemInstanceId;
     }
     public String getElementId() {

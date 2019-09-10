@@ -22,6 +22,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
@@ -30,7 +31,7 @@ import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanceQuery, CaseInstance> implements CaseInstanceQuery {
+public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanceQuery, CaseInstance> implements CaseInstanceQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
 
@@ -600,6 +601,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
 
     public String getCaseInstanceId() {
+        return caseInstanceId;
+    }
+    
+    public String getId() {
         return caseInstanceId;
     }
 

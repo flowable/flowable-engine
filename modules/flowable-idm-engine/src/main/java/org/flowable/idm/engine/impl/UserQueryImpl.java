@@ -16,9 +16,10 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.api.UserQueryProperty;
@@ -27,7 +28,7 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
 /**
  * @author Joram Barrez
  */
-public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements UserQuery {
+public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements UserQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
     protected String id;

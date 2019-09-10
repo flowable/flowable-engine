@@ -29,7 +29,7 @@ import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdap
 public class MybatisMilestoneInstanceDataManager extends AbstractCmmnDataManager<MilestoneInstanceEntity> implements MilestoneInstanceDataManager {
     
     protected MilestoneInstanceByCaseInstanceIdCachedEntityMatcher milestoneInstanceByCaseInstanceIdCachedEntityMatcher 
-        = new MilestoneInstanceByCaseInstanceIdCachedEntityMatcher();
+            = new MilestoneInstanceByCaseInstanceIdCachedEntityMatcher();
 
     public MybatisMilestoneInstanceDataManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
@@ -48,7 +48,7 @@ public class MybatisMilestoneInstanceDataManager extends AbstractCmmnDataManager
     @SuppressWarnings("unchecked")
     @Override
     public List<MilestoneInstance> findMilestoneInstancesByQueryCriteria(MilestoneInstanceQueryImpl query) {
-        return getDbSqlSession().selectList("selectMilestoneInstancesByQueryCriteria", query);
+        return getDbSqlSession().selectList("selectMilestoneInstancesByQueryCriteria", query, getManagedEntityClass());
     }
     
     @Override
