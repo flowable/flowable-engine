@@ -65,11 +65,11 @@
             INTO ${prefix}FLW_RU_BATCH_PART(ID_, REV_, BATCH_ID_, TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, RESULT_DOC_ID_, TENANT_ID_) VALUES
             (#{batchPart.id, jdbcType=VARCHAR},
             #{batchPart.revision, jdbcType=INTEGER},
-            #{batchPart.parentBatchId, jdbcType=VARCHAR},
+            #{batchPart.batchId, jdbcType=VARCHAR},
+            #{batchPart.batchType, jdbcType=VARCHAR},
             #{batchPart.scopeId, jdbcType=VARCHAR},
             #{batchPart.subScopeId, jdbcType=VARCHAR},
             #{batchPart.scopeType, jdbcType=VARCHAR},
-            #{batchPart.processInstanceId, jdbcType=VARCHAR},
             #{batchPart.batchSearchKey, jdbcType=VARCHAR},
             #{batchPart.batchSearchKey2, jdbcType=VARCHAR},
             #{batchPart.createTime, jdbcType=TIMESTAMP},
