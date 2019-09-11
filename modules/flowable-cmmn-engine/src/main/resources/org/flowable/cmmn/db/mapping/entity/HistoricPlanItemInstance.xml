@@ -235,6 +235,11 @@
         NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where PLANITEM.CASE_INST_ID_ = CASEINST.ID_)
     </delete>
   
+    <delete id="bulkDeleteHistoricPlanItemInstancesForNonExistingCaseInstances" parameterType="java.util.Map" databaseId="oracle">
+        delete from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST PLANITEM where PLANITEM.CASE_INST_ID_ is not null and
+        NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where PLANITEM.CASE_INST_ID_ = CASEINST.ID_)
+    </delete>
+
     <delete id="bulkDeleteHistoricPlanItemInstancesForNonExistingCaseInstances" databaseId="h2" parameterType="java.util.Map">
         delete from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST where CASE_INST_ID_ is not null and CASE_INST_ID_ != '' and
         CASE_INST_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)

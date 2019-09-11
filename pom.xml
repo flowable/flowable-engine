@@ -31,6 +31,9 @@
 		<junit.jupiter.version>5.5.1</junit.jupiter.version>
 		<mockito.version>3.0.0</mockito.version>
 
+		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
+		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
+
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
 
@@ -135,8 +138,8 @@
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.jdbc</groupId>
-				<artifactId>ojdbc7</artifactId>
-				<version>12.1.0.1</version>
+				<artifactId>${oracle.jdbc.artifact}</artifactId>
+				<version>${oracle.jdbc.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -1775,6 +1778,15 @@
 				<dependency>
 					<groupId>com.ibm.db2</groupId>
 					<artifactId>jcc</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>oracle</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle.jdbc</groupId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>

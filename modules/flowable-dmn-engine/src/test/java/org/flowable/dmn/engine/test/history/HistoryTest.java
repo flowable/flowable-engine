@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.test.history;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
@@ -215,9 +216,9 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         
         DmnHistoricDecisionExecution decisionExecution = historyService.createHistoricDecisionExecutionQuery().decisionKey("decision1").singleResult();
         String firstDecisionExecutionId = decisionExecution.getId();
-        
-        Thread.sleep(2000);
-        
+
+        dmnEngineConfiguration.getClock().setCurrentTime(new Date(new Date().getTime() + 2000L));
+
         ruleService.createExecuteDecisionBuilder()
             .decisionKey("decision1")
             .variable("inputVariable1", 11)
@@ -254,8 +255,8 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         
         DmnHistoricDecisionExecution decisionExecution = historyService.createHistoricDecisionExecutionQuery().decisionKey("decision1").singleResult();
         String firstDecisionExecutionId = decisionExecution.getId();
-        
-        Thread.sleep(2000);
+
+        dmnEngineConfiguration.getClock().setCurrentTime(new Date(new Date().getTime() + 2000L));
         
         ruleService.createExecuteDecisionBuilder()
             .decisionKey("decision1")
