@@ -341,4 +341,84 @@ public class StageTest extends FlowableCmmnTestCase {
         assertNotNull(stageMap.get("Stage 2.1").getEndTime());
     }
     
+    @Test
+    @CmmnDeployment
+    public void testGetStageAndMilestoneOverview() {
+        Date now = new Date();
+        setClockTo(now);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testCase")
+            .variable("showInStage", true)
+            .variable("showMilestoneInOverview", true)
+            .start();
+
+        List<StageResponse> stages = cmmnRuntimeService.getStageOverview(caseInstance.getId());
+        assertEquals(5, stages.size());
+        
+        Map<String, StageResponse> stageMap = new HashMap<>();
+        for (StageResponse stageResponse : stages) {
+            stageMap.put(stageResponse.getName(), stageResponse);
+        }
+        
+        assertEquals("Milestone 1", stageMap.get("Milestone 1").getName());
+        assertFalse(stageMap.get("Milestone 1").isCurrent());
+        assertTrue(stageMap.get("Milestone 1").isEnded());
+        assertNotNull(stageMap.get("Milestone 1").getEndTime());
+        
+        assertEquals("Stage 1", stageMap.get("Stage 1").getName());
+        assertTrue(stageMap.get("Stage 1").isCurrent());
+        assertFalse(stageMap.get("Stage 1").isEnded());
+        assertNull(stageMap.get("Stage 1").getEndTime());
+        
+        assertEquals("Stage 2", stageMap.get("Stage 2").getName());
+        assertFalse(stageMap.get("Stage 2").isCurrent());
+        assertFalse(stageMap.get("Stage 2").isEnded());
+        assertNull(stageMap.get("Stage 2").getEndTime());
+        
+        assertEquals("Milestone 2.1", stageMap.get("Milestone 2.1").getName());
+        assertFalse(stageMap.get("Milestone 2.1").isCurrent());
+        assertFalse(stageMap.get("Milestone 2.1").isEnded());
+        assertNull(stageMap.get("Milestone 2.1").getEndTime());
+        
+        assertEquals("Stage 2.1", stageMap.get("Stage 2.1").getName());
+        assertFalse(stageMap.get("Stage 2.1").isCurrent());
+        assertFalse(stageMap.get("Stage 2.1").isEnded());
+        assertNull(stageMap.get("Stage 2.1").getEndTime());
+        
+        cmmnRuntimeService.completeStagePlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 1").singleResult().getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        stages = cmmnHistoryService.getStageOverview(caseInstance.getId());
+        assertEquals(5, stages.size());
+        
+        stageMap = new HashMap<>();
+        for (StageResponse stageResponse : stages) {
+            stageMap.put(stageResponse.getName(), stageResponse);
+        }
+        
+        assertEquals("Milestone 1", stageMap.get("Milestone 1").getName());
+        assertFalse(stageMap.get("Milestone 1").isCurrent());
+        assertTrue(stageMap.get("Milestone 1").isEnded());
+        assertNotNull(stageMap.get("Milestone 1").getEndTime());
+        
+        assertEquals("Stage 1", stageMap.get("Stage 1").getName());
+        assertFalse(stageMap.get("Stage 1").isCurrent());
+        assertTrue(stageMap.get("Stage 1").isEnded());
+        assertNotNull(stageMap.get("Stage 1").getEndTime());
+        
+        assertEquals("Stage 2", stageMap.get("Stage 2").getName());
+        assertFalse(stageMap.get("Stage 2").isCurrent());
+        assertTrue(stageMap.get("Stage 2").isEnded());
+        assertNotNull(stageMap.get("Stage 2").getEndTime());
+        
+        assertEquals("Milestone 2.1", stageMap.get("Milestone 2.1").getName());
+        assertFalse(stageMap.get("Milestone 2.1").isCurrent());
+        assertTrue(stageMap.get("Milestone 2.1").isEnded());
+        assertNotNull(stageMap.get("Milestone 2.1").getEndTime());
+        
+        assertEquals("Stage 2.1", stageMap.get("Stage 2.1").getName());
+        assertFalse(stageMap.get("Stage 2.1").isCurrent());
+        assertTrue(stageMap.get("Stage 2.1").isEnded());
+        assertNotNull(stageMap.get("Stage 2.1").getEndTime());
+    }
 }

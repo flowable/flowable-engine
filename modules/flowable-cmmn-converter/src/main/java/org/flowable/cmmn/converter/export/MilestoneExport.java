@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.Milestone;
 
 public class MilestoneExport extends AbstractPlanItemDefinitionExport<Milestone> {
@@ -24,5 +27,17 @@ public class MilestoneExport extends AbstractPlanItemDefinitionExport<Milestone>
     @Override
     protected String getPlanItemDefinitionXmlElementValue(Milestone planItemDefinition) {
         return ELEMENT_MILESTONE;
+    }
+    
+    @Override
+    protected void writePlanItemDefinitionSpecificAttributes(Milestone milestone, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(milestone, xtw);
+        
+        if (milestone.getDisplayOrder() != null) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DISPLAY_ORDER, String.valueOf(milestone.getDisplayOrder()));
+        }
+        if (StringUtils.isNotEmpty(milestone.getIncludeInStageOverview()) && !"true".equalsIgnoreCase(milestone.getIncludeInStageOverview())) { // if it's missing, it's true by default
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW, milestone.getIncludeInStageOverview());
+        }
     }
 }

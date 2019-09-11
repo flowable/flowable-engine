@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+  <case id="testCase" name="Test Query Stages Only" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:includeInStageOverview="false">
+    
+      <planItem id="planItem1" name="Milestone 1" definitionRef="milestone1" />
+      <planItem id="planItem2" name="Stage 1" definitionRef="oneexpandedstage1" />
+      <planItem id="planItem4" name="Stage 2" definitionRef="oneexpandedstage2">
+        <entryCriterion id="oneentrycriterion3" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      
+      <milestone id="milestone1" name="Milestone 1" flowable:includeInStageOverview="true" />
+      
+      <stage id="oneexpandedstage1" name="Stage 1">
+        <planItem id="planItem6" name="Milestone 1.1" definitionRef="milestone2" />
+        <planItem id="planItem3" name="Stage 1.1" definitionRef="oneexpandedstage4">
+          <itemControl>
+            <manualActivationRule></manualActivationRule>
+          </itemControl>
+        </planItem>
+        
+        <milestone id="milestone2" name="Milestone 1.1" flowable:includeInStageOverview="false" />
+        
+        <stage id="oneexpandedstage4" name="Stage 1.1" flowable:includeInStageOverview="false" />
+      </stage>
+      
+      <stage id="oneexpandedstage2" name="Stage 2" flowable:includeInStageOverview="true">
+        <planItem id="planItem7" name="Milestone 2.1" definitionRef="milestone3" />
+        <planItem id="planItem5" name="Stage 2.1" definitionRef="oneexpandedstage5" />
+        
+        <milestone id="milestone3" name="Milestone 2.1" flowable:includeInStageOverview="${showMilestoneInOverview}" />
+        
+        <stage id="oneexpandedstage5" name="Stage 2.1" flowable:includeInStageOverview="${showInStage}"></stage>
+      </stage>
+      
+    </casePlanModel>
+  </case>
+</definitions>
