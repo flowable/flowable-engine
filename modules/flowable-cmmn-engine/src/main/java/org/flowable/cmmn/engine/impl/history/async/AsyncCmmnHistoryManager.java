@@ -328,6 +328,8 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonPlanItemInstanceFields(planItemInstance, data);
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, lastUpdateTime);
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_IS_SHOW_IN_OVERVIEW, evaluateShowInOverview(planItemInstance));
+            
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_FULL, data);
         }
     }

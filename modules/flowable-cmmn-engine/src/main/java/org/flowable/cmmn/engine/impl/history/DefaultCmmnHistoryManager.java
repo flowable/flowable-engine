@@ -318,6 +318,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             h -> {
                 h.setEndedTime(occurredTime);
                 h.setOccurredTime(occurredTime);
+                h.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
         });
     }
 
