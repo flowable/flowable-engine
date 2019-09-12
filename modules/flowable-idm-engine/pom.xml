@@ -365,7 +365,7 @@
 			<dependencies>
 				<dependency>
 					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -382,7 +382,7 @@
 			<dependencies>
 				<dependency>
 					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>

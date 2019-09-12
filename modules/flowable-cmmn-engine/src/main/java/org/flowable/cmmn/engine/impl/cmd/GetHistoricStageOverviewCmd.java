@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +32,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Milestone;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -56,25 +59,34 @@ public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>
         }
 
         HistoricPlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext);
-        List<HistoricPlanItemInstance> stagePlanItemInstances = planItemInstanceEntityManager.findByCriteria(new HistoricPlanItemInstanceQueryImpl()
+        List<HistoricPlanItemInstance> planItemInstances = planItemInstanceEntityManager.findByCriteria(new HistoricPlanItemInstanceQueryImpl()
             .planItemInstanceCaseInstanceId(caseInstanceId)
-            .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
+            .planItemInstanceDefinitionTypes(Arrays.asList(PlanItemDefinitionType.STAGE, PlanItemDefinitionType.MILESTONE))
             .orderByEndedTime().asc());
 
         CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
         CaseDefinition caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseInstance.getCaseDefinitionId());
         CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
         List<Stage> stages = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true);
+        List<Milestone> milestones = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(Milestone.class, true);
+        
+        List<OverviewElement> overviewElements = new ArrayList<>();
+        for (Stage stage : stages) {
+            overviewElements.add(new OverviewElement(stage.getId(), stage.getName(), stage.getDisplayOrder(), stage.getIncludeInStageOverview(), stage));
+        }
+        for (Milestone milestone : milestones) {
+            overviewElements.add(new OverviewElement(milestone.getId(), milestone.getName(), milestone.getDisplayOrder(), milestone.getIncludeInStageOverview(), milestone));
+        }
 
         // If one stage has a display order, they are ordered by that.
         // Otherwise, the order as it comes back from the query is used.
-        stages.sort(Comparator.comparing(Stage::getDisplayOrder, Comparator.nullsFirst(Comparator.naturalOrder()))
-            .thenComparing(stage -> getPlanItemInstanceEndTime(stagePlanItemInstances, stage), Comparator.nullsLast(Comparator.naturalOrder()))
+        overviewElements.sort(Comparator.comparing(OverviewElement::getDisplayOrder, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(overviewElement -> getPlanItemInstanceEndTime(planItemInstances, overviewElement.getPlanItemDefinition()), Comparator.nullsLast(Comparator.naturalOrder()))
         );
         
         List<StageResponse> stageResponses = new ArrayList<>(stages.size());
-        for (Stage stage : stages) {
-            Optional<HistoricPlanItemInstance> planItemInstance = getPlanItemInstance(stagePlanItemInstances, stage);
+        for (OverviewElement overviewElement : overviewElements) {
+            Optional<HistoricPlanItemInstance> planItemInstance = getPlanItemInstance(planItemInstances, overviewElement.getPlanItemDefinition());
             boolean showInOverview = false;
             
             // If not ended or current, it's implicitly a future one
@@ -84,11 +96,13 @@ public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>
                 }
             
             } else {
-                showInOverview = true;
+                if (!"false".equalsIgnoreCase(overviewElement.getIncludeInStageOverview())) {
+                    showInOverview = true;
+                }
             }
             
             if (showInOverview) {
-                StageResponse stageResponse = new StageResponse(stage.getId(), stage.getName());
+                StageResponse stageResponse = new StageResponse(overviewElement.getId(), overviewElement.getName());
                 
                 // If not ended or current, it's implicitly a future one
                 if (planItemInstance.isPresent()) {
@@ -104,26 +118,81 @@ public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>
         return stageResponses;
     }
     
-    protected Date getPlanItemInstanceEndTime(List<HistoricPlanItemInstance> stagePlanItemInstances, Stage stage) {
-        return getPlanItemInstance(stagePlanItemInstances, stage)
+    protected Date getPlanItemInstanceEndTime(List<HistoricPlanItemInstance> planItemInstances, PlanItemDefinition planItemDefinition) {
+        return getPlanItemInstance(planItemInstances, planItemDefinition)
             .map(HistoricPlanItemInstance::getEndedTime)
             .orElse(null);
     }
 
-    protected Optional<HistoricPlanItemInstance> getPlanItemInstance(List<HistoricPlanItemInstance> stagePlanItemInstances, Stage stage) {
+    protected Optional<HistoricPlanItemInstance> getPlanItemInstance(List<HistoricPlanItemInstance> planItemInstances, PlanItemDefinition planItemDefinition) {
         HistoricPlanItemInstance planItemInstance = null;
-        for (HistoricPlanItemInstance p : stagePlanItemInstances) {
-            if (p.getPlanItemDefinitionId().equals(stage.getId())) {
+        for (HistoricPlanItemInstance p : planItemInstances) {
+            if (p.getPlanItemDefinitionId().equals(planItemDefinition.getId())) {
+                
                 if (p.getEndedTime() == null) {
                     planItemInstance = p; // one that's not ended yet has precedence
-                } else {
-                    if (planItemInstance == null) {
-                        planItemInstance = p;
-                    }
+                } else if (planItemInstance == null) {
+                    planItemInstance = p;
                 }
-
             }
         }
         return Optional.ofNullable(planItemInstance);
+    }
+    
+    protected class OverviewElement {
+        
+        protected String id;
+        protected String name;
+        protected Integer displayOrder;
+        protected String includeInStageOverview;
+        protected PlanItemDefinition planItemDefinition;
+        
+        public OverviewElement(String id, String name, Integer displayOrder, String includeInStageOverview, PlanItemDefinition planItemDefinition) {
+            this.id = id;
+            this.name = name;
+            this.displayOrder = displayOrder;
+            this.includeInStageOverview = includeInStageOverview;
+            this.planItemDefinition = planItemDefinition;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Integer getDisplayOrder() {
+            return displayOrder;
+        }
+
+        public void setDisplayOrder(Integer displayOrder) {
+            this.displayOrder = displayOrder;
+        }
+
+        public String getIncludeInStageOverview() {
+            return includeInStageOverview;
+        }
+
+        public void setIncludeInStageOverview(String includeInStageOverview) {
+            this.includeInStageOverview = includeInStageOverview;
+        }
+
+        public PlanItemDefinition getPlanItemDefinition() {
+            return planItemDefinition;
+        }
+
+        public void setPlanItemDefinition(PlanItemDefinition planItemDefinition) {
+            this.planItemDefinition = planItemDefinition;
+        }
     }
 }

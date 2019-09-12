@@ -239,6 +239,93 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertEquals(0, historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).unfinished().count());
         assertEquals(1, historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
     }
+    
+    @CmmnDeployment
+    public void testStageAndMilestoneOverview() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testStageOverview")
+                .variable("includeInOverview", true)
+                .variable("includeInOverviewNegative", false)
+                .start();
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
+
+        ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(7, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", false, true);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", false, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", false, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+        assertStage(stageOverviewResponse.get(6), "Milestone five", false, false);
+
+        // We're doing a wrong time ordering, to test that the display order has precedence over the end time
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(7, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", false, true);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", false, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+        assertStage(stageOverviewResponse.get(6), "Milestone five", false, false);
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(7, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", true, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+        assertStage(stageOverviewResponse.get(6), "Milestone five", false, false);
+        
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", true, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, true);
+        
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(1, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", true, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", true, false);
+        
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(6, ChronoUnit.HOURS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", true, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", true, false);
+        
+        assertEquals(0, historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).unfinished().count());
+        assertEquals(1, historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+    }
 
     protected ArrayNode getStageOverviewResponse(CaseInstance caseInstance) throws IOException {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
