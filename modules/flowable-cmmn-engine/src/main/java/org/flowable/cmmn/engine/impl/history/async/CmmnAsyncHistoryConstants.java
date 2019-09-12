@@ -107,6 +107,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_GROUP_ID = "groupId";
     String FIELD_ID = "id";
     String FIELD_IS_STAGE = "isStage";
+    String FIELD_IS_SHOW_IN_OVERVIEW = "isShowInOverview";
     String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
     String FIELD_ENTITY_LINK_TYPE = "entityLinkType";
     String FIELD_LAST_AVAILABLE_TIME = "lastAvailableTime";
