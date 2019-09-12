@@ -67,6 +67,7 @@ public class SendTaskValidator extends ExternalInvocationTaskValidator {
                         for (Operation operation : bpmnInterface.getOperations()) {
                             if (operation.getId() != null && operation.getId().equals(sendTask.getOperationRef())) {
                                 operationFound = true;
+                                break;
                             }
                         }
                     }

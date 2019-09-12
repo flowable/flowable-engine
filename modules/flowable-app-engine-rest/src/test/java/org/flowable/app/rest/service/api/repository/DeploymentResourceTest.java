@@ -131,6 +131,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             for (String resourceName : resources) {
                 if ("vacationRequestApp.app".equals(resourceName)) {
                     vacationRequestAppFound = true;
+                    break;
                 }
             }
             assertTrue(vacationRequestAppFound);
