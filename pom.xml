@@ -28,7 +28,7 @@
 		<spring.boot.version>2.1.8.RELEASE</spring.boot.version>
 
 		<junit.version>4.12</junit.version>
-		<junit.jupiter.version>5.5.1</junit.jupiter.version>
+		<junit.jupiter.version>5.5.2</junit.jupiter.version>
 		<mockito.version>3.0.0</mockito.version>
 
 		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
