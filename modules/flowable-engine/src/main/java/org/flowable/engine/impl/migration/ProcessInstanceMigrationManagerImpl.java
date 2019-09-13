@@ -379,7 +379,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     protected void doMigrateProcessInstance(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        LOGGER.debug("Start migration of process instance with Id:'" + processInstance.getId() + "' to process definition identified by " + printProcessDefinitionIdentifierMessage(document));
+        LOGGER.debug("Start migration of process instance with Id:'{}' to process definition identified by {}", processInstance.getId(), printProcessDefinitionIdentifierMessage(document));
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders((ExecutionEntity) processInstance, procDefToMigrateTo, document, commandContext);
