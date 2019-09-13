@@ -159,6 +159,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
             for (ValuedDataObject otherObject : otherElement.getDataObjects()) {
                 if (thisObject.getId().equals(otherObject.getId())) {
                     exists = true;
+                    break;
                 }
             }
             if (!exists) {
