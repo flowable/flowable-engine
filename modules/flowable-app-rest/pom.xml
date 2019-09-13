@@ -23,18 +23,6 @@
 
     <plugins>
       <plugin>
-	    <groupId>org.apache.tomcat.maven</groupId>
-        <artifactId>tomcat7-maven-plugin</artifactId>
-		<configuration>
-		  <port>8080</port>
-		  <path>/flowable-rest</path>
-          <warDirectory>${project.build.directory}/${project.build.finalName}</warDirectory>
-          <systemProperties>
-		    <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-          </systemProperties>
-		</configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <version>3.0.0</version>
         <configuration>
