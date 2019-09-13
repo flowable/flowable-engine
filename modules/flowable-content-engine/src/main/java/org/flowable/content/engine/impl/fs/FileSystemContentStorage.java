@@ -298,7 +298,7 @@ public class FileSystemContentStorage implements ContentStorage {
 
                 StringBuffer buffer = new StringBuffer();
                 for (int i = 0; i < indexes.length; i++) {
-                    buffer.append(String.valueOf(indexes[i])).append(File.separatorChar);
+                    buffer.append(indexes[i]).append(File.separatorChar);
                 }
 
                 File newFolder = new File(rootFolder, buffer.toString());
