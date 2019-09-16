@@ -10,8 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.api.repository;
+package org.flowable.app.engine.impl.deployer;
 
+import org.flowable.app.api.repository.AppModel;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseAppModel implements AppModel {
 
     protected String key;
