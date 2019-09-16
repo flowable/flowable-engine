@@ -19,9 +19,12 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
+import org.flowable.engine.impl.eventbus.FlowableBpmnEventBusItemBuilder;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -65,8 +68,18 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
         if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText, 
                         execution.getCurrentActivityId(), execution, commandContext)) {
 
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getDelegateInterceptor()
-                .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            try {
+                processEngineConfiguration.getDelegateInterceptor().handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
+                
+            } catch (RuntimeException e) {
+                if (processEngineConfiguration.isEventPublisherEnabled()) {
+                    processEngineConfiguration.getEventPublisher().publishEvent(
+                                    FlowableBpmnEventBusItemBuilder.createServiceTaskExceptionEvent((ExecutionEntity) execution));
+                }
+                
+                throw e;
+            }
         }
 
         if (!triggerable) {

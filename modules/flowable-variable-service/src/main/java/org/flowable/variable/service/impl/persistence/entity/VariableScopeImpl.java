@@ -34,6 +34,7 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
+import org.flowable.variable.service.impl.eventbus.FlowableVariableEventBusItemBuilder;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**
@@ -850,6 +851,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
 
         VariableType newType = variableTypes.findVariableType(value);
+        
+        Object oldVariableValue = variableInstance.getValue();
+        String oldVariableType = variableInstance.getTypeName();
 
         if (newType != null && !newType.equals(variableInstance.getType())) {
             variableInstance.setValue(null);
@@ -871,12 +875,17 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
 
         // Dispatch event, if needed
-        if (variableServiceConfiguration.getEventDispatcher() != null && variableServiceConfiguration.getEventDispatcher().isEnabled()) {
+        if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
                             FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value,
                                             variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
                                             variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
                                             variableInstance.getScopeId(), variableInstance.getScopeType()));
+        }
+        
+        if (variableServiceConfiguration.isEventPublisherEnabled()) {
+            variableServiceConfiguration.getEventPublisher().publishEvent(FlowableVariableEventBusItemBuilder.createVariableUpdatedEvent(
+                            variableInstance, oldVariableValue, oldVariableType));
         }
     }
 
@@ -904,12 +913,16 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             }
         }
 
-        if (variableServiceConfiguration.getEventDispatcher() != null && variableServiceConfiguration.getEventDispatcher().isEnabled()) {
+        if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
                             FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value,
                                             variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
                                             variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
                                             variableInstance.getScopeId(), variableInstance.getScopeType()));
+        }
+        
+        if (variableServiceConfiguration.isEventPublisherEnabled()) {
+            variableServiceConfiguration.getEventPublisher().publishEvent(FlowableVariableEventBusItemBuilder.createVariableCreatedEvent(variableInstance));
         }
 
         return variableInstance;

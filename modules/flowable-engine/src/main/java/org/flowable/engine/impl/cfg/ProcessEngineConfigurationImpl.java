@@ -60,13 +60,13 @@ import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.function.FlowableShortHandExpressionFunction;
+import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableContainsAnyExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableContainsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableExistsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetOrDefaultExpressionFunction;
-import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGreaterThanExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGreaterThanOrEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableIsEmptyExpressionFunction;
@@ -1029,6 +1029,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEventHandlers();
         initFailedJobCommandFactory();
         initEventDispatcher();
+        initEventBus();
         initProcessValidator();
         initFormFieldHandler();
         initDatabaseEventLogging();
@@ -1426,6 +1427,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.variableServiceConfiguration.setEventPublisher(this.eventPublisher);
 
         this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 

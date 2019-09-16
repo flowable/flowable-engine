@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.eventbus.FlowableEventConsumer;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
@@ -1284,6 +1285,10 @@ public interface RuntimeService {
      *     when the given event is not suitable for dispatching.
      */
     void dispatchEvent(FlowableEvent event);
+    
+    void addEventConsumer(FlowableEventConsumer eventConsumer);
+    
+    void removeEventConsumer(FlowableEventConsumer eventConsumer);
 
     /**
      * Sets the name for the process instance with the given id.

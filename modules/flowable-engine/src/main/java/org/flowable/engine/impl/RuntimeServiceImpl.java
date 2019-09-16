@@ -25,11 +25,13 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.eventbus.FlowableEventConsumer;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.AddEventConsumerCommand;
 import org.flowable.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.AddMultiInstanceExecutionCmd;
@@ -61,6 +63,7 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
+import org.flowable.engine.impl.cmd.RemoveEventConsumerCommand;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
@@ -662,6 +665,16 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void dispatchEvent(FlowableEvent event) {
         commandExecutor.execute(new DispatchEventCommand(event));
+    }
+    
+    @Override
+    public void addEventConsumer(FlowableEventConsumer eventConsumer) {
+        commandExecutor.execute(new AddEventConsumerCommand(eventConsumer));
+    }
+    
+    @Override
+    public void removeEventConsumer(FlowableEventConsumer eventConsumer) {
+        commandExecutor.execute(new RemoveEventConsumerCommand(eventConsumer));
     }
 
     @Override
