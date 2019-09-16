@@ -579,6 +579,14 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.put("name", "stringVar");
         variableNode.put("value", "Azert%");
         variableNode.put("operation", "like");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+
+        // LikeIgnore Case
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("value", "AzErT%");
+        variableNode.put("operation", "likeIgnoreCase");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
     }
 
     /**
