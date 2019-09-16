@@ -46,12 +46,14 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     private static final Logger LOGGER = LoggerFactory.getLogger(CaseTaskActivityBehavior.class);
 
     protected Expression caseRefExpression;
+    protected String caseRef;
     protected Boolean fallbackToDefaultTenant;
     protected CaseTask caseTask;
 
     public CaseTaskActivityBehavior(Expression caseRefExpression, CaseTask caseTask) {
         super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters());
         this.caseRefExpression = caseRefExpression;
+        this.caseRef = caseTask.getCaseRef();
         this.fallbackToDefaultTenant = caseTask.getFallbackToDefaultTenant();
         this.caseTask = caseTask;
     }
@@ -60,8 +62,20 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Map<String, Object> variables) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CaseInstanceHelper caseInstanceHelper = CommandContextUtil.getCaseInstanceHelper(commandContext);
-        CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().
-                caseDefinitionKey(caseRefExpression.getValue(planItemInstanceEntity).toString());
+
+        String caseDefinitionKey = null;
+        if (caseRefExpression != null) {
+            caseDefinitionKey = caseRefExpression.getValue(planItemInstanceEntity).toString();
+
+        } else if (StringUtils.isNotEmpty(caseRef)) {
+            caseDefinitionKey = caseRef;
+
+        }
+        if (StringUtils.isEmpty(caseDefinitionKey)) {
+            throw new FlowableException("Could not start case instance: no case reference defined");
+        }
+
+        CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().caseDefinitionKey(caseDefinitionKey);
         if (StringUtils.isNotEmpty(planItemInstanceEntity.getTenantId())) {
             caseInstanceBuilder.tenantId(planItemInstanceEntity.getTenantId());
             caseInstanceBuilder.overrideCaseDefinitionTenantId(planItemInstanceEntity.getTenantId());

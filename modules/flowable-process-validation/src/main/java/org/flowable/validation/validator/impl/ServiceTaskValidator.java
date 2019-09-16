@@ -103,6 +103,7 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                         for (Operation operation : bpmnInterface.getOperations()) {
                             if (operation.getId() != null && operation.getId().equals(serviceTask.getOperationRef())) {
                                 operationFound = true;
+                                break;
                             }
                         }
                     }

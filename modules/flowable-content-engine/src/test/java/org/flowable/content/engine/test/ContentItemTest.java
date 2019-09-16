@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -111,7 +112,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertEquals(contentItem.getId(), dbContentItem.getId());
 
         try (InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
-            String contentValue = IOUtils.toString(contentStream, "utf-8");
+            String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
             assertEquals("hello", contentValue);
         }
 
@@ -157,7 +158,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertEquals(contentItem.getId(), dbContentItem.getId());
 
         try (InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
-            String contentValue = IOUtils.toString(contentStream, "utf-8");
+            String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
             assertEquals("hello", contentValue);
         }
 
@@ -201,7 +202,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertEquals(contentItem.getId(), dbContentItem.getId());
 
         try(InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
-            String contentValue = IOUtils.toString(contentStream, "utf-8");
+            String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
             assertEquals("hello", contentValue);
         }
 
@@ -302,7 +303,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertNotNull(storedContentItem);
         assertEquals(initialContentItem.getId(), storedContentItem.getId());
         InputStream contentStream = contentService.getContentItemData(initialContentItem.getId());
-        String contentValue = IOUtils.toString(contentStream, "utf-8");
+        String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
         assertEquals("hello", contentValue);
 
         assertThat(initialContentItem.getLastModified()).isNotEqualTo(storedContentItem.getLastModified());

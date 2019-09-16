@@ -96,7 +96,7 @@ com.fasterxml.jackson.core      jackson-databind            2.9.9.3         The 
 com.fasterxml.jackson.datatype  jackson-datatype-hppc       2.9.9           The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-joda       2.9.9           The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-json-org   2.9.9           The Apache Software License, Version 2.0
-com.google.guava                guava                       28.0-jre        The Apache Software License, Version 2.0
+com.google.guava                guava                       28.1-jre        The Apache Software License, Version 2.0
 com.h2database                  h2                          1.4.199         The H2 License, Version 1.0
 com.fasterxml.uuid              java-uuid-generator         3.2.0           The Apache Software License, Version 2.0
 com.sun.mail                    javax.mail                  1.6.2           CDDL/GPLv2+CE
@@ -119,13 +119,13 @@ joda-time                       joda-time                   2.10.3          Apac
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
 org.apache.commons              commons-email               1.5             Apache License, Version 2.0
 org.apache.commons              commons-lang3               3.9             The Apache Software License, Version 2.0
-org.apache.httpcomponents       httpclient                  4.5.9           Apache License, Version 2.0
-org.apache.httpcomponents       httpcore                    4.4.11          Apache License, Version 2.0
-org.apache.httpcomponents       httpmime                    4.5.9           Apache License, Version 2.0
+org.apache.httpcomponents       httpclient                  4.5.10          Apache License, Version 2.0
+org.apache.httpcomponents       httpcore                    4.4.12          Apache License, Version 2.0
+org.apache.httpcomponents       httpmime                    4.5.10          Apache License, Version 2.0
 org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
 org.codehaus.groovy             groovy                      2.5.8           The Apache Software License, Version 2.0
 org.codehaus.groovy             groovy-jsr223               2.5.8           The Apache Software License, Version 2.0
-org.liquibase                   liquibase-core              3.7.0           Apache License, Version 2.0
+org.liquibase                   liquibase-core              3.8.0           Apache License, Version 2.0
 org.mybatis                     mybatis                     3.5.2           The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              2.0.2           The Apache Software License, Version 2.0
 org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0

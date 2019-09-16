@@ -85,6 +85,7 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
 
             if (fieldName.equals("decisionTableReferenceKey") && fieldValue != null && fieldValue.length() > 0) {
                 keyDefined = true;
+                break;
             }
         }
 

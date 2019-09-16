@@ -64,7 +64,7 @@ public class CaseTaskCmmnXmlConverterTest extends AbstractConverterTest {
         PlanItemDefinition planItemDefinition = planItemTask1.getPlanItemDefinition();
         assertTrue(planItemDefinition instanceof CaseTask);
         CaseTask task1 = (CaseTask) planItemDefinition;
-        assertEquals("caseDefinitionKey", task1.getCaseRef());
+        assertEquals("caseDefinitionKey", task1.getCaseRefExpression());
         
         assertTrue(task1.getFallbackToDefaultTenant());
 

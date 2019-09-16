@@ -93,7 +93,7 @@ public class AsyncHistorySession implements Session {
     }
 
     public void addHistoricData(JobServiceConfiguration jobServiceConfiguration, String type, ObjectNode data, String tenantId) {
-        data.put(TIMESTAMP, AsyncHistoryDateUtil.formatDate(CommandContextUtil.getJobServiceConfiguration(commandContext).getClock().getCurrentTime()));
+        data.put(TIMESTAMP, AsyncHistoryDateUtil.formatDate(jobServiceConfiguration.getClock().getCurrentTime()));
         
         if (sessionData == null) {
             sessionData = new HashMap<>();

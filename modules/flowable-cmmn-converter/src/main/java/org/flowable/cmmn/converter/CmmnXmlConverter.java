@@ -119,6 +119,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
+        addTextConverter(new CaseRefExpressionXmlConverter());
         addTextConverter(new DecisionRefExpressionXmlConverter());
         addTextConverter(new ConditionXmlConverter());
         addTextConverter(new TimerExpressionXmlConverter());
