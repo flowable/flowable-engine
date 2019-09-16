@@ -56,7 +56,7 @@ public class CommentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implem
         fullMessage = (fullMessageBytes != null ? new String(fullMessageBytes) : null);
     }
 
-    public static String MESSAGE_PARTS_MARKER = "_|_";
+    public static final String MESSAGE_PARTS_MARKER = "_|_";
     public static Pattern MESSAGE_PARTS_MARKER_REGEX = Pattern.compile("_\\|_");
 
     @Override
