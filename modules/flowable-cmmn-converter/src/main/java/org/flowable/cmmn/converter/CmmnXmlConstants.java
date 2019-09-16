@@ -115,6 +115,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_BUSINESS_KEY = "businessKey";
     String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
 
+    String ELEMENT_CASE_REF_EXPRESSION = "caseRefExpression";
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     String ELEMENT_DECISION_REF_EXPRESSION = "decisionRefExpression";
     String ELEMENT_CONDITION = "condition";

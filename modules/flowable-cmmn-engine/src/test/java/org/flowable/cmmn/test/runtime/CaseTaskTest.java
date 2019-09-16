@@ -77,6 +77,16 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment
+    public void testCaseReferenceExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .variable("myVar", "oneTaskCase")
+            .start();
+        assertBlockingCaseTaskFlow(caseInstance);
+    }
+
+    @Test
     public void testBasicBlockingWithTenant() {
         cmmnRepositoryService.deleteDeployment(oneTaskCaseDeploymentId, true);
         oneTaskCaseDeploymentId = cmmnRepositoryService.createDeployment().

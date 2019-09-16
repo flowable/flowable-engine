@@ -85,7 +85,8 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     @Override
     public CaseTaskActivityBehavior createCaseTaskActivityBehavior(PlanItem planItem, CaseTask caseTask) {
-        return new CaseTaskActivityBehavior(expressionManager.createExpression(caseTask.getCaseRef()), caseTask);
+        Expression caseRefExpression = createExpression(caseTask.getCaseRefExpression());
+        return new CaseTaskActivityBehavior(caseRefExpression, caseTask);
     }
 
     @Override
@@ -181,11 +182,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     protected Expression createExpression(String refExpressionString) {
-        Expression processRefExpression = null;
+        Expression expression = null;
         if (StringUtils.isNotEmpty(refExpressionString)) {
-            processRefExpression = expressionManager.createExpression(refExpressionString);
+            expression = expressionManager.createExpression(refExpressionString);
         }
-        return processRefExpression;
+        return expression;
     }
 
 }
