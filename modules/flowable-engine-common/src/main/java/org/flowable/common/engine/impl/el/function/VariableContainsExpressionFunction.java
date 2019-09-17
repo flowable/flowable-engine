@@ -42,8 +42,8 @@ public class VariableContainsExpressionFunction extends AbstractFlowableVariable
     }
     
     @SuppressWarnings({ "rawtypes"})
-    public static boolean contains(VariableContainer variableScope, String variableName, Object... values) {
-        Object variableValue = getVariableValue(variableScope, variableName);
+    public static boolean contains(VariableContainer variableContainer, String variableName, Object... values) {
+        Object variableValue = getVariableValue(variableContainer, variableName);
         if (variableValue != null) {
             if (variableValue instanceof String) {
                 String variableStringValue = (String) variableValue;

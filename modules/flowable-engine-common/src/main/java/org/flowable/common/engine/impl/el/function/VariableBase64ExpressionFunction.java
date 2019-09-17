@@ -26,8 +26,8 @@ public class VariableBase64ExpressionFunction extends AbstractFlowableVariableEx
         super("base64");
     }
     
-    public static Object base64(VariableContainer variableScope, String variableName) {
-        Object value = getVariableValue(variableScope, variableName);
+    public static Object base64(VariableContainer variableContainer, String variableName) {
+        Object value = getVariableValue(variableContainer, variableName);
 
         if (value == null) {
             return null;

@@ -28,9 +28,9 @@ public abstract class AbstractVariableComparatorExpressionFunction extends Abstr
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected static boolean compareVariableValue(VariableContainer variableScope, String variableName, Object comparedValue, OPERATOR operator) {
+    protected static boolean compareVariableValue(VariableContainer variableContainer, String variableName, Object comparedValue, OPERATOR operator) {
         
-        Object variableValue = getVariableValue(variableScope, variableName);
+        Object variableValue = getVariableValue(variableContainer, variableName);
         if (comparedValue != null && variableValue != null) {
 
             // See equals method for an explanation why Number instances are handled specifically

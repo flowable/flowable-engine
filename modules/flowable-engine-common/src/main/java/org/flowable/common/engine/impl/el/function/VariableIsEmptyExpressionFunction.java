@@ -47,8 +47,8 @@ public class VariableIsEmptyExpressionFunction extends AbstractFlowableVariableE
     }
     
     @SuppressWarnings("rawtypes")
-    public static boolean isEmpty(VariableContainer variableScope, String variableName) {
-        Object variableValue = getVariableValue(variableScope, variableName);
+    public static boolean isEmpty(VariableContainer variableContainer, String variableName) {
+        Object variableValue = getVariableValue(variableContainer, variableName);
         if (variableValue == null)  {
             return true;
             

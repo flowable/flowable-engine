@@ -32,8 +32,8 @@ public class VariableExistsExpressionFunction extends AbstractFlowableVariableEx
         return false;
     }
     
-    public static boolean exists(VariableContainer variableScope, String variableName) {
-        return getVariableValue(variableScope, variableName) != null;
+    public static boolean exists(VariableContainer variableContainer, String variableName) {
+        return getVariableValue(variableContainer, variableName) != null;
     }
 
 }

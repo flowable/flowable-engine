@@ -27,8 +27,8 @@ public class VariableGetOrDefaultExpressionFunction extends AbstractFlowableVari
         super("getOrDefault");
     }
 
-    public static Object getOrDefault(VariableContainer variableScope, String variableName, Object value) {
-        Object variableValue = getVariableValue(variableScope, variableName);
+    public static Object getOrDefault(VariableContainer variableContainer, String variableName, Object value) {
+        Object variableValue = getVariableValue(variableContainer, variableName);
         if (variableValue != null) {
             return variableValue;
         } else {

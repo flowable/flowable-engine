@@ -29,9 +29,9 @@ public class VariableEqualsExpressionFunction extends AbstractFlowableVariableEx
         super(Arrays.asList("equals", "eq"), "equals");
     }
     
-    public static boolean equals(VariableContainer variableScope, String variableName, Object comparedValue) {
+    public static boolean equals(VariableContainer variableContainer, String variableName, Object comparedValue) {
         
-        Object variableValue = getVariableValue(variableScope, variableName);
+        Object variableValue = getVariableValue(variableContainer, variableName);
         if (comparedValue != null && variableValue != null) {
             
             // Numbers are not necessarily of the expected type due to coming from JUEL, 
