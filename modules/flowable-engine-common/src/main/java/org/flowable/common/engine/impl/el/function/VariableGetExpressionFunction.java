@@ -12,8 +12,8 @@
  */
 package org.flowable.common.engine.impl.el.function;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Returns the value of a variable. This avoids the {@link PropertyNotFoundException} that otherwise gets thrown when referencing a variable in JUEL.
@@ -22,11 +22,11 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableGetExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableGetExpressionFunction(String variableScopeName) {
-        super(variableScopeName, "get");
+    public VariableGetExpressionFunction() {
+        super("get");
     }
     
-    public static Object get(VariableScope variableScope, String variableName) {
+    public static Object get(VariableContainer variableScope, String variableName) {
         return getVariableValue(variableScope, variableName);
     }
     

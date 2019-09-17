@@ -14,7 +14,7 @@ package org.flowable.common.engine.impl.el.function;
 
 import java.util.List;
 
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * @author Joram Barrez
@@ -23,12 +23,12 @@ public abstract class AbstractVariableComparatorExpressionFunction extends Abstr
     
     protected static enum OPERATOR { LT, LTE, GT, GTE, EQ };
 
-    public AbstractVariableComparatorExpressionFunction(String variableScopeName, List<String> functionNameOptions, String functionName) {
-        super(variableScopeName, functionNameOptions, functionName);
+    public AbstractVariableComparatorExpressionFunction(List<String> functionNameOptions, String functionName) {
+        super(functionNameOptions, functionName);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected static boolean compareVariableValue(VariableScope variableScope, String variableName, Object comparedValue, OPERATOR operator) {
+    protected static boolean compareVariableValue(VariableContainer variableScope, String variableName, Object comparedValue, OPERATOR operator) {
         
         Object variableValue = getVariableValue(variableScope, variableName);
         if (comparedValue != null && variableValue != null) {

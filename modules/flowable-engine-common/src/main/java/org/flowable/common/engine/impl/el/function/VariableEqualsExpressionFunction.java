@@ -15,7 +15,7 @@ package org.flowable.common.engine.impl.el.function;
 import java.util.Arrays;
 import java.util.Objects;
 
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * Compares the value of a variable (fetched using the variableName through the variable scope)
@@ -25,11 +25,11 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableEqualsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableEqualsExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("equals", "eq"), "equals");
+    public VariableEqualsExpressionFunction() {
+        super(Arrays.asList("equals", "eq"), "equals");
     }
     
-    public static boolean equals(VariableScope variableScope, String variableName, Object comparedValue) {
+    public static boolean equals(VariableContainer variableScope, String variableName, Object comparedValue) {
         
         Object variableValue = getVariableValue(variableScope, variableName);
         if (comparedValue != null && variableValue != null) {
