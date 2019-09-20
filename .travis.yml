@@ -10,7 +10,6 @@ matrix:
       cd scripts && ./run-flowable5-tests.sh
   - jdk: openjdk11
     dist: xenial
-  - jdk: openjdk12
   - jdk: openjdk13
   - jdk: openjdk-ea
     branches:
@@ -18,7 +17,6 @@ matrix:
       - master
     if: TRAVIS_PULL_REQUEST != false
   allow_failures:
-  - jdk: openjdk13
   - jdk: openjdk-ea
   - name: "Flowable 5 tests"
 
