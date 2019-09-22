@@ -15,7 +15,6 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,8 +33,6 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * @author Tijs Rademakers
@@ -79,19 +76,29 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
         Map<String, Object> variables = new HashMap<>();
         if (!ignoreVariables && task.getProcessInstanceId() != null) {
 
-
             if (!historic) {
                 processEngineConfiguration.getTaskService()
                         .getVariableInstances(taskId).values()
-                        .stream().forEach(variableInstance ->
-                        variables.put(variableInstance.getName(), variableInstance.getValue())
-                );
+                        .stream()
+                        .forEach(variableInstance -> variables.putIfAbsent(variableInstance.getName(), variableInstance.getValue()));
+
+                processEngineConfiguration.getRuntimeService().getVariableInstances(task.getProcessInstanceId()).values()
+                        .stream()
+                        .forEach(variableInstance -> variables.putIfAbsent(variableInstance.getName(), variableInstance.getValue()));
+
+
             } else {
+
                 processEngineConfiguration.getHistoryService()
-                        .createHistoricVariableInstanceQuery()
-                        .taskId(taskId).list().stream().forEach(variableInstance ->
-                        variables.put(variableInstance.getVariableName(), variableInstance.getValue())
-                );
+                        .createHistoricVariableInstanceQuery().taskId(taskId).list()
+                        .stream()
+                        .forEach(variableInstance -> variables.putIfAbsent(variableInstance.getVariableName(), variableInstance.getValue()));
+
+                processEngineConfiguration.getHistoryService()
+                        .createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).list()
+                        .stream()
+                        .forEach(variableInstance -> variables.putIfAbsent(variableInstance.getVariableName(), variableInstance.getValue()));
+
             }
         }
 
