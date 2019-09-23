@@ -13,6 +13,7 @@
 package org.flowable.task.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -96,6 +97,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String taskDefinitionId;
     protected String key;
     protected String keyLike;
+    protected Collection<String> keys;
     protected String processDefinitionKey;
     protected String processDefinitionKeyLike;
     protected String processDefinitionKeyLikeIgnoreCase;
@@ -908,6 +910,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.keyLike = keyLike;
         } else {
             this.keyLike = keyLike;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskDefinitionKeys(Collection<String> keys) {
+        if (orActive) {
+            currentOrQueryObject.keys = keys;
+        } else {
+            this.keys = keys;
         }
         return this;
     }
@@ -1786,6 +1798,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getKeyLike() {
         return keyLike;
+    }
+
+    public Collection<String> getKeys() {
+        return keys;
     }
 
     public String getProcessDefinitionKey() {

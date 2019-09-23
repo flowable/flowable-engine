@@ -217,6 +217,11 @@ public class TaskBaseResource {
         if (request.getTaskDefinitionKeyLike() != null) {
             taskQuery.taskDefinitionKeyLike(request.getTaskDefinitionKeyLike());
         }
+
+        if (request.getTaskDefinitionKeys() != null) {
+            taskQuery.taskDefinitionKeys(request.getTaskDefinitionKeys());
+        }
+
         if (request.getDueDate() != null) {
             taskQuery.taskDueDate(request.getDueDate());
         }

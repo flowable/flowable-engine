@@ -14,6 +14,7 @@
 package org.flowable.task.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -89,6 +90,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected List<String> taskAssigneeIds;
     protected String taskDefinitionKey;
     protected String taskDefinitionKeyLike;
+    protected Collection<String> taskDefinitionKeys;
     protected String candidateUser;
     protected String candidateGroup;
     private List<String> candidateGroups;
@@ -1073,6 +1075,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery taskDefinitionKeys(Collection<String> taskDefinitionKeys) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.taskDefinitionKeys = taskDefinitionKeys;
+        } else {
+            this.taskDefinitionKeys = taskDefinitionKeys;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQuery taskPriority(Integer taskPriority) {
         if (inOrStatement) {
             this.currentOrQueryObject.taskPriority = taskPriority;
@@ -1912,6 +1924,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getTaskOwner() {
         return taskOwner;
+    }
+
+    public Collection<String> getTaskDefinitionKeys() {
+        return taskDefinitionKeys;
     }
 
     public String getTaskParentTaskId() {

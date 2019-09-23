@@ -262,6 +262,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.put("taskDefinitionKeyLike", "process%");
             assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
 
+            // Task definition keys filtering
+            requestNode.removeAll();
+            requestNode.putArray("taskDefinitionKeys").add("processTask").add("invalidTask");
+            assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+
             // Duedate filtering
             requestNode.removeAll();
             requestNode.put("dueDate", getISODateString(adhocTaskCreate.getTime()));

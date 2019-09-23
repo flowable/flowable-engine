@@ -13,6 +13,7 @@
 package org.flowable.task.api;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -294,6 +295,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * the userTask: &lt;userTask id="xxx" .../&gt;
      **/
     T taskDefinitionKeyLike(String keyLike);
+
+    /**
+     * Only select tasks with the given taskDefinitionKeys. The task definition key is the id of the userTask: &lt;userTask id="xxx" .../&gt;
+     **/
+    T taskDefinitionKeys(Collection<String> keys);
 
     /**
      * Only select tasks with the given due date.
