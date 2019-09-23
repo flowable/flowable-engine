@@ -15,7 +15,6 @@ package org.flowable.content.engine.configurator.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -118,7 +117,6 @@ public class ContentEngineConfiguratorTest {
         Set<String> names = new HashSet<>();
         for (int i = 0; i < mm.getCount(); i++) {
             String contentTypeHeader = mm.getBodyPart(i).getHeader("Content-Type")[0];
-            System.out.println(contentTypeHeader);
 
             if (contentTypeHeader.contains("name")) {
                 contentTypeHeader = contentTypeHeader
@@ -133,12 +131,8 @@ public class ContentEngineConfiguratorTest {
             }
         }
 
-        assertTrue(names.containsAll(
-            Arrays.asList("myDocument.txt", "anotherDocument.docx", "andYetAnother.pdf")));
-        assertTrue(contentTypes.containsAll(
-            Arrays.asList("text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf")));
-
-
+        assertTrue(names.containsAll(TestAttachmentBean.TEST_NAMES));
+        assertTrue(contentTypes.containsAll(TestAttachmentBean.TEST_MIME_TYPES));
     }
 
 
