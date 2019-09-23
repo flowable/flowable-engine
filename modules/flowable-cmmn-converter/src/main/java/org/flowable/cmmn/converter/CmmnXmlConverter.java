@@ -291,7 +291,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     continue;
                 }
 
-                CaseExport.writeCase(caseModel, xtw);
+                CaseExport.writeCase(model, caseModel, xtw);
 
                 Stage planModel = caseModel.getPlanModel();
 

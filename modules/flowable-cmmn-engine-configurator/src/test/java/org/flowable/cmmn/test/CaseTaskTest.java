@@ -135,6 +135,41 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.testCaseTaskWithParameters.cmmn")
+    public void testCaseTaskWithCaseNameAndBusinessKey() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithCaseNameAndBusinessKey.bpmn20.xml")
+                .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("caseTask")
+                .variable("caseName", "Test")
+                .variable("caseBusinessKey", "case-test-business")
+                .start();
+            List<Task> processTasks = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertEquals(1, processTasks.size());
+
+            processEngineTaskService.complete(processTasks.get(0).getId());
+
+            Execution execution = processEngineRuntimeService.createExecutionQuery().onlyChildExecutions()
+                            .processInstanceId(processInstance.getId())
+                            .singleResult();
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackId(execution.getId())
+                            .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
+                            .singleResult();
+
+            assertThat(caseInstance).isNotNull();
+            assertThat(caseInstance.getName()).isEqualTo("Custom Test Name");
+            assertThat(caseInstance.getBusinessKey()).isEqualTo("case-test-business");
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn")
     public void testDeleteCaseTaskShouldNotBePossible() {
         Deployment deployment = processEngineRepositoryService.createDeployment()

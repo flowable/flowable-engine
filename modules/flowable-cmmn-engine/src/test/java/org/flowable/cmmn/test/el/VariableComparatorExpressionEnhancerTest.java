@@ -26,26 +26,26 @@ import org.junit.Test;
  */
 public class VariableComparatorExpressionEnhancerTest {
     
-    private VariableLowerThanExpressionFunction variableLowerThanExpressionFunction = new VariableLowerThanExpressionFunction("planItemInstance");
-    private VariableLowerThanOrEqualsExpressionFunction variableLowerThanOrEqualsExpressionFunction = new VariableLowerThanOrEqualsExpressionFunction("planItemInstance");
-    private VariableGreaterThanExpressionFunction variableGreaterThanExpressionFunction = new VariableGreaterThanExpressionFunction("planItemInstance"); 
-    private VariableGreaterThanOrEqualsExpressionFunction variableGreaterThanOrEqualsExpressionFunction = new  VariableGreaterThanOrEqualsExpressionFunction("planItemInstance");  
+    private VariableLowerThanExpressionFunction variableLowerThanExpressionFunction = new VariableLowerThanExpressionFunction();
+    private VariableLowerThanOrEqualsExpressionFunction variableLowerThanOrEqualsExpressionFunction = new VariableLowerThanOrEqualsExpressionFunction();
+    private VariableGreaterThanExpressionFunction variableGreaterThanExpressionFunction = new VariableGreaterThanExpressionFunction(); 
+    private VariableGreaterThanOrEqualsExpressionFunction variableGreaterThanOrEqualsExpressionFunction = new  VariableGreaterThanOrEqualsExpressionFunction();  
     
     @Test
     public void testRegexNameReplacement() {
-        assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lowerThan(myVar,123)}", "${variables:lowerThan(planItemInstance,'myVar',123)}");
-        assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lessThan(myVar,123)}", "${variables:lowerThan(planItemInstance,'myVar',123)}");
-        assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lt(myVar,123)}", "${variables:lowerThan(planItemInstance,'myVar',123)}");
+        assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lowerThan(myVar,123)}", "${variables:lowerThan(variableContainer,'myVar',123)}");
+        assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lessThan(myVar,123)}", "${variables:lowerThan(variableContainer,'myVar',123)}");
+        assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lt(myVar,123)}", "${variables:lowerThan(variableContainer,'myVar',123)}");
         
-        assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction, "${variables:lowerThanOrEquals(myVar,123)}", "${variables:lowerThanOrEquals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction, "${variables:lessThanOrEquals(myVar,123)}", "${variables:lowerThanOrEquals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction,  "${variables:lte(myVar,123)}", "${variables:lowerThanOrEquals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction, "${variables:lowerThanOrEquals(myVar,123)}", "${variables:lowerThanOrEquals(variableContainer,'myVar',123)}");
+        assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction, "${variables:lessThanOrEquals(myVar,123)}", "${variables:lowerThanOrEquals(variableContainer,'myVar',123)}");
+        assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction,  "${variables:lte(myVar,123)}", "${variables:lowerThanOrEquals(variableContainer,'myVar',123)}");
         
-        assertRegexCorrect(variableGreaterThanExpressionFunction, "${variables:greaterThan(myVar,123)}", "${variables:greaterThan(planItemInstance,'myVar',123)}");
-        assertRegexCorrect(variableGreaterThanExpressionFunction, "${variables:gt(myVar,123)}", "${variables:greaterThan(planItemInstance,'myVar',123)}");
+        assertRegexCorrect(variableGreaterThanExpressionFunction, "${variables:greaterThan(myVar,123)}", "${variables:greaterThan(variableContainer,'myVar',123)}");
+        assertRegexCorrect(variableGreaterThanExpressionFunction, "${variables:gt(myVar,123)}", "${variables:greaterThan(variableContainer,'myVar',123)}");
         
-        assertRegexCorrect(variableGreaterThanOrEqualsExpressionFunction,"${variables:greaterThanOrEquals(myVar,123)}", "${variables:greaterThanOrEquals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect(variableGreaterThanOrEqualsExpressionFunction, "${variables:gte(myVar,123)}", "${variables:greaterThanOrEquals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect(variableGreaterThanOrEqualsExpressionFunction,"${variables:greaterThanOrEquals(myVar,123)}", "${variables:greaterThanOrEquals(variableContainer,'myVar',123)}");
+        assertRegexCorrect(variableGreaterThanOrEqualsExpressionFunction, "${variables:gte(myVar,123)}", "${variables:greaterThanOrEquals(variableContainer,'myVar',123)}");
     }
         
     public void assertRegexCorrect(FlowableExpressionEnhancer expressionEnhancer, String in, String out) {

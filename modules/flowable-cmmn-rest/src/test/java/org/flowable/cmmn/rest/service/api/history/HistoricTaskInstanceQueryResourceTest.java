@@ -123,6 +123,11 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         variableNode.put("operation", "like");
         assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId(), task2.getId());
 
+        variableNode.put("name", "stringVar");
+        variableNode.put("value", "AzEr%");
+        variableNode.put("operation", "likeIgnoreCase");
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId(), task2.getId());
+
         variableNode.put("name", "local");
         variableNode.put("value", "test");
         variableNode.put("operation", "equals");

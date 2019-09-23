@@ -21,8 +21,8 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableGreaterThanOrEqualsExpressionFunction extends AbstractVariableComparatorExpressionFunction {
 
-    public VariableGreaterThanOrEqualsExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("greaterThanOrEquals", "gte"), "greaterThanOrEquals");
+    public VariableGreaterThanOrEqualsExpressionFunction() {
+        super(Arrays.asList("greaterThanOrEquals", "gte"), "greaterThanOrEquals");
     }
     
     public static boolean greaterThanOrEquals(VariableScope variableScope, String variableName, Object comparedValue) {

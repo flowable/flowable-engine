@@ -991,6 +991,12 @@
       <if test="taskDefinitionKeyLike != null">
         and ${queryTablePrefix}TASK_DEF_KEY_ like #{taskDefinitionKeyLike}${wildcardEscapeClause}
       </if>
+      <if test="taskDefinitionKeys != null and !taskDefinitionKeys.isEmpty()">
+        and ${queryTablePrefix}TASK_DEF_KEY_ in
+        <foreach item="item" index="index" collection="taskDefinitionKeys" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="executionId != null">
         and ${queryTablePrefix}EXECUTION_ID_ = #{executionId}
       </if>
@@ -1213,6 +1219,12 @@
       </if>
       <if test="orQueryObject.taskDefinitionKeyLike != null">
         or ${queryTablePrefix}TASK_DEF_KEY_ like #{orQueryObject.taskDefinitionKeyLike}${wildcardEscapeClause}
+      </if>
+      <if test="orQueryObject.taskDefinitionKeys != null and !orQueryObject.taskDefinitionKeys.isEmpty()">
+        or ${queryTablePrefix}TASK_DEF_KEY_ in
+        <foreach item="item" index="index" collection="orQueryObject.taskDefinitionKeys" open="(" separator="," close=")">
+          #{item}
+        </foreach>
       </if>
       <if test="orQueryObject.executionId != null">
         or ${queryTablePrefix}EXECUTION_ID_ = #{orQueryObject.executionId}

@@ -180,10 +180,12 @@ ${myBean.doSomething(myVar, planItemInstance)}
 
 Note that these expressions support resolving primitives (including comparing them), beans, lists, arrays, and maps.
 
-On top of all process variables, there are a few default objects available that can be used in expressions:
+On top of all case variables, there are a few default objects available that can be used in expressions:
 
 * ++caseInstance++: The +DelegateCaseInstance+ holds additional information about the ongoing case instance.
 * ++planItemInstance++: The +DelegatePlanItemInstance+ holds additional information about the current plan item.
+* ++authenticatedUserId++: The id of the user that is currently authenticated. If no user is authenticated, the variable is not available.
+* ++variableContainer++: The +VariableContainer+ for which the expression is being resolved for.
 
 [[cmmnExpressionsFunctions]]
 
