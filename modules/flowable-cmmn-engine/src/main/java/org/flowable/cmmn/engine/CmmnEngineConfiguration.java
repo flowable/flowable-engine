@@ -204,6 +204,7 @@ import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
+import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -449,6 +450,19 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
+
+    // Email
+    protected String mailServerHost = "localhost";
+    protected String mailServerUsername; // by default no name and password are provided, which
+    protected String mailServerPassword; // means no authentication for mail server
+    protected int mailServerPort = 25;
+    protected boolean useSSL;
+    protected boolean useTLS;
+    protected String mailServerDefaultFrom = "flowable@localhost";
+    protected String mailServerForceTo;
+    protected String mailSessionJndi;
+    protected Map<String, MailServerInfo> mailServers = new HashMap<>();
+    protected Map<String, String> mailSessionsJndi = new HashMap<>();
 
     // Async executor
     protected JobServiceConfiguration jobServiceConfiguration;
@@ -1107,7 +1121,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initClassDelegateFactory() {
         if (classDelegateFactory == null) {
-            classDelegateFactory = new DefaultCmmnClassDelegateFactory();
+            classDelegateFactory = new DefaultCmmnClassDelegateFactory(expressionManager);
         }
     }
 
@@ -3375,6 +3389,113 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setHttpClientConfig(HttpClientConfig httpClientConfig) {
         this.httpClientConfig.merge(httpClientConfig);
         return this;
+    }
+
+    public String getMailServerHost() {
+        return mailServerHost;
+    }
+
+    public CmmnEngineConfiguration setMailServerHost(String mailServerHost) {
+        this.mailServerHost = mailServerHost;
+        return this;
+    }
+
+    public String getMailServerUsername() {
+        return mailServerUsername;
+    }
+
+    public CmmnEngineConfiguration setMailServerUsername(String mailServerUsername) {
+        this.mailServerUsername = mailServerUsername;
+        return this;
+    }
+
+    public String getMailServerPassword() {
+        return mailServerPassword;
+    }
+
+    public CmmnEngineConfiguration setMailServerPassword(String mailServerPassword) {
+        this.mailServerPassword = mailServerPassword;
+        return this;
+    }
+
+    public int getMailServerPort() {
+        return mailServerPort;
+    }
+
+    public CmmnEngineConfiguration setMailServerPort(int mailServerPort) {
+        this.mailServerPort = mailServerPort;
+        return this;
+    }
+
+    public boolean getMailServerUseSSL() {
+        return useSSL;
+    }
+
+    public CmmnEngineConfiguration setMailServerUseSSL(boolean useSSL) {
+        this.useSSL = useSSL;
+        return this;
+    }
+
+    public boolean getMailServerUseTLS() {
+        return useTLS;
+    }
+
+    public CmmnEngineConfiguration setMailServerUseTLS(boolean useTLS) {
+        this.useTLS = useTLS;
+        return this;
+    }
+
+    public String getMailServerDefaultFrom() {
+        return mailServerDefaultFrom;
+    }
+
+    public CmmnEngineConfiguration setMailServerDefaultFrom(String mailServerDefaultFrom) {
+        this.mailServerDefaultFrom = mailServerDefaultFrom;
+        return this;
+    }
+
+    public String getMailServerForceTo() {
+        return mailServerForceTo;
+    }
+
+    public CmmnEngineConfiguration setMailServerForceTo(String mailServerForceTo) {
+        this.mailServerForceTo = mailServerForceTo;
+        return this;
+    }
+
+    public String getMailSessionJndi() {
+        return mailSessionJndi;
+    }
+
+    public CmmnEngineConfiguration setMailSessionJndi(String mailSessionJndi) {
+        this.mailSessionJndi = mailSessionJndi;
+        return this;
+    }
+
+    public Map<String, MailServerInfo> getMailServers() {
+        return mailServers;
+    }
+
+    public CmmnEngineConfiguration setMailServers(Map<String, MailServerInfo> mailServers) {
+        this.mailServers = mailServers;
+        return this;
+    }
+
+    public MailServerInfo getMailServer(String tenantId) {
+        return mailServers.get(tenantId);
+    }
+
+    public Map<String, String> getMailSessionsJndi() {
+        return mailSessionsJndi;
+    }
+
+    public CmmnEngineConfiguration setMailSessionsJndi(Map<String, String> mailSessionsJndi) {
+        this.mailSessionsJndi = mailSessionsJndi;
+        return this;
+    }
+
+    public String getMailSessionJndi(String tenantId) {
+        return mailSessionsJndi.get(tenantId);
     }
 
     public FormFieldHandler getFormFieldHandler() {

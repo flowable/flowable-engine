@@ -19,19 +19,15 @@ import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemJavaDelegateActivityBehavior;
-import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
@@ -52,14 +48,14 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
     @Override
     public void execute(DelegatePlanItemInstance planItemInstance) {
         if (activityBehaviorInstance == null) {
-            activityBehaviorInstance = getCmmnActivityBehavior(className, planItemInstance);
+            activityBehaviorInstance = getCmmnActivityBehavior(className);
         }
         activityBehaviorInstance.execute(planItemInstance);
     }
 
-    protected CmmnActivityBehavior getCmmnActivityBehavior(String className, VariableScope variableScope) {
+    protected CmmnActivityBehavior getCmmnActivityBehavior(String className) {
         Object instance = instantiate(className);
-        applyFieldExtensions(fieldExtensions, instance, variableScope, false);
+        applyFieldExtensions(fieldExtensions, instance, false);
 
         if (instance instanceof PlanItemJavaDelegate) {
             return new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) instance);
@@ -82,7 +78,7 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
 
     protected TaskListener getTaskListenerInstance(DelegateTask delegateTask) {
         Object delegateInstance = instantiate(className);
-        applyFieldExtensions(fieldExtensions, delegateInstance, delegateTask, false);
+        applyFieldExtensions(fieldExtensions, delegateTask, false);
 
         if (delegateInstance instanceof TaskListener) {
             return (TaskListener) delegateInstance;
@@ -93,19 +89,19 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
 
     @Override
     public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
-        PlanItemInstanceLifecycleListener planItemLifeCycleListenerInstance = getPlanItemLifeCycleListenerInstance(planItemInstance);
+        PlanItemInstanceLifecycleListener planItemLifeCycleListenerInstance = getPlanItemLifeCycleListenerInstance();
         planItemLifeCycleListenerInstance.stateChanged(planItemInstance, oldState, newState);
     }
 
     @Override
     public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
-        CaseInstanceLifecycleListener caseLifeCycleListenerInstance = getCaseLifeCycleListenerInstance(caseInstance);
+        CaseInstanceLifecycleListener caseLifeCycleListenerInstance = getCaseLifeCycleListenerInstance();
         caseLifeCycleListenerInstance.stateChanged(caseInstance, oldState, newState);
     }
 
-    protected PlanItemInstanceLifecycleListener getPlanItemLifeCycleListenerInstance(PlanItemInstance planItemInstance) {
+    protected PlanItemInstanceLifecycleListener getPlanItemLifeCycleListenerInstance() {
         Object delegateInstance = instantiate(className);
-        applyFieldExtensions(fieldExtensions, delegateInstance, (DelegatePlanItemInstance) planItemInstance, false);
+        applyFieldExtensions(fieldExtensions, delegateInstance, false);
         if (delegateInstance instanceof PlanItemInstanceLifecycleListener) {
             return (PlanItemInstanceLifecycleListener) delegateInstance;
         } else {
@@ -113,9 +109,9 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
         }
     }
 
-    protected CaseInstanceLifecycleListener getCaseLifeCycleListenerInstance(CaseInstance caseInstance) {
+    protected CaseInstanceLifecycleListener getCaseLifeCycleListenerInstance() {
         Object delegateInstance = instantiate(className);
-        applyFieldExtensions(fieldExtensions, delegateInstance, (CaseInstanceEntity) caseInstance, false);
+        applyFieldExtensions(fieldExtensions, delegateInstance, false);
         if (delegateInstance instanceof CaseInstanceLifecycleListener) {
             return (CaseInstanceLifecycleListener) delegateInstance;
         } else {
@@ -127,15 +123,15 @@ public class CmmnClassDelegate implements CmmnActivityBehavior, TaskListener, Pl
         return ReflectUtil.instantiate(className);
     }
 
-    public static void applyFieldExtensions(List<FieldExtension> fieldExtensions, Object target, VariableContainer variableContainer, boolean throwExceptionOnMissingField) {
+    public static void applyFieldExtensions(List<FieldExtension> fieldExtensions, Object target, boolean throwExceptionOnMissingField) {
         if (fieldExtensions != null) {
             for (FieldExtension fieldExtension : fieldExtensions) {
-                applyFieldExtension(fieldExtension, target, variableContainer, throwExceptionOnMissingField);
+                applyFieldExtension(fieldExtension, target, throwExceptionOnMissingField);
             }
         }
     }
 
-    protected static void applyFieldExtension(FieldExtension fieldExtension, Object target, VariableContainer variableContainer, boolean throwExceptionOnMissingField) {
+    protected static void applyFieldExtension(FieldExtension fieldExtension, Object target, boolean throwExceptionOnMissingField) {
         Object value = null;
         if (fieldExtension.getStringValue() != null) {
             value = fieldExtension.getStringValue();

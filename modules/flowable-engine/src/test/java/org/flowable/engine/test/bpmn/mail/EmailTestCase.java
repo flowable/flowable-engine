@@ -16,7 +16,7 @@ package org.flowable.engine.test.bpmn.mail;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.cfg.MailServerInfo;
+import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

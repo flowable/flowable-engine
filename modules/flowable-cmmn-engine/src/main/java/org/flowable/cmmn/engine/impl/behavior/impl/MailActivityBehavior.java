@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.bpmn.behavior;
+package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,28 +31,27 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.api.ContentItem;
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Based on the MailActivityBehavior found in the bpmn engine, adapted for use in cmmn.
+ *
  * @author Joram Barrez
- * @author Frederik Heremans
- * @author Tim Stephenson
- * @author Filip Hrisafov
  */
-public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
+public class MailActivityBehavior extends CoreCmmnActivityBehavior {
+
+    // TODO: this should be merged with the bpmn counterpart later
 
     private static final long serialVersionUID = 1L;
 
@@ -76,56 +75,47 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     protected Expression attachments;
 
     @Override
-    public void execute(DelegateExecution execution) {
-        FlowElement flowElement = execution.getCurrentFlowElement();
-        boolean isSkipExpressionEnabled = false;
-        String skipExpressionText = null;
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        if (flowElement != null && flowElement instanceof ServiceTask) {
-            ServiceTask serviceTask = (ServiceTask) flowElement;
-            skipExpressionText = serviceTask.getSkipExpression();
-            isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionText, flowElement.getId(), execution, commandContext);
-        }
-        
-        if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText, flowElement.getId(), execution, commandContext)) {
-            boolean doIgnoreException = Boolean.parseBoolean(getStringFromField(ignoreException, execution));
-            String exceptionVariable = getStringFromField(exceptionVariableName, execution);
-            Email email = null;
-            try {
-                String headersStr = getStringFromField(headers, execution);
-                String toStr = getStringFromField(to, execution);
-                String fromStr = getStringFromField(from, execution);
-                String ccStr = getStringFromField(cc, execution);
-                String bccStr = getStringFromField(bcc, execution);
-                String subjectStr = getStringFromField(subject, execution);
-                String textStr = textVar == null ? getStringFromField(text, execution) : getStringFromField(getExpression(execution, textVar), execution);
-                String htmlStr = htmlVar == null ? getStringFromField(html, execution) : getStringFromField(getExpression(execution, htmlVar), execution);
-                String charSetStr = getStringFromField(charset, execution);
-                List<File> files = new LinkedList<>();
-                List<DataSource> dataSources = new LinkedList<>();
-                getFilesFromFields(attachments, execution, files, dataSources);
-    
-                email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
-                addHeader(email, headersStr);
-                addTo(email, toStr, execution.getTenantId());
-                setFrom(email, fromStr, execution.getTenantId());
-                addCc(email, ccStr, execution.getTenantId());
-                addBcc(email, bccStr, execution.getTenantId());
-                setSubject(email, subjectStr);
-                setMailServerProperties(email, execution.getTenantId());
-                setCharset(email, charSetStr);
-                attach(email, files, dataSources);
-    
-                email.send();
-    
-            } catch (FlowableException e) {
-                handleException(execution, e.getMessage(), e, doIgnoreException, exceptionVariable);
-            } catch (EmailException e) {
-                handleException(execution, "Could not send e-mail in execution " + execution.getId(), e, doIgnoreException, exceptionVariable);
-            }
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        boolean doIgnoreException = Boolean.parseBoolean(getStringFromField(ignoreException, planItemInstanceEntity));
+        String exceptionVariable = getStringFromField(exceptionVariableName, planItemInstanceEntity);
+        Email email = null;
+        try {
+            String headersStr = getStringFromField(headers, planItemInstanceEntity);
+            String toStr = getStringFromField(to, planItemInstanceEntity);
+            String fromStr = getStringFromField(from, planItemInstanceEntity);
+            String ccStr = getStringFromField(cc, planItemInstanceEntity);
+            String bccStr = getStringFromField(bcc, planItemInstanceEntity);
+            String subjectStr = getStringFromField(subject, planItemInstanceEntity);
+            String textStr = textVar == null ? getStringFromField(text, planItemInstanceEntity)
+                : getStringFromField(getExpression(commandContext, planItemInstanceEntity, textVar), planItemInstanceEntity);
+            String htmlStr = htmlVar == null ? getStringFromField(html, planItemInstanceEntity)
+                : getStringFromField(getExpression(commandContext, planItemInstanceEntity, htmlVar), planItemInstanceEntity);
+            String charSetStr = getStringFromField(charset, planItemInstanceEntity);
+            List<File> files = new LinkedList<>();
+            List<DataSource> dataSources = new LinkedList<>();
+            getFilesFromFields(attachments, planItemInstanceEntity, files, dataSources);
+
+            email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
+            addHeader(email, headersStr);
+            addTo(commandContext, email, toStr, planItemInstanceEntity.getTenantId());
+            setFrom(commandContext, email, fromStr, planItemInstanceEntity.getTenantId());
+            addCc(commandContext, email, ccStr, planItemInstanceEntity.getTenantId());
+            addBcc(commandContext, email, bccStr, planItemInstanceEntity.getTenantId());
+            setSubject(email, subjectStr);
+            setMailServerProperties(commandContext, email, planItemInstanceEntity.getTenantId());
+            setCharset(email, charSetStr);
+            attach(email, files, dataSources);
+
+            email.send();
+
+        } catch (FlowableException e) {
+            handleException(planItemInstanceEntity, e.getMessage(), e, doIgnoreException, exceptionVariable);
+        } catch (EmailException e) {
+            handleException(planItemInstanceEntity, "Could not send e-mail for plan item instance "
+                + planItemInstanceEntity.getId(), e, doIgnoreException, exceptionVariable);
         }
 
-        leave(execution);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 
     protected void addHeader(Email email, String headersStr) {
@@ -194,12 +184,12 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addTo(Email email, String to, String tenantId) {
+    protected void addTo(CommandContext commandContext, Email email, String to, String tenantId) {
         if (to == null) {
             // To has to be set, otherwise it can fallback to the forced To and then it won't be noticed early on
             throw new FlowableException("No recipient could be found for sending email");
         }
-        String newTo = getForceTo(tenantId);
+        String newTo = getForceTo(commandContext, tenantId);
         if (newTo == null) {
             newTo = to;
         }
@@ -217,14 +207,14 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void setFrom(Email email, String from, String tenantId) {
+    protected void setFrom(CommandContext commandContext, Email email, String from, String tenantId) {
         String fromAddress = null;
 
         if (from != null) {
             fromAddress = from;
         } else { // use default configured from address in process engine config
             if (tenantId != null && tenantId.length() > 0) {
-                Map<String, MailServerInfo> mailServers = CommandContextUtil.getProcessEngineConfiguration().getMailServers();
+                Map<String, MailServerInfo> mailServers = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getMailServers();
                 if (mailServers != null && mailServers.containsKey(tenantId)) {
                     MailServerInfo mailServerInfo = mailServers.get(tenantId);
                     fromAddress = mailServerInfo.getMailServerDefaultFrom();
@@ -232,7 +222,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             }
 
             if (fromAddress == null) {
-                fromAddress = CommandContextUtil.getProcessEngineConfiguration().getMailServerDefaultFrom();
+                fromAddress = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getMailServerDefaultFrom();
             }
         }
 
@@ -243,12 +233,12 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addCc(Email email, String cc, String tenantId) {
+    protected void addCc(CommandContext commandContext, Email email, String cc, String tenantId) {
         if (cc == null) {
             return;
         }
 
-        String newCc = getForceTo(tenantId);
+        String newCc = getForceTo(commandContext, tenantId);
         if (newCc == null) {
             newCc = cc;
         }
@@ -264,11 +254,11 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addBcc(Email email, String bcc, String tenantId) {
+    protected void addBcc(CommandContext commandContext, Email email, String bcc, String tenantId) {
         if (bcc == null) {
             return;
         }
-        String newBcc = getForceTo(tenantId);
+        String newBcc = getForceTo(commandContext, tenantId);
         if (newBcc == null) {
             newBcc = bcc;
         }
@@ -303,17 +293,17 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         email.setSubject(subject != null ? subject : "");
     }
 
-    protected void setMailServerProperties(Email email, String tenantId) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+    protected void setMailServerProperties(CommandContext commandContext, Email email, String tenantId) {
+        CmmnEngineConfiguration engineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
         boolean isMailServerSet = false;
         if (tenantId != null && tenantId.length() > 0) {
-            if (processEngineConfiguration.getMailSessionJndi(tenantId) != null) {
-                setEmailSession(email, processEngineConfiguration.getMailSessionJndi(tenantId));
+            if (engineConfiguration.getMailSessionJndi(tenantId) != null) {
+                setEmailSession(email, engineConfiguration.getMailSessionJndi(tenantId));
                 isMailServerSet = true;
 
-            } else if (processEngineConfiguration.getMailServer(tenantId) != null) {
-                MailServerInfo mailServerInfo = processEngineConfiguration.getMailServer(tenantId);
+            } else if (engineConfiguration.getMailServer(tenantId) != null) {
+                MailServerInfo mailServerInfo = engineConfiguration.getMailServer(tenantId);
                 String host = mailServerInfo.getMailServerHost();
                 if (host == null) {
                     throw new FlowableException("Could not send email: no SMTP host is configured for tenantId " + tenantId);
@@ -336,25 +326,25 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         if (!isMailServerSet) {
-            String mailSessionJndi = processEngineConfiguration.getMailSessionJndi();
+            String mailSessionJndi = engineConfiguration.getMailSessionJndi();
             if (mailSessionJndi != null) {
                 setEmailSession(email, mailSessionJndi);
 
             } else {
-                String host = processEngineConfiguration.getMailServerHost();
+                String host = engineConfiguration.getMailServerHost();
                 if (host == null) {
                     throw new FlowableException("Could not send email: no SMTP host is configured");
                 }
                 email.setHostName(host);
 
-                int port = processEngineConfiguration.getMailServerPort();
+                int port = engineConfiguration.getMailServerPort();
                 email.setSmtpPort(port);
 
-                email.setSSLOnConnect(processEngineConfiguration.getMailServerUseSSL());
-                email.setStartTLSEnabled(processEngineConfiguration.getMailServerUseTLS());
+                email.setSSLOnConnect(engineConfiguration.getMailServerUseSSL());
+                email.setStartTLSEnabled(engineConfiguration.getMailServerUseTLS());
 
-                String user = processEngineConfiguration.getMailServerUsername();
-                String password = processEngineConfiguration.getMailServerPassword();
+                String user = engineConfiguration.getMailServerUsername();
+                String password = engineConfiguration.getMailServerPassword();
                 if (user != null && password != null) {
                     email.setAuthentication(user, password);
                 }
@@ -387,9 +377,9 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         return null;
     }
 
-    protected String getStringFromField(Expression expression, DelegateExecution execution) {
+    protected String getStringFromField(Expression expression, PlanItemInstanceEntity planItemInstanceEntity) {
         if (expression != null) {
-            Object value = expression.getValue(execution);
+            Object value = expression.getValue(planItemInstanceEntity);
             if (value != null) {
                 return value.toString();
             }
@@ -397,13 +387,13 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         return null;
     }
 
-    protected void getFilesFromFields(Expression expression, DelegateExecution execution, List<File> files, List<DataSource> dataSources) {
+    protected void getFilesFromFields(Expression expression, PlanItemInstanceEntity planItemInstanceEntity, List<File> files, List<DataSource> dataSources) {
 
         if (expression == null) {
             return;
         }
 
-        Object value = expression.getValue(execution);
+        Object value = expression.getValue(planItemInstanceEntity);
         if (value != null) {
 
             if (value instanceof Collection) {
@@ -467,16 +457,16 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         return file != null && file.exists() && file.isFile() && file.canRead();
     }
 
-    protected Expression getExpression(DelegateExecution execution, Expression var) {
-        String variable = (String) execution.getVariable(var.getExpressionText());
-        return CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(variable);
+    protected Expression getExpression(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Expression var) {
+        String variable = (String) planItemInstanceEntity.getVariable(var.getExpressionText());
+        return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(variable);
     }
 
-    protected void handleException(DelegateExecution execution, String msg, Exception e, boolean doIgnoreException, String exceptionVariable) {
+    protected void handleException(PlanItemInstanceEntity planItemInstanceEntity, String msg, Exception e, boolean doIgnoreException, String exceptionVariable) {
         if (doIgnoreException) {
             LOGGER.info("Ignoring email send error: {}", msg, e);
             if (exceptionVariable != null && exceptionVariable.length() > 0) {
-                execution.setVariable(exceptionVariable, msg);
+                planItemInstanceEntity.setVariable(exceptionVariable, msg);
             }
         } else {
             if (e instanceof FlowableException) {
@@ -487,10 +477,10 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected String getForceTo(String tenantId) {
+    protected String getForceTo(CommandContext commandContext, String tenantId) {
         String forceTo = null;
         if (tenantId != null && tenantId.length() > 0) {
-            Map<String, MailServerInfo> mailServers = CommandContextUtil.getProcessEngineConfiguration().getMailServers();
+            Map<String, MailServerInfo> mailServers = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getMailServers();
             if (mailServers != null && mailServers.containsKey(tenantId)) {
                 MailServerInfo mailServerInfo = mailServers.get(tenantId);
                 forceTo = mailServerInfo.getMailServerForceTo();
@@ -498,7 +488,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         if (forceTo == null) {
-            forceTo = CommandContextUtil.getProcessEngineConfiguration().getMailServerForceTo();
+            forceTo = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getMailServerForceTo();
         }
 
         return forceTo;
