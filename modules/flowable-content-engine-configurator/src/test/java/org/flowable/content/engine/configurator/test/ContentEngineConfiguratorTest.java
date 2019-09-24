@@ -127,7 +127,7 @@ public class ContentEngineConfiguratorTest {
                 int index = contentTypeHeader.indexOf("name=");
                 int semicolonIndex = contentTypeHeader.indexOf(";");
                 contentTypes.add(contentTypeHeader.substring(0, Math.min(semicolonIndex, index)));
-                names.add(contentTypeHeader.substring(index + 5 , contentTypeHeader.length()));
+                names.add(contentTypeHeader.substring(index + 5));
             }
         }
 
