@@ -29,7 +29,7 @@ public abstract class FlowableCmmnTestCase extends AbstractFlowableCmmnTestCase 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableCmmnTestCase.class);
 
-    public static String FLOWABLE_CMMN_CFG_XML = "flowable.cmmn.cfg.xml";
+    public static final String FLOWABLE_CMMN_CFG_XML = "flowable.cmmn.cfg.xml";
 
     @BeforeClass
     public static void setupEngine() {

@@ -42,6 +42,11 @@ public class ServiceTaskParseHandler extends AbstractPlanItemParseHandler<Servic
             case HttpServiceTask.HTTP_TASK:
                 planItem.setBehavior(activityBehaviorFactory.createHttpActivityBehavior(planItem, serviceTask));
                 break;
+
+            case ServiceTask.MAIL_TASK:
+                planItem.setBehavior(activityBehaviorFactory.createEmailActivityBehavior(planItem, serviceTask));
+                break;
+
             default:
                 // java task type was not set in the version <= 6.2.0 that's why we have to assume that default service task type is java
                 if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
@@ -56,6 +61,7 @@ public class ServiceTaskParseHandler extends AbstractPlanItemParseHandler<Servic
                     }
                 }
                 break;
+
         }
     }
 

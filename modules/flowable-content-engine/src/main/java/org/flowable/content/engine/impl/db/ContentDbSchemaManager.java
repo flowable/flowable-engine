@@ -20,7 +20,7 @@ import org.flowable.content.engine.impl.util.CommandContextUtil;
 
 public class ContentDbSchemaManager extends LiquibaseBasedSchemaManager {
     
-    public static String LIQUIBASE_CHANGELOG = "org/flowable/content/db/liquibase/flowable-content-db-changelog.xml";
+    public static final String LIQUIBASE_CHANGELOG = "org/flowable/content/db/liquibase/flowable-content-db-changelog.xml";
 
     public ContentDbSchemaManager() {
         super("content", LIQUIBASE_CHANGELOG, ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);

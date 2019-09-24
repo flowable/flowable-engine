@@ -27,7 +27,7 @@ public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateTaskRelatedEntityCountCfgCmd.class);
 
-    public static String PROPERTY_TASK_RELATED_ENTITY_COUNT = "cfg.task-related-entities-count";
+    public static final String PROPERTY_TASK_RELATED_ENTITY_COUNT = "cfg.task-related-entities-count";
 
     @Override
     public Void execute(CommandContext commandContext) {

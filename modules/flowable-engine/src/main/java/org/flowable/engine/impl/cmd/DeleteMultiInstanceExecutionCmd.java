@@ -35,8 +35,8 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
 
     private static final long serialVersionUID = 1L;
     
-    protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
-    protected final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
+    protected static final String NUMBER_OF_INSTANCES = "nrOfInstances";
+    protected static final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
     
     protected String executionId;
     protected boolean executionIsCompleted;

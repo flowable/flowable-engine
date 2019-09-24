@@ -11,17 +11,39 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.el;
+package org.flowable.common.engine.impl.el;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * Expression that always returns the same value when <code>getValue</code> is called. Setting of the value is not supported.
  * 
  * @author Frederik Heremans
  */
-public class FixedValue extends org.flowable.common.engine.impl.el.FixedValue {
+public class FixedValue implements Expression {
+
+    private static final long serialVersionUID = 1L;
+    private Object value;
 
     public FixedValue(Object value) {
-        super(value);
+        this.value = value;
+    }
+    
+    @Override
+    public Object getValue(VariableContainer variableContainer) {
+        return value;
+    }
+    
+    @Override
+    public void setValue(Object value, VariableContainer variableContainer) {
+        throw new FlowableException("Cannot change fixed value");
+    }
+
+    @Override
+    public String getExpressionText() {
+        return value.toString();
     }
 
 }

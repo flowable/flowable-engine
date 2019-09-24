@@ -27,7 +27,7 @@ public class ValidateExecutionRelatedEntityCountCfgCmd implements Command<Void> 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateExecutionRelatedEntityCountCfgCmd.class);
 
-    public static String PROPERTY_EXECUTION_RELATED_ENTITY_COUNT = "cfg.execution-related-entities-count";
+    public static final String PROPERTY_EXECUTION_RELATED_ENTITY_COUNT = "cfg.execution-related-entities-count";
 
     @Override
     public Void execute(CommandContext commandContext) {

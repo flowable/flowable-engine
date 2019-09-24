@@ -22,7 +22,7 @@ import org.flowable.common.engine.impl.runtime.ClockReader;
  */
 public class DurationBusinessCalendar extends BusinessCalendarImpl {
 
-    public static String NAME = "duration";
+    public static final String NAME = "duration";
 
     public DurationBusinessCalendar(ClockReader clockReader) {
         super(clockReader);
