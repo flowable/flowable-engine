@@ -383,8 +383,11 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             PlanItem planItem = cmmnModel.findPlanItem(association.getSourceRef());
             if (planItem == null) {
                 planItem = cmmnModel.findPlanItem(association.getTargetRef());
+                if(planItem != null)
+                	planItem.addIncomingAssociation(association);
                 planItemSourceRef = association.getTargetRef();
             } else {
+            	planItem.addOutgoingAssociation(association);
                 planItemSourceRef = association.getSourceRef();
             }
 
