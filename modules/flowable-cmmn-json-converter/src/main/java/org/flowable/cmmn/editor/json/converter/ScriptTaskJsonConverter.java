@@ -50,7 +50,7 @@ public class ScriptTaskJsonConverter extends BaseCmmnJsonConverter {
         ScriptServiceTask scriptServiceTask = new ScriptServiceTask();
         
         scriptServiceTask.setImplementationType(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_SCRIPT_TASK_SCRIPT_FORMAT, elementNode));
-        addField("script", PROPERTY_SCRIPT_TASK_SCRIPT_TEXT, elementNode, scriptServiceTask);
+        addField(PROPERTY_SCRIPT_TASK_SCRIPT_TEXT, PROPERTY_SCRIPT_TASK_SCRIPT_TEXT, elementNode, scriptServiceTask);
         
         if (StringUtils.isNotEmpty(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode))) {
             scriptServiceTask.setResultVariableName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode));
