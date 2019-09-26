@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +70,8 @@ class CompositeHistoryManagerTest {
 
     @BeforeEach
     void setUp() {
-        compositeHistoryManager = new CompositeHistoryManager(Arrays.asList(historyManager1, historyManager2));
+        compositeHistoryManager = new CompositeHistoryManager(Collections.singletonList(historyManager1));
+        ((CompositeHistoryManager) compositeHistoryManager).addHistoryManager(historyManager2);
     }
 
     @Test
@@ -165,10 +166,10 @@ class CompositeHistoryManagerTest {
 
     @Test
     void recordProcessInstanceDeleted() {
-        compositeHistoryManager.recordProcessInstanceDeleted("instance-id", "def-id");
+        compositeHistoryManager.recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
 
-        verify(historyManager1).recordProcessInstanceDeleted("instance-id", "def-id");
-        verify(historyManager2).recordProcessInstanceDeleted("instance-id", "def-id");
+        verify(historyManager1).recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
+        verify(historyManager2).recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
     }
 
     @Test

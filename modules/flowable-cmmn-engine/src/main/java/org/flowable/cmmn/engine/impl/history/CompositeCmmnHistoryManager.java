@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -32,7 +33,7 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     protected final Collection<CmmnHistoryManager> historyManagers;
 
     public CompositeCmmnHistoryManager(Collection<CmmnHistoryManager> historyManagers) {
-        this.historyManagers = historyManagers;
+        this.historyManagers = new ArrayList<>(historyManagers);
     }
 
     @Override
@@ -71,9 +72,9 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordHistoricCaseInstanceDeleted(String caseInstanceId) {
+    public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
         for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricCaseInstanceDeleted(caseInstanceId);
+            historyManager.recordHistoricCaseInstanceDeleted(caseInstanceId, tenantId);
         }
     }
 
@@ -229,5 +230,9 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.deleteHistoricUserTaskLogEntry(logNumber);
         }
+    }
+
+    public void addHistoryManager(CmmnHistoryManager historyManager) {
+        historyManagers.add(historyManager);
     }
 }

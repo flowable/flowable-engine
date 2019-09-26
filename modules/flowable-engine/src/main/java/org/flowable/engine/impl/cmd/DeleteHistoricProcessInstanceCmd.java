@@ -58,7 +58,7 @@ public class DeleteHistoricProcessInstanceCmd implements Command<Object>, Serial
             return null;
         }
 
-        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceDeleted(processInstanceId, instance.getProcessDefinitionId());
+        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceDeleted(processInstanceId, instance.getProcessDefinitionId(), instance.getTenantId());
 
         return null;
     }
