@@ -128,7 +128,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordHistoricCaseInstanceDeleted(String caseInstanceId) {
+    public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             CmmnHistoryHelper.deleteHistoricCaseInstance(cmmnEngineConfiguration, caseInstanceId);
         }

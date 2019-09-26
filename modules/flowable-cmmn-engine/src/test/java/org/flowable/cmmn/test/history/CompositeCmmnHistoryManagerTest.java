@@ -103,10 +103,10 @@ class CompositeCmmnHistoryManagerTest {
 
     @Test
     void recordHistoricCaseInstanceDeleted() {
-        compositeHistoryManager.recordHistoricCaseInstanceDeleted("case-id");
+        compositeHistoryManager.recordHistoricCaseInstanceDeleted("case-id", "tenant-1");
 
-        verify(historyManager1).recordHistoricCaseInstanceDeleted("case-id");
-        verify(historyManager2).recordHistoricCaseInstanceDeleted("case-id");
+        verify(historyManager1).recordHistoricCaseInstanceDeleted("case-id", "tenant-1");
+        verify(historyManager2).recordHistoricCaseInstanceDeleted("case-id", "tenant-1");
     }
 
     @Test

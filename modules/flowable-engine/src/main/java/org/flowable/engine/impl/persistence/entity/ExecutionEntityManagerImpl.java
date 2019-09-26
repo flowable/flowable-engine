@@ -502,7 +502,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         deleteExecutionAndRelatedData(execution, deleteReason, deleteHistory);
 
         if (deleteHistory) {
-            getHistoryManager().recordProcessInstanceDeleted(execution.getId(), execution.getProcessDefinitionId());
+            getHistoryManager().recordProcessInstanceDeleted(execution.getId(), execution.getProcessDefinitionId(), execution.getTenantId());
         }
 
         getHistoryManager().recordProcessInstanceEnd(processInstanceExecutionEntity, deleteReason, null, getClock().getCurrentTime());

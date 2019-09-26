@@ -106,9 +106,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId) {
+    public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId, String processTenantId) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordProcessInstanceDeleted(processInstanceId, processDefinitionId);
+            historyManager.recordProcessInstanceDeleted(processInstanceId, processDefinitionId, processTenantId);
         }
     }
 

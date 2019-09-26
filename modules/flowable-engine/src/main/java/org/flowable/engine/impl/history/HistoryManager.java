@@ -69,7 +69,7 @@ public interface HistoryManager {
     /**
      * Deletes a historic process instance and all historic data included
      */
-    void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId);
+    void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId, String processTenantId);
 
     /**
      * Deletes historic process instances for a provided process definition id

@@ -166,10 +166,10 @@ class CompositeHistoryManagerTest {
 
     @Test
     void recordProcessInstanceDeleted() {
-        compositeHistoryManager.recordProcessInstanceDeleted("instance-id", "def-id");
+        compositeHistoryManager.recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
 
-        verify(historyManager1).recordProcessInstanceDeleted("instance-id", "def-id");
-        verify(historyManager2).recordProcessInstanceDeleted("instance-id", "def-id");
+        verify(historyManager1).recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
+        verify(historyManager2).recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
     }
 
     @Test

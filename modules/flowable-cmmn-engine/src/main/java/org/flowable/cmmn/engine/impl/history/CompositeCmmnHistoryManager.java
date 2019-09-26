@@ -72,9 +72,9 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordHistoricCaseInstanceDeleted(String caseInstanceId) {
+    public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
         for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricCaseInstanceDeleted(caseInstanceId);
+            historyManager.recordHistoricCaseInstanceDeleted(caseInstanceId, tenantId);
         }
     }
 
