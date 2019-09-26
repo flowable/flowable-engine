@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +70,8 @@ class CompositeHistoryManagerTest {
 
     @BeforeEach
     void setUp() {
-        compositeHistoryManager = new CompositeHistoryManager(Arrays.asList(historyManager1, historyManager2));
+        compositeHistoryManager = new CompositeHistoryManager(Collections.singletonList(historyManager1));
+        ((CompositeHistoryManager) compositeHistoryManager).addHistoryManager(historyManager2);
     }
 
     @Test

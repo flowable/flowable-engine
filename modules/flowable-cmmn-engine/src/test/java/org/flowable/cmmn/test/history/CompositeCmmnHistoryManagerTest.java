@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
@@ -59,7 +59,8 @@ class CompositeCmmnHistoryManagerTest {
 
     @BeforeEach
     void setUp() {
-        compositeHistoryManager = new CompositeCmmnHistoryManager(Arrays.asList(historyManager1, historyManager2));
+        compositeHistoryManager = new CompositeCmmnHistoryManager(Collections.singletonList(historyManager1));
+        ((CompositeCmmnHistoryManager) compositeHistoryManager).addHistoryManager(historyManager2);
 
     }
 
