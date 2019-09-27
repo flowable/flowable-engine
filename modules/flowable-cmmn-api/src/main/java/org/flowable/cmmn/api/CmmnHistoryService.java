@@ -64,20 +64,6 @@ public interface CmmnHistoryService {
     void deleteHistoricTaskInstance(String taskId);
     
     /**
-     * Deletes matching historic case instances
-     * 
-     * @param caseInstanceQuery the query to match case instances to delete
-     */
-    void deleteHistoricCaseInstances(HistoricCaseInstanceQuery caseInstanceQuery);
-    
-    /**
-     * Deletes matching historic case instances
-     * 
-     * @param caseInstanceQuery the query to match case instances to delete
-     */
-    void deleteHistoricCaseInstancesAndRelatedData(HistoricCaseInstanceQuery caseInstanceQuery);
-    
-    /**
      * Retrieves the {@link HistoricIdentityLink}s associated with the given task. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a certain task
      * (eg. as candidate, assignee, etc.), even if the task is completed as opposed to {@link IdentityLink}s which only exist for active tasks.
      */

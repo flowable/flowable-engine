@@ -100,34 +100,6 @@ public interface HistoryService {
     void deleteHistoricProcessInstance(String processInstanceId);
     
     /**
-     * Deletes matching historic process instances
-     * 
-     * @param processInstanceQuery the query to match process instances to delete
-     */
-    void deleteHistoricProcessInstances(HistoricProcessInstanceQueryImpl processInstanceQuery);
-    
-    /**
-     * Deletes matching historic process instances
-     * 
-     * @param processInstanceQuery the query to match process instances to delete
-     */
-    void deleteHistoricProcessInstancesAndRelatedData(HistoricProcessInstanceQueryImpl processInstanceQuery);
-    
-    /**
-     * Deletes matching historic activity instances
-     * 
-     * @param activityInstanceQuery the query to match activity instances to delete
-     */
-    void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl activityInstanceQuery);
-    
-    /**
-     * Deletes matching historic task instances
-     * 
-     * @param taskInstanceQuery the query to match task to delete
-     */
-    void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl taskInstanceQuery);
-    
-    /**
      * Deletes historic task and activity data for removed process instances
      */
     void deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();

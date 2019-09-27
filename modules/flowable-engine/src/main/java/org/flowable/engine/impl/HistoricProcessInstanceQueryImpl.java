@@ -21,13 +21,18 @@ import java.util.Set;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
+import org.flowable.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd;
+import org.flowable.engine.impl.cmd.DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -763,6 +768,27 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
         if (includeProcessVariables) {
             this.orderBy(HistoricProcessInstanceQueryProperty.INCLUDED_VARIABLE_TIME).asc();
+        }
+    }
+
+    @Override
+    public void delete() {
+        if (commandExecutor != null) {
+            commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(this));
+        } else {
+            new DeleteHistoricProcessInstancesCmd(this).execute(Context.getCommandContext());
+        }
+    }
+
+    @Override
+    public void deleteWithRelatedData() {
+        if (commandExecutor != null) {
+            CommandConfig config = new CommandConfig().transactionRequiresNew();
+            commandExecutor.execute(config, new DeleteHistoricProcessInstancesCmd(this));
+            commandExecutor.execute(config, new DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd());
+            commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd());
+        } else {
+            throw new FlowableException("deleting historic process instances with related data requires CommandExecutor");
         }
     }
 
