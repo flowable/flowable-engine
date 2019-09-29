@@ -25,7 +25,7 @@ public interface EventRegistry {
 
     Collection<InboundEventTransformer> getInboundEventTransformers();
 
-    void registerInboudEventProcessor(InboundEventProcessor inboundEventProcessor);
+    void registerInboundEventProcessor(InboundEventProcessor inboundEventProcessor);
 
     InboundEventProcessor getInboundEventProcessor();
 

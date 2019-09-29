@@ -32,6 +32,10 @@ public class DefaultEventRegistry implements EventRegistry {
 
     @Override
     public void registerChannel(String channelKey, InboundEventChannelAdapter inboundAdapter, OutboundEventChannelAdapter outboundAdaper) {
+
+        inboundAdapter.setChannelKey(channelKey);
+        inboundAdapter.setEventRegistry(this);
+
         inboundChannelAdapters.put(channelKey, inboundAdapter);
         outboundChannelAdapters.put(channelKey, outboundAdaper);
     }
@@ -47,7 +51,7 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void registerInboudEventProcessor(InboundEventProcessor inboundEventProcessor) {
+    public void registerInboundEventProcessor(InboundEventProcessor inboundEventProcessor) {
         this.inboundEventProcessor = inboundEventProcessor;
     }
 

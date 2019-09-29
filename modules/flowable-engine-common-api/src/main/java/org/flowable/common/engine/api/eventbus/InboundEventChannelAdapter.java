@@ -17,6 +17,8 @@ package org.flowable.common.engine.api.eventbus;
  */
 public interface InboundEventChannelAdapter {
 
-    void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor);
+    void setChannelKey(String channelKey);
+
+    void setEventRegistry(EventRegistry eventRegistry);
 
 }
