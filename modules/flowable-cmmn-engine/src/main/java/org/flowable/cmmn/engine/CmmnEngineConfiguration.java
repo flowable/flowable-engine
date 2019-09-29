@@ -820,7 +820,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initIdentityLinkInterceptor();
         initClock();
         initEventDispatcher();
-        initEventBus();
+        initEventBusAndRelatedServices();
         initIdentityLinkServiceConfiguration();
         initEntityLinkServiceConfiguration();
         initEventSubscriptionServiceConfiguration();

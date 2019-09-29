@@ -18,19 +18,34 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
-import org.flowable.common.engine.api.eventbus.FlowableEventBusItem;
-import org.flowable.common.engine.api.eventbus.FlowableEventConsumer;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
 
 public class BasicFlowableEventBus implements FlowableEventBus {
 
-    protected Map<String, List<FlowableEventConsumer>> eventConsumersByTypeMap = new HashMap<>();
+    protected Map<String, List<FlowableEventBusConsumer>> eventConsumersByTypeMap = new HashMap<>();
 
-    public void sendEvent(FlowableEventBusItem event) {
+    @Override
+    public void sendEvent(FlowableEventBusEvent event) {
         handleEventConsumers(event.getType(), event);
         handleEventConsumers(null, event);
     }
-    
-    public void addFlowableEventConsumer(FlowableEventConsumer eventConsumer) {
+
+    @Override
+    public void addFlowableEventConsumer(FlowableEventBusConsumer eventConsumer) {
+        List<String> supportedTypes = eventConsumer.getSupportedTypes();
+        if (supportedTypes != null && !supportedTypes.isEmpty()) {
+            for (String type : supportedTypes) {
+                putEventConsumer(type, eventConsumer);
+            }
+            
+        } else {
+            putEventConsumer(null, eventConsumer);
+        }
+    }
+
+    @Override
+    public void removeFlowableEventConsumer(FlowableEventBusConsumer eventConsumer) {
         List<String> supportedTypes = eventConsumer.getSupportedTypes();
         if (supportedTypes != null && !supportedTypes.isEmpty()) {
             for (String type : supportedTypes) {
@@ -42,41 +57,29 @@ public class BasicFlowableEventBus implements FlowableEventBus {
         }
     }
     
-    public void removeFlowableEventConsumer(FlowableEventConsumer eventConsumer) {
-        List<String> supportedTypes = eventConsumer.getSupportedTypes();
-        if (supportedTypes != null && !supportedTypes.isEmpty()) {
-            for (String type : supportedTypes) {
-                putEventConsumer(type, eventConsumer);
-            }
-            
-        } else {
-            putEventConsumer(null, eventConsumer);
-        }
-    }
-    
-    public List<FlowableEventConsumer> getEventConsumersForType(String type) {
+    public List<FlowableEventBusConsumer> getEventConsumersForType(String type) {
         return eventConsumersByTypeMap.get(type);
     }
     
-    public Map<String, List<FlowableEventConsumer>> getEventConsumersByTypeMap() {
+    public Map<String, List<FlowableEventBusConsumer>> getEventConsumersByTypeMap() {
         return eventConsumersByTypeMap;
     }
     
-    public void setEventConsumersByTypeMap(Map<String, List<FlowableEventConsumer>> eventConsumersByTypeMap) {
+    public void setEventConsumersByTypeMap(Map<String, List<FlowableEventBusConsumer>> eventConsumersByTypeMap) {
         this.eventConsumersByTypeMap = eventConsumersByTypeMap;
     }
 
-    protected void handleEventConsumers(String eventType, FlowableEventBusItem event) {
-        List<FlowableEventConsumer> eventConsumers =  eventConsumersByTypeMap.get(eventType);
+    protected void handleEventConsumers(String eventType, FlowableEventBusEvent event) {
+        List<FlowableEventBusConsumer> eventConsumers =  eventConsumersByTypeMap.get(eventType);
         if (eventConsumers != null && !eventConsumers.isEmpty()) {
-            for (FlowableEventConsumer eventConsumer : eventConsumers) {
+            for (FlowableEventBusConsumer eventConsumer : eventConsumers) {
                 eventConsumer.eventReceived(event);
             }
         }
     }
     
-    protected void putEventConsumer(String type, FlowableEventConsumer eventConsumer) {
-        List<FlowableEventConsumer> existingEventConsumers = null;
+    protected void putEventConsumer(String type, FlowableEventBusConsumer eventConsumer) {
+        List<FlowableEventBusConsumer> existingEventConsumers = null;
         if (eventConsumersByTypeMap.containsKey(type)) {
             existingEventConsumers = eventConsumersByTypeMap.get(type);
         } else {
@@ -87,9 +90,9 @@ public class BasicFlowableEventBus implements FlowableEventBus {
         eventConsumersByTypeMap.put(type, existingEventConsumers);
     }
     
-    protected void removeEventConsumer(String type, FlowableEventConsumer eventConsumer) {
+    protected void removeEventConsumer(String type, FlowableEventBusConsumer eventConsumer) {
         if (eventConsumersByTypeMap.containsKey(type)) {
-            List<FlowableEventConsumer> existingEventConsumers = eventConsumersByTypeMap.get(type);
+            List<FlowableEventBusConsumer> existingEventConsumers = eventConsumersByTypeMap.get(type);
             existingEventConsumers.remove(eventConsumer);
         }
     }

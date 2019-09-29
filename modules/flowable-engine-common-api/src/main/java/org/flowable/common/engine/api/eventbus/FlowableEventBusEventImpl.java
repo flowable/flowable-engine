@@ -15,7 +15,7 @@ package org.flowable.common.engine.api.eventbus;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class FlowableEventBusItem {
+public class FlowableEventBusEventImpl implements FlowableEventBusEvent {
 
     protected String type;
     protected String scopeId;
@@ -26,9 +26,9 @@ public class FlowableEventBusItem {
     protected LocalDateTime created;
     protected Map<String, Object> data;
     
-    public FlowableEventBusItem() {}
+    public FlowableEventBusEventImpl() {}
     
-    public FlowableEventBusItem(String type, String scopeId, String scopeType, String correlationKey) {
+    public FlowableEventBusEventImpl(String type, String scopeId, String scopeType, String correlationKey) {
         this.type = type;
         this.scopeId = scopeId;
         this.scopeType = scopeType;
@@ -36,66 +36,82 @@ public class FlowableEventBusItem {
         this.created = LocalDateTime.now();
     }
     
+    @Override
     public String getType() {
         return type;
     }
     
+    @Override
     public void setType(String type) {
         this.type = type;
     }
     
+    @Override
     public String getScopeId() {
         return scopeId;
     }
 
+    @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
     }
 
+    @Override
     public String getScopeType() {
         return scopeType;
     }
 
+    @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
     }
     
+    @Override
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
     }
 
+    @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
     }
 
+    @Override
     public String getScopeDefinitionKey() {
         return scopeDefinitionKey;
     }
 
+    @Override
     public void setScopeDefinitionKey(String scopeDefinitionKey) {
         this.scopeDefinitionKey = scopeDefinitionKey;
     }
 
+    @Override
     public String getCorrelationKey() {
         return correlationKey;
     }
     
+    @Override
     public void setCorrelationKey(String correlationKey) {
         this.correlationKey = correlationKey;
     }
     
+    @Override
     public LocalDateTime getCreated() {
         return created;
     }
 
+    @Override
     public void setCreated(LocalDateTime created) {
         this.created = created;
     }
 
+    @Override
     public Map<String, Object> getData() {
         return data;
     }
     
+    @Override
     public void setData(Map<String, Object> data) {
         this.data = data;
     }

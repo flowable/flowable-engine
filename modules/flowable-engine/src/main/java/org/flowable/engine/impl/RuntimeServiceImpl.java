@@ -25,7 +25,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
-import org.flowable.common.engine.api.eventbus.FlowableEventConsumer;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.form.FormData;
@@ -668,12 +668,12 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
     
     @Override
-    public void addEventConsumer(FlowableEventConsumer eventConsumer) {
+    public void addEventBusConsumer(FlowableEventBusConsumer eventConsumer) {
         commandExecutor.execute(new AddEventConsumerCommand(eventConsumer));
     }
     
     @Override
-    public void removeEventConsumer(FlowableEventConsumer eventConsumer) {
+    public void removeEventBusConsumer(FlowableEventBusConsumer eventConsumer) {
         commandExecutor.execute(new RemoveEventConsumerCommand(eventConsumer));
     }
 

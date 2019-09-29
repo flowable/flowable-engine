@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.flowable.common.engine.api.eventbus.FlowableEventBusItem;
-import org.flowable.common.engine.api.eventbus.FlowableEventConsumer;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventbus.FlowableEventBusItemConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -34,13 +34,13 @@ public class VariableEventTest extends PluggableFlowableTestCase implements Flow
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
     public void testVariableCreateEvent() {
-        runtimeService.addEventConsumer(variableEventConsumer);
+        runtimeService.addEventBusConsumer(variableEventConsumer);
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
             assertEquals(0, variableEventConsumer.getEvents().size());
             runtimeService.setVariable(processInstance.getId(), "testVariable", "test");
             assertEquals(1, variableEventConsumer.getEvents().size());
-            FlowableEventBusItem event = variableEventConsumer.getEvents().get(0);
+            FlowableEventBusEvent event = variableEventConsumer.getEvents().get(0);
             assertEquals(TYPE_VARIABLE_CREATED, event.getType());
             assertEquals(processInstance.getId(), event.getScopeId());
             assertEquals(ScopeTypes.BPMN, event.getScopeType());
@@ -57,14 +57,14 @@ public class VariableEventTest extends PluggableFlowableTestCase implements Flow
             
         } finally {
             variableEventConsumer.clearEvents();
-            runtimeService.removeEventConsumer(variableEventConsumer);
+            runtimeService.removeEventBusConsumer(variableEventConsumer);
         }
     }
     
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
     public void testVariableUpdateEvent() {
-        runtimeService.addEventConsumer(variableEventConsumer);
+        runtimeService.addEventBusConsumer(variableEventConsumer);
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
             assertEquals(0, variableEventConsumer.getEvents().size());
@@ -74,7 +74,7 @@ public class VariableEventTest extends PluggableFlowableTestCase implements Flow
             runtimeService.setVariable(processInstance.getId(), "testVariable", "test2");
             assertEquals(2, variableEventConsumer.getEvents().size());
             
-            FlowableEventBusItem event = variableEventConsumer.getEvents().get(0);
+            FlowableEventBusEvent event = variableEventConsumer.getEvents().get(0);
             assertEquals(TYPE_VARIABLE_CREATED, event.getType());
             
             event = variableEventConsumer.getEvents().get(1);
@@ -97,13 +97,13 @@ public class VariableEventTest extends PluggableFlowableTestCase implements Flow
             
         } finally {
             variableEventConsumer.clearEvents();
-            runtimeService.removeEventConsumer(variableEventConsumer);
+            runtimeService.removeEventBusConsumer(variableEventConsumer);
         }
     }
 
-    protected class TestVariableEventConsumer implements FlowableEventConsumer {
+    protected class TestVariableEventConsumer implements FlowableEventBusConsumer {
         
-        protected List<FlowableEventBusItem> events = new ArrayList<>();
+        protected List<FlowableEventBusEvent> events = new ArrayList<>();
         
         @Override
         public List<String> getSupportedTypes() {
@@ -111,11 +111,11 @@ public class VariableEventTest extends PluggableFlowableTestCase implements Flow
         }
 
         @Override
-        public void eventReceived(FlowableEventBusItem event) {
+        public void eventReceived(FlowableEventBusEvent event) {
             events.add(event);
         }
         
-        public List<FlowableEventBusItem> getEvents() {
+        public List<FlowableEventBusEvent> getEvents() {
             return events;
         }
 

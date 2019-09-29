@@ -18,8 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.eventbus.FlowableEventBusItem;
-import org.flowable.common.engine.api.eventbus.FlowableEventConsumer;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventbus.FlowableEventBusItemConstants;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -37,7 +37,7 @@ public class ServiceTaskEventTest extends PluggableFlowableTestCase implements F
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/serviceTask.bpmn20.xml")
     public void testVariableCreateEvent() {
-        runtimeService.addEventConsumer(serviceTaskEventConsumer);
+        runtimeService.addEventBusConsumer(serviceTaskEventConsumer);
         try {
             assertEquals(0, serviceTaskEventConsumer.getEvents().size());
             
@@ -52,7 +52,7 @@ public class ServiceTaskEventTest extends PluggableFlowableTestCase implements F
             }
             
             assertEquals(1, serviceTaskEventConsumer.getEvents().size());
-            FlowableEventBusItem event = serviceTaskEventConsumer.getEvents().get(0);
+            FlowableEventBusEvent event = serviceTaskEventConsumer.getEvents().get(0);
             assertEquals(TYPE_SERVICETASK_EXCEPTION, event.getType());
             assertNotNull(event.getScopeId());
             assertEquals(ScopeTypes.BPMN, event.getScopeType());
@@ -67,7 +67,7 @@ public class ServiceTaskEventTest extends PluggableFlowableTestCase implements F
             
         } finally {
             serviceTaskEventConsumer.clearEvents();
-            runtimeService.removeEventConsumer(serviceTaskEventConsumer);
+            runtimeService.removeEventBusConsumer(serviceTaskEventConsumer);
         }
     }
 
@@ -81,9 +81,9 @@ public class ServiceTaskEventTest extends PluggableFlowableTestCase implements F
         }
     }
     
-    protected class TestServiceTaskEventConsumer implements FlowableEventConsumer {
+    protected class TestServiceTaskEventConsumer implements FlowableEventBusConsumer {
         
-        protected List<FlowableEventBusItem> events = new ArrayList<>();
+        protected List<FlowableEventBusEvent> events = new ArrayList<>();
         
         @Override
         public List<String> getSupportedTypes() {
@@ -91,11 +91,11 @@ public class ServiceTaskEventTest extends PluggableFlowableTestCase implements F
         }
 
         @Override
-        public void eventReceived(FlowableEventBusItem event) {
+        public void eventReceived(FlowableEventBusEvent event) {
             events.add(event);
         }
         
-        public List<FlowableEventBusItem> getEvents() {
+        public List<FlowableEventBusEvent> getEvents() {
             return events;
         }
 

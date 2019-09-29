@@ -15,22 +15,23 @@ package org.flowable.variable.service.impl.eventbus;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.api.eventbus.FlowableEventBusItem;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEventImpl;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventbus.AbstractFlowableEventBusItemBuilder;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 public class FlowableVariableEventBusItemBuilder extends AbstractFlowableEventBusItemBuilder implements FlowableEventBusVariableConstants {
 
-    public static FlowableEventBusItem createVariableCreatedEvent(VariableInstanceEntity variableInstance) {
-        FlowableEventBusItem newEvent = createFlowableEventBusItem(TYPE_VARIABLE_CREATED, variableInstance);
+    public static FlowableEventBusEvent createVariableCreatedEvent(VariableInstanceEntity variableInstance) {
+        FlowableEventBusEvent newEvent = createFlowableEventBusItem(TYPE_VARIABLE_CREATED, variableInstance);
         Map<String, Object> variableData = createVariableData(variableInstance);
         newEvent.setData(variableData);
         return newEvent;
     }
     
-    public static FlowableEventBusItem createVariableUpdatedEvent(VariableInstanceEntity variableInstance, Object oldVariableValue, String oldVariableType) {
-        FlowableEventBusItem updatedEvent = createFlowableEventBusItem(TYPE_VARIABLE_UPDATED, variableInstance);
+    public static FlowableEventBusEvent createVariableUpdatedEvent(VariableInstanceEntity variableInstance, Object oldVariableValue, String oldVariableType) {
+        FlowableEventBusEvent updatedEvent = createFlowableEventBusItem(TYPE_VARIABLE_UPDATED, variableInstance);
         Map<String, Object> variableData = createVariableData(variableInstance);
         putIfNotNull(OLD_VARIABLE_TYPE, oldVariableType, variableData);
         variableData.put(OLD_VARIABLE_VALUE, oldVariableValue);
@@ -39,16 +40,16 @@ public class FlowableVariableEventBusItemBuilder extends AbstractFlowableEventBu
         return updatedEvent;
     }
     
-    protected static FlowableEventBusItem createFlowableEventBusItem(String eventType, VariableInstanceEntity variableInstance) {
-        FlowableEventBusItem event = null;
+    protected static FlowableEventBusEvent createFlowableEventBusItem(String eventType, VariableInstanceEntity variableInstance) {
+        FlowableEventBusEvent event = null;
         if (variableInstance.getProcessInstanceId() != null) {
-            event = new FlowableEventBusItem(eventType, variableInstance.getProcessInstanceId(), ScopeTypes.BPMN, variableInstance.getId());
+            event = new FlowableEventBusEventImpl(eventType, variableInstance.getProcessInstanceId(), ScopeTypes.BPMN, variableInstance.getId());
             event.setScopeDefinitionId(variableInstance.getProcessDefinitionId());
             
         } else if (variableInstance.getScopeId() != null) {
-            event = new FlowableEventBusItem(eventType, variableInstance.getScopeId(), variableInstance.getScopeType(), variableInstance.getId());
+            event = new FlowableEventBusEventImpl(eventType, variableInstance.getScopeId(), variableInstance.getScopeType(), variableInstance.getId());
         } else {
-            event = new FlowableEventBusItem();
+            event = new FlowableEventBusEventImpl();
             event.setType(eventType);
             event.setCorrelationKey(variableInstance.getId());
         }

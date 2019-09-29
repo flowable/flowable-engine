@@ -14,10 +14,10 @@ package org.flowable.common.engine.impl.eventbus;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
-import org.flowable.common.engine.api.eventbus.FlowableEventBusItem;
-import org.flowable.common.engine.api.eventbus.FlowableEventPublisher;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusPublisher;
 
-public class FlowableEventPublisherImpl implements FlowableEventPublisher {
+public class FlowableEventPublisherImpl implements FlowableEventBusPublisher {
 
     protected FlowableEventBus flowableEventBus;
     protected boolean enabled = true;
@@ -37,7 +37,7 @@ public class FlowableEventPublisherImpl implements FlowableEventPublisher {
     }
 
     @Override
-    public void publishEvent(FlowableEventBusItem event) {
+    public void publishEvent(FlowableEventBusEvent event) {
         if (!enabled) {
             return;
         }

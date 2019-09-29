@@ -15,15 +15,16 @@ package org.flowable.engine.impl.eventbus;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.api.eventbus.FlowableEventBusItem;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEventImpl;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventbus.AbstractFlowableEventBusItemBuilder;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 public class FlowableBpmnEventBusItemBuilder extends AbstractFlowableEventBusItemBuilder implements FlowableEventBusBpmnConstants {
 
-    public static FlowableEventBusItem createServiceTaskExceptionEvent(ExecutionEntity execution) {
-        FlowableEventBusItem event = new FlowableEventBusItem(TYPE_SERVICETASK_EXCEPTION, 
+    public static FlowableEventBusEvent createServiceTaskExceptionEvent(ExecutionEntity execution) {
+        FlowableEventBusEvent event = new FlowableEventBusEventImpl(TYPE_SERVICETASK_EXCEPTION,
                         execution.getProcessInstanceId(), ScopeTypes.BPMN, execution.getId());
         event.setScopeDefinitionId(execution.getProcessDefinitionId());
         event.setScopeDefinitionKey(execution.getProcessDefinitionKey());

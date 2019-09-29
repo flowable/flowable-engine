@@ -50,8 +50,12 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.eventbus.DefaultEventRegistry;
+import org.flowable.common.engine.api.eventbus.DefaultInboundEventProcessor;
+import org.flowable.common.engine.api.eventbus.EventRegistry;
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
-import org.flowable.common.engine.api.eventbus.FlowableEventPublisher;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusPublisher;
+import org.flowable.common.engine.api.eventbus.InboundEventProcessor;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
@@ -205,7 +209,9 @@ public abstract class AbstractEngineConfiguration {
     protected List<EventDispatchAction> additionalEventDispatchActions;
     
     protected FlowableEventBus eventBus;
-    protected FlowableEventPublisher eventPublisher;
+    protected FlowableEventBusPublisher eventPublisher;
+    protected EventRegistry eventRegistry;
+    protected InboundEventProcessor inboundEventProcessor;
 
     protected boolean transactionsExternallyManaged;
 
@@ -1620,7 +1626,13 @@ public abstract class AbstractEngineConfiguration {
             }
         }
     }
-    
+
+    public void initEventBusAndRelatedServices() {
+        initEventBus();
+        initEventRegistry();
+        initInboundEventProcessor();
+    }
+
     public void initEventBus() {
         if (this.eventBus == null) {
             this.eventBus = new BasicFlowableEventBus();
@@ -1628,6 +1640,18 @@ public abstract class AbstractEngineConfiguration {
         
         if (this.eventPublisher == null) {
             this.eventPublisher = new FlowableEventPublisherImpl(this.eventBus);
+        }
+    }
+
+    public void initEventRegistry() {
+        if (this.eventRegistry == null) {
+            this.eventRegistry = new DefaultEventRegistry();
+        }
+    }
+
+    public void initInboundEventProcessor() {
+        if (this.inboundEventProcessor == null) {
+            this.inboundEventProcessor = new DefaultInboundEventProcessor(eventRegistry, eventBus);
         }
     }
 
@@ -1644,11 +1668,11 @@ public abstract class AbstractEngineConfiguration {
         return eventPublisher != null && eventPublisher.isEnabled();
     }
 
-    public FlowableEventPublisher getEventPublisher() {
+    public FlowableEventBusPublisher getEventPublisher() {
         return eventPublisher;
     }
 
-    public AbstractEngineConfiguration setEventPublisher(FlowableEventPublisher eventPublisher) {
+    public AbstractEngineConfiguration setEventPublisher(FlowableEventBusPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
         return this;
     }

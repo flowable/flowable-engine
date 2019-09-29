@@ -12,25 +12,12 @@
  */
 package org.flowable.common.engine.api.eventbus;
 
-public interface FlowableEventPublisher {
+import java.util.List;
 
-    /**
-     * Dispatches the given event to any listeners that are registered.
-     * 
-     * @param event
-     *            event to publish.
-     */
-    void publishEvent(FlowableEventBusItem event);
+public interface FlowableEventBusConsumer {
 
-    /**
-     * @param enabled
-     *            true, if event publishing should be enabled.
-     */
-    void setEnabled(boolean enabled);
+    List<String> getSupportedTypes();
 
-    /**
-     * @return true, if event publishing is enabled.
-     */
-    boolean isEnabled();
+    void eventReceived(FlowableEventBusEvent event);
 
 }

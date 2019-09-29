@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
-import org.flowable.common.engine.api.eventbus.FlowableEventPublisher;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusPublisher;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
@@ -43,7 +43,7 @@ public abstract class AbstractServiceConfiguration {
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
     
-    protected FlowableEventPublisher eventPublisher;
+    protected FlowableEventBusPublisher eventPublisher;
     
     protected HistoryLevel historyLevel;
     
@@ -131,11 +131,11 @@ public abstract class AbstractServiceConfiguration {
         return eventPublisher != null && eventPublisher.isEnabled();
     }
     
-    public FlowableEventPublisher getEventPublisher() {
+    public FlowableEventBusPublisher getEventPublisher() {
         return eventPublisher;
     }
 
-    public AbstractServiceConfiguration setEventPublisher(FlowableEventPublisher eventPublisher) {
+    public AbstractServiceConfiguration setEventPublisher(FlowableEventBusPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
         return this;
     }

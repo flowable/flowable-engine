@@ -1029,7 +1029,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEventHandlers();
         initFailedJobCommandFactory();
         initEventDispatcher();
-        initEventBus();
+        initEventBusAndRelatedServices();
         initProcessValidator();
         initFormFieldHandler();
         initDatabaseEventLogging();
