@@ -172,7 +172,7 @@ public class JsonNodeELResolver extends ELResolver {
         }
         Object result = null;
         if (isResolvable(base)) {
-            JsonNode resultNode = ((JsonNode) base).get(property.toString());
+            JsonNode resultNode = getResultNode((JsonNode) base, property);
             if (resultNode != null && resultNode.isValueNode()) {
                 if (resultNode.isBoolean()) {
                     result = resultNode.asBoolean();
@@ -194,6 +194,16 @@ public class JsonNodeELResolver extends ELResolver {
             context.setPropertyResolved(true);
         }
         return result;
+    }
+
+    protected JsonNode getResultNode(JsonNode base, Object property) {
+        if (property instanceof String) {
+            return base.get((String) property);
+        } else if (property instanceof Number) {
+            return base.get(((Number) property).intValue());
+        } else {
+            return base.get(property.toString());
+        }
     }
 
     /**
