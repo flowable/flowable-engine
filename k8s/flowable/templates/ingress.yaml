@@ -1,0 +1,46 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "flowable.template" . }}
+  labels:
+    {{ include "flowable.defaultlabels" . }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "{{ .Values.ingress.sslRedirect }}"
+spec:
+  rules:
+  - http:
+      paths:
+      {{- if .Values.idm.enabled }}
+      - path: /flowable-idm/?(.*)
+        backend:
+          serviceName: {{ .Values.idm.service.name }}
+          servicePort: 8080
+      {{- end }}
+      {{- if .Values.modeler.enabled }}
+      - path: /flowable-modeler/?(.*)
+        backend:
+          serviceName: {{ .Values.modeler.service.name }}
+          servicePort: 8888
+      {{- end }}
+      {{- if .Values.task.enabled }}
+      - path: /flowable-task/?(.*)
+        backend:
+          serviceName: {{ .Values.task.service.name }}
+          servicePort: 9999
+      {{- end }}
+      {{- if .Values.admin.enabled }}
+      - path: /flowable-admin/?(.*)
+        backend:
+          serviceName: {{ .Values.admin.service.name }}
+          servicePort: 9988
+      {{- end }}
+      {{- if .Values.rest.enabled }}
+      - path: /flowable-rest/?(.*)
+        backend:
+          serviceName: {{ .Values.rest.service.name }}
+          servicePort: 8080
+      {{- end }}
+{{- end }}
