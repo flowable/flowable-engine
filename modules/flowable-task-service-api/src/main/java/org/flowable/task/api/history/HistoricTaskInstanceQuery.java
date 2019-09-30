@@ -15,6 +15,7 @@ package org.flowable.task.api.history;
 
 import java.util.Date;
 
+import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.task.api.TaskInfoQuery;
 
 /**
@@ -23,7 +24,7 @@ import org.flowable.task.api.TaskInfoQuery;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface HistoricTaskInstanceQuery extends TaskInfoQuery<HistoricTaskInstanceQuery, HistoricTaskInstance> {
+public interface HistoricTaskInstanceQuery extends TaskInfoQuery<HistoricTaskInstanceQuery, HistoricTaskInstance>, DeleteQuery<HistoricTaskInstanceQuery, HistoricTaskInstance> {
 
     /** Only select historic task instances with the given task delete reason. */
     HistoricTaskInstanceQuery taskDeleteReason(String taskDeleteReason);

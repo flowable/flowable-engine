@@ -22,6 +22,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
@@ -1652,6 +1653,23 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             }
         }
         return groupIds;
+    }
+
+    @Override
+    public void delete() {
+        if (commandExecutor != null) {
+            commandExecutor.execute(context -> {
+                CommandContextUtil.getHistoricTaskInstanceEntityManager(context).deleteHistoricTaskInstances(this);
+                return null;
+            });
+        } else {
+            CommandContextUtil.getHistoricTaskInstanceEntityManager(Context.getCommandContext()).deleteHistoricTaskInstances(this);
+        }
+    }
+
+    @Override
+    public void deleteWithRelatedData() {
+        delete();
     }
 
     // getters and setters

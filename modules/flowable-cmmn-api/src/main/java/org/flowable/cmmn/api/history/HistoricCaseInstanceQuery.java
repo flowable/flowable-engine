@@ -17,13 +17,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance> {
+public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance>, DeleteQuery<HistoricCaseInstanceQuery, HistoricCaseInstance> {
 
     /**
      * Only select historic case instances with the given identifier.

@@ -10,12 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine;
+package org.flowable.common.engine.api.query;
 
-import org.flowable.engine.history.HistoricProcessInstanceQuery;
+/**
+ * Describes methods for Queries that can perform delete operations.
+ *
+ * @author Filip Hrisafov
+ */
+public interface DeleteQuery<T extends DeleteQuery<T, U>, U> {
 
-public interface HistoryCleaningManager {
+    /**
+     * Delete all instances that match the query.
+     */
+    void delete();
 
-    HistoricProcessInstanceQuery createHistoricProcessInstanceCleaningQuery();
+    /**
+     * Delete all instances and their related data that match the query.
+     */
+    void deleteWithRelatedData();
 
 }

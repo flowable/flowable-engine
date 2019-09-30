@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -19,6 +21,8 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.engine.impl.jobexecutor.BpmnHistoryCleanupJobHandler;
@@ -40,15 +44,15 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             
             assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
             
-            HistoricProcessInstanceQueryImpl query = new HistoricProcessInstanceQueryImpl();
+            HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
             query.finishedBefore(cal.getTime());
-            historyService.deleteHistoricProcessInstances(query);
-                    
-            HistoricActivityInstanceQueryImpl activityQuery = new HistoricActivityInstanceQueryImpl();
+            query.delete();
+
+            HistoricActivityInstanceQuery activityQuery = historyService.createHistoricActivityInstanceQuery();
             activityQuery.finishedBefore(cal.getTime());
-            historyService.deleteHistoricActivityInstances(activityQuery);
+            activityQuery.delete();
             
             assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
             assertEquals(0, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
@@ -64,22 +68,47 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             
             assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()).size()).isGreaterThan(0);
+            assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
             
-            HistoricProcessInstanceQueryImpl query = new HistoricProcessInstanceQueryImpl();
+            HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
             query.finishedBefore(cal.getTime());
-            historyService.deleteHistoricProcessInstances(query);
-            
+            query.delete();
+
             assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
             
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
             taskService.complete(task.getId());
                     
-            historyService.deleteHistoricProcessInstances(query);
+            query.delete();
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()).size()).isGreaterThan(0);
+            assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
                     
             historyService.deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+
+            assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()).size()).isGreaterThan(0);
+            assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
             
             historyService.deleteRelatedDataOfRemovedHistoricProcessInstances();
             
@@ -107,11 +136,11 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
             taskService.complete(task.getId());
                     
-            HistoricProcessInstanceQueryImpl query = new HistoricProcessInstanceQueryImpl();
+            HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
             query.finishedBefore(cal.getTime());
-            historyService.deleteHistoricProcessInstancesAndRelatedData(query);
+            query.deleteWithRelatedData();
             
             assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
             assertEquals(0, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count());
@@ -145,11 +174,11 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 taskService.complete(task.getId());
             }
                     
-            HistoricProcessInstanceQueryImpl query = new HistoricProcessInstanceQueryImpl();
+            HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
             query.finishedBefore(cal.getTime());
-            historyService.deleteHistoricProcessInstancesAndRelatedData(query);
+            query.deleteWithRelatedData();
             
             assertEquals(10, historyService.createHistoricProcessInstanceQuery().count());
             assertEquals(30, historyService.createHistoricActivityInstanceQuery().count());
