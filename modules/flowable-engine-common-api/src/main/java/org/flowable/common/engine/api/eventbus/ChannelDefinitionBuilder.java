@@ -15,10 +15,24 @@ package org.flowable.common.engine.api.eventbus;
 /**
  * @author Joram Barrez
  */
-public interface InboundEventTransformer {
+public interface ChannelDefinitionBuilder {
 
-    boolean accepts(EventProcessingContext eventProcessingContext);
+    ChannelDefinitionBuilder key(String key);
 
-    FlowableEventBusEvent transform(EventProcessingContext eventProcessingContext);
+    ChannelDefinitionBuilder inboundAdapter(InboundEventChannelAdapter inboundEventChannelAdapter);
+
+    InboundEventDefinitionKeyDetectorBuilder inboundEventDefinitionKeyDetector();
+
+    ChannelDefinition register();
+
+    interface InboundEventDefinitionKeyDetectorBuilder {
+
+        ChannelDefinitionBuilder mapFromJsonField(String field);
+
+        ChannelDefinitionBuilder mapFromJsonPathExpression(String jsonPathExpression);
+
+        ChannelDefinitionBuilder custom(InboundEventKeyDetector inboundEventKeyDetector);
+
+    }
 
 }

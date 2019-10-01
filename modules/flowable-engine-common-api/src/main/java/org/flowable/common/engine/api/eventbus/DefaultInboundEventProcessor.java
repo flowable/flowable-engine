@@ -12,10 +12,9 @@
  */
 package org.flowable.common.engine.api.eventbus;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez
@@ -33,25 +32,16 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
     @Override
     public void eventReceived(String channelKey, String event) {
 
-        // TODO: split into methods
-
-        Collection<InboundEventTransformer> inboundEventTransformers = eventRegistry.getInboundEventTransformers();
-
-        if (inboundEventTransformers.isEmpty()) {
-            // TODO: log, throw exception or ...?
+        ChannelDefinition channelDefinition = eventRegistry.getChannelDefinition(channelKey);
+        if (channelDefinition == null) {
+            throw new FlowableException("No channel definition found for key " + channelKey);
         }
 
-        EventProcessingContext eventProcessingContext = new EventProcessingContextImpl(channelKey, event);
-        List<InboundEventTransformer> matchingInboundEventTransformers = inboundEventTransformers.stream()
-            .filter(inboundEventTransformer -> inboundEventTransformer.accepts(eventProcessingContext))
-            .collect(Collectors.toList());
+        EventDefinition eventDefinition = eventRegistry.detectEventDefinitionForEvent(channelKey, event);
+        EventProcessingContext eventProcessingContext = new EventProcessingContextImpl(channelKey, eventDefinition, event);
 
-        List<FlowableEventBusEvent> events = new ArrayList<>();
-        for (InboundEventTransformer inboundEventTransformer : matchingInboundEventTransformers) {
-            events.add(inboundEventTransformer.transform(eventProcessingContext));
-        }
-
-        for (FlowableEventBusEvent flowableEventBusEvent : events) {
+        Collection<FlowableEventBusEvent> eventBusEvents = eventDefinition.getEventCorrelationDefinition().correlate(eventProcessingContext);
+        for (FlowableEventBusEvent flowableEventBusEvent : eventBusEvents) {
             flowableEventBus.sendEvent(flowableEventBusEvent);
         }
 

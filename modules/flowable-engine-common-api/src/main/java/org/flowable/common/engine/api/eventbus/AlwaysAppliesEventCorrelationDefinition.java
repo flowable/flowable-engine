@@ -12,21 +12,20 @@
  */
 package org.flowable.common.engine.api.eventbus;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Joram Barrez
  */
-public interface EventProcessingContext {
+public class AlwaysAppliesEventCorrelationDefinition implements EventCorrelationDefinition {
 
-    String getChannelKey();
-
-    EventDefinition getEventDefinition();
-
-    String getEvent();
-
-    void addProcessingData(String key, Object data);
-
-    Map<String, Object> getProcessingData();
+    @Override
+    public Collection<FlowableEventBusEvent> correlate(EventProcessingContext eventProcessingContext) {
+        FlowableEventBusEvent event = new FlowableEventBusEventImpl();
+        event.setType(eventProcessingContext.getEventDefinition().getKey());
+        return Collections.singletonList(event);
+    }
 
 }

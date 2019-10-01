@@ -12,21 +12,15 @@
  */
 package org.flowable.common.engine.api.eventbus;
 
-import java.util.Map;
-
 /**
  * @author Joram Barrez
  */
-public interface EventProcessingContext {
+public interface ChannelDefinition {
 
-    String getChannelKey();
+    String getKey();
 
-    EventDefinition getEventDefinition();
+    InboundEventChannelAdapter getInboundEventChannelAdapter();
 
-    String getEvent();
-
-    void addProcessingData(String key, Object data);
-
-    Map<String, Object> getProcessingData();
+    InboundEventKeyDetector getInboundEventKeyDetector();
 
 }

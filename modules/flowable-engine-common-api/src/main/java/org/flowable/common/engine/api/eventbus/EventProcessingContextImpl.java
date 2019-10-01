@@ -21,11 +21,13 @@ import java.util.Map;
 public class EventProcessingContextImpl implements EventProcessingContext {
 
     protected String channelKey;
+    protected EventDefinition eventDefinition;
     protected String event;
     protected Map<String, Object> processingData;
 
-    public EventProcessingContextImpl(String channelKey, String event) {
+    public EventProcessingContextImpl(String channelKey, EventDefinition eventDefinition, String event) {
         this.channelKey = channelKey;
+        this.eventDefinition = eventDefinition;
         this.event = event;
     }
 
@@ -44,6 +46,15 @@ public class EventProcessingContextImpl implements EventProcessingContext {
 
     public void setChannelKey(String channelKey) {
         this.channelKey = channelKey;
+    }
+
+    @Override
+    public EventDefinition getEventDefinition() {
+        return eventDefinition;
+    }
+
+    public void setEventDefinition(EventDefinition eventDefinition) {
+        this.eventDefinition = eventDefinition;
     }
 
     @Override

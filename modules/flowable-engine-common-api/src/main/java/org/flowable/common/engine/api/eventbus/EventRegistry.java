@@ -12,21 +12,60 @@
  */
 package org.flowable.common.engine.api.eventbus;
 
-import java.util.Collection;
-
 /**
+ * Central registry for events that are received through external channels through a {@link InboundEventChannelAdapter}
+ * and then passed through to the {@link FlowableEventBusEvent}.
+ *
  * @author Joram Barrez
  */
 public interface EventRegistry {
 
-    void registerChannel(String channelKey, InboundEventChannelAdapter inboundAdapter, OutboundEventChannelAdapter outboundAdaper);
+    /**
+     * Programmatically build and register a new {@link ChannelDefinition}.
+     */
+    ChannelDefinitionBuilder newChannelDefinition();
 
-    void registerInboundEventTransformer(InboundEventTransformer inboundEventTransformer);
+    /**
+     * Low-level (vs the {@link ChannelDefinitionBuilder}) way of registering a new {@link ChannelDefinition}.
+     */
+    void registerChannelDefinition(ChannelDefinition channelDefinition);
 
-    Collection<InboundEventTransformer> getInboundEventTransformers();
+    /**
+     * Returns the {@link ChannelDefinition} instance associated with the given key.
+     */
+    ChannelDefinition getChannelDefinition(String channelKey);
 
-    void registerInboundEventProcessor(InboundEventProcessor inboundEventProcessor);
+    /**
+     * Retrieves the {@link ChannelDefinition} for the given key and
+     * uses its {@link InboundEventKeyDetector} to return the event definition for the passed event.
+     */
+    EventDefinition detectEventDefinitionForEvent(String channelKey, String event);
 
+    /**
+     * Programmatically build and register a new {@link EventDefinition}.
+     */
+    EventDefinitionBuilder newEventDefinition();
+
+    /**
+     * Low-level (vs the {@link EventDefinitionBuilder}) way of registering a new {@link EventDefinition}.
+     */
+    void registerEventDefinition(EventDefinition eventDefinition);
+
+    /**
+     * Retrieves the {@link EventDefinition} for the given eventDefinitionKey.
+     * First, it is checked if a channel is registered with the event definition.
+     * Otherwise, the event definitions not bound to a channel are checked.
+     */
+    EventDefinition getEventDefinition(String channelKey, String eventDefinitionKey);
+
+    /**
+     * See {@link #getInboundEventProcessor()}.
+     */
+    void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor);
+
+    /**
+     * Gets the processor of inbound events. All {@link InboundEventChannelAdapter} should pass received events to this processor.
+     */
     InboundEventProcessor getInboundEventProcessor();
 
 }

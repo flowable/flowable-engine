@@ -55,9 +55,7 @@ import org.flowable.common.engine.api.eventbus.DefaultInboundEventProcessor;
 import org.flowable.common.engine.api.eventbus.EventRegistry;
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusPublisher;
-import org.flowable.common.engine.api.eventbus.InboundEventChannelAdapter;
 import org.flowable.common.engine.api.eventbus.InboundEventProcessor;
-import org.flowable.common.engine.api.eventbus.InboundEventTransformer;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
@@ -213,8 +211,6 @@ public abstract class AbstractEngineConfiguration {
     protected FlowableEventBus eventBus;
     protected FlowableEventBusPublisher eventPublisher;
     protected EventRegistry eventRegistry;
-    protected Map<String, InboundEventChannelAdapter> inboundEventChannelAdapters;
-    protected List<InboundEventTransformer> inboundEventTransformers;
     protected InboundEventProcessor inboundEventProcessor;
 
     protected boolean transactionsExternallyManaged;
@@ -1651,21 +1647,13 @@ public abstract class AbstractEngineConfiguration {
         if (this.eventRegistry == null) {
             this.eventRegistry = new DefaultEventRegistry();
         }
-
-        if (this.inboundEventChannelAdapters != null) {
-            this.inboundEventChannelAdapters.forEach((channelKey, channelAdapter) -> this.eventRegistry.registerChannel(channelKey, channelAdapter, null));
-        }
-
-        if (this.inboundEventTransformers != null) {
-            this.inboundEventTransformers.forEach(inboundEventTransformer -> this.eventRegistry.registerInboundEventTransformer(inboundEventTransformer));
-        }
     }
 
     public void initInboundEventProcessor() {
         if (this.inboundEventProcessor == null) {
             this.inboundEventProcessor = new DefaultInboundEventProcessor(eventRegistry, eventBus);
         }
-        this.eventRegistry.registerInboundEventProcessor(this.inboundEventProcessor);
+        this.eventRegistry.setInboundEventProcessor(this.inboundEventProcessor);
     }
 
     public FlowableEventBus getEventBus() {
@@ -1677,35 +1665,6 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public Map<String, InboundEventChannelAdapter> getInboundEventChannelAdapters() {
-        return inboundEventChannelAdapters;
-    }
-
-    public void setInboundEventChannelAdapters(Map<String, InboundEventChannelAdapter> inboundEventChannelAdapters) {
-        this.inboundEventChannelAdapters = inboundEventChannelAdapters;
-    }
-
-    public void addInboundEventChannelAdapter(String channelKey, InboundEventChannelAdapter inboundEventChannelAdapter) {
-        if (this.inboundEventChannelAdapters == null) {
-            this.inboundEventChannelAdapters = new HashMap<>();
-        }
-        this.inboundEventChannelAdapters.put(channelKey, inboundEventChannelAdapter);
-    }
-
-    public List<InboundEventTransformer> getInboundEventTransformers() {
-        return inboundEventTransformers;
-    }
-
-    public void setInboundEventTransformers(List<InboundEventTransformer> inboundEventTransformers) {
-        this.inboundEventTransformers = inboundEventTransformers;
-    }
-
-    public void addInboundEventTransformer(InboundEventTransformer inboundEventTransformer) {
-        if (this.inboundEventTransformers == null) {
-            this.inboundEventTransformers = new ArrayList<>();
-        }
-        this.inboundEventTransformers.add(inboundEventTransformer);
-    }
 
     public boolean isEventPublisherEnabled() {
         return eventPublisher != null && eventPublisher.isEnabled();
