@@ -1,14 +1,16 @@
-ingress:
-  enabled: true
-  sslRedirect: false
-
 flowable:
+  host:
+    external: 34.90.219.164
   # Global database name, user and password
   database:
     name: flowable
     username: flowable
     password: flowable
-  
+
+ingress:
+  enabled: true
+  sslRedirect: false
+
 idm:
   enabled: true
   replicas: 1
@@ -123,25 +125,6 @@ rest:
       cpu: "1"
       memory: "1Gi"
   javaOpts: "-Xmx1g -Xms1g"
-  
-engage:
-  # Work or Engage can be enabled but not both
-  enabled: false
-  replicas: 1
-  service:
-    name: engage
-  image:
-    repository: eu.gcr.io/flw-product-playground/flowable-engage-standalone
-    tag: 3.2.0-SNAPSHOT
-    pullPolicy: Always
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "1Gi"
-    limits:
-      cpu: "2"
-      memory: "2Gi"
-  javaOpts: "-Xmx1g -Xms1g"
 
 # NGINX Ingress controller https://github.com/kubernetes/ingress-nginx
 nginx-ingress:
@@ -158,7 +141,7 @@ postgres:
     name: postgres
   image: postgres:9.6
   storage:
-    storageClassName: "manual"
+    storageClassName: "standard"
 #    storageClassName: "ssd"
     size: 1Gi
   resources:

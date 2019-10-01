@@ -35,6 +35,6 @@ The Kubernetes configuration files are located in the *resources* folder.
 
 ```helm install flowable --name=flowable```
 
-## Undeploy Flowalbe OSS
+## Undeploy Flowable OSS
 
 ```helm delete flowable --purge```
