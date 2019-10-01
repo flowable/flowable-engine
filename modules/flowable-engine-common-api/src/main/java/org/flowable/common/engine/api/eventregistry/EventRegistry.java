@@ -10,7 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.api.eventregistry;
+
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinitionBuilder;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinitionBuilder;
 
 /**
  * Central registry for events that are received through external channels through a {@link InboundEventChannelAdapter}

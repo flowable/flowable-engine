@@ -14,7 +14,7 @@ package org.flowable.common.engine.impl.eventbus;
 
 import java.util.Map;
 
-public class AbstractFlowableEventBusItemBuilder implements FlowableEventBusItemConstants {
+public class AbstractFlowableEventBusItemBuilder implements FlowableEventBusEventConstants {
     
     protected static void addProcessInfo(String executionId, String processInstanceId, String processDefinitionId, Map<String, Object> data) {
         putIfNotNull(EXECUTION_ID, executionId, data);

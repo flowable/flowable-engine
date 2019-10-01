@@ -10,15 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
-
-import java.util.Collection;
+package org.flowable.common.engine.api.eventregistry;
 
 /**
  * @author Joram Barrez
  */
-public interface EventCorrelationDefinition {
+public interface InboundEventProcessor {
 
-    Collection<FlowableEventBusEvent> correlate(EventProcessingContext eventProcessingContext);
+    void eventReceived(String channelKey, String event);
 
 }

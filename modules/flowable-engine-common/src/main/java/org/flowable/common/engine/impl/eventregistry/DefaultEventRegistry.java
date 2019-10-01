@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.impl.eventregistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +18,14 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinitionBuilder;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinitionBuilder;
+import org.flowable.common.engine.api.eventregistry.EventRegistry;
+import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
+import org.flowable.common.engine.impl.eventregistry.definition.ChannelDefinitionBuilderImpl;
+import org.flowable.common.engine.impl.eventregistry.definition.EventDefinitionBuilderImpl;
 
 /**
  * @author Joram Barrez

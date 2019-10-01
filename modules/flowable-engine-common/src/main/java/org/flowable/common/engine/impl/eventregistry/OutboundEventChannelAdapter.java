@@ -10,13 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.impl.eventregistry;
 
 /**
  * @author Joram Barrez
  */
-public interface InboundEventProcessor {
-
-    void eventReceived(String channelKey, String event);
+public class OutboundEventChannelAdapter {
 
 }

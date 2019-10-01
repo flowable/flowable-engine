@@ -10,11 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.impl.eventregistry.definition;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+
+import org.flowable.common.engine.api.eventregistry.definition.EventCorrelationDefinition;
+import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.impl.eventregistry.FlowableEventBusEventImpl;
 
 /**
  * @author Joram Barrez

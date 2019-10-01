@@ -10,13 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.api.eventregistry;
+
+import java.util.Map;
+
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 
 /**
  * @author Joram Barrez
  */
-public interface InboundEventKeyDetector {
+public interface EventProcessingContext {
 
-    String detectEventDefinitionKey(String event);
+    String getChannelKey();
+
+    EventDefinition getEventDefinition();
+
+    String getEvent();
+
+    void addProcessingData(String key, Object data);
+
+    Map<String, Object> getProcessingData();
 
 }

@@ -10,11 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.api.eventregistry.definition;
+
+import java.util.Collection;
 
 /**
  * @author Joram Barrez
  */
-public class OutboundEventChannelAdapter {
+public interface EventDefinition {
+
+    String getKey();
+
+    Collection<String> getChannelKeys();
+
+    EventCorrelationDefinition getEventCorrelationDefinition();
 
 }

@@ -21,7 +21,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.eventbus.FlowableEventBusItemConstants;
+import org.flowable.common.engine.impl.eventbus.FlowableEventBusEventConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.eventbus.FlowableEventBusBpmnConstants;
@@ -30,7 +30,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
-public class ServiceTaskEventTest extends PluggableFlowableTestCase implements FlowableEventBusBpmnConstants, FlowableEventBusItemConstants {
+public class ServiceTaskEventTest extends PluggableFlowableTestCase implements FlowableEventBusBpmnConstants, FlowableEventBusEventConstants {
     
     protected TestServiceTaskEventConsumer serviceTaskEventConsumer = new TestServiceTaskEventConsumer();
 

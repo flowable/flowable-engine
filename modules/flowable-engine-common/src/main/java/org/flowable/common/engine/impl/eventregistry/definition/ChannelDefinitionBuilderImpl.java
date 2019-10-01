@@ -10,7 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.impl.eventregistry.definition;
+
+import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinitionBuilder;
+import org.flowable.common.engine.api.eventregistry.EventRegistry;
+import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
+import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
+import org.flowable.common.engine.impl.eventregistry.JsonFieldBasedInboundEventKeyDetector;
+import org.flowable.common.engine.impl.eventregistry.JsonPathBasedInboundEventKeyDetector;
 
 /**
  * @author Joram Barrez

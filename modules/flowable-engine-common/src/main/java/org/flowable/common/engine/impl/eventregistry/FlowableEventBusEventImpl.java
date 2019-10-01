@@ -10,10 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.impl.eventregistry;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 
 public class FlowableEventBusEventImpl implements FlowableEventBusEvent {
 

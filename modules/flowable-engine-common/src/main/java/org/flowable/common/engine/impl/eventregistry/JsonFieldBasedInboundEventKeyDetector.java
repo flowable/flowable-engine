@@ -10,9 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.impl.eventregistry;
 
 import java.io.IOException;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,36 +23,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Joram Barrez
  */
-public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDetector {
+public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDetector {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected String jsonPathExpression;
+    protected String field;
 
-    public JsonPathBasedInboundEventKeyDetector(String jsonPathExpression) {
-        this.jsonPathExpression = jsonPathExpression;
+    public JsonFieldBasedInboundEventKeyDetector(String field) {
+        this.field = field;
     }
 
     @Override
     public String detectEventDefinitionKey(String event) {
         try {
             JsonNode jsonNode = objectMapper.readTree(event);
-            JsonNode result = jsonNode.at(jsonPathExpression);
-
-            if (result == null || result.isMissingNode() || result.isNull()) {
-                // TODO: throw exception? Log? ...?
-            }
-
-            if (result.isTextual()) {
-                return result.asText();
-            }
-
+            return jsonNode.path(field).asText();
         } catch (IOException e) {
-            // TODO: ?
-            e.printStackTrace();;
+            throw new FlowableException("Error while parsing event json", e);
         }
-
-        return null;
     }
 
 }

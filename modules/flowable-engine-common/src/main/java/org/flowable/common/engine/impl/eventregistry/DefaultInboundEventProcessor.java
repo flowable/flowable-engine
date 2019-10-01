@@ -10,11 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventbus;
+package org.flowable.common.engine.impl.eventregistry;
 
 import java.util.Collection;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
+import org.flowable.common.engine.api.eventregistry.EventRegistry;
+import org.flowable.common.engine.api.eventbus.FlowableEventBus;
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
 
 /**
  * @author Joram Barrez

@@ -10,16 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.eventbus;
+package org.flowable.common.engine.api.eventregistry;
 
-public interface FlowableEventBusItemConstants {
+/**
+ * @author Joram Barrez
+ */
+public interface InboundEventKeyDetector {
 
-    String TASK_ID = "taskId";
-    String EXECUTION_ID = "executionId";
-    String PROCESS_INSTANCE_ID = "processInstanceId";
-    String PROCESS_DEFINITION_ID = "processDefinitionId";
-    String SCOPE_ID = "scopeId";
-    String SUB_SCOPE_ID = "subScopeId";
-    String SCOPE_TYPE = "scopeType";
-    String SCOPE_DEFINITION_ID = "scopeDefinitionId";
+    String detectEventDefinitionKey(String event);
+
 }

@@ -20,14 +20,14 @@ import java.util.List;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.eventbus.FlowableEventBusItemConstants;
+import org.flowable.common.engine.impl.eventbus.FlowableEventBusEventConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.eventbus.FlowableEventBusVariableConstants;
 import org.junit.jupiter.api.Test;
 
-public class VariableEventTest extends PluggableFlowableTestCase implements FlowableEventBusVariableConstants, FlowableEventBusItemConstants {
+public class VariableEventTest extends PluggableFlowableTestCase implements FlowableEventBusVariableConstants, FlowableEventBusEventConstants {
     
     protected TestVariableEventConsumer variableEventConsumer = new TestVariableEventConsumer();
 
