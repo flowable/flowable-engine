@@ -19,9 +19,13 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UnacquireOwnedJobsCmd implements Command<Void> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnacquireOwnedJobsCmd.class);
+    
     private final String lockOwner;
     private final String tenantId;
 
@@ -38,8 +42,15 @@ public class UnacquireOwnedJobsCmd implements Command<Void> {
 
         List<Job> jobs = CommandContextUtil.getJobEntityManager(commandContext).findJobsByQueryCriteria(jobQuery);
         for (Job job : jobs) {
+            logJobUnlocking(job);
             CommandContextUtil.getJobManager(commandContext).unacquire(job);
         }
         return null;
+    }
+
+    protected void logJobUnlocking(Job job) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Unacquiring job {} with owner {} and tenantId {}", job, lockOwner, tenantId);
+        }
     }
 }
