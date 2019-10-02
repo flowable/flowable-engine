@@ -66,8 +66,8 @@ rest:
       cpu: "100m"
       memory: "1Gi"
     limits:
-      cpu: "2"
-      memory: "2Gi"
+      cpu: "1"
+      memory: "1Gi"
   javaOpts: "-Xmx1g -Xms1g"
 
 modeler:
@@ -97,25 +97,6 @@ admin:
   contextUrl: /
   image:
     repository: flowable/flowable-admin
-    tag: latest
-    pullPolicy: Always
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "1Gi"
-    limits:
-      cpu: "1"
-      memory: "1Gi"
-  javaOpts: "-Xmx1g -Xms1g"
-
-rest:
-  enabled: false
-  replicas: 1
-  service:
-    name: flowable-rest
-  contextUrl: /
-  image:
-    repository: flowable/flowable-rest
     tag: latest
     pullPolicy: Always
   resources:
