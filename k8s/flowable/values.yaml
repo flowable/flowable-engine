@@ -1,6 +1,7 @@
 flowable:
   host:
-    external: 34.90.219.164
+    # Public / external hostname (f.e. LB)
+    external: localhost
   # Global database name, user and password
   database:
     name: flowable
@@ -128,6 +129,8 @@ rest:
 
 # NGINX Ingress controller https://github.com/kubernetes/ingress-nginx
 nginx-ingress:
+  # disable when the cluster already has an nginx-ingress deployed
+  enabled: true
   rbac:
     create: true
   # the controller will set the endpoint records on the ingress objects to reflect those on the service
@@ -138,7 +141,7 @@ nginx-ingress:
 postgres:
   enabled: true
   service:
-    name: postgres
+    name: flowable-postgres
   image: postgres:9.6
   storage:
     storageClassName: "standard"

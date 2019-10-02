@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ include "flowable.template" . }}
+  name: {{ .Release.Name }}-{{ include "flowable.template" . }}
   labels:
     {{ include "flowable.defaultlabels" . }}
   annotations:
