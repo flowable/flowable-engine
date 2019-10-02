@@ -14,7 +14,7 @@ package org.flowable.common.engine.impl.eventregistry.definition;
 
 import java.util.Collection;
 
-import org.flowable.common.engine.api.eventregistry.definition.EventCorrelationDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.CorrelationDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 
 /**
@@ -24,7 +24,7 @@ public class EventDefinitionImpl implements EventDefinition {
 
     protected String key;
     protected Collection<String> channelKeys;
-    protected EventCorrelationDefinition eventCorrelationDefinition;
+    protected CorrelationDefinition correlationDefinition;
 
     @Override
     public String getKey() {
@@ -45,12 +45,12 @@ public class EventDefinitionImpl implements EventDefinition {
     }
 
     @Override
-    public EventCorrelationDefinition getEventCorrelationDefinition() {
-        return eventCorrelationDefinition;
+    public CorrelationDefinition getCorrelationDefinition() {
+        return correlationDefinition;
     }
 
-    public void setEventCorrelationDefinition(EventCorrelationDefinition eventCorrelationDefinition) {
-        this.eventCorrelationDefinition = eventCorrelationDefinition;
+    public void setCorrelationDefinition(CorrelationDefinition correlationDefinition) {
+        this.correlationDefinition = correlationDefinition;
     }
 
 }

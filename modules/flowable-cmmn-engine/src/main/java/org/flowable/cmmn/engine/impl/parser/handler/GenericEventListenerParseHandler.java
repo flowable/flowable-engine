@@ -21,6 +21,8 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.PlanItem;
 
+import liquibase.util.StringUtils;
+
 /**
  * @author Tijs Rademakers
  */
@@ -33,7 +35,11 @@ public class GenericEventListenerParseHandler extends AbstractPlanItemParseHandl
 
     @Override
     protected void executePlanItemParse(CmmnParserImpl cmmnParser, CmmnParseResult cmmnParseResult, PlanItem planItem, GenericEventListener genericEventListener) {
-        planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createGenericEventListenerActivityBehavior(planItem, genericEventListener));
+        if (StringUtils.isEmpty(genericEventListener.getEventType())) {
+            planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createGenericEventListenerActivityBehavior(planItem, genericEventListener));
+        } else {
+            planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createEventRegistryEventListenerActivityBehaviour(planItem, genericEventListener));
+        }
     }
 
 }

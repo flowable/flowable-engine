@@ -55,7 +55,7 @@ public interface EventDefinitionBuilder {
 
 
     /**
-     * Helper class to build a {@link EventCorrelationDefinition} as part of an {@link EventDefinition}.
+     * Helper class to build a {@link CorrelationDefinition} as part of an {@link EventDefinition}.
      */
     interface EventCorrelationBuilder {
 
@@ -65,7 +65,7 @@ public interface EventDefinitionBuilder {
          */
         EventDefinitionBuilder appliesAlways();
 
-        EventDefinitionBuilder custom(EventCorrelationDefinition eventCorrelationDefinition);
+        EventDefinitionBuilder custom(CorrelationDefinition eventCorrelationDefinition);
 
     }
 

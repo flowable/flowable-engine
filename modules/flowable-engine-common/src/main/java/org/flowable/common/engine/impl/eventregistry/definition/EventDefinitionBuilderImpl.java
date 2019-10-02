@@ -17,7 +17,7 @@ import java.util.HashSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.eventregistry.definition.EventCorrelationDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.CorrelationDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinitionBuilder;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
@@ -31,7 +31,7 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
 
     protected String key;
     protected Collection<String> channelKeys;
-    protected EventCorrelationDefinition eventCorrelationDefinition;
+    protected CorrelationDefinition eventCorrelationDefinition;
 
     public EventDefinitionBuilderImpl(EventRegistry eventRegistry) {
         this.eventRegistry = eventRegistry;
@@ -78,7 +78,7 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
         }
 
         if (eventCorrelationDefinition != null) {
-            eventDefinition.setEventCorrelationDefinition(eventCorrelationDefinition);
+            eventDefinition.setCorrelationDefinition(eventCorrelationDefinition);
         }
 
         eventRegistry.registerEventDefinition(eventDefinition);
@@ -101,7 +101,7 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
         }
 
         @Override
-        public EventDefinitionBuilder custom(EventCorrelationDefinition eventCorrelationDefinition) {
+        public EventDefinitionBuilder custom(CorrelationDefinition eventCorrelationDefinition) {
             eventDefinitionBuilder.eventCorrelationDefinition = eventCorrelationDefinition;
             return eventDefinitionBuilder;
         }

@@ -49,14 +49,22 @@ public class BasicFlowableEventBus implements FlowableEventBus {
         List<String> supportedTypes = eventConsumer.getSupportedTypes();
         if (supportedTypes != null && !supportedTypes.isEmpty()) {
             for (String type : supportedTypes) {
-                putEventConsumer(type, eventConsumer);
+                removeConsumer(eventConsumer, type);
             }
-            
         } else {
-            putEventConsumer(null, eventConsumer);
+            removeConsumer(eventConsumer, null);
         }
     }
-    
+
+    protected void removeConsumer(FlowableEventBusConsumer eventConsumer, String type) {
+        List<FlowableEventBusConsumer> consumers = eventConsumersByTypeMap.get(type);
+        if (consumers.size() == 1) {
+            eventConsumersByTypeMap.remove(type);
+        } else {
+            consumers.remove(eventConsumer);
+        }
+    }
+
     public List<FlowableEventBusConsumer> getEventConsumersForType(String type) {
         return eventConsumersByTypeMap.get(type);
     }

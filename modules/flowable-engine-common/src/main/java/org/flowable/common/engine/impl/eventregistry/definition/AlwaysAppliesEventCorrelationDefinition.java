@@ -15,7 +15,7 @@ package org.flowable.common.engine.impl.eventregistry.definition;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.flowable.common.engine.api.eventregistry.definition.EventCorrelationDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.CorrelationDefinition;
 import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.impl.eventregistry.FlowableEventBusEventImpl;
@@ -23,7 +23,7 @@ import org.flowable.common.engine.impl.eventregistry.FlowableEventBusEventImpl;
 /**
  * @author Joram Barrez
  */
-public class AlwaysAppliesEventCorrelationDefinition implements EventCorrelationDefinition {
+public class AlwaysAppliesEventCorrelationDefinition implements CorrelationDefinition {
 
     @Override
     public Collection<FlowableEventBusEvent> correlate(EventProcessingContext eventProcessingContext) {

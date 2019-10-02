@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.DecisionTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
@@ -127,6 +128,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     @Override
     public GenericEventListenerActivityBehaviour createGenericEventListenerActivityBehavior(PlanItem planItem, GenericEventListener genericEventListener) {
         return new GenericEventListenerActivityBehaviour();
+    }
+
+    @Override
+    public EventRegistryEventListenerActivityBehaviour createEventRegistryEventListenerActivityBehaviour(PlanItem planItem, GenericEventListener genericEventListener) {
+        return new EventRegistryEventListenerActivityBehaviour(genericEventListener.getEventType());
     }
 
     @Override

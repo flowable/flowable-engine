@@ -50,6 +50,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
 import org.flowable.common.engine.impl.eventregistry.DefaultEventRegistry;
 import org.flowable.common.engine.impl.eventregistry.DefaultInboundEventProcessor;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
@@ -1631,6 +1632,7 @@ public abstract class AbstractEngineConfiguration {
         initEventBus();
         initEventRegistry();
         initInboundEventProcessor();
+        initEventRegistryEventBusConsumer();
     }
 
     public void initEventBus() {
@@ -1645,7 +1647,7 @@ public abstract class AbstractEngineConfiguration {
 
     public void initEventRegistry() {
         if (this.eventRegistry == null) {
-            this.eventRegistry = new DefaultEventRegistry();
+            this.eventRegistry = new DefaultEventRegistry(eventBus);
         }
     }
 
@@ -1654,6 +1656,17 @@ public abstract class AbstractEngineConfiguration {
             this.inboundEventProcessor = new DefaultInboundEventProcessor(eventRegistry, eventBus);
         }
         this.eventRegistry.setInboundEventProcessor(this.inboundEventProcessor);
+    }
+
+    public void initEventRegistryEventBusConsumer() {
+        EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
+        if (eventRegistryEventBusConsumer != null) {
+            this.eventRegistry.registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
+        }
+    }
+
+    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
+        return null;
     }
 
     public FlowableEventBus getEventBus() {

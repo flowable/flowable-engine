@@ -47,7 +47,7 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
         EventDefinition eventDefinition = eventRegistry.detectEventDefinitionForEvent(channelKey, event);
         EventProcessingContext eventProcessingContext = new EventProcessingContextImpl(channelKey, eventDefinition, event);
 
-        Collection<FlowableEventBusEvent> eventBusEvents = eventDefinition.getEventCorrelationDefinition().correlate(eventProcessingContext);
+        Collection<FlowableEventBusEvent> eventBusEvents = eventDefinition.getCorrelationDefinition().correlate(eventProcessingContext);
         for (FlowableEventBusEvent flowableEventBusEvent : eventBusEvents) {
             flowableEventBus.sendEvent(flowableEventBusEvent);
         }

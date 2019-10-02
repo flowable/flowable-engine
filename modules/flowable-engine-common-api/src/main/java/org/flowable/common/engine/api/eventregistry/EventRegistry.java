@@ -59,10 +59,8 @@ public interface EventRegistry {
 
     /**
      * Retrieves the {@link EventDefinition} for the given eventDefinitionKey.
-     * First, it is checked if a channel is registered with the event definition.
-     * Otherwise, the event definitions not bound to a channel are checked.
      */
-    EventDefinition getEventDefinition(String channelKey, String eventDefinitionKey);
+    EventDefinition getEventDefinition(String eventDefinitionKey);
 
     /**
      * See {@link #getInboundEventProcessor()}.
@@ -73,5 +71,7 @@ public interface EventRegistry {
      * Gets the processor of inbound events. All {@link InboundEventChannelAdapter} should pass received events to this processor.
      */
     InboundEventProcessor getInboundEventProcessor();
+
+    void registerEventRegistryEventBusConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer);
 
 }

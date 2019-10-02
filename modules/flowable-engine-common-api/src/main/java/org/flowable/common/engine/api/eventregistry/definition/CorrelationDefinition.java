@@ -14,15 +14,14 @@ package org.flowable.common.engine.api.eventregistry.definition;
 
 import java.util.Collection;
 
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
+
 /**
  * @author Joram Barrez
  */
-public interface EventDefinition {
+public interface CorrelationDefinition {
 
-    String getKey();
-
-    Collection<String> getChannelKeys();
-
-    CorrelationDefinition getCorrelationDefinition();
+    Collection<FlowableEventBusEvent> correlate(EventProcessingContext eventProcessingContext);
 
 }

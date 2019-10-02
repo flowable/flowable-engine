@@ -178,4 +178,6 @@ public interface CmmnStencilConstants {
 
     String PROPERTY_EVENT_LISTENER_AVAILABLE_CONDITION = "availablecondition";
 
+    String PROPERTY_EVENT_TYPE = "eventType";
+
 }

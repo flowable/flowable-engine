@@ -12,18 +12,22 @@
  */
 package org.flowable.common.engine.impl.eventregistry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.eventbus.FlowableEventBus;
+import org.flowable.common.engine.api.eventregistry.EventRegistry;
+import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
+import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinitionBuilder;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinitionBuilder;
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
-import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
 import org.flowable.common.engine.impl.eventregistry.definition.ChannelDefinitionBuilderImpl;
 import org.flowable.common.engine.impl.eventregistry.definition.EventDefinitionBuilderImpl;
 
@@ -32,13 +36,21 @@ import org.flowable.common.engine.impl.eventregistry.definition.EventDefinitionB
  */
 public class DefaultEventRegistry implements EventRegistry {
 
+    protected FlowableEventBus eventBus;
     protected Map<String, ChannelDefinition> channelDefinitions = new HashMap<>();
 
     protected Map<String, EventDefinition> eventDefinitionsByKey = new HashMap<>();
-    protected Map<String, EventDefinition> eventDefinitionsWithoutchannelKey = new HashMap<>();
-    protected Map<String, Map<String, EventDefinition>> eventDefinitionsByChannelKey = new HashMap<>();
+//    protected Map<String, EventDefinition> eventDefinitionsWithoutchannelKey = new HashMap<>();
+//    protected Map<String, Map<String, EventDefinition>> eventDefinitionsByChannelKey = new HashMap<>();
+
+    protected List<EventRegistryEventBusConsumer> eventRegistryEventBusConsumers = new ArrayList<>();
 
     protected InboundEventProcessor inboundEventProcessor;
+
+
+    public DefaultEventRegistry(FlowableEventBus eventBus) {
+        this.eventBus = eventBus;
+    }
 
     @Override
     public ChannelDefinitionBuilder newChannelDefinition() {
@@ -81,7 +93,7 @@ public class DefaultEventRegistry implements EventRegistry {
             throw new FlowableException("No event definition key could be detected for event " + event);
         }
 
-        return getEventDefinition(channelKey, eventDefinitionKey);
+        return getEventDefinition(eventDefinitionKey);
     }
 
     @Override
@@ -93,33 +105,48 @@ public class DefaultEventRegistry implements EventRegistry {
     public void registerEventDefinition(EventDefinition eventDefinition) {
         eventDefinitionsByKey.put(eventDefinition.getKey(), eventDefinition);
 
-        if (eventDefinition.getChannelKeys() != null) {
-            for (String channelKey : eventDefinition.getChannelKeys()) {
-                if (!eventDefinitionsByChannelKey.containsKey(channelKey)) {
-                    eventDefinitionsByChannelKey.put(channelKey, new HashMap<>());
-                }
-                eventDefinitionsByChannelKey.get(channelKey).put(eventDefinition.getKey(), eventDefinition);
+        for (EventRegistryEventBusConsumer eventRegistryEventBusConsumer : eventRegistryEventBusConsumers) {
+            // Event bus does not allow dynamic changing of supported types (for performance)
+            eventBus.removeFlowableEventConsumer(eventRegistryEventBusConsumer);
+
+            if (!eventRegistryEventBusConsumer.getSupportedTypes().contains(eventDefinition.getKey())) {
+                eventRegistryEventBusConsumer.getSupportedTypes().add(eventDefinition.getKey());
             }
-
-        } else {
-            eventDefinitionsWithoutchannelKey.put(eventDefinition.getKey(), eventDefinition);
-
+            eventBus.addFlowableEventConsumer(eventRegistryEventBusConsumer);
         }
+
+//        if (eventDefinition.getChannelKeys() != null) {
+//            for (String channelKey : eventDefinition.getChannelKeys()) {
+//                if (!eventDefinitionsByChannelKey.containsKey(channelKey)) {
+//                    eventDefinitionsByChannelKey.put(channelKey, new HashMap<>());
+//                }
+//                eventDefinitionsByChannelKey.get(channelKey).put(eventDefinition.getKey(), eventDefinition);
+//            }
+//
+//        } else {
+//            eventDefinitionsWithoutchannelKey.put(eventDefinition.getKey(), eventDefinition);
+//
+//        }
     }
 
     @Override
-    public EventDefinition getEventDefinition(String channelKey, String eventDefinitionKey) {
-        EventDefinition eventDefinition = null;
-        if (eventDefinitionsByChannelKey.containsKey(channelKey)) {
-            eventDefinition = eventDefinitionsByChannelKey.get(channelKey).get(eventDefinitionKey);
-        }
-
-        if (eventDefinition == null) {
-            eventDefinition = eventDefinitionsWithoutchannelKey.get(eventDefinitionKey);
-        }
-
-        return eventDefinition;
+    public EventDefinition getEventDefinition(String eventDefinitionKey) {
+        return eventDefinitionsByKey.get(eventDefinitionKey);
     }
+
+//    @Override
+//    public EventDefinition getEventDefinition(String channelKey, String eventDefinitionKey) {
+//        EventDefinition eventDefinition = null;
+//        if (eventDefinitionsByChannelKey.containsKey(channelKey)) {
+//            eventDefinition = eventDefinitionsByChannelKey.get(channelKey).get(eventDefinitionKey);
+//        }
+//
+//        if (eventDefinition == null) {
+//            eventDefinition = eventDefinitionsWithoutchannelKey.get(eventDefinitionKey);
+//        }
+//
+//        return eventDefinition;
+//    }
 
     @Override
     public void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor) {
@@ -129,6 +156,11 @@ public class DefaultEventRegistry implements EventRegistry {
     @Override
     public InboundEventProcessor getInboundEventProcessor() {
         return inboundEventProcessor;
+    }
+
+    @Override
+    public void registerEventRegistryEventBusConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer) {
+        eventRegistryEventBusConsumers.add(eventRegistryEventBusConsumer);
     }
 
 }
