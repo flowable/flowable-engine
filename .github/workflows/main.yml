@@ -15,7 +15,7 @@ jobs:
       # Need to do install first in order for the OSGi tests to work
       run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging -B -V
+      run: ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false
 
   test_jdk11:
     name: Linux (OpenJDK 11)
@@ -29,7 +29,7 @@ jobs:
       # Need to do install first in order for the OSGi tests to work
       run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging -B -V
+      run: ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false
 
   test_jdk13:
     name: Linux (OpenJDK 13)
@@ -43,4 +43,4 @@ jobs:
       # Need to do install first in order for the OSGi tests to work
       run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging -B -V
+      run: ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false

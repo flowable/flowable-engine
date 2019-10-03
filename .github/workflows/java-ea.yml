@@ -1,6 +1,10 @@
 name: Flowable Java EA Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
 
 jobs:
   test_jdk14:
@@ -15,5 +19,5 @@ jobs:
         # Need to do install first in order for the OSGi tests to work
         run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: Test
-        run: ./mvnw verify -Pdistro,errorLogging -B -V
+        run: ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false
         continue-on-error: true
