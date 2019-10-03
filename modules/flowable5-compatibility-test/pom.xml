@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.4.3.14</version>
+		<version>6.4.3.15</version>
 	</parent>
 
 	<dependencies>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable5-compatibility</artifactId>
-			<version>6.4.3.14</version>
+			<version>6.4.3.15</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
