@@ -7,6 +7,15 @@ flowable:
     name: flowable
     username: flowable
     password: flowable
+    # specify to overwrite dynamic template values 
+    # datasourceDriverClassName:
+    # datasourceUrl:
+  cloudSql:
+    enabled: false
+    # Google Cloud SQL instance connection name
+    instanceConnectionName: flowableoss:europe-west4:flowable-db2
+    # Google credentials file name stored as secret in the cluster
+    credentials: cloudsql-credentials.json
 
 ingress:
   enabled: true
@@ -111,7 +120,7 @@ admin:
 # NGINX Ingress controller https://github.com/kubernetes/ingress-nginx
 nginx-ingress:
   # disable when the cluster already has an nginx-ingress deployed
-  enabled: true
+  enabled: false
   rbac:
     create: true
   # the controller will set the endpoint records on the ingress objects to reflect those on the service
