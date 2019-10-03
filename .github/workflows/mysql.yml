@@ -1,6 +1,10 @@
 name: Flowable MySQL Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
 
 # We explicitly don't use a container for running the job since there is some connectivity issues to MySQL if that is done
 jobs:
@@ -41,6 +45,7 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.mysql.cj.jdbc.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
   test_mysql_dmn:
     name: MySQL ${{ matrix.mysql }} DMN
     runs-on: ubuntu-latest
@@ -78,6 +83,7 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.mysql.cj.jdbc.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-dmn-engine -am
   test_mysql_content:
     name: MySQL ${{ matrix.mysql }} Content
@@ -116,4 +122,5 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.mysql.cj.jdbc.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-content-engine -am

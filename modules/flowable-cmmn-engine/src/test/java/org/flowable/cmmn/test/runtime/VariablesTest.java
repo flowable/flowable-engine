@@ -41,9 +41,12 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.junit.Rule;
@@ -71,10 +74,74 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertEquals("Hello World", variablesFromGet.get("stringVar"));
         assertTrue(variablesFromGet.containsKey("intVar"));
         assertEquals(42, ((Integer) variablesFromGet.get("intVar")).intValue());
+        
+        Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
+        assertTrue(variableInstancesFromGet.containsKey("stringVar"));
+        VariableInstance variableInstance = variableInstancesFromGet.get("stringVar");
+        assertEquals("Hello World", variableInstance.getValue());
+        assertEquals("string", variableInstance.getTypeName());
+        assertTrue(variableInstancesFromGet.containsKey("intVar"));
+        variableInstance = variableInstancesFromGet.get("intVar");
+        assertEquals(42, ((Integer) variableInstance.getValue()).intValue());
+        assertEquals("integer", variableInstance.getTypeName());
 
         assertEquals("Hello World", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
         assertEquals(42, ((Integer) cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).intValue());
         assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "doesNotExist"));
+        
+        variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "stringVar");
+        assertEquals("Hello World", variableInstance.getValue());
+        assertEquals("string", variableInstance.getTypeName());
+        variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "intVar");
+        assertEquals(42, ((Integer) variableInstance.getValue()).intValue());
+        assertEquals("integer", variableInstance.getTypeName());
+        variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "doesNotExist");
+        assertNull(variableInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testGetLocalVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("stringVar", "Hello World");
+        variables.put("intVar", 42);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("nestedTask").caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "stringVar", "Changed value");
+        cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "intVar", 21);
+        
+        Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertTrue(variablesFromGet.containsKey("stringVar"));
+        assertEquals("Hello World", variablesFromGet.get("stringVar"));
+        assertTrue(variablesFromGet.containsKey("intVar"));
+        assertEquals(42, ((Integer) variablesFromGet.get("intVar")).intValue());
+        
+        Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
+        assertTrue(variableInstancesFromGet.containsKey("stringVar"));
+        VariableInstance variableInstance = variableInstancesFromGet.get("stringVar");
+        assertEquals("Hello World", variableInstance.getValue());
+        assertEquals("string", variableInstance.getTypeName());
+        assertTrue(variableInstancesFromGet.containsKey("intVar"));
+        variableInstance = variableInstancesFromGet.get("intVar");
+        assertEquals(42, ((Integer) variableInstance.getValue()).intValue());
+        assertEquals("integer", variableInstance.getTypeName());
+
+        Map<String, Object> localVariablesFromGet = cmmnRuntimeService.getLocalVariables(planItemInstance.getId());
+        assertTrue(localVariablesFromGet.containsKey("stringVar"));
+        assertEquals("Changed value", localVariablesFromGet.get("stringVar"));
+        assertTrue(localVariablesFromGet.containsKey("intVar"));
+        assertEquals(21, ((Integer) localVariablesFromGet.get("intVar")).intValue());
+        
+        Map<String, VariableInstance> localVariableInstancesFromGet = cmmnRuntimeService.getLocalVariableInstances(planItemInstance.getId());
+        assertTrue(localVariableInstancesFromGet.containsKey("stringVar"));
+        variableInstance = localVariableInstancesFromGet.get("stringVar");
+        assertEquals("Changed value", variableInstance.getValue());
+        assertEquals("string", variableInstance.getTypeName());
+        assertTrue(variableInstancesFromGet.containsKey("intVar"));
+        variableInstance = localVariableInstancesFromGet.get("intVar");
+        assertEquals(21, ((Integer) variableInstance.getValue()).intValue());
+        assertEquals("integer", variableInstance.getTypeName());
     }
 
     @Test
@@ -115,6 +182,18 @@ public class VariablesTest extends FlowableCmmnTestCase {
         
         MyVariable myVariable = (MyVariable) cmmnRuntimeService.getVariable(caseInstance.getId(), "myVariable");
         assertEquals("Hello World", myVariable.value);
+        
+        cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "myVariable");
+                MyVariable myVariable = (MyVariable) variableInstance.getValue();
+                assertEquals("Hello World", myVariable.value);
+                
+                return null;
+            }
+        });
     }
     
     @Test

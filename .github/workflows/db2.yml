@@ -1,6 +1,10 @@
 name: Flowable DB2 Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
 
 jobs:
   test_db2:
@@ -45,6 +49,7 @@ jobs:
           -Djdbc.username=db2inst1
           -Djdbc.password=flowable
           -Djdbc.driver=com.ibm.db2.jcc.DB2Driver
+          -Dmaven.test.redirectTestOutputToFile=false
   test_db2_dmn:
     name: DB2 ${{ matrix.db2 }} DMN
     runs-on: ubuntu-latest
@@ -87,6 +92,7 @@ jobs:
           -Djdbc.username=db2inst1
           -Djdbc.password=flowable
           -Djdbc.driver=com.ibm.db2.jcc.DB2Driver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-dmn-engine -am
   test_db2_content:
     name: DB2 ${{ matrix.db2 }} Content
@@ -130,4 +136,5 @@ jobs:
           -Djdbc.username=db2inst1
           -Djdbc.password=flowable
           -Djdbc.driver=com.ibm.db2.jcc.DB2Driver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-content-engine -am

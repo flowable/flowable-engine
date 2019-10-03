@@ -44,8 +44,8 @@ The following properties are available on the process engine configuration throu
 |Name|Default value|Description
 
 |asyncExecutorThreadPoolQueueSize|100|The size of the queue on which jobs to be executed are placed after being acquired, before they are actually executed by a thread from the thread pool
-|asyncExecutorCorePoolSize|2|The minimal number of threads that are kept alive in the thread pool for job execution.
-|asyncExecutorMaxPoolSize|10|The maximum number of threads that are created in the thread pool for job execution.
+|asyncExecutorCorePoolSize|8|The minimal number of threads that are kept alive in the thread pool for job execution.
+|asyncExecutorMaxPoolSize|8|The maximum number of threads that are created in the thread pool for job execution.
 |asyncExecutorThreadKeepAliveTime|5000|The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Having a setting > 0 takes resources, but in the case of many job executions it avoids creating new threads all the time. If 0, threads will be destroyed after they've been used for job execution.
 |asyncExecutorNumberOfRetries|3|The number of times a job will be retried before it is moved to the 'deadletter' table.
 |asyncExecutorMaxTimerJobsPerAcquisition|1|The number of timer jobs that are acquired in one query. Default value is 1, as this lowers the potential for optimistic locking exceptions. Larger values can perform better, but the chance of optimistic locking exceptions occurring between different engines becomes larger too.

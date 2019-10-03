@@ -573,12 +573,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The minimal number of threads that are kept alive in the threadpool for job execution. Default value = 2. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorCorePoolSize = 2;
+    protected int asyncExecutorCorePoolSize = 8;
 
     /**
      * The maximum number of threads that are created in the threadpool for job execution. Default value = 10. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorMaxPoolSize = 10;
+    protected int asyncExecutorMaxPoolSize = 8;
 
     /**
      * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Default setting is 5 seconds. Having a setting > 0 takes resources, but in the case of many
@@ -611,6 +611,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected long asyncExecutorSecondsToWaitOnShutdown = 60L;
+
+    /**
+     * Whether or not core threads can time out (which is needed to scale down the threads). Default true.
+     *
+     * This property is only applicable when using the threadpool-based async executor.
+     */
+    protected boolean asyncExecutorAllowCoreThreadTimeout = true;
 
     /**
      * The number of timer jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
@@ -727,8 +734,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // More info: see similar async executor properties.
     protected boolean asyncHistoryExecutorMessageQueueMode;
     protected int asyncHistoryExecutorNumberOfRetries = 10;
-    protected int asyncHistoryExecutorCorePoolSize = 2;
-    protected int asyncHistoryExecutorMaxPoolSize = 10;
+    protected int asyncHistoryExecutorCorePoolSize = 8;
+    protected int asyncHistoryExecutorMaxPoolSize = 8;
     protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
     protected int asyncHistoryExecutorThreadPoolQueueSize = 100;
     protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
@@ -2127,6 +2134,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             // Reset expired
             defaultAsyncExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
             defaultAsyncExecutor.setResetExpiredJobsPageSize(asyncExecutorResetExpiredJobsPageSize);
+
+            // Core thread timeout
+            defaultAsyncExecutor.setAllowCoreThreadTimeout(asyncExecutorAllowCoreThreadTimeout);
 
             // Shutdown
             defaultAsyncExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
@@ -4440,6 +4450,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAsyncExecutorSecondsToWaitOnShutdown(long asyncExecutorSecondsToWaitOnShutdown) {
         this.asyncExecutorSecondsToWaitOnShutdown = asyncExecutorSecondsToWaitOnShutdown;
+        return this;
+    }
+
+    public boolean isAsyncExecutorAllowCoreThreadTimeout() {
+        return asyncExecutorAllowCoreThreadTimeout;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncExecutorAllowCoreThreadTimeout(boolean asyncExecutorAllowCoreThreadTimeout) {
+        this.asyncExecutorAllowCoreThreadTimeout = asyncExecutorAllowCoreThreadTimeout;
         return this;
     }
 

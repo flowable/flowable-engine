@@ -519,7 +519,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      *
      * This property is only applicable when using the threadpool-based async executor.
      */
-    protected int asyncExecutorCorePoolSize = 2;
+    protected int asyncExecutorCorePoolSize = 8;
 
     /**
      * The maximum number of threads that are created in the threadpool for job execution.
@@ -527,7 +527,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      *
      * This property is only applicable when using the threadpool-based async executor.
      */
-    protected int asyncExecutorMaxPoolSize = 10;
+    protected int asyncExecutorMaxPoolSize = 8;
 
     /**
      * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed.
@@ -566,6 +566,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected long asyncExecutorSecondsToWaitOnShutdown = 60L;
+
+    /**
+     * Whether or not core threads can time out (which is needed to scale down the threads). Default true.
+     *
+     * This property is only applicable when using the threadpool-based async executor.
+     */
+    protected boolean asyncExecutorAllowCoreThreadTimeout = true;
+
+    protected String asyncExecutorTenantId = AbstractEngineConfiguration.NO_TENANT_ID;
 
     /**
      * The number of timer jobs that are acquired during one query
@@ -701,8 +710,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // More info: see similar async executor properties.
     protected int asyncHistoryExecutorNumberOfRetries = 10;
-    protected int asyncHistoryExecutorCorePoolSize = 2;
-    protected int asyncHistoryExecutorMaxPoolSize = 10;
+    protected int asyncHistoryExecutorCorePoolSize = 8;
+    protected int asyncHistoryExecutorMaxPoolSize = 8;
     protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
     protected int asyncHistoryExecutorThreadPoolQueueSize = 100;
     protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
@@ -1767,8 +1776,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             defaultAsyncExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
             defaultAsyncExecutor.setResetExpiredJobsPageSize(asyncExecutorResetExpiredJobsPageSize);
 
+            // Core thread timeout
+            defaultAsyncExecutor.setAllowCoreThreadTimeout(asyncExecutorAllowCoreThreadTimeout);
+
             // Shutdown
             defaultAsyncExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
+
+            // Tenant
+            defaultAsyncExecutor.setTenantId(asyncExecutorTenantId);
 
             asyncExecutor = defaultAsyncExecutor;
         }
@@ -2937,6 +2952,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setAsyncExecutorSecondsToWaitOnShutdown(long asyncExecutorSecondsToWaitOnShutdown) {
         this.asyncExecutorSecondsToWaitOnShutdown = asyncExecutorSecondsToWaitOnShutdown;
+        return this;
+    }
+
+    public boolean isAsyncExecutorAllowCoreThreadTimeout() {
+        return asyncExecutorAllowCoreThreadTimeout;
+    }
+
+    public CmmnEngineConfiguration setAsyncExecutorAllowCoreThreadTimeout(boolean asyncExecutorAllowCoreThreadTimeout) {
+        this.asyncExecutorAllowCoreThreadTimeout = asyncExecutorAllowCoreThreadTimeout;
         return this;
     }
 

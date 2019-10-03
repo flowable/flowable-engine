@@ -47,6 +47,7 @@ import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -362,6 +363,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
             processEngineConfiguration.getIdentityLinkInterceptor().handleCreateSubProcessInstance(subProcessInstance, superExecutionEntity);
         }
+
+        processEngineConfiguration.getProcessInstanceHelper().processAvailableEventSubProcesses(subProcessInstance,
+            ProcessDefinitionUtil.getProcess(processDefinition.getId()),CommandContextUtil.getCommandContext());
 
         FlowableEventDispatcher flowableEventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (flowableEventDispatcher != null && flowableEventDispatcher.isEnabled()) {

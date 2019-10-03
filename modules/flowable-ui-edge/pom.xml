@@ -13,7 +13,7 @@
     <artifactId>flowable-ui-edge</artifactId>
 
     <properties>
-        <spring.cloud.version>Finchley.SR1</spring.cloud.version>
+        <spring.cloud.version>Greenwich.SR3</spring.cloud.version>
     </properties>
 
     <dependencyManagement>
@@ -30,12 +30,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
