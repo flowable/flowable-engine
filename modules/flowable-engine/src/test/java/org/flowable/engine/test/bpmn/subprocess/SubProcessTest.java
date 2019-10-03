@@ -166,9 +166,9 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
-        // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and
+        // Setting the clock forward 1 hour 5 second (timer fires in 1 hour) and
         // fire up the job executor
-        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (60 * 60 * 1000) + 1000));
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (60 * 60 * 1000) + 5000));
         waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         // The inner subprocess should be destroyed, and the escalated task should be active
