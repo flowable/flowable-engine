@@ -304,6 +304,11 @@
       where CASE_INST_ID_ = #{parameter.caseInstanceId} and ELEMENT_ID_ = #{parameter.planItemId}
   </select>
 
+  <select id="selectPlanItemInstancesByStagePlanItemInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
+      select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
+      where STAGE_INST_ID_ = #{parameter}
+  </select>
+
    <select id="selectPlanItemInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
