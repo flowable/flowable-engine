@@ -191,7 +191,7 @@ public abstract class ReflectUtil {
      */
     public static Method getSetter(String fieldName, Class<?> clazz, Class<?> fieldType) {
         String setterName = "set" + Character.toTitleCase(fieldName.charAt(0)) +
-                fieldName.substring(1, fieldName.length());
+                fieldName.substring(1);
         try {
             // Using getMethods(), getMethod(...) expects exact parameter type
             // matching and ignores inheritance-tree.
