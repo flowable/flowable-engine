@@ -13,7 +13,7 @@ jobs:
     container: openjdk:8
     strategy:
       matrix:
-        postgres: [9, 10, 11]
+        postgres: [9, 10, 11, 12]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -48,7 +48,7 @@ jobs:
     container: openjdk:8
     strategy:
       matrix:
-        postgres: [9, 10, 11]
+        postgres: [9, 10, 11, 12]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -84,7 +84,7 @@ jobs:
     container: openjdk:8
     strategy:
       matrix:
-        postgres: [9, 10, 11]
+        postgres: [9, 10, 11, 12]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
