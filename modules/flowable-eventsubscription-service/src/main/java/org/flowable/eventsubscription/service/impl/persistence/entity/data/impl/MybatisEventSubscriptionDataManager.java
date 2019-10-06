@@ -26,6 +26,8 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.Compensate
 import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
@@ -112,6 +114,11 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     @Override
     public SignalEventSubscriptionEntity createSignalEventSubscription() {
         return new SignalEventSubscriptionEntityImpl();
+    }
+
+    @Override
+    public GenericEventSubscriptionEntity createGenericEventSubscriptionEntity() {
+        return new GenericEventSubscriptionEntityImpl();
     }
 
     @Override

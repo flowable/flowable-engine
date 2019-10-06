@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
-import org.flowable.common.engine.api.eventbus.FlowableEventBusEventImpl;
+import org.flowable.common.engine.impl.eventregistry.FlowableEventBusEventImpl;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventbus.AbstractFlowableEventBusItemBuilder;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;

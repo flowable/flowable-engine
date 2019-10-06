@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,16 +45,6 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
 
-        EventDefinition eventDefinition = getEventDefinition(commandContext, planItemInstanceEntity);
-
-        CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-                .eventType(eventDefinition.getKey())
-                .subScopeId(planItemInstanceEntity.getId())
-                .scopeId(planItemInstanceEntity.getCaseInstanceId())
-                .scopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
-                .scopeType(ScopeTypes.CMMN)
-                .tenantId(planItemInstanceEntity.getTenantId())
-                .create();
     }
 
     protected EventDefinition getEventDefinition(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
@@ -65,7 +53,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
 
         String key = null;
         if (StringUtils.isNotEmpty(eventDefinitionKey)) {
-            Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(key);
+            Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(eventDefinitionKey);
             key = expression.getValue(planItemInstanceEntity).toString();
         }
 
@@ -105,7 +93,23 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
             }
 
+        } else if (PlanItemTransition.CREATE.equals(transition)) {
+            createEventSubscription(commandContext, (PlanItemInstanceEntity) planItemInstance);
+
         }
+    }
+
+    protected void createEventSubscription(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        EventDefinition eventDefinition = getEventDefinition(commandContext, planItemInstanceEntity);
+
+        CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+            .eventType(eventDefinition.getKey())
+            .subScopeId(planItemInstanceEntity.getId())
+            .scopeId(planItemInstanceEntity.getCaseInstanceId())
+            .scopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
+            .scopeType(ScopeTypes.CMMN)
+            .tenantId(planItemInstanceEntity.getTenantId())
+            .create();
     }
 
 }

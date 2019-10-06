@@ -32,6 +32,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     CompensateEventSubscriptionEntity createCompensateEventSubscription();
 
+    GenericEventSubscriptionEntity createGenericEventSubscription();
+
     /* Create and insert */
 
     EventSubscription createEventSubscription(EventSubscriptionBuilder eventSubscriptionBuilder);

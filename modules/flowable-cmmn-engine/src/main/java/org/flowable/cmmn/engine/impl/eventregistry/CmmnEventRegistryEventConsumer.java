@@ -21,7 +21,9 @@ import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventregistry.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.common.engine.impl.eventregistry.definition.AlwaysAppliesEventCorrelationDefinition;
+import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityManager;
@@ -32,8 +34,11 @@ import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
  */
 public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer  {
 
-    public CmmnEventRegistryEventConsumer(EventRegistry eventRegistry) {
+    protected CommandExecutor commandExecutor;
+
+    public CmmnEventRegistryEventConsumer(CommandExecutor commandExecutor, EventRegistry eventRegistry) {
         super(eventRegistry);
+        this.commandExecutor = commandExecutor;
     }
 
     @Override
@@ -44,18 +49,22 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
             // In this case, no correlation needs to happen.
             // This means that all event subscriptions can be fetched with the given type and they can be fired
-            List<EventSubscription> eventSubscriptions = findEventsubScriptionsByEventDefinitionKey(eventDefinition);
+            commandExecutor.execute((Command<Void>) commandContext -> {
+                List<EventSubscription> eventSubscriptions = findEventsubScriptionsByEventDefinitionKey(eventDefinition);
 
-            for (EventSubscription eventSubscription : eventSubscriptions) {
-                if (ScopeTypes.CMMN.equals(eventSubscription.getScopeType())) {
+                for (EventSubscription eventSubscription : eventSubscriptions) {
+                    if (ScopeTypes.CMMN.equals(eventSubscription.getScopeType())) {
 
-                    if (eventSubscription.getSubScopeId() != null) {
-                        CmmnRuntimeService cmmnRuntimeService = org.flowable.cmmn.engine.impl.util.CommandContextUtil.getCmmnRuntimeService();
-                        cmmnRuntimeService.triggerPlanItemInstance(eventSubscription.getSubScopeId());
+                        if (eventSubscription.getSubScopeId() != null) {
+                            CmmnRuntimeService cmmnRuntimeService = org.flowable.cmmn.engine.impl.util.CommandContextUtil.getCmmnRuntimeService();
+                            cmmnRuntimeService.triggerPlanItemInstance(eventSubscription.getSubScopeId());
+                        }
+
                     }
-
                 }
-            }
+
+                return null;
+            });
 
         }
     }

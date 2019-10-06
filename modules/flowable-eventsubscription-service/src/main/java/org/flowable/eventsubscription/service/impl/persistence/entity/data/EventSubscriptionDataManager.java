@@ -19,6 +19,7 @@ import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 
@@ -32,6 +33,8 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     SignalEventSubscriptionEntity createSignalEventSubscription();
 
     CompensateEventSubscriptionEntity createCompensateEventSubscription();
+
+    GenericEventSubscriptionEntity createGenericEventSubscriptionEntity();
 
     long findEventSubscriptionCountByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
 
