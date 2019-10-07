@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -282,6 +283,35 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(2);
     }
+
+    @Test
+    @CmmnDeployment
+    public void testUsageInAvailableCondition() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+
+        // The user event listeners should not be active after start
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceStateAvailable().count()).isEqualTo(0);
+
+        // Starting the human tasks should make the user event listeners available
+        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().planItemInstanceName("Human task 1").singleResult().getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceStateAvailable().count()).isEqualTo(1);
+
+        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().planItemInstanceName("Human task 2").singleResult().getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceStateAvailable().count()).isEqualTo(2);
+
+        // Triggering an event listener should make the tasks again enabled (as they are manual activation)
+        cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery().name("cancel 1").singleResult().getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+            .planItemInstanceStateAvailable().list()).extracting(PlanItemInstance::getName)
+            .contains("cancel 2");
+
+        cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery().name("cancel 2").singleResult().getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceStateAvailable().count()).isEqualTo(0);
+
+
+    }
+
 
     private Object evaluateExpression(String caseInstanceId, String expressionText) {
         return cmmnEngineConfiguration.getCommandExecutor().execute((Command<Object>) commandContext -> {
