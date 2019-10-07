@@ -160,12 +160,12 @@ CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().transient
 
 Flowable uses UEL for expression-resolving. UEL stands for _Unified Expression Language_ and is part of the EE6 specification (see link:$$http://docs.oracle.com/javaee/6/tutorial/doc/gjddd.html$$[ the EE6 specification] for detailed information).
 
-Expressions can be used in, for example, Java Service tasks, and plan item transitions. Although there are two types of expressions, value-expression and method-expression, Flowable abstracts this so they can both be used where an +expression+ is expected.
+Expressions can be used in, for example, Java Service tasks, sentry conditions and plan item listeners. Although there are two types of expressions, value-expression and method-expression, Flowable abstracts this so they can both be used where an +expression+ is expected.
 
-* *Value expression*: resolves to a value. By default, all case variables are available to use. Also, all spring-beans (if using Spring) are available to use in expressions. Some examples:
+* *Value expression*: resolves to a value. By default, all case variables are available to use. Also, all spring-beans (if using Spring) are available to use in expressions. In non-Spring environments the beans available to expressions can be set through the ++setBeans++ method of the ++CmmnEngineConfiguration++. Some examples:
 
 ----
-${myVar}
+${myVariable}
 ${myBean.myProperty}
 ----
 
@@ -178,14 +178,114 @@ ${myBean.addNewOrder('orderName')}
 ${myBean.doSomething(myVar, planItemInstance)}
 ----
 
-Note that these expressions support resolving primitives (including comparing them), beans, lists, arrays, and maps.
+These expressions support resolving primitives (including comparing them), beans, lists, arrays, and maps.
 
-On top of all case variables, there are a few default objects available that can be used in expressions:
+On top of all case instance variables, there are default objects available that can be used in expressions:
 
-* ++caseInstance++: The +DelegateCaseInstance+ holds additional information about the ongoing case instance.
-* ++planItemInstance++: The +DelegatePlanItemInstance+ holds additional information about the current plan item.
+* ++caseInstance++: Holds additional information about the ongoing case instance. The ++caseInstance++ keyword is available in all expressions.
+* ++planItemInstance++: The +DelegatePlanItemInstance+ holds additional information about the current plan item instance. The ++planItemInstance++ keyword is available in all plan item related expressions (e.g. sentry conditions, plan item lifecycle listeners, service task expression, etc.).
+* ++planItemInstances++: Exposes information about all current plan item instance. See the examples below on how to use it.
+* ++variableContainer++: The +VariableContainer+ for which the expression is being resolved for. A variable container is an abstraction on top of case instances, plan item instances, process instances and executions. The ++variableContainer+ keyword allows to write expressions that are not bound to a specific implementation.
 * ++authenticatedUserId++: The id of the user that is currently authenticated. If no user is authenticated, the variable is not available.
-* ++variableContainer++: The +VariableContainer+ for which the expression is being resolved for.
+
+For example:
+
+----
+${caseInstance.id}
+${caseInstance.getVariable('myVariable') == 'test'}
+${caseInstance.setVariable('myVariable', 'test')}
+
+${planItemInstance.getPlanItem().getPlanItemDefinition().getName()}
+${planItemInstance.getVariable('myVariable') == 123}
+${planItemInstance.setVariable('myVariable', 123)}
+
+${variableContainer.getVariable('myVariable')}
+${variableContainer.setVariable('myVariable', 'true')}
+----
+
+The keyword *planItemInstances* deserves some more explanation. Using this keyword it is possible to retrieve all the current plan item instances, but it also acts like a sort of API to retrieve more information about the current plan item instance.
+
+For example, the following expression
+
+----
+${planItemInstances.active().count()}
+----
+
+Will return a count of all plan item instances that are currently in the 'active' state. If we're only interested in a certain plan item, it can be filtered down:
+
+----
+${planItemInstances.definitionId('a').active().count()}
+----
+
+As the example shows, the ++planItemInstances++ keyword allows to chain together various filter methods. Such chaining will use AND semantics. The following methods are supported.
+
+Methods that filter on plan item instance state:
+
+* active()
+* available()
+* enabled()
+* disabled()
+* completed()
+* terminated()
+
+The following state filters are also supported, but do note these reflect non-spec compliant internal states:
+
+* unavailable()
+* waitingForRepetition()
+* asyncActive()
+
+To get all plan item instances that are in a terminal (i.e. terminated or completed) or non-terminal state:
+
+* onlyTerminal()
+* onlyNonTerminal()
+
+To filter based on the identifier that is set in the CMMN model:
+
+* definitionId('id1')
+* definitionIds('id1', 'id2')
+
+To filter based on the name:
+
+* name('name1')
+* names('name1', 'name2', 'name3')
+
+For some use cases, the plan item instances that should be filtered should only be part of the current stage. The 'current stage' is either the parent stage of a plan item or the case instance when there's no parent stage.
+
+* currentStage()
+
+Lastly, there is a set of methods that cannot be chained, as they return a result.
+
+* count(): returns a count of plan item instances, after applying all filters.
+* getDefinitionIds(): returns a list of strings with all the ids as defined in the CMMN model of the matching plan item instances.
+* getDefinitionNames(): returns a list of names with all the names as defined in the CMMN model of the matching plan item instances.
+* getList(): returns the 'raw' list of _org.flowable.cmmn.api.runtime.PlanItemInstance_ instances.
+
+Let's look at some examples where the above methods are used in expressions:
+
+To count all active plan item instances in a case instance:
+
+----
+${planItemInstances.active().count()}
+----
+
+To do a count of all active plan item instances with an id 'a' or 'b':
+
+----
+${planItemInstances.active().definitionIds('a', 'b').count()}
+----
+
+To get all the ids of the plan item instances which are in a terminal state in the current stage:
+
+----
+${planItemInstances.currentStage().onlyTerminal().getDefinitionIds()()}
+----
+
+To store the result of the above expression in a transient variable
+
+----
+${caseInstance.setTransientVariable('myVar', planItemInstances.currentStage().onlyTerminal().getDefinitionIds()}}
+----
+
 
 [[cmmnExpressionsFunctions]]
 
