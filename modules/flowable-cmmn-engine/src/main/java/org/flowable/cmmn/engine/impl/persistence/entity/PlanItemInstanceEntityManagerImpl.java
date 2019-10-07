@@ -137,6 +137,11 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     }
 
     @Override
+    public List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceId) {
+        return planItemInstanceDataManager.findByStagePlanItemInstanceId(stagePlanItemInstanceId);
+    }
+
+    @Override
     public List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId) {
         return planItemInstanceDataManager.findByCaseInstanceIdAndPlanItemId(caseInstanceId, planitemId);
     }

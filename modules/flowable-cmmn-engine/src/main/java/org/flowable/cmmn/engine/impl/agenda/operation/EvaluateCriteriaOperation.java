@@ -358,6 +358,11 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     protected boolean evaluateSentryIfPart(Sentry sentry, VariableContainer variableContainer) {
         Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
         Object result = conditionExpression.getValue(variableContainer);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Evaluation of sentry if condition {} results in '{}'", sentry.getSentryIfPart().getCondition(), result);
+        }
+
         if (result instanceof Boolean) {
             return (Boolean) result;
         }
@@ -469,6 +474,11 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             if (StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression())) {
                 Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(eventListener.getAvailableConditionExpression());
                 Object result = expression.getValue(planItemInstanceEntity);
+
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Evaluation of available condition {} results in '{}'", eventListener.getAvailableConditionExpression(), result);
+                }
+
                 if (result instanceof Boolean) {
                     return (Boolean) result;
                 } else {
