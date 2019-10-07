@@ -33,6 +33,7 @@ public class ELExecutionContext {
     protected BuiltinAggregator aggregator;
     protected String instanceId;
     protected String scopeType;
+    protected String tenantId;
 
     public void checkExecutionContext(String variableId) {
 
@@ -106,5 +107,13 @@ public class ELExecutionContext {
 
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 }
