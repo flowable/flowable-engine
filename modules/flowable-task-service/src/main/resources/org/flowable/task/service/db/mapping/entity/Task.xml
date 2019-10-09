@@ -712,6 +712,12 @@
       <if test="keyLike != null">
         and RES.TASK_DEF_KEY_ like #{keyLike}
       </if>
+      <if test="keys != null and !keys.isEmpty()">
+          and RES.TASK_DEF_KEY_ in
+          <foreach item="item" index="index" collection="keys" open="(" separator="," close=")">
+              #{item}
+          </foreach>
+      </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
@@ -1141,6 +1147,12 @@
             </if>
             <if test="orQueryObject.keyLike != null">
               or RES.TASK_DEF_KEY_ like #{orQueryObject.keyLike}${wildcardEscapeClause}
+            </if>
+            <if test="orQueryObject.keys != null and !orQueryObject.keys.isEmpty()">
+                or RES.TASK_DEF_KEY_ in
+                <foreach item="item" index="index" collection="orQueryObject.keys" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
             <if test="orQueryObject.processDefinitionId != null">
               or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}

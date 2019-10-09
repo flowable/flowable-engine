@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CaseTask;
+import org.flowable.cmmn.model.CmmnModel;
 
 public class CaseTaskExport extends AbstractChildTaskExport<CaseTask> {
 
@@ -33,11 +34,25 @@ public class CaseTaskExport extends AbstractChildTaskExport<CaseTask> {
     protected void writePlanItemDefinitionSpecificAttributes(CaseTask caseTask, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(caseTask, xtw);
         TaskExport.writeCommonTaskAttributes(caseTask, xtw);
-        if (StringUtils.isNotEmpty(caseTask.getCaseRef())) {
-            xtw.writeAttribute(ATTRIBUTE_CASE_REF, caseTask.getCaseRef());
-        }
         if (caseTask.getFallbackToDefaultTenant() != null) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, caseTask.getFallbackToDefaultTenant().toString());
         }
     }
+
+    @Override
+    protected void writePlanItemDefinitionBody(CmmnModel model, CaseTask caseTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionBody(model, caseTask, xtw);
+
+        // Always export the case reference as an expression, even if the caseRef is set
+        if (StringUtils.isNotEmpty(caseTask.getCaseRef()) || StringUtils.isNotEmpty(caseTask.getCaseRefExpression())) {
+            xtw.writeStartElement(ELEMENT_CASE_REF_EXPRESSION);
+            xtw.writeCData(
+                StringUtils.isNotEmpty(caseTask.getCaseRef()) ?
+                    caseTask.getCaseRef() :
+                    caseTask.getCaseRefExpression()
+            );
+            xtw.writeEndElement();
+        }
+    }
+
 }

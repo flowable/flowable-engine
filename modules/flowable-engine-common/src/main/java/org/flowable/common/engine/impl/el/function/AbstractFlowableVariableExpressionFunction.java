@@ -17,7 +17,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.VariableContainerELResolver;
 
 /**
  * @author Joram Barrez
@@ -28,12 +29,12 @@ public abstract class AbstractFlowableVariableExpressionFunction extends Abstrac
     
     private static final String FINAL_FUNCTION_PREFIX = "variables";
     
-    public AbstractFlowableVariableExpressionFunction(String variableScopeName, String functionName) {
-        this(variableScopeName, Collections.singletonList(functionName), functionName);
+    public AbstractFlowableVariableExpressionFunction(String functionName) {
+        this(Collections.singletonList(functionName), functionName);
     }
     
-    public AbstractFlowableVariableExpressionFunction(String variableScopeName, List<String> functionNameOptions, String functionName) {
-        super(variableScopeName, functionNameOptions, functionName);
+    public AbstractFlowableVariableExpressionFunction(List<String> functionNameOptions, String functionName) {
+        super(VariableContainerELResolver.VARIABLE_CONTAINER_KEY, functionNameOptions, functionName);
     }
     
     @Override
@@ -58,11 +59,11 @@ public abstract class AbstractFlowableVariableExpressionFunction extends Abstrac
     
     // Helper methods
     
-    protected static Object getVariableValue(VariableScope variableScope, String variableName) {
+    protected static Object getVariableValue(VariableContainer variableContainer, String variableName) {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("Variable name passed is null");
         }
-        return variableScope.getVariable((String) variableName);
+        return variableContainer.getVariable((String) variableName);
     }
     
     protected static boolean valuesAreNumbers(Object variableValue, Object actualValue) {

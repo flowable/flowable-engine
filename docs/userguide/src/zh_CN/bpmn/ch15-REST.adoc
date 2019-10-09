@@ -6303,7 +6303,7 @@ POST management/deadletter-jobs/{jobId}
 [source,json,linenums]
 ----
 {
-  "action" : "execute"
+  "action" : "move"
 }
 ----
 

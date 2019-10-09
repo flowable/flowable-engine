@@ -20,7 +20,7 @@ import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 public class FormDbSchemaManager extends LiquibaseBasedSchemaManager {
     
-    public static String LIQUIBASE_CHANGELOG = "org/flowable/form/db/liquibase/flowable-form-db-changelog.xml";
+    public static final String LIQUIBASE_CHANGELOG = "org/flowable/form/db/liquibase/flowable-form-db-changelog.xml";
 
     public FormDbSchemaManager() {
         super("form", LIQUIBASE_CHANGELOG, FormEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);

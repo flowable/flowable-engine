@@ -190,6 +190,7 @@ public abstract class AbstractEngineConfiguration {
 
     public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 60; // currently Execution has most params (31). 2000 / 31 = 64.
 
+    protected String mybatisMappingFile;
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
     protected List<Interceptor> customMybatisInterceptors;
@@ -849,6 +850,14 @@ public abstract class AbstractEngineConfiguration {
         } else {
             return this.getClass().getClassLoader().getResourceAsStream(resource);
         }
+    }
+
+    public void setMybatisMappingFile(String file) {
+        this.mybatisMappingFile = file;
+    }
+
+    public String getMybatisMappingFile() {
+        return mybatisMappingFile;
     }
 
     public abstract InputStream getMyBatisXmlConfigurationStream();

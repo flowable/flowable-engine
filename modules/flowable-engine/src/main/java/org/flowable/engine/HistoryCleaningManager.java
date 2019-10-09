@@ -12,10 +12,10 @@
  */
 package org.flowable.engine;
 
-import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
 
 public interface HistoryCleaningManager {
 
-    HistoricProcessInstanceQueryImpl createHistoricProcessInstanceCleaningQuery();
+    HistoricProcessInstanceQuery createHistoricProcessInstanceCleaningQuery();
 
 }

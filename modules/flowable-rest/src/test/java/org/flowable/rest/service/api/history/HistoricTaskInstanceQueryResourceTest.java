@@ -130,6 +130,11 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         variableNode.put("operation", "like");
         assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
 
+        variableNode.put("name", "stringVar");
+        variableNode.put("value", "AzEr%");
+        variableNode.put("operation", "likeIgnoreCase");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
         variableNode.put("name", "local");
         variableNode.put("value", "test");
         variableNode.put("operation", "equals");
@@ -247,6 +252,10 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("taskDefinitionKey", "processTask");
         assertResultsPresentInPostDataResponse(url, requestNode, finishedTaskProcess1.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("taskDefinitionKeys").add("processTask").add("processTask2");
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId(), finishedTaskProcess1.getId(), task2.getId());
     }
 
     protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedTaskIds) throws JsonProcessingException, IOException {

@@ -307,6 +307,7 @@ On top of all process variables, there are a few default objects available that 
 * ++execution++: The +DelegateExecution+ holds additional information about the ongoing execution.
 * ++task++: The +DelegateTask+ holds additional information about the current Task. *Note: Only works in expressions evaluated from task listeners.*
 * ++authenticatedUserId++: The id of the user that is currently authenticated. If no user is authenticated, the variable is not available.
+* ++variableContainer++: The +VariableContainer+ for which the expression is being resolved for.
 
 For more concrete usage and examples, check out <<springExpressions,Expressions in Spring>>, <<bpmnJavaServiceTaskXML,Java Service tasks>>, <<executionListeners,Execution Listeners>>,  <<taskListeners,Task Listeners>> or <<conditionalSequenceFlowXml,Conditional sequence flows>>.
 

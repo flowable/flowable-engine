@@ -23,6 +23,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.impl.cmd.DeleteHistoricActivityInstancesCmd;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -284,6 +286,20 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     public HistoricActivityInstanceQueryImpl activityInstanceId(String activityInstanceId) {
         this.activityInstanceId = activityInstanceId;
         return this;
+    }
+
+    @Override
+    public void delete() {
+        if (commandExecutor != null) {
+            commandExecutor.execute(new DeleteHistoricActivityInstancesCmd(this));
+        } else {
+            new DeleteHistoricActivityInstancesCmd(this).execute(Context.getCommandContext());
+        }
+    }
+
+    @Override
+    public void deleteWithRelatedData() {
+        delete();
     }
 
     // getters and setters

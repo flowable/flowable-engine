@@ -98,19 +98,6 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
     
     @Override
-    public void deleteHistoricCaseInstances(HistoricCaseInstanceQuery caseInstanceQuery) {
-        commandExecutor.execute(new DeleteHistoricCaseInstancesCmd((HistoricCaseInstanceQueryImpl) caseInstanceQuery));
-    }
-
-    @Override
-    public void deleteHistoricCaseInstancesAndRelatedData(HistoricCaseInstanceQuery caseInstanceQuery) {
-        CommandConfig config = new CommandConfig().transactionRequiresNew();
-        commandExecutor.execute(config, new DeleteHistoricCaseInstancesCmd((HistoricCaseInstanceQueryImpl) caseInstanceQuery));
-        commandExecutor.execute(config, new DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd());
-        commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd());
-    }
-
-    @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetHistoricIdentityLinksForCaseInstanceCmd(caseInstanceId));
     }

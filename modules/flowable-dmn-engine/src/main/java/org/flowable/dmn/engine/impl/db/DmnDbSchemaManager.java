@@ -21,7 +21,7 @@ import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
 public class DmnDbSchemaManager extends LiquibaseBasedSchemaManager {
     
-    public static String LIQUIBASE_CHANGELOG = "org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml";
+    public static final String LIQUIBASE_CHANGELOG = "org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml";
 
     public DmnDbSchemaManager() {
         super("dmn", LIQUIBASE_CHANGELOG, DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);

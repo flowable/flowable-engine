@@ -17,12 +17,20 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 
 /**
  * @author Joram Barrez
  */
 public class DefaultCmmnClassDelegateFactory implements CmmnClassDelegateFactory {
+
+    protected ExpressionManager expressionManager;
+
+    public DefaultCmmnClassDelegateFactory(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+    }
 
     @Override
     public CmmnClassDelegate create(String className, List<FieldExtension> fieldExtensions) {
@@ -38,23 +46,21 @@ public class DefaultCmmnClassDelegateFactory implements CmmnClassDelegateFactory
     }
 
     @Override
-    public Object defaultInstantiateDelegate(Class<?> clazz, ServiceTask serviceTask) {
-        return defaultInstantiateDelegate(clazz.getName(), serviceTask);
-    }
-
-    protected static Object defaultInstantiateDelegate(String className, ServiceTask serviceTask) {
-        Object object = ReflectUtil.instantiate(className);
-        for (FieldExtension extension : serviceTask.getFieldExtensions()) {
-            String value;
-            if (StringUtils.isEmpty(extension.getStringValue())) {
-                value = extension.getExpression();
-            } else {
-                value = extension.getStringValue();
-            }
-            ReflectUtil.invokeSetterOrField(object, extension.getFieldName(), value, false);
-        }
-
+    public Object defaultInstantiateDelegate(Class<?> clazz, ServiceTask serviceTask, boolean allExpressions) {
+        Object object = ReflectUtil.instantiate(clazz.getName());
         if (serviceTask != null) {
+            for (FieldExtension extension : serviceTask.getFieldExtensions()) {
+                Object value;
+                if (StringUtils.isNotEmpty(extension.getExpression())) {
+                    value = expressionManager.createExpression(extension.getExpression());
+                } else if (allExpressions) {
+                    value = new FixedValue(extension.getStringValue());
+                } else {
+                    value = extension.getStringValue();
+                }
+                ReflectUtil.invokeSetterOrField(object, extension.getFieldName(), value, false);
+            }
+
             ReflectUtil.invokeSetterOrField(object, "serviceTask", serviceTask, false);
         }
 

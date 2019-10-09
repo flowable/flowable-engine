@@ -19,6 +19,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.DecisionTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.MailActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
@@ -86,7 +87,8 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     @Override
     public CaseTaskActivityBehavior createCaseTaskActivityBehavior(PlanItem planItem, CaseTask caseTask) {
-        return new CaseTaskActivityBehavior(expressionManager.createExpression(caseTask.getCaseRef()), caseTask);
+        Expression caseRefExpression = createExpression(caseTask.getCaseRefExpression());
+        return new CaseTaskActivityBehavior(caseRefExpression, caseTask);
     }
 
     @Override
@@ -162,11 +164,16 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
                 theClass = Class.forName("org.flowable.http.cmmn.impl.CmmnHttpActivityBehaviorImpl");
             }
 
-            return (CmmnActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(theClass, task);
+            return (CmmnActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(theClass, task, true); // CmmnHttpActivityBehaviorImpl only has expression fields
 
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
         }
+    }
+
+    @Override
+    public MailActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task) {
+        return (MailActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(MailActivityBehavior.class, task, true); // MailActivityBehavior only has expression fields
     }
 
     @Override
@@ -187,11 +194,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     protected Expression createExpression(String refExpressionString) {
-        Expression processRefExpression = null;
+        Expression expression = null;
         if (StringUtils.isNotEmpty(refExpressionString)) {
-            processRefExpression = expressionManager.createExpression(refExpressionString);
+            expression = expressionManager.createExpression(refExpressionString);
         }
-        return processRefExpression;
+        return expression;
     }
 
 }

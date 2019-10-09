@@ -47,6 +47,7 @@ public class DmnJsonConverter {
 
     public static final String MODEL_NAMESPACE = "http://flowable.org/dmn";
     public static final String URI_JSON = "http://www.ecma-international.org/ecma-404/";
+    public static final String MODEL_VERSION = "3";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -107,6 +108,7 @@ public class DmnJsonConverter {
         modelNode.put("id", definition.getId());
         modelNode.put("key", firstDecision.getId());
         modelNode.put("name", definition.getName());
+        modelNode.put("version", MODEL_VERSION);
         modelNode.put("description", definition.getDescription());
         modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
 

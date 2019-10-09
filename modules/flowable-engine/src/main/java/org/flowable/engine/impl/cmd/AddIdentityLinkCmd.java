@@ -30,8 +30,8 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
 
-    public static int IDENTITY_USER = 1;
-    public static int IDENTITY_GROUP = 2;
+    public static final int IDENTITY_USER = 1;
+    public static final int IDENTITY_GROUP = 2;
 
     protected String identityId;
 

@@ -1,6 +1,10 @@
 name: Flowable SQL Server Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
 
 jobs:
   test_mssql:
@@ -51,6 +55,7 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
   test_mssql_dmn:
     name: DMN SQL Server ${{ matrix.mssql }}
     runs-on: ubuntu-latest
@@ -99,6 +104,7 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-dmn-engine -am
   test_mssql_content:
     name: Content SQL Server ${{ matrix.mssql }}
@@ -148,4 +154,5 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-content-engine -am

@@ -31,8 +31,7 @@ public class ProcessVariableScopeELResolver extends VariableContainerELResolver 
 
     public static final String EXECUTION_KEY = "execution";
     public static final String TASK_KEY = "task";
-    public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
-    
+
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
@@ -48,10 +47,6 @@ public class ProcessVariableScopeELResolver extends VariableContainerELResolver 
                     executionEntity = CommandContextUtil.getExecutionEntityManager().findById(executionId);
                 }
                 return executionEntity;
-                
-            } else if (LOGGED_IN_USER_KEY.equals(property)) {
-                context.setPropertyResolved(true);
-                return Authentication.getAuthenticatedUserId();
                 
             } else {
                 return super.getValue(context, base, property);

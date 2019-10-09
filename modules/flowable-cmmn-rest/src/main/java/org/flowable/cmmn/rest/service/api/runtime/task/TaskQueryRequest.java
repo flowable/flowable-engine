@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.task;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class TaskQueryRequest extends PaginateRequest {
     private String delegationState;
     private String candidateUser;
     private String candidateGroup;
-    private List<String> candidateGroupIn;
+    private Collection<String> candidateGroupIn;
     private String involvedUser;
     private String caseInstanceId;
     private String caseInstanceIdWithChildren;
@@ -187,11 +188,11 @@ public class TaskQueryRequest extends PaginateRequest {
         this.candidateGroup = candidateGroup;
     }
 
-    public List<String> getCandidateGroupIn() {
+    public Collection<String> getCandidateGroupIn() {
         return candidateGroupIn;
     }
 
-    public void setCandidateGroupIn(List<String> candidateGroupIn) {
+    public void setCandidateGroupIn(Collection<String> candidateGroupIn) {
         this.candidateGroupIn = candidateGroupIn;
     }
 

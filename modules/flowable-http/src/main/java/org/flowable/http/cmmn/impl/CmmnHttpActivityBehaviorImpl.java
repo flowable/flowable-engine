@@ -62,37 +62,37 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnHttpActivityBehaviorImpl.class);
 
     // HttpRequest method (GET,POST,PUT etc)
-    protected String requestMethod;
+    protected Expression requestMethod;
     // HttpRequest URL (http://flowable.org)
-    protected String requestUrl;
+    protected Expression requestUrl;
     // Line separated HTTP body headers(Optional)
-    protected String requestHeaders;
+    protected Expression requestHeaders;
     // HttpRequest body expression (Optional)
-    protected String requestBody;
+    protected Expression requestBody;
     // HttpRequest body encoding expression, for example UTF-8 (Optional)
-    protected String requestBodyEncoding;
+    protected Expression requestBodyEncoding;
     // Timeout in seconds for the body (Optional)
-    protected String requestTimeout;
+    protected Expression requestTimeout;
     // HttpRequest retry disable HTTP redirects (Optional)
-    protected String disallowRedirects;
+    protected Expression disallowRedirects;
     // Comma separated list of HTTP body status codes to fail, for example 400,5XX (Optional)
-    protected String failStatusCodes;
+    protected Expression failStatusCodes;
     // Comma separated list of HTTP body status codes to handle, for example 404,3XX (Optional)
-    protected String handleStatusCodes;
+    protected Expression handleStatusCodes;
     // Flag to ignore exceptions (Optional)
-    protected String ignoreException;
+    protected Expression ignoreException;
     // Flag to save request variables. default is false (Optional)
-    protected String saveRequestVariables;
+    protected Expression saveRequestVariables;
     // Flag to save response variables. default is false (Optional)
-    protected String saveResponseParameters;
+    protected Expression saveResponseParameters;
     // Variable name for response body
-    protected String responseVariableName;
+    protected Expression responseVariableName;
     // Flag to save the response variables as a transient variable. Default is false (Optional).
-    protected String saveResponseParametersTransient;
+    protected Expression saveResponseParametersTransient;
     // Flag to save the response variable as an ObjectNode instead of a String
-    protected String saveResponseVariableAsJson;
+    protected Expression saveResponseVariableAsJson;
     // Prefix for the execution variable names (Optional)
-    protected String resultVariablePrefix;
+    protected Expression resultVariablePrefix;
 
     protected HttpServiceTask serviceTask;
     protected HttpActivityExecutor httpActivityExecutor;
@@ -141,22 +141,22 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
         HttpRequest request = new HttpRequest();
 
         try {
-            request.setMethod(ExpressionUtils.getStringFromField(createExpression(requestMethod), planItemInstanceEntity));
-            request.setUrl(ExpressionUtils.getStringFromField(createExpression(requestUrl), planItemInstanceEntity));
-            request.setHeaders(ExpressionUtils.getStringFromField(createExpression(requestHeaders), planItemInstanceEntity));
-            request.setBody(ExpressionUtils.getStringFromField(createExpression(requestBody), planItemInstanceEntity));
-            request.setBodyEncoding(ExpressionUtils.getStringFromField(createExpression(requestBodyEncoding), planItemInstanceEntity));
-            request.setTimeout(ExpressionUtils.getIntFromField(createExpression(requestTimeout), planItemInstanceEntity));
-            request.setNoRedirects(ExpressionUtils.getBooleanFromField(createExpression(disallowRedirects), planItemInstanceEntity));
-            request.setIgnoreErrors(ExpressionUtils.getBooleanFromField(createExpression(ignoreException), planItemInstanceEntity));
-            request.setSaveRequest(ExpressionUtils.getBooleanFromField(createExpression(saveRequestVariables), planItemInstanceEntity));
-            request.setSaveResponse(ExpressionUtils.getBooleanFromField(createExpression(saveResponseParameters), planItemInstanceEntity));
-            request.setSaveResponseTransient(getBooleanFromField(createExpression(saveResponseParametersTransient), planItemInstanceEntity));
-            request.setSaveResponseAsJson(getBooleanFromField(createExpression(saveResponseVariableAsJson), planItemInstanceEntity));
-            request.setPrefix(ExpressionUtils.getStringFromField(createExpression(resultVariablePrefix), planItemInstanceEntity));
+            request.setMethod(ExpressionUtils.getStringFromField(requestMethod, planItemInstanceEntity));
+            request.setUrl(ExpressionUtils.getStringFromField(requestUrl, planItemInstanceEntity));
+            request.setHeaders(ExpressionUtils.getStringFromField(requestHeaders, planItemInstanceEntity));
+            request.setBody(ExpressionUtils.getStringFromField(requestBody, planItemInstanceEntity));
+            request.setBodyEncoding(ExpressionUtils.getStringFromField(requestBodyEncoding, planItemInstanceEntity));
+            request.setTimeout(ExpressionUtils.getIntFromField(requestTimeout, planItemInstanceEntity));
+            request.setNoRedirects(ExpressionUtils.getBooleanFromField(disallowRedirects, planItemInstanceEntity));
+            request.setIgnoreErrors(ExpressionUtils.getBooleanFromField(ignoreException, planItemInstanceEntity));
+            request.setSaveRequest(ExpressionUtils.getBooleanFromField(saveRequestVariables, planItemInstanceEntity));
+            request.setSaveResponse(ExpressionUtils.getBooleanFromField(saveResponseParameters, planItemInstanceEntity));
+            request.setSaveResponseTransient(getBooleanFromField(saveResponseParametersTransient, planItemInstanceEntity));
+            request.setSaveResponseAsJson(getBooleanFromField(saveResponseVariableAsJson, planItemInstanceEntity));
+            request.setPrefix(ExpressionUtils.getStringFromField(resultVariablePrefix, planItemInstanceEntity));
 
-            String failCodes = ExpressionUtils.getStringFromField(createExpression(failStatusCodes), planItemInstanceEntity);
-            String handleCodes = ExpressionUtils.getStringFromField(createExpression(handleStatusCodes), planItemInstanceEntity);
+            String failCodes = ExpressionUtils.getStringFromField(failStatusCodes, planItemInstanceEntity);
+            String handleCodes = ExpressionUtils.getStringFromField(handleStatusCodes, planItemInstanceEntity);
 
             if (failCodes != null) {
                 request.setFailCodes(getStringSetFromField(failCodes));
@@ -204,7 +204,7 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
                 planItemInstanceEntity.getId(),
                 createHttpRequestHandler(serviceTask.getHttpRequestHandler(), cmmnEngineConfiguration),
                 createHttpResponseHandler(serviceTask.getHttpResponseHandler(), cmmnEngineConfiguration),
-                getStringFromField(createExpression(responseVariableName), planItemInstanceEntity),
+                getStringFromField(responseVariableName, planItemInstanceEntity),
                 Collections.<MapExceptionEntry>emptyList(),
                 httpClientConfig.getSocketTimeout(),
                 httpClientConfig.getConnectTimeout(),

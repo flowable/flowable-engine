@@ -29,6 +29,22 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-content-engine</artifactId>
         </dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.subethamail</groupId>
+			<artifactId>subethasmtp-wiser</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

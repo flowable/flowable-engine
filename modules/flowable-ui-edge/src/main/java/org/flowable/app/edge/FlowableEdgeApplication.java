@@ -14,12 +14,10 @@ package org.flowable.app.edge;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
 /**
  * @author Filip Hrisafov
  */
-@EnableZuulProxy
 @SpringBootApplication
 public class FlowableEdgeApplication {
 

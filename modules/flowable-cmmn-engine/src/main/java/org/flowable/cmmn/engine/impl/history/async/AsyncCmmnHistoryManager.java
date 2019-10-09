@@ -103,7 +103,7 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     }
 
     @Override
-    public void recordHistoricCaseInstanceDeleted(String caseInstanceId) {
+    public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
         // Can only be done after the case instance has been fully ended (see DeleteHistoricCaseInstanceCmd)
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();

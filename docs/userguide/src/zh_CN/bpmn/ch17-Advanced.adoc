@@ -45,8 +45,8 @@ Flowable有两种作业类型：定时器（例如边界事件或用户任务中
 |名称|默认值|描述
 
 |asyncExecutorThreadPoolQueueSize|100|在获取待执行的作业之后，线程池中某个线程实际执行作业之前，放置这些作业的队列的长度。
-|asyncExecutorCorePoolSize|2|用于执行作业的线程池中，最小的活动(kept alive)线程数量。
-|asyncExecutorMaxPoolSize|10|用于执行作业的线程池中，创建线程的最大数量。
+|asyncExecutorCorePoolSize|8|用于执行作业的线程池中，最小的活动(kept alive)线程数量。
+|asyncExecutorMaxPoolSize|8|用于执行作业的线程池中，创建线程的最大数量。
 |asyncExecutorThreadKeepAliveTime|5000|在销毁执行作业所用的线程前，需要保持活动的时间（以毫秒计）。设置为>0的值会消耗资源，但在有大量执行作业的时候，可以避免总是创建新线程。如果设置为0，则线程会在执行完作业后立刻被销毁。
 |asyncExecutorNumberOfRetries|3|作业被移入“死信”表之前的最大重试次数。
 |asyncExecutorMaxTimerJobsPerAcquisition|1|在一次获取定时器作业的查询中，获取作业的数量。默认值为1，因为这样可以降低潜在的乐观锁异常情况。较大的数值性能较好，但在不同的引擎间发生乐观锁异常的几率也会变大。

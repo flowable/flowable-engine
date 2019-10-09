@@ -38,7 +38,7 @@ public interface CmmnHistoryManager {
 
     void recordMilestoneReached(MilestoneInstanceEntity milestoneInstanceEntity);
 
-    void recordHistoricCaseInstanceDeleted(String caseInstanceId);
+    void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId);
 
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
 

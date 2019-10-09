@@ -1,6 +1,10 @@
 name: Flowable Postgres Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
 
 jobs:
   test_postgres:
@@ -9,7 +13,7 @@ jobs:
     container: openjdk:8
     strategy:
       matrix:
-        postgres: [9, 10, 11]
+        postgres: [9, 10, 11, 12]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -37,13 +41,14 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
   test_postgres_dmn:
     name: Postgres ${{ matrix.postgres }} DMN
     runs-on: ubuntu-latest
     container: openjdk:8
     strategy:
       matrix:
-        postgres: [9, 10, 11]
+        postgres: [9, 10, 11, 12]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -71,6 +76,7 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-dmn-engine -am
   test_postgres_content:
     name: Postgres ${{ matrix.postgres }} Content
@@ -78,7 +84,7 @@ jobs:
     container: openjdk:8
     strategy:
       matrix:
-        postgres: [9, 10, 11]
+        postgres: [9, 10, 11, 12]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -106,4 +112,5 @@ jobs:
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-content-engine -am
