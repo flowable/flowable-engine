@@ -31,6 +31,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 /**
@@ -238,6 +239,41 @@ public class StageTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testStartStageAfterCompletingServiceTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        List<PlanItemInstance> activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
+            .planItemInstanceStateActive().list();
+        assertThat(activeStages)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId)
+            .containsExactly("expandedStage2");
+        Task closeTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(closeTask).isNotNull();
+
+        cmmnTaskService.complete(closeTask.getId());
+
+        activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
+            .planItemInstanceStateActive().list();
+        assertThat(activeStages)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId)
+            .containsExactly("expandedStage3");
+        Task reopenTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(reopenTask).isNotNull();
+
+        cmmnTaskService.complete(reopenTask.getId());
+
+        activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
+            .planItemInstanceStateActive().list();
+        assertThat(activeStages)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId)
+            .containsExactlyInAnyOrder("expandedStage3", "expandedStage1");
+
+        Task inProgressTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(inProgressTask).isNotNull();
     }
 
     @Test
