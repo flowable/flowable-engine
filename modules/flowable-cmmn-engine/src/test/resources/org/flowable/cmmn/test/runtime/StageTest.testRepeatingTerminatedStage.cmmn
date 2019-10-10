@@ -106,7 +106,7 @@
           </itemControl>
           <entryCriterion id="entryCriterion6" sentryRef="sentry1"></entryCriterion>
         </planItem>
-        <planItem id="planItem4" name="Service task" definitionRef="serviceTask1">
+        <planItem id="planItem4" name="Service task 1" definitionRef="serviceTask1">
           <itemControl>
             <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
           </itemControl>
@@ -135,7 +135,7 @@
             <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
           </extensionElements>
         </humanTask>
-        <task id="serviceTask1" name="Service task" flowable:type="java" flowable:expression="${true}">
+        <task id="serviceTask1" name="Service task 1" flowable:type="java" flowable:expression="${true}">
           <extensionElements>
             <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
             <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
@@ -166,8 +166,8 @@
           <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
           <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
         </extensionElements>
-        <planItem id="planItem8" name="Service task" definitionRef="serviceTask2"></planItem>
-        <task id="serviceTask2" name="Service task" flowable:type="java" flowable:expression="${true}">
+        <planItem id="planItem8" name="Service task 2" definitionRef="serviceTask2"></planItem>
+        <task id="serviceTask2" name="Service task 2" flowable:type="java" flowable:expression="${true}">
           <extensionElements>
             <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
             <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>

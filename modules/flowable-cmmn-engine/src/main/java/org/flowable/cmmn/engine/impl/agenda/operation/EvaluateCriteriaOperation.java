@@ -672,10 +672,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         if (planItemLifeCycleEvent != null) {
             stringBuilder.append(" with transition '").append(planItemLifeCycleEvent.getTransition()).append("' having fired");
             if (planItemLifeCycleEvent.getPlanItem() != null) {
-                stringBuilder.append(" for plan item ").append(planItemLifeCycleEvent.getPlanItem().getId());
-                if (planItemLifeCycleEvent.getPlanItem().getName() != null) {
-                    stringBuilder.append(" (").append(planItemLifeCycleEvent.getPlanItem().getName()).append(")");
-                }
+                stringBuilder.append(" for ").append(planItemLifeCycleEvent.getPlanItem());
             }
         }
 

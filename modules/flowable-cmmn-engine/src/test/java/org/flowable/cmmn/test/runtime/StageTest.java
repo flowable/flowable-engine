@@ -243,7 +243,7 @@ public class StageTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testStartStageAfterCompletingServiceTask() {
+    public void testRepeatingTerminatedStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
 
         List<PlanItemInstance> activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
@@ -251,26 +251,56 @@ public class StageTest extends FlowableCmmnTestCase {
         assertThat(activeStages)
             .extracting(PlanItemInstance::getPlanItemDefinitionId)
             .containsExactly("expandedStage2");
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().list();
+        assertPlanItemInstanceState(planItemInstances, "in progress", PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Hidden", PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Close", PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Draft", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Service task 1", PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Service task 2", PlanItemInstanceState.COMPLETED);
+
         Task closeTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(closeTask).isNotNull();
-
         cmmnTaskService.complete(closeTask.getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().list();
+        assertPlanItemInstanceState(planItemInstances, "in progress", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Hidden", PlanItemInstanceState.TERMINATED);
+        assertPlanItemInstanceState(planItemInstances, "Close", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Draft", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Service task 1", PlanItemInstanceState.TERMINATED);
+        assertPlanItemInstanceState(planItemInstances, "Service task 2", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Reopen Task", PlanItemInstanceState.ACTIVE);
 
         activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
             .planItemInstanceStateActive().list();
         assertThat(activeStages)
             .extracting(PlanItemInstance::getPlanItemDefinitionId)
             .containsExactly("expandedStage3");
+
         Task reopenTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(reopenTask).isNotNull();
-
         cmmnTaskService.complete(reopenTask.getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().list();
+        assertPlanItemInstanceState(planItemInstances, "in progress", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Hidden", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Close", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Draft", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Service task 1", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Service task 2", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Reopen Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.TERMINATED);
+        assertPlanItemInstanceState(planItemInstances, "In progress Task", PlanItemInstanceState.ACTIVE);
 
         activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
             .planItemInstanceStateActive().list();
         assertThat(activeStages)
             .extracting(PlanItemInstance::getPlanItemDefinitionId)
-            .containsExactlyInAnyOrder("expandedStage3", "expandedStage1");
+            .containsExactlyInAnyOrder("expandedStage1", "expandedStage2");
 
         Task inProgressTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(inProgressTask).isNotNull();

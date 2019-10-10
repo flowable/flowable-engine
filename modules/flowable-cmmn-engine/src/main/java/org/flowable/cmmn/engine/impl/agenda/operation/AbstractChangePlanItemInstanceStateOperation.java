@@ -64,18 +64,13 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         StringBuilder stringBuilder = new StringBuilder();
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         stringBuilder.append("[Change PlanItem state] ");
+
         if (planItem != null) {
-            if (planItem.getName() != null) {
-                stringBuilder.append(planItem.getName());
-                stringBuilder.append(" (id: ");
-                stringBuilder.append(planItem.getId());
-                stringBuilder.append(")");
-            } else {
-                stringBuilder.append(planItem.getId());
-            }
+            stringBuilder.append(planItem);
         } else {
-            stringBuilder.append("(plan item instance with id ").append(planItemInstanceEntity.getId()).append(")");
+             stringBuilder.append(planItemInstanceEntity);
         }
+
         stringBuilder.append(", ");
         stringBuilder.append("new state: [").append(getNewState()).append("]");
         stringBuilder.append(" with transition [");
