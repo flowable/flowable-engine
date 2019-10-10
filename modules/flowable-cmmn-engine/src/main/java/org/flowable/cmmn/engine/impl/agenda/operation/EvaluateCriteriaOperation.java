@@ -249,12 +249,22 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
                     if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
+
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("{}: single onPart matches life cycle event: [{}]", criterion, planItemLifeCycleEvent);
+                        }
+
                         return criterion.getId();
                     }
                 }
 
             } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) { // Only an if part: simply evaluate the if part
                 if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
+
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{}: single ifPart has evaluated to true", criterion);
+                    }
+
                     return criterion.getId();
                 }
                 
@@ -280,6 +290,11 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
                     if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
                         if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
+
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("{}: onPart matches life cycle event [{}]", criterion, planItemLifeCycleEvent);
+                            }
+
                             createSentryPartInstanceEntity(entityWithSentryPartInstances, sentry, sentryOnPart, null);
                             satisfiedSentryOnPartIds.add(sentryOnPart.getId());
                         }
@@ -288,12 +303,21 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
                 boolean allOnPartsSatisfied = (satisfiedSentryOnPartIds.size() == sentry.getOnParts().size());
 
+                if (allOnPartsSatisfied && LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{}: all onParts have been satisfied", criterion);
+                }
+
                 // Evaluate the if part of the sentry:
                 // In the onEvent triggerMode all onParts need to be satisfied before the if is evaluated
                 if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied
                         && (isDefaultTriggerMode || (sentry.isOnEventTriggerMode() && allOnPartsSatisfied) )) {
 
                     if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
+
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("{}: ifPart evaluates to true", criterion);
+                        }
+
                         createSentryPartInstanceEntity(entityWithSentryPartInstances, sentry, null, sentry.getSentryIfPart());
                         sentryIfPartSatisfied = true;
                     }
@@ -301,6 +325,11 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 }
 
                 if (allOnPartsSatisfied && (sentryIfPartSatisfied || sentry.getSentryIfPart() == null)) {
+
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{}: all onParts and ifParts are satisfied", criterion);
+                    }
+
                     return criterion.getId();
                 }
 
@@ -595,28 +624,16 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         List<Criterion> entryCriteria = entryDependentPlanItem.getEntryCriteria();
         if (!entryCriteria.isEmpty()) {
 
-            for (Criterion criterion : entryCriteria) {
+            // According to the spec, only the sentries that actually reference the planitem of which the event happens should be evaluated
+            List<Criterion> matchingCriteria = entryCriteria.stream()
+                .filter(criterion -> CriterionUtil
+                    .criterionHasOnPartDependingOnPlanItem(criterion, planItemLifeCycleEvent.getPlanItem(), planItemLifeCycleEvent.getTransition()))
+                .collect(Collectors.toList());
 
-                // According to the spec, only the sentries that actually reference the planitem of which the event happens should be evaluated
-                if (CriterionUtil.criterionHasOnPartDependingOnPlanItem(criterion, planItemLifeCycleEvent.getPlanItem(), planItemLifeCycleEvent.getTransition())) {
-                    boolean criterionSatisfied = true;
-
-                    List<SentryOnPart> onParts = criterion.getSentry().getOnParts();
-                    for (SentryOnPart onPart : onParts) {
-                        if (!sentryOnPartMatchesCurrentLifeCycleEvent(onPart)) {
-                            criterionSatisfied = false;
-                        }
-                    }
-
-                    if (criterion.getSentry().getSentryIfPart() != null) {
-                        if (!evaluateSentryIfPart(criterion.getSentry(), caseInstanceEntity)) { // Resolved against case entity as there's no plan item instance yet
-                            criterionSatisfied = false;
-                        }
-                    }
-
-                    if (criterionSatisfied) {
-                        return criterion.getId();
-                    }
+            if (!matchingCriteria.isEmpty()) {
+                String satisfiedCriterionId = evaluateCriteria(caseInstanceEntity, matchingCriteria);// Resolved against case entity as there's no plan item instance yet
+                if (StringUtils.isNotEmpty(satisfiedCriterionId)) {
+                    return satisfiedCriterionId;
                 }
             }
 

@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
@@ -487,4 +488,34 @@ public class StageTest extends FlowableCmmnTestCase {
         assertTrue(stageMap.get("Stage 2.1").isEnded());
         assertNotNull(stageMap.get("Stage 2.1").getEndTime());
     }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedRepeatingStageWithMultipleOnParts() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testNestedRepeatingStageWithMultipleOnParts").start();
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Nested Task").singleResult()).isNotNull();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertPlanItemInstanceState(planItemInstances, "stage1", PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "stage2", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        UserEventListenerInstance exitStageEventListener = cmmnRuntimeService.createUserEventListenerInstanceQuery().name("exit stage").singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(exitStageEventListener.getId());
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Nested Task").singleResult()).isNull();
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().caseInstanceId(caseInstance.getId()).list();
+        assertPlanItemInstanceState(planItemInstances, "stage1", PlanItemInstanceState.TERMINATED);
+        assertPlanItemInstanceState(planItemInstances, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery().
+            caseInstanceId(caseInstance.getId()).list();
+        userEventListenerInstances.forEach(userEventListenerInstance -> cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId()));
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Nested Task").singleResult()).isNotNull();
+        cmmnTaskService.createTaskQuery().list().forEach(task -> cmmnTaskService.complete(task.getId()));
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
 }
