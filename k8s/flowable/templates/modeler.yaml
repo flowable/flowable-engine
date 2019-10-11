@@ -54,12 +54,12 @@ spec:
         volumeMounts:
         resources:
 {{ toYaml .Values.modeler.resources | indent 10 }}
-      {{- if .Values.flowable.cloudSql.enabled }}
+      {{- if .Values.cloudSql.enabled }}
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.11
         command: ["/cloud_sql_proxy",
-                  "-instances={{ .Values.flowable.cloudSql.instanceConnectionName }}=tcp:5432",
-                  "-credential_file=/secrets/cloudsql/{{ .Values.flowable.cloudSql.credentials }}"]
+                  "-instances={{ .Values.cloudSql.instanceConnectionName }}=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/{{ .Values.cloudSql.credentials }}"]
         securityContext:
           runAsUser: 2  # non-root user
           allowPrivilegeEscalation: false
@@ -69,7 +69,7 @@ spec:
             readOnly: true
       {{- end }}
       volumes:
-      {{- if .Values.flowable.cloudSql.enabled }}
+      {{- if .Values.cloudSql.enabled }}
       - name: cloudsql-credentials
         secret:
           secretName: cloudsql-credentials
@@ -101,22 +101,22 @@ data:
   JAVA_OPTS: "{{ .Values.modeler.javaOpts }} -Djava.security.egd=file:/dev/./urandom"
   SERVER_SERVLET_CONTEXT_PATH: {{ .Values.modeler.contextUrl | quote }}
   SERVER_SERVLET_SESSION_TIMEOUT: 1h
-  {{- if and .Values.flowable.database.datasourceDriverClassName .Values.flowable.database.datasourceUrl }}
-  SPRING_DATASOURCE_DRIVER-CLASS-NAME: {{ .Values.flowable.database.datasourceDriverClassName | quote }}
-  SPRING_DATASOURCE_URL: {{ .Values.flowable.database.datasourceUrl | quote }}
+  {{- if and .Values.database.datasourceDriverClassName .Values.database.datasourceUrl }}
+  SPRING_DATASOURCE_DRIVER-CLASS-NAME: {{ .Values.database.datasourceDriverClassName | quote }}
+  SPRING_DATASOURCE_URL: {{ .Values.database.datasourceUrl | quote }}
   {{- else if .Values.postgres.enabled }}
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ .Values.postgres.service.name }}:5432/{{ .Values.flowable.database.name }}
-  {{- else if .Values.flowable.cloudSql.enabled }}
+  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ .Values.postgres.service.name }}:5432/{{ .Values.database.name }}
+  {{- else if .Values.cloudSql.enabled }}
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/{{ .Values.flowable.database.name }}
+  SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/{{ .Values.database.name }}
   {{- end }}
-  SPRING_DATASOURCE_USERNAME: {{ .Values.flowable.database.username }}
-  SPRING_DATASOURCE_PASSWORD: {{ .Values.flowable.database.password }}
+  SPRING_DATASOURCE_USERNAME: {{ .Values.database.username }}
+  SPRING_DATASOURCE_PASSWORD: {{ .Values.database.password }}
   FLOWABLE_MODELER_APP_DEPLOYMENT-API-URL: http://{{ .Values.task.service.name }}:9999/app-api
   FLOWABLE_COMMON_APP_IDM-URL: http://{{ .Values.idm.service.name }}:8080
-  FLOWABLE_COMMON_APP_IDM-REDIRECT-URL: http://{{ .Values.flowable.host.external }}/{{ .Values.idm.ingressPath }}/
-  FLOWABLE_COMMON_APP_REDIRECT-ON-AUTH-SUCCESS: http://{{ .Values.flowable.host.external }}/{{ .Values.modeler.ingressPath }}/
+  FLOWABLE_COMMON_APP_IDM-REDIRECT-URL: http://{{ .Values.host.external }}/{{ .Values.idm.ingressPath }}/
+  FLOWABLE_COMMON_APP_REDIRECT-ON-AUTH-SUCCESS: http://{{ .Values.host.external }}/{{ .Values.modeler.ingressPath }}/
   FLOWABLE_COMMON_APP_IDM-ADMIN_USER: admin
   FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD: test
 {{- end }}

@@ -20,11 +20,11 @@ spec:
       containers:
       - env:
         - name: POSTGRES_DB
-          value: {{ .Values.flowable.database.name }}
+          value: {{ .Values.database.name }}
         - name: POSTGRES_PASSWORD
-          value: {{ .Values.flowable.database.password }}
+          value: {{ .Values.database.password }}
         - name: POSTGRES_USER
-          value: {{ .Values.flowable.database.username }}
+          value: {{ .Values.database.username }}
         image: {{ .Values.postgres.image }}
         name: {{ include "flowable.template" . }}
         resources:

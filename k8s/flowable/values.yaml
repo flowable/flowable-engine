@@ -1,21 +1,20 @@
-flowable:
-  host:
-    # Public / external hostname (f.e. LB)
-    external: localhost
-  # Global database name, user and password
-  database:
-    name: flowable
-    username: flowable
-    password: flowable
-    # specify to overwrite dynamic template values 
-    # datasourceDriverClassName:
-    # datasourceUrl:
-  cloudSql:
-    enabled: false
-    # Google Cloud SQL instance connection name
-    # instanceConnectionName: 
-    # Google credentials file name stored as secret in the cluster
-    credentials: cloudsql-credentials.json
+host:
+  # Public / external hostname (f.e. LB)
+  external: localhost
+# Global database name, user and password
+database:
+  name: flowable
+  username: flowable
+  password: flowable
+  # specify to overwrite dynamic template values 
+  # datasourceDriverClassName:
+  # datasourceUrl:
+cloudSql:
+  enabled: false
+  # Google Cloud SQL instance connection name
+  # instanceConnectionName: 
+  # Google credentials file name stored as secret in the cluster
+  credentials: cloudsql-credentials.json
 
 ingress:
   enabled: true
@@ -27,6 +26,7 @@ idm:
   service:
     name: flowable-idm
   contextUrl: /
+  ingressPath: flowable-idm
   image:
     repository: flowable/flowable-idm
     tag: latest
@@ -47,6 +47,7 @@ task:
   service:
     name: flowable-task
   contextUrl: /
+  ingressPath: flowable-task
   image:
     repository: flowable/flowable-task
     tag: latest
@@ -66,6 +67,8 @@ rest:
   replicas: 1
   service:
     name: flowable-rest
+  contextUrl: /
+  ingressPath: flowable-rest
   image:
     repository: flowable/flowable-rest
     tag: latest
@@ -85,6 +88,7 @@ modeler:
   service:
     name: flowable-modeler
   contextUrl: /
+  ingressPath: flowable-modeler
   image:
     repository: flowable/flowable-modeler
     tag: latest
@@ -104,6 +108,7 @@ admin:
   service:
     name: flowable-admin
   contextUrl: /
+  ingressPath: flowable-admin
   image:
     repository: flowable/flowable-admin
     tag: latest
