@@ -14,31 +14,31 @@ spec:
   - http:
       paths:
       {{- if .Values.idm.enabled }}
-      - path: /flowable-idm/?(.*)
+      - path: /{{ .Values.idm.ingressPath }}/?(.*)
         backend:
           serviceName: {{ .Values.idm.service.name }}
           servicePort: 8080
       {{- end }}
       {{- if .Values.modeler.enabled }}
-      - path: /flowable-modeler/?(.*)
+      - path: /{{ .Values.modeler.ingressPath }}/?(.*)
         backend:
           serviceName: {{ .Values.modeler.service.name }}
           servicePort: 8888
       {{- end }}
       {{- if .Values.task.enabled }}
-      - path: /flowable-task/?(.*)
+      - path: /{{ .Values.task.ingressPath }}/?(.*)
         backend:
           serviceName: {{ .Values.task.service.name }}
           servicePort: 9999
       {{- end }}
       {{- if .Values.admin.enabled }}
-      - path: /flowable-admin/?(.*)
+      - path: /{{ .Values.admin.ingressPath }}/?(.*)
         backend:
           serviceName: {{ .Values.admin.service.name }}
           servicePort: 9988
       {{- end }}
       {{- if .Values.rest.enabled }}
-      - path: /flowable-rest/?(.*)
+      - path: /{{ .Values.rest.ingressPath }}/?(.*)
         backend:
           serviceName: {{ .Values.rest.service.name }}
           servicePort: 8080

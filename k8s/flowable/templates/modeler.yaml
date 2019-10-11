@@ -115,8 +115,8 @@ data:
   SPRING_DATASOURCE_PASSWORD: {{ .Values.flowable.database.password }}
   FLOWABLE_MODELER_APP_DEPLOYMENT-API-URL: http://{{ .Values.task.service.name }}:9999/app-api
   FLOWABLE_COMMON_APP_IDM-URL: http://{{ .Values.idm.service.name }}:8080
-  FLOWABLE_COMMON_APP_IDM-REDIRECT-URL: http://{{ .Values.flowable.host.external }}/flowable-idm/
-  FLOWABLE_COMMON_APP_REDIRECT-ON-AUTH-SUCCESS: http://{{ .Values.flowable.host.external }}/flowable-modeler/
+  FLOWABLE_COMMON_APP_IDM-REDIRECT-URL: http://{{ .Values.flowable.host.external }}/{{ .Values.idm.ingressPath }}/
+  FLOWABLE_COMMON_APP_REDIRECT-ON-AUTH-SUCCESS: http://{{ .Values.flowable.host.external }}/{{ .Values.modeler.ingressPath }}/
   FLOWABLE_COMMON_APP_IDM-ADMIN_USER: admin
   FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD: test
 {{- end }}

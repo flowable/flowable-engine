@@ -13,7 +13,7 @@ flowable:
   cloudSql:
     enabled: false
     # Google Cloud SQL instance connection name
-    instanceConnectionName: flowableoss:europe-west4:flowable-db2
+    # instanceConnectionName: 
     # Google credentials file name stored as secret in the cluster
     credentials: cloudsql-credentials.json
 
