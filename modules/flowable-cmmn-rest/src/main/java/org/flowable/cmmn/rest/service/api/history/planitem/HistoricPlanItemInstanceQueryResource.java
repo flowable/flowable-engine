@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Dennis Federico
  */
 @RestController
-@Api(tags = {"History PlanItem"}, description = "Manage History Plan Item Instances", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"History PlanItem"}, authorizations = {@Authorization(value = "basicAuth")})
 public class HistoricPlanItemInstanceQueryResource extends HistoricPlanItemInstanceBaseResource {
 
     @ApiOperation(value = "Query for historic plan item instances", tags = {"History PlanItem", "Query"}, nickname = "queryHistoricPlanItemInstance",

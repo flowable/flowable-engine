@@ -34,7 +34,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Task" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceQueryResource extends HistoricTaskInstanceBaseResource {
 
     @ApiOperation(value = "Query for historic task instances", tags = {"History Task", "Query" },

@@ -31,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage Form Engine", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Engine" }, authorizations = { @Authorization(value = "basicAuth") })
 public class FormEngineResource {
     
     @Autowired(required=false)

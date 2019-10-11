@@ -37,7 +37,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Plan Item Instances" }, description = "Manage Plan Item Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Plan Item Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseResource {
 
     // FIXME naming issue ?

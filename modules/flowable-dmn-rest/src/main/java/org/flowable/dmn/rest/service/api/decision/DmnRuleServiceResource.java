@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "DMN Rule Service" }, description = "Execute DMN Decision", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "DMN Rule Service" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DmnRuleServiceResource {
 
     @Autowired

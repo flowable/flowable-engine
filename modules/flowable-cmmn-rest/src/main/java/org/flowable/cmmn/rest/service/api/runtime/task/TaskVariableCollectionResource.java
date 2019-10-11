@@ -53,7 +53,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Variables" }, description = "Manage Tasks variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
     @Autowired

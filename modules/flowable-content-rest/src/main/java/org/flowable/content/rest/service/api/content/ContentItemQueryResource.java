@@ -13,12 +13,9 @@
 
 package org.flowable.content.rest.service.api.content;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,14 +23,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Content item" }, description = "Query content items", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Content item" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ContentItemQueryResource extends ContentItemBaseResource {
 
     @ApiOperation(value = "Query for content items", tags = {"Content item", "Query" },

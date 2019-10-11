@@ -33,7 +33,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionDecisionTableCollectionResource extends BaseCaseDefinitionResource {
 
     @ApiOperation(value = "List decision tables for a case definition", nickname = "listCaseDefinitionDecisionTables", tags = { "Case Definitions" })

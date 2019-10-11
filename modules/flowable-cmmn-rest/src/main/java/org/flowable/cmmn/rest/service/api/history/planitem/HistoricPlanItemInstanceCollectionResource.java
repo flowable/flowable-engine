@@ -38,7 +38,7 @@ import java.util.function.BiConsumer;
  * @author DennisFederico
  */
 @RestController
-@Api(tags = {"History PlanItem"}, description = "Manage History Plan Item Instances", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"History PlanItem"}, authorizations = {@Authorization(value = "basicAuth")})
 public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItemInstanceBaseResource {
 
     private static Map<String, BiConsumer<HistoricPlanItemInstanceQueryRequest, String>> mapping = new HashMap<>();

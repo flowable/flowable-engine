@@ -48,7 +48,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Content item" }, description = "Manages Content item", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Content item" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ContentItemCollectionResource extends ContentItemBaseResource {
 
     @Autowired

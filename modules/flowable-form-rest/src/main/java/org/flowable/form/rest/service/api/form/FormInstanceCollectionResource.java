@@ -39,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Form Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class FormInstanceCollectionResource extends BaseFormInstanceResource {
 
     @ApiOperation(value = "List of form instances", nickname = "listFormInstances", tags = { "Form Instances" })

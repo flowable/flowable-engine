@@ -36,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Case" }, description = "Manage History Case Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Case" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstanceBaseResource {
 
     @ApiOperation(value = "List of historic case instances", tags = { "History Case" }, nickname = "listHistoricCaseInstances")

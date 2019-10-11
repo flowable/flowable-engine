@@ -54,7 +54,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Deployments" }, description = "Manage Form Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Form Deployments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class FormDeploymentCollectionResource {
 
     private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();

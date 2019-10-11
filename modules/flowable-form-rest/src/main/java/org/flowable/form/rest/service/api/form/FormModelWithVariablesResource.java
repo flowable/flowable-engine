@@ -35,7 +35,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Form Models" }, description = "Manage Form Models", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Form Models" }, authorizations = { @Authorization(value = "basicAuth") })
 public class FormModelWithVariablesResource {
 
     @Autowired
