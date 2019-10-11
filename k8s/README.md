@@ -3,17 +3,21 @@
 Flowable HELM chart is located in the *flowable* folder. 
 The Kubernetes configuration files are located in the *resources* folder.
 
-## Install HELM
+## Install Helm
 
-### Install HELM client
+### Install Helm client
 
-```brew install kubernetes-helm```
+```console
+brew install kubernetes-helm
+```
 
 (or follow instructions here https://helm.sh/docs/using_helm/#installing-helm)
 
-### Install HELM server
+### Install Helm server (Tiller)
 
-```helm init```
+```console
+helm init
+```
 
 ## Requirements
 
@@ -21,20 +25,34 @@ The Kubernetes configuration files are located in the *resources* folder.
 
 *for Docker Desktop*
 
-```kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml```
+```console
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+```
 
-```kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml```
+```console
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
+```
 
 (or follow instructions here https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md)
 
 ### Install local storageclass
 
-```kubectl apply -f resources/local-storageclass.yaml```
+```console
+kubectl apply -f resources/local-storageclass.yaml
+```
 
 ## Deploy Flowable OSS
 
-```helm install flowable --name=flowable```
+```console
+helm install flowable \
+    --name=flowable \
+    --set flowable.host.external=<cluster public ip / hostname>
+```
+
+***flowable.host.external** will be used for client redirects*  
 
 ## Undeploy Flowable OSS
 
-```helm delete flowable --purge```
+```console
+helm delete flowable --purge
+```
