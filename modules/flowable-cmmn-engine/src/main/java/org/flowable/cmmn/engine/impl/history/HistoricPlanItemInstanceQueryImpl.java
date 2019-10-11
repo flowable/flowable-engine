@@ -371,6 +371,56 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
+    public HistoricPlanItemInstanceQuery orderByLastAvailableTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_AVAILABLE_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastEnabledTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_ENABLED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastDisabledTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_DISABLED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastStartedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_STARTED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastSuspendedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_SUSPENDED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastUpdatedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_UPDATED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByCompletedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.COMPLETED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByOccurredTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.OCCURRED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByTerminatedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.TERMINATED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByExitTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.EXIT_TIME);
+    }
+
+    @Override
     public HistoricPlanItemInstanceQuery orderByName() {
         return orderBy(HistoricPlanItemInstanceQueryProperty.NAME);
     }
