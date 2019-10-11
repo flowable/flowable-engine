@@ -3,3 +3,4 @@ appVersion: "6.5.0-SNAPSHOT"
 description: A Flowable Helm chart for Kubernetes
 name: flowable
 version: 0.0.1
+icon: https://flowable.org/img/logo@2x.png
