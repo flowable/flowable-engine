@@ -717,4 +717,18 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
     }
 
+    @Test
+    @CmmnDeployment
+    public void testIdVariableName() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testIdVariableName")
+            .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+            .caseDefinitionKey("oneTaskCase")
+            .singleResult();
+
+        assertEquals(subCase.getId(), cmmnRuntimeService.getVariable(caseInstance.getId(), "caseIdVariable"));
+    }
+
 }

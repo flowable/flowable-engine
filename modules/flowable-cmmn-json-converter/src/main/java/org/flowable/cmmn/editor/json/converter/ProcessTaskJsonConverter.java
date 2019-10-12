@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
@@ -61,6 +62,10 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter imp
         if (processTask.getFallbackToDefaultTenant() != null) {
             propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.getFallbackToDefaultTenant());
         }
+
+        if (StringUtils.isNotEmpty(processTask.getProcessInstanceIdVariableName())) {
+            propertiesNode.put(PROPERTY_ID_VARIABLE_NAME, processTask.getProcessInstanceIdVariableName());
+        }
         
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, processTask);
 
@@ -106,6 +111,11 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter imp
         JsonNode fallbackToDefaultTenant = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_FALLBACK_TO_DEFAULT_TENANT, elementNode);
         if (fallbackToDefaultTenant != null) {
             task.setFallbackToDefaultTenant(fallbackToDefaultTenant.booleanValue());
+        }
+
+        JsonNode idVariableName = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_ID_VARIABLE_NAME, elementNode);
+        if (idVariableName != null && idVariableName.isTextual()) {
+            task.setProcessInstanceIdVariableName(idVariableName.asText());
         }
 
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);

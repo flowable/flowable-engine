@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
@@ -33,9 +36,6 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -87,6 +87,10 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         }
 
         String processInstanceId = processInstanceService.generateNewProcessInstanceId();
+        if (StringUtils.isNotEmpty(processTask.getProcessInstanceIdVariableName())) {
+            planItemInstanceEntity.setVariable(processTask.getProcessInstanceIdVariableName(), processInstanceId);
+        }
+
         planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
         planItemInstanceEntity.setReferenceId(processInstanceId);
 

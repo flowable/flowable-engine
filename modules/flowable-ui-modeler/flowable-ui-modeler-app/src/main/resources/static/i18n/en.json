@@ -1433,6 +1433,12 @@
             "DESCRIPTION": "Definition of the output parameters"
           }
         },
+        "IDVARIABLENAMEPACKAGE": {
+          "IDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the instance id of the started instance will be stored in this variable"
+          }
+        },
         "TIMEREXPRESSIONPACKAGE": {
           "TIMEREXPRESSION": {
             "TITLE": "Timer Expression",

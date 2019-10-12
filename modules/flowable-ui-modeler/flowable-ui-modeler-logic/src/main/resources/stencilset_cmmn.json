@@ -654,6 +654,16 @@
         "popular" : true
       } ]
     }, {
+      "name" : "idVariableNamepackage",
+      "properties" : [ {
+        "id" : "idVariableName",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.IDVARIABLENAMEPACKAGE.IDVARIABLENAME.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.IDVARIABLENAMEPACKAGE.IDVARIABLENAME.DESCRIPTION",
+        "popular" : true
+      } ]
+    },{
       "name" : "timerexpressionpackage",
       "properties" : [ {
         "id" : "timerexpression",
@@ -1153,6 +1163,7 @@
         "blockingpackage",
         "casetaskcasereferencepackage",
         "fallbacktodefaulttenantpackage",
+        "idVariableNamepackage",
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
@@ -1178,6 +1189,7 @@
         "fallbacktodefaulttenantpackage",
         "processtaskinparameterspackage",
         "processtaskoutparameterspackage",
+        "idVariableNamepackage",
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",

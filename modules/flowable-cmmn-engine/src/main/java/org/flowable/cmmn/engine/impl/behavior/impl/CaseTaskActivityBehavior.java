@@ -101,6 +101,10 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
 
+        if (StringUtils.isNotEmpty(caseTask.getCaseInstanceIdVariableName())) {
+            planItemInstanceEntity.setVariable(caseTask.getCaseInstanceIdVariableName(), caseInstanceEntity.getId());
+        }
+
         // Bidirectional storing of reference to avoid queries later on
         planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
         planItemInstanceEntity.setReferenceId(caseInstanceEntity.getId());
