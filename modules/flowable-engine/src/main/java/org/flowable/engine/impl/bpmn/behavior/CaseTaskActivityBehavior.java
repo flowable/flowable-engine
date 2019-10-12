@@ -113,6 +113,10 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         }
         
         String caseInstanceId = caseInstanceService.generateNewCaseInstanceId();
+
+        if (StringUtils.isNotEmpty(caseServiceTask.getCaseInstanceIdVariableName())) {
+            execution.setVariable(caseServiceTask.getCaseInstanceIdVariableName(), caseInstanceId);
+        }
         
         if (processEngineConfiguration.isEnableEntityLinks()) {
             EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), caseInstanceId, ScopeTypes.CMMN);

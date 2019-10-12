@@ -260,4 +260,22 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn"})
+    public void testCaseTaskIdVariableName() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/caseTaskProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTask");
+            processEngineTaskService.complete(processEngineTaskService.createTaskQuery().singleResult().getId());
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+            assertEquals(caseInstance.getId(), processEngineRuntimeService.getVariable(processInstance.getId(), "myCaseInstanceId"));
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
 }
