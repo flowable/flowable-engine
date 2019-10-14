@@ -214,7 +214,11 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
 
         if (StringUtils.isNotEmpty(callActivity.getProcessInstanceIdVariableName())) {
-            execution.setVariable(callActivity.getProcessInstanceIdVariableName(), subProcessInstance.getId());
+            Expression expression = expressionManager.createExpression(callActivity.getProcessInstanceIdVariableName());
+            String idVariableName = (String) expression.getValue(execution);
+            if (StringUtils.isNotEmpty(idVariableName)) {
+                execution.setVariable(idVariableName, subProcessInstance.getId());
+            }
         }
 
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(executionEntity, subProcessInstance);

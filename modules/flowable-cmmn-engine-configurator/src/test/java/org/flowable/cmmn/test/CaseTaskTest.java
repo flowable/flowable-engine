@@ -35,6 +35,7 @@ import org.junit.Test;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
     
@@ -273,6 +274,27 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngineTaskService.complete(processEngineTaskService.createTaskQuery().singleResult().getId());
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
             assertEquals(caseInstance.getId(), processEngineRuntimeService.getVariable(processInstance.getId(), "myCaseInstanceId"));
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn"})
+    public void testCaseTaskIdVariableNameExpression() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithIdNameExpressions.bpmn20.xml")
+            .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("caseTask")
+                .variable("counter", 1)
+                .start();
+            processEngineTaskService.complete(processEngineTaskService.createTaskQuery().singleResult().getId());
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+            assertEquals(caseInstance.getId(), processEngineRuntimeService.getVariable(processInstance.getId(), "myVariable-1"));
 
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);

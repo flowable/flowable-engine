@@ -88,7 +88,11 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
         String processInstanceId = processInstanceService.generateNewProcessInstanceId();
         if (StringUtils.isNotEmpty(processTask.getProcessInstanceIdVariableName())) {
-            planItemInstanceEntity.setVariable(processTask.getProcessInstanceIdVariableName(), processInstanceId);
+            Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(processTask.getProcessInstanceIdVariableName());
+            String idVariableName = (String) expression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(idVariableName)) {
+                planItemInstanceEntity.setVariable(idVariableName, processInstanceId);
+            }
         }
 
         planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
