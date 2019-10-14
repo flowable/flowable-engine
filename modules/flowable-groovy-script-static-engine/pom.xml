@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.4.3.16</version>
+    <version>6.4.3.17</version>
   </parent>
 
   <properties>
