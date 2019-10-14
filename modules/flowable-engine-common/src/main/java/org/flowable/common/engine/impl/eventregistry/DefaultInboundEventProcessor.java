@@ -12,16 +12,21 @@
  */
 package org.flowable.common.engine.impl.eventregistry;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
-import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
-import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventregistry.EventRegistry;
+import org.flowable.common.engine.api.eventregistry.InboundEventDeserializer;
+import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
+import org.flowable.common.engine.api.eventregistry.InboundEventPayloadExtractor;
+import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
+import org.flowable.common.engine.api.eventregistry.InboundEventTransformer;
+import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 
 /**
  * @author Joram Barrez
@@ -44,10 +49,25 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
             throw new FlowableException("No channel definition found for key " + channelKey);
         }
 
-        EventDefinition eventDefinition = eventRegistry.detectEventDefinitionForEvent(channelKey, event);
-        EventProcessingContext eventProcessingContext = new EventProcessingContextImpl(channelKey, eventDefinition, event);
+        EventProcessingContextImpl eventProcessingContext = new EventProcessingContextImpl(channelKey, event);
+        InboundEventProcessingPipeline inboundEventProcessingPipeline = channelDefinition.getInboundEventProcessingPipeline();
 
-        Collection<FlowableEventBusEvent> eventBusEvents = eventDefinition.getCorrelationDefinition().correlate(eventProcessingContext);
+        InboundEventDeserializer deserializer = inboundEventProcessingPipeline.getDeserializer();
+        deserializer.deserialize(event, eventProcessingContext);
+
+        InboundEventKeyDetector inboundKeyDetector = inboundEventProcessingPipeline.getInboundKeyDetector();
+        String eventKey = inboundKeyDetector.detectEventDefinitionKey(eventProcessingContext);
+
+        EventDefinition eventDefinition = eventRegistry.getEventDefinition(eventKey);
+        eventProcessingContext.setEventDefinition(eventDefinition);
+
+        InboundEventPayloadExtractor payloadExtractor = inboundEventProcessingPipeline.getPayloadExtractor();
+        Map<String, Object> payload = payloadExtractor.extractPayload(eventProcessingContext);
+        eventProcessingContext.setPayload(payload);
+
+        InboundEventTransformer transformer = inboundEventProcessingPipeline.getTransformer();
+        List<FlowableEventBusEvent> eventBusEvents = transformer.transform(eventProcessingContext);
+
         for (FlowableEventBusEvent flowableEventBusEvent : eventBusEvents) {
             flowableEventBus.sendEvent(flowableEventBusEvent);
         }

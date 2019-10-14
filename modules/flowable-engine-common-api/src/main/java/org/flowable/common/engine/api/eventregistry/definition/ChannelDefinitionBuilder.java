@@ -13,7 +13,11 @@
 package org.flowable.common.engine.api.eventregistry.definition;
 
 import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
+import org.flowable.common.engine.api.eventregistry.InboundEventDeserializer;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
+import org.flowable.common.engine.api.eventregistry.InboundEventPayloadExtractor;
+import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
+import org.flowable.common.engine.api.eventregistry.InboundEventTransformer;
 
 /**
  * @author Joram Barrez
@@ -22,19 +26,46 @@ public interface ChannelDefinitionBuilder {
 
     ChannelDefinitionBuilder key(String key);
 
-    ChannelDefinitionBuilder inboundAdapter(InboundEventChannelAdapter inboundEventChannelAdapter);
-
-    InboundEventDefinitionKeyDetectorBuilder inboundEventDefinitionKeyDetector();
+    InboundEventProcessingPipelineBuilder channelAdapter(InboundEventChannelAdapter inboundEventChannelAdapter);
 
     ChannelDefinition register();
 
-    interface InboundEventDefinitionKeyDetectorBuilder {
 
-        ChannelDefinitionBuilder mapFromJsonField(String field);
+    interface InboundEventProcessingPipelineBuilder {
 
-        ChannelDefinitionBuilder mapFromJsonPathExpression(String jsonPathExpression);
+        InboundEventKeyDetectorBuilder deserializeToJson();
 
-        ChannelDefinitionBuilder custom(InboundEventKeyDetector inboundEventKeyDetector);
+        InboundEventKeyDetectorBuilder customDeserializer(InboundEventDeserializer deserializer);
+
+        ChannelDefinitionBuilder customEventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline);
+
+        InboundEventProcessingPipeline build();
+
+    }
+
+    interface InboundEventKeyDetectorBuilder {
+
+        InboundEventPayloadExtractorBuilder detectEventKeyUsingJsonField(String field);
+
+        InboundEventPayloadExtractorBuilder detectEventKeyUsingJsonPathExpression(String jsonPathExpression);
+
+        InboundEventPayloadExtractorBuilder detectEventKeyUsingCustomKeyDetector(InboundEventKeyDetector inboundEventKeyDetector);
+
+    }
+
+    interface InboundEventPayloadExtractorBuilder{
+
+        InboundEventTransformerBuilder jsonFieldsMapDirectlyToPayload();
+
+        InboundEventTransformerBuilder customPayloadExtractor(InboundEventPayloadExtractor inboundEventPayloadExtractor);
+
+    }
+
+    interface InboundEventTransformerBuilder {
+
+        ChannelDefinitionBuilder customTransformer(InboundEventTransformer inboundEventTransformer);
+
+        ChannelDefinition register();
 
     }
 

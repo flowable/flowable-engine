@@ -1,3 +1,4 @@
+
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,21 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventregistry.definition;
-
-import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
-import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
-import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
+package org.flowable.common.engine.api.eventregistry;
 
 /**
  * @author Joram Barrez
  */
-public interface ChannelDefinition {
+public interface InboundEventDeserializer {
 
-    String getKey();
+    /**
+     * Returns the unique type for this deserializer.
+     * Multiple pipelines using the same type of deserializer will only deserialize once.
+     */
+    String getType();
 
-    InboundEventChannelAdapter getInboundEventChannelAdapter();
-
-    InboundEventProcessingPipeline getInboundEventProcessingPipeline();
+    /**
+     * The actual deserialization.
+     */
+    void deserialize(String rawEvent, EventProcessingContext eventProcessingContext);
 
 }

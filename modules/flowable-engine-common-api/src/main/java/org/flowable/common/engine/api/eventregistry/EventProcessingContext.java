@@ -21,14 +21,15 @@ import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
  */
 public interface EventProcessingContext {
 
+    String getRawEvent();
+
     String getChannelKey();
 
     EventDefinition getEventDefinition();
 
-    String getEvent();
+    Map<String, Object> getPayload();
 
     void addProcessingData(String key, Object data);
-
     Map<String, Object> getProcessingData();
 
 }

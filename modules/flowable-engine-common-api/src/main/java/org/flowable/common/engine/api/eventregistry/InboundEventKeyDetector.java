@@ -17,6 +17,6 @@ package org.flowable.common.engine.api.eventregistry;
  */
 public interface InboundEventKeyDetector {
 
-    String detectEventDefinitionKey(String event);
+    String detectEventDefinitionKey(EventProcessingContext eventProcessingContext);
 
 }

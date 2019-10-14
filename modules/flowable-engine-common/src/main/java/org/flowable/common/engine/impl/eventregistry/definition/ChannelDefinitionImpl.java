@@ -12,6 +12,7 @@
  */
 package org.flowable.common.engine.impl.eventregistry.definition;
 
+import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
 import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
@@ -22,8 +23,8 @@ import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
 public class ChannelDefinitionImpl implements ChannelDefinition {
 
     protected String key;
-    protected InboundEventKeyDetector inboundEventKeyDetector;
     protected InboundEventChannelAdapter inboundEventChannelAdapter;
+    protected InboundEventProcessingPipeline inboundEventProcessingPipeline;
 
     @Override
     public String getKey() {
@@ -35,12 +36,12 @@ public class ChannelDefinitionImpl implements ChannelDefinition {
     }
 
     @Override
-    public InboundEventKeyDetector getInboundEventKeyDetector() {
-        return inboundEventKeyDetector;
+    public InboundEventProcessingPipeline getInboundEventProcessingPipeline() {
+        return inboundEventProcessingPipeline;
     }
 
-    public void setInboundEventKeyDetector(InboundEventKeyDetector inboundEventKeyDetector) {
-        this.inboundEventKeyDetector = inboundEventKeyDetector;
+    public void setInboundEventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline) {
+        this.inboundEventProcessingPipeline = inboundEventProcessingPipeline;
     }
 
     public InboundEventChannelAdapter getInboundEventChannelAdapter() {

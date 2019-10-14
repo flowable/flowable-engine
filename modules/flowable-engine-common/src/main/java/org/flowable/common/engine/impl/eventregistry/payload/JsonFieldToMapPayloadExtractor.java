@@ -10,44 +10,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.eventregistry;
+package org.flowable.common.engine.impl.eventregistry.payload;
 
-import java.io.IOException;
+import java.util.Map;
 
 import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
-import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
+import org.flowable.common.engine.api.eventregistry.InboundEventPayloadExtractor;
 import org.flowable.common.engine.impl.eventregistry.constant.EventProcessingConstants;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
  */
-public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDetector {
+public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtractor {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected String jsonPathExpression;
-
-    public JsonPathBasedInboundEventKeyDetector(String jsonPathExpression) {
-        this.jsonPathExpression = jsonPathExpression;
-    }
-
     @Override
-    public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
+    public Map<String, Object> extractPayload(EventProcessingContext eventProcessingContext) {
         JsonNode jsonNode = (JsonNode) eventProcessingContext.getProcessingData().get(EventProcessingConstants.DESERIALIZED_JSON_NODE);
-        JsonNode result = jsonNode.at(jsonPathExpression);
-
-        if (result == null || result.isMissingNode() || result.isNull()) {
-            // TODO: throw exception? Log? ...?
-        }
-
-        if (result.isTextual()) {
-            return result.asText();
-        }
-
-        return null;
+        return objectMapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>(){});
     }
 
 }

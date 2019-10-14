@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
@@ -40,8 +39,6 @@ public class DefaultEventRegistry implements EventRegistry {
     protected Map<String, ChannelDefinition> channelDefinitions = new HashMap<>();
 
     protected Map<String, EventDefinition> eventDefinitionsByKey = new HashMap<>();
-//    protected Map<String, EventDefinition> eventDefinitionsWithoutchannelKey = new HashMap<>();
-//    protected Map<String, Map<String, EventDefinition>> eventDefinitionsByChannelKey = new HashMap<>();
 
     protected List<EventRegistryEventBusConsumer> eventRegistryEventBusConsumers = new ArrayList<>();
 
@@ -63,8 +60,8 @@ public class DefaultEventRegistry implements EventRegistry {
             throw new FlowableIllegalArgumentException("No key set for channel definition");
         }
 
-        if ( (channelDefinition.getInboundEventChannelAdapter() != null && channelDefinition.getInboundEventKeyDetector() == null)
-            || (channelDefinition.getInboundEventChannelAdapter() == null && channelDefinition.getInboundEventKeyDetector() != null)) {
+        if ( (channelDefinition.getInboundEventChannelAdapter() != null && channelDefinition.getInboundEventProcessingPipeline() == null)
+            || (channelDefinition.getInboundEventChannelAdapter() == null && channelDefinition.getInboundEventProcessingPipeline() != null)) {
             throw new FlowableIllegalArgumentException("Need to set both inbound channel adapter and inbound event key detector when one of both is set");
         }
 
@@ -79,21 +76,6 @@ public class DefaultEventRegistry implements EventRegistry {
     @Override
     public ChannelDefinition getChannelDefinition(String channelKey) {
         return channelDefinitions.get(channelKey);
-    }
-
-    @Override
-    public EventDefinition detectEventDefinitionForEvent(String channelKey, String event) {
-        ChannelDefinition channelDefinition = getChannelDefinition(channelKey);
-        if (channelDefinition == null) {
-            throw new FlowableException("No channel definition found for key " + channelKey);
-        }
-
-        String eventDefinitionKey = channelDefinition.getInboundEventKeyDetector().detectEventDefinitionKey(event);
-        if (eventDefinitionKey == null) {
-            throw new FlowableException("No event definition key could be detected for event " + event);
-        }
-
-        return getEventDefinition(eventDefinitionKey);
     }
 
     @Override
@@ -114,39 +96,12 @@ public class DefaultEventRegistry implements EventRegistry {
             }
             eventBus.addFlowableEventConsumer(eventRegistryEventBusConsumer);
         }
-
-//        if (eventDefinition.getChannelKeys() != null) {
-//            for (String channelKey : eventDefinition.getChannelKeys()) {
-//                if (!eventDefinitionsByChannelKey.containsKey(channelKey)) {
-//                    eventDefinitionsByChannelKey.put(channelKey, new HashMap<>());
-//                }
-//                eventDefinitionsByChannelKey.get(channelKey).put(eventDefinition.getKey(), eventDefinition);
-//            }
-//
-//        } else {
-//            eventDefinitionsWithoutchannelKey.put(eventDefinition.getKey(), eventDefinition);
-//
-//        }
     }
 
     @Override
     public EventDefinition getEventDefinition(String eventDefinitionKey) {
         return eventDefinitionsByKey.get(eventDefinitionKey);
     }
-
-//    @Override
-//    public EventDefinition getEventDefinition(String channelKey, String eventDefinitionKey) {
-//        EventDefinition eventDefinition = null;
-//        if (eventDefinitionsByChannelKey.containsKey(channelKey)) {
-//            eventDefinition = eventDefinitionsByChannelKey.get(channelKey).get(eventDefinitionKey);
-//        }
-//
-//        if (eventDefinition == null) {
-//            eventDefinition = eventDefinitionsWithoutchannelKey.get(eventDefinitionKey);
-//        }
-//
-//        return eventDefinition;
-//    }
 
     @Override
     public void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor) {

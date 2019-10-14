@@ -26,11 +26,11 @@ public class EventProcessingContextImpl implements EventProcessingContext {
     protected String channelKey;
     protected EventDefinition eventDefinition;
     protected String event;
+    protected Map<String, Object> payload;
     protected Map<String, Object> processingData;
 
-    public EventProcessingContextImpl(String channelKey, EventDefinition eventDefinition, String event) {
+    public EventProcessingContextImpl(String channelKey, String event) {
         this.channelKey = channelKey;
-        this.eventDefinition = eventDefinition;
         this.event = event;
     }
 
@@ -61,12 +61,25 @@ public class EventProcessingContextImpl implements EventProcessingContext {
     }
 
     @Override
-    public String getEvent() {
+    public String getRawEvent() {
         return event;
     }
 
     public void setEvent(String event) {
         this.event = event;
+    }
+
+    public String getEvent() {
+        return event;
+    }
+
+    @Override
+    public Map<String, Object> getPayload() {
+        return payload;
+    }
+
+    public void setPayload(Map<String, Object> payload) {
+        this.payload = payload;
     }
 
     @Override

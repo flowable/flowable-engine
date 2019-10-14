@@ -10,21 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventregistry.definition;
+package org.flowable.common.engine.api.eventregistry;
 
-import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
-import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
-import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
+import java.util.List;
+
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 
 /**
  * @author Joram Barrez
  */
-public interface ChannelDefinition {
+public interface InboundEventTransformer {
 
-    String getKey();
-
-    InboundEventChannelAdapter getInboundEventChannelAdapter();
-
-    InboundEventProcessingPipeline getInboundEventProcessingPipeline();
+    List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext);
 
 }

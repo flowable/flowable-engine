@@ -42,12 +42,6 @@ public interface EventRegistry {
     ChannelDefinition getChannelDefinition(String channelKey);
 
     /**
-     * Retrieves the {@link ChannelDefinition} for the given key and
-     * uses its {@link InboundEventKeyDetector} to return the event definition for the passed event.
-     */
-    EventDefinition detectEventDefinitionForEvent(String channelKey, String event);
-
-    /**
      * Programmatically build and register a new {@link EventDefinition}.
      */
     EventDefinitionBuilder newEventDefinition();

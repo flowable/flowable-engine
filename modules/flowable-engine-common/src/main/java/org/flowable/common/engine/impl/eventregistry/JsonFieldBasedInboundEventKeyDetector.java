@@ -12,10 +12,9 @@
  */
 package org.flowable.common.engine.impl.eventregistry;
 
-import java.io.IOException;
-
-import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
+import org.flowable.common.engine.impl.eventregistry.constant.EventProcessingConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,13 +33,9 @@ public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDet
     }
 
     @Override
-    public String detectEventDefinitionKey(String event) {
-        try {
-            JsonNode jsonNode = objectMapper.readTree(event);
-            return jsonNode.path(field).asText();
-        } catch (IOException e) {
-            throw new FlowableException("Error while parsing event json", e);
-        }
+    public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
+        JsonNode jsonNode = (JsonNode) eventProcessingContext.getProcessingData().get(EventProcessingConstants.DESERIALIZED_JSON_NODE);
+        return jsonNode.path(field).asText();
     }
 
 }
