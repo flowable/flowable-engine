@@ -89,4 +89,16 @@ public class Criterion extends CaseElement implements HasAssociations {
     public void setOutgoingAssociations(List<Association> outgoingAssociations) {
         this.outgoingAssociations = outgoingAssociations;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (isEntryCriterion) {
+            stringBuilder.append("Entry criterion");
+        } else {
+            stringBuilder.append("Exit criterion");
+        }
+        stringBuilder.append(" with id '").append(id).append("'");
+        return stringBuilder.toString();
+    }
 }

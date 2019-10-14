@@ -1167,4 +1167,31 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
     }
 
+    @Test
+    @CmmnDeployment
+    public void testIdVariableName() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testIdVariableName")
+            .start();
+
+        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+        String processIdVariable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "processIdVariable");
+        assertEquals(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId(), processIdVariable);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testIdVariableNameExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testIdVariableName")
+            .variable("testVar", "A")
+            .start();
+
+        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+        String processIdVariable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "variableA");
+        assertEquals(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId(), processIdVariable);
+    }
+
 }

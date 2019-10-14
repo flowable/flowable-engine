@@ -37,7 +37,8 @@ public class RuleExpressionCondition {
         VariableContainerWrapper variableContainer = new VariableContainerWrapper(variables);
         variableContainer.setInstanceId(executionContext.getInstanceId());
         variableContainer.setScopeType(executionContext.getScopeType());
-        
+        variableContainer.setTenantId(executionContext.getTenantId());
+
         Object result = expression.getValue(variableContainer);
 
         if (result == null) {

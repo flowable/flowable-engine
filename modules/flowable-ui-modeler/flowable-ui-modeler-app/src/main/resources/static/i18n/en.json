@@ -557,6 +557,12 @@
             "DESCRIPTION" : "Look for the definition by key in the default tenant when current tenant search fails."
           }
         },
+        "CALLACTIVITYIDVARIABLENAMEPACKAGE": {
+          "CALLACTIVITYIDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the instance id of the started instance will be stored in this variable"
+          }
+        },
         "CALLACTIVITYPROCESSINSTANCENAMEPACKAGE" : {
           "CALLACTIVITYPROCESSINSTANCENAME" : {
             "TITLE" : "Process instance name",
@@ -1431,6 +1437,12 @@
           "PROCESSTASKOUTPARAMETERS": {
             "TITLE": "Out parameters",
             "DESCRIPTION": "Definition of the output parameters"
+          }
+        },
+        "IDVARIABLENAMEPACKAGE": {
+          "IDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the instance id of the started instance will be stored in this variable"
           }
         },
         "TIMEREXPRESSIONPACKAGE": {

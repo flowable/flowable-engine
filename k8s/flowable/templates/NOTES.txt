@@ -1,0 +1,24 @@
+
+    //////////          &&&& &&&                                          ,,,         ,,,
+  //////////////     &&&&&&& &&&                                          ,,,         ,,,
+ ///          ///   &&&      &&&                                          ,,,         ,,,
+ ////////     ///   &&&&&&&& &&&   &&&&&&&   &&&   &&&    &&&  ,,,,,,,,,, ,,,,,,,,,   ,,,   ,,,,,,,
+ //////   //  ///   &&&&&&&& &&& &&&&   &&&& &&&   &&&    &&& ,,,    ,,,, ,,,,   ,,,, ,,, ,,,    ,,
+ ///    ////  ///   &&&      &&& &&&     &&& &&&   &&&    &&& ,,      ,,, ,,,     ,,, ,,, ,,,,,,,,,
+ //    /////  ///   &&&      &&& &&&    &&&& &&&   &&&    &&& ,,,    ,,,, ,,,,    ,,, ,,, ,,,
+     ///////////    &&&      &&&  &&&&&&&&    &&&&&&&&&&&&&&   ,,,,,,,,,,   ,,,,,,,,  ,,,  ,,,,,,,,
+
+  :: Flowable OSS :: (v{{ .Chart.AppVersion }})
+
+Thank you for installing {{ .Chart.Name }}-{{ .Chart.Version }}
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get {{ .Release.Name }}
+
+To see deployment status, try:
+
+  $ kubectl get pods -n {{ .Release.Namespace }}

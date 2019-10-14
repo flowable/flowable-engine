@@ -40,6 +40,7 @@ public class ELExecutionContextBuilder {
         ELExecutionContext executionContext = new ELExecutionContext();
         executionContext.setInstanceId(executeDecisionInfo.getInstanceId());
         executionContext.setScopeType(executeDecisionInfo.getScopeType());
+        executionContext.setTenantId(executeDecisionInfo.getTenantId());
 
         // initialize audit trail
         executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, executeDecisionInfo));

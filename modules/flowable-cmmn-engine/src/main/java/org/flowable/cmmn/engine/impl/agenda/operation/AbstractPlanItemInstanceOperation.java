@@ -225,13 +225,6 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
         }
     }
 
-    protected boolean isPlanItemRepeatableOnComplete(PlanItem planItem) {
-        return planItem != null
-                && planItem.getEntryCriteria().isEmpty()
-                && planItem.getItemControl() != null
-                && planItem.getItemControl().getRepetitionRule() != null;
-    }
-
     protected Date getCurrentTime(CommandContext commandContext) {
         return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime();
     }
