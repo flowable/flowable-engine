@@ -62,9 +62,9 @@ public interface EventRegistry {
     void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor);
 
     /**
-     * Gets the processor of inbound events. All {@link InboundEventChannelAdapter} should pass received events to this processor.
+     * Events received in adapters should call this method to process events.
      */
-    InboundEventProcessor getInboundEventProcessor();
+    void eventReceived(String channelKey, String event);
 
     void registerEventRegistryEventBusConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer);
 

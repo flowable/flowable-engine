@@ -12,17 +12,22 @@
  */
 package org.flowable.common.engine.api.eventregistry;
 
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+
 /**
  * @author Joram Barrez
  */
 public interface InboundEventProcessingPipeline {
 
-    InboundEventDeserializer getDeserializer();
+    void deserialize(String rawEvent, EventProcessingContext eventProcessingContext);
 
-    InboundEventKeyDetector getInboundKeyDetector();
+    String detectEventDefinitionKey(EventProcessingContext eventProcessingContext);
 
-    InboundEventPayloadExtractor getPayloadExtractor();
+    Map<String, Object> extractPayload(EventProcessingContext eventProcessingContext);
 
-    InboundEventTransformer getTransformer();
+    List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext);
 
 }

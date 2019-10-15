@@ -12,8 +12,6 @@
  */
 package org.flowable.common.engine.impl.eventregistry;
 
-import java.io.IOException;
-
 import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
 import org.flowable.common.engine.impl.eventregistry.constant.EventProcessingConstants;
@@ -36,7 +34,7 @@ public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDete
 
     @Override
     public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
-        JsonNode jsonNode = (JsonNode) eventProcessingContext.getProcessingData().get(EventProcessingConstants.DESERIALIZED_JSON_NODE);
+        JsonNode jsonNode = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
         JsonNode result = jsonNode.at(jsonPathExpression);
 
         if (result == null || result.isMissingNode() || result.isNull()) {

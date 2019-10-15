@@ -83,6 +83,10 @@ public class EventProcessingContextImpl implements EventProcessingContext {
     }
 
     @Override
+    public <T> T getProcessingData(String key, Class<T> clazz) {
+        return (T) processingData.get(key);
+    }
+
     public Map<String, Object> getProcessingData() {
         return processingData;
     }

@@ -34,7 +34,7 @@ public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDet
 
     @Override
     public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
-        JsonNode jsonNode = (JsonNode) eventProcessingContext.getProcessingData().get(EventProcessingConstants.DESERIALIZED_JSON_NODE);
+        JsonNode jsonNode = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
         return jsonNode.path(field).asText();
     }
 

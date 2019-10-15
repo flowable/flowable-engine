@@ -31,7 +31,7 @@ public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtrac
 
     @Override
     public Map<String, Object> extractPayload(EventProcessingContext eventProcessingContext) {
-        JsonNode jsonNode = (JsonNode) eventProcessingContext.getProcessingData().get(EventProcessingConstants.DESERIALIZED_JSON_NODE);
+        JsonNode jsonNode = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
         return objectMapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>(){});
     }
 

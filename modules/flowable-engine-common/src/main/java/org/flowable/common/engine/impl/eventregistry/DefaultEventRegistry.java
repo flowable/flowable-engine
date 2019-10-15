@@ -109,8 +109,8 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public InboundEventProcessor getInboundEventProcessor() {
-        return inboundEventProcessor;
+    public void eventReceived(String channelKey, String event) {
+        inboundEventProcessor.eventReceived(channelKey, event);
     }
 
     @Override

@@ -12,6 +12,11 @@
  */
 package org.flowable.common.engine.impl.eventregistry.pipeline;
 
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventDeserializer;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
 import org.flowable.common.engine.api.eventregistry.InboundEventPayloadExtractor;
@@ -38,23 +43,23 @@ public class DefaultEventProcessingPipeline implements InboundEventProcessingPip
     }
 
     @Override
-    public InboundEventDeserializer getDeserializer() {
-        return inboundEventDeserializer;
+    public void deserialize(String rawEvent, EventProcessingContext eventProcessingContext) {
+        inboundEventDeserializer.deserialize(rawEvent, eventProcessingContext);
     }
 
     @Override
-    public InboundEventKeyDetector getInboundKeyDetector() {
-        return inboundEventKeyDetector;
+    public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
+        return inboundEventKeyDetector.detectEventDefinitionKey(eventProcessingContext);
     }
 
     @Override
-    public InboundEventPayloadExtractor getPayloadExtractor() {
-        return inboundEventPayloadExtractor;
+    public Map<String, Object> extractPayload(EventProcessingContext eventProcessingContext) {
+        return inboundEventPayloadExtractor.extractPayload(eventProcessingContext);
     }
 
     @Override
-    public InboundEventTransformer getTransformer() {
-        return inboundEventTransformer;
+    public List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext) {
+        return inboundEventTransformer.transform(eventProcessingContext);
     }
 
 }

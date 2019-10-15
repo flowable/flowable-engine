@@ -30,6 +30,6 @@ public interface EventProcessingContext {
     Map<String, Object> getPayload();
 
     void addProcessingData(String key, Object data);
-    Map<String, Object> getProcessingData();
+    <T> T getProcessingData(String key, Class<T> clazz);
 
 }
