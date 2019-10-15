@@ -15,13 +15,12 @@ package org.flowable.cmmn.engine.impl.parser.handler;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.PlanItem;
-
-import liquibase.util.StringUtils;
 
 /**
  * @author Tijs Rademakers
