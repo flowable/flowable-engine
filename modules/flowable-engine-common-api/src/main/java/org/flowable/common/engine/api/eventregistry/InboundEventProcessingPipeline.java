@@ -12,10 +12,13 @@
  */
 package org.flowable.common.engine.api.eventregistry;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
+import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 
 /**
  * @author Joram Barrez
@@ -26,7 +29,9 @@ public interface InboundEventProcessingPipeline {
 
     String detectEventDefinitionKey(EventProcessingContext eventProcessingContext);
 
-    Map<String, Object> extractPayload(EventProcessingContext eventProcessingContext);
+    Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventProcessingContext eventProcessingContext);
+
+    Collection<EventPayloadInstance> extractPayload(EventProcessingContext eventProcessingContext);
 
     List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext);
 

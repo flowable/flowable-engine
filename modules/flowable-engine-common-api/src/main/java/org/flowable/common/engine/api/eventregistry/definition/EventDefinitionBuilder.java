@@ -43,6 +43,24 @@ public interface EventDefinitionBuilder {
     EventDefinitionBuilder channelKeys(Collection<String> channelKeys);
 
     /**
+     * Defines one payload element of an event definition.
+     * Such payload elements are data that is contained within an event.
+     * If certain payload needs to be used to correlate runtime instances,
+     * use the {@link #correlationParameter(String, String)} method.
+     *
+     * One {@link EventDefinition} typically has multiple such elements.
+     */
+    EventDefinitionBuilder payload(String name, String type);
+
+    /**
+     * Defines one parameters for correlation that can be used in models to map onto.
+     * Each correlation parameter is automatically a {@link #payload(String, String)} element.
+     *
+     * Will create a {@link EventCorrelationParameterDefinition} behind the scenes.
+     */
+    EventDefinitionBuilder correlationParameter(String name, String type);
+
+    /**
      * Start defining how the event correlates to runtime data.
      */
     EventCorrelationBuilder correlation();

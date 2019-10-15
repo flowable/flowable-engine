@@ -12,6 +12,7 @@
  */
 package org.flowable.common.engine.impl.eventregistry.pipeline;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,8 @@ import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
 import org.flowable.common.engine.api.eventregistry.InboundEventPayloadExtractor;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
 import org.flowable.common.engine.api.eventregistry.InboundEventTransformer;
+import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
+import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 
 /**
  * @author Joram Barrez
@@ -53,7 +56,12 @@ public class DefaultEventProcessingPipeline implements InboundEventProcessingPip
     }
 
     @Override
-    public Map<String, Object> extractPayload(EventProcessingContext eventProcessingContext) {
+    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventProcessingContext eventProcessingContext) {
+        return inboundEventPayloadExtractor.extractCorrelationParameters(eventProcessingContext);
+    }
+
+    @Override
+    public Collection<EventPayloadInstance> extractPayload(EventProcessingContext eventProcessingContext) {
         return inboundEventPayloadExtractor.extractPayload(eventProcessingContext);
     }
 

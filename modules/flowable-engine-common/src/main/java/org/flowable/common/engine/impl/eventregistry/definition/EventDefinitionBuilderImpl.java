@@ -14,13 +14,17 @@ package org.flowable.common.engine.impl.eventregistry.definition;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.definition.CorrelationDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.EventCorrelationParameterDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinitionBuilder;
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
+import org.flowable.common.engine.api.eventregistry.definition.EventPayloadDefinition;
 
 /**
  * @author Joram Barrez
@@ -31,6 +35,8 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
 
     protected String key;
     protected Collection<String> channelKeys;
+    protected Map<String, EventCorrelationParameterDefinition> correlationParameterDefinitions = new LinkedHashMap<>();
+    protected Map<String, EventPayloadDefinition> eventPayloadDefinitions = new LinkedHashMap<>();
     protected CorrelationDefinition eventCorrelationDefinition;
 
     public EventDefinitionBuilderImpl(EventRegistry eventRegistry) {
@@ -59,6 +65,19 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
     }
 
     @Override
+    public EventDefinitionBuilder correlationParameter(String name, String type) {
+        correlationParameterDefinitions.put(name, new CorrelationParameterDefinitionImpl(name, type));
+        payload(name, type);
+        return this;
+    }
+
+    @Override
+    public EventDefinitionBuilder payload(String name, String type) {
+        eventPayloadDefinitions.put(name, new EventPayloadDefinitionImpl(name, type));
+        return this;
+    }
+
+    @Override
     public EventCorrelationBuilder correlation() {
         return new EventCorrelationBuilderImpl(this);
     }
@@ -76,6 +95,9 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
         if (channelKeys != null) {
             eventDefinition.setChannelKeys(channelKeys);
         }
+
+        eventDefinition.getCorrelationParameterDefinitions().addAll(correlationParameterDefinitions.values());
+        eventDefinition.getEventPayloadDefinitions().addAll(eventPayloadDefinitions.values());
 
         if (eventCorrelationDefinition != null) {
             eventDefinition.setCorrelationDefinition(eventCorrelationDefinition);

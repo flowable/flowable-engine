@@ -13,7 +13,9 @@
 package org.flowable.common.engine.impl.eventregistry.transformer;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
@@ -29,7 +31,12 @@ public class DefaultInboundEventTransformer implements InboundEventTransformer {
     public List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext) {
         FlowableEventBusEventImpl eventBusEvent = new FlowableEventBusEventImpl();
         eventBusEvent.setType(eventProcessingContext.getEventDefinition().getKey());
-        eventBusEvent.setData(eventProcessingContext.getPayload());
+
+        // TODO: temporary
+        Map<String, Object> data = new HashMap<>();
+        data.put("eventInstances", eventProcessingContext.getEventInstances());
+        eventBusEvent.setData(data);
+
         return Collections.singletonList(eventBusEvent);
     }
 

@@ -23,6 +23,10 @@ public interface EventDefinition {
 
     Collection<String> getChannelKeys();
 
+    Collection<EventPayloadDefinition> getEventPayloadDefinitions();
+
+    Collection<EventCorrelationParameterDefinition> getCorrelationParameterDefinitions();
+
     CorrelationDefinition getCorrelationDefinition();
 
 }

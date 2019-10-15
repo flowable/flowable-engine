@@ -12,13 +12,19 @@
  */
 package org.flowable.common.engine.impl.eventregistry.payload;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventPayloadExtractor;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.EventPayloadTypes;
+import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
+import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 import org.flowable.common.engine.impl.eventregistry.constant.EventProcessingConstants;
+import org.flowable.common.engine.impl.eventregistry.runtime.EventCorrelationParameterInstanceImpl;
+import org.flowable.common.engine.impl.eventregistry.runtime.EventPayloadInstanceImpl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,9 +36,47 @@ public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtrac
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public Map<String, Object> extractPayload(EventProcessingContext eventProcessingContext) {
-        JsonNode jsonNode = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
-        return objectMapper.convertValue(jsonNode, new TypeReference<Map<String, Object>>(){});
+    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventProcessingContext eventProcessingContext) {
+        EventDefinition eventDefinition = eventProcessingContext.getEventDefinition();
+        JsonNode event = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
+
+        return eventDefinition.getCorrelationParameterDefinitions().stream()
+            .map(parameterDefinition -> new EventCorrelationParameterInstanceImpl(parameterDefinition, getPayloadValue(event, parameterDefinition.getName(), parameterDefinition.getType())))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<EventPayloadInstance> extractPayload(EventProcessingContext eventProcessingContext) {
+        EventDefinition eventDefinition = eventProcessingContext.getEventDefinition();
+        JsonNode event = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
+
+        return eventDefinition.getEventPayloadDefinitions().stream()
+            .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(event, payloadDefinition.getName(), payloadDefinition.getType())))
+            .collect(Collectors.toList());
+    }
+
+    protected Object getPayloadValue(JsonNode event, String definitionName, String definitionType) {
+        JsonNode parameterNode = event.get(definitionName);
+        Object value = null;
+
+        if (EventPayloadTypes.STRING.equals(definitionType)) {
+            value = parameterNode.asText();
+
+        } else if (EventPayloadTypes.BOOLEAN.equals(definitionType)) {
+            value = parameterNode.booleanValue();
+
+        } else if (EventPayloadTypes.INTEGER.equals(definitionType)) {
+            value = parameterNode.intValue();
+
+        } else if (EventPayloadTypes.DOUBLE.equals(definitionType)) {
+            value = parameterNode.doubleValue();
+
+        } else {
+            // TODO: handle type not matching
+
+        }
+
+        return value;
     }
 
 }

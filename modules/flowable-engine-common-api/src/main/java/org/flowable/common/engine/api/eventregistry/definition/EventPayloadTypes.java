@@ -10,20 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventregistry;
-
-import java.util.Collection;
-
-import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
-import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
+package org.flowable.common.engine.api.eventregistry.definition;
 
 /**
  * @author Joram Barrez
  */
-public interface InboundEventPayloadExtractor {
+public interface EventPayloadTypes {
 
-    Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventProcessingContext eventProcessingContext);
-
-    Collection<EventPayloadInstance> extractPayload(EventProcessingContext eventProcessingContext);
+    String STRING = "string";
+    String INTEGER = "integer";
+    String DOUBLE = "double";
+    String BOOLEAN = "boolean";
 
 }

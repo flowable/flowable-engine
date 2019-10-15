@@ -12,9 +12,11 @@
  */
 package org.flowable.common.engine.api.eventregistry;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 
 /**
  * @author Joram Barrez
@@ -31,5 +33,7 @@ public interface EventProcessingContext {
 
     void addProcessingData(String key, Object data);
     <T> T getProcessingData(String key, Class<T> clazz);
+
+    Collection<EventInstance> getEventInstances();
 
 }
