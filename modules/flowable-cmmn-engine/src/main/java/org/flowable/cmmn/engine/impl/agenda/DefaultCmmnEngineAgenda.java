@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivateAsyncPlanItemInstanceOperation;
@@ -122,37 +121,6 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
     
     protected void internalPlanEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent planItemLifeCycleEvent, boolean evaluateCaseInstanceCompleted) {
-        
-        // To avoid too many evaluations of the 'same situation', the currently planned operations are looked at
-        // and when one is found that matches the pattern of one that is now to be planned, it is removed as the new one will
-        // do the same thing at a later point in the execution.
-        
-        Iterator<Runnable> plannedOperations = operations.iterator();
-        boolean found = false;
-        while (!found && plannedOperations.hasNext()) {
-            Runnable operation = plannedOperations.next();
-            if (operation instanceof EvaluateCriteriaOperation) {
-                EvaluateCriteriaOperation evaluateCriteriaOperation = (EvaluateCriteriaOperation) operation;
-                if (evaluateCriteriaOperation.getCaseInstanceEntityId() != null
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent() != null
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getTransition() != null
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getPlanItem() != null
-                        && planItemLifeCycleEvent != null
-                        && evaluateCriteriaOperation.getCaseInstanceEntityId().equals(caseInstanceEntityId)
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getTransition().equals(planItemLifeCycleEvent.getTransition())
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getPlanItem().getId().equals(planItemLifeCycleEvent.getPlanItem().getId())
-                        && evaluateCriteriaOperation.isEvaluateCaseInstanceCompleted() == evaluateCaseInstanceCompleted) {
-                    LOGGER.debug("Deferred criteria evaluation for case instance with id '{}' to later in the execution. Plan item = {}, Plan item definition = {}, transition = {}",
-                        caseInstanceEntityId,
-                        planItemLifeCycleEvent.getPlanItem().getId(),
-                        planItemLifeCycleEvent.getPlanItem().getPlanItemDefinition(),
-                        planItemLifeCycleEvent.getTransition());
-                    plannedOperations.remove();
-                    found = true;
-                }
-            }
-        }
-        
         EvaluateCriteriaOperation evaluateCriteriaOperation = new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, planItemLifeCycleEvent);
         evaluateCriteriaOperation.setEvaluateCaseInstanceCompleted(evaluateCaseInstanceCompleted);
         addOperation(evaluateCriteriaOperation, caseInstanceEntityId);

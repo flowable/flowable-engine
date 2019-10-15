@@ -518,4 +518,64 @@ public class StageTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testRepeatingStageInTerminatedCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testRepeatingStageInTerminatedCase")
+            .variable("terminateTheCase", true)
+            .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingStageInTerminatedCase2() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testRepeatingStageInTerminatedCase")
+            .variable("terminateTheCase", true)
+            .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingStageInTerminatedCase3() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        List<PlanItemInstance> activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
+            .planItemInstanceStateActive().list();
+        assertThat(activeStages)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId)
+            .containsExactly("expandedStage2");
+
+        Task closeTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(closeTask).isNotNull();
+        cmmnTaskService.complete(closeTask.getId());
+
+        Task reopenTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(reopenTask).isNotNull();
+        cmmnTaskService.complete(reopenTask.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testAllServiceTasksInRepeatedStages() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testRepeatingStageInTerminatedCase")
+            .variable("terminateTheCase", true)
+            .start();
+        assertCaseInstanceEnded(caseInstance);
+    }
+
 }
