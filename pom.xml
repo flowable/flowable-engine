@@ -29,10 +29,14 @@
 
 		<junit.version>4.12</junit.version>
 		<junit.jupiter.version>5.5.2</junit.jupiter.version>
+		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
+		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
 		<mockito.version>3.1.0</mockito.version>
 
 		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
+
+		<spotify.docker.plugin.version>1.4.10</spotify.docker.plugin.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -999,11 +1003,6 @@
 				<version>2.9.0</version>
 				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.4.10</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -1114,6 +1113,16 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>com.spotify</groupId>
+					<artifactId>dockerfile-maven-plugin</artifactId>
+					<version>${spotify.docker.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>${maven.deploy.plugin.version}</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.1.2</version>
@@ -1132,6 +1141,11 @@
 					<configuration>
 						<source>${jdk.version}</source>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven.resources.plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

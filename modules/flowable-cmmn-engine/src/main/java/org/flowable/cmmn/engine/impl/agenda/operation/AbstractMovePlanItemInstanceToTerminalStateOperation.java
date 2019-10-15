@@ -15,8 +15,10 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 import java.util.List;
 import java.util.Objects;
 
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -80,6 +82,11 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     protected boolean isRepeatingOnDelete(String originalState) {
         
         // If there are no entry criteria and the repetition rule evaluates to true: a new instance needs to be created.
+
+        CaseInstanceEntity caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstanceEntity.getCaseInstanceId());
+        if (CaseInstanceState.isInTerminalState(caseInstance)) {
+            return false;
+        }
         
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         if (isEvaluateRepetitionRule() && hasRepetitionRuleAndNoEntryCriteria(planItem)) {
@@ -102,7 +109,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
     protected boolean isWithoutStageOrParentIsNotTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
         return planItemInstanceEntity.getStagePlanItemInstanceEntity() == null
-            || !PlanItemInstanceState.isInTerminalState(planItemInstanceEntity.getStagePlanItemInstanceEntity());
+                || !PlanItemInstanceState.isInTerminalState(planItemInstanceEntity.getStagePlanItemInstanceEntity());
     }
 
     protected boolean hasRepetitionRuleAndNoEntryCriteria(PlanItem planItem) {
