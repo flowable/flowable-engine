@@ -13,6 +13,7 @@
 package org.flowable.common.engine.impl.eventregistry;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,11 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
+    public void removeChannelDefinition(String channelDefinitionKey) {
+        channelDefinitions.remove(channelDefinitionKey);
+    }
+
+    @Override
     public ChannelDefinition getChannelDefinition(String channelKey) {
         return channelDefinitions.get(channelKey);
     }
@@ -99,6 +105,24 @@ public class DefaultEventRegistry implements EventRegistry {
             }
             eventBus.addFlowableEventConsumer(eventRegistryEventBusConsumer);
         }
+    }
+
+    @Override
+    public void removeEventDefinition(String eventDefinitionKey) {
+        eventDefinitionsByKey.remove(eventDefinitionKey);
+
+        // Similar as for the addition (see the comment there)
+        for (EventRegistryEventBusConsumer eventRegistryEventBusConsumer : eventRegistryEventBusConsumers) {
+            eventBus.removeFlowableEventConsumer(eventRegistryEventBusConsumer);
+
+            eventRegistryEventBusConsumer.getSupportedTypes().remove(eventDefinitionKey);
+            eventBus.addFlowableEventConsumer(eventRegistryEventBusConsumer);
+        }
+    }
+
+    @Override
+    public Collection<EventDefinition> getAllEventDefinitions() {
+        return eventDefinitionsByKey.values();
     }
 
     @Override

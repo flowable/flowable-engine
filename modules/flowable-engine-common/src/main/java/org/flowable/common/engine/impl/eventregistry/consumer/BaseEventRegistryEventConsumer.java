@@ -18,7 +18,8 @@ import java.util.List;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
-import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
+import org.flowable.common.engine.impl.eventregistry.event.EventRegistryEvent;
 
 /**
  * @author Joram Barrez
@@ -45,12 +46,14 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
 
     @Override
     public void eventReceived(FlowableEventBusEvent event) {
-        EventDefinition eventDefinition = eventRegistry.getEventDefinition(event.getType());
-        if (eventDefinition != null) {
-            eventReceived(eventDefinition);
+        EventRegistryEvent eventRegistryEvent = (EventRegistryEvent) event;
+        if (eventRegistryEvent.getEventInstance() != null) {
+            eventReceived(eventRegistryEvent.getEventInstance());
+        } else {
+            // TODO: what should happen in this case?
         }
     }
 
-    protected abstract void eventReceived(EventDefinition eventDefinition);
+    protected abstract void eventReceived(EventInstance eventInstance);
 
 }

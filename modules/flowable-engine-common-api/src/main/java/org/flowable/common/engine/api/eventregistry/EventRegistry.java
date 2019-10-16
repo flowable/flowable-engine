@@ -12,6 +12,8 @@
  */
 package org.flowable.common.engine.api.eventregistry;
 
+import java.util.Collection;
+
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinitionBuilder;
@@ -37,6 +39,11 @@ public interface EventRegistry {
     void registerChannelDefinition(ChannelDefinition channelDefinition);
 
     /**
+     * Removes a previously registered {@link ChannelDefinition}.
+     */
+    void removeChannelDefinition(String channelDefinitionKey);
+
+    /**
      * Returns the {@link ChannelDefinition} instance associated with the given key.
      */
     ChannelDefinition getChannelDefinition(String channelKey);
@@ -52,12 +59,23 @@ public interface EventRegistry {
     void registerEventDefinition(EventDefinition eventDefinition);
 
     /**
+     * Removes a previously registered {@link EventDefinition}.
+     */
+    void removeEventDefinition(String eventDefinitionKey);
+
+    /**
+     * Returns all currently configured {@link EventDefinition} instances registered in this registry.
+     */
+    Collection<EventDefinition> getAllEventDefinitions();
+
+    /**
      * Retrieves the {@link EventDefinition} for the given eventDefinitionKey.
      */
     EventDefinition getEventDefinition(String eventDefinitionKey);
 
     /**
-     * See {@link #getInboundEventProcessor()}.
+     * The {@link InboundEventProcessor} is responsible for handling any new event.
+     * The event registry will simply pass any event it receives to this instance.
      */
     void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor);
 

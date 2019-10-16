@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.definition.CorrelationDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventregistry.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.common.engine.impl.eventregistry.definition.AlwaysAppliesEventCorrelationDefinition;
@@ -42,7 +43,8 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     }
 
     @Override
-    protected void eventReceived(EventDefinition eventDefinition) {
+    protected void eventReceived(EventInstance eventInstance) {
+        EventDefinition eventDefinition = eventInstance.getEventDefinition();
         CorrelationDefinition correlationDefinition = eventDefinition.getCorrelationDefinition();
 
         if (correlationDefinition instanceof AlwaysAppliesEventCorrelationDefinition) {
