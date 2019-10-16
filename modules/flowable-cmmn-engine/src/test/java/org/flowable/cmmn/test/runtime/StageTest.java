@@ -520,6 +520,49 @@ public class StageTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testActivateTerminatedRepeatingStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testActivateTerminatedRepeatingStage")
+            .start();
+
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.ENABLED);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.AVAILABLE);
+
+        cmmnRuntimeService
+            .createPlanItemInstanceTransitionBuilder(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult().getId())
+            .start();
+
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ENABLED);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(caseInstance, "B", PlanItemInstanceState.ACTIVE);
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("B", task.getName());
+
+        cmmnTaskService.complete(task.getId());
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ENABLED);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(caseInstance, "B", PlanItemInstanceState.COMPLETED);
+
+        cmmnRuntimeService
+            .createPlanItemInstanceTransitionBuilder(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult().getId())
+            .start();
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ENABLED);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(caseInstance, "B", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ACTIVE);
+    }
+
+    @Test
+    @CmmnDeployment
     public void testRepeatingStageInTerminatedCase() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("testRepeatingStageInTerminatedCase")
