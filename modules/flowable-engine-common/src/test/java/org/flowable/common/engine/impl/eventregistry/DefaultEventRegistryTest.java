@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +29,7 @@ import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationPara
 import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 import org.flowable.common.engine.impl.eventbus.BasicFlowableEventBus;
+import org.flowable.common.engine.impl.eventregistry.event.EventRegistryEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -78,11 +78,9 @@ public class DefaultEventRegistryTest {
         inboundEventChannelAdapter.triggerTestEvent();
 
         assertThat(testEventConsumer.eventsReceived).hasSize(1);
+        EventRegistryEvent eventRegistryEvent = (EventRegistryEvent) testEventConsumer.eventsReceived.get(0);
 
-        Collection<EventInstance> eventInstances = (Collection<EventInstance>) testEventConsumer.eventsReceived.get(0).getData().get("eventInstances");
-        assertThat(eventInstances).hasSize(1);
-
-        EventInstance eventInstance = eventInstances.iterator().next();
+        EventInstance eventInstance = eventRegistryEvent.getEventInstance();
         assertThat(eventInstance.getEventDefinition().getKey()).isEqualTo("myEvent");
 
         assertThat(eventInstance.getCorrelationParameterInstances())

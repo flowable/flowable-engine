@@ -87,8 +87,11 @@ public class DefaultEventRegistry implements EventRegistry {
     public void registerEventDefinition(EventDefinition eventDefinition) {
         eventDefinitionsByKey.put(eventDefinition.getKey(), eventDefinition);
 
+        // The eventRegistryEventBusConsumers contains the engine-specific listeners for events
+        // related to event definitions registered with this event registry.
+        // When a new event definition is added, they need to be reregistered, as the eventBus implementation
+        // captures and stores the types at registration time and not on event receiving (for performance).
         for (EventRegistryEventBusConsumer eventRegistryEventBusConsumer : eventRegistryEventBusConsumers) {
-            // Event bus does not allow dynamic changing of supported types (for performance)
             eventBus.removeFlowableEventConsumer(eventRegistryEventBusConsumer);
 
             if (!eventRegistryEventBusConsumer.getSupportedTypes().contains(eventDefinition.getKey())) {

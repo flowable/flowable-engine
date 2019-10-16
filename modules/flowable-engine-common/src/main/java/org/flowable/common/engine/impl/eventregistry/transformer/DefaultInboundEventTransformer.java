@@ -12,15 +12,15 @@
  */
 package org.flowable.common.engine.impl.eventregistry.transformer;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventTransformer;
-import org.flowable.common.engine.impl.eventregistry.FlowableEventBusEventImpl;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
+import org.flowable.common.engine.impl.eventregistry.event.EventRegistryEvent;
 
 /**
  * @author Joram Barrez
@@ -29,15 +29,12 @@ public class DefaultInboundEventTransformer implements InboundEventTransformer {
 
     @Override
     public List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext) {
-        FlowableEventBusEventImpl eventBusEvent = new FlowableEventBusEventImpl();
-        eventBusEvent.setType(eventProcessingContext.getEventDefinition().getKey());
-
-        // TODO: temporary
-        Map<String, Object> data = new HashMap<>();
-        data.put("eventInstances", eventProcessingContext.getEventInstances());
-        eventBusEvent.setData(data);
-
-        return Collections.singletonList(eventBusEvent);
+        Collection<EventInstance> eventInstances = eventProcessingContext.getEventInstances();
+        List<FlowableEventBusEvent> events = new ArrayList<>(eventInstances.size());
+        for (EventInstance eventInstance : eventInstances) {
+            events.add(new EventRegistryEvent(eventInstance));
+        }
+        return events;
     }
 
 }
