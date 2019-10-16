@@ -60,6 +60,7 @@ public class EventProcessingContextImpl implements EventProcessingContext {
         return eventDefinition;
     }
 
+    @Override
     public void setEventDefinition(EventDefinition eventDefinition) {
         this.eventDefinition = eventDefinition;
     }

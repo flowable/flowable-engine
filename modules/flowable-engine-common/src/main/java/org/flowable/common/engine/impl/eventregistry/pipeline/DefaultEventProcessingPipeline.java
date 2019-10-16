@@ -14,31 +14,37 @@ package org.flowable.common.engine.impl.eventregistry.pipeline;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
+import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.InboundEventDeserializer;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
 import org.flowable.common.engine.api.eventregistry.InboundEventPayloadExtractor;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
 import org.flowable.common.engine.api.eventregistry.InboundEventTransformer;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
 import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
+import org.flowable.common.engine.impl.eventregistry.runtime.EventInstanceImpl;
 
 /**
  * @author Joram Barrez
  */
 public class DefaultEventProcessingPipeline implements InboundEventProcessingPipeline {
 
+    protected EventRegistry eventRegistry;
     protected InboundEventDeserializer inboundEventDeserializer;
     protected InboundEventKeyDetector inboundEventKeyDetector;
     protected InboundEventPayloadExtractor inboundEventPayloadExtractor;
     protected InboundEventTransformer inboundEventTransformer;
 
-    public DefaultEventProcessingPipeline(InboundEventDeserializer inboundEventDeserializer,
-            InboundEventKeyDetector inboundEventKeyDetector, InboundEventPayloadExtractor inboundEventPayloadExtractor,
+    public DefaultEventProcessingPipeline(EventRegistry eventRegistry,
+            InboundEventDeserializer inboundEventDeserializer,
+            InboundEventKeyDetector inboundEventKeyDetector,
+            InboundEventPayloadExtractor inboundEventPayloadExtractor,
             InboundEventTransformer inboundEventTransformer) {
+        this.eventRegistry = eventRegistry;
         this.inboundEventDeserializer = inboundEventDeserializer;
         this.inboundEventKeyDetector = inboundEventKeyDetector;
         this.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
@@ -46,26 +52,40 @@ public class DefaultEventProcessingPipeline implements InboundEventProcessingPip
     }
 
     @Override
+    public List<FlowableEventBusEvent> run(EventProcessingContext eventProcessingContext) {
+        deserialize(eventProcessingContext.getRawEvent(), eventProcessingContext);
+        String eventKey = detectEventDefinitionKey(eventProcessingContext);
+
+        EventDefinition eventDefinition = eventRegistry.getEventDefinition(eventKey);
+        eventProcessingContext.setEventDefinition(eventDefinition);
+
+        EventInstanceImpl eventInstance = new EventInstanceImpl(
+            eventDefinition,
+            extractCorrelationParameters(eventProcessingContext),
+            extractPayload(eventProcessingContext)
+        );
+        eventProcessingContext.getEventInstances().add(eventInstance);
+
+        // TODO: change transform() to EventInstance instead of eventBusEvent
+        return transform(eventProcessingContext);
+    }
+
     public void deserialize(String rawEvent, EventProcessingContext eventProcessingContext) {
         inboundEventDeserializer.deserialize(rawEvent, eventProcessingContext);
     }
 
-    @Override
     public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
         return inboundEventKeyDetector.detectEventDefinitionKey(eventProcessingContext);
     }
 
-    @Override
     public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventProcessingContext eventProcessingContext) {
         return inboundEventPayloadExtractor.extractCorrelationParameters(eventProcessingContext);
     }
 
-    @Override
     public Collection<EventPayloadInstance> extractPayload(EventProcessingContext eventProcessingContext) {
         return inboundEventPayloadExtractor.extractPayload(eventProcessingContext);
     }
 
-    @Override
     public List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext) {
         return inboundEventTransformer.transform(eventProcessingContext);
     }

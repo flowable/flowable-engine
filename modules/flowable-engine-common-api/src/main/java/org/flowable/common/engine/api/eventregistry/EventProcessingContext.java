@@ -27,6 +27,7 @@ public interface EventProcessingContext {
 
     String getChannelKey();
 
+    void setEventDefinition(EventDefinition eventDefinition);
     EventDefinition getEventDefinition();
 
     Map<String, Object> getPayload();

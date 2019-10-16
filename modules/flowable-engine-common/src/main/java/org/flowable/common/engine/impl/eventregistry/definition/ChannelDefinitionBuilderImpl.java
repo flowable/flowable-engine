@@ -52,7 +52,7 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
     @Override
     public InboundEventProcessingPipelineBuilder channelAdapter(InboundEventChannelAdapter inboundEventChannelAdapter) {
         this.inboundEventChannelAdapter = inboundEventChannelAdapter;
-        this.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl(this);
+        this.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl(eventRegistry, this);
         return this.inboundEventProcessingPipelineBuilder;
     }
 
@@ -72,6 +72,7 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
 
     public static class InboundEventProcessingPipelineBuilderImpl implements InboundEventProcessingPipelineBuilder {
 
+        protected EventRegistry eventRegistry;
         protected ChannelDefinitionBuilderImpl channelDefinitionBuilder;
 
         protected InboundEventProcessingPipeline customInboundEventProcessingPipeline;
@@ -80,7 +81,8 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
         protected InboundEventPayloadExtractor inboundEventPayloadExtractor;
         protected InboundEventTransformer inboundEventTransformer;
 
-        public InboundEventProcessingPipelineBuilderImpl(ChannelDefinitionBuilderImpl channelDefinitionBuilder) {
+        public InboundEventProcessingPipelineBuilderImpl(EventRegistry eventRegistry, ChannelDefinitionBuilderImpl channelDefinitionBuilder) {
+            this.eventRegistry = eventRegistry;
             this.channelDefinitionBuilder = channelDefinitionBuilder;
         }
 
@@ -107,8 +109,8 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
             if (customInboundEventProcessingPipeline != null) {
                 return customInboundEventProcessingPipeline;
             } else {
-                return new DefaultEventProcessingPipeline(inboundEventDeserializer,
-                    inboundEventKeyDetector, inboundEventPayloadExtractor, inboundEventTransformer);
+                return new DefaultEventProcessingPipeline(eventRegistry,
+                    inboundEventDeserializer, inboundEventKeyDetector, inboundEventPayloadExtractor, inboundEventTransformer);
             }
         }
 

@@ -85,7 +85,8 @@ public class DefaultEventRegistryTest {
         EventInstance eventInstance = eventInstances.iterator().next();
         assertThat(eventInstance.getEventDefinition().getKey()).isEqualTo("myEvent");
 
-        assertThat(eventInstance.getCorrelationParameterInstances()).extracting(EventCorrelationParameterInstance::getValue).containsOnly("test");
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventCorrelationParameterInstance::getValue).containsOnly("test");
         assertThat(eventInstance.getPayloadInstances())
             .extracting(p -> p.getEventPayloadDefinition().getName(), p -> p.getEventPayloadDefinition().getType(), EventPayloadInstance::getValue)
             .containsOnly(

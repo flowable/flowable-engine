@@ -21,8 +21,6 @@ import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
-import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
-import org.flowable.common.engine.impl.eventregistry.runtime.EventInstanceImpl;
 
 /**
  * @author Joram Barrez
@@ -47,22 +45,9 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
 
         EventProcessingContextImpl eventProcessingContext = new EventProcessingContextImpl(channelKey, event);
         InboundEventProcessingPipeline inboundEventProcessingPipeline = channelDefinition.getInboundEventProcessingPipeline();
-
-        inboundEventProcessingPipeline.deserialize(event, eventProcessingContext);
-        String eventKey = inboundEventProcessingPipeline.detectEventDefinitionKey(eventProcessingContext);
-
-        EventDefinition eventDefinition = eventRegistry.getEventDefinition(eventKey);
-        eventProcessingContext.setEventDefinition(eventDefinition);
-
-        EventInstanceImpl eventInstance = new EventInstanceImpl(
-            eventDefinition,
-            inboundEventProcessingPipeline.extractCorrelationParameters(eventProcessingContext),
-            inboundEventProcessingPipeline.extractPayload(eventProcessingContext)
-        );
-        eventProcessingContext.getEventInstances().add(eventInstance);
+        List<FlowableEventBusEvent> eventBusEvents = inboundEventProcessingPipeline.run(eventProcessingContext);
 
         // TODO: change transform() to EventInstance instead of eventBusEvent
-        List<FlowableEventBusEvent> eventBusEvents = inboundEventProcessingPipeline.transform(eventProcessingContext);
         for (FlowableEventBusEvent flowableEventBusEvent : eventBusEvents) {
             flowableEventBus.sendEvent(flowableEventBusEvent);
         }
