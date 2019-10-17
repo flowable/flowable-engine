@@ -34,11 +34,11 @@ public interface ChannelDefinitionBuilder {
 
     interface InboundEventProcessingPipelineBuilder {
 
-        InboundEventKeyJsonDetectorBuilder deserializeToJson();
+        InboundEventKeyJsonDetectorBuilder jsonDeserializer();
 
-        <T> InboundEventKeyDetectorBuilder<T> customDeserializer(InboundEventDeserializer<T> deserializer);
+        <T> InboundEventKeyDetectorBuilder<T> deserializer(InboundEventDeserializer<T> deserializer);
 
-        ChannelDefinitionBuilder customEventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline);
+        ChannelDefinitionBuilder eventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline);
 
         InboundEventProcessingPipeline build();
 
@@ -54,7 +54,7 @@ public interface ChannelDefinitionBuilder {
 
     interface InboundEventKeyDetectorBuilder<T> {
 
-        InboundEventPayloadExtractorBuilder<T> detectEventKeyUsingCustomKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector);
+        InboundEventPayloadExtractorBuilder<T> detectEventKeyUsingKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector);
 
     }
 
@@ -66,13 +66,13 @@ public interface ChannelDefinitionBuilder {
 
     interface InboundEventPayloadExtractorBuilder<T> {
 
-        InboundEventTransformerBuilder customPayloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor);
+        InboundEventTransformerBuilder payloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor);
 
     }
 
     interface InboundEventTransformerBuilder {
 
-        ChannelDefinitionBuilder customTransformer(InboundEventTransformer inboundEventTransformer);
+        ChannelDefinitionBuilder transformer(InboundEventTransformer inboundEventTransformer);
 
         ChannelDefinition register();
 

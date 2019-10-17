@@ -101,7 +101,7 @@ public class DefaultEventRegistryTest {
         eventRegistry.newChannelDefinition()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
-            .deserializeToJson()
+            .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
             .jsonFieldsMapDirectlyToPayload()
             .register();

@@ -22,6 +22,8 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
 import org.flowable.common.engine.api.eventregistry.definition.EventPayloadTypes;
+import org.flowable.common.engine.impl.eventregistry.JsonFieldBasedInboundEventKeyDetector;
+import org.flowable.common.engine.impl.eventregistry.deserializer.StringToJsonDeserializer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +59,7 @@ public class TestCmmnEventRegistryConsumer extends FlowableCmmnTestCase {
         cmmnEngineConfiguration.getEventRegistry().newChannelDefinition()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
-            .deserializeToJson()
+            .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
             .jsonFieldsMapDirectlyToPayload()
             .register();
