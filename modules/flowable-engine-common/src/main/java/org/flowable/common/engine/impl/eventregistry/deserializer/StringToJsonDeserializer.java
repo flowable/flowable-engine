@@ -15,9 +15,7 @@ package org.flowable.common.engine.impl.eventregistry.deserializer;
 import java.io.IOException;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventDeserializer;
-import org.flowable.common.engine.impl.eventregistry.constant.EventProcessingConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class StringToJsonDeserializer implements InboundEventDeserializer {
+public class StringToJsonDeserializer implements InboundEventDeserializer<JsonNode> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(StringToJsonDeserializer.class);
 
@@ -41,10 +40,9 @@ public class StringToJsonDeserializer implements InboundEventDeserializer {
     }
 
     @Override
-    public void deserialize(String rawEvent, EventProcessingContext eventProcessingContext) {
+    public JsonNode deserialize(String rawEvent) {
         try {
-            JsonNode jsonNode = objectMapper.readTree(rawEvent);
-            eventProcessingContext.addProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, jsonNode);
+            return objectMapper.readTree(rawEvent);
         } catch (IOException e) {
             throw new FlowableException("Could not deserialize event to json", e);
         }

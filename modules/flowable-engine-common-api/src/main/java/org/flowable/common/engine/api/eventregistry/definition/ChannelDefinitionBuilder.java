@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.eventregistry.InboundEventTransformer;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public interface ChannelDefinitionBuilder {
 
@@ -33,9 +34,9 @@ public interface ChannelDefinitionBuilder {
 
     interface InboundEventProcessingPipelineBuilder {
 
-        InboundEventKeyDetectorBuilder deserializeToJson();
+        InboundEventKeyJsonDetectorBuilder deserializeToJson();
 
-        InboundEventKeyDetectorBuilder customDeserializer(InboundEventDeserializer deserializer);
+        <T> InboundEventKeyDetectorBuilder<T> customDeserializer(InboundEventDeserializer<T> deserializer);
 
         ChannelDefinitionBuilder customEventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline);
 
@@ -43,21 +44,29 @@ public interface ChannelDefinitionBuilder {
 
     }
 
-    interface InboundEventKeyDetectorBuilder {
+    interface InboundEventKeyJsonDetectorBuilder {
 
-        InboundEventPayloadExtractorBuilder detectEventKeyUsingJsonField(String field);
+        InboundEventPayloadJsonExtractorBuilder detectEventKeyUsingJsonField(String field);
 
-        InboundEventPayloadExtractorBuilder detectEventKeyUsingJsonPathExpression(String jsonPathExpression);
-
-        InboundEventPayloadExtractorBuilder detectEventKeyUsingCustomKeyDetector(InboundEventKeyDetector inboundEventKeyDetector);
+        InboundEventPayloadJsonExtractorBuilder detectEventKeyUsingJsonPathExpression(String jsonPathExpression);
 
     }
 
-    interface InboundEventPayloadExtractorBuilder{
+    interface InboundEventKeyDetectorBuilder<T> {
+
+        InboundEventPayloadExtractorBuilder<T> detectEventKeyUsingCustomKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector);
+
+    }
+
+    interface InboundEventPayloadJsonExtractorBuilder {
 
         InboundEventTransformerBuilder jsonFieldsMapDirectlyToPayload();
 
-        InboundEventTransformerBuilder customPayloadExtractor(InboundEventPayloadExtractor inboundEventPayloadExtractor);
+    }
+
+    interface InboundEventPayloadExtractorBuilder<T> {
+
+        InboundEventTransformerBuilder customPayloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor);
 
     }
 

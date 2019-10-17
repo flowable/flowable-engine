@@ -12,30 +12,29 @@
  */
 package org.flowable.common.engine.impl.eventregistry;
 
-import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
-import org.flowable.common.engine.impl.eventregistry.constant.EventProcessingConstants;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDetector {
+public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDetector<JsonNode> {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected String jsonPathExpression;
+    protected JsonPointer jsonPathExpression;
 
     public JsonPathBasedInboundEventKeyDetector(String jsonPathExpression) {
-        this.jsonPathExpression = jsonPathExpression;
+        this.jsonPathExpression = JsonPointer.compile(jsonPathExpression);
     }
 
     @Override
-    public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
-        JsonNode jsonNode = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
-        JsonNode result = jsonNode.at(jsonPathExpression);
+    public String detectEventDefinitionKey(JsonNode event) {
+        JsonNode result = event.at(jsonPathExpression);
 
         if (result == null || result.isMissingNode() || result.isNull()) {
             // TODO: throw exception? Log? ...?
@@ -47,5 +46,4 @@ public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDete
 
         return null;
     }
-
 }

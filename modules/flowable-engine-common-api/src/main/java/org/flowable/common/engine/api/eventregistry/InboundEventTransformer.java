@@ -12,15 +12,17 @@
  */
 package org.flowable.common.engine.api.eventregistry;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public interface InboundEventTransformer {
 
-    List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext);
+    Collection<FlowableEventBusEvent> transform(EventInstance eventInstance);
 
 }

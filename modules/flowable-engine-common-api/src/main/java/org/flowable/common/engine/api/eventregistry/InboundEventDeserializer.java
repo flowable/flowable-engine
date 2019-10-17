@@ -1,4 +1,3 @@
-
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,8 +14,9 @@ package org.flowable.common.engine.api.eventregistry;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public interface InboundEventDeserializer {
+public interface InboundEventDeserializer<T> {
 
     /**
      * Returns the unique type for this deserializer.
@@ -27,6 +27,6 @@ public interface InboundEventDeserializer {
     /**
      * The actual deserialization.
      */
-    void deserialize(String rawEvent, EventProcessingContext eventProcessingContext);
+    T deserialize(String rawEvent);
 
 }

@@ -15,13 +15,11 @@ package org.flowable.common.engine.impl.eventregistry.payload;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventPayloadExtractor;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventPayloadTypes;
 import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
 import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
-import org.flowable.common.engine.impl.eventregistry.constant.EventProcessingConstants;
 import org.flowable.common.engine.impl.eventregistry.runtime.EventCorrelationParameterInstanceImpl;
 import org.flowable.common.engine.impl.eventregistry.runtime.EventPayloadInstanceImpl;
 
@@ -30,26 +28,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtractor {
+public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtractor<JsonNode> {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventProcessingContext eventProcessingContext) {
-        EventDefinition eventDefinition = eventProcessingContext.getEventDefinition();
-        JsonNode event = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
-
+    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventDefinition eventDefinition, JsonNode event) {
         return eventDefinition.getCorrelationParameterDefinitions().stream()
             .map(parameterDefinition -> new EventCorrelationParameterInstanceImpl(parameterDefinition, getPayloadValue(event, parameterDefinition.getName(), parameterDefinition.getType())))
             .collect(Collectors.toList());
     }
 
     @Override
-    public Collection<EventPayloadInstance> extractPayload(EventProcessingContext eventProcessingContext) {
-        EventDefinition eventDefinition = eventProcessingContext.getEventDefinition();
-        JsonNode event = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
-
+    public Collection<EventPayloadInstance> extractPayload(EventDefinition eventDefinition, JsonNode event) {
         return eventDefinition.getEventPayloadDefinitions().stream()
             .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(event, payloadDefinition.getName(), payloadDefinition.getType())))
             .collect(Collectors.toList());

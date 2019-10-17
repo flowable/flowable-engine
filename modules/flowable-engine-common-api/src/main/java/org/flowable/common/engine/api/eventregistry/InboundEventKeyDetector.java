@@ -14,9 +14,11 @@ package org.flowable.common.engine.api.eventregistry;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public interface InboundEventKeyDetector {
+@FunctionalInterface
+public interface InboundEventKeyDetector<T> {
 
-    String detectEventDefinitionKey(EventProcessingContext eventProcessingContext);
+    String detectEventDefinitionKey(T event);
 
 }

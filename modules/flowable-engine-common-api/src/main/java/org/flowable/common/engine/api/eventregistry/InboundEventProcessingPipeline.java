@@ -13,17 +13,15 @@
 package org.flowable.common.engine.api.eventregistry;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
-import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
-import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public interface InboundEventProcessingPipeline {
 
-    List<FlowableEventBusEvent> run(EventProcessingContext eventProcessingContext);
+    Collection<FlowableEventBusEvent> run(String channelKey, String rawEvent);
 
 }

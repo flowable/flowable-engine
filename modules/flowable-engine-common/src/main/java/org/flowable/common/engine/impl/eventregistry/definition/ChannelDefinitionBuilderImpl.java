@@ -28,8 +28,11 @@ import org.flowable.common.engine.impl.eventregistry.payload.JsonFieldToMapPaylo
 import org.flowable.common.engine.impl.eventregistry.pipeline.DefaultEventProcessingPipeline;
 import org.flowable.common.engine.impl.eventregistry.transformer.DefaultInboundEventTransformer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
 
@@ -52,7 +55,7 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
     @Override
     public InboundEventProcessingPipelineBuilder channelAdapter(InboundEventChannelAdapter inboundEventChannelAdapter) {
         this.inboundEventChannelAdapter = inboundEventChannelAdapter;
-        this.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl(eventRegistry, this);
+        this.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry, this);
         return this.inboundEventProcessingPipelineBuilder;
     }
 
@@ -70,15 +73,15 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
         return channelDefinition;
     }
 
-    public static class InboundEventProcessingPipelineBuilderImpl implements InboundEventProcessingPipelineBuilder {
+    public static class InboundEventProcessingPipelineBuilderImpl<T> implements InboundEventProcessingPipelineBuilder {
 
         protected EventRegistry eventRegistry;
         protected ChannelDefinitionBuilderImpl channelDefinitionBuilder;
 
         protected InboundEventProcessingPipeline customInboundEventProcessingPipeline;
-        protected InboundEventDeserializer inboundEventDeserializer;
-        protected InboundEventKeyDetector inboundEventKeyDetector;
-        protected InboundEventPayloadExtractor inboundEventPayloadExtractor;
+        protected InboundEventDeserializer<T> inboundEventDeserializer;
+        protected InboundEventKeyDetector<T> inboundEventKeyDetector;
+        protected InboundEventPayloadExtractor<T> inboundEventPayloadExtractor;
         protected InboundEventTransformer inboundEventTransformer;
 
         public InboundEventProcessingPipelineBuilderImpl(EventRegistry eventRegistry, ChannelDefinitionBuilderImpl channelDefinitionBuilder) {
@@ -87,15 +90,22 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
         }
 
         @Override
-        public InboundEventKeyDetectorBuilder deserializeToJson() {
-            this.inboundEventDeserializer = new StringToJsonDeserializer();
-            return new InboundEventDefinitionKeyDetectorBuilderImpl(this);
+        public InboundEventKeyJsonDetectorBuilder deserializeToJson() {
+
+            InboundEventProcessingPipelineBuilderImpl<JsonNode> jsonPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry,
+                channelDefinitionBuilder);
+            this.channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = jsonPipelineBuilder;
+
+            jsonPipelineBuilder.inboundEventDeserializer = new StringToJsonDeserializer();
+            return new InboundEventKeyJsonDetectorBuilderImpl(jsonPipelineBuilder);
         }
 
         @Override
-        public  InboundEventKeyDetectorBuilder customDeserializer(InboundEventDeserializer deserializer) {
-            this.inboundEventDeserializer = deserializer;
-            return new InboundEventDefinitionKeyDetectorBuilderImpl(this);
+        public <D> InboundEventKeyDetectorBuilder<D> customDeserializer(InboundEventDeserializer<D> deserializer) {
+            InboundEventProcessingPipelineBuilderImpl<D> customPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry,
+                channelDefinitionBuilder);
+            customPipelineBuilder.inboundEventDeserializer = deserializer;
+            return new InboundEventDefinitionKeyDetectorBuilderImpl<>(customPipelineBuilder);
         }
 
         @Override
@@ -109,46 +119,55 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
             if (customInboundEventProcessingPipeline != null) {
                 return customInboundEventProcessingPipeline;
             } else {
-                return new DefaultEventProcessingPipeline(eventRegistry,
+                return new DefaultEventProcessingPipeline<>(eventRegistry,
                     inboundEventDeserializer, inboundEventKeyDetector, inboundEventPayloadExtractor, inboundEventTransformer);
             }
         }
 
     }
 
-    public static class InboundEventDefinitionKeyDetectorBuilderImpl implements InboundEventKeyDetectorBuilder {
+    public static class InboundEventKeyJsonDetectorBuilderImpl implements InboundEventKeyJsonDetectorBuilder {
 
-        protected InboundEventProcessingPipelineBuilderImpl inboundEventProcessingPipelineBuilder;
+        protected InboundEventProcessingPipelineBuilderImpl<JsonNode> inboundEventProcessingPipelineBuilder;
 
-        public InboundEventDefinitionKeyDetectorBuilderImpl(InboundEventProcessingPipelineBuilderImpl inboundEventProcessingPipelineBuilder) {
+        public InboundEventKeyJsonDetectorBuilderImpl(InboundEventProcessingPipelineBuilderImpl<JsonNode> inboundEventProcessingPipelineBuilder) {
             this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
         }
 
         @Override
-        public InboundEventPayloadExtractorBuilder detectEventKeyUsingJsonField(String field) {
+        public InboundEventPayloadJsonExtractorBuilder detectEventKeyUsingJsonField(String field) {
             this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(field);
-            return new InboundEventPayloadExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventPayloadJsonExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
         @Override
-        public InboundEventPayloadExtractorBuilder detectEventKeyUsingJsonPathExpression(String jsonPathExpression) {
+        public InboundEventPayloadJsonExtractorBuilder detectEventKeyUsingJsonPathExpression(String jsonPathExpression) {
             this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new JsonPathBasedInboundEventKeyDetector(jsonPathExpression);
-            return new InboundEventPayloadExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventPayloadJsonExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
+        }
+    }
+
+    public static class InboundEventDefinitionKeyDetectorBuilderImpl<T> implements InboundEventKeyDetectorBuilder<T> {
+
+        protected InboundEventProcessingPipelineBuilderImpl<T> inboundEventProcessingPipelineBuilder;
+
+        public InboundEventDefinitionKeyDetectorBuilderImpl(InboundEventProcessingPipelineBuilderImpl<T> inboundEventProcessingPipelineBuilder) {
+            this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
         }
 
         @Override
-        public InboundEventPayloadExtractorBuilder detectEventKeyUsingCustomKeyDetector(InboundEventKeyDetector inboundEventKeyDetector) {
+        public InboundEventPayloadExtractorBuilder<T> detectEventKeyUsingCustomKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector) {
             this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = inboundEventKeyDetector;
-            return new InboundEventPayloadExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventPayloadExtractorBuilderImpl<>(inboundEventProcessingPipelineBuilder);
         }
 
     }
 
-    public static class InboundEventPayloadExtractorBuilderImpl implements InboundEventPayloadExtractorBuilder {
+    public static class InboundEventPayloadJsonExtractorBuilderImpl implements InboundEventPayloadJsonExtractorBuilder {
 
-        protected InboundEventProcessingPipelineBuilderImpl inboundEventProcessingPipelineBuilder;
+        protected InboundEventProcessingPipelineBuilderImpl<JsonNode> inboundEventProcessingPipelineBuilder;
 
-        public InboundEventPayloadExtractorBuilderImpl(InboundEventProcessingPipelineBuilderImpl inboundEventProcessingPipelineBuilder) {
+        public InboundEventPayloadJsonExtractorBuilderImpl(InboundEventProcessingPipelineBuilderImpl<JsonNode> inboundEventProcessingPipelineBuilder) {
             this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
         }
 
@@ -158,8 +177,18 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
             return new InboundEventTransformerBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
+    }
+
+    public static class InboundEventPayloadExtractorBuilderImpl<T> implements InboundEventPayloadExtractorBuilder<T> {
+
+        protected InboundEventProcessingPipelineBuilderImpl<T> inboundEventProcessingPipelineBuilder;
+
+        public InboundEventPayloadExtractorBuilderImpl(InboundEventProcessingPipelineBuilderImpl<T> inboundEventProcessingPipelineBuilder) {
+            this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
+        }
+
         @Override
-        public InboundEventTransformerBuilder customPayloadExtractor(InboundEventPayloadExtractor inboundEventPayloadExtractor) {
+        public InboundEventTransformerBuilder customPayloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor) {
             this.inboundEventProcessingPipelineBuilder.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
             return new InboundEventTransformerBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
@@ -168,9 +197,9 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
 
     public static class InboundEventTransformerBuilderImpl implements InboundEventTransformerBuilder {
 
-        protected InboundEventProcessingPipelineBuilderImpl inboundEventProcessingPipelineBuilder;
+        protected InboundEventProcessingPipelineBuilderImpl<?> inboundEventProcessingPipelineBuilder;
 
-        public InboundEventTransformerBuilderImpl(InboundEventProcessingPipelineBuilderImpl inboundEventProcessingPipelineBuilder) {
+        public InboundEventTransformerBuilderImpl(InboundEventProcessingPipelineBuilderImpl<?> inboundEventProcessingPipelineBuilder) {
             this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
         }
 

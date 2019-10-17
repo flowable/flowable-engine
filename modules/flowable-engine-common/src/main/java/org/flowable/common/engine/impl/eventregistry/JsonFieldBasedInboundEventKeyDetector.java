@@ -12,17 +12,16 @@
  */
 package org.flowable.common.engine.impl.eventregistry;
 
-import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
-import org.flowable.common.engine.impl.eventregistry.constant.EventProcessingConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDetector {
+public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDetector<JsonNode> {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -33,9 +32,7 @@ public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDet
     }
 
     @Override
-    public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
-        JsonNode jsonNode = eventProcessingContext.getProcessingData(EventProcessingConstants.DESERIALIZED_JSON_NODE, JsonNode.class);
-        return jsonNode.path(field).asText();
+    public String detectEventDefinitionKey(JsonNode event) {
+        return event.path(field).asText();
     }
-
 }

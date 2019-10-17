@@ -13,10 +13,8 @@
 package org.flowable.common.engine.impl.eventregistry.pipeline;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
-import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.InboundEventDeserializer;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
@@ -25,24 +23,26 @@ import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeli
 import org.flowable.common.engine.api.eventregistry.InboundEventTransformer;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 import org.flowable.common.engine.impl.eventregistry.runtime.EventInstanceImpl;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class DefaultEventProcessingPipeline implements InboundEventProcessingPipeline {
+public class DefaultEventProcessingPipeline<T> implements InboundEventProcessingPipeline {
 
     protected EventRegistry eventRegistry;
-    protected InboundEventDeserializer inboundEventDeserializer;
-    protected InboundEventKeyDetector inboundEventKeyDetector;
-    protected InboundEventPayloadExtractor inboundEventPayloadExtractor;
+    protected InboundEventDeserializer<T> inboundEventDeserializer;
+    protected InboundEventKeyDetector<T> inboundEventKeyDetector;
+    protected InboundEventPayloadExtractor<T> inboundEventPayloadExtractor;
     protected InboundEventTransformer inboundEventTransformer;
 
     public DefaultEventProcessingPipeline(EventRegistry eventRegistry,
-            InboundEventDeserializer inboundEventDeserializer,
-            InboundEventKeyDetector inboundEventKeyDetector,
-            InboundEventPayloadExtractor inboundEventPayloadExtractor,
+            InboundEventDeserializer<T> inboundEventDeserializer,
+            InboundEventKeyDetector<T> inboundEventKeyDetector,
+            InboundEventPayloadExtractor<T> inboundEventPayloadExtractor,
             InboundEventTransformer inboundEventTransformer) {
         this.eventRegistry = eventRegistry;
         this.inboundEventDeserializer = inboundEventDeserializer;
@@ -52,42 +52,39 @@ public class DefaultEventProcessingPipeline implements InboundEventProcessingPip
     }
 
     @Override
-    public List<FlowableEventBusEvent> run(EventProcessingContext eventProcessingContext) {
-        deserialize(eventProcessingContext.getRawEvent(), eventProcessingContext);
-        String eventKey = detectEventDefinitionKey(eventProcessingContext);
+    public Collection<FlowableEventBusEvent> run(String channelKey, String rawEvent) {
+        T event = deserialize(rawEvent);
+        String eventKey = detectEventDefinitionKey(event);
 
         EventDefinition eventDefinition = eventRegistry.getEventDefinition(eventKey);
-        eventProcessingContext.setEventDefinition(eventDefinition);
 
         EventInstanceImpl eventInstance = new EventInstanceImpl(
             eventDefinition,
-            extractCorrelationParameters(eventProcessingContext),
-            extractPayload(eventProcessingContext)
+            extractCorrelationParameters(eventDefinition, event),
+            extractPayload(eventDefinition, event)
         );
-        eventProcessingContext.getEventInstances().add(eventInstance);
 
         // TODO: change transform() to EventInstance instead of eventBusEvent
-        return transform(eventProcessingContext);
+        return transform(eventInstance);
     }
 
-    public void deserialize(String rawEvent, EventProcessingContext eventProcessingContext) {
-        inboundEventDeserializer.deserialize(rawEvent, eventProcessingContext);
+    public T deserialize(String rawEvent) {
+        return inboundEventDeserializer.deserialize(rawEvent);
     }
 
-    public String detectEventDefinitionKey(EventProcessingContext eventProcessingContext) {
-        return inboundEventKeyDetector.detectEventDefinitionKey(eventProcessingContext);
+    public String detectEventDefinitionKey(T event) {
+        return inboundEventKeyDetector.detectEventDefinitionKey(event);
     }
 
-    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventProcessingContext eventProcessingContext) {
-        return inboundEventPayloadExtractor.extractCorrelationParameters(eventProcessingContext);
+    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventDefinition eventDefinition, T event) {
+        return inboundEventPayloadExtractor.extractCorrelationParameters(eventDefinition, event);
     }
 
-    public Collection<EventPayloadInstance> extractPayload(EventProcessingContext eventProcessingContext) {
-        return inboundEventPayloadExtractor.extractPayload(eventProcessingContext);
+    public Collection<EventPayloadInstance> extractPayload(EventDefinition eventDefinition, T event) {
+        return inboundEventPayloadExtractor.extractPayload(eventDefinition, event);
     }
 
-    public List<FlowableEventBusEvent> transform(EventProcessingContext eventProcessingContext) {
-        return inboundEventTransformer.transform(eventProcessingContext);
+    public Collection<FlowableEventBusEvent> transform(EventInstance eventInstance) {
+        return inboundEventTransformer.transform(eventInstance);
     }
-
 }
