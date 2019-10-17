@@ -1,0 +1,34 @@
+{
+	"name": "imagemin-svgo",
+	"version": "7.0.0",
+	"description": "SVGO imagemin plugin",
+	"license": "MIT",
+	"repository": "imagemin/imagemin-svgo",
+	"engines": {
+		"node": ">=6"
+	},
+	"scripts": {
+		"test": "xo && ava"
+	},
+	"files": [
+		"index.js"
+	],
+	"keywords": [
+		"compress",
+		"image",
+		"imageminplugin",
+		"img",
+		"minify",
+		"optimize",
+		"svg",
+		"svgo"
+	],
+	"dependencies": {
+		"is-svg": "^3.0.0",
+		"svgo": "^1.0.5"
+	},
+	"devDependencies": {
+		"ava": "*",
+		"xo": "*"
+	}
+}
