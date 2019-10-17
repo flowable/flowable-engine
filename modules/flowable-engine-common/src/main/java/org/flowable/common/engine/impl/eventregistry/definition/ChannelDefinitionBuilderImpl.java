@@ -104,6 +104,7 @@ public class ChannelDefinitionBuilderImpl implements ChannelDefinitionBuilder {
         public <D> InboundEventKeyDetectorBuilder<D> deserializer(InboundEventDeserializer<D> deserializer) {
             InboundEventProcessingPipelineBuilderImpl<D> customPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry,
                 channelDefinitionBuilder);
+            this.channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = customPipelineBuilder;
             customPipelineBuilder.inboundEventDeserializer = deserializer;
             return new InboundEventDefinitionKeyDetectorBuilderImpl<>(customPipelineBuilder);
         }
