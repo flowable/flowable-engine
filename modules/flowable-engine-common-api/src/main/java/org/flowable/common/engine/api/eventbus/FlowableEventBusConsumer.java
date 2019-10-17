@@ -12,11 +12,11 @@
  */
 package org.flowable.common.engine.api.eventbus;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface FlowableEventBusConsumer {
 
-    List<String> getSupportedTypes();
+    Collection<String> getSupportedTypes();
 
     void eventReceived(FlowableEventBusEvent event);
 

@@ -15,6 +15,7 @@ package org.flowable.engine.test.eventbus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
@@ -106,7 +107,7 @@ public class VariableEventTest extends PluggableFlowableTestCase implements Flow
         protected List<FlowableEventBusEvent> events = new ArrayList<>();
         
         @Override
-        public List<String> getSupportedTypes() {
+        public Collection<String> getSupportedTypes() {
             return Arrays.asList(TYPE_VARIABLE_CREATED, TYPE_VARIABLE_UPDATED);
         }
 

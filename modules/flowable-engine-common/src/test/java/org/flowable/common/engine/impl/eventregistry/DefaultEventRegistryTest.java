@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -113,7 +114,7 @@ public class DefaultEventRegistryTest {
         public List<FlowableEventBusEvent> eventsReceived = new ArrayList<>();
 
         @Override
-        public List<String> getSupportedTypes() {
+        public Collection<String> getSupportedTypes() {
             return Collections.singletonList("myEvent");
         }
 

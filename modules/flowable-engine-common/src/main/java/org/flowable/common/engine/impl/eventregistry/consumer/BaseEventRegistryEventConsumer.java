@@ -12,8 +12,8 @@
  */
 package org.flowable.common.engine.impl.eventregistry.consumer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
@@ -26,7 +26,7 @@ import org.flowable.common.engine.impl.eventregistry.event.EventRegistryEvent;
  */
 public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventBusConsumer {
 
-    protected List<String> supportedTypes = new ArrayList<>();
+    protected Collection<String> supportedTypes = new LinkedHashSet<>();
     protected EventRegistry eventRegistry;
 
     public BaseEventRegistryEventConsumer(EventRegistry eventRegistry) {
@@ -40,7 +40,7 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
     }
 
     @Override
-    public List<String> getSupportedTypes() {
+    public Collection<String> getSupportedTypes() {
         return supportedTypes;
     }
 

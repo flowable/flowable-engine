@@ -13,6 +13,7 @@
 package org.flowable.common.engine.impl.eventbus;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class BasicFlowableEventBus implements FlowableEventBus {
 
     @Override
     public void addFlowableEventConsumer(FlowableEventBusConsumer eventConsumer) {
-        List<String> supportedTypes = eventConsumer.getSupportedTypes();
+        Collection<String> supportedTypes = eventConsumer.getSupportedTypes();
         if (supportedTypes != null && !supportedTypes.isEmpty()) {
             for (String type : supportedTypes) {
                 putEventConsumer(type, eventConsumer);
@@ -46,7 +47,7 @@ public class BasicFlowableEventBus implements FlowableEventBus {
 
     @Override
     public void removeFlowableEventConsumer(FlowableEventBusConsumer eventConsumer) {
-        List<String> supportedTypes = eventConsumer.getSupportedTypes();
+        Collection<String> supportedTypes = eventConsumer.getSupportedTypes();
         if (supportedTypes != null && !supportedTypes.isEmpty()) {
             for (String type : supportedTypes) {
                 removeConsumer(eventConsumer, type);
