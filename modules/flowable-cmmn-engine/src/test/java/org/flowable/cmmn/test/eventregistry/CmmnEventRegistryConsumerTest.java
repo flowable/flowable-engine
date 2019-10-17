@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Joram Barrez
  */
-public class TestCmmnEventRegistryConsumer extends FlowableCmmnTestCase {
+public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
 
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
