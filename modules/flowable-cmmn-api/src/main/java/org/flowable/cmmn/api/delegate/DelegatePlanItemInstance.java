@@ -16,6 +16,7 @@ import java.util.Date;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -54,5 +55,14 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     void setTenantId(String tenantId);
 
     PlanItem getPlanItem();
+
+    default PlanItemDefinition getPlanItemDefinition() {
+        PlanItem planItem = getPlanItem();
+        if (planItem != null) {
+            return planItem.getPlanItemDefinition();
+        }
+
+        return null;
+    }
 
 }
