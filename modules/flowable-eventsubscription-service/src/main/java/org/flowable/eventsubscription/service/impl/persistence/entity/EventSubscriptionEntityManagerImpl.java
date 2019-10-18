@@ -228,6 +228,10 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
             subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
         
+        if (subscriptionEntity.getConfiguration() == null) {
+            subscriptionEntity.setConfiguration(eventSubscriptionBuilder.getConfiguration());
+        }
+
         insert(subscriptionEntity);
         
         return subscriptionEntity;
@@ -245,6 +249,9 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
         if (eventSubscriptionBuilder.getTenantId() != null) {
             subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
+
+        subscriptionEntity.setConfiguration(eventSubscriptionBuilder.getConfiguration());
+
         insert(subscriptionEntity);
         
         return subscriptionEntity;
@@ -259,6 +266,9 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
         if (eventSubscriptionBuilder.getTenantId() != null) {
             eventSubscription.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
+
+        eventSubscription.setConfiguration(eventSubscriptionBuilder.getConfiguration());
+
         insert(eventSubscription);
         return eventSubscription;
     }
@@ -278,6 +288,8 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
         if (eventSubscriptionBuilder.getTenantId() != null) {
             eventSubscription.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
+
+        eventSubscription.setConfiguration(eventSubscriptionBuilder.getConfiguration());
 
         insert(eventSubscription);
 

@@ -27,6 +27,4 @@ public interface EventDefinition {
 
     Collection<EventCorrelationParameterDefinition> getCorrelationParameterDefinitions();
 
-    CorrelationDefinition getCorrelationDefinition();
-
 }

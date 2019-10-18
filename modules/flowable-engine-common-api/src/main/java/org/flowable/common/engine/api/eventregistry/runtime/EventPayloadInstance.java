@@ -16,10 +16,15 @@ import org.flowable.common.engine.api.eventregistry.definition.EventPayloadDefin
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public interface EventPayloadInstance {
 
     EventPayloadDefinition getEventPayloadDefinition();
+
+    String getDefinitionName();
+
+    String getDefinitionType();
 
     Object getValue();
 

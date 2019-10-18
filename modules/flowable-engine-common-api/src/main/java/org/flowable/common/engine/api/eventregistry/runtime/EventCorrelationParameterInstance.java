@@ -16,10 +16,15 @@ import org.flowable.common.engine.api.eventregistry.definition.EventCorrelationP
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public interface EventCorrelationParameterInstance {
 
     EventCorrelationParameterDefinition getEventCorrelationParameterDefinition();
+
+    String getDefinitionName();
+
+    String getDefinitionType();
 
     Object getValue();
 

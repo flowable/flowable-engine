@@ -61,30 +61,9 @@ public interface EventDefinitionBuilder {
     EventDefinitionBuilder correlationParameter(String name, String type);
 
     /**
-     * Start defining how the event correlates to runtime data.
-     */
-    EventCorrelationBuilder correlation();
-
-    /**
      * Registers the new {@link EventDefinition} based on the passed parameters
      * to this instance with the {@link EventRegistry}.
      */
     EventDefinition register();
-
-
-    /**
-     * Helper class to build a {@link CorrelationDefinition} as part of an {@link EventDefinition}.
-     */
-    interface EventCorrelationBuilder {
-
-        /**
-         * Defines that this event always applies.
-         * No correlation is applied. Anything listener for this event gets triggered.
-         */
-        EventDefinitionBuilder appliesAlways();
-
-        EventDefinitionBuilder custom(CorrelationDefinition eventCorrelationDefinition);
-
-    }
 
 }

@@ -13,6 +13,7 @@
 package org.flowable.common.engine.api.eventregistry;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
@@ -86,4 +87,11 @@ public interface EventRegistry {
 
     void registerEventRegistryEventBusConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer);
 
+    /**
+     * Method to generate the unique key used to correlate an event.
+     *
+     * @param data data information used to generate the key (must not be {@code null})
+     * @return a unique string correlating the event based on the information supplied
+     */
+    String generateKey(Map<String, Object> data);
 }

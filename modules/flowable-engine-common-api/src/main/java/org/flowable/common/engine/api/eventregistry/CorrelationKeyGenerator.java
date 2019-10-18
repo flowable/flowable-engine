@@ -10,18 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventregistry.definition;
-
-import java.util.Collection;
-
-import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
-import org.flowable.common.engine.api.eventregistry.EventProcessingContext;
+package org.flowable.common.engine.api.eventregistry;
 
 /**
- * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public interface CorrelationDefinition {
+public interface CorrelationKeyGenerator<T> {
 
-    Collection<FlowableEventBusEvent> correlate(EventProcessingContext eventProcessingContext);
-
+    String generateKey(T source);
 }

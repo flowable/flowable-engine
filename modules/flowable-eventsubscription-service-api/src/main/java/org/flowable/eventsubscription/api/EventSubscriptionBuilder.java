@@ -40,6 +40,8 @@ public interface EventSubscriptionBuilder {
 
     EventSubscriptionBuilder tenantId(String tenantId);
 
+    EventSubscriptionBuilder configuration(String configuration);
+
     EventSubscription create();
     
     String getEventType();
@@ -65,4 +67,6 @@ public interface EventSubscriptionBuilder {
     String getScopeType();
 
     String getTenantId();
+
+    String getConfiguration();
 }

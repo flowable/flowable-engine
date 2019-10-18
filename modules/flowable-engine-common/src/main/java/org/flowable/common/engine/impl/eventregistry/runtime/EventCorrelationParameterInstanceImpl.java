@@ -17,6 +17,7 @@ import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationPara
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class EventCorrelationParameterInstanceImpl implements EventCorrelationParameterInstance {
 
@@ -36,6 +37,16 @@ public class EventCorrelationParameterInstanceImpl implements EventCorrelationPa
 
     public void setEventCorrelationParameterDefinition(EventCorrelationParameterDefinition eventCorrelationParameterDefinition) {
         this.eventCorrelationParameterDefinition = eventCorrelationParameterDefinition;
+    }
+
+    @Override
+    public String getDefinitionName() {
+        return eventCorrelationParameterDefinition.getName();
+    }
+
+    @Override
+    public String getDefinitionType() {
+        return eventCorrelationParameterDefinition.getType();
     }
 
     @Override

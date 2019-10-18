@@ -37,6 +37,7 @@ public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtrac
     @Override
     public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventDefinition eventDefinition, JsonNode event) {
         return eventDefinition.getCorrelationParameterDefinitions().stream()
+            .filter(parameterDefinition -> event.has(parameterDefinition.getName()))
             .map(parameterDefinition -> new EventCorrelationParameterInstanceImpl(parameterDefinition, getPayloadValue(event, parameterDefinition.getName(), parameterDefinition.getType())))
             .collect(Collectors.toList());
     }
@@ -44,6 +45,7 @@ public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtrac
     @Override
     public Collection<EventPayloadInstance> extractPayload(EventDefinition eventDefinition, JsonNode event) {
         return eventDefinition.getEventPayloadDefinitions().stream()
+            .filter(payloadDefinition -> event.has(payloadDefinition.getName()))
             .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(event, payloadDefinition.getName(), payloadDefinition.getType())))
             .collect(Collectors.toList());
     }

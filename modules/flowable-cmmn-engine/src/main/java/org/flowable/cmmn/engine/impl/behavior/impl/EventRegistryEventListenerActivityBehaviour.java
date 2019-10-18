@@ -12,7 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,17 +25,21 @@ import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavio
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTriggerableActivityBehavior implements PlanItemActivityBehavior {
 
@@ -102,6 +109,8 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
     protected void createEventSubscription(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         EventDefinition eventDefinition = getEventDefinition(commandContext, planItemInstanceEntity);
 
+        String correlationKey = getCorrelationKey(commandContext, planItemInstanceEntity);
+
         CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
             .eventType(eventDefinition.getKey())
             .subScopeId(planItemInstanceEntity.getId())
@@ -109,7 +118,40 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
             .scopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
             .scopeType(ScopeTypes.CMMN)
             .tenantId(planItemInstanceEntity.getTenantId())
+            .configuration(correlationKey)
             .create();
+    }
+
+    protected String getCorrelationKey(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        String correlationKey;
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
+        if (planItemDefinition != null) {
+            List<ExtensionElement> eventCorrelations = planItemDefinition.getExtensionElements()
+                .getOrDefault("eventCorrelationParameter", Collections.emptyList());
+            if (!eventCorrelations.isEmpty()) {
+                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+                ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+
+                Map<String, Object> correlationParameters = new HashMap<>();
+                for (ExtensionElement eventCorrelation : eventCorrelations) {
+                    String name = eventCorrelation.getAttributeValue(null, "name");
+                    String valueExpression = eventCorrelation.getAttributeValue(null, "value");
+                    if (StringUtils.isNotEmpty(valueExpression)) {
+                        Object value = expressionManager.createExpression(valueExpression).getValue(planItemInstanceEntity);
+                        correlationParameters.put(name, value);
+                    } else {
+                        correlationParameters.put(name, null);
+                    }
+                }
+
+                correlationKey = cmmnEngineConfiguration.getEventRegistry().generateKey(correlationParameters);
+            } else {
+                correlationKey = null;
+            }
+        } else {
+            correlationKey = null;
+        }
+        return correlationKey;
     }
 
 }

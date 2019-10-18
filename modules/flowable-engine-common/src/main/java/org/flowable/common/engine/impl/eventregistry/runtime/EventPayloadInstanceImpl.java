@@ -16,8 +16,9 @@ import org.flowable.common.engine.api.eventregistry.definition.EventPayloadDefin
 import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 
 /**
-  * @author Joram Barrez
-  */
+ * @author Joram Barrez
+ * @author Filip Hrisafov
+ */
 public class EventPayloadInstanceImpl implements EventPayloadInstance {
 
     protected EventPayloadDefinition eventPayloadDefinition;
@@ -35,6 +36,16 @@ public class EventPayloadInstanceImpl implements EventPayloadInstance {
 
     public void setEventPayloadDefinition(EventPayloadDefinition eventPayloadDefinition) {
         this.eventPayloadDefinition = eventPayloadDefinition;
+    }
+
+    @Override
+    public String getDefinitionName() {
+        return eventPayloadDefinition.getName();
+    }
+
+    @Override
+    public String getDefinitionType() {
+        return eventPayloadDefinition.getType();
     }
 
     @Override

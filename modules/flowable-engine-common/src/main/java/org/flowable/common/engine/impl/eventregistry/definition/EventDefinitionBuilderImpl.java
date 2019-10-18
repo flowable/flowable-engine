@@ -20,7 +20,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
-import org.flowable.common.engine.api.eventregistry.definition.CorrelationDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventCorrelationParameterDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinitionBuilder;
@@ -37,7 +36,6 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
     protected Collection<String> channelKeys;
     protected Map<String, EventCorrelationParameterDefinition> correlationParameterDefinitions = new LinkedHashMap<>();
     protected Map<String, EventPayloadDefinition> eventPayloadDefinitions = new LinkedHashMap<>();
-    protected CorrelationDefinition eventCorrelationDefinition;
 
     public EventDefinitionBuilderImpl(EventRegistry eventRegistry) {
         this.eventRegistry = eventRegistry;
@@ -78,11 +76,6 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
     }
 
     @Override
-    public EventCorrelationBuilder correlation() {
-        return new EventCorrelationBuilderImpl(this);
-    }
-
-    @Override
     public EventDefinition register() {
         EventDefinitionImpl eventDefinition = new EventDefinitionImpl();
 
@@ -99,35 +92,9 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
         eventDefinition.getCorrelationParameterDefinitions().addAll(correlationParameterDefinitions.values());
         eventDefinition.getEventPayloadDefinitions().addAll(eventPayloadDefinitions.values());
 
-        if (eventCorrelationDefinition != null) {
-            eventDefinition.setCorrelationDefinition(eventCorrelationDefinition);
-        }
-
         eventRegistry.registerEventDefinition(eventDefinition);
 
         return eventDefinition;
-    }
-
-    public static class EventCorrelationBuilderImpl implements EventCorrelationBuilder {
-
-        protected EventDefinitionBuilderImpl eventDefinitionBuilder;
-
-        public EventCorrelationBuilderImpl(EventDefinitionBuilderImpl eventDefinitionBuilder) {
-            this.eventDefinitionBuilder = eventDefinitionBuilder;
-        }
-
-        @Override
-        public EventDefinitionBuilder appliesAlways() {
-            eventDefinitionBuilder.eventCorrelationDefinition = new AlwaysAppliesEventCorrelationDefinition();
-            return eventDefinitionBuilder;
-        }
-
-        @Override
-        public EventDefinitionBuilder custom(CorrelationDefinition eventCorrelationDefinition) {
-            eventDefinitionBuilder.eventCorrelationDefinition = eventCorrelationDefinition;
-            return eventDefinitionBuilder;
-        }
-
     }
 
 }

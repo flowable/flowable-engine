@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
+import org.flowable.common.engine.api.eventregistry.CorrelationKeyGenerator;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
@@ -44,10 +45,11 @@ public class DefaultEventRegistry implements EventRegistry {
     protected List<EventRegistryEventBusConsumer> eventRegistryEventBusConsumers = new ArrayList<>();
 
     protected InboundEventProcessor inboundEventProcessor;
-
+    protected CorrelationKeyGenerator<Map<String, Object>> correlationKeyGenerator;
 
     public DefaultEventRegistry(FlowableEventBus eventBus) {
         this.eventBus = eventBus;
+        this.correlationKeyGenerator = new DefaultCorrelationKeyGenerator();
     }
 
     @Override
@@ -145,4 +147,8 @@ public class DefaultEventRegistry implements EventRegistry {
         eventRegistryEventBusConsumers.add(eventRegistryEventBusConsumer);
     }
 
+    @Override
+    public String generateKey(Map<String, Object> data) {
+        return correlationKeyGenerator.generateKey(data);
+    }
 }

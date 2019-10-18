@@ -98,7 +98,7 @@ public class DefaultEventRegistryTest {
         assertThat(eventInstance.getCorrelationParameterInstances())
             .extracting(EventCorrelationParameterInstance::getValue).containsOnly("test");
         assertThat(eventInstance.getPayloadInstances())
-            .extracting(p -> p.getEventPayloadDefinition().getName(), p -> p.getEventPayloadDefinition().getType(), EventPayloadInstance::getValue)
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getDefinitionType, EventPayloadInstance::getValue)
             .containsOnly(
                 tuple("customerId", EventPayloadTypes.STRING, "test"),
                 tuple("payload1", EventPayloadTypes.STRING, "Hello World"),

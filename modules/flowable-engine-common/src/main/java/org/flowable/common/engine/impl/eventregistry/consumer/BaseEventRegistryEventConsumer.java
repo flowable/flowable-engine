@@ -12,17 +12,25 @@
  */
 package org.flowable.common.engine.impl.eventregistry.consumer;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
+import org.flowable.common.engine.api.eventregistry.runtime.EventCorrelationParameterInstance;
 import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.impl.eventregistry.event.EventRegistryEvent;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventBusConsumer {
 
@@ -55,5 +63,29 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
     }
 
     protected abstract void eventReceived(EventInstance eventInstance);
+
+    protected Collection<String> generateCorrelationKeys(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
+        if (correlationParameterInstances.isEmpty()) {
+            return Collections.emptySet();
+        }
+        List<EventCorrelationParameterInstance> list = new ArrayList<>(correlationParameterInstances);
+        Collection<String> correlationKeys = new HashSet<>();
+        for (int i = 1; i <= list.size(); i++) {
+            for (int j = 0; j <= list.size() - i; j++) {
+                correlationKeys.add(generateCorrelationKey(list.subList(j, j + i)));
+            }
+        }
+
+        return correlationKeys;
+    }
+
+    protected String generateCorrelationKey(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
+        Map<String, Object> data = new HashMap<>();
+        for (EventCorrelationParameterInstance correlationParameterInstance : correlationParameterInstances) {
+            data.put(correlationParameterInstance.getDefinitionName(), correlationParameterInstance.getValue());
+        }
+
+        return eventRegistry.generateKey(data);
+    }
 
 }

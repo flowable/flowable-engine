@@ -106,6 +106,18 @@
       <if test="tenantId == null">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>        
+      <if test="configuration != null">
+          and RES.CONFIGURATION_ = #{configuration}
+      </if>
+      <if test="configurations != null and !configurations.isEmpty()">
+          and RES.CONFIGURATION_ in
+          <foreach item="item" index="index" collection="configurations" open="(" separator="," close=")">
+              #{item}
+          </foreach>
+      </if>
+      <if test="withoutConfiguration">
+          and RES.CONFIGURATION_ is null
+      </if>
     </where>
   </sql>
   
