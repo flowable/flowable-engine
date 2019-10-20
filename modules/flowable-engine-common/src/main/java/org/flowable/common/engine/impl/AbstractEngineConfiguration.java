@@ -50,12 +50,10 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
-import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
-import org.flowable.common.engine.impl.eventregistry.DefaultEventRegistry;
-import org.flowable.common.engine.impl.eventregistry.DefaultInboundEventProcessor;
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusPublisher;
+import org.flowable.common.engine.api.eventregistry.EventRegistry;
+import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
@@ -71,6 +69,8 @@ import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.eventbus.BasicFlowableEventBus;
 import org.flowable.common.engine.impl.eventbus.FlowableEventPublisherImpl;
+import org.flowable.common.engine.impl.eventregistry.DefaultEventRegistry;
+import org.flowable.common.engine.impl.eventregistry.DefaultInboundEventProcessor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContextFactory;
@@ -82,6 +82,9 @@ import org.flowable.common.engine.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.common.engine.impl.interceptor.LogInterceptor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.common.engine.impl.logging.LoggingListener;
+import org.flowable.common.engine.impl.logging.LoggingSession;
+import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -94,6 +97,8 @@ import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class AbstractEngineConfiguration {
 
@@ -214,6 +219,8 @@ public abstract class AbstractEngineConfiguration {
     protected FlowableEventBusPublisher eventPublisher;
     protected EventRegistry eventRegistry;
     protected InboundEventProcessor inboundEventProcessor;
+    
+    protected LoggingListener loggingListener;
 
     protected boolean transactionsExternallyManaged;
 
@@ -352,6 +359,7 @@ public abstract class AbstractEngineConfiguration {
     protected boolean usePrefixId;
 
     protected Clock clock;
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
     // Variables
 
@@ -646,6 +654,16 @@ public abstract class AbstractEngineConfiguration {
             }
 
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            
+            if (isLoggingSessionEnabled()) {
+                if (!sessionFactories.containsKey(LoggingSession.class)) {
+                    LoggingSessionFactory loggingSessionFactory = new LoggingSessionFactory();
+                    loggingSessionFactory.setLoggingListener(loggingListener);
+                    loggingSessionFactory.setObjectMapper(objectMapper);
+                    sessionFactories.put(LoggingSession.class, loggingSessionFactory);
+                }
+            }
+            
             commandContextFactory.setSessionFactories(sessionFactories);
         }
 
@@ -1716,6 +1734,18 @@ public abstract class AbstractEngineConfiguration {
     public void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor) {
         this.inboundEventProcessor = inboundEventProcessor;
     }
+    
+    public boolean isLoggingSessionEnabled() {
+        return loggingListener != null;
+    }
+    
+    public LoggingListener getLoggingListener() {
+        return loggingListener;
+    }
+
+    public void setLoggingListener(LoggingListener loggingListener) {
+        this.loggingListener = loggingListener;
+    }
 
     public Clock getClock() {
         return clock;
@@ -1723,6 +1753,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setClock(Clock clock) {
         this.clock = clock;
+        return this;
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public AbstractEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         return this;
     }
 

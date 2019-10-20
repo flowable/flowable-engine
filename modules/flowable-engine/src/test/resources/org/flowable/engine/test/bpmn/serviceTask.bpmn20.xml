@@ -7,7 +7,7 @@
   <process id="startToEnd">
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
-    <serviceTask id="task" name="Test task" flowable:class="org.flowable.engine.test.eventbus.ServiceTaskEventTest$ExceptionServiceTaskDelegate" />
+    <serviceTask id="task" name="Test task" flowable:class="org.flowable.engine.test.logging.ServiceTaskLoggingTest$ExceptionServiceTaskDelegate" />
     <sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd" />
     <endEvent id="theEnd" />
   </process>

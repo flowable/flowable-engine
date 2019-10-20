@@ -99,15 +99,13 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class AppEngineConfiguration extends AbstractEngineConfiguration implements
         AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_APP_";
 
-    protected String cmmnEngineName = AppEngines.NAME_DEFAULT;
+    protected String appEngineName = AppEngines.NAME_DEFAULT;
 
     protected AppManagementService appManagementService = new AppManagementServiceImpl(this);
     protected AppRepositoryService appRepositoryService = new AppRepositoryServiceImpl(this);
@@ -145,7 +143,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected List<VariableType> customPostVariableTypes;
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -469,15 +466,15 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     @Override
     public String getEngineName() {
-        return cmmnEngineName;
+        return appEngineName;
     }
 
-    public String getCmmnEngineName() {
-        return cmmnEngineName;
+    public String getAppEngineName() {
+        return appEngineName;
     }
 
-    public AppEngineConfiguration setCmmnEngineName(String cmmnEngineName) {
-        this.cmmnEngineName = cmmnEngineName;
+    public AppEngineConfiguration setAppEngineName(String appEngineName) {
+        this.appEngineName = appEngineName;
         return this;
     }
 
@@ -709,15 +706,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public AppEngineConfiguration setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
-        return this;
-    }
-
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public AppEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
         return this;
     }
 

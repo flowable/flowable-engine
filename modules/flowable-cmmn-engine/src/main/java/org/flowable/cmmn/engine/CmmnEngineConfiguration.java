@@ -298,8 +298,6 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
         ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
@@ -448,7 +446,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
@@ -2743,15 +2740,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setAnnotationFontName(String annotationFontName) {
         this.annotationFontName = annotationFontName;
-        return this;
-    }
-
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public CmmnEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
         return this;
     }
 

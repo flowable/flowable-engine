@@ -29,6 +29,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInitializin
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Joram Barrez
  */
@@ -219,6 +221,11 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         variableInstance.setScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
+    }
+    
+    @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        // TODO
     }
 
     @Override

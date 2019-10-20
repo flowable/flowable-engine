@@ -81,6 +81,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.logging.LoggingSession;
+import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
@@ -412,8 +414,6 @@ import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -892,8 +892,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * @since 5.21
      */
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
-
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     protected List<Object> flowable5JobProcessors = Collections.emptyList();
     protected List<JobProcessor> jobProcessors = Collections.emptyList();
@@ -1396,6 +1394,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 }
             }
         }
+        
+        if (isLoggingSessionEnabled()) {
+            if (!sessionFactories.containsKey(LoggingSession.class)) {
+                LoggingSessionFactory loggingSessionFactory = new LoggingSessionFactory();
+                loggingSessionFactory.setLoggingListener(loggingListener);
+                loggingSessionFactory.setObjectMapper(objectMapper);
+                sessionFactories.put(LoggingSession.class, loggingSessionFactory);
+            }
+        }
 
         if (customSessionFactories != null) {
             for (SessionFactory sessionFactory : customSessionFactories) {
@@ -1450,6 +1457,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+        this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
 
         this.variableServiceConfiguration.init();
 
@@ -4130,15 +4138,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setDelegateExpressionFieldInjectionMode(DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode) {
         this.delegateExpressionFieldInjectionMode = delegateExpressionFieldInjectionMode;
-        return this;
-    }
-
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public ProcessEngineConfigurationImpl setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
         return this;
     }
 
