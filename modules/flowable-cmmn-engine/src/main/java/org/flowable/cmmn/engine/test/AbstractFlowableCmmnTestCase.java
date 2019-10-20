@@ -15,11 +15,13 @@ package org.flowable.cmmn.engine.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -131,7 +133,33 @@ public abstract class AbstractFlowableCmmnTestCase {
         assertTrue("No runtime case instance found", cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count() > 0);
         assertNull("Historical case instance is already marked as ended", cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getEndTime());
     }
-    
+
+    protected void assertPlanItemInstanceState(CaseInstance caseInstance, String name, String ... states) {
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName()
+            .asc()
+            .includeEnded()
+            .list();
+        assertPlanItemInstanceState(planItemInstances, name, states);
+    }
+
+    protected void assertPlanItemInstanceState(List<PlanItemInstance> planItemInstances, String name, String ... states) {
+        List<String> planItemInstanceStates = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .map(PlanItemInstance::getState)
+            .collect(Collectors.toList());
+
+        if (planItemInstanceStates.isEmpty()) {
+            fail("No plan item instances found with name " + name);
+        }
+
+        assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
+        for (String state : states) {
+            assertTrue("State '" + state + "' not found in plan item instances states '" + planItemInstanceStates + "'", planItemInstanceStates.contains(state));
+        }
+    }
+
     protected void waitForJobExecutorToProcessAllJobs() {
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 20000L, 200L, true);
     }

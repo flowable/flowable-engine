@@ -217,6 +217,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
     public static final String ATTRIBUTE_SAME_DEPLOYMENT = "sameDeployment";
     public static final String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
+    public static final String ATTRIBUTE_ID_VARIABLE_NAME = "idVariableName";
     public static final String ELEMENT_IN_PARAMETERS = "in";
     public static final String ELEMENT_OUT_PARAMETERS = "out";
 

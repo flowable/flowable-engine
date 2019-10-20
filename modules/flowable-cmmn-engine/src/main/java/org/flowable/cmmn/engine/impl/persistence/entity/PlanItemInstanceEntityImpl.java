@@ -477,5 +477,20 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     public void setSentryPartInstanceCount(int sentryPartInstanceCount) {
         this.sentryPartInstanceCount = sentryPartInstanceCount;
     }
-    
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("PlanItemInstance with id: ")
+            .append(id);
+
+        if (getName() != null) {
+            stringBuilder.append(", name: ").append(name);
+        }
+        stringBuilder.append(", definitionId: ")
+            .append(planItemDefinitionId)
+            .append(", state: ")
+            .append(state);
+        return stringBuilder.toString();
+    }
 }

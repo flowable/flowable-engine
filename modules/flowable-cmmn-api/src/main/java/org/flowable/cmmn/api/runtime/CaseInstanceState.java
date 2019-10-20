@@ -34,4 +34,8 @@ public interface CaseInstanceState {
     
     Set<String> END_STATES = new HashSet<>(Arrays.asList(COMPLETED, FAILED, SUSPENDED, CLOSED, TERMINATED));
 
+    static boolean isInTerminalState(CaseInstance caseInstance) {
+        return END_STATES.contains(caseInstance.getState());
+    }
+
 }

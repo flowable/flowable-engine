@@ -63,6 +63,7 @@ public class CaseServiceTaskXMLConverter extends ServiceTaskXMLConverter {
         caseServiceTask.setInheritBusinessKey(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_INHERIT_BUSINESS_KEY, xtr)));
         caseServiceTask.setSameDeployment(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SAME_DEPLOYMENT, xtr)));
         caseServiceTask.setFallbackToDefaultTenant(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, xtr)));
+        caseServiceTask.setCaseInstanceIdVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ID_VARIABLE_NAME, xtr));
         parseChildElements(getXMLElementName(), caseServiceTask, childParserMap, bpmnModel, xtr);
     }
     
@@ -91,6 +92,9 @@ public class CaseServiceTaskXMLConverter extends ServiceTaskXMLConverter {
         }
         if (caseServiceTask.isFallbackToDefaultTenant()) {
             writeQualifiedAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, "true", xtw);
+        }
+        if (StringUtils.isNotEmpty(caseServiceTask.getCaseInstanceIdVariableName())) {
+            writeQualifiedAttribute(ATTRIBUTE_ID_VARIABLE_NAME, caseServiceTask.getCaseInstanceIdVariableName(), xtw);
         }
     }
 

@@ -114,6 +114,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
     String ATTRIBUTE_BUSINESS_KEY = "businessKey";
     String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
+    String ATTRIBUTE_ID_VARIABLE_NAME = "idVariableName";
 
     String ELEMENT_CASE_REF_EXPRESSION = "caseRefExpression";
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";

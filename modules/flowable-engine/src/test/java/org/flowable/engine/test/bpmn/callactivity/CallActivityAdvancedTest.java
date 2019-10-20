@@ -990,6 +990,45 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/CallActivity.testIdVariableName.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testIdVariableName() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("testIdVariableName")
+            .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", task.getName());
+
+        assertEquals(1, runtimeService.getVariables(processInstance.getId()).size());
+        assertEquals(0, runtimeService.getVariables(task.getProcessInstanceId()).size());
+
+        assertEquals(task.getProcessInstanceId(), runtimeService.getVariable(processInstance.getId(), "myVariable"));
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/CallActivity.testIdVariableNameExpression.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testIdVariableNameExpression() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("testIdVariableName")
+            .variable("counter", 123)
+            .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("Task in subprocess", task.getName());
+
+        assertEquals(2, runtimeService.getVariables(processInstance.getId()).size());
+        assertEquals(0, runtimeService.getVariables(task.getProcessInstanceId()).size());
+
+        assertEquals(task.getProcessInstanceId(), runtimeService.getVariable(processInstance.getId(), "myVariable-123"));
+    }
+
     protected void assertCallActivityToFallback() {
         org.flowable.engine.repository.Deployment deployment = this.repositoryService.createDeployment().
             addClasspathResource("org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml").

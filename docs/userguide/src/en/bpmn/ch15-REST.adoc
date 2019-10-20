@@ -1307,7 +1307,7 @@ POST runtime/process-instances
    "variables": [
       {
         "name":"myVar",
-        "value":"This is a variable",
+        "value":"This is a variable"
       }
    ]
 }
@@ -1325,7 +1325,7 @@ POST runtime/process-instances
    "variables": [
       {
         "name":"myVar",
-        "value":"This is a variable",
+        "value":"This is a variable"
       }
    ]
 }
@@ -1342,7 +1342,7 @@ POST runtime/process-instances
    "variables": [
       {
         "name":"myVar",
-        "value":"This is a variable",
+        "value":"This is a variable"
       }
    ]
 }

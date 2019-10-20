@@ -67,24 +67,27 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     public static final String CALLED_ELEMENT_TYPE_KEY = "key";
     public static final String CALLED_ELEMENT_TYPE_ID = "id";
 
+    protected CallActivity callActivity;
     protected String calledElement;
     protected String calledElementType;
     protected Expression calledElementExpression;
     protected Boolean fallbackToDefaultTenant;
     protected List<MapExceptionEntry> mapExceptions;
 
-    public CallActivityBehavior(String processDefinitionKey, String calledElementType, Boolean fallbackToDefaultTenant, List<MapExceptionEntry> mapExceptions) {
+    public CallActivityBehavior(String processDefinitionKey, CallActivity callActivity) {
         this.calledElement = processDefinitionKey;
-        this.calledElementType = calledElementType;
-        this.mapExceptions = mapExceptions;
-        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
+        this.callActivity = callActivity;
+        this.calledElementType = callActivity.getCalledElementType();
+        this.mapExceptions = callActivity.getMapExceptions();
+        this.fallbackToDefaultTenant = callActivity.getFallbackToDefaultTenant();
     }
 
-    public CallActivityBehavior(Expression processDefinitionExpression, String calledElementType, List<MapExceptionEntry> mapExceptions, Boolean fallbackToDefaultTenant) {
+    public CallActivityBehavior(Expression processDefinitionExpression, CallActivity callActivity) {
         this.calledElementExpression = processDefinitionExpression;
-        this.calledElementType = calledElementType;
-        this.mapExceptions = mapExceptions;
-        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
+        this.callActivity = callActivity;
+        this.calledElementType = callActivity.getCalledElementType();
+        this.mapExceptions = callActivity.getMapExceptions();
+        this.fallbackToDefaultTenant = callActivity.getFallbackToDefaultTenant();
     }
 
     @Override
@@ -208,6 +211,14 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         if (processEngineConfiguration.isEnableEntityLinks()) {
             EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), subProcessInstance.getId(), ScopeTypes.BPMN);
             EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), subProcessInstance.getId(), ScopeTypes.BPMN);
+        }
+
+        if (StringUtils.isNotEmpty(callActivity.getProcessInstanceIdVariableName())) {
+            Expression expression = expressionManager.createExpression(callActivity.getProcessInstanceIdVariableName());
+            String idVariableName = (String) expression.getValue(execution);
+            if (StringUtils.isNotEmpty(idVariableName)) {
+                execution.setVariable(idVariableName, subProcessInstance.getId());
+            }
         }
 
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordSubProcessInstanceStart(executionEntity, subProcessInstance);

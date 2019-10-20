@@ -38,6 +38,9 @@ public class ProcessTaskExport extends AbstractChildTaskExport<ProcessTask> {
         if (processTask.getFallbackToDefaultTenant() != null) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, String.valueOf(processTask.getFallbackToDefaultTenant()));
         }
+        if (StringUtils.isNotEmpty(processTask.getProcessInstanceIdVariableName())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_ID_VARIABLE_NAME, processTask.getProcessInstanceIdVariableName());
+        }
     }
 
     @Override
