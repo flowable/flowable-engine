@@ -1862,7 +1862,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     @Override
     protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
-        return new CmmnEventRegistryEventConsumer(commandExecutor, eventRegistry);
+        return new CmmnEventRegistryEventConsumer(this, eventRegistry);
     }
 
     @Override

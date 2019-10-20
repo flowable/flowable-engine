@@ -16,12 +16,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventregistry.consumer.BaseEventRegistryEventConsumer;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
@@ -33,56 +33,56 @@ import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
  */
 public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer  {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CommandExecutor commandExecutor;
 
-    public CmmnEventRegistryEventConsumer(CommandExecutor commandExecutor, EventRegistry eventRegistry) {
+    public CmmnEventRegistryEventConsumer(CmmnEngineConfiguration cmmnEngineConfiguration, EventRegistry eventRegistry) {
         super(eventRegistry);
-        this.commandExecutor = commandExecutor;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+        this.commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
     }
 
     @Override
     protected void eventReceived(EventInstance eventInstance) {
         EventDefinition eventDefinition = eventInstance.getEventDefinition();
 
-        commandExecutor.execute(commandContext -> {
-            // Always execute the events without a correlation key
-            List<EventSubscription> eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(eventDefinition, commandContext);
+        // Fetching the event subscriptions happens in one transactions,
+        // executing them in another. There is no overarching transactions.
+        // The reason for this is that the handling of one event subscription
+        // should not influence (i.e. roll back) the handling of another.
 
-            CmmnRuntimeService cmmnRuntimeService = org.flowable.cmmn.engine.impl.util.CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                .getCmmnRuntimeService();
+        // Always execute the events without a correlation key
+        List<EventSubscription> eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(eventDefinition);
+        CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        for (EventSubscription eventSubscription : eventSubscriptions) {
+            if (eventSubscription.getSubScopeId() != null) {
+                cmmnRuntimeService.triggerPlanItemInstance(eventSubscription.getSubScopeId());
+            }
+        }
+
+        Collection<String> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
+        if (!correlationKeys.isEmpty()) {
+            // If there are correlation keys then look for all event subscriptions matching them
+            eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventDefinition, correlationKeys);
             for (EventSubscription eventSubscription : eventSubscriptions) {
                 if (eventSubscription.getSubScopeId() != null) {
                     cmmnRuntimeService.triggerPlanItemInstance(eventSubscription.getSubScopeId());
                 }
             }
+        }
 
-            Collection<String> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
-
-            if (!correlationKeys.isEmpty()) {
-                // If there are correlation keys then look for all event subscriptions matching them
-                eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventDefinition, correlationKeys, commandContext);
-                for (EventSubscription eventSubscription : eventSubscriptions) {
-                    if (eventSubscription.getSubScopeId() != null) {
-                        cmmnRuntimeService.triggerPlanItemInstance(eventSubscription.getSubScopeId());
-                    }
-                }
-            }
-            return null;
-        });
     }
 
-    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(EventDefinition eventDefinition,
-        Collection<String> correlationKeys, CommandContext commandContext) {
-        return CommandContextUtil.getEventSubscriptionEntityManager(commandContext)
-            .findEventSubscriptionsByQueryCriteria(
-                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).configurations(correlationKeys).scopeType(ScopeTypes.CMMN));
+    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(EventDefinition eventDefinition, Collection<String> correlationKeys) {
+        return commandExecutor.execute(commandContext ->
+            CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(
+                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).configurations(correlationKeys).scopeType(ScopeTypes.CMMN)));
     }
 
-    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(EventDefinition eventDefinition,
-        CommandContext commandContext) {
-        return CommandContextUtil.getEventSubscriptionEntityManager(commandContext)
-            .findEventSubscriptionsByQueryCriteria(
-                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).withoutConfiguration().scopeType(ScopeTypes.CMMN));
+    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(EventDefinition eventDefinition) {
+        return commandExecutor.execute(commandContext ->
+            CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(
+                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).withoutConfiguration().scopeType(ScopeTypes.CMMN)));
     }
 
 }
