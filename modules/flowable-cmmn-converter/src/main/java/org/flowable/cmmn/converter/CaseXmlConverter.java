@@ -53,7 +53,12 @@ public class CaseXmlConverter extends BaseCmmnXmlConverter {
             List<String> candidateGroups = CmmnXmlUtil.parseDelimitedList(candidateGroupsString);
             caze.setCandidateStarterGroups(candidateGroups);
         }
-        
+
+        String startEventType = CmmnXmlUtil.getAttributeValue(CmmnXmlUtil.ATTRIBUTE_CASE_START_EVENT_TYPE, xtr);
+        if (StringUtils.isNotEmpty(startEventType)) {
+            caze.setStartEventType(startEventType);
+        }
+
         conversionHelper.getCmmnModel().addCase(caze);
         conversionHelper.setCurrentCase(caze);
         return caze;

@@ -192,7 +192,7 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
         eventSubscriptionDataManager.deleteEventSubscriptionsForProcessDefinition(processDefinitionId);
     }
-    
+
     @Override
     public void deleteEventSubscriptionsByExecutionId(String executionId) {
         eventSubscriptionDataManager.deleteEventSubscriptionsByExecutionId(executionId);
@@ -202,7 +202,12 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     public void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType) {
         eventSubscriptionDataManager.deleteEventSubscriptionsForScopeIdAndType(scopeId, scopeType);
     }
-    
+
+    @Override
+    public void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
+        eventSubscriptionDataManager.deleteEventSubscriptionsForScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
+    }
+
     protected SignalEventSubscriptionEntity insertSignalEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
         SignalEventSubscriptionEntity subscriptionEntity = createSignalEventSubscription();
         subscriptionEntity.setExecutionId(eventSubscriptionBuilder.getExecutionId());

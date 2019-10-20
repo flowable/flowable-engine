@@ -7,7 +7,7 @@
   <!-- RESULTMAP -->
 
   <!--
-    Note that the type here is the generic event subcription and not the EventSubScriptionEntityImpl.
+    Note that the type here is the generic event subscription and not the EventSubScriptionEntityImpl.
     The reason is that a generic event subscription can have any value for the eventType, which doesn't
     work with the discriminator below. By putting the type as it is, it will instantiate the generic event subscription
     when none of the values in the discriminator match.
@@ -947,6 +947,10 @@
   
   <delete id="deleteEventSubscriptionsForScopeIdAndType" parameterType="map">
      delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
+  </delete>
+
+  <delete id="deleteEventSubscriptionsForScopeDefinitionIdAndType" parameterType="map">
+     delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
 
 </mapper>

@@ -22,6 +22,7 @@ public class Case extends CmmnElement implements HasLifecycleListeners {
     protected String name;
     protected String initiatorVariableName;
     protected Stage planModel;
+    protected String startEventType;
     protected List<String> candidateStarterUsers = new ArrayList<>();
     protected List<String> candidateStarterGroups = new ArrayList<>();
     protected Map<String, CaseElement> allCaseElements = new HashMap<>();
@@ -49,6 +50,14 @@ public class Case extends CmmnElement implements HasLifecycleListeners {
 
     public void setPlanModel(Stage planModel) {
         this.planModel = planModel;
+    }
+
+    public String getStartEventType() {
+        return startEventType;
+    }
+
+    public void setStartEventType(String startEventType) {
+        this.startEventType = startEventType;
     }
 
     public List<String> getCandidateStarterUsers() {

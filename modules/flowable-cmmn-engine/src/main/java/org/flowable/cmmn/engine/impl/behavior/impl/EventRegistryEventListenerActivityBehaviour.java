@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
@@ -127,7 +128,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
         if (planItemDefinition != null) {
             List<ExtensionElement> eventCorrelations = planItemDefinition.getExtensionElements()
-                .getOrDefault("eventCorrelationParameter", Collections.emptyList());
+                .getOrDefault(CmmnXmlConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, Collections.emptyList());
             if (!eventCorrelations.isEmpty()) {
                 CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
                 ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();

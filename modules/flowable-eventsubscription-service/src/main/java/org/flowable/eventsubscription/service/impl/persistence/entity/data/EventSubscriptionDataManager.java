@@ -74,4 +74,6 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     
     void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType);
 
+    void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+
 }

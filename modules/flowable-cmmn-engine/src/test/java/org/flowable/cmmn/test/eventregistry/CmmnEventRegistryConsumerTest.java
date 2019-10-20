@@ -16,12 +16,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Random;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
 import org.flowable.common.engine.api.eventregistry.definition.EventPayloadTypes;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -214,6 +217,51 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(order2Case.getId()).list()).hasSize(2);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testCaseStartNoCorrelationParameter() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCaseStartEvent").singleResult();
+        assertThat(caseDefinition).isNotNull();
+
+        EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery()
+            .scopeDefinitionId(caseDefinition.getId())
+            .scopeType(ScopeTypes.CMMN)
+            .singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(0);
+
+        for (int i = 1; i <= 5; i++) {
+            inboundEventChannelAdapter.triggerTestEvent();
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(i);
+        }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseStartWithSimpleCorrelationParameter() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCaseStartEvent").singleResult();
+        assertThat(caseDefinition).isNotNull();
+
+        EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery()
+            .scopeDefinitionId(caseDefinition.getId())
+            .scopeType(ScopeTypes.CMMN)
+            .singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(0);
+
+        inboundEventChannelAdapter.triggerTestEvent("anotherCustomer");
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(0); // shouldn't trigger, correlation doesn't match
+
+        for (int i = 1; i <= 3; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(i);
+        }
+    }
+
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
         public String channelKey;
@@ -227,6 +275,10 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
         @Override
         public void setEventRegistry(EventRegistry eventRegistry) {
             this.eventRegistry = eventRegistry;
+        }
+
+        public void triggerTestEvent() {
+            triggerTestEvent(null);
         }
 
         public void triggerTestEvent(String customerId) {

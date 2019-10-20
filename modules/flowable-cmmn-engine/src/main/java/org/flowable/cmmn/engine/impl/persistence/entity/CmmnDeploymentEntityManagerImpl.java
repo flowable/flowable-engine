@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
@@ -58,7 +59,12 @@ public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<C
         CaseDefinitionEntityManager caseDefinitionEntityManager = getCaseDefinitionEntityManager();
         List<CaseDefinition> caseDefinitions = caseDefinitionEntityManager.createCaseDefinitionQuery().deploymentId(deploymentId).list();
         for (CaseDefinition caseDefinition : caseDefinitions) {
-            CommandContextUtil.getIdentityLinkService().deleteIdentityLinksByScopeDefinitionIdAndType(caseDefinition.getId(), ScopeTypes.CMMN);
+
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            CommandContextUtil.getIdentityLinkService(commandContext)
+                .deleteIdentityLinksByScopeDefinitionIdAndType(caseDefinition.getId(), ScopeTypes.CMMN);
+            CommandContextUtil.getEventSubscriptionService(commandContext)
+                .deleteEventSubscriptionsForScopeDefinitionIdAndType(caseDefinition.getId(), ScopeTypes.CMMN);
             
             if (cascade) {
                 caseDefinitionEntityManager.deleteCaseDefinitionAndRelatedData(caseDefinition.getId(), true);
