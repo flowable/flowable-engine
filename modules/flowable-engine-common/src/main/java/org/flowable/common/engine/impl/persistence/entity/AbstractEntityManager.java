@@ -1,33 +1,34 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventsubscription.service.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.impl.persistence.entity.Entity;
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
-import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
-import org.flowable.eventsubscription.service.event.impl.FlowableEventSubscriptionEventBuilder;
-import org.flowable.eventsubscription.service.impl.persistence.AbstractManager;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public abstract class AbstractEntityManager<EntityImpl extends Entity> extends AbstractManager implements EntityManager<EntityImpl> {
+public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extends DataManager<EntityImpl>>
+    implements EntityManager<EntityImpl> {
 
-    public AbstractEntityManager(EventSubscriptionServiceConfiguration variableServiceConfiguration) {
-        super(variableServiceConfiguration);
+    protected DM dataManager;
+
+    public AbstractEntityManager(DM dataManager) {
+        this.dataManager = dataManager;
     }
 
     /*
@@ -52,11 +53,16 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     @Override
     public void insert(EntityImpl entity, boolean fireCreateEvent) {
         getDataManager().insert(entity);
+        if (fireCreateEvent) {
+            fireEntityInsertedEvent(entity);
+        }
+    }
 
+    protected void fireEntityInsertedEvent(Entity entity) {
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (fireCreateEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventSubscriptionEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
-            eventDispatcher.dispatchEvent(FlowableEventSubscriptionEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
+            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
         }
     }
 
@@ -68,13 +74,17 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     @Override
     public EntityImpl update(EntityImpl entity, boolean fireUpdateEvent) {
         EntityImpl updatedEntity = getDataManager().update(entity);
-
-        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (fireUpdateEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventSubscriptionEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
+        if (fireUpdateEvent) {
+            fireEntityUpdatedEvent(entity);
         }
-
         return updatedEntity;
+    }
+
+    protected void fireEntityUpdatedEvent(Entity entity) {
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            getEventDispatcher().dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
+        }
     }
 
     @Override
@@ -94,9 +104,29 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
 
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (fireDeleteEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventSubscriptionEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
+            fireEntityDeletedEvent(entity);
         }
     }
 
-    protected abstract DataManager<EntityImpl> getDataManager();
+    protected void fireEntityDeletedEvent(Entity entity) {
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
+        }
+    }
+
+    protected FlowableEntityEvent createEntityEvent(FlowableEngineEventType eventType, Entity entity) {
+        return new FlowableEntityEventImpl(entity, eventType);
+    }
+
+    protected DM getDataManager() {
+        return dataManager;
+    }
+
+    protected void setDataManager(DM dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    protected abstract FlowableEventDispatcher getEventDispatcher();
+
 }
