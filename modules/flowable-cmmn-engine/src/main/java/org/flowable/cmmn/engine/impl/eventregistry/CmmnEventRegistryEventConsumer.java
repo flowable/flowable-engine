@@ -46,8 +46,8 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     protected void eventReceived(EventInstance eventInstance) {
         EventDefinition eventDefinition = eventInstance.getEventDefinition();
 
-        // Fetching the event subscriptions happens in one transactions,
-        // executing them in another. There is no overarching transactions.
+        // Fetching the event subscriptions happens in one transaction,
+        // executing them one per subscription. There is no overarching transaction.
         // The reason for this is that the handling of one event subscription
         // should not influence (i.e. roll back) the handling of another.
 

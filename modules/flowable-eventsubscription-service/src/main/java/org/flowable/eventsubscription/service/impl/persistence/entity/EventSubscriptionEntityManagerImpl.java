@@ -233,10 +233,6 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
             subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
         
-        if (subscriptionEntity.getConfiguration() == null) {
-            subscriptionEntity.setConfiguration(eventSubscriptionBuilder.getConfiguration());
-        }
-
         insert(subscriptionEntity);
         
         return subscriptionEntity;
