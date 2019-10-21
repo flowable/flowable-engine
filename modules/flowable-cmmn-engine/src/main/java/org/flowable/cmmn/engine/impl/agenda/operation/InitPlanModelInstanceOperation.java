@@ -40,7 +40,7 @@ public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperatio
         Case caseModel = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId());
         Object eventInstance = caseInstanceEntity.getTransientVariable("eventInstance");
         if (eventInstance instanceof EventInstance) {
-            EventInstanceCmmnUtil.handleEventInstance(caseInstanceEntity, caseModel, (EventInstance) eventInstance);
+            EventInstanceCmmnUtil.handleEventInstanceOutParameters(caseInstanceEntity, caseModel, (EventInstance) eventInstance);
         }
         Stage stage = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel();
         createPlanItemInstancesForNewStage(commandContext,

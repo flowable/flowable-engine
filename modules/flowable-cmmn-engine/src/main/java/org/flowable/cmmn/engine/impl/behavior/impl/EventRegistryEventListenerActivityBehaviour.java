@@ -98,7 +98,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
     protected void handleEventInstance(PlanItemInstanceEntity planItemInstanceEntity, EventInstance eventInstance) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
         if (planItemDefinition != null) {
-            EventInstanceCmmnUtil.handleEventInstance(planItemInstanceEntity, planItemDefinition, eventInstance);
+            EventInstanceCmmnUtil.handleEventInstanceOutParameters(planItemInstanceEntity, planItemDefinition, eventInstance);
         }
     }
 

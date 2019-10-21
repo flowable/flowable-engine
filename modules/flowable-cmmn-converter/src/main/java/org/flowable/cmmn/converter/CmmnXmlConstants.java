@@ -178,6 +178,7 @@ public interface CmmnXmlConstants {
 
     String ELEMENT_EVENT_TYPE = "eventType";
     String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
+    String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
     String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
 
     String ELEMENT_DI_CMMN = "CMMNDI";

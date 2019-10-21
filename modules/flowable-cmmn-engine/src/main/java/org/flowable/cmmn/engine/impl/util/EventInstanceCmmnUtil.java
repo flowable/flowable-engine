@@ -12,9 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -22,8 +25,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.EventPayloadDefinition;
 import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.eventregistry.runtime.EventPayloadInstanceImpl;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -31,7 +39,12 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class EventInstanceCmmnUtil {
 
-    public static void handleEventInstance(VariableScope variableScope, BaseElement baseElement, EventInstance eventInstance) {
+    /**
+     * Processes the 'out parameters' of an {@link EventInstance} and stores the corresponding variables on the {@link VariableScope}.
+     *
+     * Typically used when mapping incoming event payload into a runtime instance (the {@link VariableScope)}.
+     */
+    public static void handleEventInstanceOutParameters(VariableScope variableScope, BaseElement baseElement, EventInstance eventInstance) {
         List<ExtensionElement> outParameters = baseElement.getExtensionElements()
             .getOrDefault(CmmnXmlConstants.ELEMENT_EVENT_OUT_PARAMETER, Collections.emptyList());
         if (!outParameters.isEmpty()) {
@@ -54,6 +67,44 @@ public class EventInstanceCmmnUtil {
                 }
             }
         }
+    }
+
+    /**
+     * Reads the 'in parameters' and converts them to {@link EventPayloadInstance} instances.
+     *
+     * Typically used when needing to create {@link EventInstance}'s and populate the payload.
+     */
+    public static Collection<EventPayloadInstance> createEventPayloadInstances(VariableScope variableScope, ExpressionManager expressionManager,
+            BaseElement baseElement, EventDefinition eventDefinition) {
+
+        List<EventPayloadInstance> eventPayloadInstances = new ArrayList<>();
+        List<ExtensionElement> inParameters = baseElement.getExtensionElements()
+            .getOrDefault(CmmnXmlConstants.ELEMENT_EVENT_IN_PARAMETER, Collections.emptyList());
+
+        if (!inParameters.isEmpty()) {
+
+            for (ExtensionElement inParameter : inParameters) {
+
+                String source = inParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
+                String target = inParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
+
+                Optional<EventPayloadDefinition> matchingEventDefinition = eventDefinition.getEventPayloadDefinitions()
+                    .stream()
+                    .filter(e -> e.getName().equals(target))
+                    .findFirst();
+                if (matchingEventDefinition.isPresent()) {
+                    EventPayloadDefinition eventPayloadDefinition = matchingEventDefinition.get();
+
+                    Expression sourceExpression = expressionManager.createExpression(source);
+                    Object value = sourceExpression.getValue(variableScope);
+
+                    eventPayloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, value));
+                }
+
+            }
+        }
+
+        return eventPayloadInstances;
     }
 
 }

@@ -42,8 +42,7 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
         cmmnEngineConfiguration.getEventRegistry().newEventDefinition()
             .outboundChannelKey("out-channel")
             .key("testEvent")
-            .payload("payload1", EventPayloadTypes.STRING)
-            .payload("payload2", EventPayloadTypes.INTEGER)
+            .payload("customerId", EventPayloadTypes.STRING)
             .register();
     }
 
@@ -68,7 +67,7 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testSendEventTaskNoPayload() throws Exception {
+    public void testSimpleSendEvent() throws Exception {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("testSendEvent")
             .variable("myVariable", "Hello World!")

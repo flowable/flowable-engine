@@ -12,17 +12,20 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 import org.flowable.common.engine.impl.eventregistry.runtime.EventInstanceImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -53,7 +56,9 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
         EventInstanceImpl eventInstance = new EventInstanceImpl();
         eventInstance.setEventDefinition(eventDefinition);
 
-        // TODO: read inParameters to pass variable data into event payload as PayloadInstances
+        Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceCmmnUtil
+            .createEventPayloadInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventDefinition);
+        eventInstance.setPayloadInstances(eventPayloadInstances);
 
         // TODO: always async? Send event in post-commit? Triggerable?
 

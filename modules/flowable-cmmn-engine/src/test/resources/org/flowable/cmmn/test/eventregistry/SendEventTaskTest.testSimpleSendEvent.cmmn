@@ -21,7 +21,7 @@
             <task id="sendEventTask1" name="Send event task" flowable:type="send-event">
                 <extensionElements>
                     <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
-                    <flowable:eventInParameter source="customerId" target="${myVariable}"></flowable:eventInParameter>
+                    <flowable:eventInParameter source="${myVariable}" target="customerId"></flowable:eventInParameter>
                     <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
                     <design:stencilid><![CDATA[SendEventTask]]></design:stencilid>
                     <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
