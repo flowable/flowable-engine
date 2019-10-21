@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.PropertyDataManager;
 
@@ -23,23 +22,17 @@ import org.flowable.engine.impl.persistence.entity.data.PropertyDataManager;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class PropertyEntityManagerImpl extends AbstractEntityManager<PropertyEntity> implements PropertyEntityManager {
-
-    protected PropertyDataManager propertyDataManager;
+public class PropertyEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<PropertyEntity, PropertyDataManager>
+    implements PropertyEntityManager {
 
     public PropertyEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, PropertyDataManager propertyDataManager) {
-        super(processEngineConfiguration);
-        this.propertyDataManager = propertyDataManager;
-    }
-
-    @Override
-    protected DataManager<PropertyEntity> getDataManager() {
-        return propertyDataManager;
+        super(processEngineConfiguration, propertyDataManager);
     }
 
     @Override
     public List<PropertyEntity> findAll() {
-        return propertyDataManager.findAll();
+        return dataManager.findAll();
     }
 
 }

@@ -15,7 +15,6 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.data.JobByteArrayDataManager;
 
@@ -23,36 +22,22 @@ import org.flowable.job.service.impl.persistence.entity.data.JobByteArrayDataMan
  * @author Joram Barrez
  * @author Marcus Klimstra (CGI)
  */
-public class JobByteArrayEntityManagerImpl extends AbstractEntityManager<JobByteArrayEntity> implements JobByteArrayEntityManager {
-
-    protected JobByteArrayDataManager byteArrayDataManager;
+public class JobByteArrayEntityManagerImpl
+    extends AbstractJobServiceEngineEntityManager<JobByteArrayEntity, JobByteArrayDataManager>
+    implements JobByteArrayEntityManager {
 
     public JobByteArrayEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, JobByteArrayDataManager byteArrayDataManager) {
-        super(jobServiceConfiguration);
-        this.byteArrayDataManager = byteArrayDataManager;
-    }
-
-    @Override
-    protected DataManager<JobByteArrayEntity> getDataManager() {
-        return byteArrayDataManager;
+        super(jobServiceConfiguration, byteArrayDataManager);
     }
 
     @Override
     public List<JobByteArrayEntity> findAll() {
-        return byteArrayDataManager.findAll();
+        return dataManager.findAll();
     }
 
     @Override
     public void deleteByteArrayById(String byteArrayEntityId) {
-        byteArrayDataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
-    }
-
-    public JobByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
-    }
-
-    public void setByteArrayDataManager(JobByteArrayDataManager byteArrayDataManager) {
-        this.byteArrayDataManager = byteArrayDataManager;
+        dataManager.deleteByteArrayNoRevisionCheck(byteArrayEntityId);
     }
 
 }
