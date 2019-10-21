@@ -10,22 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventregistry;
+package org.flowable.common.engine.api.eventregistry.definition;
+
+import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
+import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
 
 /**
  * @author Joram Barrez
- * @author Filip Hrisafov
  */
-public interface InboundEventDeserializer<T> {
+public interface InboundChannelDefinition extends ChannelDefinition {
 
-    /**
-     * Returns the unique type for this deserializer.
-     */
-    String getType();
+    InboundEventChannelAdapter getInboundEventChannelAdapter();
 
-    /**
-     * The actual deserialization.
-     */
-    T deserialize(String rawEvent);
+    InboundEventProcessingPipeline getInboundEventProcessingPipeline();
 
 }

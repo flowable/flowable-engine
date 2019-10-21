@@ -17,9 +17,13 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
-import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinitionBuilder;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinitionBuilder;
+import org.flowable.common.engine.api.eventregistry.definition.InboundChannelDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.InboundChannelDefinitionBuilder;
+import org.flowable.common.engine.api.eventregistry.definition.OutboundChannelDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.OutboundChannelDefinitionBuilder;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 
 /**
  * Central registry for events that are received through external channels through a {@link InboundEventChannelAdapter}
@@ -30,12 +34,27 @@ import org.flowable.common.engine.api.eventregistry.definition.EventDefinitionBu
 public interface EventRegistry {
 
     /**
-     * Programmatically build and register a new {@link ChannelDefinition}.
+     * Programmatically build and register a new {@link InboundChannelDefinition}.
      */
-    ChannelDefinitionBuilder newChannelDefinition();
+    InboundChannelDefinitionBuilder newInboundChannelDefinition();
 
     /**
-     * Low-level (vs the {@link ChannelDefinitionBuilder}) way of registering a new {@link ChannelDefinition}.
+     * Returns the {@link InboundChannelDefinition} instance associated with the given key.
+     */
+    InboundChannelDefinition getInboundChannelDefinition(String channelKey);
+
+    /**
+     * Programmatically build and register a new {@link OutboundChannelDefinition}.
+     */
+    OutboundChannelDefinitionBuilder newOutboundChannelDefinition();
+
+    /**
+     * Returns the {@link OutboundChannelDefinition} instance associated with the given key.
+     */
+    OutboundChannelDefinition getOutboundChannelDefinition(String channelKey);
+
+    /**
+     * Low-level (vs the {@link InboundChannelDefinitionBuilder}) way of registering a new {@link ChannelDefinition}.
      */
     void registerChannelDefinition(ChannelDefinition channelDefinition);
 
@@ -43,11 +62,6 @@ public interface EventRegistry {
      * Removes a previously registered {@link ChannelDefinition}.
      */
     void removeChannelDefinition(String channelDefinitionKey);
-
-    /**
-     * Returns the {@link ChannelDefinition} instance associated with the given key.
-     */
-    ChannelDefinition getChannelDefinition(String channelKey);
 
     /**
      * Programmatically build and register a new {@link EventDefinition}.
@@ -81,10 +95,15 @@ public interface EventRegistry {
     void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor);
 
     /**
-     * Events received in adapters should call this method to process events.
+     * The {@link OutboundEventProcessor} is responsible for handling sending out events.
+     * The event registry will simply pass any event it needs to send to this instance.
      */
-    void eventReceived(String channelKey, String event);
+    void setOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor);
 
+    /**
+     * Registers a {@link EventRegistryEventBusConsumer} instance (a consumer of event registry events which
+     * is created by any of the engines).
+     */
     void registerEventRegistryEventBusConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer);
 
     /**
@@ -94,4 +113,15 @@ public interface EventRegistry {
      * @return a unique string correlating the event based on the information supplied
      */
     String generateKey(Map<String, Object> data);
+
+    /**
+     * Events received in adapters should call this method to process events.
+     */
+    void eventReceived(String channelKey, String event);
+
+    /**
+     * Send out an event. The corresponding {@link EventDefinition} will be used to
+     * decide which channel (and pipeline) will be used
+     */
+    void sendEvent(EventInstance eventInstance);
 }

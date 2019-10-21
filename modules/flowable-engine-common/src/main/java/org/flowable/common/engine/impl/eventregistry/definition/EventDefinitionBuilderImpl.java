@@ -33,7 +33,8 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
     protected EventRegistry eventRegistry;
 
     protected String key;
-    protected Collection<String> channelKeys;
+    protected Collection<String> inboundChannelKeys;
+    protected Collection<String> outboundChannelKeys;
     protected Map<String, EventCorrelationParameterDefinition> correlationParameterDefinitions = new LinkedHashMap<>();
     protected Map<String, EventPayloadDefinition> eventPayloadDefinitions = new LinkedHashMap<>();
 
@@ -48,17 +49,32 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
     }
 
     @Override
-    public EventDefinitionBuilder channelKey(String channelKey) {
-        if (channelKeys == null) {
-            channelKeys = new HashSet<>();
+    public EventDefinitionBuilder inboundChannelKey(String channelKey) {
+        if (inboundChannelKeys == null) {
+            inboundChannelKeys = new HashSet<>();
         }
-        channelKeys.add(channelKey);
+        inboundChannelKeys.add(channelKey);
         return this;
     }
 
     @Override
-    public EventDefinitionBuilder channelKeys(Collection<String> channelKeys) {
-        channelKeys.forEach(this::channelKey);
+    public EventDefinitionBuilder inboundChannelKeys(Collection<String> channelKeys) {
+        channelKeys.forEach(this::inboundChannelKey);
+        return this;
+    }
+
+    @Override
+    public EventDefinitionBuilder outboundChannelKey(String channelKey) {
+        if (outboundChannelKeys == null) {
+            outboundChannelKeys = new HashSet<>();
+        }
+        outboundChannelKeys.add(channelKey);
+        return this;
+    }
+
+    @Override
+    public EventDefinitionBuilder outboundChannelKeys(Collection<String> channelKeys) {
+        channelKeys.forEach(this::outboundChannelKey);
         return this;
     }
 
@@ -85,8 +101,12 @@ public class EventDefinitionBuilderImpl implements EventDefinitionBuilder {
             throw new FlowableIllegalArgumentException("An event definition key is mandatory");
         }
 
-        if (channelKeys != null) {
-            eventDefinition.setChannelKeys(channelKeys);
+        if (inboundChannelKeys != null) {
+            eventDefinition.setInboundChannelKeys(inboundChannelKeys);
+        }
+
+        if (outboundChannelKeys != null) {
+            eventDefinition.setOutboundChannelKeys(outboundChannelKeys);
         }
 
         eventDefinition.getCorrelationParameterDefinitions().addAll(correlationParameterDefinitions.values());

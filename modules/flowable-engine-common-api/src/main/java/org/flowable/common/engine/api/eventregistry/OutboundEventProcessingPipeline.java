@@ -12,20 +12,13 @@
  */
 package org.flowable.common.engine.api.eventregistry;
 
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
+
 /**
  * @author Joram Barrez
- * @author Filip Hrisafov
  */
-public interface InboundEventDeserializer<T> {
+public interface OutboundEventProcessingPipeline {
 
-    /**
-     * Returns the unique type for this deserializer.
-     */
-    String getType();
-
-    /**
-     * The actual deserialization.
-     */
-    T deserialize(String rawEvent);
+    String run(EventInstance eventInstance);
 
 }

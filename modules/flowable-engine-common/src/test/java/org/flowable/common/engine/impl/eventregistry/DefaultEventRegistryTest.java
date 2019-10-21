@@ -80,7 +80,7 @@ public class DefaultEventRegistryTest {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = setupTestChannel();
 
         eventRegistry.newEventDefinition()
-            .channelKey("test-channel")
+            .inboundChannelKey("test-channel")
             .key("myEvent")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
             .payload("payload1", EventPayloadTypes.STRING)
@@ -111,7 +111,7 @@ public class DefaultEventRegistryTest {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = setupTestChannelWithCustomDeserializer();
 
         eventRegistry.newEventDefinition()
-            .channelKey("test-channel")
+            .inboundChannelKey("test-channel")
             .key("myEvent")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
             .payload("payload1", EventPayloadTypes.STRING)
@@ -140,7 +140,7 @@ public class DefaultEventRegistryTest {
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        eventRegistry.newChannelDefinition()
+        eventRegistry.newInboundChannelDefinition()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .jsonDeserializer()
@@ -154,7 +154,7 @@ public class DefaultEventRegistryTest {
     protected TestInboundEventChannelAdapter setupTestChannelWithCustomDeserializer() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        eventRegistry.newChannelDefinition()
+        eventRegistry.newInboundChannelDefinition()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .deserializer(new InboundEventDeserializer<Customer>() {

@@ -47,7 +47,7 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
         inboundEventChannelAdapter = setupTestChannel();
 
         cmmnEngineConfiguration.getEventRegistry().newEventDefinition()
-            .channelKey("test-channel")
+            .inboundChannelKey("test-channel")
             .key("myEvent")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
             .correlationParameter("orderId", EventPayloadTypes.STRING)
@@ -59,7 +59,7 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        cmmnEngineConfiguration.getEventRegistry().newChannelDefinition()
+        cmmnEngineConfiguration.getEventRegistry().newInboundChannelDefinition()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .jsonDeserializer()

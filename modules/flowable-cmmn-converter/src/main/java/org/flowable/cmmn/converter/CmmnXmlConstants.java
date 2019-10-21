@@ -175,6 +175,8 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_CASE_START_EVENT_TYPE = "startEventType";
     String ATTRIBUTE_EVENT_LISTENER_EVENT_TYPE = "eventType";
+
+    String ELEMENT_EVENT_TYPE = "eventType";
     String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
     String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
 

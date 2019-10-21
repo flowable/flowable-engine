@@ -25,7 +25,8 @@ import org.flowable.common.engine.api.eventregistry.definition.EventPayloadDefin
 public class EventDefinitionImpl implements EventDefinition {
 
     protected String key;
-    protected Collection<String> channelKeys;
+    protected Collection<String> inboundChannelKeys = new ArrayList<>();
+    protected Collection<String> outboundChannelKeys = new ArrayList<>();
     protected Collection<EventCorrelationParameterDefinition> correlationParameterDefinitions = new ArrayList<>();
     protected Collection<EventPayloadDefinition> eventPayloadDefinitions = new ArrayList<>();
 
@@ -39,12 +40,21 @@ public class EventDefinitionImpl implements EventDefinition {
     }
 
     @Override
-    public Collection<String> getChannelKeys() {
-        return channelKeys;
+    public Collection<String> getInboundChannelKeys() {
+        return inboundChannelKeys;
     }
 
-    public void setChannelKeys(Collection<String> channelKeys) {
-        this.channelKeys = channelKeys;
+    public void setInboundChannelKeys(Collection<String> inboundChannelKeys) {
+        this.inboundChannelKeys = inboundChannelKeys;
+    }
+
+    @Override
+    public Collection<String> getOutboundChannelKeys() {
+        return outboundChannelKeys;
+    }
+
+    public void setOutboundChannelKeys(Collection<String> outboundChannelKeys) {
+        this.outboundChannelKeys = outboundChannelKeys;
     }
 
     @Override

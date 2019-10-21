@@ -23,8 +23,4 @@ public interface ChannelDefinition {
 
     String getKey();
 
-    InboundEventChannelAdapter getInboundEventChannelAdapter();
-
-    InboundEventProcessingPipeline getInboundEventProcessingPipeline();
-
 }

@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.parser.handler;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
@@ -23,6 +23,7 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 
 /**
@@ -32,7 +33,7 @@ public class ServiceTaskParseHandler extends AbstractPlanItemParseHandler<Servic
 
     @Override
     public Collection<Class<? extends BaseElement>> getHandledTypes() {
-        return Collections.singletonList(ServiceTask.class);
+        return Arrays.asList(ServiceTask.class, SendEventServiceTask.class);
     }
 
     @Override
@@ -45,6 +46,10 @@ public class ServiceTaskParseHandler extends AbstractPlanItemParseHandler<Servic
 
             case ServiceTask.MAIL_TASK:
                 planItem.setBehavior(activityBehaviorFactory.createEmailActivityBehavior(planItem, serviceTask));
+                break;
+
+            case SendEventServiceTask.SEND_EVENT:
+                planItem.setBehavior(activityBehaviorFactory.createSendEventActivityBehavior(planItem, (SendEventServiceTask) serviceTask));
                 break;
 
             default:

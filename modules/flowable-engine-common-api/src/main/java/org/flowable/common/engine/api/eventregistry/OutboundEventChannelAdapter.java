@@ -14,18 +14,9 @@ package org.flowable.common.engine.api.eventregistry;
 
 /**
  * @author Joram Barrez
- * @author Filip Hrisafov
  */
-public interface InboundEventDeserializer<T> {
+public interface OutboundEventChannelAdapter {
 
-    /**
-     * Returns the unique type for this deserializer.
-     */
-    String getType();
-
-    /**
-     * The actual deserialization.
-     */
-    T deserialize(String rawEvent);
+    void sendEvent(String rawEvent);
 
 }

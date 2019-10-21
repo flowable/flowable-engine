@@ -10,14 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.eventregistry.deserializer;
+package org.flowable.common.engine.impl.eventregistry.serialization;
 
 import java.io.IOException;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.eventregistry.InboundEventDeserializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,8 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Filip Hrisafov
  */
 public class StringToJsonDeserializer implements InboundEventDeserializer<JsonNode> {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(StringToJsonDeserializer.class);
 
     public static String TYPE = "stringToJson";
 

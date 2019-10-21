@@ -20,7 +20,7 @@ import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeline;
 import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
-import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
+import org.flowable.common.engine.api.eventregistry.definition.InboundChannelDefinition;
 
 /**
  * @author Joram Barrez
@@ -39,7 +39,7 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
     @Override
     public void eventReceived(String channelKey, String event) {
 
-        ChannelDefinition channelDefinition = eventRegistry.getChannelDefinition(channelKey);
+        InboundChannelDefinition channelDefinition = eventRegistry.getInboundChannelDefinition(channelKey);
         if (channelDefinition == null) {
             throw new FlowableException("No channel definition found for key " + channelKey);
         }
@@ -47,7 +47,6 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
         InboundEventProcessingPipeline inboundEventProcessingPipeline = channelDefinition.getInboundEventProcessingPipeline();
         Collection<FlowableEventBusEvent> eventBusEvents = inboundEventProcessingPipeline.run(channelKey, event);
 
-        // TODO: change transform() to EventInstance instead of eventBusEvent
         for (FlowableEventBusEvent flowableEventBusEvent : eventBusEvents) {
             flowableEventBus.sendEvent(flowableEventBusEvent);
         }

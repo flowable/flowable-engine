@@ -21,7 +21,9 @@ public interface EventDefinition {
 
     String getKey();
 
-    Collection<String> getChannelKeys();
+    Collection<String> getInboundChannelKeys();
+
+    Collection<String> getOutboundChannelKeys();
 
     Collection<EventPayloadDefinition> getEventPayloadDefinitions();
 

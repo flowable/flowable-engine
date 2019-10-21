@@ -23,13 +23,13 @@ import org.flowable.common.engine.api.eventregistry.InboundEventTransformer;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public interface ChannelDefinitionBuilder {
+public interface InboundChannelDefinitionBuilder {
 
-    ChannelDefinitionBuilder key(String key);
+    InboundChannelDefinitionBuilder key(String key);
 
     InboundEventProcessingPipelineBuilder channelAdapter(InboundEventChannelAdapter inboundEventChannelAdapter);
 
-    ChannelDefinition register();
+    InboundChannelDefinition register();
 
 
     interface InboundEventProcessingPipelineBuilder {
@@ -38,7 +38,7 @@ public interface ChannelDefinitionBuilder {
 
         <T> InboundEventKeyDetectorBuilder<T> deserializer(InboundEventDeserializer<T> deserializer);
 
-        ChannelDefinitionBuilder eventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline);
+        InboundChannelDefinitionBuilder eventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline);
 
         InboundEventProcessingPipeline build();
 
@@ -72,9 +72,9 @@ public interface ChannelDefinitionBuilder {
 
     interface InboundEventTransformerBuilder {
 
-        ChannelDefinitionBuilder transformer(InboundEventTransformer inboundEventTransformer);
+        InboundChannelDefinitionBuilder transformer(InboundEventTransformer inboundEventTransformer);
 
-        ChannelDefinition register();
+        InboundChannelDefinition register();
 
     }
 

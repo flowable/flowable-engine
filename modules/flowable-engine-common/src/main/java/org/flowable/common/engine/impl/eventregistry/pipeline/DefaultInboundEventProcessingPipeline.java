@@ -31,7 +31,7 @@ import org.flowable.common.engine.impl.eventregistry.runtime.EventInstanceImpl;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public class DefaultEventProcessingPipeline<T> implements InboundEventProcessingPipeline {
+public class DefaultInboundEventProcessingPipeline<T> implements InboundEventProcessingPipeline {
 
     protected EventRegistry eventRegistry;
     protected InboundEventDeserializer<T> inboundEventDeserializer;
@@ -39,7 +39,7 @@ public class DefaultEventProcessingPipeline<T> implements InboundEventProcessing
     protected InboundEventPayloadExtractor<T> inboundEventPayloadExtractor;
     protected InboundEventTransformer inboundEventTransformer;
 
-    public DefaultEventProcessingPipeline(EventRegistry eventRegistry,
+    public DefaultInboundEventProcessingPipeline(EventRegistry eventRegistry,
             InboundEventDeserializer<T> inboundEventDeserializer,
             InboundEventKeyDetector<T> inboundEventKeyDetector,
             InboundEventPayloadExtractor<T> inboundEventPayloadExtractor,

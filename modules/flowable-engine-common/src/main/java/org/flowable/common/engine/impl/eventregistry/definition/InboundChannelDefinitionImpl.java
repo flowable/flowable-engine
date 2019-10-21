@@ -16,11 +16,12 @@ import org.flowable.common.engine.api.eventregistry.InboundEventProcessingPipeli
 import org.flowable.common.engine.api.eventregistry.definition.ChannelDefinition;
 import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
 import org.flowable.common.engine.api.eventregistry.InboundEventKeyDetector;
+import org.flowable.common.engine.api.eventregistry.definition.InboundChannelDefinition;
 
 /**
  * @author Joram Barrez
  */
-public class ChannelDefinitionImpl implements ChannelDefinition {
+public class InboundChannelDefinitionImpl implements InboundChannelDefinition {
 
     protected String key;
     protected InboundEventChannelAdapter inboundEventChannelAdapter;
@@ -44,6 +45,7 @@ public class ChannelDefinitionImpl implements ChannelDefinition {
         this.inboundEventProcessingPipeline = inboundEventProcessingPipeline;
     }
 
+    @Override
     public InboundEventChannelAdapter getInboundEventChannelAdapter() {
         return inboundEventChannelAdapter;
     }

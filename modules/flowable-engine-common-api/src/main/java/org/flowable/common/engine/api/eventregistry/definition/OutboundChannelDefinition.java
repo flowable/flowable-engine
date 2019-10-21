@@ -10,11 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.eventregistry;
+package org.flowable.common.engine.api.eventregistry.definition;
+
+import org.flowable.common.engine.api.eventregistry.OutboundEventChannelAdapter;
+import org.flowable.common.engine.api.eventregistry.OutboundEventProcessingPipeline;
 
 /**
  * @author Joram Barrez
  */
-public class OutboundEventChannelAdapter {
+public interface OutboundChannelDefinition extends ChannelDefinition {
+
+    OutboundEventChannelAdapter getOutboundEventChannelAdapter();
+
+    OutboundEventProcessingPipeline getOutboundEventProcessingPipeline();
 
 }

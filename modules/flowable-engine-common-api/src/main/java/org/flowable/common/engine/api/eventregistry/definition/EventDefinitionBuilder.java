@@ -29,18 +29,26 @@ public interface EventDefinitionBuilder {
     EventDefinitionBuilder key(String key);
 
     /**
-     * Some event definitions are unique to a certain channel (e.g. an external message queue).
-     * When the event definition only applies to one channel only, set the logical key with this method.
-     *
-     * When there's only one channel or the event can be received through all channels,
-     * this method doesn't need to be called.
+     * {@link EventDefinition} can be bound to inbound or outbound channels.
+     * Calling this method will bind it to an inbound channel with the given key.
      */
-    EventDefinitionBuilder channelKey(String channelKey);
+    EventDefinitionBuilder inboundChannelKey(String channelKey);
 
     /**
-     * Allows to set multiple channel keys. See {@link #channelKey(String)}.
+     * Allows to set multiple channel keys. See {@link #inboundChannelKey(String)}.
      */
-    EventDefinitionBuilder channelKeys(Collection<String> channelKeys);
+    EventDefinitionBuilder inboundChannelKeys(Collection<String> channelKeys);
+
+    /**
+     * {@link EventDefinition} can be bound to inbound or outbound channels.
+     * Calling this method will bind it to an inbound channel with the given key.
+     */
+    EventDefinitionBuilder outboundChannelKey(String channelKey);
+
+    /**
+     * Allows to set multiple channel keys. See {@link #inboundChannelKey(String)}.
+     */
+    EventDefinitionBuilder outboundChannelKeys(Collection<String> channelKeys);
 
     /**
      * Defines one payload element of an event definition.

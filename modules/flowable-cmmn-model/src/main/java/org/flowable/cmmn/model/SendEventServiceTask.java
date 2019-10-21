@@ -10,22 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.api.eventregistry;
+package org.flowable.cmmn.model;
 
 /**
  * @author Joram Barrez
- * @author Filip Hrisafov
  */
-public interface InboundEventDeserializer<T> {
+public class SendEventServiceTask extends ServiceTask {
 
-    /**
-     * Returns the unique type for this deserializer.
-     */
-    String getType();
+    public static final String SEND_EVENT = "send-event";
 
-    /**
-     * The actual deserialization.
-     */
-    T deserialize(String rawEvent);
+    public SendEventServiceTask() {
+        this.type = SEND_EVENT;
+    }
 
 }

@@ -21,6 +21,7 @@ import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ScriptServiceTask;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Task;
 
@@ -58,6 +59,9 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
 
             } else if (Objects.equals(type, ScriptServiceTask.SCRIPT_TASK)) {
                 task = convertToScriptTask(xtr);
+
+            } else if (Objects.equals(type, SendEventServiceTask.SEND_EVENT)) {
+              task = convertToSendEventTask(xtr);
 
             } else {
                 task = new Task();
@@ -129,6 +133,10 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         }
 
         return scriptTask;
+    }
+
+    protected Task convertToSendEventTask(XMLStreamReader xmlStreamReader) {
+        return new SendEventServiceTask();
     }
 
     protected void convertCommonTaskAttributes(XMLStreamReader xtr, Task task) {
