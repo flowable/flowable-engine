@@ -33,7 +33,7 @@
     
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <property name="hibernate.connection.url" value="jdbc:h2:mem:flowable-jpa;DB_CLOSE_DELAY=1000;MVCC=TRUE"/>
+      <property name="hibernate.connection.url" value="jdbc:h2:mem:flowable-jpa;DB_CLOSE_DELAY=1000"/>
       <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
       <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
       <property name="hibernate.connection.username" value="sa"/>
