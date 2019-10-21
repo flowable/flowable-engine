@@ -15,7 +15,10 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
+import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -34,6 +37,11 @@ public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperatio
     public void run() {
         super.run();
         
+        Case caseModel = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId());
+        Object eventInstance = caseInstanceEntity.getTransientVariable("eventInstance");
+        if (eventInstance instanceof EventInstance) {
+            EventInstanceCmmnUtil.handleEventInstance(caseInstanceEntity, caseModel, (EventInstance) eventInstance);
+        }
         Stage stage = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel();
         createPlanItemInstancesForNewStage(commandContext,
                 stage.getPlanItems(), 

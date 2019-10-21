@@ -55,7 +55,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         List<EventSubscription> eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(eventDefinition);
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
-            handleEventSubscription(cmmnRuntimeService, eventSubscription);
+            handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance);
         }
 
         Collection<String> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
@@ -63,7 +63,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             // If there are correlation keys then look for all event subscriptions matching them
             eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventDefinition, correlationKeys);
             for (EventSubscription eventSubscription : eventSubscriptions) {
-                handleEventSubscription(cmmnRuntimeService, eventSubscription);
+                handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance);
             }
         }
 
@@ -81,13 +81,19 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).withoutConfiguration().scopeType(ScopeTypes.CMMN)));
     }
 
-    protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription) {
+    protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
+        EventInstance eventInstance) {
         if (eventSubscription.getSubScopeId() != null) {
-            cmmnRuntimeService.triggerPlanItemInstance(eventSubscription.getSubScopeId());
+            cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(eventSubscription.getSubScopeId())
+                .transientVariable("eventInstance", eventInstance)
+                .trigger();
 
         } else if (eventSubscription.getScopeDefinitionId() != null
             && eventSubscription.getScopeId() == null && eventSubscription.getSubScopeId() == null) {
-            cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(eventSubscription.getScopeDefinitionId()).start();
+            cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionId(eventSubscription.getScopeDefinitionId())
+                .transientVariable("eventInstance", eventInstance)
+                .start();
         }
     }
 

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.eventregistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Random;
 
@@ -262,6 +263,39 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
+    @CmmnDeployment
+    public void testGenericEventListenerWithPayload() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testCaseEventWithPayload")
+            .start();
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
+        inboundEventChannelAdapter.triggerTestEvent("payloadCustomer");
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+            .containsOnly(
+                entry("customerIdVar", "payloadCustomer"),
+                entry("payload1", "Hello World")
+            );
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseStartWithPayload() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCaseStartEventWithPayload").singleResult();
+        assertThat(caseDefinition).isNotNull();
+
+        inboundEventChannelAdapter.triggerTestEvent("payloadStartCustomer");
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(1);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+            .containsOnly(
+                entry("customerIdVar", "payloadStartCustomer"),
+                entry("payload1", "Hello World")
+            );
+    }
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
         public String channelKey;

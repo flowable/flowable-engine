@@ -26,12 +26,14 @@ import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavio
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -85,9 +87,20 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
             }
         }
         
+        EventInstance eventInstance = (EventInstance) planItemInstanceEntity.getTransientVariable("eventInstance");
+        if (eventInstance != null) {
+            handleEventInstance(planItemInstanceEntity, eventInstance);
+        }
+
         CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
     }
 
+    protected void handleEventInstance(PlanItemInstanceEntity planItemInstanceEntity, EventInstance eventInstance) {
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
+        if (planItemDefinition != null) {
+            EventInstanceCmmnUtil.handleEventInstance(planItemInstanceEntity, planItemDefinition, eventInstance);
+        }
+    }
 
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
