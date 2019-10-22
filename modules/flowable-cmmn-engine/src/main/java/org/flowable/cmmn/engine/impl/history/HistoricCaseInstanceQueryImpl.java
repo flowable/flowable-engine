@@ -15,23 +15,27 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
-import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -50,8 +54,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String caseDefinitionCategory;
     protected Integer caseDefinitionVersion;
     protected String caseInstanceId;
-    protected String caseInstanceNameLikeIgnoreCase;
     protected Set<String> caseInstanceIds;
+    protected String caseInstanceNameLikeIgnoreCase;
     protected String businessKey;
     protected String caseInstanceParentId;
     protected String deploymentId;
@@ -445,11 +449,44 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         List<HistoricCaseInstance> results;
         if (includeCaseVariables) {
             results = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findWithVariablesByQueryCriteria(this);
+
+            if (caseInstanceId != null) {
+                addCachedVariableForQueryById(commandContext, results);
+            }
+
         } else {
             results = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findByCriteria(this);
         }
 
         return results;
+    }
+
+    protected void addCachedVariableForQueryById(CommandContext commandContext, List<HistoricCaseInstance> results) {
+
+        // Unlike the CaseInstanceEntityImpl, variables are not stored on the HistoricCaseInstanceEntityImpl.
+        // The solution for the non-historical entity is to use the variable cache on the entity, inspect the variables
+        // of the current transaction and add them if necessary.
+        // For the historical entity, we need to detect this use case specifically (i.e. byId is used) and check the entityCache.
+
+        for (HistoricCaseInstance historicCaseInstance : results) {
+            if (Objects.equals(caseInstanceId, historicCaseInstance.getId())) {
+
+                EntityCache entityCache = commandContext.getSession(EntityCache.class);
+                List<HistoricVariableInstanceEntity> cachedVariableEntities = entityCache.findInCache(HistoricVariableInstanceEntity.class);
+                for (HistoricVariableInstanceEntity cachedVariableEntity : cachedVariableEntities) {
+
+                    if (historicCaseInstance.getId().equals(cachedVariableEntity.getScopeId())
+                            && ScopeTypes.CMMN.equals(cachedVariableEntity.getScopeType())) {
+
+                        // Variables from the cache have precedence
+                        ((HistoricCaseInstanceEntity) historicCaseInstance).getQueryVariables().add(cachedVariableEntity);
+
+                    }
+
+                }
+
+            }
+        }
     }
 
     @Override

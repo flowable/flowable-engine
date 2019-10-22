@@ -12,21 +12,28 @@
  */
 package org.flowable.engine.test.bpmn.cache;
 
+import java.util.Map;
+
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.delegate.DelegateTask;
 
-public class CacheTaskListener implements TaskListener {
+public class TestCacheTaskListener implements TaskListener {
     
     private static final long serialVersionUID = 1L;
     
-    public static String taskId;
-    public static String historicTaskId;
+    public static String TASK_ID;
+    public static String HISTORIC_TASK_ID;
+
+    public static Map<String, Object> PROCESS_VARIABLES;
+    public static Map<String, Object> HISTORIC_PROCESS_VARIABLES;
 
     @Override
     public void notify(DelegateTask delegateTask) {
@@ -34,14 +41,28 @@ public class CacheTaskListener implements TaskListener {
         TaskService taskService = processEngineConfiguration.getTaskService();
         Task task = taskService.createTaskQuery().taskId(delegateTask.getId()).singleResult();
         if (task != null && task.getId().equals(delegateTask.getId())) {
-            taskId = task.getId();
+            TASK_ID = task.getId();
         }
         
         HistoryService historyService = processEngineConfiguration.getHistoryService();
         HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(delegateTask.getId()).singleResult();
         if (historicTask != null && historicTask.getId().equals(delegateTask.getId())) {
-            historicTaskId = historicTask.getId();
+            HISTORIC_TASK_ID = historicTask.getId();
         }
+
+        delegateTask.setVariable("varFromTheListener", "valueFromTheListener");
+
+        ProcessInstance processInstance = processEngineConfiguration.getRuntimeService().createProcessInstanceQuery()
+            .processInstanceId(task.getProcessInstanceId())
+            .includeProcessVariables()
+            .singleResult();
+        PROCESS_VARIABLES = processInstance.getProcessVariables();
+
+        HistoricProcessInstance historicProcessInstance = processEngineConfiguration.getHistoryService().createHistoricProcessInstanceQuery()
+            .processInstanceId(task.getProcessInstanceId())
+            .includeProcessVariables()
+            .singleResult();
+        HISTORIC_PROCESS_VARIABLES = historicProcessInstance.getProcessVariables();
     }
 
 }
