@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.db;
 
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,9 +22,12 @@ import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.common.engine.impl.db.AbstractSqlScriptBasedDbSchemaManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
@@ -83,7 +87,18 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     @Override
     public void schemaCreate() {
         
+        // The common schema manager is special and would handle its own locking mechanism
         getCommonSchemaManager().schemaCreate();
+
+        ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
+        LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager("processDbSchema");
+        lockManager.executeOperation(processEngineConfiguration.getSchemaLockWaitTime(), () -> {
+            schemaCreateInLock();
+            return null;
+        });
+    }
+
+    protected void schemaCreateInLock() {
         getIdentityLinkSchemaManager().schemaCreate();
         getEntityLinkSchemaManager().schemaCreate();
         getEventSubscriptionSchemaManager().schemaCreate();
@@ -212,59 +227,70 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             }
         }
         
+        // The common schema manager is special and would handle its own locking mechanism
         getCommonSchemaManager().schemaUpdate();
-        getIdentityLinkSchemaManager().schemaUpdate();
-        getEntityLinkSchemaManager().schemaUpdate();
-        getEventSubscriptionSchemaManager().schemaUpdate();
-        getTaskSchemaManager().schemaUpdate();
-        getVariableSchemaManager().schemaUpdate();
-        getJobSchemaManager().schemaUpdate();
-        getBatchSchemaManager().schemaUpdate();
 
-        if (isUpgradeNeeded) {
-            dbVersionProperty.setValue(ProcessEngine.VERSION);
+        ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
+        LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager("processDbSchema");
+        lockManager.waitForLock(processEngineConfiguration.getSchemaLockWaitTime());
 
-            PropertyEntity dbHistoryProperty;
-            if ("5.0".equals(dbVersion)) {
-                dbHistoryProperty = CommandContextUtil.getPropertyEntityManager().create();
-                dbHistoryProperty.setName("schema.history");
-                dbHistoryProperty.setValue("create(5.0)");
-                dbSqlSession.insert(dbHistoryProperty);
-            } else {
-                dbHistoryProperty = dbSqlSession.selectById(PropertyEntity.class, "schema.history");
-            }
+        try {
+            getIdentityLinkSchemaManager().schemaUpdate();
+            getEntityLinkSchemaManager().schemaUpdate();
+            getEventSubscriptionSchemaManager().schemaUpdate();
+            getTaskSchemaManager().schemaUpdate();
+            getVariableSchemaManager().schemaUpdate();
+            getJobSchemaManager().schemaUpdate();
+            getBatchSchemaManager().schemaUpdate();
 
-            // Set upgrade history
-            String dbHistoryValue = "upgrade(" + dbVersion + "->" + ProcessEngine.VERSION + ")";
-            dbHistoryProperty.setValue(dbHistoryValue);
-
-            // Engine upgrade
-            if (version6120Index > matchingVersionIndex) {
-                dbSchemaUpgrade("engine", version6120Index);
-            } else {
-                dbSchemaUpgrade("engine", matchingVersionIndex);
-            }
-            
-            feedback = "upgraded Flowable from " + dbVersion + " to " + ProcessEngine.VERSION;
-            
-        } else if (!isEngineTablePresent) {
-            dbSchemaCreateEngine();
-        }
-        
-        if (isHistoryTablePresent) {
             if (isUpgradeNeeded) {
-                if (version6120Index > matchingVersionIndex) {
-                    dbSchemaUpgrade("history", version6120Index);
+                dbVersionProperty.setValue(ProcessEngine.VERSION);
+
+                PropertyEntity dbHistoryProperty;
+                if ("5.0".equals(dbVersion)) {
+                    dbHistoryProperty = CommandContextUtil.getPropertyEntityManager().create();
+                    dbHistoryProperty.setName("schema.history");
+                    dbHistoryProperty.setValue("create(5.0)");
+                    dbSqlSession.insert(dbHistoryProperty);
                 } else {
-                    dbSchemaUpgrade("history", matchingVersionIndex);
+                    dbHistoryProperty = dbSqlSession.selectById(PropertyEntity.class, "schema.history");
                 }
+
+                // Set upgrade history
+                String dbHistoryValue = "upgrade(" + dbVersion + "->" + ProcessEngine.VERSION + ")";
+                dbHistoryProperty.setValue(dbHistoryValue);
+
+                // Engine upgrade
+                if (version6120Index > matchingVersionIndex) {
+                    dbSchemaUpgrade("engine", version6120Index);
+                } else {
+                    dbSchemaUpgrade("engine", matchingVersionIndex);
+                }
+
+                feedback = "upgraded Flowable from " + dbVersion + " to " + ProcessEngine.VERSION;
+
+            } else if (!isEngineTablePresent) {
+                dbSchemaCreateEngine();
             }
-            
-        } else if (dbSqlSession.getDbSqlSessionFactory().isDbHistoryUsed()) {
-            dbSchemaCreateHistory();
+
+            if (isHistoryTablePresent) {
+                if (isUpgradeNeeded) {
+                    if (version6120Index > matchingVersionIndex) {
+                        dbSchemaUpgrade("history", version6120Index);
+                    } else {
+                        dbSchemaUpgrade("history", matchingVersionIndex);
+                    }
+                }
+
+            } else if (dbSqlSession.getDbSqlSessionFactory().isDbHistoryUsed()) {
+                dbSchemaCreateHistory();
+            }
+
+            return feedback;
+        } finally {
+            lockManager.releaseLock();
         }
 
-        return feedback;
     }
 
     public boolean isEngineTablePresent() {
@@ -351,6 +377,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         return CommandContextUtil.getProcessEngineConfiguration().getBatchSchemaManager();
     }
     
+    protected ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+        return CommandContextUtil.getProcessEngineConfiguration();
+    }
+
     @Override
     protected String getResourcesRootDirectory() {
         return "org/flowable/db/";

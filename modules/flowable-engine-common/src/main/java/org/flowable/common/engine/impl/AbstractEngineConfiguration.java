@@ -20,6 +20,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -278,6 +279,16 @@ public abstract class AbstractEngineConfiguration {
     protected boolean enableLogSqlExecutionTime;
 
     protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+
+    /**
+     * Duration between the checks when acquiring a lock.
+     */
+    protected Duration lockPollRate = Duration.ofSeconds(10);
+
+    /**
+     * Duration to wait for the DB Schema lock before giving up.
+     */
+    protected Duration schemaLockWaitTime = Duration.ofMinutes(5);
 
     // DATA MANAGERS //////////////////////////////////////////////////////////////////
 
@@ -1683,6 +1694,23 @@ public abstract class AbstractEngineConfiguration {
 
     public PropertyDataManager getPropertyDataManager() {
         return propertyDataManager;
+    }
+
+    public Duration getLockPollRate() {
+        return lockPollRate;
+    }
+
+    public AbstractEngineConfiguration setLockPollRate(Duration lockPollRate) {
+        this.lockPollRate = lockPollRate;
+        return this;
+    }
+
+    public Duration getSchemaLockWaitTime() {
+        return schemaLockWaitTime;
+    }
+
+    public void setSchemaLockWaitTime(Duration schemaLockWaitTime) {
+        this.schemaLockWaitTime = schemaLockWaitTime;
     }
 
     public AbstractEngineConfiguration setPropertyDataManager(PropertyDataManager propertyDataManager) {
