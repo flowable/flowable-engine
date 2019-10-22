@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.app;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,6 +42,18 @@ public class FlowableAppProperties {
      * Whether to perform deployment of resources, default is {@code true}.
      */
     private boolean deployResources = true;
+
+    /**
+     * Whether to use a lock when performing the auto deployment.
+     * If not set then the global default would be used.
+     */
+    private Boolean useLockForAutoDeployment;
+
+    /**
+     * Duration to wait for the auto deployment lock before giving up.
+     * If not set then the global default would be used.
+     */
+    private Duration autoDeploymentLockWaitTime;
 
     /**
      * The servlet configuration for the Process Rest API.
@@ -87,5 +100,21 @@ public class FlowableAppProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Boolean getUseLockForAutoDeployment() {
+        return useLockForAutoDeployment;
+    }
+
+    public void setUseLockForAutoDeployment(Boolean useLockForAutoDeployment) {
+        this.useLockForAutoDeployment = useLockForAutoDeployment;
+    }
+
+    public Duration getAutoDeploymentLockWaitTime() {
+        return autoDeploymentLockWaitTime;
+    }
+
+    public void setAutoDeploymentLockWaitTime(Duration autoDeploymentLockWaitTime) {
+        this.autoDeploymentLockWaitTime = autoDeploymentLockWaitTime;
     }
 }

@@ -13,18 +13,22 @@
 
 package org.flowable.form.spring.autodeployment;
 
+import java.time.Duration;
+
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.engine.FormEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Default implementation of {@link AutoDeploymentStrategy} that groups all {@link Resource}s into a single deployment. This implementation is equivalent to the previously used implementation.
+ * Default implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that groups all {@link Resource}s into a single deployment. This implementation is equivalent to the previously used implementation.
  * 
  * @author Tiese Barrell
  */
-public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class DefaultAutoDeploymentStrategy extends AbstractFormAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAutoDeploymentStrategy.class);
 
@@ -33,13 +37,21 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
      */
     public static final String DEPLOYMENT_MODE = "default";
 
+    public DefaultAutoDeploymentStrategy() {
+    }
+
+    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
+        super(useLockForDeployments, deploymentLockWaitTime);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final FormRepositoryService repositoryService) {
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, FormEngine engine) {
+        FormRepositoryService repositoryService = engine.getFormRepositoryService();
 
         try {
             // Create a single deployment for all resources using the name hint as the literal name

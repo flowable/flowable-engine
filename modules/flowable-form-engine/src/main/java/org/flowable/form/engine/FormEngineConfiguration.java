@@ -259,6 +259,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     @Override
     public void initSchemaManager() {
+        super.initSchemaManager();
         if (this.schemaManager == null) {
             this.schemaManager = new FormDbSchemaManager();
         }

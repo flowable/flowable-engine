@@ -22,6 +22,7 @@ import java.io.InputStream;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.engine.FormEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -34,6 +35,9 @@ import org.springframework.core.io.Resource;
  */
 @MockitoSettings
 public class AbstractAutoDeploymentStrategyTest {
+
+    @Mock
+    protected FormEngine formEngineMock;
 
     @Mock
     protected FormRepositoryService repositoryServiceMock;
@@ -73,6 +77,7 @@ public class AbstractAutoDeploymentStrategyTest {
 
     @BeforeEach
     public void before() throws Exception {
+        when(formEngineMock.getFormRepositoryService()).thenReturn(repositoryServiceMock);
 
         when(resourceMock1.getPathWithinContext()).thenReturn(resourceName1);
         when(resourceMock1.getFile()).thenReturn(fileMock1);

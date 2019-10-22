@@ -22,11 +22,11 @@ import javax.sql.DataSource;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.AppEngines;
-import org.flowable.app.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.common.spring.SpringTransactionContextFactory;
 import org.flowable.common.spring.SpringTransactionInterceptor;
@@ -48,7 +48,7 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected Collection<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = new ArrayList<>();
     protected volatile boolean running = false;
     protected List<String> enginesBuild = new ArrayList<>();
     protected final Object lifeCycleMonitor = new Object();
@@ -95,8 +95,8 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
 
     protected void autoDeployResources(AppEngine appEngine) {
         if (deploymentResources != null && deploymentResources.length > 0) {
-            final AutoDeploymentStrategy strategy = getAutoDeploymentStrategy(deploymentMode);
-            strategy.deployResources(deploymentResources, appEngine.getAppRepositoryService());
+            final AutoDeploymentStrategy<AppEngine> strategy = getAutoDeploymentStrategy(deploymentMode);
+            strategy.deployResources(getDeploymentName(), deploymentResources, appEngine);
         }
     }
 
@@ -159,9 +159,9 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
      *            the mode to get the strategy for
      * @return the deployment strategy to use for the mode. Never <code>null</code>
      */
-    protected AutoDeploymentStrategy getAutoDeploymentStrategy(final String mode) {
-        AutoDeploymentStrategy result = new DefaultAutoDeploymentStrategy();
-        for (final AutoDeploymentStrategy strategy : deploymentStrategies) {
+    protected AutoDeploymentStrategy<AppEngine> getAutoDeploymentStrategy(final String mode) {
+        AutoDeploymentStrategy<AppEngine> result = new DefaultAutoDeploymentStrategy();
+        for (final AutoDeploymentStrategy<AppEngine> strategy : deploymentStrategies) {
             if (strategy.handlesMode(mode)) {
                 result = strategy;
                 break;
@@ -178,6 +178,14 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
                 running = true;
             }
         }
+    }
+
+    public Collection<AutoDeploymentStrategy<AppEngine>> getDeploymentStrategies() {
+        return deploymentStrategies;
+    }
+
+    public void setDeploymentStrategies(Collection<AutoDeploymentStrategy<AppEngine>> deploymentStrategies) {
+        this.deploymentStrategies = deploymentStrategies;
     }
 
     @Override

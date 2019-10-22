@@ -203,6 +203,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
 
     @Override
     public void initSchemaManager() {
+        super.initSchemaManager();
         if (this.schemaManager == null) {
             this.schemaManager = new IdmDbSchemaManager();
         }

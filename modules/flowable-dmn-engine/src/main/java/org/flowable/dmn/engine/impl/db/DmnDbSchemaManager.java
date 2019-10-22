@@ -16,6 +16,7 @@ package org.flowable.dmn.engine.impl.db;
 import org.flowable.common.engine.impl.db.EngineDatabaseConfiguration;
 import org.flowable.common.engine.impl.db.LiquibaseBasedSchemaManager;
 import org.flowable.common.engine.impl.db.LiquibaseDatabaseConfiguration;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
@@ -34,5 +35,36 @@ public class DmnDbSchemaManager extends LiquibaseBasedSchemaManager {
 
     public void initSchema() {
         initSchema(CommandContextUtil.getDmnEngineConfiguration().getDatabaseSchemaUpdate());
+    }
+
+    @Override
+    public void schemaCreate() {
+        getCommonSchemaManager().schemaCreate();
+        super.schemaCreate();
+    }
+
+    @Override
+    public void schemaDrop() {
+        try {
+            super.schemaDrop();
+        } catch (Exception e) {
+            logger.info("Error dropping dmn engine tables", e);
+        }
+
+        try {
+            getCommonSchemaManager().schemaDrop();
+        } catch (Exception e) {
+            logger.info("Error dropping common tables", e);
+        }
+    }
+
+    @Override
+    public String schemaUpdate() {
+        getCommonSchemaManager().schemaUpdate();
+        return super.schemaUpdate();
+    }
+
+    protected SchemaManager getCommonSchemaManager() {
+        return CommandContextUtil.getDmnEngineConfiguration().getCommonSchemaManager();
     }
 }

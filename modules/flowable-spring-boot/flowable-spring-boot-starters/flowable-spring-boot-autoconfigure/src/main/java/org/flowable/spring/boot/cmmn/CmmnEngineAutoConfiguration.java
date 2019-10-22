@@ -13,14 +13,21 @@
 package org.flowable.spring.boot.cmmn;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
+import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
@@ -116,7 +123,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @Bean
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-        @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider)
+        @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider,
+        ObjectProvider<AutoDeploymentStrategy<CmmnEngine>> cmmnAutoDeploymentStrategies)
         throws IOException {
         
         SpringCmmnEngineConfiguration configuration = new SpringCmmnEngineConfiguration();
@@ -159,6 +167,16 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
 
         configuration.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
+
+        List<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = cmmnAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
+        boolean useLockForAutoDeployment = defaultIfNotNull(cmmnProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
+        Duration autoDeploymentLockWaitTime = defaultIfNotNull(cmmnProperties.getAutoDeploymentLockWaitTime(),
+            flowableProperties.getAutoDeploymentLockWaitTime());
+        // Always add the out of the box auto deployment strategies as last
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
+        configuration.setDeploymentStrategies(deploymentStrategies);
 
         return configuration;
     }

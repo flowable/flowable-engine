@@ -14,22 +14,25 @@
 package org.flowable.app.spring.autodeployment;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.zip.ZipInputStream;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
+import org.flowable.app.engine.AppEngine;
 import org.flowable.common.engine.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Default Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each resource by name.
+ * Default Implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that performs a separate deployment for each resource by name.
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class DefaultAutoDeploymentStrategy extends AbstractAppAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAutoDeploymentStrategy.class);
 
@@ -38,14 +41,22 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
      */
     public static final String DEPLOYMENT_MODE = "default";
 
+    public DefaultAutoDeploymentStrategy() {
+    }
+
+    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
+        super(useLockForDeployments, deploymentLockWaitTime);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final Resource[] resources, final AppRepositoryService repositoryService) {
-        
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, AppEngine engine) {
+        AppRepositoryService repositoryService = engine.getAppRepositoryService();
+
         // Create a separate deployment for each resource using the resource name
 
         for (final Resource resource : resources) {
