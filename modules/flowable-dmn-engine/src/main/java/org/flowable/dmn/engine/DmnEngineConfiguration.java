@@ -270,7 +270,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     // Data managers
     ///////////////////////////////////////////////////////////
 
+    @Override
     public void initDataManagers() {
+        super.initDataManagers();
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisDmnDeploymentDataManager(this);
         }
@@ -285,7 +287,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         }
     }
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (deploymentEntityManager == null) {
             deploymentEntityManager = new DmnDeploymentEntityManagerImpl(this, deploymentDataManager);
         }

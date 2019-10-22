@@ -78,6 +78,10 @@ import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
@@ -274,6 +278,14 @@ public abstract class AbstractEngineConfiguration {
     protected boolean enableLogSqlExecutionTime;
 
     protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+
+    // DATA MANAGERS //////////////////////////////////////////////////////////////////
+
+    protected PropertyDataManager propertyDataManager;
+
+    // ENTITY MANAGERS ////////////////////////////////////////////////////////////////
+
+    protected PropertyEntityManager propertyEntityManager;
 
     protected List<EngineDeployer> customPreDeployers;
     protected List<EngineDeployer> customPostDeployers;
@@ -608,6 +620,22 @@ public abstract class AbstractEngineConfiguration {
     public void initClock() {
         if (clock == null) {
             clock = new DefaultClockImpl();
+        }
+    }
+
+    // Data managers ///////////////////////////////////////////////////////////
+
+    public void initDataManagers() {
+        if (propertyDataManager == null) {
+            propertyDataManager = new MybatisPropertyDataManager();
+        }
+    }
+
+    // Entity managers //////////////////////////////////////////////////////////
+
+    public void initEntityManagers() {
+        if (propertyEntityManager == null) {
+            propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
         }
     }
 
@@ -1650,6 +1678,24 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
         this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+
+    public PropertyDataManager getPropertyDataManager() {
+        return propertyDataManager;
+    }
+
+    public AbstractEngineConfiguration setPropertyDataManager(PropertyDataManager propertyDataManager) {
+        this.propertyDataManager = propertyDataManager;
+        return this;
+    }
+
+    public PropertyEntityManager getPropertyEntityManager() {
+        return propertyEntityManager;
+    }
+
+    public AbstractEngineConfiguration setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
+        this.propertyEntityManager = propertyEntityManager;
         return this;
     }
 

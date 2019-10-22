@@ -14,10 +14,10 @@ package org.flowable.engine.test.cfg.taskcount;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;

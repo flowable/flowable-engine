@@ -10,17 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.entity.data;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 
 /**
  * @author Joram Barrez
  */
-public interface PropertyDataManager extends DataManager<PropertyEntity> {
+public interface PropertyEntityManager extends EntityManager<PropertyEntity> {
 
     List<PropertyEntity> findAll();
 

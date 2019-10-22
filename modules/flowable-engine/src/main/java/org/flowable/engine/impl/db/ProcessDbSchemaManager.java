@@ -21,9 +21,9 @@ import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.common.engine.impl.db.AbstractSqlScriptBasedDbSchemaManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
@@ -76,7 +76,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
 
     protected String getDbVersion() {
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
+        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
         return (String) dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement);
     }
     

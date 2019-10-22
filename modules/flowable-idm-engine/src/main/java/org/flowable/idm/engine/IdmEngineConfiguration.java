@@ -106,7 +106,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     protected GroupDataManager groupDataManager;
     protected IdentityInfoDataManager identityInfoDataManager;
     protected MembershipDataManager membershipDataManager;
-    protected PropertyDataManager propertyDataManager;
+    protected PropertyDataManager idmPropertyDataManager;
     protected TokenDataManager tokenDataManager;
     protected UserDataManager userDataManager;
     protected PrivilegeDataManager privilegeDataManager;
@@ -117,7 +117,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     protected GroupEntityManager groupEntityManager;
     protected IdentityInfoEntityManager identityInfoEntityManager;
     protected MembershipEntityManager membershipEntityManager;
-    protected PropertyEntityManager propertyEntityManager;
+    protected PropertyEntityManager idmPropertyEntityManager;
     protected TableDataManager tableDataManager;
     protected TokenEntityManager tokenEntityManager;
     protected UserEntityManager userEntityManager;
@@ -227,7 +227,9 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     // Data managers
     ///////////////////////////////////////////////////////////
 
+    @Override
     public void initDataManagers() {
+        super.initDataManagers();
         if (byteArrayDataManager == null) {
             byteArrayDataManager = new MybatisByteArrayDataManager(this);
         }
@@ -240,8 +242,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         if (membershipDataManager == null) {
             membershipDataManager = new MybatisMembershipDataManager(this);
         }
-        if (propertyDataManager == null) {
-            propertyDataManager = new MybatisPropertyDataManager(this);
+        if (idmPropertyDataManager == null) {
+            idmPropertyDataManager = new MybatisPropertyDataManager(this);
         }
         if (tokenDataManager == null) {
             tokenDataManager = new MybatisTokenDataManager(this);
@@ -257,7 +259,9 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         }
     }
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (byteArrayEntityManager == null) {
             byteArrayEntityManager = new ByteArrayEntityManagerImpl(this, byteArrayDataManager);
         }
@@ -270,8 +274,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         if (membershipEntityManager == null) {
             membershipEntityManager = new MembershipEntityManagerImpl(this, membershipDataManager);
         }
-        if (propertyEntityManager == null) {
-            propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
+        if (idmPropertyEntityManager == null) {
+            idmPropertyEntityManager = new PropertyEntityManagerImpl(this, idmPropertyDataManager);
         }
         if (tableDataManager == null) {
             tableDataManager = new TableDataManagerImpl(this);
@@ -569,12 +573,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public PropertyDataManager getPropertyDataManager() {
-        return propertyDataManager;
+    public PropertyDataManager getIdmPropertyDataManager() {
+        return idmPropertyDataManager;
     }
 
-    public IdmEngineConfiguration setPropertyDataManager(PropertyDataManager propertyDataManager) {
-        this.propertyDataManager = propertyDataManager;
+    public IdmEngineConfiguration setIdmPropertyDataManager(PropertyDataManager idmPropertyDataManager) {
+        this.idmPropertyDataManager = idmPropertyDataManager;
         return this;
     }
 
@@ -650,12 +654,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public PropertyEntityManager getPropertyEntityManager() {
-        return propertyEntityManager;
+    public PropertyEntityManager getIdmPropertyEntityManager() {
+        return idmPropertyEntityManager;
     }
 
-    public IdmEngineConfiguration setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
-        this.propertyEntityManager = propertyEntityManager;
+    public IdmEngineConfiguration setIdmPropertyEntityManager(PropertyEntityManager idmPropertyEntityManager) {
+        this.idmPropertyEntityManager = idmPropertyEntityManager;
         return this;
     }
 

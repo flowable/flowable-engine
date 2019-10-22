@@ -11,23 +11,23 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public class PropertyEntityManagerImpl
-    extends AbstractProcessEngineEntityManager<PropertyEntity, PropertyDataManager>
+    extends AbstractEngineEntityManager<AbstractEngineConfiguration, PropertyEntity, PropertyDataManager>
     implements PropertyEntityManager {
 
-    public PropertyEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, PropertyDataManager propertyDataManager) {
-        super(processEngineConfiguration, propertyDataManager);
+    public PropertyEntityManagerImpl(AbstractEngineConfiguration engineConfiguration, PropertyDataManager propertyDataManager) {
+        super(engineConfiguration, propertyDataManager);
     }
 
     @Override

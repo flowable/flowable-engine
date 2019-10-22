@@ -2,11 +2,11 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
   
-<mapper namespace="org.flowable.engine.impl.persistence.entity.PropertyEntityImpl">
+<mapper namespace="org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl">
 
   <!-- PROPERTY INSERT -->
   
-  <insert id="insertProperty" parameterType="org.flowable.engine.impl.persistence.entity.PropertyEntityImpl">
+  <insert id="insertProperty" parameterType="org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl">
       insert into ${prefix}ACT_GE_PROPERTY (
         NAME_,
         VALUE_,
@@ -40,7 +40,7 @@
 
   <!-- PROPERTY UPDATE -->
   
-  <update id="updateProperty" parameterType="org.flowable.engine.impl.persistence.entity.PropertyEntityImpl">
+  <update id="updateProperty" parameterType="org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl">
     update ${prefix}ACT_GE_PROPERTY
     <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
@@ -52,14 +52,14 @@
 
   <!-- PROPERTY DELETE -->
   
-  <delete id="deleteProperty" parameterType="org.flowable.engine.impl.persistence.entity.PropertyEntityImpl">
+  <delete id="deleteProperty" parameterType="org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl">
     delete from ${prefix}ACT_GE_PROPERTY where NAME_ = #{name} and REV_ = #{revision}
   </delete>
 
 
   <!-- PROPERTY SELECT -->
   
-  <resultMap id="propertyResultMap" type="org.flowable.engine.impl.persistence.entity.PropertyEntityImpl">
+  <resultMap id="propertyResultMap" type="org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl">
     <id property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="value" column="VALUE_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />

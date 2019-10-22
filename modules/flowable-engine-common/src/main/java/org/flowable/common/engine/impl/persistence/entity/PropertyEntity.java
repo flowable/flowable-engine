@@ -10,17 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
-import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.db.HasRevision;
 
 /**
- * @author Joram Barrez
+ * @author Tom Baeyens
  */
-public interface PropertyEntityManager extends EntityManager<PropertyEntity> {
+public interface PropertyEntity extends Entity, HasRevision {
 
-    List<PropertyEntity> findAll();
+    String getName();
+
+    void setName(String name);
+
+    String getValue();
+
+    void setValue(String value);
+
+    @Override
+    String getId();
+
+    @Override
+    Object getPersistentState();
 
 }

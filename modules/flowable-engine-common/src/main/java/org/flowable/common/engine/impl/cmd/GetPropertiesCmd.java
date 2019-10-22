@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.cmd;
+package org.flowable.common.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,8 +20,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 
 /**
  * @author Tom Baeyens
@@ -30,10 +29,9 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
 
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unchecked")
     @Override
     public Map<String, String> execute(CommandContext commandContext) {
-        List<PropertyEntity> propertyEntities = CommandContextUtil.getPropertyEntityManager(commandContext).findAll();
+        List<PropertyEntity> propertyEntities = commandContext.getCurrentEngineConfiguration().getPropertyEntityManager().findAll();
 
         Map<String, String> properties = new HashMap<>();
         for (PropertyEntity propertyEntity : propertyEntities) {
