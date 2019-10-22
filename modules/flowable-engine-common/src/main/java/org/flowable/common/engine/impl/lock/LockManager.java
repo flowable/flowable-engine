@@ -13,8 +13,6 @@
 package org.flowable.common.engine.impl.lock;
 
 import java.time.Duration;
-import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -41,13 +39,13 @@ public interface LockManager {
      */
     void releaseLock();
 
-    default <T> T executeOperation(Duration waitTime, Supplier<T> consumer) {
-        waitForLock(waitTime);
-        try {
-            return consumer.get();
-        } finally {
-            releaseLock();
-        }
-    }
+    /**
+     * Wait to acquire a lock, once a lock is acquired execute the supplier and release finally the lock.
+     *
+     * @param waitTime the duration to wait before throwing an exception
+     * @param supplier the supplier to be executed once the lock is acquired
+     * @return the result from the {@code supplier}
+     */
+    <T> T waitForLockRunAndRelease(Duration waitTime, Supplier<T> supplier);
 
 }

@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.db;
 
-import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +24,6 @@ import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
-import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -33,6 +31,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
     
     protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
+
+    protected static final String PROCESS_DB_SCHEMA_LOCK_NAME = "processDbSchemaLock";
     
     @Override
     public void schemaCheckVersion() {
@@ -91,11 +91,15 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         getCommonSchemaManager().schemaCreate();
 
         ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
-        LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager("processDbSchema");
-        lockManager.executeOperation(processEngineConfiguration.getSchemaLockWaitTime(), () -> {
+        if (processEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
+            LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager(PROCESS_DB_SCHEMA_LOCK_NAME);
+            lockManager.waitForLockRunAndRelease(processEngineConfiguration.getSchemaLockWaitTime(), () -> {
+                schemaCreateInLock();
+                return null;
+            });
+        } else {
             schemaCreateInLock();
-            return null;
-        });
+        }
     }
 
     protected void schemaCreateInLock() {
@@ -231,8 +235,13 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         getCommonSchemaManager().schemaUpdate();
 
         ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
-        LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager("processDbSchema");
-        lockManager.waitForLock(processEngineConfiguration.getSchemaLockWaitTime());
+        LockManager lockManager;
+        if (processEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
+            lockManager = processEngineConfiguration.getManagementService().getLockManager(PROCESS_DB_SCHEMA_LOCK_NAME);
+            lockManager.waitForLock(processEngineConfiguration.getSchemaLockWaitTime());
+        } else {
+            lockManager = null;
+        }
 
         try {
             getIdentityLinkSchemaManager().schemaUpdate();
@@ -288,7 +297,9 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
 
             return feedback;
         } finally {
-            lockManager.releaseLock();
+            if (lockManager != null) {
+                lockManager.releaseLock();
+            }
         }
 
     }

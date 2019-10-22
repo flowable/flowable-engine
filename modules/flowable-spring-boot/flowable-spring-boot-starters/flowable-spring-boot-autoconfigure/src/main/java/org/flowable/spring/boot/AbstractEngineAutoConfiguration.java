@@ -59,6 +59,8 @@ public abstract class AbstractEngineAutoConfiguration {
         engineConfiguration.setDatabaseSchemaUpdate(defaultText(flowableProperties.getDatabaseSchemaUpdate(), engineConfiguration
             .getDatabaseSchemaUpdate()));
 
+        engineConfiguration.setUseLockForDatabaseSchemaUpdate(flowableProperties.isUseLockForDatabaseSchemaUpdate());
+
         engineConfiguration.setDbHistoryUsed(flowableProperties.isDbHistoryUsed());
 
         if (flowableProperties.getCustomMybatisMappers() != null) {
