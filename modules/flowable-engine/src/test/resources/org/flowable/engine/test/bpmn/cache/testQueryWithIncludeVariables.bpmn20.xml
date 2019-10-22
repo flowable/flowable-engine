@@ -9,7 +9,7 @@
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
     <userTask id="task">
         <extensionElements>
-            <flowable:taskListener event="create" class="org.flowable.engine.test.bpmn.cache.TestCacheTaskListener" />
+            <flowable:taskListener event="create" class="org.flowable.engine.test.bpmn.cache.TestQueryWithIncludeVariabesTaskListener" />
         </extensionElements>
     </userTask>
     <sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd" />

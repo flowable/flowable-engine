@@ -12,12 +12,19 @@
  */
 package org.flowable.engine.test.bpmn.cache;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Tijs Rademakers
+ * @author Joram Barrez
+ */
 public class CacheTaskTest extends PluggableFlowableTestCase {
     
     @Test
@@ -39,10 +46,35 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
-        assertNotNull(CacheTaskListener.taskId);
-        assertEquals(task.getId(), CacheTaskListener.taskId);
-        assertNotNull(CacheTaskListener.historicTaskId);
-        assertEquals(task.getId(), CacheTaskListener.historicTaskId);
+        assertNotNull(TestCacheTaskListener.TASK_ID);
+        assertEquals(task.getId(), TestCacheTaskListener.TASK_ID);
+        assertNotNull(TestCacheTaskListener.HISTORIC_TASK_ID);
+        assertEquals(task.getId(), TestCacheTaskListener.HISTORIC_TASK_ID);
+    }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/cache/cacheUserTask.bpmn20.xml")
+    public void testQueryWithIncludeVariables() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTask")
+            .variable("myVar1", "Hello")
+            .variable("myVar2", "World")
+            .variable("myVar3", 123)
+            .start();
+
+        assertThat(TestCacheTaskListener.PROCESS_VARIABLES).containsOnly(
+            entry("myVar1", "Hello"),
+            entry("myVar2", "World"),
+            entry("myVar3", 123),
+            entry("varFromTheListener", "valueFromTheListener")
+        );
+
+        assertThat(TestCacheTaskListener.HISTORIC_PROCESS_VARIABLES).containsOnly(
+            entry("myVar1", "Hello"),
+            entry("myVar2", "World"),
+            entry("myVar3", 123),
+            entry("varFromTheListener", "valueFromTheListener")
+        );
     }
     
 }

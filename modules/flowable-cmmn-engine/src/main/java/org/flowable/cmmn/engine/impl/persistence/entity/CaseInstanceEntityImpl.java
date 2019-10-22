@@ -239,6 +239,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public Map<String, Object> getCaseVariables() {
         Map<String, Object> caseVariables = new HashMap<>();
+
         if (this.queryVariables != null) {
             for (VariableInstanceEntity queryVariable : queryVariables) {
                 if (queryVariable.getId() != null && queryVariable.getTaskId() == null) {
@@ -246,6 +247,14 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
                 }
             }
         }
+
+        // The variables from the cache have precedence
+        if (variableInstances != null) {
+            for (String variableName : variableInstances.keySet()) {
+                caseVariables.put(variableName, variableInstances.get(variableName).getValue());
+            }
+        }
+
         return caseVariables;
     }
 

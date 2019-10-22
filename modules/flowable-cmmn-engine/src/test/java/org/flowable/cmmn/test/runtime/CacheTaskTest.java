@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -23,6 +25,10 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
+/**
+ * @author Tijs Rademakers
+ * @author Joram Barrez
+ */
 public class CacheTaskTest extends FlowableCmmnTestCase {
     
     @Test
@@ -72,5 +78,31 @@ public class CacheTaskTest extends FlowableCmmnTestCase {
         assertEquals(milestoneInstance.getId(), CacheMilestoneListener.milestoneInstanceId);
         assertNotNull(CacheMilestoneListener.historicMilestoneInstanceId);
         assertEquals(milestoneInstance.getId(), CacheMilestoneListener.historicMilestoneInstanceId);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseInstanceQueryWithIncludeVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testCaseInstanceQueryWithIncludeVariables")
+            .variable("myVar1", "Hello")
+            .variable("myVar2", "World")
+            .variable("myVar3", 123)
+            .start();
+
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.VARIABLES).containsOnly(
+            entry("myVar1", "Hello"),
+            entry("myVar2", "World"),
+            entry("myVar3", 123),
+            entry("varFromTheServiceTask", "valueFromTheServiceTask")
+        );
+
+        assertThat(TestQueryCaseInstanceWithIncludeVariablesDelegate.HISTORIC_VARIABLES).containsOnly(
+            entry("myVar1", "Hello"),
+            entry("myVar2", "World"),
+            entry("myVar3", 123),
+            entry("varFromTheServiceTask", "valueFromTheServiceTask")
+        );
+
     }
 }
