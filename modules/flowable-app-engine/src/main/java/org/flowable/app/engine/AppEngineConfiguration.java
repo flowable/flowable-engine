@@ -284,7 +284,9 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initService(appRepositoryService);
     }
 
+    @Override
     public void initDataManagers() {
+        super.initDataManagers();
         if (tableDataManager == null) {
             tableDataManager = new TableDataManagerImpl();
         }
@@ -299,7 +301,9 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         }
     }
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (appDeploymentEntityManager == null) {
             appDeploymentEntityManager = new AppDeploymentEntityManagerImpl(this, deploymentDataManager);
         }

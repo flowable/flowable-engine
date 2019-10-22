@@ -159,13 +159,17 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     // Data managers
     ///////////////////////////////////////////////////////////
 
+    @Override
     public void initDataManagers() {
+        super.initDataManagers();
         if (contentItemDataManager == null) {
             contentItemDataManager = new MybatisContentItemDataManager(this);
         }
     }
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (contentItemEntityManager == null) {
             contentItemEntityManager = new ContentItemEntityManagerImpl(this, contentItemDataManager);
         }

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.entity;
+package org.flowable.common.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
@@ -20,7 +20,7 @@ import org.flowable.common.engine.api.FlowableException;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class PropertyEntityImpl extends AbstractBpmnEngineEntity implements PropertyEntity, Serializable {
+public class PropertyEntityImpl extends AbstractEntity implements PropertyEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,6 +28,13 @@ public class PropertyEntityImpl extends AbstractBpmnEngineEntity implements Prop
     protected String value;
 
     public PropertyEntityImpl() {
+    }
+
+    @Override
+    public String getIdPrefix() {
+        // The name of the property is also the id of the property
+        // therefore the id prefix is not needed
+        return "";
     }
 
     @Override

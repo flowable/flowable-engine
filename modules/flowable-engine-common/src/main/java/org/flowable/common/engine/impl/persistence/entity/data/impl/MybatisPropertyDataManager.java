@@ -10,24 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.entity.data.impl;
+package org.flowable.common.engine.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
-import org.flowable.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
+import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisPropertyDataManager extends AbstractProcessDataManager<PropertyEntity> implements PropertyDataManager {
-
-    public MybatisPropertyDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        super(processEngineConfiguration);
-    }
+public class MybatisPropertyDataManager extends AbstractDataManager<PropertyEntity> implements PropertyDataManager {
 
     @Override
     public Class<? extends PropertyEntity> getManagedEntityClass() {
