@@ -65,6 +65,12 @@ public class FlowableProperties {
      * In some situations you want to set the schema to use for table checks / generation if the database metadata doesn't return that correctly.
      */
     private String databaseSchema;
+
+    /**
+     * Whether to use a lock when performing the database schema create or update operations.
+     */
+    private boolean useLockForDatabaseSchemaUpdate = false;
+
     /**
      * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#enabled}
      */
@@ -213,6 +219,14 @@ public class FlowableProperties {
 
     public void setDatabaseSchema(String databaseSchema) {
         this.databaseSchema = databaseSchema;
+    }
+
+    public boolean isUseLockForDatabaseSchemaUpdate() {
+        return useLockForDatabaseSchemaUpdate;
+    }
+
+    public void setUseLockForDatabaseSchemaUpdate(boolean useLockForDatabaseSchemaUpdate) {
+        this.useLockForDatabaseSchemaUpdate = useLockForDatabaseSchemaUpdate;
     }
 
     /**

@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.lock;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.function.Supplier;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
@@ -76,9 +77,9 @@ public class LockManagerImpl implements LockManager {
 
         try {
             hasAcquiredLock = executeCommand(new LockCmd(lockName));
-            LOGGER.debug("successfully acquired lock {}", lockName);
+            LOGGER.info("successfully acquired lock {}", lockName);
         } catch (FlowableOptimisticLockingException ex) {
-            LOGGER.debug("failed to acquire lock {} due to optimistic locking", lockName, ex);
+            LOGGER.info("failed to acquire lock {} due to optimistic locking", lockName, ex);
             hasAcquiredLock = false;
         }
         return hasAcquiredLock;
@@ -87,8 +88,18 @@ public class LockManagerImpl implements LockManager {
     @Override
     public void releaseLock() {
         executeCommand(new ReleaseLockCmd(lockName));
-        LOGGER.debug("successfully released lock {}", lockName);
+        LOGGER.info("successfully released lock {}", lockName);
         hasAcquiredLock = false;
+    }
+
+    @Override
+    public <T> T waitForLockRunAndRelease(Duration waitTime, Supplier<T> supplier) {
+        waitForLock(waitTime);
+        try {
+            return supplier.get();
+        } finally {
+            releaseLock();
+        }
     }
 
     protected <T> T executeCommand(Command<T> command) {

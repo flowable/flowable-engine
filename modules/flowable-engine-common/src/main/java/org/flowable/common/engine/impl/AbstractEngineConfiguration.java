@@ -138,6 +138,11 @@ public abstract class AbstractEngineConfiguration {
 
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
 
+    /**
+     * Whether to use a lock when performing the database schema create or update operations.
+     */
+    protected boolean useLockForDatabaseSchemaUpdate = false;
+
     protected String xmlEncoding = "UTF-8";
 
     // COMMAND EXECUTORS ///////////////////////////////////////////////
@@ -1574,6 +1579,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
+        return this;
+    }
+
+    public boolean isUseLockForDatabaseSchemaUpdate() {
+        return useLockForDatabaseSchemaUpdate;
+    }
+
+    public AbstractEngineConfiguration setUseLockForDatabaseSchemaUpdate(boolean useLockForDatabaseSchemaUpdate) {
+        this.useLockForDatabaseSchemaUpdate = useLockForDatabaseSchemaUpdate;
         return this;
     }
 

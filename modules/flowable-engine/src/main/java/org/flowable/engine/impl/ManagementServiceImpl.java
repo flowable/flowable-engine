@@ -13,7 +13,6 @@
 package org.flowable.engine.impl;
 
 import java.sql.Connection;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -350,10 +349,6 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
             throw new FlowableIllegalArgumentException("The command is null");
         }
         return commandExecutor.execute(config, command);
-    }
-
-    protected Duration getLockRecheckTime() {
-        return Duration.ofSeconds(10);
     }
 
     @Override
