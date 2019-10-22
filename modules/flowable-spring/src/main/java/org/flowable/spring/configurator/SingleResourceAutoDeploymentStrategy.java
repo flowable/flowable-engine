@@ -14,8 +14,10 @@
 package org.flowable.spring.configurator;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.zip.ZipInputStream;
 
+import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
@@ -23,12 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each resource by name.
+ * Implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that performs a separate deployment for each resource by name.
  * 
  * @author Tiese Barrell
  * @author Joram Barrez
  */
-public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class SingleResourceAutoDeploymentStrategy extends AbstractProcessAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleResourceAutoDeploymentStrategy.class);
 
@@ -37,15 +40,22 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeployment
      */
     public static final String DEPLOYMENT_MODE = "single-resource";
 
+    public SingleResourceAutoDeploymentStrategy() {
+    }
+
+    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
+        super(useLockForDeployments, deploymentLockWaitTime);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
-
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, ProcessEngine engine) {
         // Create a separate deployment for each resource using the resource name
+        RepositoryService repositoryService = engine.getRepositoryService();
 
         for (final Resource resource : resources) {
 

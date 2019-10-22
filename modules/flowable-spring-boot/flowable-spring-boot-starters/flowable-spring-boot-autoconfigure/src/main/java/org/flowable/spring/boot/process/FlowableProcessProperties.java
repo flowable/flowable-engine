@@ -12,6 +12,8 @@
  */
 package org.flowable.spring.boot.process;
 
+import java.time.Duration;
+
 import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -46,6 +48,19 @@ public class FlowableProcessProperties {
      */
     private boolean enableSafeXml = true;
 
+    /**
+     * Whether to use a lock when performing the auto deployment.
+     * If not set then the global default would be used.
+     */
+    private Boolean useLockForAutoDeployment;
+
+    /**
+     * Duration to wait for the auto deployment lock before giving up.
+     * If not set then the global default would be used.
+     */
+    private Duration autoDeploymentLockWaitTime;
+
+
     public FlowableServlet getServlet() {
         return servlet;
     }
@@ -74,6 +89,22 @@ public class FlowableProcessProperties {
         this.enableSafeXml = enableSafeXml;
     }
     
+    public Boolean getUseLockForAutoDeployment() {
+        return useLockForAutoDeployment;
+    }
+
+    public void setUseLockForAutoDeployment(Boolean useLockForAutoDeployment) {
+        this.useLockForAutoDeployment = useLockForAutoDeployment;
+    }
+
+    public Duration getAutoDeploymentLockWaitTime() {
+        return autoDeploymentLockWaitTime;
+    }
+
+    public void setAutoDeploymentLockWaitTime(Duration autoDeploymentLockWaitTime) {
+        this.autoDeploymentLockWaitTime = autoDeploymentLockWaitTime;
+    }
+
     public static class AsyncHistory {
         
         private boolean enabled;

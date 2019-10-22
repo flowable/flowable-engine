@@ -1,19 +1,17 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.flowable.common.spring;
 
-package org.flowable.spring.configurator;
-
-import org.flowable.engine.RepositoryService;
 import org.springframework.core.io.Resource;
 
 /**
@@ -23,8 +21,9 @@ import org.springframework.core.io.Resource;
  * A strategy is capable of handling deployments corresponding to a certain indicated deployment mode. This applicability is verified using the {@link #handlesMode(String)} method.
  * 
  * @author Tiese Barrell
+ * @author Filip Hrisafov
  */
-public interface AutoDeploymentStrategy {
+public interface AutoDeploymentStrategy<E> {
 
     /**
      * Determines whether the strategy handles deployments for the provided deployment mode.
@@ -36,15 +35,15 @@ public interface AutoDeploymentStrategy {
     boolean handlesMode(final String mode);
 
     /**
-     * Performs deployment for the provided resources, using the provided name as a hint and the provided {@link RepositoryService} to perform deployment(s).
+     * Performs deployment for the provided resources, using the provided name as a hint and the provided {@code engine} to perform deployment(s).
      * 
      * @param deploymentNameHint
      *            the hint for the name of deployment(s) performed
      * @param resources
      *            the resources to be deployed
-     * @param repositoryService
-     *            the repository service to use for deployment(s)
+     * @param engine
+     *            the engine to use for deployment(s)
      */
-    void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService);
+    void deployResources(String deploymentNameHint, Resource[] resources, E engine);
 
 }

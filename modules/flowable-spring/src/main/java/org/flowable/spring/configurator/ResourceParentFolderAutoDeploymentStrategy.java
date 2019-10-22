@@ -14,6 +14,7 @@
 package org.flowable.spring.configurator;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
 
+import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
@@ -28,13 +30,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each set of {@link Resource}s that share the same parent folder.
+ * Implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that performs a separate deployment for each set of {@link Resource}s that share the same parent folder.
  * The namehint is used to prefix the names of deployments. If the parent folder for a {@link Resource} cannot be determined, the resource's name is used.
  * 
  * @author Tiese Barrell
  * @author Joram Barrez
  */
-public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class ResourceParentFolderAutoDeploymentStrategy extends AbstractProcessAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceParentFolderAutoDeploymentStrategy.class);
 
@@ -45,14 +48,22 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDepl
 
     private static final String DEPLOYMENT_NAME_PATTERN = "%s.%s";
 
+    public ResourceParentFolderAutoDeploymentStrategy() {
+    }
+
+    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
+        super(useLockForDeployments, deploymentLockWaitTime);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, ProcessEngine engine) {
 
+        RepositoryService repositoryService = engine.getRepositoryService();
         // Create a deployment for each distinct parent folder using the namehint as a prefix
         final Map<String, Set<Resource>> resourcesMap = createMap(resources);
         for (final Entry<String, Set<Resource>> group : resourcesMap.entrySet()) {
