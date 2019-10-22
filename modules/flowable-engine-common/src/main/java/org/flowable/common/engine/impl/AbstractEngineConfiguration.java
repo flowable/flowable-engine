@@ -74,6 +74,8 @@ import org.flowable.common.engine.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.common.engine.impl.interceptor.LogInterceptor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -978,7 +980,11 @@ public abstract class AbstractEngineConfiguration {
             logger.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
-    }    
+    }
+
+    public LockManager getLockManager(String lockName) {
+        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate());
+    }
 
     // getters and setters
     // //////////////////////////////////////////////////////

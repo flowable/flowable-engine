@@ -201,6 +201,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     @Override
     public void initSchemaManager() {
+        super.initSchemaManager();
         if (this.schemaManager == null) {
             this.schemaManager = new ContentDbSchemaManager();
         }

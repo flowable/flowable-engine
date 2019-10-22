@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.dmn;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -72,6 +73,18 @@ public class FlowableDmnProperties {
      * A result is that intermediate results created up to the point the validation error occurs are returned.
      */
     private boolean strictMode = true;
+
+    /**
+     * Whether to use a lock when performing the auto deployment.
+     * If not set then the global default would be used.
+     */
+    private Boolean useLockForAutoDeployment;
+
+    /**
+     * Duration to wait for the auto deployment lock before giving up.
+     * If not set then the global default would be used.
+     */
+    private Duration autoDeploymentLockWaitTime;
 
     /**
      * The servlet configuration for the DMN Rest API.
@@ -141,6 +154,22 @@ public class FlowableDmnProperties {
 
     public void setStrictMode(boolean strictMode) {
         this.strictMode = strictMode;
+    }
+
+    public Boolean getUseLockForAutoDeployment() {
+        return useLockForAutoDeployment;
+    }
+
+    public void setUseLockForAutoDeployment(Boolean useLockForAutoDeployment) {
+        this.useLockForAutoDeployment = useLockForAutoDeployment;
+    }
+
+    public Duration getAutoDeploymentLockWaitTime() {
+        return autoDeploymentLockWaitTime;
+    }
+
+    public void setAutoDeploymentLockWaitTime(Duration autoDeploymentLockWaitTime) {
+        this.autoDeploymentLockWaitTime = autoDeploymentLockWaitTime;
     }
 
     public FlowableServlet getServlet() {
