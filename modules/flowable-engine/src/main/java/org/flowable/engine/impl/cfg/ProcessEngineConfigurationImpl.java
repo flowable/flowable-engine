@@ -434,7 +434,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected IdentityService identityService = new IdentityServiceImpl(this);
     protected TaskService taskService = new TaskServiceImpl(this);
     protected FormService formService = new FormServiceImpl();
-    protected ManagementService managementService = new ManagementServiceImpl();
+    protected ManagementService managementService = new ManagementServiceImpl(this);
     protected DynamicBpmnService dynamicBpmnService = new DynamicBpmnServiceImpl(this);
     protected ProcessMigrationService processInstanceMigrationService = new ProcessMigrationServiceImpl(this);
 

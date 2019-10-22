@@ -76,6 +76,14 @@ public abstract class AbstractEngineAutoConfiguration {
         if (flowableProperties.getCustomMybatisXMLMappers() != null) {
             engineConfiguration.setCustomMybatisXMLMappers(new HashSet<>(flowableProperties.getCustomMybatisXMLMappers()));
         }
+
+        if (flowableProperties.getLockPollRate() != null) {
+            engineConfiguration.setLockPollRate(flowableProperties.getLockPollRate());
+        }
+
+        if (flowableProperties.getSchemaLockWaitTime() != null) {
+            engineConfiguration.setSchemaLockWaitTime(flowableProperties.getSchemaLockWaitTime());
+        }
     }
 
     public List<Resource> discoverDeploymentResources(String prefix, List<String> suffixes, boolean loadResources) throws IOException {
