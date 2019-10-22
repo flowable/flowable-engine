@@ -1145,6 +1145,34 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    public void testExitActiveProcessTaskThroughExitSentryOnStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testExitActiveProcessTaskThroughExitSentryOnStage")
+            .variable("myVar", "test")
+            .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemInstanceStateActive()
+            .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+            .singleResult();
+        assertEquals("theProcess", planItemInstance.getName());
+
+        assertNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+        assertNotNull(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(planItemInstance.getReferenceId()).singleResult());
+
+        // When the event listener now occurs, the stage should be exited, also exiting the process task plan item
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertNotNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult());
+        assertNull(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(planItemInstance.getReferenceId()).singleResult());
+    }
+
+    @Test
+    @CmmnDeployment
     public void testExitCaseInstanceOnProcessInstanceComplete() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("testExitCaseInstanceOnProcessInstanceComplete")
