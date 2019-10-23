@@ -13,7 +13,6 @@
 
 package org.flowable.cmmn.spring.autodeployment;
 
-import java.io.IOException;
 import java.time.Duration;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -46,6 +45,11 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractCmmnAutoDeploy
         super(useLockForDeployments, deploymentLockWaitTime);
     }
 
+    public SingleResourceAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime,
+        boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
@@ -59,24 +63,22 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractCmmnAutoDeploy
 
         for (final Resource resource : resources) {
 
+            final String resourceName = determineResourceName(resource);
+            final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
+
+            addResource(resource, resourceName, deploymentBuilder);
             try {
-                final String resourceName = determineResourceName(resource);
-                final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
-                deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
 
                 deploymentBuilder.deploy();
 
-            } catch (Exception e) {
-                // Any exception should not stop the bootup of the engine
-                String resourceName = null;
-                if (resource != null) {
-                    try {
-                        resourceName = resource.getURL().toString();
-                    } catch (IOException ioe) {
-                        resourceName = resource.toString();
-                    }
+            } catch (RuntimeException e) {
+                if (throwExceptionOnDeploymentFailure) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying CMMN definitions for resource {}. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resource, e);
                 }
-                LOGGER.warn("Exception while autodeploying CMMN definitions for resource {}. This exception can be ignored if the root cause indicates a unique constraint violation, which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resourceName, e);
             }
         }
     }

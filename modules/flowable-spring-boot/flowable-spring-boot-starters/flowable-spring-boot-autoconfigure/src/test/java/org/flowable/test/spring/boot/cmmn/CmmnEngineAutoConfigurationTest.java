@@ -138,18 +138,21 @@ public class CmmnEngineAutoConfigurationTest {
                 .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
                 });
 
             assertThat(deploymentStrategies).element(1)
                 .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
                 });
 
             assertThat(deploymentStrategies).element(2)
                 .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
                 });
 
             deleteDeployments(cmmnEngine);
@@ -161,7 +164,8 @@ public class CmmnEngineAutoConfigurationTest {
         contextRunner
             .withPropertyValues(
                 "flowable.cmmn.use-lock-for-auto-deployment=true",
-                "flowable.cmmn.auto-deployment-lock-wait-time=10m"
+                "flowable.cmmn.auto-deployment-lock-wait-time=10m",
+                "flowable.cmmn.throw-exception-on-auto-deployment-failure=false"
             )
             .run(context -> {
                 assertThat(context)
@@ -193,18 +197,21 @@ public class CmmnEngineAutoConfigurationTest {
                     .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
                     });
 
                 assertThat(deploymentStrategies).element(1)
                     .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
                     });
 
                 assertThat(deploymentStrategies).element(2)
                     .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
                     });
 
                 deleteDeployments(cmmnEngine);

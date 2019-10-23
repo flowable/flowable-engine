@@ -54,6 +54,11 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractCmmnAuto
         super(useLockForDeployments, deploymentLockWaitTime);
     }
 
+    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime,
+        boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
@@ -67,22 +72,24 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractCmmnAuto
         final Map<String, Set<Resource>> resourcesMap = createMap(resources);
         for (final Entry<String, Set<Resource>> group : resourcesMap.entrySet()) {
 
+            final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
+            final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
+
+            for (final Resource resource : group.getValue()) {
+                addResource(resource, deploymentBuilder);
+            }
             try {
-
-                final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
-                final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
-
-                for (final Resource resource : group.getValue()) {
-                    deploymentBuilder.addInputStream(determineResourceName(resource), resource.getInputStream());
-                }
 
                 deploymentBuilder.deploy();
 
-            } catch (Exception e) {
-                // Any exception should not stop the bootup of the engine
-                LOGGER.warn("Exception while autodeploying CMMN definitions. "
-                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+            } catch (RuntimeException e) {
+                if (throwExceptionOnDeploymentFailure) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying CMMN definitions. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+                }
             }
         }
 

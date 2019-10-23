@@ -43,7 +43,7 @@ public class DefaultAutoDeploymentStrategy extends AbstractProcessAutoDeployment
     }
 
     public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        this(useLockForDeployments, deploymentLockWaitTime, true);
+        super(useLockForDeployments, deploymentLockWaitTime);
     }
 
     public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {

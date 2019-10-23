@@ -48,6 +48,10 @@ public class DefaultAutoDeploymentStrategy extends AbstractAppAutoDeploymentStra
         super(useLockForDeployments, deploymentLockWaitTime);
     }
 
+    public DefaultAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
@@ -61,42 +65,28 @@ public class DefaultAutoDeploymentStrategy extends AbstractAppAutoDeploymentStra
 
         for (final Resource resource : resources) {
 
+            String resourceName = determineResourceName(resource);
+            if (resourceName.contains("/")) {
+                resourceName = resourceName.substring(resourceName.lastIndexOf('/') + 1);
+
+            } else if (resourceName.contains("\\")) {
+                resourceName = resourceName.substring(resourceName.lastIndexOf('\\') + 1);
+            }
+            final AppDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
+            addResource(resource, resourceName, deploymentBuilder);
+
             try {
-
-                String resourceName = determineResourceName(resource);
-                if (resourceName.contains("/")) {
-                    resourceName = resourceName.substring(resourceName.lastIndexOf('/') + 1);
-
-                } else if (resourceName.contains("\\")) {
-                    resourceName = resourceName.substring(resourceName.lastIndexOf('\\') + 1);
-                }
-
-                final AppDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
-
-                try {
-                    if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip")) {
-                        deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
-                    } else {
-                        deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-                    }
-
-                } catch (IOException e) {
-                    throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
-                }
 
                 deploymentBuilder.deploy();
 
-            } catch (Exception e) {
-                // Any exception should not stop the bootup of the engine
-                String resourceName = null;
-                if (resource != null) {
-                    try {
-                        resourceName = resource.getURL().toString();
-                    } catch (IOException ioe) {
-                        resourceName = resource.toString();
-                    }
+            } catch (RuntimeException e) {
+                if (throwExceptionOnDeploymentFailure) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying app definition for resource {}. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resource, e);
                 }
-                LOGGER.warn("Exception while autodeploying app definition for resource {}. This exception can be ignored if the root cause indicates a unique constraint violation, which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resourceName, e);
             }
         }
     }

@@ -95,6 +95,7 @@ public class AppEngineAutoConfigurationTest {
                     .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
                         assertThat(strategy.isUseLockForDeployments()).isFalse();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
                     });
 
                 deleteDeployments(appEngine);
@@ -116,7 +117,8 @@ public class AppEngineAutoConfigurationTest {
         contextRunner
             .withPropertyValues(
                 "flowable.app.use-lock-for-auto-deployment=true",
-                "flowable.app.auto-deployment-lock-wait-time=10m"
+                "flowable.app.auto-deployment-lock-wait-time=10m",
+                "flowable.app.throw-exception-on-auto-deployment-failure=false"
             )
             .run(context -> {
                 AppEngine appEngine = context.getBean(AppEngine.class);
@@ -132,6 +134,7 @@ public class AppEngineAutoConfigurationTest {
                     .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
                     });
 
                 deleteDeployments(appEngine);

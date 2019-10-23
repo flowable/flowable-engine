@@ -106,10 +106,12 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         boolean useLockForAutoDeployment = defaultIfNotNull(formProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
         Duration autoDeploymentLockWaitTime = defaultIfNotNull(formProperties.getAutoDeploymentLockWaitTime(),
             flowableProperties.getAutoDeploymentLockWaitTime());
+        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(formProperties.getThrowExceptionOnAutoDeploymentFailure(),
+            flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
         // Always add the out of the box auto deployment strategies as last
-        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
-        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
-        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
         configuration.setDeploymentStrategies(deploymentStrategies);
 
         return configuration;

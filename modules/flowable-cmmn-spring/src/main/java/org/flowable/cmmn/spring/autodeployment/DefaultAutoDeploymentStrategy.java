@@ -46,6 +46,10 @@ public class DefaultAutoDeploymentStrategy extends AbstractCmmnAutoDeploymentStr
         super(useLockForDeployments, deploymentLockWaitTime);
     }
 
+    public DefaultAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
@@ -55,21 +59,25 @@ public class DefaultAutoDeploymentStrategy extends AbstractCmmnAutoDeploymentStr
     protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, CmmnEngine engine) {
         CmmnRepositoryService repositoryService = engine.getCmmnRepositoryService();
 
-        try {
-            // Create a single deployment for all resources using the name hint as the literal name
-            final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
+        // Create a single deployment for all resources using the name hint as the literal name
+        final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
 
-            for (final Resource resource : resources) {
-                deploymentBuilder.addInputStream(determineResourceName(resource), resource.getInputStream());
-            }
+        for (final Resource resource : resources) {
+            addResource(resource, deploymentBuilder);
+        }
+
+        try {
 
             deploymentBuilder.deploy();
 
-        } catch (Exception e) {
-            // Any exception should not stop the bootup of the engine
-            LOGGER.warn("Exception while autodeploying CMMN definitions. "
-                + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+        } catch (RuntimeException e) {
+            if (throwExceptionOnDeploymentFailure) {
+                throw e;
+            } else {
+                LOGGER.warn("Exception while autodeploying CMMN definitions. "
+                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+            }
         }
 
     }

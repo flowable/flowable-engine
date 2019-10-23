@@ -54,6 +54,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class SpringAutoDeployTest extends AbstractTestCase {
 
@@ -238,7 +239,6 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
     }
 
-
     @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContextWithSingleResourceDeploymentMode();
@@ -313,8 +313,8 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         createAppContext(properties);
         assertThat(repositoryService.createProcessDefinitionQuery().list())
             .extracting(ProcessDefinition::getKey)
-            .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+            .containsExactlyInAnyOrder("d");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
     }
 
     // --Helper methods
