@@ -14,6 +14,8 @@ package org.flowable.spring.boot.form;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,7 +85,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     public SpringFormEngineConfiguration formEngineConfiguration(
         DataSource dataSource,
         PlatformTransactionManager platformTransactionManager,
-        ObjectProvider<AutoDeploymentStrategy<FormEngine>> formAutoDeploymentStrategies
+        ObjectProvider<List<AutoDeploymentStrategy<FormEngine>>> formAutoDeploymentStrategies
     ) throws IOException {
         
         SpringFormEngineConfiguration configuration = new SpringFormEngineConfiguration();
@@ -102,7 +104,11 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
 
-        List<AutoDeploymentStrategy<FormEngine>> deploymentStrategies = formAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<FormEngine>> deploymentStrategies = formAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
         boolean useLockForAutoDeployment = defaultIfNotNull(formProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
         Duration autoDeploymentLockWaitTime = defaultIfNotNull(formProperties.getAutoDeploymentLockWaitTime(),
             flowableProperties.getAutoDeploymentLockWaitTime());
