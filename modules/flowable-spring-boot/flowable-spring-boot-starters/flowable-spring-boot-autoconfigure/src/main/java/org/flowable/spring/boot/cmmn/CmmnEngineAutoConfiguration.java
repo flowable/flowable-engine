@@ -14,6 +14,8 @@ package org.flowable.spring.boot.cmmn;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,7 +126,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
         @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider,
-        ObjectProvider<AutoDeploymentStrategy<CmmnEngine>> cmmnAutoDeploymentStrategies)
+        ObjectProvider<List<AutoDeploymentStrategy<CmmnEngine>>> cmmnAutoDeploymentStrategies)
         throws IOException {
         
         SpringCmmnEngineConfiguration configuration = new SpringCmmnEngineConfiguration();
@@ -168,7 +170,11 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configuration.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
 
-        List<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = cmmnAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = cmmnAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
         boolean useLockForAutoDeployment = defaultIfNotNull(cmmnProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
         Duration autoDeploymentLockWaitTime = defaultIfNotNull(cmmnProperties.getAutoDeploymentLockWaitTime(),
             flowableProperties.getAutoDeploymentLockWaitTime());

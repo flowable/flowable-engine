@@ -14,6 +14,8 @@ package org.flowable.spring.boot.dmn;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,7 +82,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
     @Bean
     @ConditionalOnMissingBean
     public SpringDmnEngineConfiguration dmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-        ObjectProvider<AutoDeploymentStrategy<DmnEngine>> dmnAutoDeploymentStrategies) throws IOException {
+        ObjectProvider<List<AutoDeploymentStrategy<DmnEngine>>> dmnAutoDeploymentStrategies) throws IOException {
         SpringDmnEngineConfiguration configuration = new SpringDmnEngineConfiguration();
 
         List<Resource> resources = this.discoverDeploymentResources(
@@ -101,7 +103,11 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
         configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());
         configuration.setStrictMode(dmnProperties.isStrictMode());
 
-        List<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = dmnAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = dmnAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
         boolean useLockForAutoDeployment = defaultIfNotNull(dmnProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
         Duration autoDeploymentLockWaitTime = defaultIfNotNull(dmnProperties.getAutoDeploymentLockWaitTime(),
             flowableProperties.getAutoDeploymentLockWaitTime());

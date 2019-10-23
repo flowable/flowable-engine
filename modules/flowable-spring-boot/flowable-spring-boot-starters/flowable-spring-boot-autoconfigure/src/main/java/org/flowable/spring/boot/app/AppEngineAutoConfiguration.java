@@ -14,6 +14,8 @@ package org.flowable.spring.boot.app;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,7 +65,7 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
     @Bean
     @ConditionalOnMissingBean
     public SpringAppEngineConfiguration springAppEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-        ObjectProvider<AutoDeploymentStrategy<AppEngine>> appAutoDeploymentStrategies) throws IOException {
+        ObjectProvider<List<AutoDeploymentStrategy<AppEngine>>> appAutoDeploymentStrategies) throws IOException {
 
         SpringAppEngineConfiguration conf = new SpringAppEngineConfiguration();
 
@@ -82,7 +84,11 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
         conf.setIdGenerator(new StrongUuidGenerator());
 
-        List<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = appAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = appAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
         boolean useLockForAutoDeployment = defaultIfNotNull(appProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
         Duration autoDeploymentLockWaitTime = defaultIfNotNull(appProperties.getAutoDeploymentLockWaitTime(),
             flowableProperties.getAutoDeploymentLockWaitTime());
