@@ -51,7 +51,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -227,10 +226,11 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         boolean useLockForAutoDeployment = defaultIfNotNull(processProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
         Duration autoDeploymentLockWaitTime = defaultIfNotNull(processProperties.getAutoDeploymentLockWaitTime(),
             flowableProperties.getAutoDeploymentLockWaitTime());
+        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(processProperties.getThrowExceptionOnAutoDeploymentFailure(), flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
         // Always add the out of the box auto deployment strategies as last
-        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
-        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
-        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime));
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
         conf.setDeploymentStrategies(deploymentStrategies);
 
         return conf;
