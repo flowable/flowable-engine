@@ -18,6 +18,8 @@ import java.time.Duration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.lock.LockManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
@@ -30,16 +32,24 @@ import org.springframework.core.io.Resource;
  */
 public abstract class CommonAutoDeploymentStrategy<E> implements AutoDeploymentStrategy<E> {
 
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+
     protected boolean useLockForDeployments;
     protected Duration deploymentLockWaitTime;
+    protected boolean throwExceptionOnDeploymentFailure;
 
     public CommonAutoDeploymentStrategy() {
-        this(false, Duration.ofMinutes(5));
+        this(false, Duration.ofMinutes(5), true);
     }
 
     public CommonAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
+        this(useLockForDeployments, deploymentLockWaitTime, true);
+    }
+
+    public CommonAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
         this.useLockForDeployments = useLockForDeployments;
         this.deploymentLockWaitTime = deploymentLockWaitTime;
+        this.throwExceptionOnDeploymentFailure = throwExceptionOnDeploymentFailure;
     }
 
     /**
@@ -126,5 +136,13 @@ public abstract class CommonAutoDeploymentStrategy<E> implements AutoDeploymentS
 
     public void setDeploymentLockWaitTime(Duration deploymentLockWaitTime) {
         this.deploymentLockWaitTime = deploymentLockWaitTime;
+    }
+
+    public boolean isThrowExceptionOnDeploymentFailure() {
+        return throwExceptionOnDeploymentFailure;
+    }
+
+    public void setThrowExceptionOnDeploymentFailure(boolean throwExceptionOnDeploymentFailure) {
+        this.throwExceptionOnDeploymentFailure = throwExceptionOnDeploymentFailure;
     }
 }

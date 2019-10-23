@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.zip.ZipInputStream;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
@@ -52,7 +51,11 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractProcessA
     }
 
     public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
+        this(useLockForDeployments, deploymentLockWaitTime, true);
+    }
+
+    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
     }
 
     @Override
@@ -68,28 +71,23 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractProcessA
         final Map<String, Set<Resource>> resourcesMap = createMap(resources);
         for (final Entry<String, Set<Resource>> group : resourcesMap.entrySet()) {
 
+            final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
+            final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
+
+            for (final Resource resource : group.getValue()) {
+                addResource(resource, deploymentBuilder);
+            }
+
             try {
-                final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
-                final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
-
-                for (final Resource resource : group.getValue()) {
-                    final String resourceName = determineResourceName(resource);
-
-                    if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
-                        deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
-                    } else {
-                        deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-                    }
-
-                }
-
                 deploymentBuilder.deploy();
-
             } catch (Exception e) {
-                // Any exception should not stop the bootup of the engine
-                LOGGER.warn("Exception while autodeploying process definitions. "
-                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+                if (throwExceptionOnDeploymentFailure) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying process definitions. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+                }
             }
         }
 

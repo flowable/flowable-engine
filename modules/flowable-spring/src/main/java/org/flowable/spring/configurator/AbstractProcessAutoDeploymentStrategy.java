@@ -13,11 +13,17 @@
 
 package org.flowable.spring.configurator;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.zip.ZipInputStream;
 
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.springframework.core.io.Resource;
 
 /**
  * Abstract base class for implementations of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
@@ -33,12 +39,36 @@ public abstract class AbstractProcessAutoDeploymentStrategy extends CommonAutoDe
     }
 
     public AbstractProcessAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
+        this(useLockForDeployments, deploymentLockWaitTime, true);
+    }
+
+    public AbstractProcessAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
     }
 
     @Override
     protected LockManager getLockManager(ProcessEngine engine, String deploymentNameHint) {
         return engine.getManagementService().getLockManager(deploymentNameHint);
+    }
+
+    protected void addResource(Resource resource, DeploymentBuilder deploymentBuilder) {
+        String resourceName = determineResourceName(resource);
+        addResource(resource, resourceName, deploymentBuilder);
+    }
+
+    protected void addResource(Resource resource, String resourceName, DeploymentBuilder deploymentBuilder) {
+        try (InputStream inputStream = resource.getInputStream()) {
+            if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
+                try (ZipInputStream zipStream = new ZipInputStream(inputStream)) {
+                    deploymentBuilder.addZipInputStream(zipStream);
+                }
+            } else {
+                deploymentBuilder.addInputStream(resourceName, inputStream);
+            }
+        } catch (IOException ex) {
+            throw new UncheckedIOException("Failed to read resource " + resourceName, ex);
+
+        }
     }
 
 }

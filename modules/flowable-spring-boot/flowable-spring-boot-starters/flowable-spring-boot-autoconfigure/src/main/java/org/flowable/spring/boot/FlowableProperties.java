@@ -133,6 +133,11 @@ public class FlowableProperties {
      */
     private Duration autoDeploymentLockWaitTime = Duration.ofMinutes(5);
 
+    /**
+     * Whether to throw an exception if there was some kind of failure during the auto deployment.
+     */
+    private boolean throwExceptionOnAutoDeploymentFailure = true;
+
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
     }
@@ -369,5 +374,13 @@ public class FlowableProperties {
 
     public void setAutoDeploymentLockWaitTime(Duration autoDeploymentLockWaitTime) {
         this.autoDeploymentLockWaitTime = autoDeploymentLockWaitTime;
+    }
+
+    public boolean isThrowExceptionOnAutoDeploymentFailure() {
+        return throwExceptionOnAutoDeploymentFailure;
+    }
+
+    public void setThrowExceptionOnAutoDeploymentFailure(boolean throwExceptionOnAutoDeploymentFailure) {
+        this.throwExceptionOnAutoDeploymentFailure = throwExceptionOnAutoDeploymentFailure;
     }
 }
