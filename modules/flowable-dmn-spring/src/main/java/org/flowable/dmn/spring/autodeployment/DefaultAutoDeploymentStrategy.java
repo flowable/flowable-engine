@@ -46,6 +46,10 @@ public class DefaultAutoDeploymentStrategy extends AbstractDmnAutoDeploymentStra
         super(useLockForDeployments, deploymentLockWaitTime);
     }
 
+    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
@@ -55,21 +59,24 @@ public class DefaultAutoDeploymentStrategy extends AbstractDmnAutoDeploymentStra
     protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, DmnEngine engine) {
         DmnRepositoryService repositoryService = engine.getDmnRepositoryService();
 
-        try {
-            // Create a single deployment for all resources using the name hint as the literal name
-            final DmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
+        // Create a single deployment for all resources using the name hint as the literal name
+        final DmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
 
-            for (final Resource resource : resources) {
-                deploymentBuilder.addInputStream(determineResourceName(resource), resource.getInputStream());
-            }
+        for (final Resource resource : resources) {
+            addResource(resource, deploymentBuilder);
+        }
+        try {
 
             deploymentBuilder.deploy();
 
         } catch (Exception e) {
-            // Any exception should not stop the bootup of the engine
-            LOGGER.warn("Exception while autodeploying DMN definitions. "
-                + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+            if (throwExceptionOnDeploymentFailure) {
+                throw e;
+            } else {
+                LOGGER.warn("Exception while autodeploying DMN definitions. "
+                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+            }
         }
 
     }

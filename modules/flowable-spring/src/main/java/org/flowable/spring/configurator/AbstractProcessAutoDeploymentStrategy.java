@@ -39,7 +39,7 @@ public abstract class AbstractProcessAutoDeploymentStrategy extends CommonAutoDe
     }
 
     public AbstractProcessAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        this(useLockForDeployments, deploymentLockWaitTime, true);
+        super(useLockForDeployments, deploymentLockWaitTime);
     }
 
     public AbstractProcessAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
@@ -66,8 +66,7 @@ public abstract class AbstractProcessAutoDeploymentStrategy extends CommonAutoDe
                 deploymentBuilder.addInputStream(resourceName, inputStream);
             }
         } catch (IOException ex) {
-            throw new UncheckedIOException("Failed to read resource " + resourceName, ex);
-
+            throw new UncheckedIOException("Failed to read resource " + resource, ex);
         }
     }
 

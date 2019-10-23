@@ -13,56 +13,111 @@
 
 package org.flowable.spring.test.autodeployment;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Driver;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.sql.DataSource;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
+import org.flowable.cmmn.converter.CmmnXMLException;
+import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
+import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.junit.After;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.AbstractXmlApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class SpringAutoDeployTest {
 
-    protected static final String CTX_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml";
-    protected static final String CTX_NO_DROP_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-no-drop-context.xml";
-    protected static final String CTX_CREATE_DROP_CLEAN_DB = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-create-drop-clean-db-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_DEFAULT = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-default-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-single-resource-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-resource-parent-folder-context.xml";
+    protected static final String DEFAULT_VALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/simple*.cmmn";
 
-    protected ApplicationContext applicationContext;
+    protected static final String DEFAULT_INVALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/*simple*.cmmn";
+
+    protected static final String DEFAULT_VALID_DIRECTORY_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/**/simple*.cmmn";
+
+    protected static final String DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/**/*simple*.cmmn";
+
+    protected ConfigurableApplicationContext applicationContext;
     protected CmmnRepositoryService repositoryService;
-
-    protected void createAppContext(String path) {
-        this.applicationContext = new ClassPathXmlApplicationContext(path);
-        this.repositoryService = applicationContext.getBean(CmmnRepositoryService.class);
-    }
 
     @After
     public void tearDown() throws Exception {
         removeAllDeployments();
-        this.applicationContext = null;
+        if (this.applicationContext != null) {
+            this.applicationContext.close();
+            this.applicationContext = null;
+        }
         this.repositoryService = null;
+    }
+
+    protected void createAppContextWithoutDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContextWithDefaultDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+    protected void createAppContextWithSingleResourceDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "single-resource");
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContextWithResourceParenFolderDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "resource-parent-folder");
+        properties.put("deploymentResources", DEFAULT_VALID_DIRECTORY_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContext(Map<String, Object> properties) {
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+        applicationContext.register(SpringCmmnAutoDeployTestConfiguration.class);
+        applicationContext.getEnvironment().getPropertySources()
+            .addLast(new MapPropertySource("springAutoDeploy", properties));
+        applicationContext.refresh();
+        this.applicationContext = applicationContext;
+        this.repositoryService = applicationContext.getBean(CmmnRepositoryService.class);
     }
 
     @Test
     public void testBasicActivitiSpringIntegration() {
-        createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
+        createAppContextWithoutDeploymentMode();
         List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().list();
 
         Set<String> caseDefinitionKeys = new HashSet<>();
@@ -78,14 +133,14 @@ public class SpringAutoDeployTest {
 
     @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
-        createAppContext(CTX_PATH);
+        createAppContextWithoutDeploymentMode();
         CmmnDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
         assertEquals(1, deploymentQuery.count());
         CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery();
         assertEquals(1, caseDefinitionQuery.count());
 
         // Creating a new app context with same resources doesn't lead to more deployments
-        new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
+        createAppContextWithoutDeploymentMode();
         assertEquals(1, deploymentQuery.count());
         assertEquals(1, caseDefinitionQuery.count());
     }
@@ -93,9 +148,9 @@ public class SpringAutoDeployTest {
     // Updating the form file should lead to a new deployment when restarting the Spring container
     @Test
     public void testResourceRedeploymentAfterCaseDefinitionChange() throws Exception {
-        createAppContext(CTX_PATH);
+        createAppContextWithoutDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
-        ((AbstractXmlApplicationContext) applicationContext).destroy();
+        applicationContext.close();
 
         String filePath = "org/flowable/spring/test/autodeployment/simple-case.cmmn";
         String originalCaseFileContent = IoUtil.readFileAsString(filePath);
@@ -109,8 +164,7 @@ public class SpringAutoDeployTest {
         Thread.sleep(2000);
 
         try {
-            applicationContext = new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
-            repositoryService = (CmmnRepositoryService) applicationContext.getBean("cmmnRepositoryService");
+            createAppContextWithoutDeploymentMode();
         } finally {
             // Reset file content such that future test are not seeing something funny
             IoUtil.writeStringToFile(originalCaseFileContent, filePath);
@@ -123,39 +177,197 @@ public class SpringAutoDeployTest {
     }
 
     @Test
-    public void testAutoDeployWithCreateDropOnCleanDb() {
-        createAppContext(CTX_CREATE_DROP_CLEAN_DB);
+    public void testAutoDeployWithDeploymentModeDefault() {
+        createAppContextWithDefaultDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(1, repositoryService.createCaseDefinitionQuery().count());
     }
 
     @Test
-    public void testAutoDeployWithDeploymentModeDefault() {
-        createAppContext(CTX_DEPLOYMENT_MODE_DEFAULT);
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(1, repositoryService.createCaseDefinitionQuery().count());
+    public void testAutoDeployWithInvalidResourcesWithDeploymentModeDefault() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        assertThatThrownBy(() -> createAppContext(properties))
+            .hasCauseInstanceOf(CmmnXMLException.class);
+        assertThat(repositoryService).isNull();
+
+        // Some of the resources should have been deployed
+        properties.put("deploymentResources", "classpath*:/notExisting*.cmmn");
+        createAppContext(properties);
+        assertThat(repositoryService.createCaseDefinitionQuery().list())
+            .extracting(CaseDefinition::getKey)
+            .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+    }
+
+    @Test
+    public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionWithDeploymentModeDefault() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        properties.put("throwExceptionOnDeploymentFailure", false);
+        createAppContext(properties);
+
+        assertThat(repositoryService.createCaseDefinitionQuery().list())
+            .extracting(CaseDefinition::getKey)
+            .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
-        createAppContext(CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE);
+        createAppContextWithSingleResourceDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(1, repositoryService.createCaseDefinitionQuery().count());
     }
 
     @Test
+    public void testAutoDeployWithInvalidResourcesWithDeploymentModeSingleResource() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "single-resource");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        assertThatThrownBy(() -> createAppContext(properties))
+            .hasCauseInstanceOf(CmmnXMLException.class);
+        assertThat(repositoryService).isNull();
+
+        // Some of the resources should have been deployed
+        properties.put("deploymentResources", "classpath*:/notExisting*.bpmn20.xml");
+        createAppContext(properties);
+        assertThat(repositoryService.createCaseDefinitionQuery().list())
+            .extracting(CaseDefinition::getKey)
+            .containsExactlyInAnyOrder("myCase");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionOnDeploymentWithDeploymentModeSingleResource() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "single-resource");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        properties.put("throwExceptionOnDeploymentFailure", false);
+        createAppContext(properties);
+
+        assertThat(repositoryService.createCaseDefinitionQuery().list())
+            .extracting(CaseDefinition::getKey)
+            .containsExactlyInAnyOrder("myCase");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+    }
+
+    @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
-        createAppContext(CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER);
+        createAppContextWithResourceParenFolderDeploymentMode();
         assertEquals(2, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createCaseDefinitionQuery().count());
+    }
+
+    @Test
+    public void testAutoDeployWithInvalidResourcesWithDeploymentModeResourceParentFolder() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "resource-parent-folder");
+        properties.put("deploymentResources", DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES);
+        assertThatThrownBy(() -> createAppContext(properties))
+            .hasCauseInstanceOf(CmmnXMLException.class);
+        assertThat(repositoryService).isNull();
+
+        // Start a new application context to verify that there are no deployments
+        properties.put("deploymentResources", "classpath*:/notExisting*.cmmn");
+        createAppContext(properties);
+
+        assertThat(repositoryService.createCaseDefinitionQuery().list())
+            .extracting(CaseDefinition::getKey)
+            .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+    }
+
+    @Test
+    public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionOnDeploymentWithDeploymentModeResourceParentFolder() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "resource-parent-folder");
+        properties.put("deploymentResources", DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES);
+        properties.put("throwExceptionOnDeploymentFailure", false);
+        createAppContext(properties);
+        assertThat(repositoryService.createCaseDefinitionQuery().list())
+            .extracting(CaseDefinition::getKey)
+            .containsExactlyInAnyOrder("myCase2");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
     }
 
     // --Helper methods
     // ----------------------------------------------------------
 
     protected void removeAllDeployments() {
-        for (CmmnDeployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
+        if (repositoryService != null) {
+            for (CmmnDeployment deployment : repositoryService.createDeploymentQuery().list()) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
+    }
+
+    @Configuration
+    static class SpringCmmnAutoDeployTestConfiguration {
+
+        @Bean
+        public SimpleDriverDataSource dataSource(
+            @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> driverClass,
+            @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}") String url,
+            @Value("${jdbc.username:sa}") String username,
+            @Value("${jdbc.password:}") String password
+        ) {
+            SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+            dataSource.setDriverClass(driverClass);
+            dataSource.setUrl(url);
+            dataSource.setUsername(username);
+            dataSource.setPassword(password);
+
+            return dataSource;
+        }
+
+        @Bean
+        public PlatformTransactionManager transactionManager(DataSource dataSource) {
+            return new DataSourceTransactionManager(dataSource);
+        }
+
+        @Bean
+        public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            @Value("${databaseSchemaUpdate:true}") String databaseSchemaUpdate,
+            @Value("${deploymentMode:#{null}}") String deploymentMode,
+            @Value("${deploymentResources}") Resource[] deploymentResources,
+            @Value("${throwExceptionOnDeploymentFailure:#{null}}") Boolean throwExceptionOnDeploymentFailure
+        ) {
+            SpringCmmnEngineConfiguration cmmnEngineConfiguration = new SpringCmmnEngineConfiguration();
+            cmmnEngineConfiguration.setDataSource(dataSource);
+            cmmnEngineConfiguration.setTransactionManager(transactionManager);
+            cmmnEngineConfiguration.setDatabaseSchemaUpdate(databaseSchemaUpdate);
+
+            if (deploymentMode != null) {
+                cmmnEngineConfiguration.setDeploymentMode(deploymentMode);
+            }
+
+            cmmnEngineConfiguration.setDeploymentResources(deploymentResources);
+
+            if (throwExceptionOnDeploymentFailure != null) {
+                cmmnEngineConfiguration.getDeploymentStrategies()
+                    .forEach(strategy -> {
+                        if (strategy instanceof CommonAutoDeploymentStrategy) {
+                            ((CommonAutoDeploymentStrategy<CmmnEngine>) strategy).setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                        }
+                    });
+            }
+
+            return cmmnEngineConfiguration;
+        }
+
+        @Bean
+        public CmmnEngineFactoryBean cmmnEngine(SpringCmmnEngineConfiguration cmmnEngineConfiguration) {
+            CmmnEngineFactoryBean cmmnEngineFactoryBean = new CmmnEngineFactoryBean();
+            cmmnEngineFactoryBean.setCmmnEngineConfiguration(cmmnEngineConfiguration);
+            return cmmnEngineFactoryBean;
+        }
+
+        @Bean
+        public CmmnRepositoryService repositoryService(CmmnEngine cmmnEngine) {
+            return cmmnEngine.getCmmnRepositoryService();
         }
     }
 

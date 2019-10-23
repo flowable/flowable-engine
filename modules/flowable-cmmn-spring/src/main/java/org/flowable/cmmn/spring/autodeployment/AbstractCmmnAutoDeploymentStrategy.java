@@ -13,11 +13,16 @@
 
 package org.flowable.cmmn.spring.autodeployment;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.time.Duration;
 
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
+import org.springframework.core.io.Resource;
 
 /**
  * Abstract base class for implementations of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategyDeploymentStrategy}.
@@ -34,8 +39,25 @@ public abstract class AbstractCmmnAutoDeploymentStrategy extends CommonAutoDeplo
         super(useLockForDeployments, deploymentLockWaitTime);
     }
 
+    public AbstractCmmnAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected LockManager getLockManager(CmmnEngine engine, String deploymentNameHint) {
         return engine.getCmmnEngineConfiguration().getLockManager(deploymentNameHint);
+    }
+
+    protected void addResource(Resource resource, CmmnDeploymentBuilder deploymentBuilder) {
+        String resourceName = determineResourceName(resource);
+        addResource(resource, resourceName, deploymentBuilder);
+    }
+
+    protected void addResource(Resource resource, String resourceName, CmmnDeploymentBuilder deploymentBuilder) {
+        try (InputStream inputStream = resource.getInputStream()) {
+            deploymentBuilder.addInputStream(resourceName, inputStream);
+        } catch (IOException ex) {
+            throw new UncheckedIOException("Failed to read resource " + resource, ex);
+        }
     }
 }

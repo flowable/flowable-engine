@@ -42,7 +42,7 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractProcessAutoDep
     }
 
     public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        this(useLockForDeployments, deploymentLockWaitTime, true);
+        super(useLockForDeployments, deploymentLockWaitTime);
     }
 
     public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {

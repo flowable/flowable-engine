@@ -54,6 +54,10 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractFormAuto
         super(useLockForDeployments, deploymentLockWaitTime);
     }
 
+    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
@@ -68,22 +72,24 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractFormAuto
 
         for (final Entry<String, Set<Resource>> group : resourcesMap.entrySet()) {
 
-            try {
-                final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
-                final FormDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
+            final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
+            final FormDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
 
-                for (final Resource resource : group.getValue()) {
-                    final String resourceName = determineResourceName(resource);
-                    deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-                }
+            for (final Resource resource : group.getValue()) {
+                addResource(resource, deploymentBuilder);
+            }
+            try {
 
                 deploymentBuilder.deploy();
 
-            } catch (Exception e) {
-                // Any exception should not stop the bootup of the engine
-                LOGGER.warn("Exception while autodeploying process definitions. "
-                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+            } catch (RuntimeException e) {
+                if (throwExceptionOnDeploymentFailure) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying form definitions. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+                }
             }
 
         }

@@ -69,6 +69,12 @@ public class FlowableFormProperties {
     private Duration autoDeploymentLockWaitTime;
 
     /**
+     * Whether to throw an exception if there was some kind of failure during the auto deployment.
+     * If not set then the global default would be used.
+     */
+    private Boolean throwExceptionOnAutoDeploymentFailure;
+
+    /**
      * The servlet configuration for the Form Rest API.
      */
     @NestedConfigurationProperty
@@ -128,6 +134,14 @@ public class FlowableFormProperties {
 
     public void setAutoDeploymentLockWaitTime(Duration autoDeploymentLockWaitTime) {
         this.autoDeploymentLockWaitTime = autoDeploymentLockWaitTime;
+    }
+
+    public Boolean getThrowExceptionOnAutoDeploymentFailure() {
+        return throwExceptionOnAutoDeploymentFailure;
+    }
+
+    public void setThrowExceptionOnAutoDeploymentFailure(Boolean throwExceptionOnAutoDeploymentFailure) {
+        this.throwExceptionOnAutoDeploymentFailure = throwExceptionOnAutoDeploymentFailure;
     }
 
     public FlowableServlet getServlet() {

@@ -51,7 +51,7 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractProcessA
     }
 
     public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        this(useLockForDeployments, deploymentLockWaitTime, true);
+        super(useLockForDeployments, deploymentLockWaitTime);
     }
 
     public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {

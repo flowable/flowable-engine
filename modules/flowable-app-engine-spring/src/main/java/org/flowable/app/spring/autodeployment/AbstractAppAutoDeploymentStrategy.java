@@ -13,11 +13,17 @@
 
 package org.flowable.app.spring.autodeployment;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.zip.ZipInputStream;
 
+import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
+import org.springframework.core.io.Resource;
 
 /**
  * Abstract base class for implementations of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}.
@@ -34,8 +40,31 @@ public abstract class AbstractAppAutoDeploymentStrategy extends CommonAutoDeploy
         super(useLockForDeployments, deploymentLockWaitTime);
     }
 
+    public AbstractAppAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected LockManager getLockManager(AppEngine engine, String deploymentNameHint) {
         return engine.getAppEngineConfiguration().getLockManager("appDeploymentsLock");
+    }
+
+    protected void addResource(Resource resource, AppDeploymentBuilder deploymentBuilder) {
+        String resourceName = determineResourceName(resource);
+        addResource(resource, resourceName, deploymentBuilder);
+    }
+
+    protected void addResource(Resource resource, String resourceName, AppDeploymentBuilder deploymentBuilder) {
+        try (InputStream inputStream = resource.getInputStream()) {
+            if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip")) {
+                try (ZipInputStream zipStream = new ZipInputStream(inputStream)) {
+                    deploymentBuilder.addZipInputStream(zipStream);
+                }
+            } else {
+                deploymentBuilder.addInputStream(resourceName, inputStream);
+            }
+        } catch (IOException ex) {
+            throw new UncheckedIOException("Failed to read resource " + resource, ex);
+        }
     }
 }
