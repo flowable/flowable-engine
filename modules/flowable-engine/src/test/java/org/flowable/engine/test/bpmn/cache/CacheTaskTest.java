@@ -15,6 +15,8 @@ package org.flowable.engine.test.bpmn.cache;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.Map;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -54,7 +56,7 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/cache/cacheUserTask.bpmn20.xml")
-    public void testQueryWithIncludeVariables() {
+    public void testProcessInstanceQueryWithIncludeVariables() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey("oneTask")
             .variable("myVar1", "Hello")
@@ -62,19 +64,40 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
             .variable("myVar3", 123)
             .start();
 
-        assertThat(TestCacheTaskListener.PROCESS_VARIABLES).containsOnly(
+        Map.Entry[] entries = {
             entry("myVar1", "Hello"),
             entry("myVar2", "World"),
             entry("myVar3", 123),
             entry("varFromTheListener", "valueFromTheListener")
-        );
-
-        assertThat(TestCacheTaskListener.HISTORIC_PROCESS_VARIABLES).containsOnly(
-            entry("myVar1", "Hello"),
-            entry("myVar2", "World"),
-            entry("myVar3", 123),
-            entry("varFromTheListener", "valueFromTheListener")
-        );
+        };
+        assertThat(processInstance.getProcessVariables()).containsOnly(entries);
+        assertThat(TestCacheTaskListener.PROCESS_VARIABLES).containsOnly(entries);
+        assertThat(TestCacheTaskListener.HISTORIC_PROCESS_VARIABLES).containsOnly(entries);
     }
-    
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/cache/cacheUserTask.bpmn20.xml")
+    public void testTaskQueryWithIncludeVariables() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTask")
+            .variable("myVar1", "Hello")
+            .variable("myVar2", "World")
+            .variable("myVar3", 123)
+            .start();
+
+        Map.Entry[] entries = {
+            entry("myVar1", "Hello"),
+            entry("myVar2", "World"),
+            entry("myVar3", 123),
+            entry("varFromTheListener", "valueFromTheListener")
+        };
+
+        assertThat(TestCacheTaskListener.TASK_PROCESS_VARIABLES).containsOnly(entries);
+        assertThat(TestCacheTaskListener.HISTORIC_TASK_PROCESS_VARIABLES).containsOnly(entries);
+
+        assertThat(TestCacheTaskListener.TASK_LOCAL_VARIABLES).containsOnly(entry("localVar", "localValue"));
+        assertThat(TestCacheTaskListener.HISTORIC_TASK_LOCAL_VARIABLES).containsOnly(entry("localVar", "localValue"));
+
+    }
+
 }

@@ -35,6 +35,12 @@ public class TestCacheTaskListener implements TaskListener {
     public static Map<String, Object> PROCESS_VARIABLES;
     public static Map<String, Object> HISTORIC_PROCESS_VARIABLES;
 
+    public static Map<String, Object> TASK_PROCESS_VARIABLES;
+    public static Map<String, Object> HISTORIC_TASK_PROCESS_VARIABLES;
+
+    public static Map<String, Object> TASK_LOCAL_VARIABLES;
+    public static Map<String, Object> HISTORIC_TASK_LOCAL_VARIABLES;
+
     @Override
     public void notify(DelegateTask delegateTask) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
@@ -51,7 +57,9 @@ public class TestCacheTaskListener implements TaskListener {
         }
 
         delegateTask.setVariable("varFromTheListener", "valueFromTheListener");
+        delegateTask.setVariableLocal("localVar", "localValue");
 
+        // Used in CacheTaskTest#testTaskQueryWithIncludeVariables
         ProcessInstance processInstance = processEngineConfiguration.getRuntimeService().createProcessInstanceQuery()
             .processInstanceId(task.getProcessInstanceId())
             .includeProcessVariables()
@@ -63,6 +71,24 @@ public class TestCacheTaskListener implements TaskListener {
             .includeProcessVariables()
             .singleResult();
         HISTORIC_PROCESS_VARIABLES = historicProcessInstance.getProcessVariables();
+
+        // Used in CacheTaskTest#testTaskQueryWithIncludeVariables
+        Task taskFromQuery = processEngineConfiguration.getTaskService().createTaskQuery()
+            .taskId(delegateTask.getId())
+            .includeProcessVariables()
+            .includeTaskLocalVariables()
+            .singleResult();
+        TASK_PROCESS_VARIABLES = taskFromQuery.getProcessVariables();
+        TASK_LOCAL_VARIABLES = taskFromQuery.getTaskLocalVariables();
+
+        HistoricTaskInstance historicTaskFromQuery = processEngineConfiguration.getHistoryService().createHistoricTaskInstanceQuery()
+            .taskId(delegateTask.getId())
+            .includeProcessVariables()
+            .includeTaskLocalVariables()
+            .singleResult();
+        HISTORIC_TASK_PROCESS_VARIABLES = historicTaskFromQuery.getProcessVariables();
+        HISTORIC_TASK_LOCAL_VARIABLES = historicTaskFromQuery.getTaskLocalVariables();
+
     }
 
 }
