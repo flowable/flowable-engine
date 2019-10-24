@@ -20,52 +20,46 @@ import org.flowable.app.api.repository.AppDefinitionQuery;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.persistence.entity.data.AppDefinitionDataManager;
 import org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 
 /**
  * @author Tijs Rademakers
  */
-public class AppDefinitionEntityManagerImpl extends AbstractAppEntityManager<AppDefinitionEntity> implements AppDefinitionEntityManager {
-
-    protected AppDefinitionDataManager appDefinitionDataManager;
+public class AppDefinitionEntityManagerImpl
+    extends AbstractEngineEntityManager<AppEngineConfiguration, AppDefinitionEntity, AppDefinitionDataManager>
+    implements AppDefinitionEntityManager {
 
     public AppDefinitionEntityManagerImpl(AppEngineConfiguration appEngineConfiguration, AppDefinitionDataManager appDefinitionDataManager) {
-        super(appEngineConfiguration);
-        this.appDefinitionDataManager = appDefinitionDataManager;
-    }
-
-    @Override
-    protected DataManager<AppDefinitionEntity> getDataManager() {
-        return appDefinitionDataManager;
+        super(appEngineConfiguration, appDefinitionDataManager);
     }
 
     @Override
     public AppDefinitionEntity findLatestAppDefinitionByKey(String appDefinitionKey) {
-        return appDefinitionDataManager.findLatestAppDefinitionByKey(appDefinitionKey);
+        return dataManager.findLatestAppDefinitionByKey(appDefinitionKey);
     }
 
     @Override
     public AppDefinitionEntity findLatestAppDefinitionByKeyAndTenantId(String appDefinitionKey, String tenantId) {
-        return appDefinitionDataManager.findLatestAppDefinitionByKeyAndTenantId(appDefinitionKey, tenantId);
+        return dataManager.findLatestAppDefinitionByKeyAndTenantId(appDefinitionKey, tenantId);
     }
 
     @Override
     public AppDefinitionEntity findAppDefinitionByDeploymentAndKey(String deploymentId, String appDefinitionKey) {
-        return appDefinitionDataManager.findAppDefinitionByDeploymentAndKey(deploymentId, appDefinitionKey);
+        return dataManager.findAppDefinitionByDeploymentAndKey(deploymentId, appDefinitionKey);
     }
 
     @Override
     public AppDefinitionEntity findAppDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String appDefinitionKey, String tenantId) {
-        return appDefinitionDataManager.findAppDefinitionByDeploymentAndKeyAndTenantId(deploymentId, appDefinitionKey, tenantId);
+        return dataManager.findAppDefinitionByDeploymentAndKeyAndTenantId(deploymentId, appDefinitionKey, tenantId);
     }
 
     @Override
     public AppDefinition findAppDefinitionByKeyAndVersionAndTenantId(String appDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
         if (tenantId == null || AppEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-            return appDefinitionDataManager.findAppDefinitionByKeyAndVersion(appDefinitionKey, caseDefinitionVersion);
+            return dataManager.findAppDefinitionByKeyAndVersion(appDefinitionKey, caseDefinitionVersion);
         } else {
-            return appDefinitionDataManager.findAppDefinitionByKeyAndVersionAndTenantId(appDefinitionKey, caseDefinitionVersion, tenantId);
+            return dataManager.findAppDefinitionByKeyAndVersionAndTenantId(appDefinitionKey, caseDefinitionVersion, tenantId);
         }
     }
     
@@ -77,25 +71,17 @@ public class AppDefinitionEntityManagerImpl extends AbstractAppEntityManager<App
     
     @Override
     public AppDefinitionQuery createAppDefinitionQuery() {
-        return new AppDefinitionQueryImpl(appEngineConfiguration.getCommandExecutor());
+        return new AppDefinitionQueryImpl(engineConfiguration.getCommandExecutor());
     }
 
     @Override
     public List<AppDefinition> findAppDefinitionsByQueryCriteria(AppDefinitionQuery appDefinitionQuery) {
-        return appDefinitionDataManager.findAppDefinitionsByQueryCriteria((AppDefinitionQueryImpl) appDefinitionQuery);
+        return dataManager.findAppDefinitionsByQueryCriteria((AppDefinitionQueryImpl) appDefinitionQuery);
     }
 
     @Override
     public long findAppDefinitionCountByQueryCriteria(AppDefinitionQuery appDefinitionQuery) {
-        return appDefinitionDataManager.findAppDefinitionCountByQueryCriteria((AppDefinitionQueryImpl) appDefinitionQuery);
-    }
-
-    public AppDefinitionDataManager getAppDefinitionDataManager() {
-        return appDefinitionDataManager;
-    }
-
-    public void setAppDefinitionDataManager(AppDefinitionDataManager appDefinitionDataManager) {
-        this.appDefinitionDataManager = appDefinitionDataManager;
+        return dataManager.findAppDefinitionCountByQueryCriteria((AppDefinitionQueryImpl) appDefinitionQuery);
     }
 
 }

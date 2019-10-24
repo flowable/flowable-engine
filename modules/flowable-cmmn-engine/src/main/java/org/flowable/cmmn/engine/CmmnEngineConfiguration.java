@@ -1057,7 +1057,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(cmmnHistoryService);
     }
 
+    @Override
     public void initDataManagers() {
+        super.initDataManagers();
         if (tableDataManager == null) {
             tableDataManager = new TableDataManagerImpl();
         }
@@ -1096,7 +1098,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (cmmnDeploymentEntityManager == null) {
             cmmnDeploymentEntityManager = new CmmnDeploymentEntityManagerImpl(this, deploymentDataManager);
         }

@@ -20,6 +20,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,11 +74,17 @@ import org.flowable.common.engine.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.common.engine.impl.interceptor.LogInterceptor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
@@ -132,6 +139,11 @@ public abstract class AbstractEngineConfiguration {
     protected Command<Void> schemaManagementCmd;
 
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
+
+    /**
+     * Whether to use a lock when performing the database schema create or update operations.
+     */
+    protected boolean useLockForDatabaseSchemaUpdate = false;
 
     protected String xmlEncoding = "UTF-8";
 
@@ -274,6 +286,24 @@ public abstract class AbstractEngineConfiguration {
     protected boolean enableLogSqlExecutionTime;
 
     protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+
+    /**
+     * Duration between the checks when acquiring a lock.
+     */
+    protected Duration lockPollRate = Duration.ofSeconds(10);
+
+    /**
+     * Duration to wait for the DB Schema lock before giving up.
+     */
+    protected Duration schemaLockWaitTime = Duration.ofMinutes(5);
+
+    // DATA MANAGERS //////////////////////////////////////////////////////////////////
+
+    protected PropertyDataManager propertyDataManager;
+
+    // ENTITY MANAGERS ////////////////////////////////////////////////////////////////
+
+    protected PropertyEntityManager propertyEntityManager;
 
     protected List<EngineDeployer> customPreDeployers;
     protected List<EngineDeployer> customPostDeployers;
@@ -611,6 +641,22 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
+    // Data managers ///////////////////////////////////////////////////////////
+
+    public void initDataManagers() {
+        if (propertyDataManager == null) {
+            propertyDataManager = new MybatisPropertyDataManager();
+        }
+    }
+
+    // Entity managers //////////////////////////////////////////////////////////
+
+    public void initEntityManagers() {
+        if (propertyEntityManager == null) {
+            propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
+        }
+    }
+
     // services
     // /////////////////////////////////////////////////////////////////
 
@@ -934,7 +980,11 @@ public abstract class AbstractEngineConfiguration {
             logger.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
-    }    
+    }
+
+    public LockManager getLockManager(String lockName) {
+        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate());
+    }
 
     // getters and setters
     // //////////////////////////////////////////////////////
@@ -1538,6 +1588,15 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public boolean isUseLockForDatabaseSchemaUpdate() {
+        return useLockForDatabaseSchemaUpdate;
+    }
+
+    public AbstractEngineConfiguration setUseLockForDatabaseSchemaUpdate(boolean useLockForDatabaseSchemaUpdate) {
+        this.useLockForDatabaseSchemaUpdate = useLockForDatabaseSchemaUpdate;
+        return this;
+    }
+
     public boolean isEnableEventDispatcher() {
         return enableEventDispatcher;
     }
@@ -1650,6 +1709,41 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
         this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+
+    public PropertyDataManager getPropertyDataManager() {
+        return propertyDataManager;
+    }
+
+    public Duration getLockPollRate() {
+        return lockPollRate;
+    }
+
+    public AbstractEngineConfiguration setLockPollRate(Duration lockPollRate) {
+        this.lockPollRate = lockPollRate;
+        return this;
+    }
+
+    public Duration getSchemaLockWaitTime() {
+        return schemaLockWaitTime;
+    }
+
+    public void setSchemaLockWaitTime(Duration schemaLockWaitTime) {
+        this.schemaLockWaitTime = schemaLockWaitTime;
+    }
+
+    public AbstractEngineConfiguration setPropertyDataManager(PropertyDataManager propertyDataManager) {
+        this.propertyDataManager = propertyDataManager;
+        return this;
+    }
+
+    public PropertyEntityManager getPropertyEntityManager() {
+        return propertyEntityManager;
+    }
+
+    public AbstractEngineConfiguration setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
+        this.propertyEntityManager = propertyEntityManager;
         return this;
     }
 

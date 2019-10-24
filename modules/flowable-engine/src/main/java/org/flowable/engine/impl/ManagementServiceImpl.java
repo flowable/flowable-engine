@@ -27,11 +27,14 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.event.EventLogEntry;
@@ -46,7 +49,6 @@ import org.flowable.engine.impl.cmd.GetBatchDocumentCmd;
 import org.flowable.engine.impl.cmd.GetBatchPartCmd;
 import org.flowable.engine.impl.cmd.GetBatchPartDocumentCmd;
 import org.flowable.engine.impl.cmd.GetEventLogEntriesCmd;
-import org.flowable.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.engine.impl.cmd.GetTableNameCmd;
@@ -88,6 +90,10 @@ import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
  */
 public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements ManagementService {
     
+    public ManagementServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+
     @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd());
@@ -343,6 +349,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
             throw new FlowableIllegalArgumentException("The command is null");
         }
         return commandExecutor.execute(config, command);
+    }
+
+    @Override
+    public LockManager getLockManager(String lockName) {
+        return new LockManagerImpl(commandExecutor, lockName, getConfiguration().getLockPollRate());
     }
 
     @Override

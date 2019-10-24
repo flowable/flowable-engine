@@ -17,6 +17,10 @@
             jdbcType="VARCHAR" />
     </typeHandlers>
     <mappers>
+        <!-- Common mappers -->
+        <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+
+        <!-- Engine mappers -->
         <mapper resource="org/flowable/app/db/mapping/entity/TableData.xml" />
         <mapper resource="org/flowable/app/db/mapping/entity/AppDeployment.xml" />
         <mapper resource="org/flowable/app/db/mapping/entity/AppResource.xml" />

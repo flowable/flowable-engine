@@ -13,16 +13,24 @@
 package org.flowable.spring.boot.app;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
+import org.flowable.app.engine.AppEngine;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -56,7 +64,8 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
     @Bean
     @ConditionalOnMissingBean
-    public SpringAppEngineConfiguration springAppEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager) throws IOException {
+    public SpringAppEngineConfiguration springAppEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<List<AutoDeploymentStrategy<AppEngine>>> appAutoDeploymentStrategies) throws IOException {
 
         SpringAppEngineConfiguration conf = new SpringAppEngineConfiguration();
 
@@ -74,6 +83,20 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
         configureEngine(conf, dataSource);
 
         conf.setIdGenerator(new StrongUuidGenerator());
+
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = appAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
+        boolean useLockForAutoDeployment = defaultIfNotNull(appProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
+        Duration autoDeploymentLockWaitTime = defaultIfNotNull(appProperties.getAutoDeploymentLockWaitTime(),
+            flowableProperties.getAutoDeploymentLockWaitTime());
+        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(appProperties.getThrowExceptionOnAutoDeploymentFailure(),
+            flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
+        // Always add the out of the box auto deployment strategies as last
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        conf.setDeploymentStrategies(deploymentStrategies);
 
         return conf;
     }

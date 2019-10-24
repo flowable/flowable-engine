@@ -28,7 +28,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -37,18 +37,12 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager<PlanItemInstanceEntity> implements PlanItemInstanceEntityManager {
-
-    protected PlanItemInstanceDataManager planItemInstanceDataManager;
+public class PlanItemInstanceEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, PlanItemInstanceEntity, PlanItemInstanceDataManager>
+    implements PlanItemInstanceEntityManager {
     
     public PlanItemInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceDataManager planItemInstanceDataManager) {
-        super(cmmnEngineConfiguration);
-        this.planItemInstanceDataManager = planItemInstanceDataManager;
-    }
-    
-    @Override
-    protected DataManager<PlanItemInstanceEntity> getDataManager() {
-        return planItemInstanceDataManager;
+        super(cmmnEngineConfiguration, planItemInstanceDataManager);
     }
     
     @Override
@@ -56,7 +50,7 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
             String stagePlanItemInstanceId, String tenantId, boolean addToParent) {
         
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-        ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+        ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
         CaseInstanceEntity caseInstanceEntity = getCaseInstanceEntityManager().findById(caseInstanceId);
         
         PlanItemInstanceEntity planItemInstanceEntity = create();
@@ -103,47 +97,47 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
-        planItemInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
+        dataManager.deleteByCaseDefinitionId(caseDefinitionId);
     }
     
     @Override
     public void deleteByStageInstanceId(String stageInstanceId) {
-        planItemInstanceDataManager.deleteByStageInstanceId(stageInstanceId);
+        dataManager.deleteByStageInstanceId(stageInstanceId);
     }
     
     @Override
     public void deleteByCaseInstanceId(String caseInstanceId) {
-        planItemInstanceDataManager.deleteByCaseInstanceId(caseInstanceId);
+        dataManager.deleteByCaseInstanceId(caseInstanceId);
     }
     
     @Override
     public PlanItemInstanceQuery createPlanItemInstanceQuery() {
-        return new PlanItemInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new PlanItemInstanceQueryImpl(engineConfiguration.getCommandExecutor());
     }
 
     @Override
     public long countByCriteria(PlanItemInstanceQuery planItemInstanceQuery) {
-        return planItemInstanceDataManager.countByCriteria((PlanItemInstanceQueryImpl) planItemInstanceQuery);
+        return dataManager.countByCriteria((PlanItemInstanceQueryImpl) planItemInstanceQuery);
     }
 
     @Override
     public List<PlanItemInstance> findByCriteria(PlanItemInstanceQuery planItemInstanceQuery) {
-        return planItemInstanceDataManager.findByCriteria((PlanItemInstanceQueryImpl) planItemInstanceQuery);
+        return dataManager.findByCriteria((PlanItemInstanceQueryImpl) planItemInstanceQuery);
     }
     
     @Override
     public List<PlanItemInstanceEntity> findByCaseInstanceId(String caseInstanceId) {
-        return planItemInstanceDataManager.findByCaseInstanceId(caseInstanceId);
+        return dataManager.findByCaseInstanceId(caseInstanceId);
     }
 
     @Override
     public List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceId) {
-        return planItemInstanceDataManager.findByStagePlanItemInstanceId(stagePlanItemInstanceId);
+        return dataManager.findByStagePlanItemInstanceId(stagePlanItemInstanceId);
     }
 
     @Override
     public List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId) {
-        return planItemInstanceDataManager.findByCaseInstanceIdAndPlanItemId(caseInstanceId, planitemId);
+        return dataManager.findByCaseInstanceIdAndPlanItemId(caseInstanceId, planitemId);
     }
 
     @Override
@@ -181,6 +175,10 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
         }
         
         getDataManager().delete(planItemInstanceEntity);
+    }
+
+    protected CaseInstanceEntityManager getCaseInstanceEntityManager() {
+        return engineConfiguration.getCaseInstanceEntityManager();
     }
     
 }

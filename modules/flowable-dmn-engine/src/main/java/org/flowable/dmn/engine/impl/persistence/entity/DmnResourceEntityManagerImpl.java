@@ -15,7 +15,7 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnResourceDataManager;
 
@@ -23,41 +23,27 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.DmnResourceDataManag
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class DmnResourceEntityManagerImpl extends AbstractEntityManager<DmnResourceEntity> implements DmnResourceEntityManager {
-
-    protected DmnResourceDataManager resourceDataManager;
+public class DmnResourceEntityManagerImpl
+    extends AbstractEngineEntityManager<DmnEngineConfiguration, DmnResourceEntity, DmnResourceDataManager>
+    implements DmnResourceEntityManager {
 
     public DmnResourceEntityManagerImpl(DmnEngineConfiguration dmnEngineConfiguration, DmnResourceDataManager resourceDataManager) {
-        super(dmnEngineConfiguration);
-        this.resourceDataManager = resourceDataManager;
-    }
-
-    @Override
-    protected DataManager<DmnResourceEntity> getDataManager() {
-        return resourceDataManager;
+        super(dmnEngineConfiguration, resourceDataManager);
     }
 
     @Override
     public void deleteResourcesByDeploymentId(String deploymentId) {
-        resourceDataManager.deleteResourcesByDeploymentId(deploymentId);
+        dataManager.deleteResourcesByDeploymentId(deploymentId);
     }
 
     @Override
     public DmnResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
-        return resourceDataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
+        return dataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
     }
 
     @Override
     public List<DmnResourceEntity> findResourcesByDeploymentId(String deploymentId) {
-        return resourceDataManager.findResourcesByDeploymentId(deploymentId);
-    }
-
-    public DmnResourceDataManager getResourceDataManager() {
-        return resourceDataManager;
-    }
-
-    public void setResourceDataManager(DmnResourceDataManager resourceDataManager) {
-        this.resourceDataManager = resourceDataManager;
+        return dataManager.findResourcesByDeploymentId(deploymentId);
     }
 
 }

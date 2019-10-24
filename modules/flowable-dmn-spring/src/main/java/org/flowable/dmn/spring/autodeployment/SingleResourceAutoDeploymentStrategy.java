@@ -13,21 +13,23 @@
 
 package org.flowable.dmn.spring.autodeployment;
 
-import java.io.IOException;
+import java.time.Duration;
 
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.engine.DmnEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each resource by name.
+ * Implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that performs a separate deployment for each resource by name.
  * 
  * @author Tiese Barrell
  * @author Joram Barrez
  */
-public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class SingleResourceAutoDeploymentStrategy extends AbstractDmnAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleResourceAutoDeploymentStrategy.class);
 
@@ -36,36 +38,46 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeployment
      */
     public static final String DEPLOYMENT_MODE = "single-resource";
 
+    public SingleResourceAutoDeploymentStrategy() {
+    }
+
+    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
+        super(useLockForDeployments, deploymentLockWaitTime);
+    }
+
+    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final DmnRepositoryService repositoryService) {
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, DmnEngine engine) {
+        DmnRepositoryService repositoryService = engine.getDmnRepositoryService();
 
         // Create a separate deployment for each resource using the resource name
 
         for (Resource resource : resources) {
 
+            final String resourceName = determineResourceName(resource);
+            final DmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
+            addResource(resource, resourceName, deploymentBuilder);
+
             try {
-                final String resourceName = determineResourceName(resource);
-                final DmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
-                deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
 
                 deploymentBuilder.deploy();
 
             } catch (Exception e) {
-                // Any exception should not stop the bootup of the engine
-                String resourceName = null;
-                if (resource != null) {
-                    try {
-                        resourceName = resource.getURL().toString();
-                    } catch (IOException ioe) {
-                        resourceName = resource.toString();
-                    }
+                if (throwExceptionOnDeploymentFailure) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying DMN definitions for resource {}. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resource, e);
                 }
-                LOGGER.warn("Exception while autodeploying DMN definitions for resource {}. This exception can be ignored if the root cause indicates a unique constraint violation, which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resourceName, e);
             }
         }
     }

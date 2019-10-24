@@ -18,6 +18,8 @@ import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDep
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +37,10 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.HttpClientConfig;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
+import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
@@ -56,6 +62,9 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Filip Hrisafov
@@ -122,8 +131,146 @@ public class CmmnEngineAutoConfigurationTest {
                         );
                 });
 
+            SpringCmmnEngineConfiguration engineConfiguration = (SpringCmmnEngineConfiguration) cmmnEngine.getCmmnEngineConfiguration();
+            Collection<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+            assertThat(deploymentStrategies).element(0)
+                .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                });
+
+            assertThat(deploymentStrategies).element(1)
+                .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                });
+
+            assertThat(deploymentStrategies).element(2)
+                .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                });
+
             deleteDeployments(cmmnEngine);
         });
+    }
+
+    @Test
+    public void standaloneCmmnEngineWithBasicDataSourceAndAutoDeploymentWithLocking() {
+        contextRunner
+            .withPropertyValues(
+                "flowable.cmmn.use-lock-for-auto-deployment=true",
+                "flowable.cmmn.auto-deployment-lock-wait-time=10m",
+                "flowable.cmmn.throw-exception-on-auto-deployment-failure=false"
+            )
+            .run(context -> {
+                assertThat(context)
+                    .doesNotHaveBean(AppEngine.class)
+                    .doesNotHaveBean(ProcessEngine.class)
+                    .doesNotHaveBean("cmmnProcessEngineConfigurationConfigurer")
+                    .doesNotHaveBean("cmmnAppEngineConfigurationConfigurer");
+                CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+                assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
+
+                assertAllServicesPresent(context, cmmnEngine);
+
+                assertAutoDeployment(context);
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactlyInAnyOrder(
+                                SpringCmmnEngineConfiguration.class,
+                                SpringIdmEngineConfiguration.class
+                            );
+                    });
+
+                SpringCmmnEngineConfiguration engineConfiguration = (SpringCmmnEngineConfiguration) cmmnEngine.getCmmnEngineConfiguration();
+                Collection<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                    });
+
+                assertThat(deploymentStrategies).element(1)
+                    .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                    });
+
+                assertThat(deploymentStrategies).element(2)
+                    .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                    });
+
+                deleteDeployments(cmmnEngine);
+            });
+    }
+
+    @Test
+    public void standaloneCmmnEngineWithBasicDataSourceAndCustomAutoDeploymentStrategies() {
+        contextRunner
+            .withUserConfiguration(CustomAutoDeploymentStrategyConfiguration.class)
+            .withPropertyValues("flowable.auto-deployment-lock-wait-time=10m")
+            .run(context -> {
+                assertThat(context)
+                    .doesNotHaveBean(AppEngine.class)
+                    .doesNotHaveBean(ProcessEngine.class)
+                    .doesNotHaveBean("cmmnProcessEngineConfigurationConfigurer")
+                    .doesNotHaveBean("cmmnAppEngineConfigurationConfigurer");
+                CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+                assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
+
+                assertAllServicesPresent(context, cmmnEngine);
+
+                assertAutoDeployment(context);
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactlyInAnyOrder(
+                                SpringCmmnEngineConfiguration.class,
+                                SpringIdmEngineConfiguration.class
+                            );
+                    });
+
+                SpringCmmnEngineConfiguration engineConfiguration = (SpringCmmnEngineConfiguration) cmmnEngine.getCmmnEngineConfiguration();
+                Collection<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOf(TestCmmnEngineAutoDeploymentStrategy.class);
+                assertThat(deploymentStrategies).element(1)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                    });
+
+                assertThat(deploymentStrategies).element(2)
+                    .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                    });
+
+                assertThat(deploymentStrategies).element(3)
+                    .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                    });
+
+                deleteDeployments(cmmnEngine);
+            });
     }
 
     @Test
@@ -163,7 +310,95 @@ public class CmmnEngineAutoConfigurationTest {
             deleteDeployments(cmmnEngine);
         });
     }
-    
+
+    @Test
+    public void cmmnEngineWithBasicDataSourceAndProcessEngineAndCustomAutoDeploymentStrategies() {
+        contextRunner.withConfiguration(AutoConfigurations.of(
+            HibernateJpaAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class
+        )).withUserConfiguration(CustomAutoDeploymentStrategyConfiguration.class, CustomProcessAutoDeploymentStrategyConfiguration.class)
+            .run(context -> {
+                assertThat(context)
+                    .doesNotHaveBean(AppEngine.class)
+                    .hasBean("cmmnProcessEngineConfigurationConfigurer")
+                    .doesNotHaveBean("cmmnAppEngineConfigurationConfigurer");
+                ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+                assertThat(processEngine).as("Process engine").isNotNull();
+                CmmnEngineConfigurationApi cmmnProcessConfigurationApi = cmmnEngine(processEngine);
+
+                CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+                assertThat(cmmnEngine.getCmmnEngineConfiguration()).as("Cmmn Engine Configuration").isEqualTo(cmmnProcessConfigurationApi);
+                assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
+
+                assertAllServicesPresent(context, cmmnEngine);
+                assertAutoDeployment(context);
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactlyInAnyOrder(
+                                SpringCmmnEngineConfiguration.class,
+                                SpringIdmEngineConfiguration.class,
+                                SpringProcessEngineConfiguration.class
+                            );
+                    });
+
+                SpringCmmnEngineConfiguration cmmnEngineConfiguration = (SpringCmmnEngineConfiguration) cmmnEngine.getCmmnEngineConfiguration();
+                Collection<AutoDeploymentStrategy<CmmnEngine>> cmmnDeploymentStrategies = cmmnEngineConfiguration.getDeploymentStrategies();
+
+                assertThat(cmmnDeploymentStrategies).element(0)
+                    .isInstanceOf(TestCmmnEngineAutoDeploymentStrategy.class);
+
+                assertThat(cmmnDeploymentStrategies).element(1)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                assertThat(cmmnDeploymentStrategies).element(2)
+                    .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                assertThat(cmmnDeploymentStrategies).element(3)
+                    .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                SpringProcessEngineConfiguration processEngineConfiguration = (SpringProcessEngineConfiguration) processEngine.getProcessEngineConfiguration();
+                Collection<AutoDeploymentStrategy<ProcessEngine>> processDeploymentStrategies = processEngineConfiguration.getDeploymentStrategies();
+
+                assertThat(processDeploymentStrategies).element(0)
+                    .isInstanceOf(TestProcessEngineAutoDeploymentStrategy.class);
+
+                assertThat(processDeploymentStrategies).element(1)
+                    .isInstanceOfSatisfying(org.flowable.spring.configurator.DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                assertThat(processDeploymentStrategies).element(2)
+                    .isInstanceOfSatisfying(org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                assertThat(processDeploymentStrategies).element(3)
+                    .isInstanceOfSatisfying(org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                deleteDeployments(processEngine);
+                deleteDeployments(cmmnEngine);
+            });
+
+    }
+
     @Test
     public void cmmnEngineWithBasicDataSourceAndAppEngine() {
         contextRunner.withConfiguration(AutoConfigurations.of(
@@ -280,5 +515,49 @@ public class CmmnEngineAutoConfigurationTest {
     private static CmmnEngineConfigurationApi cmmnEngine(AppEngine appEngine) {
         AppEngineConfiguration appEngineConfiguration = appEngine.getAppEngineConfiguration();
         return EngineServiceUtil.getCmmnEngineConfiguration(appEngineConfiguration);
+    }
+
+    @Configuration
+    static class CustomAutoDeploymentStrategyConfiguration {
+
+        @Bean
+        public TestCmmnEngineAutoDeploymentStrategy testCmmnEngineAutoDeploymentStrategy() {
+            return new TestCmmnEngineAutoDeploymentStrategy();
+        }
+    }
+
+    @Configuration
+    static class CustomProcessAutoDeploymentStrategyConfiguration {
+
+        @Bean
+        public TestProcessEngineAutoDeploymentStrategy testProcessEngineAutoDeploymentStrategy() {
+            return new TestProcessEngineAutoDeploymentStrategy();
+        }
+    }
+
+    static class TestCmmnEngineAutoDeploymentStrategy implements AutoDeploymentStrategy<CmmnEngine> {
+
+        @Override
+        public boolean handlesMode(String mode) {
+            return false;
+        }
+
+        @Override
+        public void deployResources(String deploymentNameHint, Resource[] resources, CmmnEngine engine) {
+
+        }
+    }
+
+    static class TestProcessEngineAutoDeploymentStrategy implements AutoDeploymentStrategy<ProcessEngine> {
+
+        @Override
+        public boolean handlesMode(String mode) {
+            return false;
+        }
+
+        @Override
+        public void deployResources(String deploymentNameHint, Resource[] resources, ProcessEngine engine) {
+
+        }
     }
 }

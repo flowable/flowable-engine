@@ -16,7 +16,6 @@ package org.flowable.job.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.common.engine.impl.Page;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.data.JobInfoDataManager;
 
@@ -25,56 +24,42 @@ import org.flowable.job.service.impl.persistence.entity.data.JobInfoDataManager;
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity> extends AbstractEntityManager<T> implements JobInfoEntityManager<T> {
+public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM extends JobInfoDataManager<T>>
+    extends AbstractJobServiceEngineEntityManager<T, DM>
+    implements JobInfoEntityManager<T> {
 
-    protected JobInfoDataManager<T> jobDataManager;
-
-    public JobInfoEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, JobInfoDataManager<T> jobDataManager) {
-        super(jobServiceConfiguration);
-        this.jobDataManager = jobDataManager;
-    }
-
-    @Override
-    protected DataManager<T> getDataManager() {
-        return jobDataManager;
+    public JobInfoEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, DM jobDataManager) {
+        super(jobServiceConfiguration, jobDataManager);
     }
 
     @Override
     public List<T> findJobsToExecute(Page page) {
-        return jobDataManager.findJobsToExecute(page);
+        return dataManager.findJobsToExecute(page);
     }
 
     @Override
     public List<T> findJobsByExecutionId(String executionId) {
-        return jobDataManager.findJobsByExecutionId(executionId);
+        return dataManager.findJobsByExecutionId(executionId);
     }
 
     @Override
     public List<T> findJobsByProcessInstanceId(String processInstanceId) {
-        return jobDataManager.findJobsByProcessInstanceId(processInstanceId);
+        return dataManager.findJobsByProcessInstanceId(processInstanceId);
     }
 
     @Override
     public List<T> findExpiredJobs(Page page) {
-        return jobDataManager.findExpiredJobs(page);
+        return dataManager.findExpiredJobs(page);
     }
 
     @Override
     public void resetExpiredJob(String jobId) {
-        jobDataManager.resetExpiredJob(jobId);
+        dataManager.resetExpiredJob(jobId);
     }
 
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
-    }
-
-    public JobInfoDataManager<T> getJobDataManager() {
-        return jobDataManager;
-    }
-
-    public void setJobDataManager(JobInfoDataManager<T> jobDataManager) {
-        this.jobDataManager = jobDataManager;
+        dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
 }

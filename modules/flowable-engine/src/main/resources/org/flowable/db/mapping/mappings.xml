@@ -47,7 +47,7 @@
         <mapper resource="org/flowable/db/mapping/entity/Model.xml" />
         <mapper resource="org/flowable/db/mapping/entity/ProcessDefinition.xml" />
         <mapper resource="org/flowable/db/mapping/entity/ProcessDefinitionInfo.xml" />
-        <mapper resource="org/flowable/db/mapping/entity/Property.xml" />
+        <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Resource.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/SuspendedJob.xml" />
         <mapper resource="org/flowable/db/mapping/entity/TableData.xml" />
