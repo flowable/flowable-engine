@@ -22,6 +22,7 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -75,7 +76,10 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("A", taskA.getName());
         assertEquals("Label 1", taskA.getLabel());
         assertEquals("Icon 1", taskA.getIcon());
-        
+        assertNotNull(taskA.getDefaultControl());
+        assertNotNull(taskA.getDefaultControl().getParentCompletionRule());
+        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, taskA.getDefaultControl().getParentCompletionRule().getType());
+
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
         assertEquals(1, planItemTaskB.getEntryCriteria().size());
@@ -83,6 +87,9 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         CasePageTask taskB = (CasePageTask) planItemDefinition;
         assertEquals(CasePageTask.TYPE, taskB.getType());
         assertEquals("B", taskB.getName());
+        assertNotNull(taskB.getDefaultControl());
+        assertNotNull(taskB.getDefaultControl().getParentCompletionRule());
+        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, taskB.getDefaultControl().getParentCompletionRule().getType());
         
         assertEquals(1, taskB.getExtensionElements().size());
         List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("index");
