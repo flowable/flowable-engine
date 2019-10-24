@@ -16,9 +16,9 @@ package org.flowable.dmn.spring.autodeployment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.time.Duration;
 
 import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.engine.DmnEngine;
@@ -35,17 +35,13 @@ public abstract class AbstractDmnAutoDeploymentStrategy extends CommonAutoDeploy
     public AbstractDmnAutoDeploymentStrategy() {
     }
 
-    public AbstractDmnAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime, true);
-    }
-
-    public AbstractDmnAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public AbstractDmnAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
     protected LockManager getLockManager(DmnEngine engine, String deploymentNameHint) {
-        return engine.getDmnEngineConfiguration().getLockManager(deploymentNameHint);
+        return engine.getDmnEngineConfiguration().getLockManager(determineLockName(deploymentNameHint));
     }
 
     protected void addResource(Resource resource, DmnDeploymentBuilder deploymentBuilder) {

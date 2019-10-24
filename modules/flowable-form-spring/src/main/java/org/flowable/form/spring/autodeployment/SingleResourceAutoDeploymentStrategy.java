@@ -13,8 +13,7 @@
 
 package org.flowable.form.spring.autodeployment;
 
-import java.time.Duration;
-
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.FormEngine;
@@ -41,12 +40,8 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractFormAutoDeploy
     public SingleResourceAutoDeploymentStrategy() {
     }
 
-    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public SingleResourceAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -70,7 +65,7 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractFormAutoDeploy
                 deploymentBuilder.deploy();
 
             } catch (RuntimeException e) {
-                if (throwExceptionOnDeploymentFailure) {
+                if (isThrowExceptionOnDeploymentFailure()) {
                     throw e;
                 } else {
                     LOGGER.warn("Exception while autodeploying form definitions for resource {}. "

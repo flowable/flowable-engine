@@ -385,7 +385,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
                 processEngineConfiguration.getDeploymentStrategies()
                     .forEach(strategy -> {
                         if (strategy instanceof CommonAutoDeploymentStrategy) {
-                            ((CommonAutoDeploymentStrategy<ProcessEngine>) strategy).setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                            ((CommonAutoDeploymentStrategy<ProcessEngine>) strategy).getDeploymentProperties().setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
                         }
                     });
             }

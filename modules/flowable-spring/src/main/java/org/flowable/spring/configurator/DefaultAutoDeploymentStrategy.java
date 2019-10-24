@@ -13,8 +13,7 @@
 
 package org.flowable.spring.configurator;
 
-import java.time.Duration;
-
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -42,12 +41,8 @@ public class DefaultAutoDeploymentStrategy extends AbstractProcessAutoDeployment
     public DefaultAutoDeploymentStrategy() {
     }
 
-    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public DefaultAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -69,7 +64,7 @@ public class DefaultAutoDeploymentStrategy extends AbstractProcessAutoDeployment
         try {
             deploymentBuilder.deploy();
         } catch (RuntimeException e) {
-            if (throwExceptionOnDeploymentFailure) {
+            if (isThrowExceptionOnDeploymentFailure()) {
                 throw e;
             } else {
                 LOGGER.warn("Exception while autodeploying process definitions. "

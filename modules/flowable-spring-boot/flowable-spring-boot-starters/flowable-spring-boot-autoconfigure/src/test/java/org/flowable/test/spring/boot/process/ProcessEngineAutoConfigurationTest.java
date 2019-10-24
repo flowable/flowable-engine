@@ -146,6 +146,7 @@ public class ProcessEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             assertThat(deploymentStrategies).element(1)
@@ -153,6 +154,7 @@ public class ProcessEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             assertThat(deploymentStrategies).element(2)
@@ -160,6 +162,7 @@ public class ProcessEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             deleteDeployments(processEngine);
@@ -170,9 +173,10 @@ public class ProcessEngineAutoConfigurationTest {
     public void standaloneProcessEngineWithBasicDatasourceAndAutoDeploymentWithLocking() {
         contextRunner
             .withPropertyValues(
-                "flowable.process.use-lock-for-auto-deployment=true",
-                "flowable.process.auto-deployment-lock-wait-time=10m",
-                "flowable.process.throw-exception-on-auto-deployment-failure=false"
+                "flowable.auto-deployment.engine.bpmn.use-lock=true",
+                "flowable.auto-deployment.engine.bpmn.lock-wait-time=10m",
+                "flowable.auto-deployment.engine.bpmn.throw-exception-on-deployment-failure=false",
+                "flowable.auto-deployment.engine.bpmn.lock-name=testLock"
             )
             .run(context -> {
                 assertThat(context).as("Process engine").hasSingleBean(ProcessEngine.class);
@@ -207,6 +211,7 @@ public class ProcessEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 assertThat(deploymentStrategies).element(1)
@@ -214,6 +219,7 @@ public class ProcessEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 assertThat(deploymentStrategies).element(2)
@@ -221,6 +227,7 @@ public class ProcessEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 deleteDeployments(processEngine);

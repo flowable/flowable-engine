@@ -13,16 +13,15 @@
 package org.flowable.spring.boot.form;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
@@ -34,6 +33,7 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.flowable.spring.boot.FlowableAutoDeploymentProperties;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -61,6 +61,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ConditionalOnFormEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableAutoDeploymentProperties.class,
     FlowableFormProperties.class
 })
 @AutoConfigureAfter({
@@ -74,10 +75,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableFormProperties formProperties;
+    protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
-    public FormEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableFormProperties formProperties) {
+    public FormEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableFormProperties formProperties,
+        FlowableAutoDeploymentProperties autoDeploymentProperties) {
         super(flowableProperties);
         this.formProperties = formProperties;
+        this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
     @Bean
@@ -109,15 +113,12 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         if (deploymentStrategies == null) {
             deploymentStrategies = new ArrayList<>();
         }
-        boolean useLockForAutoDeployment = defaultIfNotNull(formProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
-        Duration autoDeploymentLockWaitTime = defaultIfNotNull(formProperties.getAutoDeploymentLockWaitTime(),
-            flowableProperties.getAutoDeploymentLockWaitTime());
-        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(formProperties.getThrowExceptionOnAutoDeploymentFailure(),
-            flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
+
+        CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.FORM);
         // Always add the out of the box auto deployment strategies as last
-        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
-        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
-        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(deploymentProperties));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         configuration.setDeploymentStrategies(deploymentStrategies);
 
         return configuration;

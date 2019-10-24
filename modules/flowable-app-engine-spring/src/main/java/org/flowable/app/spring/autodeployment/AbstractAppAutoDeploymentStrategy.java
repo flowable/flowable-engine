@@ -16,12 +16,12 @@ package org.flowable.app.spring.autodeployment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.time.Duration;
 import java.util.zip.ZipInputStream;
 
 import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.springframework.core.io.Resource;
 
@@ -36,17 +36,14 @@ public abstract class AbstractAppAutoDeploymentStrategy extends CommonAutoDeploy
     public AbstractAppAutoDeploymentStrategy() {
     }
 
-    public AbstractAppAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public AbstractAppAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public AbstractAppAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
     protected LockManager getLockManager(AppEngine engine, String deploymentNameHint) {
-        return engine.getAppEngineConfiguration().getLockManager("appDeploymentsLock");
+        // The app engine does not have deployment name
+        return engine.getAppEngineConfiguration().getLockManager(determineLockName("appDeploymentsLock"));
     }
 
     protected void addResource(Resource resource, AppDeploymentBuilder deploymentBuilder) {

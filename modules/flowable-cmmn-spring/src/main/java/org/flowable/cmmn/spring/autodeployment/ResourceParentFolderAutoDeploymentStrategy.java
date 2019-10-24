@@ -14,7 +14,6 @@
 package org.flowable.cmmn.spring.autodeployment;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,6 +23,7 @@ import java.util.Set;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -50,13 +50,8 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractCmmnAuto
     public ResourceParentFolderAutoDeploymentStrategy() {
     }
 
-    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime,
-        boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public ResourceParentFolderAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -83,7 +78,7 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractCmmnAuto
                 deploymentBuilder.deploy();
 
             } catch (RuntimeException e) {
-                if (throwExceptionOnDeploymentFailure) {
+                if (isThrowExceptionOnDeploymentFailure()) {
                     throw e;
                 } else {
                     LOGGER.warn("Exception while autodeploying CMMN definitions. "

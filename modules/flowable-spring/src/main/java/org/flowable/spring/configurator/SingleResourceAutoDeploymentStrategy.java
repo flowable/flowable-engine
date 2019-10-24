@@ -13,8 +13,7 @@
 
 package org.flowable.spring.configurator;
 
-import java.time.Duration;
-
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -41,12 +40,8 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractProcessAutoDep
     public SingleResourceAutoDeploymentStrategy() {
     }
 
-    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public SingleResourceAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -67,7 +62,7 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractProcessAutoDep
             try {
                 deploymentBuilder.deploy();
             } catch (RuntimeException e) {
-                if (throwExceptionOnDeploymentFailure) {
+                if (isThrowExceptionOnDeploymentFailure()) {
                     throw e;
                 } else {
                     LOGGER.warn(

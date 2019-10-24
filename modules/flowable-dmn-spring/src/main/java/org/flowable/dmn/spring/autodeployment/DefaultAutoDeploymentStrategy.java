@@ -13,8 +13,7 @@
 
 package org.flowable.dmn.spring.autodeployment;
 
-import java.time.Duration;
-
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
@@ -42,12 +41,8 @@ public class DefaultAutoDeploymentStrategy extends AbstractDmnAutoDeploymentStra
     public DefaultAutoDeploymentStrategy() {
     }
 
-    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public DefaultAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -70,7 +65,7 @@ public class DefaultAutoDeploymentStrategy extends AbstractDmnAutoDeploymentStra
             deploymentBuilder.deploy();
 
         } catch (Exception e) {
-            if (throwExceptionOnDeploymentFailure) {
+            if (isThrowExceptionOnDeploymentFailure()) {
                 throw e;
             } else {
                 LOGGER.warn("Exception while autodeploying DMN definitions. "

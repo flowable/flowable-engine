@@ -139,6 +139,7 @@ public class CmmnEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             assertThat(deploymentStrategies).element(1)
@@ -146,6 +147,7 @@ public class CmmnEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             assertThat(deploymentStrategies).element(2)
@@ -153,6 +155,7 @@ public class CmmnEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             deleteDeployments(cmmnEngine);
@@ -163,9 +166,10 @@ public class CmmnEngineAutoConfigurationTest {
     public void standaloneCmmnEngineWithBasicDataSourceAndAutoDeploymentWithLocking() {
         contextRunner
             .withPropertyValues(
-                "flowable.cmmn.use-lock-for-auto-deployment=true",
-                "flowable.cmmn.auto-deployment-lock-wait-time=10m",
-                "flowable.cmmn.throw-exception-on-auto-deployment-failure=false"
+                "flowable.auto-deployment.engine.cmmn.use-lock=true",
+                "flowable.auto-deployment.engine.cmmn.lock-wait-time=10m",
+                "flowable.auto-deployment.engine.cmmn.throw-exception-on-deployment-failure=false",
+                "flowable.auto-deployment.engine.cmmn.lock-name=testLock"
             )
             .run(context -> {
                 assertThat(context)
@@ -198,6 +202,7 @@ public class CmmnEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 assertThat(deploymentStrategies).element(1)
@@ -205,6 +210,7 @@ public class CmmnEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 assertThat(deploymentStrategies).element(2)
@@ -212,6 +218,7 @@ public class CmmnEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 deleteDeployments(cmmnEngine);
@@ -222,7 +229,7 @@ public class CmmnEngineAutoConfigurationTest {
     public void standaloneCmmnEngineWithBasicDataSourceAndCustomAutoDeploymentStrategies() {
         contextRunner
             .withUserConfiguration(CustomAutoDeploymentStrategyConfiguration.class)
-            .withPropertyValues("flowable.auto-deployment-lock-wait-time=10m")
+            .withPropertyValues("flowable.auto-deployment.lock-wait-time=10m")
             .run(context -> {
                 assertThat(context)
                     .doesNotHaveBean(AppEngine.class)

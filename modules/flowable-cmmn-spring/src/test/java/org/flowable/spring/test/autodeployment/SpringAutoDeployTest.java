@@ -350,7 +350,7 @@ public class SpringAutoDeployTest {
                 cmmnEngineConfiguration.getDeploymentStrategies()
                     .forEach(strategy -> {
                         if (strategy instanceof CommonAutoDeploymentStrategy) {
-                            ((CommonAutoDeploymentStrategy<CmmnEngine>) strategy).setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                            ((CommonAutoDeploymentStrategy<CmmnEngine>) strategy).getDeploymentProperties().setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
                         }
                     });
             }
