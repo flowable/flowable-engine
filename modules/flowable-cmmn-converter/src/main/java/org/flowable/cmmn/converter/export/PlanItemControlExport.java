@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.ManualActivationRule;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.RequiredRule;
@@ -42,7 +43,12 @@ public class PlanItemControlExport implements CmmnXmlConstants {
     }
 
     protected static void writeItemControlContent(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
-        writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
+        boolean hasWrittenExtensionElements = writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
+        hasWrittenExtensionElements = writeParentCompletionRule(planItemControl.getParentCompletionRule(), hasWrittenExtensionElements, xtw);
+        if (hasWrittenExtensionElements) {
+            xtw.writeEndElement();
+        }
+        
         writeRepetitionRule(planItemControl.getRepetitionRule(), xtw);
         writeRequiredRule(planItemControl.getRequiredRule(), xtw);
         writeManualActivationRule(planItemControl.getManualActivationRule(), xtw);
@@ -88,7 +94,8 @@ public class PlanItemControlExport implements CmmnXmlConstants {
         }
     }
 
-    public static void writeCompletionNeutralRule(CompletionNeutralRule completionNeutralRule, XMLStreamWriter xtw) throws XMLStreamException {
+    public static boolean writeCompletionNeutralRule(CompletionNeutralRule completionNeutralRule, XMLStreamWriter xtw) throws XMLStreamException {
+        boolean hasWrittenExtensionElements = false;
         if (completionNeutralRule != null) {
             xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
             xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_COMPLETION_NEUTRAL_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
@@ -99,7 +106,29 @@ public class PlanItemControlExport implements CmmnXmlConstants {
                 xtw.writeEndElement();
             }
             xtw.writeEndElement();
-            xtw.writeEndElement();
+            
+            hasWrittenExtensionElements = true;
         }
+        
+        return hasWrittenExtensionElements;
     }
+    
+    public static boolean writeParentCompletionRule(ParentCompletionRule parentCompletionRule, boolean hasWrittenExtensionElements, XMLStreamWriter xtw) throws XMLStreamException {
+        if (parentCompletionRule != null) {
+            if (!hasWrittenExtensionElements) {
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
+            }
+            
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_PARENT_COMPLETION_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
+            if (StringUtils.isNotEmpty(parentCompletionRule.getType())) {
+                xtw.writeAttribute(ATTRIBUTE_TYPE, parentCompletionRule.getType());
+            }
+            xtw.writeEndElement();
+            
+            hasWrittenExtensionElements = true;
+        }
+        
+        return hasWrittenExtensionElements;
+    }
+    
 }

@@ -40,6 +40,7 @@ import org.flowable.cmmn.model.HasLifecycleListeners;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.IOParameter;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
@@ -75,6 +76,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                 if (xtr.isStartElement()) {
                     if (CmmnXmlConstants.ELEMENT_COMPLETION_NEUTRAL_RULE.equals(xtr.getLocalName())) {
                         readCompletionNeutralRule(xtr, conversionHelper);
+                        
+                    } else if (CmmnXmlConstants.ELEMENT_PARENT_COMPLETION_RULE.equals(xtr.getLocalName())) {
+                        readParentCompletionRule(xtr, conversionHelper);
 
                     } else if (CmmnXmlConstants.ELEMENT_FIELD.equals(xtr.getLocalName())) {
                         readFieldExtension(xtr, conversionHelper);
@@ -95,8 +99,8 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                         readTaskListener(xtr, conversionHelper);
 
                     } else if (CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equals(xtr.getLocalName()) ||
-                        CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER.equals(xtr.getLocalName())
-                    ) {
+                                    CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER.equals(xtr.getLocalName())) {
+                        
                         readLifecycleListener(xtr, conversionHelper);
 
                     } else {
@@ -106,10 +110,11 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
                 } else if (xtr.isEndElement()) {
                     if (CmmnXmlConstants.ELEMENT_TASK_LISTENER.equalsIgnoreCase(xtr.getLocalName())
-                        || CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())
-                        || CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())
-                    ) {
+                                    || CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())
+                                    || CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER.equalsIgnoreCase(xtr.getLocalName())) {
+                        
                         conversionHelper.removeCurrentCmmnElement();
+                        
                     } else if (CmmnXmlConstants.ELEMENT_EXTENSION_ELEMENTS.equalsIgnoreCase(xtr.getLocalName())) {
                         readyWithChildElements = true;
                     }
@@ -159,6 +164,19 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                 LOGGER.error("Error processing CMMN document", ex);
                 throw new XMLException("Error processing CMMN document", ex);
             }
+        }
+    }
+    
+    protected void readParentCompletionRule(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+            ParentCompletionRule parentCompletionRule = new ParentCompletionRule();
+            parentCompletionRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+            parentCompletionRule.setType(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_TYPE));
+
+            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+            planItemControl.setParentCompletionRule(parentCompletionRule);
+
+            readCommonXmlInfo(parentCompletionRule, xtr);
         }
     }
 

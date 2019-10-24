@@ -117,6 +117,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
         // Completing the task should autocomplete the stage
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceNotEnded(caseInstance);
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
         assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
         
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());

@@ -45,7 +45,7 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     @Override
     protected void internalExecute() {
         if (isStage(planItemInstanceEntity)) {
-            exitChildPlanItemInstances();
+            completeChildPlanItemInstances();
         }
 
         planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));

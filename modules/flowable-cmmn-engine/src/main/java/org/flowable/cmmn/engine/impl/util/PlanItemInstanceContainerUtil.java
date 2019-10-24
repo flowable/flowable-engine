@@ -17,6 +17,7 @@ import java.util.Collection;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -70,6 +71,12 @@ public class PlanItemInstanceContainerUtil {
                         return false;
                     }
                     if (PlanItemInstanceState.ACTIVE.equals(childPlanItemInstance.getState())) {
+                        if (childPlanItemInstance.getPlanItem().getItemControl() != null && childPlanItemInstance.getPlanItem().getItemControl().getParentCompletionRule() != null) {
+                            ParentCompletionRule parentCompletionRule = childPlanItemInstance.getPlanItem().getItemControl().getParentCompletionRule();
+                            if (ParentCompletionRule.ALWAYS_IGNORE.equals(parentCompletionRule.getType())) {
+                                continue;
+                            }
+                        }
                         return false;
                     }
                     if (!PlanItemInstanceContainerUtil.isEndStateReachedForAllChildPlanItems(childPlanItemInstance)) {

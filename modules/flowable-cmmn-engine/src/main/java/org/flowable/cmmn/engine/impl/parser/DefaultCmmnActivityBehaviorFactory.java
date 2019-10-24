@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.parser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.CasePageTaskActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.DecisionTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
@@ -31,6 +32,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBeh
 import org.flowable.cmmn.engine.impl.behavior.impl.UserEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
+import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
@@ -173,6 +175,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     @Override
     public ScriptTaskActivityBehavior createScriptTaskActivityBehavior(PlanItem planItem, ScriptServiceTask task) {
         return new ScriptTaskActivityBehavior(task);
+    }
+
+    @Override
+    public CasePageTaskActivityBehaviour createCasePageTaskActivityBehaviour(PlanItem planItem, CasePageTask task) {
+        return new CasePageTaskActivityBehaviour(task);
     }
 
     public void setClassDelegateFactory(CmmnClassDelegateFactory classDelegateFactory) {
