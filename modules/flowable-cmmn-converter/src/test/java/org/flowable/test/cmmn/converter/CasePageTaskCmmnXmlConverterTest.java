@@ -71,14 +71,15 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
         assertEquals(0, planItemTaskA.getEntryCriteria().size());
         assertTrue(planItemDefinition instanceof CasePageTask);
+
         CasePageTask taskA = (CasePageTask) planItemDefinition;
         assertEquals(CasePageTask.TYPE, taskA.getType());
         assertEquals("A", taskA.getName());
         assertEquals("Label 1", taskA.getLabel());
         assertEquals("Icon 1", taskA.getIcon());
-        assertNotNull(taskA.getDefaultControl());
-        assertNotNull(taskA.getDefaultControl().getParentCompletionRule());
-        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, taskA.getDefaultControl().getParentCompletionRule().getType());
+        assertNotNull(planItemTaskA.getItemControl());
+        assertNotNull(planItemTaskA.getItemControl().getParentCompletionRule());
+        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, planItemTaskA.getItemControl().getParentCompletionRule().getType());
 
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
@@ -87,9 +88,9 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         CasePageTask taskB = (CasePageTask) planItemDefinition;
         assertEquals(CasePageTask.TYPE, taskB.getType());
         assertEquals("B", taskB.getName());
-        assertNotNull(taskB.getDefaultControl());
-        assertNotNull(taskB.getDefaultControl().getParentCompletionRule());
-        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, taskB.getDefaultControl().getParentCompletionRule().getType());
+        assertNotNull(planItemTaskB.getItemControl());
+        assertNotNull(planItemTaskB.getItemControl().getParentCompletionRule());
+        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, planItemTaskB.getItemControl().getParentCompletionRule().getType());
         
         assertEquals(1, taskB.getExtensionElements().size());
         List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("index");
