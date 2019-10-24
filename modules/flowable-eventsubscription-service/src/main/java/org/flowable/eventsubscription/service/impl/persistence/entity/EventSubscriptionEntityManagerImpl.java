@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.flowable.bpmn.model.Signal;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
@@ -29,35 +29,29 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.data.Event
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<EventSubscriptionEntity> implements EventSubscriptionEntityManager {
-
-    protected EventSubscriptionDataManager eventSubscriptionDataManager;
+public class EventSubscriptionEntityManagerImpl
+    extends AbstractServiceEngineEntityManager<EventSubscriptionServiceConfiguration, EventSubscriptionEntity, EventSubscriptionDataManager>
+    implements EventSubscriptionEntityManager {
 
     public EventSubscriptionEntityManagerImpl(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration, 
                     EventSubscriptionDataManager eventSubscriptionDataManager) {
         
-        super(eventSubscriptionServiceConfiguration);
-        this.eventSubscriptionDataManager = eventSubscriptionDataManager;
-    }
-
-    @Override
-    protected DataManager<EventSubscriptionEntity> getDataManager() {
-        return eventSubscriptionDataManager;
+        super(eventSubscriptionServiceConfiguration, eventSubscriptionDataManager);
     }
 
     @Override
     public CompensateEventSubscriptionEntity createCompensateEventSubscription() {
-        return eventSubscriptionDataManager.createCompensateEventSubscription();
+        return dataManager.createCompensateEventSubscription();
     }
 
     @Override
     public MessageEventSubscriptionEntity createMessageEventSubscription() {
-        return eventSubscriptionDataManager.createMessageEventSubscription();
+        return dataManager.createMessageEventSubscription();
     }
 
     @Override
     public SignalEventSubscriptionEntity createSignalEventSubscription() {
-        return eventSubscriptionDataManager.createSignalEventSubscription();
+        return dataManager.createSignalEventSubscription();
     }
 
     public EventSubscription createEventSubscription(EventSubscriptionBuilder eventSubscriptionBuilder) {
@@ -106,97 +100,97 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
 
     @Override
     public long findEventSubscriptionCountByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
-        return eventSubscriptionDataManager.findEventSubscriptionCountByQueryCriteria(eventSubscriptionQueryImpl);
+        return dataManager.findEventSubscriptionCountByQueryCriteria(eventSubscriptionQueryImpl);
     }
 
     @Override
     public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
-        return eventSubscriptionDataManager.findEventSubscriptionsByQueryCriteria(eventSubscriptionQueryImpl);
+        return dataManager.findEventSubscriptionsByQueryCriteria(eventSubscriptionQueryImpl);
     }
 
     @Override
     public List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName) {
-        return eventSubscriptionDataManager.findMessageEventSubscriptionsByProcessInstanceAndEventName(processInstanceId, eventName);
+        return dataManager.findMessageEventSubscriptionsByProcessInstanceAndEventName(processInstanceId, eventName);
     }
 
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName(String eventName, String tenantId) {
-        return eventSubscriptionDataManager.findSignalEventSubscriptionsByEventName(eventName, tenantId);
+        return dataManager.findSignalEventSubscriptionsByEventName(eventName, tenantId);
     }
 
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName) {
-        return eventSubscriptionDataManager.findSignalEventSubscriptionsByProcessInstanceAndEventName(processInstanceId, eventName);
+        return dataManager.findSignalEventSubscriptionsByProcessInstanceAndEventName(processInstanceId, eventName);
     }
     
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByScopeAndEventName(String scopeId, String scopeType, String eventName) {
-        return eventSubscriptionDataManager.findSignalEventSubscriptionsByScopeAndEventName(scopeId, scopeType, eventName);
+        return dataManager.findSignalEventSubscriptionsByScopeAndEventName(scopeId, scopeType, eventName);
     }
 
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(String name, String executionId) {
-        return eventSubscriptionDataManager.findSignalEventSubscriptionsByNameAndExecution(name, executionId);
+        return dataManager.findSignalEventSubscriptionsByNameAndExecution(name, executionId);
     }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(final String executionId, final String type) {
-        return eventSubscriptionDataManager.findEventSubscriptionsByExecutionAndType(executionId, type);
+        return dataManager.findEventSubscriptionsByExecutionAndType(executionId, type);
     }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type) {
-        return eventSubscriptionDataManager.findEventSubscriptionsByProcessInstanceAndActivityId(processInstanceId, activityId, type);
+        return dataManager.findEventSubscriptionsByProcessInstanceAndActivityId(processInstanceId, activityId, type);
     }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecution(final String executionId) {
-        return eventSubscriptionDataManager.findEventSubscriptionsByExecution(executionId);
+        return dataManager.findEventSubscriptionsByExecution(executionId);
     }
     
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(final String subScopeId) {
-        return eventSubscriptionDataManager.findEventSubscriptionsBySubScopeId(subScopeId);
+        return dataManager.findEventSubscriptionsBySubScopeId(subScopeId);
     }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
-        return eventSubscriptionDataManager.findEventSubscriptionsByTypeAndProcessDefinitionId(type, processDefinitionId, tenantId);
+        return dataManager.findEventSubscriptionsByTypeAndProcessDefinitionId(type, processDefinitionId, tenantId);
     }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByName(String type, String eventName, String tenantId) {
-        return eventSubscriptionDataManager.findEventSubscriptionsByName(type, eventName, tenantId);
+        return dataManager.findEventSubscriptionsByName(type, eventName, tenantId);
     }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName, String executionId) {
-        return eventSubscriptionDataManager.findEventSubscriptionsByNameAndExecution(type, eventName, executionId);
+        return dataManager.findEventSubscriptionsByNameAndExecution(type, eventName, executionId);
     }
 
     @Override
     public MessageEventSubscriptionEntity findMessageStartEventSubscriptionByName(String messageName, String tenantId) {
-        return eventSubscriptionDataManager.findMessageStartEventSubscriptionByName(messageName, tenantId);
+        return dataManager.findMessageStartEventSubscriptionByName(messageName, tenantId);
     }
 
     @Override
     public void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId) {
-        eventSubscriptionDataManager.updateEventSubscriptionTenantId(oldTenantId, newTenantId);
+        dataManager.updateEventSubscriptionTenantId(oldTenantId, newTenantId);
     }
 
     @Override
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
-        eventSubscriptionDataManager.deleteEventSubscriptionsForProcessDefinition(processDefinitionId);
+        dataManager.deleteEventSubscriptionsForProcessDefinition(processDefinitionId);
     }
     
     @Override
     public void deleteEventSubscriptionsByExecutionId(String executionId) {
-        eventSubscriptionDataManager.deleteEventSubscriptionsByExecutionId(executionId);
+        dataManager.deleteEventSubscriptionsByExecutionId(executionId);
     }
     
     @Override
     public void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType) {
-        eventSubscriptionDataManager.deleteEventSubscriptionsForScopeIdAndType(scopeId, scopeType);
+        dataManager.deleteEventSubscriptionsForScopeIdAndType(scopeId, scopeType);
     }
     
     protected SignalEventSubscriptionEntity insertSignalEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
@@ -273,14 +267,6 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
             messageEventSubscriptionEntities.add((MessageEventSubscriptionEntity) eventSubscriptionEntity);
         }
         return messageEventSubscriptionEntities;
-    }
-
-    public EventSubscriptionDataManager getEventSubscriptionDataManager() {
-        return eventSubscriptionDataManager;
-    }
-
-    public void setEventSubscriptionDataManager(EventSubscriptionDataManager eventSubscriptionDataManager) {
-        this.eventSubscriptionDataManager = eventSubscriptionDataManager;
     }
 
 }

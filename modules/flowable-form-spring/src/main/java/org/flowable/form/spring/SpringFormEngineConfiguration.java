@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.common.spring.SpringTransactionContextFactory;
 import org.flowable.common.spring.SpringTransactionInterceptor;
@@ -29,7 +30,6 @@ import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.FormEngines;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
-import org.flowable.form.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
@@ -52,7 +52,7 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    private Collection<AutoDeploymentStrategy<FormEngine>> deploymentStrategies = new ArrayList<>();
     protected volatile boolean running = false;
     protected List<String> enginesBuild = new ArrayList<>();
     protected final Object lifeCycleMonitor = new Object();
@@ -101,8 +101,8 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
 
     protected void autoDeployResources(FormEngine formEngine) {
         if (deploymentResources != null && deploymentResources.length > 0) {
-            final AutoDeploymentStrategy strategy = getAutoDeploymentStrategy(deploymentMode);
-            strategy.deployResources(deploymentName, deploymentResources, formEngine.getFormRepositoryService());
+            final AutoDeploymentStrategy<FormEngine> strategy = getAutoDeploymentStrategy(deploymentMode);
+            strategy.deployResources(deploymentName, deploymentResources, formEngine);
         }
     }
 
@@ -175,15 +175,23 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
      *            the mode to get the strategy for
      * @return the deployment strategy to use for the mode. Never <code>null</code>
      */
-    protected AutoDeploymentStrategy getAutoDeploymentStrategy(final String mode) {
-        AutoDeploymentStrategy result = new DefaultAutoDeploymentStrategy();
-        for (final AutoDeploymentStrategy strategy : deploymentStrategies) {
+    protected AutoDeploymentStrategy<FormEngine> getAutoDeploymentStrategy(final String mode) {
+        AutoDeploymentStrategy<FormEngine> result = new DefaultAutoDeploymentStrategy();
+        for (final AutoDeploymentStrategy<FormEngine> strategy : deploymentStrategies) {
             if (strategy.handlesMode(mode)) {
                 result = strategy;
                 break;
             }
         }
         return result;
+    }
+
+    public Collection<AutoDeploymentStrategy<FormEngine>> getDeploymentStrategies() {
+        return deploymentStrategies;
+    }
+
+    public void setDeploymentStrategies(Collection<AutoDeploymentStrategy<FormEngine>> deploymentStrategies) {
+        this.deploymentStrategies = deploymentStrategies;
     }
 
     @Override

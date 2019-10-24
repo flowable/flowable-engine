@@ -14,13 +14,14 @@
 package org.flowable.spring.configurator;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.zip.ZipInputStream;
 
+import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
@@ -28,13 +29,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each set of {@link Resource}s that share the same parent folder.
+ * Implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that performs a separate deployment for each set of {@link Resource}s that share the same parent folder.
  * The namehint is used to prefix the names of deployments. If the parent folder for a {@link Resource} cannot be determined, the resource's name is used.
  * 
  * @author Tiese Barrell
  * @author Joram Barrez
  */
-public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class ResourceParentFolderAutoDeploymentStrategy extends AbstractProcessAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceParentFolderAutoDeploymentStrategy.class);
 
@@ -45,40 +47,47 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDepl
 
     private static final String DEPLOYMENT_NAME_PATTERN = "%s.%s";
 
+    public ResourceParentFolderAutoDeploymentStrategy() {
+    }
+
+    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
+        super(useLockForDeployments, deploymentLockWaitTime);
+    }
+
+    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, ProcessEngine engine) {
 
+        RepositoryService repositoryService = engine.getRepositoryService();
         // Create a deployment for each distinct parent folder using the namehint as a prefix
         final Map<String, Set<Resource>> resourcesMap = createMap(resources);
         for (final Entry<String, Set<Resource>> group : resourcesMap.entrySet()) {
 
+            final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
+            final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
+
+            for (final Resource resource : group.getValue()) {
+                addResource(resource, deploymentBuilder);
+            }
+
             try {
-                final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
-                final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
-
-                for (final Resource resource : group.getValue()) {
-                    final String resourceName = determineResourceName(resource);
-
-                    if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
-                        deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
-                    } else {
-                        deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-                    }
-
-                }
-
                 deploymentBuilder.deploy();
-
             } catch (Exception e) {
-                // Any exception should not stop the bootup of the engine
-                LOGGER.warn("Exception while autodeploying process definitions. "
-                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+                if (throwExceptionOnDeploymentFailure) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying process definitions. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+                }
             }
         }
 

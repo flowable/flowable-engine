@@ -59,6 +59,8 @@ public abstract class AbstractEngineAutoConfiguration {
         engineConfiguration.setDatabaseSchemaUpdate(defaultText(flowableProperties.getDatabaseSchemaUpdate(), engineConfiguration
             .getDatabaseSchemaUpdate()));
 
+        engineConfiguration.setUseLockForDatabaseSchemaUpdate(flowableProperties.isUseLockForDatabaseSchemaUpdate());
+
         engineConfiguration.setDbHistoryUsed(flowableProperties.isDbHistoryUsed());
 
         if (flowableProperties.getCustomMybatisMappers() != null) {
@@ -75,6 +77,14 @@ public abstract class AbstractEngineAutoConfiguration {
 
         if (flowableProperties.getCustomMybatisXMLMappers() != null) {
             engineConfiguration.setCustomMybatisXMLMappers(new HashSet<>(flowableProperties.getCustomMybatisXMLMappers()));
+        }
+
+        if (flowableProperties.getLockPollRate() != null) {
+            engineConfiguration.setLockPollRate(flowableProperties.getLockPollRate());
+        }
+
+        if (flowableProperties.getSchemaLockWaitTime() != null) {
+            engineConfiguration.setSchemaLockWaitTime(flowableProperties.getSchemaLockWaitTime());
         }
     }
 
@@ -117,6 +127,14 @@ public abstract class AbstractEngineAutoConfiguration {
             return deploymentName;
         }
         return defaultName;
+    }
+
+    protected <T> T defaultIfNotNull(T value, T defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return value;
     }
 
 }

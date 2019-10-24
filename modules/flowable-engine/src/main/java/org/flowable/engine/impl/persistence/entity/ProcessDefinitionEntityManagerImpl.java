@@ -16,7 +16,6 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -29,95 +28,81 @@ import org.flowable.engine.repository.ProcessDefinition;
  * @author Saeid Mirzaei
  * @author Joram Barrez
  */
-public class ProcessDefinitionEntityManagerImpl extends AbstractEntityManager<ProcessDefinitionEntity> implements ProcessDefinitionEntityManager {
-
-    protected ProcessDefinitionDataManager processDefinitionDataManager;
+public class ProcessDefinitionEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<ProcessDefinitionEntity, ProcessDefinitionDataManager>
+    implements ProcessDefinitionEntityManager {
 
     public ProcessDefinitionEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, ProcessDefinitionDataManager processDefinitionDataManager) {
-        super(processEngineConfiguration);
-        this.processDefinitionDataManager = processDefinitionDataManager;
-    }
-
-    @Override
-    protected DataManager<ProcessDefinitionEntity> getDataManager() {
-        return processDefinitionDataManager;
+        super(processEngineConfiguration, processDefinitionDataManager);
     }
 
     @Override
     public ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
-        return processDefinitionDataManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+        return dataManager.findLatestProcessDefinitionByKey(processDefinitionKey);
     }
 
     @Override
     public ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
-        return processDefinitionDataManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+        return dataManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
     }
     
     @Override
     public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKey(String processDefinitionKey) {
-        return processDefinitionDataManager.findLatestDerivedProcessDefinitionByKey(processDefinitionKey);
+        return dataManager.findLatestDerivedProcessDefinitionByKey(processDefinitionKey);
     }
 
     @Override
     public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
-        return processDefinitionDataManager.findLatestDerivedProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+        return dataManager.findLatestDerivedProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
     }
 
     @Override
     public void deleteProcessDefinitionsByDeploymentId(String deploymentId) {
-        processDefinitionDataManager.deleteProcessDefinitionsByDeploymentId(deploymentId);
+        dataManager.deleteProcessDefinitionsByDeploymentId(deploymentId);
     }
 
     @Override
     public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
-        return processDefinitionDataManager.findProcessDefinitionsByQueryCriteria(processDefinitionQuery);
+        return dataManager.findProcessDefinitionsByQueryCriteria(processDefinitionQuery);
     }
 
     @Override
     public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
-        return processDefinitionDataManager.findProcessDefinitionCountByQueryCriteria(processDefinitionQuery);
+        return dataManager.findProcessDefinitionCountByQueryCriteria(processDefinitionQuery);
     }
 
     @Override
     public ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
-        return processDefinitionDataManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+        return dataManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
     }
 
     @Override
     public ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String processDefinitionKey, String tenantId) {
-        return processDefinitionDataManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
+        return dataManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
     }
 
     @Override
     public ProcessDefinition findProcessDefinitionByKeyAndVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId) {
         if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-            return processDefinitionDataManager.findProcessDefinitionByKeyAndVersion(processDefinitionKey, processDefinitionVersion);
+            return dataManager.findProcessDefinitionByKeyAndVersion(processDefinitionKey, processDefinitionVersion);
         } else {
-            return processDefinitionDataManager.findProcessDefinitionByKeyAndVersionAndTenantId(processDefinitionKey, processDefinitionVersion, tenantId);
+            return dataManager.findProcessDefinitionByKeyAndVersionAndTenantId(processDefinitionKey, processDefinitionVersion, tenantId);
         }
     }
 
     @Override
     public List<ProcessDefinition> findProcessDefinitionsByNativeQuery(Map<String, Object> parameterMap) {
-        return processDefinitionDataManager.findProcessDefinitionsByNativeQuery(parameterMap);
+        return dataManager.findProcessDefinitionsByNativeQuery(parameterMap);
     }
 
     @Override
     public long findProcessDefinitionCountByNativeQuery(Map<String, Object> parameterMap) {
-        return processDefinitionDataManager.findProcessDefinitionCountByNativeQuery(parameterMap);
+        return dataManager.findProcessDefinitionCountByNativeQuery(parameterMap);
     }
 
     @Override
     public void updateProcessDefinitionTenantIdForDeployment(String deploymentId, String newTenantId) {
-        processDefinitionDataManager.updateProcessDefinitionTenantIdForDeployment(deploymentId, newTenantId);
-    }
-
-    public ProcessDefinitionDataManager getProcessDefinitionDataManager() {
-        return processDefinitionDataManager;
-    }
-
-    public void setProcessDefinitionDataManager(ProcessDefinitionDataManager processDefinitionDataManager) {
-        this.processDefinitionDataManager = processDefinitionDataManager;
+        dataManager.updateProcessDefinitionTenantIdForDeployment(deploymentId, newTenantId);
     }
 
 }

@@ -16,6 +16,7 @@ import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,6 +55,24 @@ public class FlowableFormProperties {
      * Whether the form engine needs to be started.
      */
     private boolean enabled = true;
+
+    /**
+     * Whether to use a lock when performing the auto deployment.
+     * If not set then the global default would be used.
+     */
+    private Boolean useLockForAutoDeployment;
+
+    /**
+     * Duration to wait for the auto deployment lock before giving up.
+     * If not set then the global default would be used.
+     */
+    private Duration autoDeploymentLockWaitTime;
+
+    /**
+     * Whether to throw an exception if there was some kind of failure during the auto deployment.
+     * If not set then the global default would be used.
+     */
+    private Boolean throwExceptionOnAutoDeploymentFailure;
 
     /**
      * The servlet configuration for the Form Rest API.
@@ -99,6 +118,30 @@ public class FlowableFormProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Boolean getUseLockForAutoDeployment() {
+        return useLockForAutoDeployment;
+    }
+
+    public void setUseLockForAutoDeployment(Boolean useLockForAutoDeployment) {
+        this.useLockForAutoDeployment = useLockForAutoDeployment;
+    }
+
+    public Duration getAutoDeploymentLockWaitTime() {
+        return autoDeploymentLockWaitTime;
+    }
+
+    public void setAutoDeploymentLockWaitTime(Duration autoDeploymentLockWaitTime) {
+        this.autoDeploymentLockWaitTime = autoDeploymentLockWaitTime;
+    }
+
+    public Boolean getThrowExceptionOnAutoDeploymentFailure() {
+        return throwExceptionOnAutoDeploymentFailure;
+    }
+
+    public void setThrowExceptionOnAutoDeploymentFailure(Boolean throwExceptionOnAutoDeploymentFailure) {
+        this.throwExceptionOnAutoDeploymentFailure = throwExceptionOnAutoDeploymentFailure;
     }
 
     public FlowableServlet getServlet() {

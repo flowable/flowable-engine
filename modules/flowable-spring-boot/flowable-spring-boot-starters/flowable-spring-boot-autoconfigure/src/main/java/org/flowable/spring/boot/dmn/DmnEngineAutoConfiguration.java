@@ -13,13 +13,22 @@
 package org.flowable.spring.boot.dmn;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
+import org.flowable.dmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.dmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.dmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
@@ -31,6 +40,7 @@ import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -71,7 +81,8 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
     @Bean
     @ConditionalOnMissingBean
-    public SpringDmnEngineConfiguration dmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager) throws IOException {
+    public SpringDmnEngineConfiguration dmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<List<AutoDeploymentStrategy<DmnEngine>>> dmnAutoDeploymentStrategies) throws IOException {
         SpringDmnEngineConfiguration configuration = new SpringDmnEngineConfiguration();
 
         List<Resource> resources = this.discoverDeploymentResources(
@@ -85,13 +96,28 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
             configuration.setDeploymentName(dmnProperties.getDeploymentName());
         }
 
-
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
 
         configuration.setHistoryEnabled(dmnProperties.isHistoryEnabled());
         configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());
         configuration.setStrictMode(dmnProperties.isStrictMode());
+
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = dmnAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
+        boolean useLockForAutoDeployment = defaultIfNotNull(dmnProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
+        Duration autoDeploymentLockWaitTime = defaultIfNotNull(dmnProperties.getAutoDeploymentLockWaitTime(),
+            flowableProperties.getAutoDeploymentLockWaitTime());
+        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(dmnProperties.getThrowExceptionOnAutoDeploymentFailure(),
+            flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
+        // Always add the out of the box auto deployment strategies as last
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        configuration.setDeploymentStrategies(deploymentStrategies);
 
         return configuration;
     }

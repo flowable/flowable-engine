@@ -7,6 +7,10 @@
     <setting name="lazyLoadingEnabled" value="false" />
   </settings>
   <mappers>
+    <!-- Common mappers -->
+    <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+
+    <!-- Engine mappers -->
     <mapper resource="org/flowable/dmn/db/mapping/common.xml" />
     <mapper resource="org/flowable/dmn/db/mapping/entity/DecisionTable.xml" />
     <mapper resource="org/flowable/dmn/db/mapping/entity/Deployment.xml" />

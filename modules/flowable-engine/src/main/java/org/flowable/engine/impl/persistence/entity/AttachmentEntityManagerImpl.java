@@ -18,9 +18,9 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
@@ -30,30 +30,24 @@ import org.flowable.task.api.Task;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class AttachmentEntityManagerImpl extends AbstractEntityManager<AttachmentEntity> implements AttachmentEntityManager {
-
-    protected AttachmentDataManager attachmentDataManager;
+public class AttachmentEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<AttachmentEntity, AttachmentDataManager>
+    implements AttachmentEntityManager {
 
     public AttachmentEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, AttachmentDataManager attachmentDataManager) {
-        super(processEngineConfiguration);
-        this.attachmentDataManager = attachmentDataManager;
-    }
-
-    @Override
-    protected DataManager<AttachmentEntity> getDataManager() {
-        return attachmentDataManager;
+        super(processEngineConfiguration, attachmentDataManager);
     }
 
     @Override
     public List<AttachmentEntity> findAttachmentsByProcessInstanceId(String processInstanceId) {
         checkHistoryEnabled();
-        return attachmentDataManager.findAttachmentsByProcessInstanceId(processInstanceId);
+        return dataManager.findAttachmentsByProcessInstanceId(processInstanceId);
     }
 
     @Override
     public List<AttachmentEntity> findAttachmentsByTaskId(String taskId) {
         checkHistoryEnabled();
-        return attachmentDataManager.findAttachmentsByTaskId(taskId);
+        return dataManager.findAttachmentsByTaskId(taskId);
     }
 
     @Override
@@ -84,7 +78,7 @@ public class AttachmentEntityManagerImpl extends AbstractEntityManager<Attachmen
                 getByteArrayEntityManager().deleteByteArrayById(contentId);
             }
 
-            attachmentDataManager.delete((AttachmentEntity) attachment);
+            dataManager.delete((AttachmentEntity) attachment);
 
             if (dispatchEvents) {
                 eventDispatcher.dispatchEvent(
@@ -99,12 +93,12 @@ public class AttachmentEntityManagerImpl extends AbstractEntityManager<Attachmen
         }
     }
 
-    public AttachmentDataManager getAttachmentDataManager() {
-        return attachmentDataManager;
+    protected HistoryManager getHistoryManager() {
+        return engineConfiguration.getHistoryManager();
     }
 
-    public void setAttachmentDataManager(AttachmentDataManager attachmentDataManager) {
-        this.attachmentDataManager = attachmentDataManager;
+    protected ByteArrayEntityManager getByteArrayEntityManager() {
+        return engineConfiguration.getByteArrayEntityManager();
     }
 
 }

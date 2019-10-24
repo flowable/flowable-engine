@@ -13,9 +13,9 @@
 
 package org.flowable.spring.configurator;
 
-import java.io.IOException;
-import java.util.zip.ZipInputStream;
+import java.time.Duration;
 
+import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
@@ -23,12 +23,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each resource by name.
+ * Implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that performs a separate deployment for each resource by name.
  * 
  * @author Tiese Barrell
  * @author Joram Barrez
  */
-public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class SingleResourceAutoDeploymentStrategy extends AbstractProcessAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleResourceAutoDeploymentStrategy.class);
 
@@ -37,41 +38,42 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeployment
      */
     public static final String DEPLOYMENT_MODE = "single-resource";
 
+    public SingleResourceAutoDeploymentStrategy() {
+    }
+
+    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
+        super(useLockForDeployments, deploymentLockWaitTime);
+    }
+
+    public SingleResourceAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
+        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
-
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, ProcessEngine engine) {
         // Create a separate deployment for each resource using the resource name
+        RepositoryService repositoryService = engine.getRepositoryService();
 
         for (final Resource resource : resources) {
 
+            final String resourceName = determineResourceName(resource);
+            final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
+            addResource(resource, resourceName, deploymentBuilder);
             try {
-                final String resourceName = determineResourceName(resource);
-                final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
-
-                if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
-                    deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
-                } else {
-                    deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-                }
-
                 deploymentBuilder.deploy();
-
-            } catch (Exception e) {
-                String resourceName = null;
-                if (resource != null) {
-                    try {
-                        resourceName = resource.getURL().toString();
-                    } catch (IOException ioe) {
-                        resourceName = resource.toString();
-                    }
+            } catch (RuntimeException e) {
+                if (throwExceptionOnDeploymentFailure) {
+                    throw e;
+                } else {
+                    LOGGER.warn(
+                        "Exception while autodeploying process definitions for resource {}. This exception can be ignored if the root cause indicates a unique constraint violation, which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ",
+                        resource, e);
                 }
-                // Any exception should not stop the bootup of the engine
-                LOGGER.warn("Exception while autodeploying process definitions for resource {}. This exception can be ignored if the root cause indicates a unique constraint violation, which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resourceName, e);
             }
         }
     }

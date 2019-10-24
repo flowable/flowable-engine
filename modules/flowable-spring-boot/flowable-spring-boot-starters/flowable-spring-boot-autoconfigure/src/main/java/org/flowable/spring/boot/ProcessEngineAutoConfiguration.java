@@ -13,13 +13,19 @@
 package org.flowable.spring.boot;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
+import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -33,6 +39,9 @@ import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.Process;
 import org.flowable.spring.boot.process.ProcessAsync;
 import org.flowable.spring.boot.process.ProcessAsyncHistory;
+import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
+import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
@@ -144,7 +153,8 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             @Process ObjectProvider<IdGenerator> processIdGenerator,
             ObjectProvider<IdGenerator> globalIdGenerator,
             @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
-            @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider) throws IOException {
+            @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider,
+            ObjectProvider<List<AutoDeploymentStrategy<ProcessEngine>>> processEngineAutoDeploymentStrategies) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
@@ -213,6 +223,21 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             idGenerator = new StrongUuidGenerator();
         }
         conf.setIdGenerator(idGenerator);
+
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<ProcessEngine>> deploymentStrategies = processEngineAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
+        boolean useLockForAutoDeployment = defaultIfNotNull(processProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
+        Duration autoDeploymentLockWaitTime = defaultIfNotNull(processProperties.getAutoDeploymentLockWaitTime(),
+            flowableProperties.getAutoDeploymentLockWaitTime());
+        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(processProperties.getThrowExceptionOnAutoDeploymentFailure(), flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
+        // Always add the out of the box auto deployment strategies as last
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        conf.setDeploymentStrategies(deploymentStrategies);
 
         return conf;
     }

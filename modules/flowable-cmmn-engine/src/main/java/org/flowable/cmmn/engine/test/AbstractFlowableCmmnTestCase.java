@@ -134,6 +134,16 @@ public abstract class AbstractFlowableCmmnTestCase {
         assertNull("Historical case instance is already marked as ended", cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getEndTime());
     }
 
+    protected void assertPlanItemInstanceState(CaseInstance caseInstance, String name, String ... states) {
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName()
+            .asc()
+            .includeEnded()
+            .list();
+        assertPlanItemInstanceState(planItemInstances, name, states);
+    }
+
     protected void assertPlanItemInstanceState(List<PlanItemInstance> planItemInstances, String name, String ... states) {
         List<String> planItemInstanceStates = planItemInstances.stream()
             .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -24,6 +25,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
@@ -31,10 +33,12 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -1648,6 +1652,15 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksWithRelatedEntitiesByQueryCriteria(this);
+
+            if (taskId != null) {
+                if (includeProcessVariables) {
+                    addCachedVariableForQueryById(commandContext, tasks, false);
+                } else if (includeTaskLocalVariables) {
+                    addCachedVariableForQueryById(commandContext, tasks, true);
+                }
+            }
+
         } else {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksByQueryCriteria(this);
         }
@@ -1663,6 +1676,29 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         return tasks;
+    }
+
+    protected void addCachedVariableForQueryById(CommandContext commandContext, List<Task> results, boolean local) {
+        for (Task task : results) {
+            if (Objects.equals(taskId, task.getId())) {
+
+                EntityCache entityCache = commandContext.getSession(EntityCache.class);
+                List<VariableInstanceEntity> cachedVariableEntities = entityCache.findInCache(VariableInstanceEntity.class);
+                for (VariableInstanceEntity cachedVariableEntity : cachedVariableEntities) {
+
+                    if (local) {
+                        if (task.getId().equals(cachedVariableEntity.getTaskId())) {
+                            ((TaskEntity) task).getQueryVariables().add(cachedVariableEntity);
+                        }
+                    } else {
+                        if (task.getProcessInstanceId().equals(cachedVariableEntity.getProcessInstanceId())) {
+                            ((TaskEntity) task).getQueryVariables().add(cachedVariableEntity);
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     @Override

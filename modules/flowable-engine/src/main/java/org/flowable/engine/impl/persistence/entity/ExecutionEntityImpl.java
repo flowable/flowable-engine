@@ -1075,6 +1075,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public Map<String, Object> getProcessVariables() {
         Map<String, Object> variables = new HashMap<>();
+
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
@@ -1082,6 +1083,15 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
                 }
             }
         }
+
+        // The variables from the cache have precedence
+        if (variableInstances != null) {
+            for (String variableName : variableInstances.keySet()) {
+                variables.put(variableName, variableInstances.get(variableName).getValue());
+            }
+        }
+
+
         return variables;
     }
 

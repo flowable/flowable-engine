@@ -13,14 +13,23 @@
 package org.flowable.spring.boot.cmmn;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
+import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
@@ -116,7 +125,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @Bean
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-        @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider)
+        @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider,
+        ObjectProvider<List<AutoDeploymentStrategy<CmmnEngine>>> cmmnAutoDeploymentStrategies)
         throws IOException {
         
         SpringCmmnEngineConfiguration configuration = new SpringCmmnEngineConfiguration();
@@ -159,6 +169,22 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
 
         configuration.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
+
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = cmmnAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
+        boolean useLockForAutoDeployment = defaultIfNotNull(cmmnProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
+        Duration autoDeploymentLockWaitTime = defaultIfNotNull(cmmnProperties.getAutoDeploymentLockWaitTime(),
+            flowableProperties.getAutoDeploymentLockWaitTime());
+        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(cmmnProperties.getThrowExceptionOnAutoDeploymentFailure(),
+            flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
+        // Always add the out of the box auto deployment strategies as last
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        configuration.setDeploymentStrategies(deploymentStrategies);
 
         return configuration;
     }
