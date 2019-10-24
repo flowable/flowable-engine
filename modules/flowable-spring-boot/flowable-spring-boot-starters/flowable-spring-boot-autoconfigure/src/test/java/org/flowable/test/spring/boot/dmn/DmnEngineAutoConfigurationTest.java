@@ -106,6 +106,7 @@ public class DmnEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             assertThat(deploymentStrategies).element(1)
@@ -113,6 +114,7 @@ public class DmnEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             assertThat(deploymentStrategies).element(2)
@@ -120,6 +122,7 @@ public class DmnEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             deleteDeployments(dmnEngine);
@@ -131,9 +134,10 @@ public class DmnEngineAutoConfigurationTest {
     public void standaloneDmnEngineWithBasicDataSourceAndAutoDeploymentWithLocking() {
         contextRunner
             .withPropertyValues(
-                "flowable.dmn.use-lock-for-auto-deployment=true",
-                "flowable.dmn.auto-deployment-lock-wait-time=10m",
-                "flowable.dmn.throw-exception-on-auto-deployment-failure=false"
+                "flowable.auto-deployment.engine.dmn.use-lock=true",
+                "flowable.auto-deployment.engine.dmn.lock-wait-time=10m",
+                "flowable.auto-deployment.engine.dmn.throw-exception-on-deployment-failure=false",
+                "flowable.auto-deployment.engine.dmn.lock-name=testLock"
             )
             .run(context -> {
                 assertThat(context)
@@ -164,6 +168,7 @@ public class DmnEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 assertThat(deploymentStrategies).element(1)
@@ -171,6 +176,7 @@ public class DmnEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 assertThat(deploymentStrategies).element(2)
@@ -178,6 +184,7 @@ public class DmnEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 deleteDeployments(dmnEngine);

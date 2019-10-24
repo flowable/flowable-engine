@@ -114,6 +114,7 @@ public class FormEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             assertThat(deploymentStrategies).element(1)
@@ -121,6 +122,7 @@ public class FormEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             assertThat(deploymentStrategies).element(2)
@@ -128,6 +130,7 @@ public class FormEngineAutoConfigurationTest {
                     assertThat(strategy.isUseLockForDeployments()).isFalse();
                     assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
                 });
 
             deleteDeployments(formEngine);
@@ -139,9 +142,10 @@ public class FormEngineAutoConfigurationTest {
     public void standaloneFormEngineWithBasicDataSourceAndAutoDeploymentWithLocking() {
         contextRunner
             .withPropertyValues(
-                "flowable.form.use-lock-for-auto-deployment=true",
-                "flowable.form.auto-deployment-lock-wait-time=10m",
-                "flowable.form.throw-exception-on-auto-deployment-failure=false"
+                "flowable.auto-deployment.engine.form.use-lock=true",
+                "flowable.auto-deployment.engine.form.lock-wait-time=10m",
+                "flowable.auto-deployment.engine.form.throw-exception-on-deployment-failure=false",
+                "flowable.auto-deployment.engine.form.lock-name=testLock"
             )
             .run(context -> {
                 assertThat(context)
@@ -183,6 +187,7 @@ public class FormEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 assertThat(deploymentStrategies).element(1)
@@ -190,6 +195,7 @@ public class FormEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 assertThat(deploymentStrategies).element(2)
@@ -197,6 +203,7 @@ public class FormEngineAutoConfigurationTest {
                         assertThat(strategy.isUseLockForDeployments()).isTrue();
                         assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
                         assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
                     });
 
                 deleteDeployments(formEngine);

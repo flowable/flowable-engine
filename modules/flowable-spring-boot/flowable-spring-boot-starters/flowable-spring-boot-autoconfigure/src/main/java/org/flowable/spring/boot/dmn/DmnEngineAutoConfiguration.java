@@ -13,16 +13,15 @@
 package org.flowable.spring.boot.dmn;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
@@ -34,6 +33,7 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.flowable.spring.boot.FlowableAutoDeploymentProperties;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -60,6 +60,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ConditionalOnDmnEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableAutoDeploymentProperties.class,
     FlowableDmnProperties.class
 })
 @AutoConfigureAfter({
@@ -73,10 +74,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableDmnProperties dmnProperties;
+    protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
-    public DmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableDmnProperties dmnProperties) {
+    public DmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableDmnProperties dmnProperties,
+        FlowableAutoDeploymentProperties autoDeploymentProperties) {
         super(flowableProperties);
         this.dmnProperties = dmnProperties;
+        this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
     @Bean
@@ -108,15 +112,11 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
         if (deploymentStrategies == null) {
             deploymentStrategies = new ArrayList<>();
         }
-        boolean useLockForAutoDeployment = defaultIfNotNull(dmnProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
-        Duration autoDeploymentLockWaitTime = defaultIfNotNull(dmnProperties.getAutoDeploymentLockWaitTime(),
-            flowableProperties.getAutoDeploymentLockWaitTime());
-        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(dmnProperties.getThrowExceptionOnAutoDeploymentFailure(),
-            flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
+        CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.DMN);
         // Always add the out of the box auto deployment strategies as last
-        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
-        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
-        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(deploymentProperties));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         configuration.setDeploymentStrategies(deploymentStrategies);
 
         return configuration;

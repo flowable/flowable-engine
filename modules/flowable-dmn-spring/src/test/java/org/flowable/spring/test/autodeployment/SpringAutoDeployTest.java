@@ -337,7 +337,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
                 dmnEngineConfiguration.getDeploymentStrategies()
                     .forEach(strategy -> {
                         if (strategy instanceof CommonAutoDeploymentStrategy) {
-                            ((CommonAutoDeploymentStrategy<DmnEngine>) strategy).setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                            ((CommonAutoDeploymentStrategy<DmnEngine>) strategy).getDeploymentProperties().setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
                         }
                     });
             }

@@ -362,7 +362,7 @@ public class SpringAutoDeployTest {
                 formEngineConfiguration.getDeploymentStrategies()
                     .forEach(strategy -> {
                         if (strategy instanceof CommonAutoDeploymentStrategy) {
-                            ((CommonAutoDeploymentStrategy<FormEngine>) strategy).setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                            ((CommonAutoDeploymentStrategy<FormEngine>) strategy).getDeploymentProperties().setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
                         }
                     });
             }

@@ -34,22 +34,14 @@ public abstract class CommonAutoDeploymentStrategy<E> implements AutoDeploymentS
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected boolean useLockForDeployments;
-    protected Duration deploymentLockWaitTime;
-    protected boolean throwExceptionOnDeploymentFailure;
+    protected CommonAutoDeploymentProperties deploymentProperties;
 
     public CommonAutoDeploymentStrategy() {
-        this(false, Duration.ofMinutes(5), true);
+        this(new CommonAutoDeploymentProperties(false, Duration.ofMinutes(5), true));
     }
 
-    public CommonAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        this(useLockForDeployments, deploymentLockWaitTime, true);
-    }
-
-    public CommonAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        this.useLockForDeployments = useLockForDeployments;
-        this.deploymentLockWaitTime = deploymentLockWaitTime;
-        this.throwExceptionOnDeploymentFailure = throwExceptionOnDeploymentFailure;
+    public CommonAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        this.deploymentProperties = deploymentProperties;
     }
 
     /**
@@ -69,6 +61,15 @@ public abstract class CommonAutoDeploymentStrategy<E> implements AutoDeploymentS
      */
     protected abstract LockManager getLockManager(E engine, String deploymentNameHint);
 
+    protected String determineLockName(String deploymentNameHint) {
+        String lockName = getLockName();
+        if (StringUtils.isBlank(lockName)) {
+            return deploymentNameHint;
+        }
+
+        return lockName;
+    }
+
     @Override
     public boolean handlesMode(final String mode) {
         return StringUtils.equalsIgnoreCase(mode, getDeploymentMode());
@@ -76,9 +77,9 @@ public abstract class CommonAutoDeploymentStrategy<E> implements AutoDeploymentS
 
     @Override
     public void deployResources(String deploymentNameHint, Resource[] resources, E engine) {
-        if (useLockForDeployments) {
+        if (isUseLockForDeployments()) {
             LockManager deploymentLockManager = getLockManager(engine, deploymentNameHint);
-            deploymentLockManager.waitForLockRunAndRelease(deploymentLockWaitTime, () -> {
+            deploymentLockManager.waitForLockRunAndRelease(getDeploymentLockWaitTime(), () -> {
                 deployResourcesInternal(deploymentNameHint, resources, engine);
                 return null;
             });
@@ -122,27 +123,27 @@ public abstract class CommonAutoDeploymentStrategy<E> implements AutoDeploymentS
         return resourceName;
     }
 
-    public boolean isUseLockForDeployments() {
-        return useLockForDeployments;
+    public CommonAutoDeploymentProperties getDeploymentProperties() {
+        return deploymentProperties;
     }
 
-    public void setUseLockForDeployments(boolean useLockForDeployments) {
-        this.useLockForDeployments = useLockForDeployments;
+    public void setDeploymentProperties(CommonAutoDeploymentProperties deploymentProperties) {
+        this.deploymentProperties = deploymentProperties;
+    }
+
+    public boolean isUseLockForDeployments() {
+        return deploymentProperties.isUseLock();
     }
 
     public Duration getDeploymentLockWaitTime() {
-        return deploymentLockWaitTime;
-    }
-
-    public void setDeploymentLockWaitTime(Duration deploymentLockWaitTime) {
-        this.deploymentLockWaitTime = deploymentLockWaitTime;
+        return deploymentProperties.getLockWaitTime();
     }
 
     public boolean isThrowExceptionOnDeploymentFailure() {
-        return throwExceptionOnDeploymentFailure;
+        return deploymentProperties.isThrowExceptionOnDeploymentFailure();
     }
 
-    public void setThrowExceptionOnDeploymentFailure(boolean throwExceptionOnDeploymentFailure) {
-        this.throwExceptionOnDeploymentFailure = throwExceptionOnDeploymentFailure;
+    public String getLockName() {
+        return deploymentProperties.getLockName();
     }
 }

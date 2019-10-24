@@ -13,11 +13,10 @@
 
 package org.flowable.cmmn.spring.autodeployment;
 
-import java.time.Duration;
-
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -42,12 +41,8 @@ public class DefaultAutoDeploymentStrategy extends AbstractCmmnAutoDeploymentStr
     public DefaultAutoDeploymentStrategy() {
     }
 
-    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public DefaultAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public DefaultAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -71,7 +66,7 @@ public class DefaultAutoDeploymentStrategy extends AbstractCmmnAutoDeploymentStr
             deploymentBuilder.deploy();
 
         } catch (RuntimeException e) {
-            if (throwExceptionOnDeploymentFailure) {
+            if (isThrowExceptionOnDeploymentFailure()) {
                 throw e;
             } else {
                 LOGGER.warn("Exception while autodeploying CMMN definitions. "
