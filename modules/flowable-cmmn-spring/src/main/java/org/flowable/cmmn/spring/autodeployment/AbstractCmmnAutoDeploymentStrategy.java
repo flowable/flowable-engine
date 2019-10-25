@@ -16,11 +16,11 @@ package org.flowable.cmmn.spring.autodeployment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.time.Duration;
 
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.springframework.core.io.Resource;
 
@@ -35,17 +35,13 @@ public abstract class AbstractCmmnAutoDeploymentStrategy extends CommonAutoDeplo
     public AbstractCmmnAutoDeploymentStrategy() {
     }
 
-    public AbstractCmmnAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public AbstractCmmnAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public AbstractCmmnAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
     protected LockManager getLockManager(CmmnEngine engine, String deploymentNameHint) {
-        return engine.getCmmnEngineConfiguration().getLockManager(deploymentNameHint);
+        return engine.getCmmnEngineConfiguration().getLockManager(determineLockName(deploymentNameHint));
     }
 
     protected void addResource(Resource resource, CmmnDeploymentBuilder deploymentBuilder) {

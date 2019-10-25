@@ -290,7 +290,7 @@ public class SpringAutoDeployTest {
                 appEngineConfiguration.getDeploymentStrategies()
                     .forEach(strategy -> {
                         if (strategy instanceof CommonAutoDeploymentStrategy) {
-                            ((CommonAutoDeploymentStrategy<AppEngine>) strategy).setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                            ((CommonAutoDeploymentStrategy<AppEngine>) strategy).getDeploymentProperties().setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
                         }
                     });
             }

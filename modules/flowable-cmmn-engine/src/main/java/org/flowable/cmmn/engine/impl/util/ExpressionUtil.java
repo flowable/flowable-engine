@@ -51,7 +51,7 @@ public class ExpressionUtil {
         return false;
     }
 
-    public static boolean isCompletionNeutralPlanItemInstance( PlanItemInstanceEntity planItemInstanceEntity) {
+    public static boolean isCompletionNeutralPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
         return isCompletionNeutralPlanItemInstance(CommandContextUtil.getCommandContext(), planItemInstanceEntity);
     }
 

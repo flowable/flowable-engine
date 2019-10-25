@@ -43,6 +43,7 @@ import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
@@ -187,6 +188,13 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         }
                     }
                 } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
+                    if (planItem.getItemControl() != null && planItem.getItemControl().getParentCompletionRule() != null) {
+                        ParentCompletionRule parentCompletionRule = planItem.getItemControl().getParentCompletionRule();
+                        if (ParentCompletionRule.ALWAYS_IGNORE.equals(parentCompletionRule.getType())) {
+                            continue;
+                        }
+                    }
+                    
                     activeChildren++;
                 }
             }
@@ -404,9 +412,18 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 if (PlanItemInstanceState.END_STATES.contains(childPlanItemInstance.getState())) {
                     continue;
                 }
+                
                 if (PlanItemInstanceState.AVAILABLE.contains(childPlanItemInstance.getState()) && ExpressionUtil.isCompletionNeutralPlanItemInstance(childPlanItemInstance)) {
                     continue;
                 }
+                
+                if (childPlanItemInstance.getPlanItem().getItemControl() != null && childPlanItemInstance.getPlanItem().getItemControl().getParentCompletionRule() != null) {
+                    ParentCompletionRule parentCompletionRule = childPlanItemInstance.getPlanItem().getItemControl().getParentCompletionRule();
+                    if (ParentCompletionRule.ALWAYS_IGNORE.equals(parentCompletionRule.getType())) {
+                        continue;
+                    }
+                }
+                
                 return false;
             }
         }

@@ -14,13 +14,13 @@
 package org.flowable.form.spring.autodeployment;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.FormEngine;
@@ -50,12 +50,8 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractFormAuto
     public ResourceParentFolderAutoDeploymentStrategy() {
     }
 
-    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public ResourceParentFolderAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -83,7 +79,7 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractFormAuto
                 deploymentBuilder.deploy();
 
             } catch (RuntimeException e) {
-                if (throwExceptionOnDeploymentFailure) {
+                if (isThrowExceptionOnDeploymentFailure()) {
                     throw e;
                 } else {
                     LOGGER.warn("Exception while autodeploying form definitions. "

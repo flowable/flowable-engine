@@ -14,13 +14,13 @@
 package org.flowable.dmn.spring.autodeployment;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
@@ -50,12 +50,8 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractDmnAutoD
     public ResourceParentFolderAutoDeploymentStrategy() {
     }
 
-    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public ResourceParentFolderAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public ResourceParentFolderAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -84,7 +80,7 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractDmnAutoD
                 deploymentBuilder.deploy();
 
             } catch (Exception e) {
-                if (throwExceptionOnDeploymentFailure) {
+                if (isThrowExceptionOnDeploymentFailure()) {
                     throw e;
                 } else {
                     LOGGER.warn("Exception while autodeploying DMN definitions. "

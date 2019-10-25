@@ -13,14 +13,10 @@
 
 package org.flowable.app.spring.autodeployment;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.zip.ZipInputStream;
-
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.engine.AppEngine;
-import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -44,12 +40,8 @@ public class DefaultAutoDeploymentStrategy extends AbstractAppAutoDeploymentStra
     public DefaultAutoDeploymentStrategy() {
     }
 
-    public DefaultAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public DefaultAutoDeploymentStrategy(boolean useLockForAutoDeployment, Duration autoDeploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public DefaultAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
@@ -80,7 +72,7 @@ public class DefaultAutoDeploymentStrategy extends AbstractAppAutoDeploymentStra
                 deploymentBuilder.deploy();
 
             } catch (RuntimeException e) {
-                if (throwExceptionOnDeploymentFailure) {
+                if (isThrowExceptionOnDeploymentFailure()) {
                     throw e;
                 } else {
                     LOGGER.warn("Exception while autodeploying app definition for resource {}. "

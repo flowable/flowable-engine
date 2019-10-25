@@ -16,10 +16,10 @@ package org.flowable.spring.configurator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.time.Duration;
 import java.util.zip.ZipInputStream;
 
 import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -38,17 +38,13 @@ public abstract class AbstractProcessAutoDeploymentStrategy extends CommonAutoDe
         super();
     }
 
-    public AbstractProcessAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public AbstractProcessAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public AbstractProcessAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
     protected LockManager getLockManager(ProcessEngine engine, String deploymentNameHint) {
-        return engine.getManagementService().getLockManager(deploymentNameHint);
+        return engine.getManagementService().getLockManager(determineLockName(deploymentNameHint));
     }
 
     protected void addResource(Resource resource, DeploymentBuilder deploymentBuilder) {

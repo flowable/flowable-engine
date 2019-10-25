@@ -16,9 +16,9 @@ package org.flowable.form.spring.autodeployment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.time.Duration;
 
 import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.engine.FormEngine;
@@ -35,17 +35,13 @@ public abstract class AbstractFormAutoDeploymentStrategy extends CommonAutoDeplo
     public AbstractFormAutoDeploymentStrategy() {
     }
 
-    public AbstractFormAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime) {
-        super(useLockForDeployments, deploymentLockWaitTime);
-    }
-
-    public AbstractFormAutoDeploymentStrategy(boolean useLockForDeployments, Duration deploymentLockWaitTime, boolean throwExceptionOnDeploymentFailure) {
-        super(useLockForDeployments, deploymentLockWaitTime, throwExceptionOnDeploymentFailure);
+    public AbstractFormAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
     }
 
     @Override
     protected LockManager getLockManager(FormEngine engine, String deploymentNameHint) {
-        return engine.getFormEngineConfiguration().getLockManager(deploymentNameHint);
+        return engine.getFormEngineConfiguration().getLockManager(determineLockName(deploymentNameHint));
     }
 
     protected void addResource(Resource resource, FormDeploymentBuilder deploymentBuilder) {

@@ -45,7 +45,7 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
         if (isStage(planItemInstanceEntity)) {
             exitChildPlanItemInstances(exitCriterionId);
         }
-
+        
         planItemInstanceEntity.setExitCriterionId(exitCriterionId);
         planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
         planItemInstanceEntity.setExitTime(planItemInstanceEntity.getEndedTime());

@@ -123,21 +123,6 @@ public class FlowableProperties {
      */
     private Duration schemaLockWaitTime = Duration.ofMinutes(5);
 
-    /**
-     * Whether to use a lock when performing the auto deployment.
-     */
-    private boolean useLockForAutoDeployment = false;
-
-    /**
-     * Duration to wait for the auto deployment lock before giving up.
-     */
-    private Duration autoDeploymentLockWaitTime = Duration.ofMinutes(5);
-
-    /**
-     * Whether to throw an exception if there was some kind of failure during the auto deployment.
-     */
-    private boolean throwExceptionOnAutoDeploymentFailure = true;
-
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
     }
@@ -360,27 +345,4 @@ public class FlowableProperties {
         this.schemaLockWaitTime = schemaLockWaitTime;
     }
 
-    public boolean isUseLockForAutoDeployment() {
-        return useLockForAutoDeployment;
-    }
-
-    public void setUseLockForAutoDeployment(boolean useLockForAutoDeployment) {
-        this.useLockForAutoDeployment = useLockForAutoDeployment;
-    }
-
-    public Duration getAutoDeploymentLockWaitTime() {
-        return autoDeploymentLockWaitTime;
-    }
-
-    public void setAutoDeploymentLockWaitTime(Duration autoDeploymentLockWaitTime) {
-        this.autoDeploymentLockWaitTime = autoDeploymentLockWaitTime;
-    }
-
-    public boolean isThrowExceptionOnAutoDeploymentFailure() {
-        return throwExceptionOnAutoDeploymentFailure;
-    }
-
-    public void setThrowExceptionOnAutoDeploymentFailure(boolean throwExceptionOnAutoDeploymentFailure) {
-        this.throwExceptionOnAutoDeploymentFailure = throwExceptionOnAutoDeploymentFailure;
-    }
 }

@@ -47,6 +47,7 @@ import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
+import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnModel;
@@ -54,8 +55,10 @@ import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Sentry;
@@ -504,6 +507,20 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     
                     criterion.setSentry(sentry);
                     planItem.addEntryCriterion(criterion);
+                }
+            } else if (planItemDefinition instanceof CasePageTask) {
+                // check, if the parent completion rule is set and if not, set it to the default value for a case page which is always ignore
+                CasePageTask casePageTask = (CasePageTask) planItemDefinition;
+
+                if (planItem.getItemControl() == null) {
+                    PlanItemControl planItemControl = new PlanItemControl();
+                    planItem.setItemControl(planItemControl);
+                }
+                if (planItem.getItemControl().getParentCompletionRule() == null) {
+                    ParentCompletionRule parentCompletionRule = new ParentCompletionRule();
+                    parentCompletionRule.setType(ParentCompletionRule.ALWAYS_IGNORE);
+
+                    planItem.getItemControl().setParentCompletionRule(parentCompletionRule);
                 }
             }
         }

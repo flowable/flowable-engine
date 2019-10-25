@@ -139,6 +139,18 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         return false;
     }
 
+    protected void completeChildPlanItemInstances() {
+        completeChildPlanItemInstances(null);
+    }
+
+    protected void completeChildPlanItemInstances(String exitCriterionId) {
+        for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
+            if (StateTransition.isPossible(child, PlanItemTransition.COMPLETE)) {
+                CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(child);
+            }
+        }
+    }
+    
     protected void exitChildPlanItemInstances() {
         exitChildPlanItemInstances(null);
     }

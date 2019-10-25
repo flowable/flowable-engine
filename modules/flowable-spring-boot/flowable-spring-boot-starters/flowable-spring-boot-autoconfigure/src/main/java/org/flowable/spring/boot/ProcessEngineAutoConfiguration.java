@@ -15,16 +15,16 @@ package org.flowable.spring.boot;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
@@ -71,6 +71,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @ConditionalOnProcessEngine
 @EnableConfigurationProperties({
+    FlowableAutoDeploymentProperties.class,
     FlowableProperties.class,
     FlowableMailProperties.class,
     FlowableHttpProperties.class,
@@ -97,10 +98,11 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     protected final FlowableIdmProperties idmProperties;
     protected final FlowableMailProperties mailProperties;
     protected final FlowableHttpProperties httpProperties;
+    protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
         FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties,
-        FlowableHttpProperties httpProperties) {
+        FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
         
         super(flowableProperties);
         this.processProperties = processProperties;
@@ -108,6 +110,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         this.idmProperties = idmProperties;
         this.mailProperties = mailProperties;
         this.httpProperties = httpProperties;
+        this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
     /**
@@ -229,14 +232,12 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         if (deploymentStrategies == null) {
             deploymentStrategies = new ArrayList<>();
         }
-        boolean useLockForAutoDeployment = defaultIfNotNull(processProperties.getUseLockForAutoDeployment(), flowableProperties.isUseLockForAutoDeployment());
-        Duration autoDeploymentLockWaitTime = defaultIfNotNull(processProperties.getAutoDeploymentLockWaitTime(),
-            flowableProperties.getAutoDeploymentLockWaitTime());
-        boolean throwExceptionOnDeploymentFailure = defaultIfNotNull(processProperties.getThrowExceptionOnAutoDeploymentFailure(), flowableProperties.isThrowExceptionOnAutoDeploymentFailure());
+        CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.BPMN);
+
         // Always add the out of the box auto deployment strategies as last
-        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
-        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
-        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(useLockForAutoDeployment, autoDeploymentLockWaitTime, throwExceptionOnDeploymentFailure));
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(deploymentProperties));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         conf.setDeploymentStrategies(deploymentStrategies);
 
         return conf;

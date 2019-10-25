@@ -82,6 +82,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
     String ELEMENT_REPETITION_RULE = "repetitionRule";
     String ELEMENT_COMPLETION_NEUTRAL_RULE = "completionNeutralRule";
+    String ELEMENT_PARENT_COMPLETION_RULE = "parentCompletionRule";
 
     String ELEMENT_PROCESS = "process";
     String ELEMENT_DECISION = "decision";
@@ -148,6 +149,9 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
 
     String ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
+    
+    String ATTRIBUTE_LABEL = "label";
+    String ATTRIBUTE_ICON = "icon";
 
     String ELEMENT_FIELD = "field";
     String ATTRIBUTE_FIELD_STRING = "stringValue";
