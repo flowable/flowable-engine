@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
@@ -90,7 +91,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         if (isEvaluateRepetitionRule() && hasRepetitionRuleAndNoEntryCriteria(planItem)) {
-            return evaluateRepetitionRule(planItemInstanceEntity);
+            return ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity);
         }
 
         // If the plan item instance is in AVAILABLE, and it's repeatable and it gets terminated

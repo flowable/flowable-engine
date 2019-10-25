@@ -16,6 +16,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -30,7 +31,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
 
     @Override
     protected void internalExecute() {
-        if (hasRepetitionRule(planItemInstanceEntity)) {
+        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
             //Increase repetition counter, value is kept from the previous instance of the repetition
             //@see CmmOpertion.copyAndInsertPlanItemInstance used by @see EvaluateCriteriaOperation and @see AbstractDeletePlanItemInstanceOperation
             //Or if its the first instance of the repetition, this call sets the counter to 1

@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -49,6 +50,34 @@ public class ExpressionUtil {
             return isRequired;
         }
         return false;
+    }
+
+    public static boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null) {
+            return hasRepetitionRule(planItemInstanceEntity.getPlanItem());
+        }
+        return false;
+    }
+
+    public static boolean hasRepetitionRule(PlanItem planItem) {
+        return planItem.getItemControl() != null
+            && planItem.getItemControl().getRepetitionRule() != null;
+    }
+
+    public static boolean evaluateRepetitionRule(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (hasRepetitionRule(planItemInstanceEntity)) {
+            String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
+            return evaluateRepetitionRule(commandContext, planItemInstanceEntity, repetitionCondition);
+        }
+        return false;
+    }
+
+    public static boolean evaluateRepetitionRule(CommandContext commandContext, VariableContainer variableContainer, String repetitionCondition) {
+        if (StringUtils.isNotEmpty(repetitionCondition)) {
+            return ExpressionUtil.evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
+        } else {
+            return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
+        }
     }
 
     public static boolean isCompletionNeutralPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
