@@ -58,7 +58,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected boolean completeable;
+    protected boolean completable;
     protected String entryCriterionId;
     protected String exitCriterionId;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
@@ -100,7 +100,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
-        persistentState.put("completeable", completeable);
+        persistentState.put("completeable", completable);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
         persistentState.put("countEnabled", countEnabled);
@@ -321,12 +321,24 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.referenceType = referenceType;
     }
     @Override
-    public boolean isCompleteable() {
-        return completeable;
+    public boolean isCompletable() {
+        return completable;
     }
     @Override
-    public void setCompleteable(boolean completeable) {
-        this.completeable = completeable;
+    public void setCompletable(boolean completable) {
+        this.completable = completable;
+    }
+    /**
+     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     */
+    public boolean isCompleteable() {
+        return completable;
+    }
+    /**
+     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     */
+    public void setCompleteable(boolean completable) {
+        this.completable = completable;
     }
     @Override
     public String getEntryCriterionId() {

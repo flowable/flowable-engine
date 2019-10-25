@@ -43,7 +43,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
-    protected boolean completeable;
+    protected boolean completable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
     protected Date lockTime;
@@ -66,7 +66,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         persistentState.put("startUserId", startUserId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
-        persistentState.put("completeable", completeable);
+        persistentState.put("completeable", completable);
         persistentState.put("tenantId", tenantId);
         persistentState.put("lockTime", lockTime);
         return persistentState;
@@ -129,12 +129,24 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         this.startUserId = startUserId;
     }
     @Override
-    public boolean isCompleteable() {
-        return completeable;
+    public boolean isCompletable() {
+        return completable;
     }
     @Override
-    public void setCompleteable(boolean completeable) {
-        this.completeable = completeable;
+    public void setCompletable(boolean completable) {
+        this.completable = completable;
+    }
+    /**
+     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     */
+    public boolean isCompleteable() {
+        return completable;
+    }
+    /**
+     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     */
+    public void setCompleteable(boolean completable) {
+        this.completable = completable;
     }
     @Override
     public String getCallbackId() {
