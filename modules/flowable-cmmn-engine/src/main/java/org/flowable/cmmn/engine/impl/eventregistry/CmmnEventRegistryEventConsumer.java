@@ -17,12 +17,12 @@ import java.util.List;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
-import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
-import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.eventregistry.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.definition.EventDefinition;
+import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;

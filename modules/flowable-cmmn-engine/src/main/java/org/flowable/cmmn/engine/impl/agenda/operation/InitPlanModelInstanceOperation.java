@@ -18,7 +18,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
+import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**

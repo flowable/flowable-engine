@@ -52,10 +52,6 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.eventbus.FlowableEventBus;
 import org.flowable.common.engine.api.eventbus.FlowableEventBusPublisher;
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
-import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
-import org.flowable.common.engine.api.eventregistry.InboundEventProcessor;
-import org.flowable.common.engine.api.eventregistry.OutboundEventProcessor;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
@@ -70,9 +66,6 @@ import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.eventbus.BasicFlowableEventBus;
 import org.flowable.common.engine.impl.eventbus.FlowableEventPublisherImpl;
-import org.flowable.common.engine.impl.eventregistry.DefaultEventRegistry;
-import org.flowable.common.engine.impl.eventregistry.DefaultInboundEventProcessor;
-import org.flowable.common.engine.impl.eventregistry.DefaultOutboundEventProcessor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContextFactory;
@@ -219,10 +212,7 @@ public abstract class AbstractEngineConfiguration {
 
     protected FlowableEventBus eventBus;
     protected FlowableEventBusPublisher eventPublisher;
-    protected EventRegistry eventRegistry;
-    protected InboundEventProcessor inboundEventProcessor;
-    protected OutboundEventProcessor outboundEventProcessor;
-    
+
     protected LoggingListener loggingListener;
 
     protected boolean transactionsExternallyManaged;
@@ -1660,10 +1650,6 @@ public abstract class AbstractEngineConfiguration {
 
     public void initEventBusAndRelatedServices() {
         initEventBus();
-        initEventRegistry();
-        initInboundEventProcessor();
-        initOutboundEventProcessor();
-        initEventRegistryEventBusConsumer();
     }
 
     public void initEventBus() {
@@ -1674,37 +1660,6 @@ public abstract class AbstractEngineConfiguration {
         if (this.eventPublisher == null) {
             this.eventPublisher = new FlowableEventPublisherImpl(this.eventBus);
         }
-    }
-
-    public void initEventRegistry() {
-        if (this.eventRegistry == null) {
-            this.eventRegistry = new DefaultEventRegistry(eventBus);
-        }
-    }
-
-    public void initInboundEventProcessor() {
-        if (this.inboundEventProcessor == null) {
-            this.inboundEventProcessor = new DefaultInboundEventProcessor(eventRegistry, eventBus);
-        }
-        this.eventRegistry.setInboundEventProcessor(this.inboundEventProcessor);
-    }
-
-    public void initOutboundEventProcessor() {
-        if (this.outboundEventProcessor == null) {
-            this.outboundEventProcessor = new DefaultOutboundEventProcessor(eventRegistry);
-        }
-        this.eventRegistry.setOutboundEventProcessor(outboundEventProcessor);
-    }
-
-    public void initEventRegistryEventBusConsumer() {
-        EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
-        if (eventRegistryEventBusConsumer != null) {
-            this.eventRegistry.registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
-        }
-    }
-
-    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
-        return null;
     }
 
     public FlowableEventBus getEventBus() {
@@ -1730,22 +1685,6 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public EventRegistry getEventRegistry() {
-        return eventRegistry;
-    }
-
-    public void setEventRegistry(EventRegistry eventRegistry) {
-        this.eventRegistry = eventRegistry;
-    }
-
-    public InboundEventProcessor getInboundEventProcessor() {
-        return inboundEventProcessor;
-    }
-
-    public void setInboundEventProcessor(InboundEventProcessor inboundEventProcessor) {
-        this.inboundEventProcessor = inboundEventProcessor;
-    }
-    
     public boolean isLoggingSessionEnabled() {
         return loggingListener != null;
     }
