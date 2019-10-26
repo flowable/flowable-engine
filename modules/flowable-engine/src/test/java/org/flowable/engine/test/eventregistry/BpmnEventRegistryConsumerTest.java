@@ -19,14 +19,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
-import org.flowable.common.engine.api.eventregistry.InboundEventChannelAdapter;
-import org.flowable.common.engine.api.eventregistry.definition.EventPayloadTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTestCase;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.InboundEventChannelAdapter;
+import org.flowable.eventregistry.api.definition.EventPayloadTypes;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
 import org.junit.Test;

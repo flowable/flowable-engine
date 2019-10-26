@@ -17,14 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
-import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
-import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.eventregistry.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.definition.EventDefinition;
+import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;

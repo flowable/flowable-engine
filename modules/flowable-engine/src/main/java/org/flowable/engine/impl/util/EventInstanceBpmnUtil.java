@@ -26,12 +26,12 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
-import org.flowable.common.engine.api.eventregistry.definition.EventPayloadDefinition;
-import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
-import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.common.engine.impl.eventregistry.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.api.definition.EventDefinition;
+import org.flowable.eventregistry.api.definition.EventPayloadDefinition;
+import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.variable.api.delegate.VariableScope;
 
 public class EventInstanceBpmnUtil {

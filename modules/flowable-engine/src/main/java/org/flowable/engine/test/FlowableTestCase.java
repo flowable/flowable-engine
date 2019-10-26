@@ -20,11 +20,11 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.test.mock.FlowableMockSupport;
 
@@ -61,7 +61,7 @@ public abstract class FlowableTestCase extends TestCase {
     protected String configurationResource = "flowable.cfg.xml";
     protected String deploymentId;
 
-    protected ProcessEngineConfiguration processEngineConfiguration;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected ProcessEngine processEngine;
     protected RepositoryService repositoryService;
     protected RuntimeService runtimeService;

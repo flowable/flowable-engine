@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -29,6 +28,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
