@@ -14,14 +14,21 @@ package org.flowable.engine.test.bpmn.event.end;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Assumptions;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ExtensionAttribute;
@@ -35,6 +42,7 @@ import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -42,9 +50,13 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 
 /**
  * @author Nico Rehwaldt
@@ -1058,6 +1070,50 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstanceId);
         assertHistoricProcessInstanceDetails(processInstanceId);
+    }
+
+    @Test
+    @Deployment
+    void testWithSubCaseTaskAndEnsureSubCaseIsTerminated() {
+        // Arrange
+        CaseInstanceService caseInstanceService = Mockito.mock(CaseInstanceService.class);
+        processEngineConfiguration.setCaseInstanceService(caseInstanceService);
+        String caseInstanceId = "237d9bb7-0ddb-4860-bad1-1dd47e34abe1";
+        when(caseInstanceService.generateNewCaseInstanceId()).thenReturn(caseInstanceId);
+        when(caseInstanceService.findChildCaseIdsForExecutionIds(ArgumentMatchers.any())).thenReturn(Collections.singleton(caseInstanceId));
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateByEndEvent");
+        Task task = taskService.createTaskQuery()
+                .processInstanceId(processInstance.getProcessInstanceId())
+                .singleResult();
+        Assumptions.assumeThat(task).isNotNull();
+        Assumptions.assumeThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
+        Execution caseTaskExecution = runtimeService.createExecutionQuery()
+                .processInstanceId(processInstance.getProcessInstanceId())
+                .activityId("caseTask1")
+                .singleResult();
+
+        // Act
+        taskService.complete(task.getId());
+
+        // Assert
+        verify(caseInstanceService).generateNewCaseInstanceId();
+        verify(caseInstanceService).startCaseInstanceByKey(
+                "myCase",
+                caseInstanceId,
+                null,
+                null,
+                caseTaskExecution.getId(),
+                "",
+                true,
+                Collections.emptyMap()
+        );
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Set<String>> listArgumentCaptor = ArgumentCaptor.forClass(Set.class);
+        verify(caseInstanceService).findChildCaseIdsForExecutionIds(listArgumentCaptor.capture());
+        Set<String> executionIds = listArgumentCaptor.getValue();
+        Assertions.assertThat(executionIds).contains(caseTaskExecution.getId());
+        verify(caseInstanceService).deleteCaseInstance(caseInstanceId);
     }
 
     protected void assertHistoricProcessInstanceDetails(ProcessInstance pi) {
