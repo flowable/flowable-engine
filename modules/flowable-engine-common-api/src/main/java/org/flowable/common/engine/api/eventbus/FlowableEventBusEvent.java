@@ -29,6 +29,7 @@ public interface FlowableEventBusEvent {
 
     void setCorrelationKey(String correlationKey);
 
+    //TODO why not instant?
     LocalDateTime getCreated();
 
     void setCreated(LocalDateTime created);

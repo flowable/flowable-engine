@@ -23,10 +23,10 @@ import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.eventregistry.EventRegistry;
-import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
-import org.flowable.common.engine.api.eventregistry.runtime.EventPayloadInstance;
-import org.flowable.common.engine.impl.eventregistry.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.definition.EventDefinition;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**

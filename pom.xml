@@ -548,6 +548,16 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-eventsubscription-service</artifactId>
 				<version>${project.version}</version>
@@ -1020,6 +1030,8 @@
 		<module>modules/flowable-variable-service</module>
         <module>modules/flowable-identitylink-service-api</module>
 		<module>modules/flowable-identitylink-service</module>
+		<module>modules/flowable-event-registry</module>
+		<module>modules/flowable-event-registry-api</module>
 		<module>modules/flowable-eventsubscription-service-api</module>
 		<module>modules/flowable-eventsubscription-service</module>
         <module>modules/flowable-task-service-api</module>
