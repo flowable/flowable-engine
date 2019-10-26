@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Assumptions;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -36,6 +38,7 @@ import org.junit.Test;
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Valentin Zickner
  */
 public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
     
@@ -344,4 +347,37 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn"})
+    public void testCaseTaskWithTerminateEndEvent() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithTerminateEndEventOnDifferentExecution.bpmn20.xml")
+                .deploy();
+
+        try {
+            // Arrange
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateByEndEvent");
+            Task task = processEngineTaskService.createTaskQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .singleResult();
+            Assumptions.assumeThat(task).isNotNull();
+            Assumptions.assumeThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
+
+            long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assumptions.assumeThat(numberOfActiveCaseInstances).isEqualTo(1);
+
+            // Act
+            processEngineTaskService.complete(task.getId());
+
+            // Assert
+            long numberOfActiveCaseInstancesAfterCompletion = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstancesAfterCompletion).isEqualTo(0);
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
 }

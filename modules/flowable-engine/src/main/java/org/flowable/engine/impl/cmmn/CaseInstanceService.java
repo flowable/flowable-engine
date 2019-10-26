@@ -12,12 +12,15 @@
  */
 package org.flowable.engine.impl.cmmn;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Tijs Rademakers
+ * @author Valentin Zickner
  */
 public interface CaseInstanceService {
     
@@ -34,5 +37,7 @@ public interface CaseInstanceService {
     void handleSignalEvent(EventSubscriptionEntity eventSubscription);
 
     void deleteCaseInstance(String caseInstanceId);
+
+    Set<String> findChildCaseIdsForExecutionIds(Collection<String> executionIds);
 
 }
