@@ -93,4 +93,206 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedComplexCompletion() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestingPlanItems").start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(7, planItemInstances.size());
+        String[] expectedNames = new String[] { "Stage A", "Stage B", "Task A", "Task B", "Task C", "Task D", "Task E" };
+        String[] expectedStates = new String[] { ACTIVE, ACTIVE, ENABLED, ENABLED, ACTIVE, ENABLED, ENABLED };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // start and complete Task A -> nothing yet to happen
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(6, planItemInstances.size());
+        expectedNames = new String[] { "Stage A", "Stage B", "Task B", "Task C", "Task D", "Task E" };
+        expectedStates = new String[] { ACTIVE, ACTIVE, ENABLED, ACTIVE, ENABLED, ENABLED };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // complete Task C -> nothing yet to happen
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(5, planItemInstances.size());
+        expectedNames = new String[] { "Stage A", "Stage B", "Task B", "Task D", "Task E" };
+        expectedStates = new String[] { ACTIVE, ACTIVE, ENABLED, ENABLED, ENABLED };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // start Task B -> nothing yet to happen
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(5, planItemInstances.size());
+        expectedNames = new String[] { "Stage A", "Stage B", "Task B", "Task D", "Task E" };
+        expectedStates = new String[] { ACTIVE, ACTIVE, ACTIVE, ENABLED, ENABLED };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // complete Task B -> Stage B and then Stage A need to complete
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(3, planItemInstances.size());
+        expectedNames = new String[] { "Task B", "Task D", "Task E" };
+        expectedStates = new String[] { ENABLED, ENABLED, ENABLED };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // start and complete Task E -> case must be completed, as Task E is ignored after first completion
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/CMMN/test/runtime/PlanItemCompletionTest.testNestedComplexCompletion.cmmn" })
+    public void testNestedComplexCompletionAlternatePath() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestingPlanItems").start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(7, planItemInstances.size());
+        String[] expectedNames = new String[] { "Stage A", "Stage B", "Task A", "Task B", "Task C", "Task D", "Task E" };
+        String[] expectedStates = new String[] { ACTIVE, ACTIVE, ENABLED, ENABLED, ACTIVE, ENABLED, ENABLED };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+
+        // start Task D and E -> nothing yet to happen
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(5).getId());
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(6).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(7, planItemInstances.size());
+        expectedNames = new String[] { "Stage A", "Stage B", "Task A", "Task B", "Task C", "Task D", "Task E" };
+        expectedStates = new String[] { ACTIVE, ACTIVE, ENABLED, ENABLED, ACTIVE, ACTIVE, ACTIVE };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // complete Task C and Task D -> still nothing yet to happen
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(4).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(5).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(5, planItemInstances.size());
+        expectedNames = new String[] { "Stage A", "Stage B", "Task A", "Task B", "Task E" };
+        expectedStates = new String[] { ACTIVE, ACTIVE, ENABLED, ENABLED, ACTIVE };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // start and complete Task A -> nothing yet to happen
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        expectedNames = new String[] { "Stage A", "Stage B", "Task B", "Task E" };
+        expectedStates = new String[] { ACTIVE, ACTIVE, ENABLED, ACTIVE };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // start Task B -> nothing yet to happen
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        expectedNames = new String[] { "Stage A", "Stage B", "Task B", "Task E" };
+        expectedStates = new String[] { ACTIVE, ACTIVE, ACTIVE, ACTIVE };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // complete Task E -> nothing further changes
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        expectedNames = new String[] { "Stage A", "Stage B", "Task B", "Task E" };
+        expectedStates = new String[] { ACTIVE, ACTIVE, ACTIVE, ENABLED };
+        for (int i = 0; i < planItemInstances.size(); i++) {
+            assertEquals(expectedNames[i], planItemInstances.get(i).getName());
+            assertEquals(expectedStates[i], planItemInstances.get(i).getState());
+        }
+
+        // complete Task B -> case must be completed now
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
 }
