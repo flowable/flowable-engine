@@ -295,6 +295,10 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_EVENT_COMPENSATEDEFINITION = "compensateEventDefinition";
     public static final String ATTRIBUTE_COMPENSATE_ACTIVITYREF = "activityRef";
     public static final String ATTRIBUTE_COMPENSATE_WAITFORCOMPLETION = "waitForCompletion";
+    
+    public static final String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
+    public static final String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
+    public static final String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
 
     public static final String ELEMENT_FORMPROPERTY = "formProperty";
     public static final String ATTRIBUTE_FORM_ID = "id";
@@ -335,6 +339,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_DATA_ID = "id";
     public static final String ATTRIBUTE_DATA_NAME = "name";
     public static final String ATTRIBUTE_DATA_ITEM_REF = "itemSubjectRef";
+    
     // only used by valued data objects
     public static final String ELEMENT_DATA_VALUE = "value";
 

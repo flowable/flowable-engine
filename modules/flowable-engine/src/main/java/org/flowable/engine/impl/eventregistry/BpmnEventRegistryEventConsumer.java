@@ -10,36 +10,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.eventregistry;
+package org.flowable.engine.impl.eventregistry;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.flowable.cmmn.api.CmmnRuntimeService;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.eventregistry.EventRegistry;
 import org.flowable.common.engine.api.eventregistry.definition.EventDefinition;
 import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.eventregistry.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
 
-/**
- * @author Joram Barrez
- * @author Filip Hrisafov
- */
-public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer  {
+public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer  {
 
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected CommandExecutor commandExecutor;
 
-    public CmmnEventRegistryEventConsumer(CmmnEngineConfiguration cmmnEngineConfiguration, EventRegistry eventRegistry) {
+    public BpmnEventRegistryEventConsumer(ProcessEngineConfigurationImpl processEngineConfiguration, EventRegistry eventRegistry) {
         super(eventRegistry);
-        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
-        this.commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
+        this.processEngineConfiguration = processEngineConfiguration;
+        this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 
     @Override
@@ -53,9 +51,9 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
         // Always execute the events without a correlation key
         List<EventSubscription> eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(eventDefinition);
-        CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
-            handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance);
+            handleEventSubscription(runtimeService, eventSubscription, eventInstance);
         }
 
         Collection<String> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
@@ -63,36 +61,35 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             // If there are correlation keys then look for all event subscriptions matching them
             eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventDefinition, correlationKeys);
             for (EventSubscription eventSubscription : eventSubscriptions) {
-                handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance);
+                handleEventSubscription(runtimeService, eventSubscription, eventInstance);
             }
         }
-
     }
 
     protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(EventDefinition eventDefinition, Collection<String> correlationKeys) {
         return commandExecutor.execute(commandContext ->
             CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(
-                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).configurations(correlationKeys).scopeType(ScopeTypes.CMMN)));
+                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).configurations(correlationKeys).scopeType(ScopeTypes.BPMN)));
     }
 
     protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(EventDefinition eventDefinition) {
         return commandExecutor.execute(commandContext ->
             CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(
-                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).withoutConfiguration().scopeType(ScopeTypes.CMMN)));
+                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).withoutConfiguration().scopeType(ScopeTypes.BPMN)));
     }
 
-    protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription, EventInstance eventInstance) {
-        if (eventSubscription.getSubScopeId() != null) {
-            cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(eventSubscription.getSubScopeId())
-                .transientVariable("eventInstance", eventInstance)
-                .trigger();
+    protected void handleEventSubscription(RuntimeService runtimeService, EventSubscription eventSubscription, EventInstance eventInstance) {
+        if (eventSubscription.getExecutionId() != null) {
+            Map<String, Object> transientVariableMap = new HashMap<>();
+            transientVariableMap.put("eventInstance", eventInstance);
+            runtimeService.trigger(eventSubscription.getExecutionId(), null, transientVariableMap);
 
-        } else if (eventSubscription.getScopeDefinitionId() != null
-            && eventSubscription.getScopeId() == null && eventSubscription.getSubScopeId() == null) {
-            cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionId(eventSubscription.getScopeDefinitionId())
-                .transientVariable("eventInstance", eventInstance)
-                .start();
+        } else if (eventSubscription.getProcessDefinitionId() != null
+                        && eventSubscription.getProcessInstanceId() == null && eventSubscription.getExecutionId() == null) {
+            
+            runtimeService.createProcessInstanceBuilder().processDefinitionId(eventSubscription.getProcessDefinitionId())
+                    .transientVariable("eventInstance", eventInstance)
+                    .start();
         }
     }
 

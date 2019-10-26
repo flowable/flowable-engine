@@ -61,6 +61,7 @@ import org.flowable.engine.impl.bpmn.behavior.BoundaryCompensateEventActivityBeh
 import org.flowable.engine.impl.bpmn.behavior.BoundaryConditionalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundarySignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryTimerEventActivityBehavior;
@@ -488,6 +489,11 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public BoundaryCompensateEventActivityBehavior createBoundaryCompensateEventActivityBehavior(BoundaryEvent boundaryEvent, CompensateEventDefinition compensateEventDefinition, boolean interrupting) {
         return wrappedActivityBehaviorFactory.createBoundaryCompensateEventActivityBehavior(boundaryEvent, compensateEventDefinition, interrupting);
+    }
+    
+    @Override
+    public BoundaryEventRegistryEventActivityBehavior createBoundaryEventRegistryEventActivityBehavior(BoundaryEvent boundaryEvent, String eventDefinitionKey, boolean interrupting) {
+        return wrappedActivityBehaviorFactory.createBoundaryEventRegistryEventActivityBehavior(boundaryEvent, eventDefinitionKey, interrupting);
     }
 
     // Mock support //////////////////////////////////////////////////////

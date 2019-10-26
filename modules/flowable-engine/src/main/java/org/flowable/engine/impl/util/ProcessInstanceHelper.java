@@ -33,6 +33,7 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.eventregistry.runtime.EventInstance;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.context.Context;
@@ -203,7 +204,15 @@ public class ProcessInstanceHelper {
                 processInstance.setVariable(varName, startInstanceBeforeContext.getVariables().get(varName));
             }
         }
+        
         if (startInstanceBeforeContext.getTransientVariables() != null) {
+            
+            Object eventInstance = startInstanceBeforeContext.getTransientVariables().get("eventInstance");
+            if (eventInstance instanceof EventInstance) {
+                EventInstanceBpmnUtil.handleEventInstanceOutParameters(processInstance, startInstanceBeforeContext.getInitialFlowElement(), 
+                                (EventInstance) eventInstance);
+            }
+            
             for (String varName : startInstanceBeforeContext.getTransientVariables().keySet()) {
                 processInstance.setTransientVariable(varName, startInstanceBeforeContext.getTransientVariables().get(varName));
             }

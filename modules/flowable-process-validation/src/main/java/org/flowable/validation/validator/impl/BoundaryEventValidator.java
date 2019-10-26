@@ -15,6 +15,7 @@ package org.flowable.validation.validator.impl;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CancelEventDefinition;
@@ -23,6 +24,7 @@ import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Process;
@@ -61,9 +63,8 @@ public class BoundaryEventValidator extends ProcessLevelValidator {
                         && !(eventDefinition instanceof CancelEventDefinition) && !(eventDefinition instanceof MessageEventDefinition) 
                         && !(eventDefinition instanceof ConditionalEventDefinition) && !(eventDefinition instanceof CompensateEventDefinition) 
                         && !(eventDefinition instanceof EscalationEventDefinition)) {
-
+                    
                     addError(errors, Problems.BOUNDARY_EVENT_INVALID_EVENT_DEFINITION, process, boundaryEvent, "Invalid or unsupported event definition");
-
                 }
 
                 if (eventDefinition instanceof CancelEventDefinition) {
@@ -112,8 +113,18 @@ public class BoundaryEventValidator extends ProcessLevelValidator {
 
             } else {
 
-                addError(errors, Problems.BOUNDARY_EVENT_NO_EVENT_DEFINITION, process, boundaryEvent, "Event definition is missing from boundary event");
+                boolean isEventRegistryBoundaryEvent = false;
+                List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get("eventType");
+                if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
+                    String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
+                    if (StringUtils.isNotEmpty(eventTypeValue)) {
+                        isEventRegistryBoundaryEvent = true;
+                    }
+                }
 
+                if (!isEventRegistryBoundaryEvent) {
+                    addError(errors, Problems.BOUNDARY_EVENT_NO_EVENT_DEFINITION, process, boundaryEvent, "Event definition is missing from boundary event");
+                }
             }
         }
 

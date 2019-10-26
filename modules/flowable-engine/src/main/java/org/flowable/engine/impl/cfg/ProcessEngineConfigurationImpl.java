@@ -42,6 +42,7 @@ import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.eventregistry.EventRegistryEventBusConsumer;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
@@ -203,6 +204,7 @@ import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.event.logger.EventLogger;
+import org.flowable.engine.impl.eventregistry.BpmnEventRegistryEventConsumer;
 import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
 import org.flowable.engine.impl.form.DoubleFormType;
@@ -2592,6 +2594,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 commandExecutor.execute(getSchemaCommandConfig(), new SchemaOperationProcessEngineClose());
             }
         };
+    }
+    
+    @Override
+    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
+        return new BpmnEventRegistryEventConsumer(this, eventRegistry);
     }
 
     @Override

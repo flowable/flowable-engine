@@ -31,6 +31,7 @@ import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
@@ -351,9 +352,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         // The parent execution becomes a scope, and a child execution is created for each of the boundary events
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
 
-            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
-                    || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
-                continue;
+            if (!(boundaryEvent.getBehavior() instanceof BoundaryEventRegistryEventActivityBehavior)) {
+                if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
+                        || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+                    continue;
+                }
             }
 
             // A Child execution of the current execution is created to represent the boundary event being active
