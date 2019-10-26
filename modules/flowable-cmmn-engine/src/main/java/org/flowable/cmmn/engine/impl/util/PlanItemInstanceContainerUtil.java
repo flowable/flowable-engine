@@ -93,12 +93,22 @@ public class PlanItemInstanceContainerUtil {
                     // if the plan item is required and not yet in an end state or active, we need to check the special parent completion rule to determine
                     // if we need to prevent completion
                     if (ExpressionUtil.isRequiredPlanItemInstance(commandContext, planItem)) {
-                        alreadyCompleted = getAlreadyCompletedFlagIfPlanItemIsIgnoredForCompletion(commandContext, planItem, null);
-                        // check, if this plan item has repetition
-                        if (alreadyCompleted != null && alreadyCompleted) {
-                            continue;
+                        // if the plan item is repeatable, we need to further investigate, as a required plan item might have a special rule set to be ignored
+                        // after first completion
+                        if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItem)) {
+                            alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItem);
+                            if (shouldIgnorePlanItemForCompletion(commandContext, planItem, alreadyCompleted)) {
+                                continue;
+                            }
+                            if (!alreadyCompleted) {
+                                // was never completed before and is required, evaluation can stop here as we found required work still to be done
+                                return new CompletionEvaluationResult(false, false);
+                            }
+                            // we don't ignore it for completion, but if it was completed before, the parent is still completable (depends then on its autocompletion)
+                            shouldBeCompleted = false;
+                        } else {
+                            return new CompletionEvaluationResult(false, false);
                         }
-                        return new CompletionEvaluationResult(false, false);
                     }
 
                     // same thing, if we're not in autocomplete mode, but the parent completion mode of the plan item says to ignore if available or enabled
@@ -115,8 +125,10 @@ public class PlanItemInstanceContainerUtil {
 
                     // special care if the plan item is repeatable
                     if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItem)) {
-                        alreadyCompleted = getAlreadyCompletedFlagIfPlanItemIsIgnoredForCompletion(commandContext, planItem, alreadyCompleted);
-                        if (alreadyCompleted != null && alreadyCompleted) {
+                        if (alreadyCompleted == null) {
+                            alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItem);
+                        }
+                        if (shouldIgnorePlanItemForCompletion(commandContext, planItem, alreadyCompleted)) {
                             continue;
                         }
                     }
@@ -147,33 +159,24 @@ public class PlanItemInstanceContainerUtil {
     }
 
     /**
-     * Evaluates the plan item for being ignored for completion, if it was at least completed once before. The result is returned as a flag with lazy
-     * initialization, as its evaluation is quite expensive.
+     * Evaluates the plan item for being ignored for completion, if it was at least completed once before.
      *
      * @param commandContext the command context under which this method is invoked
      * @param planItem the plan item to evaluate its completed state
-     * @param alreadyCompleted the optional flag, if plan item completion was evaluated before as it involves a DB query and thus we want to avoid it to be
-     *      invoked more than once
-     * @return true, if the plan item was completed before and its parent completion mode is in ignored, if completed state, false, if it was never completed
-     *      before, null, if there was no need to evaluate the flag
+     * @param alreadyCompleted true, if the plan item has been completed before already
+     * @return true, if the plan item should be ignored for completion according the parent completion rule and if it was completed before
      */
-    public static Boolean getAlreadyCompletedFlagIfPlanItemIsIgnoredForCompletion(CommandContext commandContext, PlanItemInstanceEntity planItem, Boolean alreadyCompleted) {
+    public static boolean shouldIgnorePlanItemForCompletion(CommandContext commandContext, PlanItemInstanceEntity planItem, boolean alreadyCompleted) {
         // a required plan item with repetition might need special treatment
         if (isParentCompletionRuleForPlanItemEqualToType(planItem, ALWAYS_IGNORE_AFTER_FIRST_COMPLETION)) {
             // we're not (yet) in active state here and have repetition, so we need to check, whether that plan item was completed at least
             // once already in the past
-            if (alreadyCompleted == null) {
-                alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItem);
-            }
             return alreadyCompleted;
         } else if (isParentCompletionRuleForPlanItemEqualToType(planItem, IGNORE_AFTER_FIRST_COMPLETION_IF_AVAILABLE_OR_ENABLED) &&
             (AVAILABLE.equals(planItem.getState()) || ENABLED.equals(planItem.getState()))) {
-            if (alreadyCompleted == null) {
-                alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItem);
-            }
             return alreadyCompleted;
         }
-        return null;
+        return false;
     }
 
     /**
