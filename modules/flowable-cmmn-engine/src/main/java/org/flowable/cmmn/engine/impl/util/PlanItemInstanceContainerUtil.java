@@ -105,7 +105,7 @@ public class PlanItemInstanceContainerUtil {
                                 return new CompletionEvaluationResult(false, false);
                             }
                             // we don't ignore it for completion, but if it was completed before, the parent is still completable (depends then on its autocompletion)
-                            shouldBeCompleted = false;
+                            shouldBeCompleted = shouldBeCompleted && containerIsAutocomplete;
                         } else {
                             return new CompletionEvaluationResult(false, false);
                         }
