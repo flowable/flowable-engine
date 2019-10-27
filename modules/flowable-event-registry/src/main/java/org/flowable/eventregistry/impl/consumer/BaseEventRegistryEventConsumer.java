@@ -54,9 +54,14 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
 
     @Override
     public void eventReceived(FlowableEventBusEvent event) {
-        EventRegistryEvent eventRegistryEvent = (EventRegistryEvent) event;
-        if (eventRegistryEvent.getEventInstance() != null) {
-            eventReceived(eventRegistryEvent.getEventInstance());
+        if (event instanceof EventRegistryEvent) {
+            EventRegistryEvent eventRegistryEvent = (EventRegistryEvent) event;
+            if (eventRegistryEvent.getEventInstance() != null) {
+                eventReceived(eventRegistryEvent.getEventInstance());
+            } else {
+                // TODO: what should happen in this case?
+            }
+            
         } else {
             // TODO: what should happen in this case?
         }

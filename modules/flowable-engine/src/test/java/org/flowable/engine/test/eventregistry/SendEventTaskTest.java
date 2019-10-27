@@ -42,6 +42,13 @@ public class SendEventTaskTest extends FlowableTestCase {
             .key("myEvent")
             .payload("eventProperty", EventPayloadTypes.STRING)
             .register();
+        
+        processEngineConfiguration.getEventRegistry().newEventDefinition()
+            .outboundChannelKey("out-channel")
+            .key("anotherEvent")
+            .payload("nameProperty", EventPayloadTypes.STRING)
+            .payload("numberProperty", EventPayloadTypes.INTEGER)
+            .register();
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
@@ -59,8 +66,9 @@ public class SendEventTaskTest extends FlowableTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        processEngineConfiguration.getEventRegistry().removeChannelDefinition("test-channel");
+        processEngineConfiguration.getEventRegistry().removeChannelDefinition("out-channel");
         processEngineConfiguration.getEventRegistry().removeEventDefinition("myEvent");
+        processEngineConfiguration.getEventRegistry().removeEventDefinition("anotherEvent");
     }
 
     @Test
@@ -80,6 +88,30 @@ public class SendEventTaskTest extends FlowableTestCase {
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
         assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("test");
+    }
+    
+    @Test
+    @Deployment
+    public void testSendEventWithExpressions() throws Exception {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                        .processDefinitionKey("process")
+                        .variable("name", "someName")
+                        .variable("accountNumber", 123)
+                        .start();
+        
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        
+        taskService.complete(task.getId());
+        
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+        JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
+        assertThat(jsonNode).hasSize(2);
+        assertThat(jsonNode.get("nameProperty").asText()).isEqualTo("someName");
+        assertThat(jsonNode.get("numberProperty").asText()).isEqualTo("123");
     }
 
     public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
