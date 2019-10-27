@@ -188,7 +188,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    @CmmnDeployment(resources = { "org/flowable/CMMN/test/runtime/PlanItemCompletionTest.testNestedComplexCompletion.cmmn" })
+    @CmmnDeployment
     public void testNestedComplexCompletionAlternatePath() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestingPlanItems").start();
 
