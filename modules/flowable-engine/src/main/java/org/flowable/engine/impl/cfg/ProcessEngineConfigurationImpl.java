@@ -176,6 +176,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.ParallelGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ReceiveTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ScriptTaskParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.SendEventServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.SendTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.SequenceFlowParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ServiceTaskParseHandler;
@@ -1947,6 +1948,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new ProcessParseHandler());
         bpmnParserHandlers.add(new ReceiveTaskParseHandler());
         bpmnParserHandlers.add(new ScriptTaskParseHandler());
+        bpmnParserHandlers.add(new SendEventServiceTaskParseHandler());
         bpmnParserHandlers.add(new SendTaskParseHandler());
         bpmnParserHandlers.add(new SequenceFlowParseHandler());
         bpmnParserHandlers.add(new ServiceTaskParseHandler());

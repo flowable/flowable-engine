@@ -25,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.IOParameter;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.eventregistry.api.definition.EventDefinition;
@@ -75,33 +77,49 @@ public class EventInstanceBpmnUtil {
             BaseElement baseElement, EventDefinition eventDefinition) {
 
         List<EventPayloadInstance> eventPayloadInstances = new ArrayList<>();
-        List<ExtensionElement> inParameters = baseElement.getExtensionElements()
-            .getOrDefault(BpmnXMLConstants.ELEMENT_EVENT_IN_PARAMETER, Collections.emptyList());
-
-        if (!inParameters.isEmpty()) {
-
-            for (ExtensionElement inParameter : inParameters) {
-
-                String source = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
-                String target = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-
-                Optional<EventPayloadDefinition> matchingEventDefinition = eventDefinition.getEventPayloadDefinitions()
-                    .stream()
-                    .filter(e -> e.getName().equals(target))
-                    .findFirst();
-                if (matchingEventDefinition.isPresent()) {
-                    EventPayloadDefinition eventPayloadDefinition = matchingEventDefinition.get();
-
-                    Expression sourceExpression = expressionManager.createExpression(source);
-                    Object value = sourceExpression.getValue(variableScope);
-
-                    eventPayloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, value));
+        if (baseElement instanceof SendEventServiceTask) {
+            SendEventServiceTask eventServiceTask = (SendEventServiceTask) baseElement;
+            if (!eventServiceTask.getEventInParameters().isEmpty()) {
+                for (IOParameter parameter : eventServiceTask.getEventInParameters()) {
+                    addEventPayloadInstance(eventPayloadInstances, parameter.getSource(), parameter.getTarget(), 
+                                    variableScope, expressionManager, eventDefinition);
                 }
-
+            }
+            
+        } else {
+            List<ExtensionElement> inParameters = baseElement.getExtensionElements()
+                .getOrDefault(BpmnXMLConstants.ELEMENT_EVENT_IN_PARAMETER, Collections.emptyList());
+    
+            if (!inParameters.isEmpty()) {
+    
+                for (ExtensionElement inParameter : inParameters) {
+    
+                    String source = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
+                    String target = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
+    
+                    addEventPayloadInstance(eventPayloadInstances, source, target, variableScope, expressionManager, eventDefinition);
+                }
             }
         }
 
         return eventPayloadInstances;
+    }
+    
+    protected static void addEventPayloadInstance(List<EventPayloadInstance> eventPayloadInstances, String source, String target, 
+                    VariableScope variableScope, ExpressionManager expressionManager, EventDefinition eventDefinition) {
+        
+        Optional<EventPayloadDefinition> matchingEventDefinition = eventDefinition.getEventPayloadDefinitions()
+            .stream()
+            .filter(e -> e.getName().equals(target))
+            .findFirst();
+        if (matchingEventDefinition.isPresent()) {
+            EventPayloadDefinition eventPayloadDefinition = matchingEventDefinition.get();
+
+            Expression sourceExpression = expressionManager.createExpression(source);
+            Object value = sourceExpression.getValue(variableScope);
+
+            eventPayloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, value));
+        }
     }
 
 }

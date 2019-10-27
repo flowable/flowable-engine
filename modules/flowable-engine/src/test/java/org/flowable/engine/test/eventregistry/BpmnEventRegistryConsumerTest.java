@@ -79,7 +79,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableTestCase {
 
     @Test
     @Deployment
-    public void testGenericEventListenerNoCorrelation() {
+    public void testBoundaryEventListenerNoCorrelation() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
@@ -99,7 +99,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableTestCase {
     
     @Test
     @Deployment
-    public void testGenericEventListenerNoCorrelationNoTrigger() {
+    public void testBoundaryEventListenerNoCorrelationNoTrigger() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
@@ -115,7 +115,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableTestCase {
 
     @Test
     @Deployment
-    public void testGenericEventListenerWithCorrelation() {
+    public void testBoundaryEventListenerWithCorrelation() {
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("customerIdVar", "kermit");
         ProcessInstance kermitProcessInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
@@ -138,6 +138,32 @@ public class BpmnEventRegistryConsumerTest extends FlowableTestCase {
         inboundEventChannelAdapter.triggerTestEvent("gonzo");
         assertThat(taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).singleResult().getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
         assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).singleResult().getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
+    }
+    
+    @Test
+    @Deployment
+    public void testBoundaryEventListenerWithPayload() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
+        
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().activityId("eventBoundary").singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
+
+        inboundEventChannelAdapter.triggerTestEvent("payloadStartCustomer");
+        Task afterTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(afterTask.getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
+        
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+            .containsOnly(
+                entry("customerIdVar", "payloadStartCustomer"),
+                entry("payload1", "Hello World")
+            );
+        
+        eventSubscription = runtimeService.createEventSubscriptionQuery().activityId("eventBoundary").singleResult();
+        assertThat(eventSubscription).isNull();
     }
 
     @Test

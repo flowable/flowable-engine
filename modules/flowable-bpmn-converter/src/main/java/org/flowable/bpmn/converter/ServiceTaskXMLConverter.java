@@ -12,6 +12,9 @@
  */
 package org.flowable.bpmn.converter;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.export.FieldExtensionExport;
 import org.flowable.bpmn.converter.export.MapExceptionExport;
@@ -23,10 +26,8 @@ import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.CustomProperty;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.ServiceTask;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 /**
  * @author Tijs Rademakers
@@ -53,6 +54,9 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             
         } else if (ServiceTask.CASE_TASK.equals(serviceTaskType)) {
             serviceTask = new CaseServiceTask();
+            
+        } else if (ServiceTask.SEND_EVENT_TASK.equals(serviceTaskType)) {
+            serviceTask = new SendEventServiceTask();
             
         } else {
             serviceTask = new ServiceTask();
@@ -92,6 +96,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         
         if (serviceTask instanceof CaseServiceTask) {
             convertCaseServiceTaskXMLProperties((CaseServiceTask) serviceTask, model, xtr);
+        } else if (serviceTask instanceof SendEventServiceTask) {
+            convertSendEventServiceTaskXMLProperties((SendEventServiceTask) serviceTask, model, xtr);
         } else {
             parseChildElements(getXMLElementName(), serviceTask, model, xtr);
         }
@@ -157,7 +163,11 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
     }
     
     protected void convertCaseServiceTaskXMLProperties(CaseServiceTask caseServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) throws Exception {
-        
+        // override in CaseServiceTaskXMLConverter
+    }
+    
+    protected void convertSendEventServiceTaskXMLProperties(SendEventServiceTask sendEventServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) throws Exception {
+        // override in SendEventServiceTaskXMLConverter
     }
     
     protected boolean writeCustomProperties(ServiceTask serviceTask, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {

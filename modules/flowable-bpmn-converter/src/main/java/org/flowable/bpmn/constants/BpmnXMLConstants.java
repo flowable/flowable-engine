@@ -233,6 +233,9 @@ public interface BpmnXMLConstants {
     
     public static final String ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY = "caseDefinitionKey";
     public static final String ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME = "caseInstanceName";
+    
+    public static final String ATTRIBUTE_EVENT_TYPE = "eventType";
+    public static final String ATTRIBUTE_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
 
     public static final String ELEMENT_SEQUENCE_FLOW = "sequenceFlow";
     public static final String ELEMENT_FLOW_CONDITION = "conditionExpression";

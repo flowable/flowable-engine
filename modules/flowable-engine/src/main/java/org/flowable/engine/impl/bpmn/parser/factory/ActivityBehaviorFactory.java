@@ -35,6 +35,7 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.ParallelGateway;
 import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.ScriptTask;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.SendTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.Signal;
@@ -89,6 +90,7 @@ import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SendEventTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
@@ -169,6 +171,8 @@ public interface ActivityBehaviorFactory {
     public abstract ActivityBehavior createBusinessRuleTaskActivityBehavior(BusinessRuleTask businessRuleTask);
 
     public abstract ScriptTaskActivityBehavior createScriptTaskActivityBehavior(ScriptTask scriptTask);
+    
+    public abstract SendEventTaskActivityBehavior createSendEventTaskBehavior(SendEventServiceTask sendEventServiceTask);
 
     public abstract ExclusiveGatewayActivityBehavior createExclusiveGatewayActivityBehavior(ExclusiveGateway exclusiveGateway);
 
