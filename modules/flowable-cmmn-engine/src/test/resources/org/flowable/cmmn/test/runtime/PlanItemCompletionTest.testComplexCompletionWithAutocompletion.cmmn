@@ -7,7 +7,7 @@
                 <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
             </extensionElements>
             <planItem id="planItem9" name="Stage A" definitionRef="expandedStage1"></planItem>
-            <stage id="expandedStage1" name="Stage A" autoComplete="true" flowable:includeInStageOverview="true">
+            <stage id="expandedStage1" name="Stage A" flowable:autoCompleteCondition="${vars:getOrDefault('autocompleteEnabled', false)}" flowable:includeInStageOverview="true">
                 <extensionElements>
                     <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
                     <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
