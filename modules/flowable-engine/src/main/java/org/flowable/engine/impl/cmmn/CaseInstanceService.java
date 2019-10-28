@@ -37,6 +37,6 @@ public interface CaseInstanceService {
 
     void deleteCaseInstance(String caseInstanceId);
 
-    Set<String> findChildCaseIdsForExecutionIds(Set<String> executionIds);
+    Set<String> findChildCaseIdsForExecutionId(String executionId);
 
 }

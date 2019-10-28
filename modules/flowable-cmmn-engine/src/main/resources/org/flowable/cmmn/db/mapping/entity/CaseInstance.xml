@@ -405,12 +405,6 @@
             <if test="callbackId != null">
                 and RES.CALLBACK_ID_ = #{callbackId}
             </if>
-            <if test="callbackIds != null">
-                and RES.CALLBACK_ID_ IN
-                <foreach item="callbackId" index="index" collection="callbackIds" open="(" separator="," close=")">
-                    #{callbackId}
-                </foreach>
-            </if>
             <if test="callbackType != null">
                 and RES.CALLBACK_TYPE_ = #{callbackType}
             </if>

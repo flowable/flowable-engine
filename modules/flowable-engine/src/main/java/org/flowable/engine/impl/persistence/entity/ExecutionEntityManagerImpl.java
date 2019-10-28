@@ -22,6 +22,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
@@ -39,6 +40,7 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
@@ -783,6 +785,18 @@ public class ExecutionEntityManagerImpl
         deleteJobs(executionEntity, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteEventSubScriptions(executionEntity, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteActivityInstances(executionEntity, commandContext);
+        deleteSubCases(executionEntity, commandContext);
+    }
+
+    protected void deleteSubCases(ExecutionEntity executionEntity, CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration != null && processEngineConfiguration.getCaseInstanceService() != null) {
+            CaseInstanceService caseInstanceService = processEngineConfiguration.getCaseInstanceService();
+            Set<String> childCaseInstanceIds = caseInstanceService.findChildCaseIdsForExecutionId(executionEntity.getId());
+            for (String childCaseInstanceId : childCaseInstanceIds) {
+                caseInstanceService.deleteCaseInstance(childCaseInstanceId);
+            }
+        }
     }
 
     protected void deleteActivityInstances(ExecutionEntity executionEntity, CommandContext commandContext) {
