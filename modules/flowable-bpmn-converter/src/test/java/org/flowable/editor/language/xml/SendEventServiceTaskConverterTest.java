@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.SendEventServiceTask;
@@ -53,6 +54,8 @@ public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
         assertEquals("Send event task", sendEventServiceTask.getName());
 
         assertEquals("myEvent", sendEventServiceTask.getEventType());
+        assertTrue(sendEventServiceTask.isTriggerable());
+        assertEquals("triggerMyEvent", sendEventServiceTask.getTriggerEventType());
 
         List<IOParameter> parameters = sendEventServiceTask.getEventInParameters();
         assertEquals(2, parameters.size());
@@ -64,6 +67,18 @@ public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
         assertEquals("anotherCustomerId", parameter.getTarget());
 
         parameters = sendEventServiceTask.getEventOutParameters();
-        assertEquals(0, parameters.size());
+        assertEquals(1, parameters.size());
+        parameter = parameters.get(0);
+        assertEquals("eventProperty", parameter.getSource());
+        assertEquals("newVariable", parameter.getTarget());
+        
+        List<ExtensionElement> correlationParameters = sendEventServiceTask.getExtensionElements().get(ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER);
+        assertEquals(2, correlationParameters.size());
+        ExtensionElement correlationElement = correlationParameters.get(0);
+        assertEquals("customerId", correlationElement.getAttributeValue(null, "name"));
+        assertEquals("${customerIdVar}", correlationElement.getAttributeValue(null, "value"));
+        correlationElement = correlationParameters.get(1);
+        assertEquals("orderId", correlationElement.getAttributeValue(null, "name"));
+        assertEquals("${orderIdVar}", correlationElement.getAttributeValue(null, "value"));
     }
 }

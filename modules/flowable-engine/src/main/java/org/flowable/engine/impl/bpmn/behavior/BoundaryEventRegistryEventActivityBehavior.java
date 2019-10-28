@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -63,7 +64,7 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
                         .processDefinitionId(executionEntity.getProcessDefinitionId())
                         .scopeType(ScopeTypes.BPMN)
                         .tenantId(executionEntity.getTenantId())
-                        .configuration(CorrelationUtil.getCorrelationKey(commandContext, executionEntity))
+                        .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, executionEntity))
                         .create();
         
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);

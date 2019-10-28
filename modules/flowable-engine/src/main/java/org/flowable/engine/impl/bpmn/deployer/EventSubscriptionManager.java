@@ -14,6 +14,7 @@ package org.flowable.engine.impl.bpmn.deployer;
 
 import java.util.List;
 
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
@@ -180,7 +181,7 @@ public class EventSubscriptionManager {
                 .activityId(startEvent.getId())
                 .processDefinitionId(processDefinition.getId())
                 .scopeType(ScopeTypes.BPMN)
-                .configuration(CorrelationUtil.getCorrelationKey(commandContext, startEvent, null));
+                .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, startEvent, null));
                 
         if (processDefinition.getTenantId() != null) {
             eventSubscriptionBuilder.tenantId(processDefinition.getTenantId());

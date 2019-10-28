@@ -54,6 +54,16 @@ public class SendEventServiceTaskXMLConverter extends ServiceTaskXMLConverter {
             sendEventServiceTask.setEventType(eventType);
         }
         
+        String triggerable = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TRIGGERABLE, xtr);
+        if ("true".equalsIgnoreCase(triggerable)) {
+            sendEventServiceTask.setTriggerable(true);
+        }
+        
+        String triggerEventType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TRIGGER_EVENT_TYPE, xtr);
+        if (StringUtils.isNotEmpty(triggerEventType)) {
+            sendEventServiceTask.setTriggerEventType(triggerEventType);
+        }
+        
         parseChildElements(getXMLElementName(), sendEventServiceTask, childParserMap, bpmnModel, xtr);
     }
     
@@ -65,8 +75,17 @@ public class SendEventServiceTaskXMLConverter extends ServiceTaskXMLConverter {
         if (StringUtils.isNotEmpty(sendEventServiceTask.getSkipExpression())) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, sendEventServiceTask.getSkipExpression(), xtw);
         }
+        
         if (StringUtils.isNotEmpty(sendEventServiceTask.getEventType())) {
             writeQualifiedAttribute(ATTRIBUTE_EVENT_TYPE, sendEventServiceTask.getEventType(), xtw);
+        }
+        
+        if (sendEventServiceTask.isTriggerable()) {
+            writeQualifiedAttribute(ATTRIBUTE_TRIGGERABLE, "true", xtw);
+        }
+        
+        if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
+            writeQualifiedAttribute(ATTRIBUTE_TRIGGER_EVENT_TYPE, sendEventServiceTask.getTriggerEventType(), xtw);
         }
     }
 
@@ -75,6 +94,7 @@ public class SendEventServiceTaskXMLConverter extends ServiceTaskXMLConverter {
         SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) element;
         didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_IN_PARAMETER, sendEventServiceTask.getEventInParameters(), didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_OUT_PARAMETER, sendEventServiceTask.getEventOutParameters(), didWriteExtensionStartElement, xtw);
+        
         return didWriteExtensionStartElement;
     }
 

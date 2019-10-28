@@ -332,6 +332,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget(), xtw);
             }
+            if (ioParameter.isTransient()) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT, "true", xtw);
+            }
 
             xtw.writeEndElement();
         }

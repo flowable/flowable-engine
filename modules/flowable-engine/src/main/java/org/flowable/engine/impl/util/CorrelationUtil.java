@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -27,14 +26,14 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 public class CorrelationUtil {
 
-    public static String getCorrelationKey(CommandContext commandContext, ExecutionEntity executionEntity) {
-        return getCorrelationKey(commandContext, executionEntity.getCurrentFlowElement(), executionEntity);
+    public static String getCorrelationKey(String elementName, CommandContext commandContext, ExecutionEntity executionEntity) {
+        return getCorrelationKey(elementName, commandContext, executionEntity.getCurrentFlowElement(), executionEntity);
     }
     
-    public static String getCorrelationKey(CommandContext commandContext, FlowElement flowElement, ExecutionEntity executionEntity) {
+    public static String getCorrelationKey(String elementName, CommandContext commandContext, FlowElement flowElement, ExecutionEntity executionEntity) {
         String correlationKey = null;
         if (flowElement != null) {
-            List<ExtensionElement> eventCorrelations = flowElement.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER);
+            List<ExtensionElement> eventCorrelations = flowElement.getExtensionElements().get(elementName);
             if (eventCorrelations != null && !eventCorrelations.isEmpty()) {
                 ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
                 ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();

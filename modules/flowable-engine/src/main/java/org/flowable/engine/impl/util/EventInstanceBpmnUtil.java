@@ -44,25 +44,27 @@ public class EventInstanceBpmnUtil {
      * Typically used when mapping incoming event payload into a runtime instance (the {@link VariableScope)}.
      */
     public static void handleEventInstanceOutParameters(VariableScope variableScope, BaseElement baseElement, EventInstance eventInstance) {
-        List<ExtensionElement> outParameters = baseElement.getExtensionElements()
-            .getOrDefault(BpmnXMLConstants.ELEMENT_EVENT_OUT_PARAMETER, Collections.emptyList());
-        if (!outParameters.isEmpty()) {
-            Map<String, EventPayloadInstance> payloadInstances = eventInstance.getPayloadInstances()
+        Map<String, EventPayloadInstance> payloadInstances = eventInstance.getPayloadInstances()
                 .stream()
                 .collect(Collectors.toMap(EventPayloadInstance::getDefinitionName, Function.identity()));
-
-            for (ExtensionElement outParameter : outParameters) {
-                String payloadSourceName = outParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
-                EventPayloadInstance payloadInstance = payloadInstances.get(payloadSourceName);
-                String variableName = outParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-                if (StringUtils.isNotEmpty(variableName)) {
+        
+        if (baseElement instanceof SendEventServiceTask) {
+            SendEventServiceTask eventServiceTask = (SendEventServiceTask) baseElement;
+            if (!eventServiceTask.getEventOutParameters().isEmpty()) {
+                for (IOParameter parameter : eventServiceTask.getEventOutParameters()) {
+                    setEventParameterVariable(parameter.getSource(), parameter.getTarget(), parameter.isTransient(), payloadInstances, variableScope);
+                }
+            }
+            
+        } else {
+            List<ExtensionElement> outParameters = baseElement.getExtensionElements()
+                    .getOrDefault(BpmnXMLConstants.ELEMENT_EVENT_OUT_PARAMETER, Collections.emptyList());
+            if (!outParameters.isEmpty()) {
+                for (ExtensionElement outParameter : outParameters) {
+                    String payloadSourceName = outParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
+                    String variableName = outParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
                     Boolean isTransient = Boolean.valueOf(outParameter.getAttributeValue(null, "transient"));
-                    Object value = payloadInstance != null ? payloadInstance.getValue() : null;
-                    if (Boolean.TRUE.equals(isTransient)) {
-                        variableScope.setTransientVariable(variableName, value);
-                    } else {
-                        variableScope.setVariable(variableName, value);
-                    }
+                    setEventParameterVariable(payloadSourceName, variableName, isTransient, payloadInstances, variableScope);
                 }
             }
         }
@@ -103,6 +105,20 @@ public class EventInstanceBpmnUtil {
         }
 
         return eventPayloadInstances;
+    }
+    
+    protected static void setEventParameterVariable(String source, String target, boolean isTransient, 
+                    Map<String, EventPayloadInstance> payloadInstances, VariableScope variableScope) {
+        
+        EventPayloadInstance payloadInstance = payloadInstances.get(source);
+        if (StringUtils.isNotEmpty(target)) {
+            Object value = payloadInstance != null ? payloadInstance.getValue() : null;
+            if (Boolean.TRUE.equals(isTransient)) {
+                variableScope.setTransientVariable(target, value);
+            } else {
+                variableScope.setVariable(target, value);
+            }
+        }
     }
     
     protected static void addEventPayloadInstance(List<EventPayloadInstance> eventPayloadInstances, String source, String target, 

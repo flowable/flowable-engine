@@ -21,6 +21,7 @@ import java.util.List;
 public class SendEventServiceTask extends ServiceTask {
 
     protected String eventType;
+    protected String triggerEventType;
     protected List<IOParameter> eventInParameters = new ArrayList<>();
     protected List<IOParameter> eventOutParameters = new ArrayList<>();
 
@@ -30,6 +31,14 @@ public class SendEventServiceTask extends ServiceTask {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
+    }
+
+    public String getTriggerEventType() {
+        return triggerEventType;
+    }
+
+    public void setTriggerEventType(String triggerEventType) {
+        this.triggerEventType = triggerEventType;
     }
 
     public List<IOParameter> getEventInParameters() {
@@ -58,6 +67,7 @@ public class SendEventServiceTask extends ServiceTask {
     public void setValues(SendEventServiceTask otherElement) {
         super.setValues(otherElement);
         setEventType(otherElement.getEventType());
+        setTriggerEventType(otherElement.getTriggerEventType());
         
         eventInParameters = new ArrayList<>();
         if (otherElement.getEventInParameters() != null && !otherElement.getEventInParameters().isEmpty()) {
