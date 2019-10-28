@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.cmmn;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +37,6 @@ public interface CaseInstanceService {
 
     void deleteCaseInstance(String caseInstanceId);
 
-    Set<String> findChildCaseIdsForExecutionIds(Collection<String> executionIds);
+    Set<String> findChildCaseIdsForExecutionIds(Set<String> executionIds);
 
 }
