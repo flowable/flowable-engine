@@ -10,7 +10,7 @@
             <planItem id="planItem7" name="Task E" definitionRef="humanTask5">
                 <itemControl>
                     <extensionElements>
-                        <flowable:parentCompletionRule type="alwaysIgnoreAfterFirstCompletion" />
+                        <flowable:parentCompletionRule type="ignoreAfterFirstCompletion" />
                     </extensionElements>
                     <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
                     <requiredRule></requiredRule>

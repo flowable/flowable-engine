@@ -516,7 +516,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
                 if (planItem.getItemControl().getParentCompletionRule() == null) {
                     ParentCompletionRule parentCompletionRule = new ParentCompletionRule();
-                    parentCompletionRule.setType(ParentCompletionRule.ALWAYS_IGNORE);
+                    parentCompletionRule.setType(ParentCompletionRule.IGNORE);
 
                     planItem.getItemControl().setParentCompletionRule(parentCompletionRule);
                 }

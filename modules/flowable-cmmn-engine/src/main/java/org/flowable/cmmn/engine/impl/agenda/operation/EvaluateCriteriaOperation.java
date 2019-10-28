@@ -191,7 +191,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
                     if (planItem.getItemControl() != null && planItem.getItemControl().getParentCompletionRule() != null) {
                         ParentCompletionRule parentCompletionRule = planItem.getItemControl().getParentCompletionRule();
-                        if (ParentCompletionRule.ALWAYS_IGNORE.equals(parentCompletionRule.getType())) {
+                        if (ParentCompletionRule.IGNORE.equals(parentCompletionRule.getType())) {
                             continue;
                         }
                     }

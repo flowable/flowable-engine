@@ -67,7 +67,7 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected boolean completeable;
+    protected boolean completable;
     protected boolean onlyStages;
     protected String entryCriterionId;
     protected String exitCriterionId;
@@ -455,8 +455,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     
     @Override
-    public PlanItemInstanceQuery planItemInstanceCompleteable() {
-        this.completeable = true;
+    public PlanItemInstanceQuery planItemInstanceCompletable() {
+        this.completable = true;
         return this;
     }
     
@@ -708,8 +708,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     public String getReferenceType() {
         return referenceType;
     }
-    public boolean isCompleteable() {
-        return completeable;
+    public boolean isCompletable() {
+        return completable;
     }
     public boolean isOnlyStages() {
         return onlyStages;

@@ -218,7 +218,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
         assertTrue(stagePlanItemInstance.isCompletable());
         assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
 
-        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceCompleteable().singleResult());
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceCompletable().singleResult());
         cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
         assertCaseInstanceEnded(caseInstance);
     }

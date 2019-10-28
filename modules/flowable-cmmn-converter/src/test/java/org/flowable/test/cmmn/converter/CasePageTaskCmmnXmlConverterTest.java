@@ -79,7 +79,7 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("Icon 1", taskA.getIcon());
         assertNotNull(planItemTaskA.getItemControl());
         assertNotNull(planItemTaskA.getItemControl().getParentCompletionRule());
-        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, planItemTaskA.getItemControl().getParentCompletionRule().getType());
+        assertEquals(ParentCompletionRule.IGNORE, planItemTaskA.getItemControl().getParentCompletionRule().getType());
 
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
@@ -90,7 +90,7 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("B", taskB.getName());
         assertNotNull(planItemTaskB.getItemControl());
         assertNotNull(planItemTaskB.getItemControl().getParentCompletionRule());
-        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, planItemTaskB.getItemControl().getParentCompletionRule().getType());
+        assertEquals(ParentCompletionRule.IGNORE, planItemTaskB.getItemControl().getParentCompletionRule().getType());
         
         assertEquals(1, taskB.getExtensionElements().size());
         List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("index");

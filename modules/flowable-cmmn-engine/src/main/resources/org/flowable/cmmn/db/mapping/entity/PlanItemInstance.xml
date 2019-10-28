@@ -36,7 +36,7 @@
             #{startUserId ,jdbcType=VARCHAR},
             #{referenceId ,jdbcType=VARCHAR},
             #{referenceType ,jdbcType=VARCHAR},
-            #{completeable ,jdbcType=BOOLEAN},
+            #{completable ,jdbcType=BOOLEAN},
             #{entryCriterionId, jdbcType=VARCHAR},
             #{exitCriterionId, jdbcType=VARCHAR},
             #{countEnabled, jdbcType=BOOLEAN},
@@ -80,7 +80,7 @@
             #{planItemInstance.startUserId ,jdbcType=VARCHAR},
             #{planItemInstance.referenceId, jdbcType=VARCHAR},
             #{planItemInstance.referenceType, jdbcType=VARCHAR},
-            #{planItemInstance.completeable, jdbcType=BOOLEAN},
+            #{planItemInstance.completable, jdbcType=BOOLEAN},
             #{planItemInstance.entryCriterionId, jdbcType=VARCHAR},
             #{planItemInstance.exitCriterionId, jdbcType=VARCHAR},
             #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
@@ -125,7 +125,7 @@
                 #{planItemInstance.startUserId ,jdbcType=VARCHAR},
                 #{planItemInstance.referenceId, jdbcType=VARCHAR},
                 #{planItemInstance.referenceType, jdbcType=VARCHAR},
-                #{planItemInstance.completeable, jdbcType=BOOLEAN},
+                #{planItemInstance.completable, jdbcType=BOOLEAN},
                 #{planItemInstance.entryCriterionId, jdbcType=VARCHAR},
                 #{planItemInstance.exitCriterionId, jdbcType=VARCHAR},
                 #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
@@ -210,8 +210,8 @@
         <if test="originalPersistentState.referenceType != referenceType">
             REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
         </if>
-        <if test="originalPersistentState.completeable != completeable">
-            IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN},
+        <if test="originalPersistentState.completable != completable">
+            IS_COMPLETEABLE_ = #{completable, jdbcType=BOOLEAN},
         </if>
         <if test="originalPersistentState.entryCriterionId != entryCriterionId">
             ENTRY_CRITERION_ID_ = #{entryCriterionId, jdbcType=VARCHAR},
@@ -280,7 +280,7 @@
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
-    <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
+    <result property="completable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
     <result property="entryCriterionId" column="ENTRY_CRITERION_ID_" jdbcType="VARCHAR" />
     <result property="exitCriterionId" column="EXIT_CRITERION_ID_" jdbcType="VARCHAR" />
     <result property="countEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
@@ -452,8 +452,8 @@
         <if test="referenceType != null">
             and RES.REFERENCE_TYPE_ = #{referenceType}
         </if>
-        <if test="completeable">
-            and RES.IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
+        <if test="completable">
+            and RES.IS_COMPLETEABLE_ = #{completable, jdbcType=BOOLEAN}
         </if>
         <if test="onlyStages">
             and RES.IS_STAGE_ = #{onlyStages, jdbcType=BOOLEAN}

@@ -17,8 +17,8 @@ import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.END_STATES;
-import static org.flowable.cmmn.model.ParentCompletionRule.ALWAYS_IGNORE;
-import static org.flowable.cmmn.model.ParentCompletionRule.ALWAYS_IGNORE_AFTER_FIRST_COMPLETION;
+import static org.flowable.cmmn.model.ParentCompletionRule.IGNORE;
+import static org.flowable.cmmn.model.ParentCompletionRule.IGNORE_AFTER_FIRST_COMPLETION;
 import static org.flowable.cmmn.model.ParentCompletionRule.IGNORE_AFTER_FIRST_COMPLETION_IF_AVAILABLE_OR_ENABLED;
 import static org.flowable.cmmn.model.ParentCompletionRule.IGNORE_IF_AVAILABLE;
 import static org.flowable.cmmn.model.ParentCompletionRule.IGNORE_IF_AVAILABLE_OR_ENABLED;
@@ -56,7 +56,7 @@ public class PlanItemInstanceContainerUtil {
     }
 
     /**
-     * Method to check a plan item container (most likely a stage or case plan model) if it should be completed according its child plan item states, their
+     * Method to check a plan item container (most likely a stage or case plan model) if it should be completed according its child plan item states and their
      * combined behavior rules (e.g. repetition, if-part, manual activation, required, etc). The method returns two results: whether the plan item itself
      * is completable, which is the case when there is no more active or required work to be done, but it might still have optional work to do and a second
      * one which represents whether the plan item should in fact be completed (the difference being the state of the autocomplete mode, where if turned off,
@@ -74,30 +74,30 @@ public class PlanItemInstanceContainerUtil {
         boolean shouldBeCompleted = true;
 
         if (planItemInstanceContainer.getChildPlanItemInstances() != null) {
-            for (PlanItemInstanceEntity planItem : planItemInstanceContainer.getChildPlanItemInstances()) {
+            for (PlanItemInstanceEntity planItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
 
                 // check, if the plan item should be ignored as its id is part of the list of plan items to be ignored
-                if (planItemInstanceIdsToIgnore == null || !planItemInstanceIdsToIgnore.contains(planItem.getId())) {
+                if (planItemInstanceIdsToIgnore == null || !planItemInstanceIdsToIgnore.contains(planItemInstance.getId())) {
                     Boolean alreadyCompleted = null;
 
                     // continue, if the plan item is in one of the end states or it is configured to be ignored for parent completion
-                    if (END_STATES.contains(planItem.getState()) || isParentCompletionRuleForPlanItemEqualToType(planItem, ALWAYS_IGNORE)) {
+                    if (END_STATES.contains(planItemInstance.getState()) || isParentCompletionRuleForPlanItemEqualToType(planItemInstance, IGNORE)) {
                         continue;
                     }
 
                     // if the plan item is active and not to be ignored, we can directly stop to look any further as it prevents the parent from being completed
-                    if (ACTIVE_STATES.contains(planItem.getState())) {
+                    if (ACTIVE_STATES.contains(planItemInstance.getState())) {
                         return new CompletionEvaluationResult(false, false);
                     }
 
                     // if the plan item is required and not yet in an end state or active, we need to check the special parent completion rule to determine
                     // if we need to prevent completion
-                    if (ExpressionUtil.isRequiredPlanItemInstance(commandContext, planItem)) {
+                    if (ExpressionUtil.isRequiredPlanItemInstance(commandContext, planItemInstance)) {
                         // if the plan item is repeatable, we need to further investigate, as a required plan item might have a special rule set to be ignored
                         // after first completion
-                        if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItem)) {
-                            alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItem);
-                            if (shouldIgnorePlanItemForCompletion(commandContext, planItem, alreadyCompleted)) {
+                        if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstance)) {
+                            alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItemInstance);
+                            if (shouldIgnorePlanItemForCompletion(commandContext, planItemInstance, alreadyCompleted)) {
                                 continue;
                             }
                             if (!alreadyCompleted) {
@@ -112,45 +112,47 @@ public class PlanItemInstanceContainerUtil {
                     }
 
                     // same thing, if we're not in autocomplete mode, but the parent completion mode of the plan item says to ignore if available or enabled
-                    if (isParentCompletionRuleForPlanItemEqualToType(planItem, IGNORE_IF_AVAILABLE_OR_ENABLED) &&
-                        (ENABLED.equals(planItem.getState()) || AVAILABLE.equals(planItem.getState()))) {
+                    if (isParentCompletionRuleForPlanItemEqualToType(planItemInstance, IGNORE_IF_AVAILABLE_OR_ENABLED) &&
+                        (ENABLED.equals(planItemInstance.getState()) || AVAILABLE.equals(planItemInstance.getState()))) {
                         continue;
                     }
 
                     // same for the available state
-                    if ((isParentCompletionRuleForPlanItemEqualToType(planItem, IGNORE_IF_AVAILABLE) || ExpressionUtil.isCompletionNeutralPlanItemInstance(commandContext, planItem))
-                        && AVAILABLE.equals(planItem.getState())) {
+                    if ((isParentCompletionRuleForPlanItemEqualToType(planItemInstance, IGNORE_IF_AVAILABLE) || ExpressionUtil.isCompletionNeutralPlanItemInstance(commandContext, planItemInstance))
+                        && AVAILABLE.equals(planItemInstance.getState())) {
                         continue;
                     }
 
                     // special care if the plan item is repeatable
-                    if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItem)) {
+                    if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstance)) {
                         if (alreadyCompleted == null) {
-                            alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItem);
+                            alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItemInstance);
                         }
-                        if (shouldIgnorePlanItemForCompletion(commandContext, planItem, alreadyCompleted)) {
+                        if (shouldIgnorePlanItemForCompletion(commandContext, planItemInstance, alreadyCompleted)) {
                             continue;
                         }
                     }
 
                     // if the plan item is in available or enabled state, we ignore it, if we look at it with autocompletion in mind
-                    if (AVAILABLE.equals(planItem.getState()) || ENABLED.equals(planItem.getState())) {
+                    if (AVAILABLE.equals(planItemInstance.getState()) || ENABLED.equals(planItemInstance.getState())) {
                         shouldBeCompleted = shouldBeCompleted && containerIsAutocomplete;
                     }
 
                     // recursively invoke this method again with the current child plan item to check its children
-                    if (planItem.getChildPlanItemInstances() != null) {
+                    if (planItemInstance.getChildPlanItemInstances() != null) {
+
                         boolean childContainerIsAutocomplete = false;
-                        if (PlanItemDefinitionType.STAGE.equals(planItem.getPlanItemDefinitionType())) {
-                            Stage stage = (Stage) planItem.getPlanItem().getPlanItemDefinition();
+                        if (PlanItemDefinitionType.STAGE.equals(planItemInstance.getPlanItemDefinitionType())) {
+                            Stage stage = (Stage) planItemInstance.getPlanItem().getPlanItemDefinition();
                             childContainerIsAutocomplete = stage.isAutoComplete();
                         }
-                        CompletionEvaluationResult completionEvaluationResult = shouldPlanItemContainerComplete(commandContext, planItem, null,
-                            childContainerIsAutocomplete);
-                        if (!completionEvaluationResult.isCompletable) {
+
+                        CompletionEvaluationResult childPlanItemInstanceCompletionEvaluationResult =
+                            shouldPlanItemContainerComplete(commandContext, planItemInstance, null, childContainerIsAutocomplete);
+                        if (!childPlanItemInstanceCompletionEvaluationResult.isCompletable) {
                             return new CompletionEvaluationResult(false, false);
                         }
-                        shouldBeCompleted = shouldBeCompleted & completionEvaluationResult.shouldBeCompleted;
+                        shouldBeCompleted = shouldBeCompleted && childPlanItemInstanceCompletionEvaluationResult.shouldBeCompleted;
                     }
                 }
             }
@@ -162,18 +164,18 @@ public class PlanItemInstanceContainerUtil {
      * Evaluates the plan item for being ignored for completion, if it was at least completed once before.
      *
      * @param commandContext the command context under which this method is invoked
-     * @param planItem the plan item to evaluate its completed state
+     * @param planItemInstance the plan item to evaluate its completed state
      * @param alreadyCompleted true, if the plan item has been completed before already
      * @return true, if the plan item should be ignored for completion according the parent completion rule and if it was completed before
      */
-    public static boolean shouldIgnorePlanItemForCompletion(CommandContext commandContext, PlanItemInstanceEntity planItem, boolean alreadyCompleted) {
+    public static boolean shouldIgnorePlanItemForCompletion(CommandContext commandContext, PlanItemInstanceEntity planItemInstance, boolean alreadyCompleted) {
         // a required plan item with repetition might need special treatment
-        if (isParentCompletionRuleForPlanItemEqualToType(planItem, ALWAYS_IGNORE_AFTER_FIRST_COMPLETION)) {
+        if (isParentCompletionRuleForPlanItemEqualToType(planItemInstance, IGNORE_AFTER_FIRST_COMPLETION)) {
             // we're not (yet) in active state here and have repetition, so we need to check, whether that plan item was completed at least
             // once already in the past
             return alreadyCompleted;
-        } else if (isParentCompletionRuleForPlanItemEqualToType(planItem, IGNORE_AFTER_FIRST_COMPLETION_IF_AVAILABLE_OR_ENABLED) &&
-            (AVAILABLE.equals(planItem.getState()) || ENABLED.equals(planItem.getState()))) {
+        } else if (isParentCompletionRuleForPlanItemEqualToType(planItemInstance, IGNORE_AFTER_FIRST_COMPLETION_IF_AVAILABLE_OR_ENABLED) &&
+            (AVAILABLE.equals(planItemInstance.getState()) || ENABLED.equals(planItemInstance.getState()))) {
             return alreadyCompleted;
         }
         return false;
@@ -183,14 +185,14 @@ public class PlanItemInstanceContainerUtil {
      * Searches for completed plan items with the same plan item id as the given one.
      *
      * @param commandContext the command context under which this method is invoked
-     * @param planItem the plan item instance to search for already completed instances
+     * @param planItemInstance the plan item instance to search for already completed instances
      * @return true, if there is at least one completed instance found, false otherwise
      */
-    public static boolean isPlanItemAlreadyCompleted(CommandContext commandContext, PlanItemInstanceEntity planItem) {
-        List<PlanItemInstanceEntity> planItems = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-            .findByCaseInstanceIdAndPlanItemId(planItem.getCaseInstanceId(), planItem.getPlanItem().getId());
-        if (planItems != null && planItems.size() > 0) {
-            for (PlanItemInstanceEntity item : planItems) {
+    public static boolean isPlanItemAlreadyCompleted(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
+        List<PlanItemInstanceEntity> planItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+            .findByCaseInstanceIdAndPlanItemId(planItemInstance.getCaseInstanceId(), planItemInstance.getPlanItem().getId());
+        if (planItemInstances != null && planItemInstances.size() > 0) {
+            for (PlanItemInstanceEntity item : planItemInstances) {
                 if (COMPLETED.equals(item.getState())) {
                     return true;
                 }
@@ -202,13 +204,13 @@ public class PlanItemInstanceContainerUtil {
     /**
      * Checks the plan items parent completion mode to be equal to a given type and returns true if so.
      *
-     * @param planItem the plan item to check for a parent completion mode
+     * @param planItemInstance the plan item to check for a parent completion mode
      * @param parentCompletionRuleType the parent completion type to check against
      * @return true, if there is a parent completion mode set on the plan item equal to the given one
      */
-    public static boolean isParentCompletionRuleForPlanItemEqualToType(PlanItemInstanceEntity planItem, String parentCompletionRuleType) {
-        if (planItem.getPlanItem().getItemControl() != null && planItem.getPlanItem().getItemControl().getParentCompletionRule() != null) {
-            ParentCompletionRule parentCompletionRule = planItem.getPlanItem().getItemControl().getParentCompletionRule();
+    public static boolean isParentCompletionRuleForPlanItemEqualToType(PlanItemInstanceEntity planItemInstance, String parentCompletionRuleType) {
+        if (planItemInstance.getPlanItem().getItemControl() != null && planItemInstance.getPlanItem().getItemControl().getParentCompletionRule() != null) {
+            ParentCompletionRule parentCompletionRule = planItemInstance.getPlanItem().getItemControl().getParentCompletionRule();
             if (parentCompletionRuleType.equals(parentCompletionRule.getType())) {
                 return true;
             }

@@ -17,7 +17,7 @@
                 <planItem id="planItem4" name="Case Page Task One" definitionRef="casePageTask1">
                     <itemControl>
                         <extensionElements>
-                            <flowable:parentCompletionRule type="alwaysIgnore" />
+                            <flowable:parentCompletionRule type="ignore" />
                         </extensionElements>
                     </itemControl>
                 </planItem>

@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.cmmn.test.runtime;
 
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
@@ -59,6 +71,44 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
             assertEquals(expectedNames[i], planItemInstances.get(i).getName());
             assertEquals(expectedStates[i], planItemInstances.get(i).getState());
         }
+
+        // trigger user listener to complete stage
+        cmmnRuntimeService.completeUserEventListenerInstance(planItemInstances.get(3).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testManualActivatedTaskWithRepetitionIgnoreAfterFirstCompletion() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("requiredTaskWithRepetitionAndManualActivation").start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "User Listener A", AVAILABLE);
+
+        // Completing the task should not complete the case instance, even when set to 'ignoreAfterFirstCompletion',
+        // as the event listener is still there in the available state.
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .orderByEndTime().asc()
+            .includeEnded()
+            .list();
+
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED, COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "User Listener A", AVAILABLE);
 
         // trigger user listener to complete stage
         cmmnRuntimeService.completeUserEventListenerInstance(planItemInstances.get(3).getId());
