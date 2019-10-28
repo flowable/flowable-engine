@@ -380,4 +380,36 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
         }
     }
 
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn"})
+    public void testCaseTaskWithTwoCaseTasksWithTerminateEndEvent() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithTwoParallelCasesAndWithTerminateEndEventOnDifferentExecution.bpmn20.xml")
+                .deploy();
+
+        try {
+            // Arrange
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateByEndEvent");
+            Task task = processEngineTaskService.createTaskQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .singleResult();
+            Assumptions.assumeThat(task).isNotNull();
+            Assumptions.assumeThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
+
+            long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assumptions.assumeThat(numberOfActiveCaseInstances).isEqualTo(2);
+
+            // Act
+            processEngineTaskService.complete(task.getId());
+
+            // Assert
+            long numberOfActiveCaseInstancesAfterCompletion = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstancesAfterCompletion).isEqualTo(0);
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
 }
