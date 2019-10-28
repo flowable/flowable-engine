@@ -56,7 +56,9 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
         
         FlowElement flowElement = execution.getCurrentFlowElement();
         if (!(flowElement instanceof CaseServiceTask)) {
-            throw new FlowableException("No execution could be found with a case service task for id " + executionId);
+            // The execution already passed this stage, there is no need to trigger the case task anymore.
+            // One possible reason for this is, that the case task was terminated by a boundary event.
+            return null;
         }
         
         CaseServiceTask caseServiceTask = (CaseServiceTask) flowElement;

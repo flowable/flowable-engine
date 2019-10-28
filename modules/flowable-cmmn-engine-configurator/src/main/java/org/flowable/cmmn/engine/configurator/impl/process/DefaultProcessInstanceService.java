@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.configurator.impl.process;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -109,7 +110,9 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
         
         FlowElement flowElement = execution.getCurrentFlowElement();
         if (!(flowElement instanceof CaseServiceTask)) {
-            throw new FlowableException("No execution could be found with a case service task for id " + executionId);
+            // The execution already processed this stage, there is no need to copy parameters anymore.
+            // One possible reason for this is that the case task was terminated by a boundary event.
+            return Collections.emptyList();
         }
         
         List<IOParameter> cmmnParameters = new ArrayList<>();
