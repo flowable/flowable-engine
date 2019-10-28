@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.configurator.impl.cmmn;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,7 +21,6 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
-import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnEngineEntityConstants;
@@ -115,16 +113,11 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     }
 
     @Override
-    public Set<String> findChildCaseIdsForExecutionIds(Collection<String> executionIds) {
+    public Set<String> findChildCaseIdsForExecutionIds(Set<String> executionIds) {
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
-        CaseInstanceQuery caseInstanceQuery = cmmnRuntimeService.createCaseInstanceQuery()
+        return cmmnRuntimeService.createCaseInstanceQuery()
                 .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
-                .or();
-        for (String executionId : executionIds) {
-            caseInstanceQuery.caseInstanceCallbackId(executionId);
-        }
-        return caseInstanceQuery
-                .endOr()
+                .caseInstanceCallbackIds(executionIds)
                 .list()
                 .stream()
                 .map(CaseInstance::getId)
