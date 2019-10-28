@@ -113,11 +113,11 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     }
 
     @Override
-    public Set<String> findChildCaseIdsForExecutionIds(Set<String> executionIds) {
+    public Set<String> findChildCaseIdsForExecutionId(String executionId) {
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         return cmmnRuntimeService.createCaseInstanceQuery()
                 .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
-                .caseInstanceCallbackIds(executionIds)
+                .caseInstanceCallbackId(executionId)
                 .list()
                 .stream()
                 .map(CaseInstance::getId)

@@ -13,8 +13,6 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
@@ -39,7 +37,6 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,18 +218,6 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             }
         }
         
-        CaseInstanceService caseInstanceService = CommandContextUtil.getProcessEngineConfiguration().getCaseInstanceService();
-        if (caseInstanceService != null) {
-            Set<String> executionIds = childExecutions
-                    .stream()
-                    .map(ExecutionEntity::getId)
-                    .collect(Collectors.toSet());
-            Set<String> childCaseInstanceIds = caseInstanceService.findChildCaseIdsForExecutionIds(executionIds);
-            for (String childCaseInstanceId : childCaseInstanceIds) {
-                caseInstanceService.deleteCaseInstance(childCaseInstanceId);
-            }
-        }
-
         CommandContextUtil.getExecutionEntityManager().deleteChildExecutions(rootExecutionEntity, null, null, deleteReason, true, terminateEndEvent);
         sendProcessInstanceCompletedEvent(rootExecutionEntity, terminateEndEvent);
         executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason, false);
