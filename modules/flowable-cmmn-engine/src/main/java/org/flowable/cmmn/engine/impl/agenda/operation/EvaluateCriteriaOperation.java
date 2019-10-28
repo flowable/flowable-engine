@@ -408,8 +408,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
 
     protected boolean isStageCompletable(PlanItemInstanceEntity stagePlanItemInstanceEntity, Stage stage) {
+        boolean autoComplete = ExpressionUtil.evaluateAutoComplete(commandContext, stagePlanItemInstanceEntity, stage);
         CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
-            .shouldPlanItemContainerComplete(commandContext, stagePlanItemInstanceEntity, stage.isAutoComplete());
+            .shouldPlanItemContainerComplete(commandContext, stagePlanItemInstanceEntity, autoComplete);
 
         if (completionEvaluationResult.isCompletable()) {
             stagePlanItemInstanceEntity.setCompletable(true);
@@ -419,7 +420,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
 
     protected boolean evaluatePlanModelComplete() {
-        boolean isAutoComplete = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel().isAutoComplete();
+        boolean isAutoComplete = ExpressionUtil.evaluateAutoComplete(commandContext, caseInstanceEntity,
+            CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel());
+
         CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
             .shouldPlanItemContainerComplete(commandContext, caseInstanceEntity, isAutoComplete);
 

@@ -144,7 +144,8 @@ public class PlanItemInstanceContainerUtil {
                         boolean childContainerIsAutocomplete = false;
                         if (PlanItemDefinitionType.STAGE.equals(planItemInstance.getPlanItemDefinitionType())) {
                             Stage stage = (Stage) planItemInstance.getPlanItem().getPlanItemDefinition();
-                            childContainerIsAutocomplete = stage.isAutoComplete();
+
+                            childContainerIsAutocomplete = ExpressionUtil.evaluateAutoComplete(commandContext, planItemInstance, stage);
                         }
 
                         CompletionEvaluationResult childPlanItemInstanceCompletionEvaluationResult =

@@ -1,0 +1,475 @@
+package org.flowable.cmmn.test.runtime;
+
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.junit.Test;
+
+/**
+ * Testing the auto-complete condition expression.
+ *
+ * @author Micha Kiener
+ */
+public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/AutoCompleteEvaluationTest.testAutoCompleteCondition.cmmn")
+    public void testEnableStageAutoCompleteConditionOnStart() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("autoCompleteTest")
+            .variable("enableStageAutoComplete", true)
+            .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start and complete Task B which will auto-complete Stage A
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start and complete Task C -> will complete the case
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(0).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/AutoCompleteEvaluationTest.testAutoCompleteCondition.cmmn")
+    public void testEnableStageAutoCompleteConditionOnStartSecondPath() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("autoCompleteTest")
+            .variable("enableStageAutoComplete", true)
+            .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start Task A, nothing yet happens
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
+
+        // start Task B which will still not yet auto-complete Stage A
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // now also complete Task B -> still no auto-complete, as Task A is still active, even if not required
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // now also complete Task A -> Stage A should now get auto-completed
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start and complete Task C -> will complete the case
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(0).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/AutoCompleteEvaluationTest.testAutoCompleteCondition.cmmn")
+    public void testEnablePlanModelAutoCompleteConditionOnStart() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("autoCompleteTest")
+            .variable("enableStageAutoComplete", true)
+            .variable("enablePlanModelAutoComplete", true)
+            .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start and complete Task B which will auto-complete Stage A and even the full case as Task C is optional and the case itself is on auto-complete
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/AutoCompleteEvaluationTest.testAutoCompleteCondition.cmmn")
+    public void testEnablePlanModelAutoCompleteConditionOnStartSecondPath() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("autoCompleteTest")
+            .variable("enableStageAutoComplete", true)
+            .variable("enablePlanModelAutoComplete", true)
+            .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start Task A, nothing yet happens
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
+
+        // start Task B which will still not yet auto-complete Stage A
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // now also complete Task B -> still no auto-complete, as Task A is still active, even if not required
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start Task C which will prevent the case from being completed directly, if Stage A completes
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(3).getId());
+
+        // now also complete Task A -> Stage A should now get auto-completed
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+
+        // complete Task C -> will complete the case
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/AutoCompleteEvaluationTest.testAutoCompleteCondition.cmmn")
+    public void testEnableStageAutoCompleteConditionDynamic() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("autoCompleteTest")
+            .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start and complete Task B which would complete Stage A, but we don't have auto-completion on yet
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // setting the stage now dynamically on auto-complete should directly complete Stage A
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "enableStageAutoComplete", true);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start and complete Task C -> will complete the case
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(0).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/AutoCompleteEvaluationTest.testAutoCompleteCondition.cmmn")
+    public void testEnableStageAutoCompleteConditionDynamicSecondPath() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("autoCompleteTest")
+            .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start Task A, nothing yet happens
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
+
+        // start Task B which will still not yet auto-complete Stage A
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // now also complete Task B -> still no auto-complete, as Task A is still active, even if not required
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // now also complete Task A -> Stage A will get completed, even without auto-completion as we set Task B to be ignored in Enabled state after first completion
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start and complete Task C -> will complete the case
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(0).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/AutoCompleteEvaluationTest.testAutoCompleteCondition.cmmn")
+    public void testEnablePlanModelAutoCompleteConditionDynamic() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("autoCompleteTest")
+            .variable("enableStageAutoComplete", true)
+            .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start and complete Task B which will auto-complete Stage A, but not yet the case as we haven't set the auto-complete flag there yet
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // set the auto-complete flag on the case plan model which should directly complete the case
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "enablePlanModelAutoComplete", true);
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/AutoCompleteEvaluationTest.testAutoCompleteCondition.cmmn")
+    public void testEnablePlanModelAutoCompleteConditionDynamicSecondPath() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("autoCompleteTest")
+            .variable("enableStageAutoComplete", true)
+            .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start Task A, nothing yet happens
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
+
+        // start Task B which will still not yet auto-complete Stage A
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // now also complete Task B -> still no auto-complete, as Task A is still active, even if not required
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ENABLED);
+
+        // start Task C which will prevent the case from being completed directly, if Stage A completes
+        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(3).getId());
+
+        // now also complete Task A -> Stage A should now get auto-completed
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .orderByName().asc()
+            .list();
+
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+
+        // set the auto-complete flag on the case plan model which should directly complete the case
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "enablePlanModelAutoComplete", true);
+
+        // complete Task C -> will complete the case
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+}
