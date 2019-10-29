@@ -77,6 +77,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
 
     String ATTRIBUTE_TRIGGER_MODE = "triggerMode";
+    String ATTRIBUTE_EXIT_EVENT_TYPE = "exitEventType";
+    String ATTRIBUTE_EXIT_TYPE = "exitType";
 
     String ELEMENT_REQUIRED_RULE = "requiredRule";
     String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
