@@ -19,16 +19,35 @@ import java.util.List;
  * @author Joram Barrez
  */
 public class Criterion extends CaseElement implements HasAssociations {
-    
+
+    public static final String EXIT_TYPE_DEFAULT = "default";
+    public static final String EXIT_TYPE_ACTIVE_INSTANCES = "activeInstances";
+    public static final String EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES = "activeAndEnabledInstances";
+
+    public static final String EXIT_EVENT_TYPE_EXIT = "exit";
+    public static final String EXIT_EVENT_TYPE_COMPLETE = "complete";
+    public static final String EXIT_EVENT_TYPE_FORCE_COMPLETE = "forceComplete";
+
     protected String technicalId;
     protected String sentryRef;
     protected Sentry sentry;
     protected String attachedToRefId;
     protected boolean isEntryCriterion;
     protected boolean isExitCriterion;
+
+    /**
+     * The exit type is only available (used) on an exit sentry attached to a plan item and represents on how it affects its plan item instances when triggered.
+     */
+    protected String exitType;
+
+    /**
+     * The exit event type is only available (used) on an exit sentry attached to a case plan model or a stage and represents which event will be triggered
+     * when exiting the stage or case plan model.
+     */
+    protected String exitEventType;
     protected List<Association> incomingAssociations = new ArrayList<>();
     protected List<Association> outgoingAssociations = new ArrayList<>();
-    
+
     public String getTechnicalId() {
         return technicalId;
     }
@@ -64,6 +83,18 @@ public class Criterion extends CaseElement implements HasAssociations {
     }
     public void setExitCriterion(boolean isExitCriterion) {
         this.isExitCriterion = isExitCriterion;
+    }
+    public String getExitType() {
+        return exitType;
+    }
+    public void setExitType(String exitType) {
+        this.exitType = exitType;
+    }
+    public String getExitEventType() {
+        return exitEventType;
+    }
+    public void setExitEventType(String exitEventType) {
+        this.exitEventType = exitEventType;
     }
     @Override
     public void addIncomingAssociation(Association association) {
