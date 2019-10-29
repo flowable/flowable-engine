@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.impl;
+package org.flowable.eventregistry.impl.keydetector;
 
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 

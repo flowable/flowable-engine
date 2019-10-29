@@ -10,29 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.impl;
+package org.flowable.eventregistry.impl.keydetector;
 
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Joram Barrez
- * @author Filip Hrisafov
  */
-public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDetector<JsonNode> {
+public class StaticKeyDetector<T> implements InboundEventKeyDetector<T> {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected String staticKey;
 
-    protected String field;
-
-    public JsonFieldBasedInboundEventKeyDetector(String field) {
-        this.field = field;
+    public StaticKeyDetector(String staticKey) {
+        this.staticKey = staticKey;
     }
 
     @Override
-    public String detectEventDefinitionKey(JsonNode event) {
-        return event.path(field).asText();
+    public String detectEventDefinitionKey(T event) {
+        return staticKey;
     }
+
 }

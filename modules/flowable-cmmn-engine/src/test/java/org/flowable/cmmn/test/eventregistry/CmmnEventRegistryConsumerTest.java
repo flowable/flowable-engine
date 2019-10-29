@@ -16,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -296,6 +298,39 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
                 entry("payload1", "Hello World")
             );
     }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseStartStoreCorrelationAsBusinessKey() {
+        for (int i = 1; i <= 3; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(i);
+        }
+
+        // Business keys should be all equal
+        Set<String> businessKeys = cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getBusinessKey).collect(Collectors.toSet());
+        assertThat(businessKeys).hasSize(1);
+
+        for (int i = 1; i <= 5; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer" + i);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(3 + i);
+        }
+
+        // Business keys should be all equal
+        businessKeys = cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getBusinessKey).collect(Collectors.toSet());
+        assertThat(businessKeys).hasSize(6);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseStartOnlyOneInstance() {
+        for (int i = 1; i <= 9; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(1);
+        }
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getBusinessKey()).isNotNull();
+    }
+
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
         public String channelKey;

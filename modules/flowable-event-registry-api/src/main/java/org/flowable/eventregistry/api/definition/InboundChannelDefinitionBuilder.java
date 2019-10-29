@@ -46,6 +46,8 @@ public interface InboundChannelDefinitionBuilder {
 
     interface InboundEventKeyJsonDetectorBuilder {
 
+        InboundEventPayloadJsonExtractorBuilder fixedEventKey(String key);
+
         InboundEventPayloadJsonExtractorBuilder detectEventKeyUsingJsonField(String field);
 
         InboundEventPayloadJsonExtractorBuilder detectEventKeyUsingJsonPathExpression(String jsonPathExpression);

@@ -69,6 +69,10 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
 
     protected abstract void eventReceived(EventInstance eventInstance);
 
+    /**
+     * Generates all possible correlation keys for the given correlation parameters.
+     * The first element in the list will only have used one parameter. The last element in the list has included all parameters.
+     */
     protected Collection<String> generateCorrelationKeys(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
         if (correlationParameterInstances.isEmpty()) {
             return Collections.emptySet();

@@ -13,10 +13,15 @@
 package org.flowable.cmmn.engine.impl.eventregistry;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -51,19 +56,20 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         // The reason for this is that the handling of one event subscription
         // should not influence (i.e. roll back) the handling of another.
 
+        Collection<String> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
+
         // Always execute the events without a correlation key
         List<EventSubscription> eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(eventDefinition);
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
-            handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance);
+            handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys);
         }
 
-        Collection<String> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
         if (!correlationKeys.isEmpty()) {
             // If there are correlation keys then look for all event subscriptions matching them
             eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventDefinition, correlationKeys);
             for (EventSubscription eventSubscription : eventSubscriptions) {
-                handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance);
+                handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys);
             }
         }
 
@@ -81,19 +87,57 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).withoutConfiguration().scopeType(ScopeTypes.CMMN)));
     }
 
-    protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription, EventInstance eventInstance) {
+    protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription, EventInstance eventInstance, Collection<String> correlationKeys) {
         if (eventSubscription.getSubScopeId() != null) {
+
             cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(eventSubscription.getSubScopeId())
                 .transientVariable("eventInstance", eventInstance)
                 .trigger();
 
         } else if (eventSubscription.getScopeDefinitionId() != null
-            && eventSubscription.getScopeId() == null && eventSubscription.getSubScopeId() == null) {
-            cmmnRuntimeService.createCaseInstanceBuilder()
+                && eventSubscription.getScopeId() == null && eventSubscription.getSubScopeId() == null) {
+
+            CaseInstanceBuilder caseInstanceBuilder = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionId(eventSubscription.getScopeDefinitionId())
-                .transientVariable("eventInstance", eventInstance)
-                .start();
+                .transientVariable("eventInstance", eventInstance);
+
+            if (correlationKeys != null) {
+                String startCorrelationConfiguration = getStartCorrelationConfiguration(eventSubscription);
+
+                String lastCorrelationKey = null;
+                for (String correlationKey : correlationKeys) {
+                    lastCorrelationKey = correlationKey;
+                }
+
+                if (Objects.equals(startCorrelationConfiguration, "storeAsBusinessKey")) {
+                    caseInstanceBuilder.businessKey(lastCorrelationKey);
+
+                } else if (Objects.equals(startCorrelationConfiguration, "storeAsUniqueBusinessKey")) {
+                    long caseInstanceCount = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKey(lastCorrelationKey).count();
+                    if (caseInstanceCount > 0) {
+                        // Returning, no new instance should be started
+                        return;
+                    }
+                    caseInstanceBuilder.businessKey(lastCorrelationKey);
+
+                }
+            }
+
+            caseInstanceBuilder.start();
+
         }
+    }
+
+    protected String getStartCorrelationConfiguration(EventSubscription eventSubscription) {
+        CmmnModel cmmnModel = cmmnEngineConfiguration.getCmmnRepositoryService().getCmmnModel(eventSubscription.getScopeDefinitionId());
+        if (cmmnModel != null) {
+            List<ExtensionElement> correlationCfgExtensions = cmmnModel.getPrimaryCase().getExtensionElements()
+                .getOrDefault("startEventCorrelationConfiguration", Collections.emptyList());
+            if (!correlationCfgExtensions.isEmpty()) {
+                return correlationCfgExtensions.get(0).getElementText();
+            }
+        }
+        return null;
     }
 
 }

@@ -21,11 +21,12 @@ import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.definition.InboundChannelDefinition;
 import org.flowable.eventregistry.api.definition.InboundChannelDefinitionBuilder;
-import org.flowable.eventregistry.impl.JsonFieldBasedInboundEventKeyDetector;
-import org.flowable.eventregistry.impl.JsonPathBasedInboundEventKeyDetector;
-import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
+import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
+import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
+import org.flowable.eventregistry.impl.keydetector.StaticKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
+import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -132,6 +133,12 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
 
         public InboundEventKeyJsonDetectorBuilderImpl(InboundEventProcessingPipelineBuilderImpl<JsonNode> inboundEventProcessingPipelineBuilder) {
             this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
+        }
+
+        @Override
+        public InboundEventPayloadJsonExtractorBuilder fixedEventKey(String key) {
+            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new StaticKeyDetector(key);
+            return new InboundEventPayloadJsonExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
         @Override
