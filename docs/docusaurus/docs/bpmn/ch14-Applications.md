@@ -590,7 +590,7 @@ It will also add all available privileges in the Flowable project to the newly c
 
 -   access-task: provides the privilege to login to the Flowable Task application
 
--   access-rest-api: allows the user to do call the REST API. Otherwise a 403 (forbidden) http status will be returned. Note that *flowable.rest.app.authentication-mode* nees to be set to *verify-privilege*, which is the default.
+-   access-rest-api: allows the user to do call the REST API. Otherwise a 403 (forbidden) http status will be returned. Note that *flowable.rest.app.authentication-mode* needs to be set to *verify-privilege*, which is the default.
 
 When logging in to [<http://localhost:8080/flowable-idm>](http://localhost:8080/flowable-idm) with admin/test for the first time the following user overview screen is shown:
 

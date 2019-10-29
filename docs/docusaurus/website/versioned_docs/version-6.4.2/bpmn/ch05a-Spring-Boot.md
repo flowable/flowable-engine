@@ -128,7 +128,7 @@ You will see an output like this:
     o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
     flowable.Application                     : Started Application in 18.235 seconds (JVM running for 19.661)
 
-So, by just adding the dependency to the classpath and using the *@SpringBootAplication* annotation a lot has happened behind the scenes:
+So, by just adding the dependency to the classpath and using the *@SpringBootApplication* annotation a lot has happened behind the scenes:
 
 -   An in-memory datasource is created automatically (because the H2 driver is on the classpath) and passed to the Flowable process engine configuration
 
