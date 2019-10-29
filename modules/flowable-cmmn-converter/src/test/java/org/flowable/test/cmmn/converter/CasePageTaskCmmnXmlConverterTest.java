@@ -75,8 +75,17 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         CasePageTask taskA = (CasePageTask) planItemDefinition;
         assertEquals(CasePageTask.TYPE, taskA.getType());
         assertEquals("A", taskA.getName());
+        assertEquals("testKey", taskA.getFormKey());
         assertEquals("Label 1", taskA.getLabel());
         assertEquals("Icon 1", taskA.getIcon());
+        assertEquals("johndoe", taskA.getAssignee());
+        assertEquals("janedoe", taskA.getOwner());
+        assertEquals(2, taskA.getCandidateUsers().size());
+        assertEquals("johndoe", taskA.getCandidateUsers().get(0));
+        assertEquals("janedoe", taskA.getCandidateUsers().get(1));
+        assertEquals(2, taskA.getCandidateGroups().size());
+        assertEquals("sales", taskA.getCandidateGroups().get(0));
+        assertEquals("management", taskA.getCandidateGroups().get(1));
         assertNotNull(planItemTaskA.getItemControl());
         assertNotNull(planItemTaskA.getItemControl().getParentCompletionRule());
         assertEquals(ParentCompletionRule.IGNORE, planItemTaskA.getItemControl().getParentCompletionRule().getType());

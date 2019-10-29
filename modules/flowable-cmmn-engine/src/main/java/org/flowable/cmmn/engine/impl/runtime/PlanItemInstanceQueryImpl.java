@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -71,6 +72,10 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected boolean onlyStages;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String formKey;
+    protected String extraValue;
+    protected String involvedUser;
+    protected Collection<String> involvedGroups;
     protected String tenantId;
     protected boolean withoutTenantId;
     
@@ -483,6 +488,42 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         this.exitCriterionId = exitCriterionId;
         return this;
     }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceFormKey(String formKey) {
+        if (formKey == null) {
+            throw new FlowableIllegalArgumentException("formKey is null");
+        }
+        this.formKey = formKey;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceExtraValue(String extraValue) {
+        if (extraValue == null) {
+            throw new FlowableIllegalArgumentException("extraValue is null");
+        }
+        this.extraValue = extraValue;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery involvedUser(String involvedUser) {
+        if (involvedUser == null) {
+            throw new FlowableIllegalArgumentException("involvedUser is null");
+        }
+        this.involvedUser = involvedUser;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery involvedGroups(Collection<String> involvedGroups) {
+        if (involvedGroups == null) {
+            throw new FlowableIllegalArgumentException("involvedGroups is null");
+        }
+        this.involvedGroups = involvedGroups;
+        return this;
+    }
 
     @Override
     public PlanItemInstanceQuery planItemInstanceTenantId(String tenantId) {
@@ -719,6 +760,18 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     public String getExitCriterionId() {
         return exitCriterionId;
+    }
+    public String getFormKey() {
+        return formKey;
+    }
+    public String getExtraValue() {
+        return extraValue;
+    }
+    public String getInvolvedUser() {
+        return involvedUser;
+    }
+    public Collection<String> getInvolvedGroups() {
+        return involvedGroups;
     }
     public String getTenantId() {
         return tenantId;

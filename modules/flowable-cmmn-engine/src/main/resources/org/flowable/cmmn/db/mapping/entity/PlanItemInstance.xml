@@ -8,7 +8,7 @@
         insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
               NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
               LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
-              START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, IS_COUNT_ENABLED_, 
+              START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, EXTRA_VALUE_, IS_COUNT_ENABLED_, 
               VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
@@ -39,6 +39,7 @@
             #{completable ,jdbcType=BOOLEAN},
             #{entryCriterionId, jdbcType=VARCHAR},
             #{exitCriterionId, jdbcType=VARCHAR},
+            #{extraValue, jdbcType=VARCHAR},
             #{countEnabled, jdbcType=BOOLEAN},
             #{variableCount, jdbcType=INTEGER},
             #{sentryPartInstanceCount, jdbcType=INTEGER},
@@ -51,7 +52,7 @@
                                                      NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                      LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_,
                                                      ENDED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
-                                                     IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
+                                                     EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
     values
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
@@ -83,6 +84,7 @@
             #{planItemInstance.completable, jdbcType=BOOLEAN},
             #{planItemInstance.entryCriterionId, jdbcType=VARCHAR},
             #{planItemInstance.exitCriterionId, jdbcType=VARCHAR},
+            #{planItemInstance.extraValue, jdbcType=VARCHAR},
             #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
             #{planItemInstance.variableCount, jdbcType=INTEGER},
             #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
@@ -98,7 +100,7 @@
                                                       NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                       LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
                                                       START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
-                                                      IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
+                                                      EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -128,6 +130,7 @@
                 #{planItemInstance.completable, jdbcType=BOOLEAN},
                 #{planItemInstance.entryCriterionId, jdbcType=VARCHAR},
                 #{planItemInstance.exitCriterionId, jdbcType=VARCHAR},
+                #{planItemInstance.extraValue, jdbcType=VARCHAR},
                 #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
                 #{planItemInstance.variableCount, jdbcType=INTEGER},
                 #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
@@ -219,6 +222,9 @@
         <if test="originalPersistentState.exitCriterionId != exitCriterionId">
             EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR},
         </if>
+        <if test="originalPersistentState.extraValue != extraValue">
+            EXTRA_VALUE_ = #{extraValue, jdbcType=VARCHAR},
+        </if>
         <if test="originalPersistentState.countEnabled != countEnabled">
             IS_COUNT_ENABLED_ = #{countEnabled, jdbcType=BOOLEAN},
         </if>
@@ -283,6 +289,7 @@
     <result property="completable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
     <result property="entryCriterionId" column="ENTRY_CRITERION_ID_" jdbcType="VARCHAR" />
     <result property="exitCriterionId" column="EXIT_CRITERION_ID_" jdbcType="VARCHAR" />
+    <result property="extraValue" column="EXTRA_VALUE_" jdbcType="VARCHAR" />
     <result property="countEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="sentryPartInstanceCount" column="SENTRY_PART_INST_COUNT_" jdbcType="INTEGER" />
@@ -464,14 +471,40 @@
         <if test="exitCriterionId != null">
             and RES.EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR}
         </if>
+        <if test="formKey != null">
+            and RES.EXTRA_VALUE_ = #{formKey, jdbcType=VARCHAR}
+        </if>
+        <if test="extraValue != null">
+            and RES.EXTRA_VALUE_ = #{extraValue, jdbcType=VARCHAR}
+        </if>
         <if test="tenantId != null">
             and RES.TENANT_ID_ = #{tenantId}
         </if>
         <if test="withoutTenantId">
             and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
         </if>
+        <if test="involvedUser != null || involvedGroups != null">
+            and exists(select I.ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SUB_SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'planItem'
+                and
+                (
+                  <if test="involvedUser != null">
+                    I.USER_ID_ = #{involvedUser}
+                  </if>
+                  <if test="involvedUser != null &amp;&amp; involvedGroups != null &amp;&amp; involvedGroups &gt; 0">
+                    or
+                  </if>
+                  <if test="involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
+                    I.GROUP_ID_ IN
+                    <foreach item="involvedGroup" index="index" collection="involvedGroups"
+                             open="(" separator="," close=")">
+                      #{involvedGroup}
+                    </foreach>
+                  </if>
+                )
+            )
+        </if>
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        <choose>
+          <choose>
             <when test="queryVariableValue.operator.equals('EXISTS')">
               and EXISTS (
                 select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}

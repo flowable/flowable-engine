@@ -121,6 +121,8 @@ public class CaseInstanceEntityManagerImpl
         List<PlanItemInstanceEntity> childTaskPlanItemInstances = new ArrayList<>();
         collectPlanItemInstances(caseInstanceEntity, stagePlanItemInstances, childTaskPlanItemInstances);
 
+        getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.PLAN_ITEM);
+        
         // Plan item instances are removed per stage, in reversed order
         for (int i = stagePlanItemInstances.size() - 1; i>=0; i--) {
             planItemInstanceEntityManager.deleteByStageInstanceId(stagePlanItemInstances.get(i).getId());
@@ -162,7 +164,8 @@ public class CaseInstanceEntityManagerImpl
     }
 
     protected void collectPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer,
-        List<PlanItemInstanceEntity> stagePlanItemInstanceEntities, List<PlanItemInstanceEntity> childTaskPlanItemInstanceEntities) {
+            List<PlanItemInstanceEntity> stagePlanItemInstanceEntities, List<PlanItemInstanceEntity> childTaskPlanItemInstanceEntities) {
+        
         for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceContainer.getChildPlanItemInstances()) {
 
             if (planItemInstanceEntity.isStage()) {
@@ -170,11 +173,11 @@ public class CaseInstanceEntityManagerImpl
                 collectPlanItemInstances(planItemInstanceEntity, stagePlanItemInstanceEntities, childTaskPlanItemInstanceEntities);
 
             } else if (planItemInstanceEntity.getPlanItem() != null
-                && planItemInstanceEntity.getPlanItem().getBehavior() != null
-                && planItemInstanceEntity.getPlanItem().getBehavior() instanceof ChildTaskActivityBehavior) {
-                    childTaskPlanItemInstanceEntities.add(planItemInstanceEntity);
+                    && planItemInstanceEntity.getPlanItem().getBehavior() != null
+                    && planItemInstanceEntity.getPlanItem().getBehavior() instanceof ChildTaskActivityBehavior) {
+                
+                childTaskPlanItemInstanceEntities.add(planItemInstanceEntity);
             }
-
         }
     }
 

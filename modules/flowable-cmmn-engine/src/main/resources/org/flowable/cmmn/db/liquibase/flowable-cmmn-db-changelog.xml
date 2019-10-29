@@ -460,5 +460,17 @@
         </addColumn>
     
     </changeSet>
+    
+    <changeSet id="9" author="flowable">
+    
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+            <column name="EXTRA_VALUE_" type="varchar(255)" />
+        </addColumn>
+        
+        <addColumn tableName="ACT_CMMN_HI_PLAN_ITEM_INST">
+            <column name="EXTRA_VALUE_" type="varchar(255)" />
+        </addColumn>
+    
+    </changeSet>
 
 </databaseChangeLog>

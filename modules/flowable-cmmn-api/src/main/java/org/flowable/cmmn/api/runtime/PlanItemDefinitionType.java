@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.api.runtime;
 
+import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.GenericEventListener;
@@ -48,6 +49,8 @@ public interface PlanItemDefinitionType {
     String HUMAN_TASK = HumanTask.class.getSimpleName().toLowerCase();
     
     String CASE_TASK = CaseTask.class.getSimpleName().toLowerCase();
+    
+    String CASE_PAGE_TASK = CasePageTask.class.getSimpleName().toLowerCase();
     
     String PROCESS_TASK = ProcessTask.class.getSimpleName().toLowerCase();
     

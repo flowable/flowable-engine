@@ -42,6 +42,7 @@ import org.flowable.cmmn.engine.impl.cmd.GetCaseVariableInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkChildrenForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkParentsForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetPlanItemVariableInstanceCmd;
@@ -320,6 +321,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public List<IdentityLink> getIdentityLinksForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetIdentityLinksForCaseInstanceCmd(caseInstanceId));
+    }
+    
+    @Override
+    public List<IdentityLink> getIdentityLinksForPlanItemInstance(String planItemInstanceId) {
+        return commandExecutor.execute(new GetIdentityLinksForPlanItemInstanceCmd(planItemInstanceId));
     }
     
     @Override

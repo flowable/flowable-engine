@@ -32,7 +32,6 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
@@ -143,9 +142,8 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicIdentityLinkEntity.setGroupId(identityLink.getGroupId());
             historicIdentityLinkEntity.setScopeDefinitionId(identityLink.getScopeDefinitionId());
             historicIdentityLinkEntity.setScopeId(identityLink.getScopeId());
-            if (identityLink.getScopeId() != null) {
-                historicIdentityLinkEntity.setScopeType(ScopeTypes.CMMN);
-            }
+            historicIdentityLinkEntity.setSubScopeId(identityLink.getSubScopeId());
+            historicIdentityLinkEntity.setScopeType(identityLink.getScopeType());
             historicIdentityLinkEntity.setTaskId(identityLink.getTaskId());
             historicIdentityLinkEntity.setType(identityLink.getType());
             historicIdentityLinkEntity.setUserId(identityLink.getUserId());
@@ -250,9 +248,21 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setCreateTime(planItemInstanceEntity.getCreateTime());
             historicPlanItemInstanceEntity.setEntryCriterionId(planItemInstanceEntity.getEntryCriterionId());
             historicPlanItemInstanceEntity.setExitCriterionId(planItemInstanceEntity.getExitCriterionId());
+            historicPlanItemInstanceEntity.setExtraValue(planItemInstanceEntity.getExtraValue());
             historicPlanItemInstanceEntity.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
             
             historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
+        }
+    }
+    
+    @Override
+    public void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
+            HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.findById(planItemInstanceEntity.getId());
+            if (historicPlanItemInstanceEntity != null) {
+                historicPlanItemInstanceEntity.setFormKey(planItemInstanceEntity.getFormKey());
+            }
         }
     }
 

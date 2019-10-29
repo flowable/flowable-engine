@@ -53,6 +53,11 @@ public class HistoricIdentityLinkEntityManagerImpl
     public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
         return dataManager.findHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
+    
+    @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return dataManager.findHistoricIdentityLinksBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
 
     @Override
     public void deleteHistoricIdentityLinksByTaskId(String taskId) {

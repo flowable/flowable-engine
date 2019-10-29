@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.runtime;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -78,8 +79,12 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     PlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
     PlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId);
+    PlanItemInstanceQuery planItemInstanceFormKey(String formKey);
+    PlanItemInstanceQuery planItemInstanceExtraValue(String extraValue);
     PlanItemInstanceQuery planItemInstanceCompletable();
     PlanItemInstanceQuery onlyStages();
+    PlanItemInstanceQuery involvedUser(String involvedUser);
+    PlanItemInstanceQuery involvedGroups(Collection<String> involvedGroups);
     PlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     PlanItemInstanceQuery planItemInstanceWithoutTenantId();
     

@@ -21,7 +21,7 @@
    <!-- INSERT HISTORIC IDENTITY LINK -->
   
   <insert id="insertHistoricIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
-    insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
+    insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
     values (#{id, jdbcType=VARCHAR},
             #{type, jdbcType=VARCHAR},
             #{userId, jdbcType=VARCHAR},
@@ -29,13 +29,14 @@
             #{taskId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
             #{createTime, jdbcType=TIMESTAMP})
   </insert>
   
   <insert id="bulkInsertHistoricIdentityLink" parameterType="java.util.List">
-    insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
+    insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
     values 
       <foreach collection="list" item="historicIdentityLink" index="index" separator=",">
         (#{historicIdentityLink.id, jdbcType=VARCHAR},
@@ -45,6 +46,7 @@
          #{historicIdentityLink.taskId, jdbcType=VARCHAR},
          #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR},
          #{historicIdentityLink.scopeId, jdbcType=VARCHAR},
+         #{historicIdentityLink.subScopeId, jdbcType=VARCHAR},
          #{historicIdentityLink.scopeType, jdbcType=VARCHAR},
          #{historicIdentityLink.scopeDefinitionId, jdbcType=VARCHAR},
          #{historicIdentityLink.createTime, jdbcType=TIMESTAMP})
@@ -54,7 +56,7 @@
   <insert id="bulkInsertHistoricIdentityLink" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="historicIdentityLink" index="index">
-        INTO ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_) VALUES 
+        INTO ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_) VALUES 
           (#{historicIdentityLink.id, jdbcType=VARCHAR},
            #{historicIdentityLink.type, jdbcType=VARCHAR},
            #{historicIdentityLink.userId, jdbcType=VARCHAR},
@@ -62,6 +64,7 @@
            #{historicIdentityLink.taskId, jdbcType=VARCHAR},
            #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR},
            #{historicIdentityLink.scopeId, jdbcType=VARCHAR},
+           #{historicIdentityLink.subScopeId, jdbcType=VARCHAR},
            #{historicIdentityLink.scopeType, jdbcType=VARCHAR},
            #{historicIdentityLink.scopeDefinitionId, jdbcType=VARCHAR},
            #{historicIdentityLink.createTime, jdbcType=TIMESTAMP})
@@ -145,6 +148,7 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />       
@@ -166,6 +170,10 @@
   
   <select id="selectHistoricIdentityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
     select * from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+  </select>
+  
+  <select id="selectHistoricIdentityLinksBySubScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
+    select * from ${prefix}ACT_HI_IDENTITYLINK where SUB_SCOPE_ID_ = #{parameter.subScopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
   </select>
   
  <select id="selectIdentityLinks" resultMap="historicIdentityLinkResultMap">

@@ -24,7 +24,7 @@
 
                 <task id="nestedTask" name="Nested Task" isBlocking="true" />
                 
-                <task id="casePageTask1" name="Page 1" flowable:type="casePage" />
+                <task id="casePageTask1" name="Page 1" flowable:type="casePage" flowable:formKey="${keyVar}" />
 
             </stage>
 

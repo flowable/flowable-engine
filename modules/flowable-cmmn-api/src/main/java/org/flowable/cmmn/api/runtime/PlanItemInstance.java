@@ -48,6 +48,8 @@ public interface PlanItemInstance {
     boolean isCompletable();
     String getEntryCriterionId();
     String getExitCriterionId();
+    String getFormKey();
+    String getExtraValue();
     String getTenantId();
     
 }

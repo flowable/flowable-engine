@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -71,6 +72,10 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected boolean notEnded;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String formKey;
+    protected String extraValue;
+    protected String involvedUser;
+    protected Collection<String> involvedGroups;
     protected boolean onlyStages;
     protected String tenantId;
     protected String tenantIdLike;
@@ -186,6 +191,42 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
             throw new FlowableIllegalArgumentException("ExitCriterionId is null");
         }
         this.exitCriterionId = exitCriterionId;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceFormKey(String formKey) {
+        if (formKey == null) {
+            throw new FlowableIllegalArgumentException("formKey is null");
+        }
+        this.formKey = formKey;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceExtraValue(String extraValue) {
+        if (extraValue == null) {
+            throw new FlowableIllegalArgumentException("extraValue is null");
+        }
+        this.extraValue = extraValue;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery involvedUser(String involvedUser) {
+        if (involvedUser == null) {
+            throw new FlowableIllegalArgumentException("involvedUser is null");
+        }
+        this.involvedUser = involvedUser;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery involvedGroups(Collection<String> involvedGroups) {
+        if (involvedGroups == null) {
+            throw new FlowableIllegalArgumentException("involvedGroups is null");
+        }
+        this.involvedGroups = involvedGroups;
         return this;
     }
     
@@ -554,6 +595,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public String getExitCriterionId() {
         return exitCriterionId;
+    }
+    public String getFormKey() {
+        return formKey;
+    }
+    public String getExtraValue() {
+        return extraValue;
+    }
+    public String getInvolvedUser() {
+        return involvedUser;
+    }
+    public Collection<String> getInvolvedGroups() {
+        return involvedGroups;
     }
     public boolean isOnlyStages() {
         return onlyStages;

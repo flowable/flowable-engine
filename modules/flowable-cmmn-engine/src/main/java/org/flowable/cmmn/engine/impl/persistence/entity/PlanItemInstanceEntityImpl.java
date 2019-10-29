@@ -61,6 +61,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected boolean completable;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String extraValue;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Counts
@@ -103,6 +104,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("completeable", completable);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
+        persistentState.put("extraValue", extraValue);
         persistentState.put("countEnabled", countEnabled);
         persistentState.put("variableCount", variableCount);
         persistentState.put("sentryPartInstanceCount", sentryPartInstanceCount);
@@ -343,6 +345,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setExitCriterionId(String exitCriterionId) {
         this.exitCriterionId = exitCriterionId;
+    }
+    @Override
+    public String getFormKey() {
+        return extraValue;
+    }
+    @Override
+    public void setFormKey(String formKey) {
+        this.extraValue = formKey;
+    }
+    @Override
+    public String getExtraValue() {
+        return extraValue;
+    }
+    @Override
+    public void setExtraValue(String extraValue) {
+        this.extraValue = extraValue;
     }
     @Override
     public String getTenantId() {
