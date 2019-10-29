@@ -13,7 +13,6 @@
 package org.flowable.spring.boot.cmmn;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
