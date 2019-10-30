@@ -23,6 +23,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentit
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksByProcInstMatcher;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksByScopeIdAndTypeMatcher;
+import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksBySubScopeIdAndTypeMatcher;
 
 /**
  * @author Joram Barrez
@@ -31,6 +32,7 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
 
     protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByProcInstMatcher = new HistoricIdentityLinksByProcInstMatcher();
     protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByScopeIdAndTypeMatcher = new HistoricIdentityLinksByScopeIdAndTypeMatcher();
+    protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksBySubScopeIdAndTypeMatcher = new HistoricIdentityLinksBySubScopeIdAndTypeMatcher();
 
     @Override
     public Class<? extends HistoricIdentityLinkEntity> getManagedEntityClass() {
@@ -59,6 +61,14 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
         parameters.put("scopeId", scopeId);
         parameters.put("scopeType", scopeType);
         return getList("selectHistoricIdentityLinksByScopeIdAndType", parameters, historicIdentityLinksByScopeIdAndTypeMatcher, true);
+    }
+    
+    @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("subScopeId", subScopeId);
+        parameters.put("scopeType", scopeType);
+        return getList("selectHistoricIdentityLinksBySubScopeIdAndType", parameters, historicIdentityLinksBySubScopeIdAndTypeMatcher, true);
     }
     
     @Override

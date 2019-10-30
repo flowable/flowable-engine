@@ -51,6 +51,11 @@ public class HistoricIdentityLinkServiceImpl extends CommonServiceImpl<IdentityL
     }
     
     @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
+    
+    @Override
     public HistoricIdentityLinkEntity createHistoricIdentityLink() {
         return getHistoricIdentityLinkEntityManager().create();
     }

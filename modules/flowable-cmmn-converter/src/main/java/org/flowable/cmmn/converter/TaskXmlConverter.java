@@ -118,6 +118,11 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
     
     protected Task convertToCasePageTask(XMLStreamReader xtr) {
         CasePageTask casePageTask = new CasePageTask();
+        String formKey = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FORM_KEY);
+        if (formKey != null) {
+            casePageTask.setFormKey(formKey);
+        }
+        
         String label = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_LABEL);
         if (label != null) {
             casePageTask.setLabel(label);
@@ -126,6 +131,32 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         String icon = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ICON);
         if (icon != null) {
             casePageTask.setIcon(icon);
+        }
+        
+        String assignee = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ASSIGNEE);
+        if (assignee != null) {
+            casePageTask.setAssignee(assignee);
+        }
+        
+        String owner = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_OWNER);
+        if (owner != null) {
+            casePageTask.setOwner(owner);
+        }
+        
+        String candidateUsersString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_USERS);
+        if (StringUtils.isNotEmpty(candidateUsersString)) {
+            String[] candidateUsers = candidateUsersString.split(",");
+            for (String candidateUser : candidateUsers) {
+                casePageTask.getCandidateUsers().add(candidateUser);
+            }
+        }
+        
+        String candidateGroupsString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_GROUPS);
+        if (StringUtils.isNotEmpty(candidateGroupsString)) {
+            String[] candidateGroups = candidateGroupsString.split(",");
+            for (String candidateGroup : candidateGroups) {
+                casePageTask.getCandidateGroups().add(candidateGroup);
+            }
         }
         
         return casePageTask;

@@ -48,6 +48,7 @@ public class IdentityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJs
         historicIdentityLinkEntity.setId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
         historicIdentityLinkEntity.setGroupId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_GROUP_ID));
         historicIdentityLinkEntity.setScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID));
+        historicIdentityLinkEntity.setSubScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SUB_SCOPE_ID));
         historicIdentityLinkEntity.setScopeType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE));
         historicIdentityLinkEntity.setScopeDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SCOPE_DEFINITION_ID));
         historicIdentityLinkEntity.setTaskId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_TASK_ID));

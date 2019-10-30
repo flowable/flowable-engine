@@ -29,6 +29,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -164,13 +166,22 @@ public class PlanItemInstanceEntityManagerImpl
                 }
             }
         }
-
+        
         if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.TIMER_EVENT_LISTENER)) {
             TimerJobEntityManager timerJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobEntityManager();
             List<TimerJobEntity> timerJobsEntities = timerJobEntityManager
                 .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
             for (TimerJobEntity timerJobEntity : timerJobsEntities) {
                 timerJobEntityManager.delete(timerJobEntity);
+            }
+        }
+
+        if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.CASE_PAGE_TASK)) {
+            IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+            List<IdentityLinkEntity> identityLinkEntities = identityLinkEntityManager
+                .findIdentityLinksBySubScopeIdAndType(planItemInstanceEntity.getId(), ScopeTypes.PLAN_ITEM);
+            for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
+                identityLinkEntityManager.delete(identityLinkEntity);
             }
         }
         

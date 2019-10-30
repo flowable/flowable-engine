@@ -22,7 +22,9 @@
                 </planItemOnPart>
             </sentry>
             
-            <task id="casePageTaskA" name="A" flowable:type="casePage" flowable:label="Label 1" flowable:icon="Icon 1" />
+            <task id="casePageTaskA" name="A" flowable:type="casePage" flowable:formKey="testKey" flowable:label="Label 1" flowable:icon="Icon 1" 
+                    flowable:assignee="johndoe" flowable:owner="janedoe" flowable:candidateUsers="johndoe,janedoe" flowable:candidateGroups="sales,management" />
+                    
             <task id="casePageTaskB" name="B" flowable:type="casePage">
                 <extensionElements>
                     <flowable:index>0</flowable:index>

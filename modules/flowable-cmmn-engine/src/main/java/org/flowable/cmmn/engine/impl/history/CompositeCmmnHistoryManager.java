@@ -154,6 +154,13 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
             historyManager.recordPlanItemInstanceCreated(planItemInstanceEntity);
         }
     }
+    
+    @Override
+    public void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordPlanItemInstanceUpdated(planItemInstanceEntity);
+        }
+    }
 
     @Override
     public void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity) {

@@ -30,8 +30,8 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLi
  * @author Joram Barrez
  */
 public class IdentityLinkEntityManagerImpl
-    extends AbstractServiceEngineEntityManager<IdentityLinkServiceConfiguration, IdentityLinkEntity, IdentityLinkDataManager>
-    implements IdentityLinkEntityManager {
+        extends AbstractServiceEngineEntityManager<IdentityLinkServiceConfiguration, IdentityLinkEntity, IdentityLinkDataManager>
+        implements IdentityLinkEntityManager {
 
     public IdentityLinkEntityManagerImpl(IdentityLinkServiceConfiguration identityLinkServiceConfiguration, IdentityLinkDataManager identityLinkDataManager) {
         super(identityLinkServiceConfiguration, identityLinkDataManager);
@@ -70,6 +70,11 @@ public class IdentityLinkEntityManagerImpl
     @Override
     public List<IdentityLinkEntity> findIdentityLinksByScopeIdAndType(String scopeId, String scopeType) {
         return dataManager.findIdentityLinksByScopeIdAndType(scopeId, scopeType);
+    }
+    
+    @Override
+    public List<IdentityLinkEntity> findIdentityLinksBySubScopeIdAndType(String subScopeId, String scopeType) {
+        return dataManager.findIdentityLinksBySubScopeIdAndType(subScopeId, scopeType);
     }
 
     @Override
@@ -123,6 +128,22 @@ public class IdentityLinkEntityManagerImpl
         IdentityLinkEntity identityLinkEntity = dataManager.create();
         identityLinkEntity.setScopeDefinitionId(scopeDefinitionId);
         identityLinkEntity.setScopeId(scopeId);
+        identityLinkEntity.setScopeType(scopeType);
+        identityLinkEntity.setUserId(userId);
+        identityLinkEntity.setGroupId(groupId);
+        identityLinkEntity.setType(type);
+        insert(identityLinkEntity);
+        return identityLinkEntity;
+    }
+    
+    @Override
+    public IdentityLinkEntity addSubScopeIdentityLink(String scopeDefinitionId, String scopeId, String subScopeId, String scopeType, 
+                    String userId, String groupId, String type) {
+        
+        IdentityLinkEntity identityLinkEntity = dataManager.create();
+        identityLinkEntity.setScopeDefinitionId(scopeDefinitionId);
+        identityLinkEntity.setScopeId(scopeId);
+        identityLinkEntity.setSubScopeId(subScopeId);
         identityLinkEntity.setScopeType(scopeType);
         identityLinkEntity.setUserId(userId);
         identityLinkEntity.setGroupId(groupId);

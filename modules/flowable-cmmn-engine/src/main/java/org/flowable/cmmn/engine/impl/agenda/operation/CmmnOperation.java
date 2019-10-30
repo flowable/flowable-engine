@@ -26,7 +26,6 @@ import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -125,7 +124,7 @@ public abstract class CmmnOperation implements Runnable {
                 planItemInstanceEntityToCopy.getTenantId(),
                 addToParent);
 
-        if (hasRepetitionRule(planItemInstanceEntityToCopy)) {
+        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntityToCopy)) {
             int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
             setRepetitionCounter(planItemInstanceEntity, counter);
         }
@@ -150,33 +149,4 @@ public abstract class CmmnOperation implements Runnable {
         String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
         return repetitionCounterVariableName;
     }
-
-    protected boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null) {
-            return hasRepetitionRule(planItemInstanceEntity.getPlanItem());
-        }
-        return false;
-    }
-
-    protected boolean hasRepetitionRule(PlanItem planItem) {
-        return planItem.getItemControl() != null
-            && planItem.getItemControl().getRepetitionRule() != null;
-    }
-
-    protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (hasRepetitionRule(planItemInstanceEntity)) {
-            String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
-            return evaluateRepetitionRule(planItemInstanceEntity, repetitionCondition);
-        }
-        return false;
-    }
-
-    protected boolean evaluateRepetitionRule(VariableContainer variableContainer, String repetitionCondition) {
-        if (StringUtils.isNotEmpty(repetitionCondition)) {
-            return ExpressionUtil.evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
-        } else {
-            return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
-        }
-    }
-
 }

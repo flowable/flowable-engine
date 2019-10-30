@@ -10,7 +10,7 @@
             <planItem id="planItemForTask" definitionRef="taskOne">
                 <itemControl>
                     <extensionElements>
-                        <flowable:parentCompletionRule type="alwaysIgnore" />
+                        <flowable:parentCompletionRule type="ignore" />
                     </extensionElements>
                 </itemControl>
             </planItem>
@@ -46,7 +46,7 @@
                 <planItem id="withoutCondition" definitionRef="taskTwo">
                     <itemControl>
                         <extensionElements>
-                            <flowable:parentCompletionRule type="alwaysIgnoreAfterFirstCompletion" />
+                            <flowable:parentCompletionRule type="ignoreAfterFirstCompletion" />
                         </extensionElements>
                     </itemControl>
                 </planItem>

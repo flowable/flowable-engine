@@ -51,7 +51,7 @@ public class ParentCompletionConverterTest extends AbstractConverterTest {
             assertNotNull(planItem.getItemControl().getParentCompletionRule().getType());
         });
         
-        assertEquals(ParentCompletionRule.ALWAYS_IGNORE, planItems.get(0).getItemControl().getParentCompletionRule().getType());
+        assertEquals(ParentCompletionRule.IGNORE, planItems.get(0).getItemControl().getParentCompletionRule().getType());
         assertEquals(ParentCompletionRule.DEFAULT, planItems.get(1).getItemControl().getParentCompletionRule().getType());
         assertEquals(ParentCompletionRule.IGNORE_IF_AVAILABLE, planItems.get(2).getItemControl().getParentCompletionRule().getType());
         assertEquals(ParentCompletionRule.IGNORE_IF_AVAILABLE_OR_ENABLED, planItems.get(3).getItemControl().getParentCompletionRule().getType());
@@ -62,7 +62,7 @@ public class ParentCompletionConverterTest extends AbstractConverterTest {
         PlanItem planItem = planItems1.get(0);
         assertNotNull(planItem.getItemControl());
         assertNotNull(planItem.getItemControl().getParentCompletionRule());
-        assertEquals(ParentCompletionRule.ALWAYS_IGNORE_AFTER_FIRST_COMPLETION, planItem.getItemControl().getParentCompletionRule().getType());
+        assertEquals(ParentCompletionRule.IGNORE_AFTER_FIRST_COMPLETION, planItem.getItemControl().getParentCompletionRule().getType());
     }
 
 }
