@@ -1261,7 +1261,7 @@ Returns a read-only view of the DMN engine that is used in this REST-service.
 
     {
        "name":"default",
-       "version":"6.5.0-SNAPSHOT",
+       "version":"6.5.0.event-SNAPSHOT",
        "resourceUrl":"file://flowable-dmn/flowable.dmn.cfg.xml",
        "exception":null
     }

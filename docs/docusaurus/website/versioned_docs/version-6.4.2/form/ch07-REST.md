@@ -1492,7 +1492,7 @@ Returns a read-only view of the engine that is used in this REST-service.
 
     {
        "name":"default",
-       "version":"6.5.0-SNAPSHOT",
+       "version":"6.5.0.event-SNAPSHOT",
        "resourceUrl":"file://flowable/flowable.form.cfg.xml",
        "exception":null
     }
