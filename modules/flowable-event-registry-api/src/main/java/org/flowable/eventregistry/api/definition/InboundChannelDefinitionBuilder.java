@@ -36,6 +36,8 @@ public interface InboundChannelDefinitionBuilder {
 
         InboundEventKeyJsonDetectorBuilder jsonDeserializer();
 
+        InboundEventKeyXmlDetectorBuilder xmlDeserializer();
+
         <T> InboundEventKeyDetectorBuilder<T> deserializer(InboundEventDeserializer<T> deserializer);
 
         InboundChannelDefinitionBuilder eventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline);
@@ -54,6 +56,14 @@ public interface InboundChannelDefinitionBuilder {
 
     }
 
+    interface InboundEventKeyXmlDetectorBuilder {
+
+        InboundEventPayloadXmlExtractorBuilder fixedEventKey(String key);
+
+        InboundEventPayloadXmlExtractorBuilder detectEventKeyUsingXPathExpression(String jsonPathExpression);
+
+    }
+
     interface InboundEventKeyDetectorBuilder<T> {
 
         InboundEventPayloadExtractorBuilder<T> detectEventKeyUsingKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector);
@@ -63,6 +73,12 @@ public interface InboundChannelDefinitionBuilder {
     interface InboundEventPayloadJsonExtractorBuilder {
 
         InboundEventTransformerBuilder jsonFieldsMapDirectlyToPayload();
+
+    }
+
+    interface InboundEventPayloadXmlExtractorBuilder {
+
+        InboundEventTransformerBuilder xmlElementsMapDirectlyToPayload();
 
     }
 

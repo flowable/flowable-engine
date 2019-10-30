@@ -24,10 +24,14 @@ import org.flowable.eventregistry.api.definition.InboundChannelDefinitionBuilder
 import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.StaticKeyDetector;
+import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
+import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
+import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
+import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -92,13 +96,22 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
 
         @Override
         public InboundEventKeyJsonDetectorBuilder jsonDeserializer() {
-
-            InboundEventProcessingPipelineBuilderImpl<JsonNode> jsonPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry,
-                channelDefinitionBuilder);
+            InboundEventProcessingPipelineBuilderImpl<JsonNode> jsonPipelineBuilder
+                = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry, channelDefinitionBuilder);
             this.channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = jsonPipelineBuilder;
 
             jsonPipelineBuilder.inboundEventDeserializer = new StringToJsonDeserializer();
             return new InboundEventKeyJsonDetectorBuilderImpl(jsonPipelineBuilder);
+        }
+
+        @Override
+        public InboundEventKeyXmlDetectorBuilder xmlDeserializer() {
+            InboundEventProcessingPipelineBuilderImpl<Document> xmlPipelineBuilder
+                = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry, channelDefinitionBuilder);
+            this.channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = xmlPipelineBuilder;
+
+            xmlPipelineBuilder.inboundEventDeserializer = new StringToXmlDocumentDeserializer();
+            return new InboundEventKeyXmlDetectorBuilderImpl(xmlPipelineBuilder);
         }
 
         @Override
@@ -154,6 +167,28 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         }
     }
 
+    public static class InboundEventKeyXmlDetectorBuilderImpl implements InboundEventKeyXmlDetectorBuilder {
+
+        protected InboundEventProcessingPipelineBuilderImpl<Document> inboundEventProcessingPipelineBuilder;
+
+        public InboundEventKeyXmlDetectorBuilderImpl(InboundEventProcessingPipelineBuilderImpl<Document> inboundEventProcessingPipelineBuilder) {
+            this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
+        }
+
+        @Override
+        public InboundEventPayloadXmlExtractorBuilder fixedEventKey(String key) {
+            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new StaticKeyDetector(key);
+            return new InboundEventPayloadXmlExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
+        }
+
+        @Override
+        public InboundEventPayloadXmlExtractorBuilder detectEventKeyUsingXPathExpression(String xpathExpression) {
+            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new XpathBasedInboundEventKeyDetector(xpathExpression);
+            return new InboundEventPayloadXmlExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
+        }
+
+    }
+
     public static class InboundEventDefinitionKeyDetectorBuilderImpl<T> implements InboundEventKeyDetectorBuilder<T> {
 
         protected InboundEventProcessingPipelineBuilderImpl<T> inboundEventProcessingPipelineBuilder;
@@ -181,6 +216,22 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         @Override
         public InboundEventTransformerBuilder jsonFieldsMapDirectlyToPayload() {
             this.inboundEventProcessingPipelineBuilder.inboundEventPayloadExtractor = new JsonFieldToMapPayloadExtractor();
+            return new InboundEventTransformerBuilderImpl(inboundEventProcessingPipelineBuilder);
+        }
+
+    }
+
+    public static class InboundEventPayloadXmlExtractorBuilderImpl implements InboundEventPayloadXmlExtractorBuilder {
+
+        protected InboundEventProcessingPipelineBuilderImpl<Document> inboundEventProcessingPipelineBuilder;
+
+        public InboundEventPayloadXmlExtractorBuilderImpl(InboundEventProcessingPipelineBuilderImpl<Document> inboundEventProcessingPipelineBuilder) {
+            this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
+        }
+
+        @Override
+        public InboundEventTransformerBuilder xmlElementsMapDirectlyToPayload() {
+            this.inboundEventProcessingPipelineBuilder.inboundEventPayloadExtractor = new XmlElementsToMapPayloadExtractor();
             return new InboundEventTransformerBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
