@@ -274,7 +274,14 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
             if (task != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
                 caseDefinitionId = task.getScopeDefinitionId();
             }
+        
+        } else if (ScopeTypes.PLAN_ITEM.equals(identityLink.getScopeType()) && identityLink.getSubScopeId() != null) {
+            PlanItemInstanceEntity planItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(identityLink.getSubScopeId());
+            if (planItemInstance != null) {
+                caseDefinitionId = planItemInstance.getCaseDefinitionId();
+            }
         }
+        
         return CaseDefinitionUtil.getCaseDefinition(caseDefinitionId);
     }
     
