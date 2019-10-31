@@ -20,6 +20,7 @@ import org.flowable.eventregistry.api.definition.OutboundChannelDefinition;
 import org.flowable.eventregistry.api.definition.OutboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.impl.pipeline.DefaultOutboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToJsonStringSerializer;
+import org.flowable.eventregistry.impl.serialization.EventPayloadToXmlStringSerializer;
 
 /**
  * @author Joram Barrez
@@ -80,6 +81,12 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
         @Override
         public OutboundChannelDefinitionBuilder jsonSerializer() {
             this.outboundEventSerializer = new EventPayloadToJsonStringSerializer();
+            return outboundChannelDefinitionBuilder;
+        }
+
+        @Override
+        public OutboundChannelDefinitionBuilder xmlSerializer() {
+            this.outboundEventSerializer = new EventPayloadToXmlStringSerializer();
             return outboundChannelDefinitionBuilder;
         }
 

@@ -39,7 +39,7 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
 
     @Override
     public String getType() {
-        return null;
+        return TYPE;
     }
 
     @Override

@@ -32,6 +32,8 @@ public interface OutboundChannelDefinitionBuilder {
 
         OutboundChannelDefinitionBuilder jsonSerializer();
 
+        OutboundChannelDefinitionBuilder xmlSerializer();
+
         OutboundChannelDefinitionBuilder serializer(OutboundEventSerializer serializer);
 
         OutboundChannelDefinitionBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline);
