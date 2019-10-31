@@ -126,6 +126,7 @@ import org.flowable.cmmn.engine.impl.parser.handler.MilestoneParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.PlanFragmentParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ProcessTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ScriptTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.SendEventServiceTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ServiceTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.SignalEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.StageParseHandler;
@@ -1251,6 +1252,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnParseHandlers.add(new ProcessTaskParseHandler());
         cmmnParseHandlers.add(new ScriptTaskParseHandler());
         cmmnParseHandlers.add(new ServiceTaskParseHandler());
+        cmmnParseHandlers.add(new SendEventServiceTaskParseHandler());
         cmmnParseHandlers.add(new StageParseHandler());
         cmmnParseHandlers.add(new HttpTaskParseHandler());
         cmmnParseHandlers.add(new TaskParseHandler());

@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.parser.handler;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
@@ -33,7 +33,7 @@ public class ServiceTaskParseHandler extends AbstractPlanItemParseHandler<Servic
 
     @Override
     public Collection<Class<? extends BaseElement>> getHandledTypes() {
-        return Arrays.asList(ServiceTask.class, SendEventServiceTask.class);
+        return Collections.singletonList(ServiceTask.class);
     }
 
     @Override
