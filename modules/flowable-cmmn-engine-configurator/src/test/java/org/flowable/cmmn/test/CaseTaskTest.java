@@ -83,6 +83,50 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
+    public void testCaseTaskWithCaseDefinitionKeyExpression() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithCaseDefinitionKeyExpression.bpmn20.xml")
+            .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("caseTask")
+                .variable("caseKeyVar", "oneHumanTaskCase")
+                .start();
+            List<Task> processTasks = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertThat(processTasks).hasSize(1);
+
+            processEngineTaskService.complete(processTasks.get(0).getId());
+
+            String caseInstanceId = processEngineRuntimeService.getVariable(processInstance.getId(), "myCaseInstanceId", String.class);
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstanceId)
+                .singleResult();
+
+            assertThat(caseInstance).isNotNull();
+
+            List<Task> caseTasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(caseTasks).hasSize(1);
+
+            cmmnTaskService.complete(caseTasks.get(0).getId());
+
+            CaseInstance dbCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(dbCaseInstance).isNull();
+
+            processTasks = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertThat(processTasks).hasSize(1);
+
+            processEngine.getTaskService().complete(processTasks.get(0).getId());
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
     @CmmnDeployment
     public void testCaseTaskWithParameters() {
         Deployment deployment = processEngineRepositoryService.createDeployment()
