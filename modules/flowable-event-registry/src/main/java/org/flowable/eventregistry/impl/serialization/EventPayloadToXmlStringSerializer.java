@@ -23,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
-import org.flowable.eventregistry.api.definition.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.w3c.dom.Document;
@@ -61,13 +60,9 @@ public class EventPayloadToXmlStringSerializer implements OutboundEventSerialize
 
             if (!eventInstance.getPayloadInstances().isEmpty()) {
                 for (EventPayloadInstance payloadInstance : eventInstance.getPayloadInstances()) {
-
-                    String definitionType = payloadInstance.getDefinitionType();
-                    if (EventPayloadTypes.STRING.equals(definitionType)) {
-                        Element element = doc.createElement(payloadInstance.getDefinitionName());
-                        element.setTextContent(payloadInstance.getValue().toString());
-                        rootElement.appendChild(element);
-                    }
+                    Element element = doc.createElement(payloadInstance.getDefinitionName());
+                    element.setTextContent(payloadInstance.getValue().toString());
+                    rootElement.appendChild(element);
                 }
             }
 
