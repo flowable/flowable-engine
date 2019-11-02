@@ -21,12 +21,14 @@ import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_RE
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Test;
+import org.opentest4j.AssertionFailedError;
 
 /**
  * Adds testing around plan item completion evaluation.
@@ -418,7 +420,14 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         // start Task B and D and complete C
         cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(3).getId());
+        // Task D has 2 states (enabled and waiting for repetition),
+        // so we should explicitly get the enabled state for starting
+        PlanItemInstance taskD = planItemInstances.stream()
+            .filter(pi -> Objects.equals("Task D", pi.getName()))
+            .filter(pi -> Objects.equals(ENABLED, pi.getState()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionFailedError("Could not find enabled Task D"));
+        cmmnRuntimeService.startPlanItemInstance(taskD.getId());
 
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(caseInstance.getId())
@@ -436,7 +445,14 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
 
         // complete Task B and D
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+        // Task D has 2 states (active and waiting for repetition),
+        // so we should explicitly get the enabled state for triggering
+        taskD = planItemInstances.stream()
+            .filter(pi -> Objects.equals("Task D", pi.getName()))
+            .filter(pi -> Objects.equals(ACTIVE, pi.getState()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionFailedError("Could not find active Task D"));
+        cmmnRuntimeService.triggerPlanItemInstance(taskD.getId());
 
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(caseInstance.getId())
