@@ -214,7 +214,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     // Data managers
     ///////////////////////////////////////////////////////////
 
+    @Override
     public void initDataManagers() {
+        super.initDataManagers();
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisFormDeploymentDataManager(this);
         }
@@ -229,7 +231,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         }
     }
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (deploymentEntityManager == null) {
             deploymentEntityManager = new FormDeploymentEntityManagerImpl(this, deploymentDataManager);
         }
@@ -251,6 +255,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     @Override
     public void initSchemaManager() {
+        super.initSchemaManager();
         if (this.schemaManager == null) {
             this.schemaManager = new FormDbSchemaManager();
         }

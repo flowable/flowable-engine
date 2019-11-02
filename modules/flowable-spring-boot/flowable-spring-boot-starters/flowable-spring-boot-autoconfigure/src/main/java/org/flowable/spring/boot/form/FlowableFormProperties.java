@@ -12,12 +12,12 @@
  */
 package org.flowable.spring.boot.form;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Properties for configuring the form engine.

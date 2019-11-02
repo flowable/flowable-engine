@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,6 +65,12 @@ public class FlowableProperties {
      * In some situations you want to set the schema to use for table checks / generation if the database metadata doesn't return that correctly.
      */
     private String databaseSchema;
+
+    /**
+     * Whether to use a lock when performing the database schema create or update operations.
+     */
+    private boolean useLockForDatabaseSchemaUpdate = false;
+
     /**
      * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#enabled}
      */
@@ -105,6 +112,16 @@ public class FlowableProperties {
      * Enable form field validation after form submission on the engine level
      */
     protected boolean formFieldValidationEnabled = false;
+
+    /**
+     * Duration between the checks when acquiring a lock.
+     */
+    private Duration lockPollRate = Duration.ofSeconds(10);
+
+    /**
+     * Duration to wait for the DB Schema lock before giving up.
+     */
+    private Duration schemaLockWaitTime = Duration.ofMinutes(5);
 
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
@@ -202,6 +219,14 @@ public class FlowableProperties {
 
     public void setDatabaseSchema(String databaseSchema) {
         this.databaseSchema = databaseSchema;
+    }
+
+    public boolean isUseLockForDatabaseSchemaUpdate() {
+        return useLockForDatabaseSchemaUpdate;
+    }
+
+    public void setUseLockForDatabaseSchemaUpdate(boolean useLockForDatabaseSchemaUpdate) {
+        this.useLockForDatabaseSchemaUpdate = useLockForDatabaseSchemaUpdate;
     }
 
     /**
@@ -303,4 +328,21 @@ public class FlowableProperties {
     public void setFormFieldValidationEnabled(boolean formFieldValidationEnabled) {
         this.formFieldValidationEnabled = formFieldValidationEnabled;
     }
+
+    public Duration getLockPollRate() {
+        return lockPollRate;
+    }
+
+    public void setLockPollRate(Duration lockPollRate) {
+        this.lockPollRate = lockPollRate;
+    }
+
+    public Duration getSchemaLockWaitTime() {
+        return schemaLockWaitTime;
+    }
+
+    public void setSchemaLockWaitTime(Duration schemaLockWaitTime) {
+        this.schemaLockWaitTime = schemaLockWaitTime;
+    }
+
 }

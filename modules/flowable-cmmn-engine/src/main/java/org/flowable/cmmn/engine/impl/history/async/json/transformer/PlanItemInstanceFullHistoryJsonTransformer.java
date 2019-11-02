@@ -80,6 +80,7 @@ public class PlanItemInstanceFullHistoryJsonTransformer extends AbstractPlanItem
         historicPlanItemInstanceEntity.setTerminatedTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_TERMINATED_TIME));
         historicPlanItemInstanceEntity.setExitTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_EXIT_TIME));
         historicPlanItemInstanceEntity.setEndedTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_END_TIME));
+        historicPlanItemInstanceEntity.setExtraValue(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_EXTRA_VALUE));
         
         if (historicalData.has(CmmnAsyncHistoryConstants.FIELD_IS_SHOW_IN_OVERVIEW)) {
             historicPlanItemInstanceEntity.setShowInOverview(getBooleanFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_IS_SHOW_IN_OVERVIEW));

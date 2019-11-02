@@ -25,23 +25,17 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<CmmnDeploymentEntity> implements CmmnDeploymentEntityManager {
-
-    protected CmmnDeploymentDataManager deploymentDataManager;
+public class CmmnDeploymentEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, CmmnDeploymentEntity, CmmnDeploymentDataManager>
+    implements CmmnDeploymentEntityManager {
 
     public CmmnDeploymentEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, CmmnDeploymentDataManager deploymentDataManager) {
-        super(cmmnEngineConfiguration);
-        this.deploymentDataManager = deploymentDataManager;
-    }
-
-    @Override
-    protected DataManager<CmmnDeploymentEntity> getDataManager() {
-        return deploymentDataManager;
+        super(cmmnEngineConfiguration, deploymentDataManager);
     }
 
     @Override
@@ -78,35 +72,35 @@ public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<C
 
     @Override
     public CmmnDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        return deploymentDataManager.findLatestDeploymentByName(deploymentName);
+        return dataManager.findLatestDeploymentByName(deploymentName);
     }
     
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
-        return deploymentDataManager.getDeploymentResourceNames(deploymentId);
+        return dataManager.getDeploymentResourceNames(deploymentId);
     }
     
     @Override
     public CmmnDeploymentQuery createDeploymentQuery() {
-        return new CmmnDeploymentQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new CmmnDeploymentQueryImpl(engineConfiguration.getCommandExecutor());
     }
     
     @Override
     public List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {
-        return deploymentDataManager.findDeploymentsByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
+        return dataManager.findDeploymentsByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
     }
     
     @Override
     public long findDeploymentCountByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {
-        return deploymentDataManager.findDeploymentCountByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
+        return dataManager.findDeploymentCountByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
     }
 
-    public CmmnDeploymentDataManager getDeploymentDataManager() {
-        return deploymentDataManager;
+    protected CmmnResourceEntityManager getCmmnResourceEntityManager() {
+        return engineConfiguration.getCmmnResourceEntityManager();
     }
 
-    public void setDeploymentDataManager(CmmnDeploymentDataManager deploymentDataManager) {
-        this.deploymentDataManager = deploymentDataManager;
+    protected CaseDefinitionEntityManager getCaseDefinitionEntityManager() {
+        return engineConfiguration.getCaseDefinitionEntityManager();
     }
 
 }

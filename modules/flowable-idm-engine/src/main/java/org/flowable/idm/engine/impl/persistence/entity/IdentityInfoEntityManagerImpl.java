@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.data.IdentityInfoDataManager;
 
@@ -27,18 +26,12 @@ import org.flowable.idm.engine.impl.persistence.entity.data.IdentityInfoDataMana
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<IdentityInfoEntity> implements IdentityInfoEntityManager {
-
-    protected IdentityInfoDataManager identityInfoDataManager;
+public class IdentityInfoEntityManagerImpl
+    extends AbstractIdmEngineEntityManager<IdentityInfoEntity, IdentityInfoDataManager>
+    implements IdentityInfoEntityManager {
 
     public IdentityInfoEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, IdentityInfoDataManager identityInfoDataManager) {
-        super(idmEngineConfiguration);
-        this.identityInfoDataManager = identityInfoDataManager;
-    }
-
-    @Override
-    protected DataManager<IdentityInfoEntity> getDataManager() {
-        return identityInfoDataManager;
+        super(idmEngineConfiguration, identityInfoDataManager);
     }
 
     @Override
@@ -61,14 +54,14 @@ public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<Identit
             // update
             identityInfoEntity.setValue(value);
             identityInfoEntity.setPasswordBytes(storedPassword);
-            identityInfoDataManager.update(identityInfoEntity);
+            dataManager.update(identityInfoEntity);
 
             if (accountDetails == null) {
                 accountDetails = new HashMap<>();
             }
 
             Set<String> newKeys = new HashSet<>(accountDetails.keySet());
-            List<IdentityInfoEntity> identityInfoDetails = identityInfoDataManager.findIdentityInfoDetails(identityInfoEntity.getId());
+            List<IdentityInfoEntity> identityInfoDetails = dataManager.findIdentityInfoDetails(identityInfoEntity.getId());
             for (IdentityInfoEntity identityInfoDetail : identityInfoDetails) {
                 String detailKey = identityInfoDetail.getKey();
                 newKeys.remove(detailKey);
@@ -84,7 +77,7 @@ public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<Identit
 
         } else {
             // insert
-            identityInfoEntity = identityInfoDataManager.create();
+            identityInfoEntity = dataManager.create();
             identityInfoEntity.setUserId(userId);
             identityInfoEntity.setType(type);
             identityInfoEntity.setKey(key);
@@ -100,7 +93,7 @@ public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<Identit
     protected void insertAccountDetails(IdentityInfoEntity identityInfoEntity, Map<String, String> accountDetails, Set<String> keys) {
         for (String newKey : keys) {
             // insert detail
-            IdentityInfoEntity identityInfoDetail = identityInfoDataManager.create();
+            IdentityInfoEntity identityInfoDetail = dataManager.create();
             identityInfoDetail.setParentId(identityInfoEntity.getId());
             identityInfoDetail.setKey(newKey);
             identityInfoDetail.setValue(accountDetails.get(newKey));
@@ -118,25 +111,17 @@ public class IdentityInfoEntityManagerImpl extends AbstractEntityManager<Identit
 
     @Override
     public IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key) {
-        return identityInfoDataManager.findUserInfoByUserIdAndKey(userId, key);
+        return dataManager.findUserInfoByUserIdAndKey(userId, key);
     }
 
     @Override
     public List<IdentityInfoEntity> findIdentityInfoByUserId(String userId) {
-        return identityInfoDataManager.findIdentityInfoByUserId(userId);
+        return dataManager.findIdentityInfoByUserId(userId);
     }
 
     @Override
     public List<String> findUserInfoKeysByUserIdAndType(String userId, String type) {
-        return identityInfoDataManager.findUserInfoKeysByUserIdAndType(userId, type);
-    }
-
-    public IdentityInfoDataManager getIdentityInfoDataManager() {
-        return identityInfoDataManager;
-    }
-
-    public void setIdentityInfoDataManager(IdentityInfoDataManager identityInfoDataManager) {
-        this.identityInfoDataManager = identityInfoDataManager;
+        return dataManager.findUserInfoKeysByUserIdAndType(userId, type);
     }
 
 }

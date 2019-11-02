@@ -79,6 +79,10 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
 
     void setExitCriterionId(String exitCriterionId);
     
+    void setFormKey(String formKey);
+    
+    void setExtraValue(String extraValue);
+    
     void setShowInOverview(boolean showInOverview);
 
     void setTenantId(String tenantId);

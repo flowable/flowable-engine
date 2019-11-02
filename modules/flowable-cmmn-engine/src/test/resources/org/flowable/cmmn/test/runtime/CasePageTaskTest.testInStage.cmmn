@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Task One" definitionRef="rootTask" />
+            <planItem id="planItem2" name="Stage One" definitionRef="stage1" />
+
+            <task id="rootTask" name="The Task" isBlocking="true" />
+
+            <stage id="stage1" name="Nested Stage">
+
+                <planItem id="planItem3" name="Task Two" definitionRef="nestedTask" />
+                <planItem id="planItem4" name="Case Page Task One" definitionRef="casePageTask1">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:parentCompletionRule type="ignore" />
+                        </extensionElements>
+                    </itemControl>
+                </planItem>
+
+                <task id="nestedTask" name="Nested Task" isBlocking="true" />
+                
+                <task id="casePageTask1" name="Page 1" flowable:type="casePage" flowable:formKey="${keyVar}" />
+
+            </stage>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -25,15 +26,18 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Tom Baeyens
@@ -168,6 +172,15 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
             tasks = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(this);
+
+            if (taskId != null) {
+                if (includeProcessVariables) {
+                    addCachedVariableForQueryById(commandContext, tasks, false);
+                } else if (includeTaskLocalVariables) {
+                    addCachedVariableForQueryById(commandContext, tasks, true);
+                }
+            }
+
         } else {
             tasks = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesByQueryCriteria(this);
         }
@@ -183,6 +196,29 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         return tasks;
+    }
+
+    protected void addCachedVariableForQueryById(CommandContext commandContext, List<HistoricTaskInstance> results, boolean local) {
+        for (HistoricTaskInstance task : results) {
+            if (Objects.equals(taskId, task.getId())) {
+
+                EntityCache entityCache = commandContext.getSession(EntityCache.class);
+                List<HistoricVariableInstanceEntity> cachedVariableEntities = entityCache.findInCache(HistoricVariableInstanceEntity.class);
+                for (HistoricVariableInstanceEntity cachedVariableEntity : cachedVariableEntities) {
+
+                    if (local) {
+                        if (task.getId().equals(cachedVariableEntity.getTaskId())) {
+                            ((HistoricTaskInstanceEntity) task).getQueryVariables().add(cachedVariableEntity);
+                        }
+                    } else {
+                        if (task.getProcessInstanceId().equals(cachedVariableEntity.getProcessInstanceId())) {
+                            ((HistoricTaskInstanceEntity) task).getQueryVariables().add(cachedVariableEntity);
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     @Override

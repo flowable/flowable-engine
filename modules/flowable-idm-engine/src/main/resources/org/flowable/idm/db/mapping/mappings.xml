@@ -15,6 +15,10 @@
                  jdbcType="VARCHAR"/>
   </typeHandlers>
   <mappers>
+    <!-- Common mappers -->
+    <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+
+    <!-- Engine mappers -->
     <mapper resource="org/flowable/idm/db/mapping/common.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/ByteArray.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/Group.xml" />

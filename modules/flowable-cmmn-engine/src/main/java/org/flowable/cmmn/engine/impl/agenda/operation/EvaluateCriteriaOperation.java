@@ -38,11 +38,13 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
@@ -135,8 +137,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 String satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
                 if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
                     boolean activatePlanItemInstance = true;
-                    if (!planItem.getEntryCriteria().isEmpty() && hasRepetitionRule(planItemInstanceEntity)) {
-                        boolean isRepeating = evaluateRepetitionRule(planItemInstanceEntity);
+                    if (!planItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
+                        boolean isRepeating = ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity);
                         if (isRepeating) {
 
                             PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity);
@@ -177,7 +179,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity);
                         if (criteriaChangeOrActiveChildrenForStage) {
                             criteriaChanged = true;
-                            planItemInstanceEntity.setCompleteable(false); // an active child = stage cannot be completed anymore
+                            planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
                         } else {
                             Stage stage = (Stage) planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
                             if (isStageCompletable(planItemInstanceEntity, stage)) {
@@ -187,6 +189,13 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         }
                     }
                 } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
+                    if (planItem.getItemControl() != null && planItem.getItemControl().getParentCompletionRule() != null) {
+                        ParentCompletionRule parentCompletionRule = planItem.getItemControl().getParentCompletionRule();
+                        if (ParentCompletionRule.IGNORE.equals(parentCompletionRule.getType())) {
+                            continue;
+                        }
+                    }
+                    
                     activeChildren++;
                 }
             }
@@ -398,66 +407,43 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return false;
     }
 
-    protected boolean isAvailableChildPlanCompletionNeutralOrNotActive(PlanItemInstanceContainer planItemInstanceContainer) {
-        if (planItemInstanceContainer.getChildPlanItemInstances() != null) {
-            for (PlanItemInstanceEntity childPlanItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
-                if (PlanItemInstanceState.END_STATES.contains(childPlanItemInstance.getState())) {
-                    continue;
-                }
-                if (PlanItemInstanceState.AVAILABLE.contains(childPlanItemInstance.getState()) && ExpressionUtil.isCompletionNeutralPlanItemInstance(childPlanItemInstance)) {
-                    continue;
-                }
-                return false;
-            }
-        }
-        return true;
-    }
-
     protected boolean isStageCompletable(PlanItemInstanceEntity stagePlanItemInstanceEntity, Stage stage) {
-        boolean allRequiredChildrenInEndState = PlanItemInstanceContainerUtil.isEndStateReachedForAllRequiredChildPlanItems(commandContext, stagePlanItemInstanceEntity);
-        if (allRequiredChildrenInEndState) {
-            stagePlanItemInstanceEntity.setCompleteable(true);
+        boolean autoComplete = ExpressionUtil.evaluateAutoComplete(commandContext, stagePlanItemInstanceEntity, stage);
+        CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
+            .shouldPlanItemContainerComplete(commandContext, stagePlanItemInstanceEntity, autoComplete);
+
+        if (completionEvaluationResult.isCompletable()) {
+            stagePlanItemInstanceEntity.setCompletable(true);
         }
 
-        if (stagePlanItemInstanceEntity.isCompleteable()) {
-            if (stage.isAutoComplete()) {
-                return true;
-            } else {
-                return isAvailableChildPlanCompletionNeutralOrNotActive(stagePlanItemInstanceEntity);
-            }
-        } else {
-            return false;
-        }
+        return completionEvaluationResult.shouldBeCompleted();
     }
-    
+
     protected boolean evaluatePlanModelComplete() {
-        boolean allRequiredChildrenInEndState = PlanItemInstanceContainerUtil.isEndStateReachedForAllRequiredChildPlanItems(commandContext, caseInstanceEntity);
-        if (allRequiredChildrenInEndState) {
-            boolean previousCompleteableState = caseInstanceEntity.isCompleteable();
-            caseInstanceEntity.setCompleteable(true);
+        boolean isAutoComplete = ExpressionUtil.evaluateAutoComplete(commandContext, caseInstanceEntity,
+            CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel());
+
+        CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
+            .shouldPlanItemContainerComplete(commandContext, caseInstanceEntity, isAutoComplete);
+
+        if (completionEvaluationResult.isCompletable()) {
+            boolean previousCompletableState = caseInstanceEntity.isCompletable();
+            caseInstanceEntity.setCompletable(true);
 
             // When the case entity changes, the plan items with an available condition can be become ready for creation
-            if (previousCompleteableState != caseInstanceEntity.isCompleteable()) {
+            if (previousCompletableState != caseInstanceEntity.isCompletable()) {
                 boolean planItemInstancesChanged = evaluatePlanItemsWithAvailableCondition(caseInstanceEntity);
                 if (planItemInstancesChanged) {
                     // If new plan items have changed, this could lead to changing of the fact that the case instance entity is completable
-                    allRequiredChildrenInEndState = PlanItemInstanceContainerUtil.isEndStateReachedForAllRequiredChildPlanItems(commandContext, caseInstanceEntity);
-                    if (!allRequiredChildrenInEndState) {
-                        caseInstanceEntity.setCompleteable(false);
+                    completionEvaluationResult = PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(commandContext, caseInstanceEntity, isAutoComplete);
+                    if (!completionEvaluationResult.isCompletable()) {
+                        caseInstanceEntity.setCompletable(false);
                     }
                 }
             }
         }
-        
-        if (caseInstanceEntity.isCompleteable()) {
-            if (CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel().isAutoComplete()) {
-                return true;
-            } else {
-                return isAvailableChildPlanCompletionNeutralOrNotActive(caseInstanceEntity);
-            }
-        } else {
-            return false;
-        }
+
+        return completionEvaluationResult.shouldBeCompleted();
     }
 
     protected boolean evaluatePlanItemsWithAvailableCondition(PlanItemInstanceContainer planItemInstanceContainer) {
@@ -542,7 +528,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 if (childPlanItemInstances.isEmpty() // runtime state
                         && (potentialTerminatedPlanItemInstances.isEmpty()
                                 // (terminated state) the plan item instance should not have been created anytime before
-                            || (hasRepetitionRule(entryDependentPlanItem) && evaluateRepetitionRule(caseInstanceEntity, entryDependentPlanItem.getItemControl().getRepetitionRule().getCondition())))) {
+                            || (ExpressionUtil.hasRepetitionRule(entryDependentPlanItem) && ExpressionUtil.evaluateRepetitionRule(commandContext, caseInstanceEntity, entryDependentPlanItem.getItemControl().getRepetitionRule().getCondition())))) {
 
                     // If the sentry satisfied, the plan item becomes active and all parent stages that are not yet activate are made active
                     String satisfiedCriterion = evaluateDependentPlanItemEntryCriteria(entryDependentPlanItem);
@@ -598,8 +584,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(entryDependentPlanItemInstance);
 
                         // Special care needed in case the plan item instance is repeating
-                        if (!entryDependentPlanItem.getEntryCriteria().isEmpty() && hasRepetitionRule(entryDependentPlanItemInstance)) {
-                            if (evaluateRepetitionRule(entryDependentPlanItemInstance)) {
+                        if (!entryDependentPlanItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(entryDependentPlanItemInstance)) {
+                            if (ExpressionUtil.evaluateRepetitionRule(commandContext, entryDependentPlanItemInstance)) {
                                 createPlanItemInstanceDuplicateForRepetition(entryDependentPlanItemInstance);
                             }
                         }

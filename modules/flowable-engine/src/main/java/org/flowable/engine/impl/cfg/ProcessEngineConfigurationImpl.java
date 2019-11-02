@@ -88,6 +88,8 @@ import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
@@ -297,8 +299,6 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManage
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.TableDataManager;
@@ -316,7 +316,6 @@ import org.flowable.engine.impl.persistence.entity.data.HistoricProcessInstanceD
 import org.flowable.engine.impl.persistence.entity.data.ModelDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
-import org.flowable.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisAttachmentDataManager;
@@ -331,7 +330,6 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricProc
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisModelDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
@@ -445,7 +443,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected IdentityService identityService = new IdentityServiceImpl(this);
     protected TaskService taskService = new TaskServiceImpl(this);
     protected FormService formService = new FormServiceImpl();
-    protected ManagementService managementService = new ManagementServiceImpl();
+    protected ManagementService managementService = new ManagementServiceImpl(this);
     protected DynamicBpmnService dynamicBpmnService = new DynamicBpmnServiceImpl(this);
     protected ProcessMigrationService processInstanceMigrationService = new ProcessMigrationServiceImpl(this);
 
@@ -467,7 +465,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ModelDataManager modelDataManager;
     protected ProcessDefinitionDataManager processDefinitionDataManager;
     protected ProcessDefinitionInfoDataManager processDefinitionInfoDataManager;
-    protected PropertyDataManager propertyDataManager;
     protected ResourceDataManager resourceDataManager;
 
     // ENTITY MANAGERS ///////////////////////////////////////////////////////////
@@ -485,7 +482,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ModelEntityManager modelEntityManager;
     protected ProcessDefinitionEntityManager processDefinitionEntityManager;
     protected ProcessDefinitionInfoEntityManager processDefinitionInfoEntityManager;
-    protected PropertyEntityManager propertyEntityManager;
     protected ResourceEntityManager resourceEntityManager;
     protected TableDataManager tableDataManager;
 
@@ -1227,8 +1223,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // Data managers ///////////////////////////////////////////////////////////
 
+    @Override
     @SuppressWarnings("rawtypes")
     public void initDataManagers() {
+        super.initDataManagers();
         if (attachmentDataManager == null) {
             attachmentDataManager = new MybatisAttachmentDataManager(this);
         }
@@ -1271,9 +1269,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (processDefinitionInfoDataManager == null) {
             processDefinitionInfoDataManager = new MybatisProcessDefinitionInfoDataManager(this);
         }
-        if (propertyDataManager == null) {
-            propertyDataManager = new MybatisPropertyDataManager(this);
-        }
         if (resourceDataManager == null) {
             resourceDataManager = new MybatisResourceDataManager(this);
         }
@@ -1281,7 +1276,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // Entity managers //////////////////////////////////////////////////////////
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (attachmentEntityManager == null) {
             attachmentEntityManager = new AttachmentEntityManagerImpl(this, attachmentDataManager);
         }
@@ -1320,9 +1317,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (processDefinitionInfoEntityManager == null) {
             processDefinitionInfoEntityManager = new ProcessDefinitionInfoEntityManagerImpl(this, processDefinitionInfoDataManager);
-        }
-        if (propertyEntityManager == null) {
-            propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
@@ -3875,10 +3869,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public PropertyDataManager getPropertyDataManager() {
-        return propertyDataManager;
-    }
-
+    @Override
     public ProcessEngineConfigurationImpl setPropertyDataManager(PropertyDataManager propertyDataManager) {
         this.propertyDataManager = propertyDataManager;
         return this;
@@ -4010,10 +4001,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public PropertyEntityManager getPropertyEntityManager() {
-        return propertyEntityManager;
-    }
-
+    @Override
     public ProcessEngineConfigurationImpl setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
         this.propertyEntityManager = propertyEntityManager;
         return this;

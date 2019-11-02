@@ -14,8 +14,8 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

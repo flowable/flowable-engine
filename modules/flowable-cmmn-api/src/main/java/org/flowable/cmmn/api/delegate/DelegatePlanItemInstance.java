@@ -49,9 +49,11 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     void setStartUserId(String startUserId);
     void setReferenceId(String referenceId);
     void setReferenceType(String referenceType);
-    void setCompleteable(boolean completeable);
+    void setCompletable(boolean completable);
     void setEntryCriterionId(String entryCriterionId);
     void setExitCriterionId(String exitCriterionId);
+    void setFormKey(String formKey);
+    void setExtraValue(String extraValue);
     void setTenantId(String tenantId);
 
     PlanItem getPlanItem();

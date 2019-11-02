@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.common.spring.SpringTransactionContextFactory;
 import org.flowable.common.spring.SpringTransactionInterceptor;
@@ -29,7 +30,6 @@ import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
-import org.flowable.dmn.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
@@ -52,7 +52,7 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected Collection<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = new ArrayList<>();
     protected volatile boolean running = false;
     protected List<String> enginesBuild = new ArrayList<>();
     protected final Object lifeCycleMonitor = new Object();
@@ -101,8 +101,8 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
 
     protected void autoDeployResources(DmnEngine dmnEngine) {
         if (deploymentResources != null && deploymentResources.length > 0) {
-            final AutoDeploymentStrategy strategy = getAutoDeploymentStrategy(deploymentMode);
-            strategy.deployResources(deploymentName, deploymentResources, dmnEngine.getDmnRepositoryService());
+            final AutoDeploymentStrategy<DmnEngine> strategy = getAutoDeploymentStrategy(deploymentMode);
+            strategy.deployResources(deploymentName, deploymentResources, dmnEngine);
         }
     }
 
@@ -176,15 +176,23 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
      *            the mode to get the strategy for
      * @return the deployment strategy to use for the mode. Never <code>null</code>
      */
-    protected AutoDeploymentStrategy getAutoDeploymentStrategy(final String mode) {
-        AutoDeploymentStrategy result = new DefaultAutoDeploymentStrategy();
-        for (final AutoDeploymentStrategy strategy : deploymentStrategies) {
+    protected AutoDeploymentStrategy<DmnEngine> getAutoDeploymentStrategy(final String mode) {
+        AutoDeploymentStrategy<DmnEngine> result = new DefaultAutoDeploymentStrategy();
+        for (final AutoDeploymentStrategy<DmnEngine> strategy : deploymentStrategies) {
             if (strategy.handlesMode(mode)) {
                 result = strategy;
                 break;
             }
         }
         return result;
+    }
+
+    public Collection<AutoDeploymentStrategy<DmnEngine>> getDeploymentStrategies() {
+        return deploymentStrategies;
+    }
+
+    public void setDeploymentStrategies(Collection<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies) {
+        this.deploymentStrategies = deploymentStrategies;
     }
 
     @Override

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -395,6 +396,70 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         // After the history jobs it has the new data
         historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(historicTaskInstance.getDueDate()).isNull();
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testCasePageTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneCasePageTask").start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals(2, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertEquals(1, cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                        .planItemInstanceFormKey("testKey")
+                        .planItemInstanceCaseInstanceId(caseInstance.getId())
+                        .singleResult();
+        assertEquals("The Case Page Task", historicPlanItemInstance.getName());
+        assertEquals("testKey", historicPlanItemInstance.getFormKey());
+        assertEquals("testKey", historicPlanItemInstance.getExtraValue());
+        assertNull(historicPlanItemInstance.getEndedTime());
+        
+        List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForPlanItemInstance(historicPlanItemInstance.getId());
+        assertEquals(5, historicIdentityLinks.size());
+        
+        List<HistoricIdentityLink> historicAssigneeLink = historicIdentityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.ASSIGNEE)).collect(Collectors.toList());
+        assertEquals(1, historicAssigneeLink.size());
+        assertEquals("johnDoe", historicAssigneeLink.get(0).getUserId());
+        
+        List<HistoricIdentityLink> historicOwnerLink = historicIdentityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.OWNER)).collect(Collectors.toList());
+        assertEquals(1, historicOwnerLink.size());
+        assertEquals("janeDoe", historicOwnerLink.get(0).getUserId());
+        
+        List<HistoricIdentityLink> historicCandidateUserLinks = historicIdentityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) && 
+                        identityLink.getUserId() != null).collect(Collectors.toList());
+        assertEquals(2, historicCandidateUserLinks.size());
+        List<String> linkValues = new ArrayList<>();
+        for (HistoricIdentityLink candidateLink : historicCandidateUserLinks) {
+            linkValues.add(candidateLink.getUserId());
+        }
+        assertTrue(linkValues.contains("johnDoe"));
+        assertTrue(linkValues.contains("janeDoe"));
+        
+        List<HistoricIdentityLink> historicGroupLink = historicIdentityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
+                        identityLink.getGroupId() != null).collect(Collectors.toList());
+        assertEquals(1, historicGroupLink.size());
+        assertEquals("sales", historicGroupLink.get(0).getGroupId());
+        
+        // Complete
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(historicTaskInstance.getEndTime());
+        
+        assertEquals(2, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
+        historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                        .planItemInstanceFormKey("testKey")
+                        .planItemInstanceCaseInstanceId(caseInstance.getId())
+                        .singleResult();
+        assertNotNull(historicPlanItemInstance.getEndedTime());
     }
     
     @Test

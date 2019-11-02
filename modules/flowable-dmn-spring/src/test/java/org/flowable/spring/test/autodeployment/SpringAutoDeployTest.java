@@ -13,52 +13,108 @@
 
 package org.flowable.spring.test.autodeployment;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.sql.Driver;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.AbstractXmlApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.flowable.dmn.spring.DmnEngineFactoryBean;
+import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
+import org.flowable.dmn.xml.exception.DmnXMLException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class SpringAutoDeployTest extends AbstractDmnTestCase {
 
-    protected static final String CTX_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml";
-    protected static final String CTX_NO_DROP_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-no-drop-context.xml";
-    protected static final String CTX_CREATE_DROP_CLEAN_DB = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-create-drop-clean-db-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_DEFAULT = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-default-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-single-resource-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-resource-parent-folder-context.xml";
+    protected static final String DEFAULT_VALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/simple*.dmn";
 
-    protected ApplicationContext applicationContext;
+    protected static final String DEFAULT_INVALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/*simple*.dmn";
+
+    protected static final String DEFAULT_VALID_DIRECTORY_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/**/simple*.dmn";
+
+    protected static final String DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/**/*simple*.dmn";
+
+    protected ConfigurableApplicationContext applicationContext;
     protected DmnRepositoryService repositoryService;
 
-    protected void createAppContext(String path) {
-        this.applicationContext = new ClassPathXmlApplicationContext(path);
+    protected void createAppContextWithoutDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContextWithDefaultDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+    protected void createAppContextWithSingleResourceDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "single-resource");
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContextWithResourceParenFolderDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "resource-parent-folder");
+        properties.put("deploymentResources", DEFAULT_VALID_DIRECTORY_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContext(Map<String, Object> properties) {
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+        applicationContext.register(SpringDmnAutoDeployTestConfiguration.class);
+        applicationContext.getEnvironment().getPropertySources()
+            .addLast(new MapPropertySource("springAutoDeploy", properties));
+        applicationContext.refresh();
+        this.applicationContext = applicationContext;
         this.repositoryService = applicationContext.getBean(DmnRepositoryService.class);
     }
 
     @Override
     protected void tearDown() throws Exception {
         removeAllDeployments();
-        this.applicationContext = null;
+        if (this.applicationContext != null) {
+            this.applicationContext.close();
+            this.applicationContext = null;
+        }
         this.repositoryService = null;
         super.tearDown();
     }
 
     public void testBasicActivitiSpringIntegration() {
-        createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
+        createAppContextWithoutDeploymentMode();
         List<DmnDecisionTable> decisionTables = repositoryService.createDecisionTableQuery().orderByDecisionTableKey().asc().list();
 
         Set<String> decisionTableKeys = new HashSet<>();
@@ -74,23 +130,23 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
     }
 
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
-        createAppContext(CTX_PATH);
+        createAppContextWithoutDeploymentMode();
         DmnDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
         assertEquals(1, deploymentQuery.count());
         DmnDecisionTableQuery decisionTableQuery = repositoryService.createDecisionTableQuery();
         assertEquals(2, decisionTableQuery.count());
 
         // Creating a new app context with same resources doesn't lead to more deployments
-        new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
+        createAppContextWithoutDeploymentMode();
         assertEquals(1, deploymentQuery.count());
         assertEquals(2, decisionTableQuery.count());
     }
 
     // Updating the form file should lead to a new deployment when restarting the Spring container
     public void testResourceRedeploymentAfterDecisionTableChange() throws Exception {
-        createAppContext(CTX_PATH);
+        createAppContextWithoutDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
-        ((AbstractXmlApplicationContext) applicationContext).destroy();
+        applicationContext.close();
 
         String filePath = "org/flowable/spring/test/autodeployment/simple_1.dmn";
         String originalFormFileContent = IoUtil.readFileAsString(filePath);
@@ -104,8 +160,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         Thread.sleep(2000);
 
         try {
-            applicationContext = new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
-            repositoryService = (DmnRepositoryService) applicationContext.getBean("dmnRepositoryService");
+            createAppContextWithoutDeploymentMode();
         } finally {
             // Reset file content such that future test are not seeing something funny
             IoUtil.writeStringToFile(originalFormFileContent, filePath);
@@ -117,37 +172,191 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertEquals(4, repositoryService.createDecisionTableQuery().count());
     }
 
-    public void testAutoDeployWithCreateDropOnCleanDb() {
-        createAppContext(CTX_CREATE_DROP_CLEAN_DB);
+    public void testAutoDeployWithDeploymentModeDefault() {
+        createAppContextWithDefaultDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createDecisionTableQuery().count());
     }
 
-    public void testAutoDeployWithDeploymentModeDefault() {
-        createAppContext(CTX_DEPLOYMENT_MODE_DEFAULT);
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createDecisionTableQuery().count());
+    public void testAutoDeployWithInvalidResourcesWithDeploymentModeDefault() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        assertThatThrownBy(() -> createAppContext(properties))
+            .hasCauseInstanceOf(DmnXMLException.class);
+        assertThat(repositoryService).isNull();
+
+        // Some of the resources should have been deployed
+        properties.put("deploymentResources", "classpath*:/notExisting*.bpmn20.xml");
+        createAppContext(properties);
+        assertThat(repositoryService.createDecisionTableQuery().list())
+            .extracting(DmnDecisionTable::getKey)
+            .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+    }
+
+    public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionWithDeploymentModeDefault() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        properties.put("throwExceptionOnDeploymentFailure", false);
+        createAppContext(properties);
+
+        assertThat(repositoryService.createDecisionTableQuery().list())
+            .extracting(DmnDecisionTable::getKey)
+            .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
     }
 
     public void testAutoDeployWithDeploymentModeSingleResource() {
-        createAppContext(CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE);
+        createAppContextWithSingleResourceDeploymentMode();
         assertEquals(2, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createDecisionTableQuery().count());
     }
 
+    public void testAutoDeployWithInvalidResourcesWithDeploymentModeSingleResource() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "single-resource");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        assertThatThrownBy(() -> createAppContext(properties))
+            .hasCauseInstanceOf(DmnXMLException.class);
+        assertThat(repositoryService).isNull();
+
+        // Some of the resources should have been deployed
+        properties.put("deploymentResources", "classpath*:/notExisting*.dmn");
+        createAppContext(properties);
+        assertThat(repositoryService.createDecisionTableQuery().list())
+            .extracting(DmnDecisionTable::getKey)
+            .containsExactlyInAnyOrder("decision", "decision2");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+    }
+
+    public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionOnDeploymentWithDeploymentModeSingleResource() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "single-resource");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        properties.put("throwExceptionOnDeploymentFailure", false);
+        createAppContext(properties);
+
+        assertThat(repositoryService.createDecisionTableQuery().list())
+            .extracting(DmnDecisionTable::getKey)
+            .containsExactlyInAnyOrder("decision", "decision2");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+    }
+
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
-        createAppContext(CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER);
+        createAppContextWithResourceParenFolderDeploymentMode();
         assertEquals(2, repositoryService.createDeploymentQuery().count());
         assertEquals(3, repositoryService.createDecisionTableQuery().count());
+    }
+
+    public void testAutoDeployWithInvalidResourcesWithDeploymentModeResourceParentFolder() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "resource-parent-folder");
+        properties.put("deploymentResources", DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES);
+        assertThatThrownBy(() -> createAppContext(properties))
+            .hasCauseInstanceOf(DmnXMLException.class);
+        assertThat(repositoryService).isNull();
+
+        // Start a new application context to verify that there are no deployments
+        properties.put("deploymentResources", "classpath*:/notExisting*.dmn");
+        createAppContext(properties);
+
+        assertThat(repositoryService.createDecisionTableQuery().list())
+            .extracting(DmnDecisionTable::getKey)
+            .isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+    }
+
+    public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionOnDeploymentWithDeploymentModeResourceParentFolder() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "resource-parent-folder");
+        properties.put("deploymentResources", DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES);
+        properties.put("throwExceptionOnDeploymentFailure", false);
+        createAppContext(properties);
+        assertThat(repositoryService.createDecisionTableQuery().list())
+            .extracting(DmnDecisionTable::getKey)
+            .containsExactlyInAnyOrder("decision3");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
     }
 
     // --Helper methods
     // ----------------------------------------------------------
 
     private void removeAllDeployments() {
-        for (DmnDeployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId());
+        if (repositoryService != null) {
+            for (DmnDeployment deployment : repositoryService.createDeploymentQuery().list()) {
+                repositoryService.deleteDeployment(deployment.getId());
+            }
         }
     }
+
+    @Configuration
+    static class SpringDmnAutoDeployTestConfiguration {
+
+        @Bean
+        public SimpleDriverDataSource dataSource(
+            @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> driverClass,
+            @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}") String url,
+            @Value("${jdbc.username:sa}") String username,
+            @Value("${jdbc.password:}") String password
+        ) {
+            SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+            dataSource.setDriverClass(driverClass);
+            dataSource.setUrl(url);
+            dataSource.setUsername(username);
+            dataSource.setPassword(password);
+
+            return dataSource;
+        }
+
+        @Bean
+        public PlatformTransactionManager transactionManager(DataSource dataSource) {
+            return new DataSourceTransactionManager(dataSource);
+        }
+
+        @Bean
+        public SpringDmnEngineConfiguration dmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            @Value("${databaseSchemaUpdate:true}") String databaseSchemaUpdate,
+            @Value("${deploymentMode:#{null}}") String deploymentMode,
+            @Value("${deploymentResources}") Resource[] deploymentResources,
+            @Value("${throwExceptionOnDeploymentFailure:#{null}}") Boolean throwExceptionOnDeploymentFailure
+        ) {
+            SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
+            dmnEngineConfiguration.setDataSource(dataSource);
+            dmnEngineConfiguration.setTransactionManager(transactionManager);
+            dmnEngineConfiguration.setDatabaseSchemaUpdate(databaseSchemaUpdate);
+
+            if (deploymentMode != null) {
+                dmnEngineConfiguration.setDeploymentMode(deploymentMode);
+            }
+
+            dmnEngineConfiguration.setDeploymentResources(deploymentResources);
+
+            if (throwExceptionOnDeploymentFailure != null) {
+                dmnEngineConfiguration.getDeploymentStrategies()
+                    .forEach(strategy -> {
+                        if (strategy instanceof CommonAutoDeploymentStrategy) {
+                            ((CommonAutoDeploymentStrategy<DmnEngine>) strategy).getDeploymentProperties().setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                        }
+                    });
+            }
+
+            return dmnEngineConfiguration;
+        }
+
+        @Bean
+        public DmnEngineFactoryBean dmnEngine(SpringDmnEngineConfiguration dmnEngineConfiguration) {
+            DmnEngineFactoryBean dmnEngineFactoryBean = new DmnEngineFactoryBean();
+            dmnEngineFactoryBean.setDmnEngineConfiguration(dmnEngineConfiguration);
+            return dmnEngineFactoryBean;
+        }
+
+        @Bean
+        public DmnRepositoryService repositoryService(DmnEngine dmnEngine) {
+            return dmnEngine.getDmnRepositoryService();
+        }
+    }
+
 
 }

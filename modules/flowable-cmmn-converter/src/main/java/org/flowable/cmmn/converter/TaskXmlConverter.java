@@ -17,6 +17,7 @@ import java.util.Objects;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
@@ -55,10 +56,13 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
                 task = convertToHttpTask(className);
 
             } else if (Objects.equals(type, ServiceTask.MAIL_TASK)) {
-                task = convertToMailtask();
+                task = convertToMailTask();
 
             } else if (Objects.equals(type, ScriptServiceTask.SCRIPT_TASK)) {
                 task = convertToScriptTask(xtr);
+                
+            } else if (Objects.equals(type, CasePageTask.TYPE)) {
+                task = convertToCasePageTask(xtr);
 
             } else if (Objects.equals(type, SendEventServiceTask.SEND_EVENT)) {
               task = convertToSendEventTask(xtr);
@@ -110,10 +114,56 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         return httpServiceTask;
     }
 
-    protected Task convertToMailtask() {
+    protected Task convertToMailTask() {
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setType(ServiceTask.MAIL_TASK);
         return serviceTask;
+    }
+    
+    protected Task convertToCasePageTask(XMLStreamReader xtr) {
+        CasePageTask casePageTask = new CasePageTask();
+        String formKey = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FORM_KEY);
+        if (formKey != null) {
+            casePageTask.setFormKey(formKey);
+        }
+        
+        String label = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_LABEL);
+        if (label != null) {
+            casePageTask.setLabel(label);
+        }
+        
+        String icon = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ICON);
+        if (icon != null) {
+            casePageTask.setIcon(icon);
+        }
+        
+        String assignee = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ASSIGNEE);
+        if (assignee != null) {
+            casePageTask.setAssignee(assignee);
+        }
+        
+        String owner = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_OWNER);
+        if (owner != null) {
+            casePageTask.setOwner(owner);
+        }
+        
+        String candidateUsersString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_USERS);
+        if (StringUtils.isNotEmpty(candidateUsersString)) {
+            String[] candidateUsers = candidateUsersString.split(",");
+            for (String candidateUser : candidateUsers) {
+                casePageTask.getCandidateUsers().add(candidateUser);
+            }
+        }
+        
+        String candidateGroupsString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_GROUPS);
+        if (StringUtils.isNotEmpty(candidateGroupsString)) {
+            String[] candidateGroups = candidateGroupsString.split(",");
+            for (String candidateGroup : candidateGroups) {
+                casePageTask.getCandidateGroups().add(candidateGroup);
+            }
+        }
+        
+        return casePageTask;
     }
 
     protected Task convertToScriptTask(XMLStreamReader xtr) {

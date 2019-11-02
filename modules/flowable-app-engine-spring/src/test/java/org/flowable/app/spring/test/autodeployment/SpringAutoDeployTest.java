@@ -13,56 +13,113 @@
 
 package org.flowable.app.spring.test.autodeployment;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Driver;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.sql.DataSource;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDefinitionQuery;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.api.repository.AppDeploymentQuery;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.spring.AppEngineFactoryBean;
+import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.junit.After;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.AbstractXmlApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import com.fasterxml.jackson.core.JsonParseException;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class SpringAutoDeployTest {
 
-    protected static final String CTX_PATH = "org/flowable/app/spring/test/autodeployment/SpringAutoDeployTest-context.xml";
-    protected static final String CTX_NO_DROP_PATH = "org/flowable/app/spring/test/autodeployment/SpringAutoDeployTest-no-drop-context.xml";
-    protected static final String CTX_CREATE_DROP_CLEAN_DB = "org/flowable/app/spring/test/autodeployment/SpringAutoDeployTest-create-drop-clean-db-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_DEFAULT = "org/flowable/app/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-default-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE = "org/flowable/app/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-single-resource-context.xml";
-    protected static final String CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER = "org/flowable/app/spring/test/autodeployment/SpringAutoDeployTest-deploymentmode-resource-parent-folder-context.xml";
+    protected static final String DEFAULT_VALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/app/spring/test/autodeployment/simple*.app";
 
-    protected ApplicationContext applicationContext;
+    protected static final String DEFAULT_INVALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/app/spring/test/autodeployment/*simple*.app";
+
+    protected static final String DEFAULT_VALID_DIRECTORY_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/app/spring/test/autodeployment/**/simple*.app";
+
+    protected static final String DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/app/spring/test/autodeployment/**/*simple*.app";
+
+    protected ConfigurableApplicationContext applicationContext;
     protected AppRepositoryService repositoryService;
 
-    protected void createAppContext(String path) {
-        this.applicationContext = new ClassPathXmlApplicationContext(path);
+    protected void createAppContextWithoutDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContextWithDefaultDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+    protected void createAppContextWithSingleResourceDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "single-resource");
+        properties.put("deploymentResources", DEFAULT_VALID_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContextWithResourceParenFolderDeploymentMode() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "resource-parent-folder");
+        properties.put("deploymentResources", DEFAULT_VALID_DIRECTORY_DEPLOYMENT_RESOURCES);
+        createAppContext(properties);
+    }
+
+    protected void createAppContext(Map<String, Object> properties) {
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+        applicationContext.register(SpringAppAutoDeployTestConfiguration.class);
+        applicationContext.getEnvironment().getPropertySources()
+            .addLast(new MapPropertySource("springAutoDeploy", properties));
+        applicationContext.refresh();
+        this.applicationContext = applicationContext;
         this.repositoryService = applicationContext.getBean(AppRepositoryService.class);
     }
 
     @After
     public void tearDown() throws Exception {
         removeAllDeployments();
-        this.applicationContext = null;
+        if (this.applicationContext != null) {
+            this.applicationContext.close();
+            this.applicationContext = null;
+        }
         this.repositoryService = null;
     }
 
     @Test
     public void testBasicSpringIntegration() {
-        createAppContext("org/flowable/app/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
+        createAppContextWithoutDeploymentMode();
         List<AppDefinition> appDefinitions = repositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().list();
 
         Set<String> appDefinitionKeys = new HashSet<>();
@@ -78,14 +135,14 @@ public class SpringAutoDeployTest {
 
     @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
-        createAppContext(CTX_PATH);
+        createAppContextWithoutDeploymentMode();
         AppDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
         assertEquals(1, deploymentQuery.count());
         AppDefinitionQuery appDefinitionQuery = repositoryService.createAppDefinitionQuery();
         assertEquals(1, appDefinitionQuery.count());
 
         // Creating a new app context with same resources doesn't lead to more deployments
-        new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
+        createAppContextWithoutDeploymentMode();
         assertEquals(1, deploymentQuery.count());
         assertEquals(1, appDefinitionQuery.count());
     }
@@ -93,9 +150,9 @@ public class SpringAutoDeployTest {
     // Updating the form file should lead to a new deployment when restarting the Spring container
     @Test
     public void testResourceRedeploymentAfterAppDefinitionChange() throws Exception {
-        createAppContext(CTX_PATH);
+        createAppContextWithoutDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
-        ((AbstractXmlApplicationContext) applicationContext).destroy();
+        applicationContext.close();
 
         String filePath = "org/flowable/app/spring/test/autodeployment/simple.app";
         String originalAppFileContent = IoUtil.readFileAsString(filePath);
@@ -109,8 +166,7 @@ public class SpringAutoDeployTest {
         Thread.sleep(2000);
 
         try {
-            applicationContext = new ClassPathXmlApplicationContext(CTX_NO_DROP_PATH);
-            repositoryService = (AppRepositoryService) applicationContext.getBean("appRepositoryService");
+            createAppContextWithoutDeploymentMode();
         } finally {
             // Reset file content such that future test are not seeing something funny
             IoUtil.writeStringToFile(originalAppFileContent, filePath);
@@ -123,29 +179,56 @@ public class SpringAutoDeployTest {
     }
 
     @Test
-    public void testAutoDeployWithCreateDropOnCleanDb() {
-        createAppContext(CTX_CREATE_DROP_CLEAN_DB);
+    public void testAutoDeployWithDeploymentModeDefault() {
+        createAppContextWithDefaultDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(1, repositoryService.createAppDefinitionQuery().count());
     }
 
     @Test
-    public void testAutoDeployWithDeploymentModeDefault() {
-        createAppContext(CTX_DEPLOYMENT_MODE_DEFAULT);
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(1, repositoryService.createAppDefinitionQuery().count());
+    public void testAutoDeployWithInvalidResourcesWithDeploymentModeDefault() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        assertThatThrownBy(() -> createAppContext(properties))
+            .hasMessageContaining("Error reading app resource")
+            .hasCauseInstanceOf(FlowableException.class)
+            .hasRootCauseInstanceOf(JsonParseException.class);
+        assertThat(repositoryService).isNull();
+
+        // Some of the resources should have been deployed
+        properties.put("deploymentResources", "classpath*:/notExisting*.app");
+        createAppContext(properties);
+        assertThat(repositoryService.createAppDefinitionQuery().list())
+            .extracting(AppDefinition::getKey)
+            .containsExactlyInAnyOrder("simpleApp");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionWithDeploymentModeDefault() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("deploymentMode", "default");
+        properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
+        properties.put("throwExceptionOnDeploymentFailure", false);
+        createAppContext(properties);
+
+        assertThat(repositoryService.createAppDefinitionQuery().list())
+            .extracting(AppDefinition::getKey)
+            .containsExactlyInAnyOrder("simpleApp");
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
-        createAppContext(CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE);
+        createAppContextWithSingleResourceDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(1, repositoryService.createAppDefinitionQuery().count());
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
-        createAppContext(CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER);
+        createAppContextWithResourceParenFolderDeploymentMode();
         assertEquals(2, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createAppDefinitionQuery().count());
     }
@@ -154,8 +237,77 @@ public class SpringAutoDeployTest {
     // ----------------------------------------------------------
 
     protected void removeAllDeployments() {
-        for (AppDeployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
+        if (repositoryService != null) {
+            for (AppDeployment deployment : repositoryService.createDeploymentQuery().list()) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
+    }
+
+    @Configuration
+    static class SpringAppAutoDeployTestConfiguration {
+
+        @Bean
+        public SimpleDriverDataSource dataSource(
+            @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> driverClass,
+            @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}") String url,
+            @Value("${jdbc.username:sa}") String username,
+            @Value("${jdbc.password:}") String password
+        ) {
+            SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+            dataSource.setDriverClass(driverClass);
+            dataSource.setUrl(url);
+            dataSource.setUsername(username);
+            dataSource.setPassword(password);
+
+            return dataSource;
+        }
+
+        @Bean
+        public PlatformTransactionManager transactionManager(DataSource dataSource) {
+            return new DataSourceTransactionManager(dataSource);
+        }
+
+        @Bean
+        public SpringAppEngineConfiguration appEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            @Value("${databaseSchemaUpdate:true}") String databaseSchemaUpdate,
+            @Value("${deploymentMode:#{null}}") String deploymentMode,
+            @Value("${deploymentResources}") Resource[] deploymentResources,
+            @Value("${throwExceptionOnDeploymentFailure:#{null}}") Boolean throwExceptionOnDeploymentFailure
+        ) {
+            SpringAppEngineConfiguration appEngineConfiguration = new SpringAppEngineConfiguration();
+            appEngineConfiguration.setDataSource(dataSource);
+            appEngineConfiguration.setTransactionManager(transactionManager);
+            appEngineConfiguration.setDatabaseSchemaUpdate(databaseSchemaUpdate);
+
+            if (deploymentMode != null) {
+                appEngineConfiguration.setDeploymentMode(deploymentMode);
+            }
+
+            appEngineConfiguration.setDeploymentResources(deploymentResources);
+
+            if (throwExceptionOnDeploymentFailure != null) {
+                appEngineConfiguration.getDeploymentStrategies()
+                    .forEach(strategy -> {
+                        if (strategy instanceof CommonAutoDeploymentStrategy) {
+                            ((CommonAutoDeploymentStrategy<AppEngine>) strategy).getDeploymentProperties().setThrowExceptionOnDeploymentFailure(throwExceptionOnDeploymentFailure);
+                        }
+                    });
+            }
+
+            return appEngineConfiguration;
+        }
+
+        @Bean
+        public AppEngineFactoryBean appEngine(SpringAppEngineConfiguration appEngineConfiguration) {
+            AppEngineFactoryBean appEngineFactoryBean = new AppEngineFactoryBean();
+            appEngineFactoryBean.setAppEngineConfiguration(appEngineConfiguration);
+            return appEngineFactoryBean;
+        }
+
+        @Bean
+        public AppRepositoryService repositoryService(AppEngine appEngine) {
+            return appEngine.getAppRepositoryService();
         }
     }
 

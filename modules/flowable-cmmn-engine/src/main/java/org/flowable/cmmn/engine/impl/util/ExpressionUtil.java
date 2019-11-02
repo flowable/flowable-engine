@@ -14,7 +14,9 @@ package org.flowable.cmmn.engine.impl.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -51,7 +53,35 @@ public class ExpressionUtil {
         return false;
     }
 
-    public static boolean isCompletionNeutralPlanItemInstance( PlanItemInstanceEntity planItemInstanceEntity) {
+    public static boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null) {
+            return hasRepetitionRule(planItemInstanceEntity.getPlanItem());
+        }
+        return false;
+    }
+
+    public static boolean hasRepetitionRule(PlanItem planItem) {
+        return planItem.getItemControl() != null
+            && planItem.getItemControl().getRepetitionRule() != null;
+    }
+
+    public static boolean evaluateRepetitionRule(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (hasRepetitionRule(planItemInstanceEntity)) {
+            String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
+            return evaluateRepetitionRule(commandContext, planItemInstanceEntity, repetitionCondition);
+        }
+        return false;
+    }
+
+    public static boolean evaluateRepetitionRule(CommandContext commandContext, VariableContainer variableContainer, String repetitionCondition) {
+        if (StringUtils.isNotEmpty(repetitionCondition)) {
+            return ExpressionUtil.evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
+        } else {
+            return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
+        }
+    }
+
+    public static boolean isCompletionNeutralPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
         return isCompletionNeutralPlanItemInstance(CommandContextUtil.getCommandContext(), planItemInstanceEntity);
     }
 
@@ -69,4 +99,18 @@ public class ExpressionUtil {
         return false;
     }
 
+    /**
+     * Returns true, if the given stage has an auto-complete condition which evaluates to true or if not, is in auto-complete mode permanently.
+     *
+     * @param commandContext the command context in which the method is invoked
+     * @param variableContainer the variable container (most likely the plan item representing the stage or case plan model) used to evaluate the condition against
+     * @param stage the stage model object to get its auto-complete condition from
+     * @return true, if the stage is in auto-complete, either statically or if the condition evaluates to true
+     */
+    public static boolean evaluateAutoComplete(CommandContext commandContext, VariableContainer variableContainer, Stage stage) {
+        if (StringUtils.isNotEmpty(stage.getAutoCompleteCondition())) {
+            return evaluateBooleanExpression(commandContext, variableContainer, stage.getAutoCompleteCondition());
+        }
+        return stage.isAutoComplete();
+    }
 }

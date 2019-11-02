@@ -45,6 +45,9 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     @Override
     protected void internalExecute() {
         if (isStage(planItemInstanceEntity)) {
+            // terminate any remaining child plan items (e.g. in enabled / available state), but don't complete them as it might lead
+            // into wrong behavior resulting from it (e.g. triggering some follow-up actions on that completion event) and it will leave
+            // such implicitly completed plan items in complete state although they were never explicitly completed
             exitChildPlanItemInstances();
         }
 

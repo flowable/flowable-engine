@@ -15,51 +15,42 @@ package org.flowable.entitylink.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
-import org.flowable.entitylink.service.event.impl.FlowableEntityLinkEventBuilder;
 import org.flowable.entitylink.service.impl.persistence.entity.data.EntityLinkDataManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class EntityLinkEntityManagerImpl extends AbstractEntityManager<EntityLinkEntity> implements EntityLinkEntityManager {
-
-    protected EntityLinkDataManager entityLinkDataManager;
+public class EntityLinkEntityManagerImpl
+    extends AbstractServiceEngineEntityManager<EntityLinkServiceConfiguration, EntityLinkEntity, EntityLinkDataManager>
+    implements EntityLinkEntityManager {
 
     public EntityLinkEntityManagerImpl(EntityLinkServiceConfiguration entityLinkServiceConfiguration, EntityLinkDataManager entityLinkDataManager) {
-        super(entityLinkServiceConfiguration);
-        this.entityLinkDataManager = entityLinkDataManager;
-    }
-
-    @Override
-    protected DataManager<EntityLinkEntity> getDataManager() {
-        return entityLinkDataManager;
+        super(entityLinkServiceConfiguration, entityLinkDataManager);
     }
     
     @Override
     public EntityLinkEntity create() {
         EntityLinkEntity entityLinkEntity = super.create();
-        entityLinkEntity.setCreateTime(entityLinkServiceConfiguration.getClock().getCurrentTime());
+        entityLinkEntity.setCreateTime(getClock().getCurrentTime());
         return entityLinkEntity;
     }
 
     @Override
     public List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType) {
-        return entityLinkDataManager.findEntityLinksByScopeIdAndType(scopeId, scopeType, linkType);
+        return dataManager.findEntityLinksByScopeIdAndType(scopeId, scopeType, linkType);
     }
     
     @Override
     public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
-        return entityLinkDataManager.findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);
+        return dataManager.findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);
     }
 
     @Override
     public List<EntityLink> findEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType, String linkType) {
-        return entityLinkDataManager.findEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType, linkType);
+        return dataManager.findEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType, linkType);
     }
 
     @Override
@@ -84,30 +75,17 @@ public class EntityLinkEntityManagerImpl extends AbstractEntityManager<EntityLin
     }
     
     public void deleteEntityLink(EntityLinkEntity identityLink) {
-        delete(identityLink, false);
-        
-        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEntityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
-        }
+        delete(identityLink);
     }
 
     @Override
     public void deleteEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
-        entityLinkDataManager.deleteEntityLinksByScopeIdAndScopeType(scopeId, scopeType);
+        dataManager.deleteEntityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
     
     @Override
     public void deleteEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
-        entityLinkDataManager.deleteEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
-    }
-
-    public EntityLinkDataManager getEntityLinkDataManager() {
-        return entityLinkDataManager;
-    }
-
-    public void setEntityLinkDataManager(EntityLinkDataManager entityLinkDataManager) {
-        this.entityLinkDataManager = entityLinkDataManager;
+        dataManager.deleteEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
     }
 
 }

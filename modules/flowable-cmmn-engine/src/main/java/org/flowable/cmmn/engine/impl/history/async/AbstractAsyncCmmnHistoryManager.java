@@ -109,6 +109,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_GROUP_ID, identityLink.getGroupId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_DEFINITION_ID, identityLink.getScopeDefinitionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, identityLink.getScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SUB_SCOPE_ID, identityLink.getSubScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID, identityLink.getScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, identityLink.getScopeType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, identityLink.getScopeDefinitionId());
@@ -180,6 +181,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE, planItemInstanceEntity.getReferenceType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ENTRY_CRITERION_ID, planItemInstanceEntity.getEntryCriterionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_EXIT_CRITERION_ID, planItemInstanceEntity.getExitCriterionId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_EXTRA_VALUE, planItemInstanceEntity.getExtraValue());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, planItemInstanceEntity.getTenantId());
 
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_AVAILABLE_TIME, planItemInstanceEntity.getLastAvailableTime());
@@ -272,7 +274,14 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
             if (task != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
                 caseDefinitionId = task.getScopeDefinitionId();
             }
+        
+        } else if (ScopeTypes.PLAN_ITEM.equals(identityLink.getScopeType()) && identityLink.getSubScopeId() != null) {
+            PlanItemInstanceEntity planItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(identityLink.getSubScopeId());
+            if (planItemInstance != null) {
+                caseDefinitionId = planItemInstance.getCaseDefinitionId();
+            }
         }
+        
         return CaseDefinitionUtil.getCaseDefinition(caseDefinitionId);
     }
     

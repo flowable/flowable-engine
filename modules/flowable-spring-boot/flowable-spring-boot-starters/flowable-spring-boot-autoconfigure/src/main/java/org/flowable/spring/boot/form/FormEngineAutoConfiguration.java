@@ -13,24 +13,34 @@
 package org.flowable.spring.boot.form;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
+import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
+import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.form.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.flowable.spring.boot.FlowableAutoDeploymentProperties;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -51,6 +61,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ConditionalOnFormEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableAutoDeploymentProperties.class,
     FlowableFormProperties.class
 })
 @AutoConfigureAfter({
@@ -64,17 +75,21 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableFormProperties formProperties;
+    protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
-    public FormEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableFormProperties formProperties) {
+    public FormEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableFormProperties formProperties,
+        FlowableAutoDeploymentProperties autoDeploymentProperties) {
         super(flowableProperties);
         this.formProperties = formProperties;
+        this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
     @Bean
     @ConditionalOnMissingBean
     public SpringFormEngineConfiguration formEngineConfiguration(
         DataSource dataSource,
-        PlatformTransactionManager platformTransactionManager
+        PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<List<AutoDeploymentStrategy<FormEngine>>> formAutoDeploymentStrategies
     ) throws IOException {
         
         SpringFormEngineConfiguration configuration = new SpringFormEngineConfiguration();
@@ -92,6 +107,19 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<FormEngine>> deploymentStrategies = formAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
+
+        CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.FORM);
+        // Always add the out of the box auto deployment strategies as last
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));
+        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(deploymentProperties));
+        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
+        configuration.setDeploymentStrategies(deploymentStrategies);
 
         return configuration;
     }

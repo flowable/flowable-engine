@@ -24,6 +24,7 @@ import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItemDefinition;
 
 /**
+ * This function evaluates a stage to be completable, which is the case, if all required and active plan items are completed
  * @author Joram Barrez
  */
 public class IsStageCompletableExpressionFunction extends AbstractCmmnExpressionFunction {
@@ -47,7 +48,7 @@ public class IsStageCompletableExpressionFunction extends AbstractCmmnExpression
             PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) object;
 
             if (planItemInstanceEntity.isStage()) {
-                return planItemInstanceEntity.isCompleteable();
+                return planItemInstanceEntity.isCompletable();
 
             } else if (planItemInstanceEntity.getStageInstanceId() != null) {
                 PlanItemInstanceEntity stagePlanItemInstanceEntity = planItemInstanceEntity.getStagePlanItemInstanceEntity();
@@ -59,22 +60,23 @@ public class IsStageCompletableExpressionFunction extends AbstractCmmnExpression
                 if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())
                         && planItemDefinition instanceof EventListener
                         && (StringUtils.isNotEmpty(((EventListener) planItemDefinition).getAvailableConditionExpression()))) {
-                    return PlanItemInstanceContainerUtil.isEndStateReachedForAllRequiredChildPlanItems(stagePlanItemInstanceEntity, Collections.singletonList(planItemInstanceEntity.getId()));
+                    return PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(stagePlanItemInstanceEntity,
+                        Collections.singletonList(planItemInstanceEntity.getId()), true).isCompletable();
 
                 } else {
-                    return stagePlanItemInstanceEntity.isCompleteable();
+                    return stagePlanItemInstanceEntity.isCompletable();
 
                 }
 
             } else {
                 CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager().findById(planItemInstanceEntity.getCaseInstanceId());
-                return caseInstanceEntity.isCompleteable();
+                return caseInstanceEntity.isCompletable();
 
             }
 
         } else if (object instanceof CaseInstanceEntity) {
             CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) object;
-            return caseInstanceEntity.isCompleteable();
+            return caseInstanceEntity.isCompletable();
 
         }
         return false;

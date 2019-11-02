@@ -630,6 +630,31 @@
         }
 
       ]
+    },
+    {
+      "name": "flowable.auto-deployment.engine.keys",
+      "values": [
+        {
+          "value": "bpmn",
+          "description": "Process engine."
+        },
+        {
+          "value": "cmmn",
+          "description": "Case engine."
+        },
+        {
+          "value": "dmn",
+          "description": "DMN engine."
+        },
+        {
+          "value": "form",
+          "description": "Form engine."
+        },
+        {
+          "value": "app",
+          "description": "App engine."
+        }
+      ]
     }
   ]
 }

@@ -57,7 +57,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     @Test
     public void testDeployResources() {
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3 };
-        classUnderTest.deployResources(resources, repositoryServiceMock);
+        classUnderTest.deployResources(null, resources, appEngineMock);
 
         verify(repositoryServiceMock, times(3)).createDeployment();
         verify(deploymentBuilderMock, times(1)).name(resourceName1);
@@ -71,7 +71,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     @Test
     public void testDeployResourcesNoResources() {
         final Resource[] resources = new Resource[] {};
-        classUnderTest.deployResources(resources, repositoryServiceMock);
+        classUnderTest.deployResources(null, resources, appEngineMock);
 
         verify(repositoryServiceMock, never()).createDeployment();
         verify(deploymentBuilderMock, never()).addInputStream(isA(String.class), isA(InputStream.class));

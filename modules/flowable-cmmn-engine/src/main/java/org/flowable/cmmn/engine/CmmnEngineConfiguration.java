@@ -116,6 +116,7 @@ import org.flowable.cmmn.engine.impl.parser.CmmnParseHandlers;
 import org.flowable.cmmn.engine.impl.parser.CmmnParser;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.engine.impl.parser.DefaultCmmnActivityBehaviorFactory;
+import org.flowable.cmmn.engine.impl.parser.handler.CasePageTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.DecisionTaskParseHandler;
@@ -185,6 +186,7 @@ import org.flowable.cmmn.engine.impl.runtime.DefaultCmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
+import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
@@ -358,6 +360,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
     protected CreateHumanTaskInterceptor createHumanTaskInterceptor;
+    protected CreateCasePageTaskInterceptor createCasePageTaskInterceptor;
     protected CmmnIdentityLinkInterceptor identityLinkInterceptor;
 
     protected boolean executeServiceSchemaManagers = true;
@@ -1069,7 +1072,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(cmmnHistoryService);
     }
 
+    @Override
     public void initDataManagers() {
+        super.initDataManagers();
         if (tableDataManager == null) {
             tableDataManager = new TableDataManagerImpl();
         }
@@ -1108,7 +1113,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (cmmnDeploymentEntityManager == null) {
             cmmnDeploymentEntityManager = new CmmnDeploymentEntityManagerImpl(this, deploymentDataManager);
         }
@@ -1255,6 +1262,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnParseHandlers.add(new SendEventServiceTaskParseHandler());
         cmmnParseHandlers.add(new StageParseHandler());
         cmmnParseHandlers.add(new HttpTaskParseHandler());
+        cmmnParseHandlers.add(new CasePageTaskParseHandler());
         cmmnParseHandlers.add(new TaskParseHandler());
         cmmnParseHandlers.add(new GenericEventListenerParseHandler());
         cmmnParseHandlers.add(new SignalEventListenerParseHandler());
@@ -2404,6 +2412,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCreateHumanTaskInterceptor(CreateHumanTaskInterceptor createHumanTaskInterceptor) {
         this.createHumanTaskInterceptor = createHumanTaskInterceptor;
+        return this;
+    }
+
+    public CreateCasePageTaskInterceptor getCreateCasePageTaskInterceptor() {
+        return createCasePageTaskInterceptor;
+    }
+
+    public CmmnEngineConfiguration setCreateCasePageTaskInterceptor(CreateCasePageTaskInterceptor createCasePageTaskInterceptor) {
+        this.createCasePageTaskInterceptor = createCasePageTaskInterceptor;
         return this;
     }
 

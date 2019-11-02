@@ -60,9 +60,10 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected boolean completeable;
+    protected boolean completable;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String extraValue;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Counts
@@ -102,9 +103,10 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
-        persistentState.put("completeable", completeable);
+        persistentState.put("completeable", completable);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
+        persistentState.put("extraValue", extraValue);
         persistentState.put("countEnabled", countEnabled);
         persistentState.put("variableCount", variableCount);
         persistentState.put("sentryPartInstanceCount", sentryPartInstanceCount);
@@ -323,12 +325,12 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.referenceType = referenceType;
     }
     @Override
-    public boolean isCompleteable() {
-        return completeable;
+    public boolean isCompletable() {
+        return completable;
     }
     @Override
-    public void setCompleteable(boolean completeable) {
-        this.completeable = completeable;
+    public void setCompletable(boolean completable) {
+        this.completable = completable;
     }
     @Override
     public String getEntryCriterionId() {
@@ -345,6 +347,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setExitCriterionId(String exitCriterionId) {
         this.exitCriterionId = exitCriterionId;
+    }
+    @Override
+    public String getFormKey() {
+        return extraValue;
+    }
+    @Override
+    public void setFormKey(String formKey) {
+        this.extraValue = formKey;
+    }
+    @Override
+    public String getExtraValue() {
+        return extraValue;
+    }
+    @Override
+    public void setExtraValue(String extraValue) {
+        this.extraValue = extraValue;
     }
     @Override
     public String getTenantId() {

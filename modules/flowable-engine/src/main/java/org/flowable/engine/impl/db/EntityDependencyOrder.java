@@ -20,6 +20,7 @@ import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityIm
 import org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityImpl;
@@ -37,7 +38,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricScopeInstanceEntityIm
 import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityImpl;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;

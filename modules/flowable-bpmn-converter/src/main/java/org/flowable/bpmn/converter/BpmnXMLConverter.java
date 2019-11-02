@@ -612,6 +612,10 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             MultiInstanceExport.writeMultiInstance(subProcess, model, xtw);
 
+            for (FlowElement subElement : subProcess.getFlowElements()) {
+                createXML(subElement, model, xtw);
+            }
+
             if (subProcess instanceof AdhocSubProcess) {
                 AdhocSubProcess adhocSubProcess = (AdhocSubProcess) subProcess;
                 if (StringUtils.isNotEmpty(adhocSubProcess.getCompletionCondition())) {
@@ -619,10 +623,6 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     xtw.writeCData(adhocSubProcess.getCompletionCondition());
                     xtw.writeEndElement();
                 }
-            }
-
-            for (FlowElement subElement : subProcess.getFlowElements()) {
-                createXML(subElement, model, xtw);
             }
 
             for (Artifact artifact : subProcess.getArtifacts()) {

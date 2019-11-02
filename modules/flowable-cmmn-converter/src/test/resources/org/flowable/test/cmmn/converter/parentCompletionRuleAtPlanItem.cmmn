@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="completionNeutralTestCase">
+        <casePlanModel id="myCompletionNeutralTestPlanModel" name="My completion neutral test plan model">
+
+            <planItem id="planItemForTask" definitionRef="taskOne">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:parentCompletionRule type="ignore" />
+                    </extensionElements>
+                </itemControl>
+            </planItem>
+
+            <planItem id="planItemForMilestone" definitionRef="milestoneOne">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:parentCompletionRule type="default" />
+                    </extensionElements>
+                </itemControl>
+            </planItem>
+
+            <planItem id="planItemForListener" definitionRef="eventListenerOne">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:parentCompletionRule type="ignoreIfAvailable" />
+                    </extensionElements>
+                </itemControl>
+            </planItem>
+
+            <planItem id="planItemForStage" definitionRef="stageOne">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:parentCompletionRule type="ignoreIfAvailableOrEnabled" />
+                    </extensionElements>
+                </itemControl>
+            </planItem>
+
+            <task id="taskOne" name="A completion neutral task"/>
+            <milestone id="milestoneOne" name="A completion neutral milestone"/>
+            <timerEventListener id="eventListenerOne" name="A completion neutral event listener"/>
+            <stage id="stageOne" name="A completion neutral stage">
+                <planItem id="withoutCondition" definitionRef="taskTwo">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:parentCompletionRule type="ignoreAfterFirstCompletion" />
+                        </extensionElements>
+                    </itemControl>
+                </planItem>
+                <task id="taskTwo"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

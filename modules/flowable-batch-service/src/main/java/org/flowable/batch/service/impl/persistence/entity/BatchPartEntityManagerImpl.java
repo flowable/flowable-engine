@@ -18,40 +18,34 @@ import java.util.List;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 
-public class BatchPartEntityManagerImpl extends AbstractEntityManager<BatchPartEntity> implements BatchPartEntityManager {
-
-    protected BatchPartDataManager batchPartDataManager;
+public class BatchPartEntityManagerImpl
+    extends AbstractServiceEngineEntityManager<BatchServiceConfiguration, BatchPartEntity, BatchPartDataManager>
+    implements BatchPartEntityManager {
 
     public BatchPartEntityManagerImpl(BatchServiceConfiguration batchServiceConfiguration, BatchPartDataManager batchPartDataManager) {
-        super(batchServiceConfiguration);
-        this.batchPartDataManager = batchPartDataManager;
+        super(batchServiceConfiguration, batchPartDataManager);
     }
 
     @Override
-    protected DataManager<BatchPartEntity> getDataManager() {
-        return batchPartDataManager;
-    }
-    
-    @Override
     public List<BatchPart> findBatchPartsByBatchId(String batchId) {
-        return batchPartDataManager.findBatchPartsByBatchId(batchId);
+        return dataManager.findBatchPartsByBatchId(batchId);
     }
     
     @Override
     public List<BatchPart> findBatchPartsByBatchIdAndStatus(String batchId, String status) {
-        return batchPartDataManager.findBatchPartsByBatchIdAndStatus(batchId, status);
+        return dataManager.findBatchPartsByBatchIdAndStatus(batchId, status);
     }
     
     @Override
     public List<BatchPart> findBatchPartsByScopeIdAndType(String scopeId, String scopeType) {
-        return batchPartDataManager.findBatchPartsByScopeIdAndType(scopeId, scopeType);
+        return dataManager.findBatchPartsByScopeIdAndType(scopeId, scopeType);
     }
 
     @Override
     public BatchPartEntity createBatchPart(BatchEntity parentBatch, String status, String scopeId, String subScopeId, String scopeType) {
-        BatchPartEntity batchPartEntity = batchPartDataManager.create();
+        BatchPartEntity batchPartEntity = dataManager.create();
         batchPartEntity.setBatchId(parentBatch.getId());
         batchPartEntity.setBatchType(parentBatch.getBatchType());
         batchPartEntity.setScopeId(scopeId);
@@ -85,5 +79,9 @@ public class BatchPartEntityManagerImpl extends AbstractEntityManager<BatchPartE
         }
 
         delete(batchPartEntity);
+    }
+
+    protected BatchPartEntityManager getBatchPartEntityManager() {
+        return serviceConfiguration.getBatchPartEntityManager();
     }
 }

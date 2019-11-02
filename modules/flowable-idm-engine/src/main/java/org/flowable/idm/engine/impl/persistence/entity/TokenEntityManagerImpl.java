@@ -16,7 +16,6 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.engine.IdmEngineConfiguration;
@@ -26,18 +25,12 @@ import org.flowable.idm.engine.impl.persistence.entity.data.TokenDataManager;
 /**
  * @author Tijs Rademakers
  */
-public class TokenEntityManagerImpl extends AbstractEntityManager<TokenEntity> implements TokenEntityManager {
-
-    protected TokenDataManager tokenDataManager;
+public class TokenEntityManagerImpl
+    extends AbstractIdmEngineEntityManager<TokenEntity, TokenDataManager>
+    implements TokenEntityManager {
 
     public TokenEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, TokenDataManager tokenDataManager) {
-        super(idmEngineConfiguration);
-        this.tokenDataManager = tokenDataManager;
-    }
-
-    @Override
-    protected DataManager<TokenEntity> getDataManager() {
-        return tokenDataManager;
+        super(idmEngineConfiguration, tokenDataManager);
     }
 
     @Override
@@ -60,12 +53,12 @@ public class TokenEntityManagerImpl extends AbstractEntityManager<TokenEntity> i
 
     @Override
     public List<Token> findTokenByQueryCriteria(TokenQueryImpl query) {
-        return tokenDataManager.findTokenByQueryCriteria(query);
+        return dataManager.findTokenByQueryCriteria(query);
     }
 
     @Override
     public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
-        return tokenDataManager.findTokenCountByQueryCriteria(query);
+        return dataManager.findTokenCountByQueryCriteria(query);
     }
 
     @Override
@@ -75,11 +68,11 @@ public class TokenEntityManagerImpl extends AbstractEntityManager<TokenEntity> i
 
     @Override
     public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap) {
-        return tokenDataManager.findTokensByNativeQuery(parameterMap);
+        return dataManager.findTokensByNativeQuery(parameterMap);
     }
 
     @Override
     public long findTokenCountByNativeQuery(Map<String, Object> parameterMap) {
-        return tokenDataManager.findTokenCountByNativeQuery(parameterMap);
+        return dataManager.findTokenCountByNativeQuery(parameterMap);
     }
 }

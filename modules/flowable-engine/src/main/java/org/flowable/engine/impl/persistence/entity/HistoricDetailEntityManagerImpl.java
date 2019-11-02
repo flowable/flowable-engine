@@ -19,10 +19,10 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.HistoricDetailQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -30,25 +30,19 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<HistoricDetailEntity> implements HistoricDetailEntityManager {
-
-    protected HistoricDetailDataManager historicDetailDataManager;
+public class HistoricDetailEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<HistoricDetailEntity, HistoricDetailDataManager>
+    implements HistoricDetailEntityManager {
 
     public HistoricDetailEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, HistoricDetailDataManager historicDetailDataManager) {
-        super(processEngineConfiguration);
-        this.historicDetailDataManager = historicDetailDataManager;
-    }
-
-    @Override
-    protected DataManager<HistoricDetailEntity> getDataManager() {
-        return historicDetailDataManager;
+        super(processEngineConfiguration, historicDetailDataManager);
     }
 
     @Override
     public HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution,
         String propertyId, String propertyValue, String taskId, Date createTime) {
 
-        HistoricFormPropertyEntity historicFormPropertyEntity = historicDetailDataManager.createHistoricFormProperty();
+        HistoricFormPropertyEntity historicFormPropertyEntity = dataManager.createHistoricFormProperty();
         historicFormPropertyEntity.setProcessInstanceId(execution.getProcessInstanceId());
         historicFormPropertyEntity.setExecutionId(execution.getId());
         historicFormPropertyEntity.setTaskId(taskId);
@@ -72,7 +66,7 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
     @Override
     public HistoricDetailVariableInstanceUpdateEntity copyAndInsertHistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance,
         Date createTime) {
-        HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = historicDetailDataManager.createHistoricDetailVariableInstanceUpdate();
+        HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = dataManager.createHistoricDetailVariableInstanceUpdate();
         historicVariableUpdate.setProcessInstanceId(variableInstance.getProcessInstanceId());
         historicVariableUpdate.setExecutionId(variableInstance.getExecutionId());
         historicVariableUpdate.setTaskId(variableInstance.getTaskId());
@@ -108,7 +102,7 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
     @Override
     public void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId) {
         if (getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            List<HistoricDetailEntity> historicDetails = historicDetailDataManager.findHistoricDetailsByProcessInstanceId(historicProcessInstanceId);
+            List<HistoricDetailEntity> historicDetails = dataManager.findHistoricDetailsByProcessInstanceId(historicProcessInstanceId);
 
             for (HistoricDetailEntity historicDetail : historicDetails) {
                 delete(historicDetail);
@@ -118,18 +112,18 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
 
     @Override
     public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
-        return historicDetailDataManager.findHistoricDetailCountByQueryCriteria(historicVariableUpdateQuery);
+        return dataManager.findHistoricDetailCountByQueryCriteria(historicVariableUpdateQuery);
     }
 
     @Override
     public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
-        return historicDetailDataManager.findHistoricDetailsByQueryCriteria(historicVariableUpdateQuery);
+        return dataManager.findHistoricDetailsByQueryCriteria(historicVariableUpdateQuery);
     }
 
     @Override
     public void deleteHistoricDetailsByTaskId(String taskId) {
         if (getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.FULL)) {
-            List<HistoricDetailEntity> details = historicDetailDataManager.findHistoricDetailsByTaskId(taskId);
+            List<HistoricDetailEntity> details = dataManager.findHistoricDetailsByTaskId(taskId);
             for (HistoricDetail detail : details) {
                 delete((HistoricDetailEntity) detail);
             }
@@ -138,25 +132,25 @@ public class HistoricDetailEntityManagerImpl extends AbstractEntityManager<Histo
     
     @Override
     public void deleteHistoricDetailForNonExistingProcessInstances() {
-        historicDetailDataManager.deleteHistoricDetailForNonExistingProcessInstances();
+        dataManager.deleteHistoricDetailForNonExistingProcessInstances();
     }
 
     @Override
     public List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap) {
-        return historicDetailDataManager.findHistoricDetailsByNativeQuery(parameterMap);
+        return dataManager.findHistoricDetailsByNativeQuery(parameterMap);
     }
 
     @Override
     public long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap) {
-        return historicDetailDataManager.findHistoricDetailCountByNativeQuery(parameterMap);
+        return dataManager.findHistoricDetailCountByNativeQuery(parameterMap);
     }
 
-    public HistoricDetailDataManager getHistoricDetailDataManager() {
-        return historicDetailDataManager;
+    protected ActivityInstanceEntityManager getActivityInstanceEntityManager() {
+        return engineConfiguration.getActivityInstanceEntityManager();
     }
 
-    public void setHistoricDetailDataManager(HistoricDetailDataManager historicDetailDataManager) {
-        this.historicDetailDataManager = historicDetailDataManager;
+    protected HistoryManager getHistoryManager() {
+        return engineConfiguration.getHistoryManager();
     }
 
 }

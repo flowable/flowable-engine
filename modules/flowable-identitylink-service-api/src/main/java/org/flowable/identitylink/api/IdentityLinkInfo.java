@@ -46,6 +46,11 @@ public interface IdentityLinkInfo {
     String getScopeId();
     
     /**
+     * The sub scope id associated with this identity link
+     */
+    String getSubScopeId();
+    
+    /**
      * The scope type associated with this identity link
      */
     String getScopeType();

@@ -129,6 +129,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_REFERENCE_TYPE = "referenceType";
     String FIELD_ENTRY_CRITERION_ID = "entryCriterionId";
     String FIELD_EXIT_CRITERION_ID = "exitCriterionId";
+    String FIELD_EXTRA_VALUE = "extraValue";
     String FIELD_REVISION = "revision";
     String FIELD_SCOPE_ID = "scopeId";
     String FIELD_SCOPE_DEFINITION_ID = "scopeDefinitionId";
