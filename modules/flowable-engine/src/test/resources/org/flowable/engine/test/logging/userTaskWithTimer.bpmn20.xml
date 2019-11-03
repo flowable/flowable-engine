@@ -4,7 +4,7 @@
   xmlns:flowable="http://flowable.org/bpmn"
   targetNamespace="Examples">
 
-  <process id="userTaskWithTimer">
+  <process id="userTaskWithTimer" name="User task with timer">
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask1" />
     <userTask id="userTask1" name="User task 1" flowable:priority="60" flowable:dueDate="2020-01-04" />

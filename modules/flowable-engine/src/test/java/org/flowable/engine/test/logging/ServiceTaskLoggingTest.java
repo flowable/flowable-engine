@@ -65,6 +65,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertNotNull(loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("theStart", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("StartEvent", loggingNode.get("elementType").asText());
@@ -79,6 +81,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertNotNull(loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("flow1", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("SequenceFlow", loggingNode.get("elementType").asText());
@@ -94,6 +98,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertNotNull(loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
@@ -109,6 +115,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertNotNull(loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
@@ -123,6 +131,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertNotNull(loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
@@ -160,6 +170,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("theStart", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("StartEvent", loggingNode.get("elementType").asText());
@@ -174,6 +186,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("flow1", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("SequenceFlow", loggingNode.get("elementType").asText());
@@ -189,6 +203,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
@@ -204,6 +220,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
@@ -218,6 +236,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertFalse(loggingNode.has("subScopeId"));
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
@@ -235,6 +255,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
@@ -249,6 +271,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("flow2", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("SequenceFlow", loggingNode.get("elementType").asText());
@@ -264,6 +288,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
@@ -278,6 +304,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -298,6 +326,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -319,6 +349,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -335,6 +367,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -360,6 +394,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -385,6 +421,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -410,6 +448,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -447,6 +487,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertFalse(loggingNode.has("subScopeId"));
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertFalse(loggingNode.has("elementId"));
         assertFalse(loggingNode.has("elementType"));
         assertFalse(loggingNode.has("elementName"));
@@ -474,6 +516,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertFalse(loggingNode.has("subScopeId"));
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertFalse(loggingNode.has("elementId"));
         assertFalse(loggingNode.has("elementType"));
         assertFalse(loggingNode.has("elementName"));
@@ -514,6 +558,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertFalse(loggingNode.has("subScopeId"));
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertFalse(loggingNode.has("elementId"));
         assertFalse(loggingNode.has("elementType"));
         assertFalse(loggingNode.has("elementName"));
@@ -557,6 +603,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertFalse(loggingNode.has("subScopeId"));
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertFalse(loggingNode.has("elementId"));
         assertFalse(loggingNode.has("elementType"));
         assertFalse(loggingNode.has("elementName"));
@@ -603,6 +651,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertFalse(loggingNode.has("subScopeId"));
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -623,6 +673,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertFalse(loggingNode.has("subScopeId"));
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -639,6 +691,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -659,6 +713,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("flow3", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("SequenceFlow", loggingNode.get("elementType").asText());
@@ -674,6 +730,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("theEnd", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("EndEvent", loggingNode.get("elementType").asText());
@@ -710,6 +768,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("theStart", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("StartEvent", loggingNode.get("elementType").asText());
@@ -724,6 +784,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("flow1", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("SequenceFlow", loggingNode.get("elementType").asText());
@@ -739,6 +801,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
@@ -764,6 +828,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
@@ -800,6 +866,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
@@ -815,6 +883,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
@@ -832,6 +902,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
@@ -848,6 +920,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertFalse(loggingNode.has("subScopeId"));
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
@@ -867,6 +941,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
@@ -883,6 +959,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("task", loggingNode.get("elementId").asText());
         assertEquals("Test task", loggingNode.get("elementName").asText());
         assertEquals("ServiceTask", loggingNode.get("elementType").asText());
@@ -897,6 +975,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("flow2", loggingNode.get("elementId").asText());
         assertFalse(loggingNode.has("elementName"));
         assertEquals("SequenceFlow", loggingNode.get("elementType").asText());
@@ -914,6 +994,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
@@ -930,6 +1012,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -952,6 +1036,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -975,6 +1061,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -993,6 +1081,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -1020,6 +1110,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -1047,6 +1139,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());
@@ -1074,6 +1168,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
         assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
         assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals("userTask", loggingNode.get("elementId").asText());
         assertEquals("UserTask", loggingNode.get("elementType").asText());
         assertEquals("Some user task", loggingNode.get("elementName").asText());

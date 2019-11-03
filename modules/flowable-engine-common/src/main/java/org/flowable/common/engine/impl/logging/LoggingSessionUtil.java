@@ -43,10 +43,7 @@ public class LoggingSessionUtil {
         addLoggingData(type, loggingNode);
     }
     
-    public static void addErrorLoggingData(String type, String message, String scopeId, String subScopeId, String scopeType, 
-                    String scopeDefinitionId, String elementId, String elementName, String elementType, String elementSubType, Throwable t) {
-        
-        ObjectNode loggingNode = fillLoggingData(message, scopeId, subScopeId, scopeType, scopeDefinitionId, elementId, elementName, elementType, elementSubType);
+    public static void addErrorLoggingData(String type, ObjectNode loggingNode, Throwable t) {
         ObjectNode exceptionNode = loggingNode.putObject("exception");
         exceptionNode.put("message", t.getMessage());
         exceptionNode.put("stackTrace", ExceptionUtils.getStackTrace(t));

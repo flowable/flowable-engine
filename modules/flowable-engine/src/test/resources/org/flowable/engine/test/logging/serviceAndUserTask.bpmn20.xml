@@ -4,7 +4,7 @@
   xmlns:flowable="http://flowable.org/bpmn"
   targetNamespace="Examples">
 
-  <process id="serviceAndUserTask">
+  <process id="serviceAndUserTask" name="Service and User task">
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
     <serviceTask id="task" name="Test task" flowable:class="org.flowable.engine.test.logging.ServiceTaskLoggingTest$VariableServiceTaskDelegate" />

@@ -37,6 +37,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegate;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -58,8 +59,11 @@ public class BpmnLoggingSessionUtil {
             activityType = flowElement.getClass().getSimpleName();
             activitySubType = getActivitySubType(flowElement);
         }
-        LoggingSessionUtil.addLoggingData(type, message, execution.getProcessInstanceId(), execution.getId(), 
+        
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), 
                         ScopeTypes.BPMN, execution.getProcessDefinitionId(), activityId, activityName, activityType, activitySubType);
+        fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode);
     }
     
     public static void addLoggingData(String type, String message, TaskEntity task, DelegateExecution execution) {
@@ -73,6 +77,7 @@ public class BpmnLoggingSessionUtil {
         putIfNotNull("taskDueDate", task.getDueDate(), loggingNode);
         putIfNotNull("taskPriority", task.getPriority(), loggingNode);
         
+        fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
         fillFlowElementInfo(loggingNode, execution);
         
         LoggingSessionUtil.addLoggingData(type, loggingNode);
@@ -89,6 +94,8 @@ public class BpmnLoggingSessionUtil {
         putIfNotNull("elementSubType", getActivitySubType(flowNode), loggingNode);
         loggingNode.put("activityBehavior", activityBehavior.getClass().getSimpleName());
         
+        fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
+        
         LoggingSessionUtil.addLoggingData(type, loggingNode);
     }
     
@@ -100,6 +107,8 @@ public class BpmnLoggingSessionUtil {
         loggingNode.put("elementType", flowElement.getClass().getSimpleName());
         putIfNotNull("elementSubType", getActivitySubType(flowElement), loggingNode);
         loggingNode.put("jobId", jobEntity.getId());
+        
+        fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
         
         LoggingSessionUtil.addLoggingData(type, loggingNode);
     }
@@ -129,6 +138,8 @@ public class BpmnLoggingSessionUtil {
             putIfNotNull("targetRef", sequenceFlow.getTargetRef(), loggingNode);
         }
         
+        fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
+        
         LoggingSessionUtil.addLoggingData(type, loggingNode);
     }
     
@@ -138,6 +149,7 @@ public class BpmnLoggingSessionUtil {
         loggingNode.put("taskId", task.getId());
         putIfNotNull("taskName", task.getName(), loggingNode);
         
+        fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
         fillFlowElementInfo(loggingNode, execution);
         
         return loggingNode;
@@ -155,12 +167,17 @@ public class BpmnLoggingSessionUtil {
             activityType = flowElement.getClass().getSimpleName();
             activitySubType = getActivitySubType(flowElement);
         }
-        LoggingSessionUtil.addErrorLoggingData(type, message, execution.getProcessInstanceId(), execution.getId(), 
-                        ScopeTypes.BPMN, execution.getProcessDefinitionId(), activityId, activityName, activityType, activitySubType, t);
+        
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), 
+                        ScopeTypes.BPMN, execution.getProcessDefinitionId(), activityId, activityName, activityType, activitySubType);
+        fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
+        LoggingSessionUtil.addErrorLoggingData(type, loggingNode, t);
     }
     
     public static void fillLoggingData(ObjectNode loggingNode, ExecutionEntity executionEntity) {
         loggingNode.put("scopeDefinitionId", executionEntity.getProcessDefinitionId());
+        
+        fillScopeDefinitionInfo(executionEntity.getProcessDefinitionId(), loggingNode);
         
         FlowElement flowElement = executionEntity.getCurrentFlowElement();
         if (flowElement == null) {
@@ -177,7 +194,7 @@ public class BpmnLoggingSessionUtil {
     public static void addTaskIdentityLinkData(String type, String message, boolean isUser, List<IdentityLinkEntity> identityLinkEntities, 
                     TaskEntity task, DelegateExecution execution) {
         
-        ObjectNode loggingNode = BpmnLoggingSessionUtil.fillBasicTaskLoggingData(message, task, execution);
+        ObjectNode loggingNode = fillBasicTaskLoggingData(message, task, execution);
         ArrayNode identityLinkArray = null;
         if (isUser) {
             identityLinkArray = loggingNode.putArray("taskUserIdentityLinks");
@@ -251,6 +268,12 @@ public class BpmnLoggingSessionUtil {
         }
         
         return activitySubType;
+    }
+    
+    protected static void fillScopeDefinitionInfo(String processDefinitionId, ObjectNode loggingNode) {
+        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
+        loggingNode.put("scopeDefinitionKey", processDefinition.getKey());
+        loggingNode.put("scopeDefinitionName", processDefinition.getName());
     }
     
     protected static void fillFlowElementInfo(ObjectNode loggingNode, DelegateExecution execution) {
