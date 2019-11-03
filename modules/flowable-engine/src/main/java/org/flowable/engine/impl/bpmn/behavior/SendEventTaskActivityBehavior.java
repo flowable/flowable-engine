@@ -13,7 +13,6 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,6 +25,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
@@ -34,10 +34,10 @@ import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventregistry.api.runtime.EventInstance;
-import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * Sends an event to the event registry
@@ -62,22 +62,29 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         if (eventDefinition == null) {
             throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType());
         }
-
-        EventInstanceImpl eventInstance = new EventInstanceImpl();
-        eventInstance.setEventDefinition(eventDefinition);
-
-        Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceBpmnUtil.createEventPayloadInstances(execution, 
-                        CommandContextUtil.getProcessEngineConfiguration().getExpressionManager(), sendEventServiceTask, eventDefinition);
-        eventInstance.setPayloadInstances(eventPayloadInstances);
-
-        // TODO: always async? Send event in post-commit? Triggerable?
-
-        eventRegistry.sendEvent(eventInstance);
         
-        if (!sendEventServiceTask.isTriggerable()) {
-            leave(execution);
-            
-        } else {
+        JobService jobService = CommandContextUtil.getJobService();
+        
+        JobEntity job = jobService.createJob();
+        job.setExecutionId(execution.getId());
+        job.setProcessInstanceId(execution.getProcessInstanceId());
+        job.setProcessDefinitionId(execution.getProcessDefinitionId());
+        job.setElementId(sendEventServiceTask.getId());
+        job.setElementName(sendEventServiceTask.getName());
+        job.setJobHandlerType(AsyncSendEventJobHandler.TYPE);
+
+        // Inherit tenant id (if applicable)
+        if (execution.getTenantId() != null) {
+            job.setTenantId(execution.getTenantId());
+        }
+        
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        executionEntity.getJobs().add(job);
+        
+        jobService.createAsyncJob(job, true);
+        jobService.scheduleAsyncJob(job);
+
+        if (sendEventServiceTask.isTriggerable()) {
             EventDefinition triggerEventDefinition = null;
             if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
                 triggerEventDefinition = eventRegistry.getEventDefinition(sendEventServiceTask.getTriggerEventType());
@@ -85,7 +92,6 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 triggerEventDefinition = eventDefinition;
             }
             
-            ExecutionEntity executionEntity = (ExecutionEntity) execution;
             EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService().createEventSubscriptionBuilder()
                     .eventType(triggerEventDefinition.getKey())
                     .executionId(execution.getId())

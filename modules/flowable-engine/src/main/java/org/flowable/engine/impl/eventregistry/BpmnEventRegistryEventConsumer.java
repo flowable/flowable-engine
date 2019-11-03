@@ -89,7 +89,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             
             runtimeService.createProcessInstanceBuilder().processDefinitionId(eventSubscription.getProcessDefinitionId())
                     .transientVariable("eventInstance", eventInstance)
-                    .start();
+                    .startAsync();
         }
     }
 

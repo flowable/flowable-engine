@@ -17,6 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTestCase;
@@ -25,6 +27,7 @@ import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.definition.EventPayloadTypes;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -112,6 +115,15 @@ public class SendEventTaskTest extends FlowableTestCase {
         
         taskService.complete(task.getId());
         
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(AsyncSendEventJobHandler.TYPE, job.getJobHandlerType());
+        assertEquals("sendEventTask", job.getElementId());
+        
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
@@ -135,6 +147,15 @@ public class SendEventTaskTest extends FlowableTestCase {
         
         taskService.complete(task.getId());
         
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(AsyncSendEventJobHandler.TYPE, job.getJobHandlerType());
+        assertEquals("sendEventTask", job.getElementId());
+        
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
@@ -155,16 +176,25 @@ public class SendEventTaskTest extends FlowableTestCase {
         
         taskService.complete(task.getId());
         
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myTriggerEvent");
+        assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(AsyncSendEventJobHandler.TYPE, job.getJobHandlerType());
+        assertEquals("sendEventTask", job.getElementId());
+        
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
         assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("test");
-        
-        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(eventSubscription).isNotNull();
-        assertThat(eventSubscription.getEventType()).isEqualTo("myTriggerEvent");
-        assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
         
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -198,16 +228,25 @@ public class SendEventTaskTest extends FlowableTestCase {
         
         taskService.complete(task.getId());
         
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myTriggerEvent");
+        assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals(AsyncSendEventJobHandler.TYPE, job.getJobHandlerType());
+        assertEquals("sendEventTask", job.getElementId());
+        
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+        
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
         assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("test");
-        
-        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(eventSubscription).isNotNull();
-        assertThat(eventSubscription.getEventType()).isEqualTo("myTriggerEvent");
-        assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
         
         ObjectMapper objectMapper = new ObjectMapper();
 

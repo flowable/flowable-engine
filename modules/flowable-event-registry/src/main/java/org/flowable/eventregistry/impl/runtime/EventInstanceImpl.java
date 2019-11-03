@@ -34,8 +34,9 @@ public class EventInstanceImpl implements EventInstance {
     }
 
     public EventInstanceImpl(EventDefinition eventDefinition,
-        Collection<EventCorrelationParameterInstance> correlationParameterInstances,
+            Collection<EventCorrelationParameterInstance> correlationParameterInstances,
             Collection<EventPayloadInstance> payloadInstances) {
+        
         this.eventDefinition = eventDefinition;
         this.correlationParameterInstances = correlationParameterInstances;
         this.payloadInstances = payloadInstances;
