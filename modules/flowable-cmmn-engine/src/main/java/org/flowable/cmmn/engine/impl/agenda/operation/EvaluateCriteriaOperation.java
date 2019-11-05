@@ -92,10 +92,10 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
-            if (evaluateCaseInstanceCompleted 
+            if (evaluateCaseInstanceCompleted
+                    && evaluatePlanModelComplete()
                     && !criteriaChangeOrActiveChildren
-                    && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
-                    && evaluatePlanModelComplete()){
+                    && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
@@ -426,19 +426,18 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
             .shouldPlanItemContainerComplete(commandContext, caseInstanceEntity, isAutoComplete);
 
-        if (completionEvaluationResult.isCompletable()) {
-            boolean previousCompletableState = caseInstanceEntity.isCompletable();
-            caseInstanceEntity.setCompletable(true);
+        // update the completion state on the case and check, if it was changed
+        boolean previousCompletableState = caseInstanceEntity.isCompletable();
+        caseInstanceEntity.setCompletable(completionEvaluationResult.isCompletable());
 
-            // When the case entity changes, the plan items with an available condition can be become ready for creation
-            if (previousCompletableState != caseInstanceEntity.isCompletable()) {
-                boolean planItemInstancesChanged = evaluatePlanItemsWithAvailableCondition(caseInstanceEntity);
-                if (planItemInstancesChanged) {
-                    // If new plan items have changed, this could lead to changing of the fact that the case instance entity is completable
-                    completionEvaluationResult = PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(commandContext, caseInstanceEntity, isAutoComplete);
-                    if (!completionEvaluationResult.isCompletable()) {
-                        caseInstanceEntity.setCompletable(false);
-                    }
+        // When the case entity changes, the plan items with an available condition can be become ready for creation
+        if (previousCompletableState != caseInstanceEntity.isCompletable()) {
+            boolean planItemInstancesChanged = evaluatePlanItemsWithAvailableCondition(caseInstanceEntity);
+            if (planItemInstancesChanged) {
+                // If new plan items have changed, this could lead to changing of the fact that the case instance entity completable state is changed again
+                completionEvaluationResult = PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(commandContext, caseInstanceEntity, isAutoComplete);
+                if (completionEvaluationResult.isCompletable() != caseInstanceEntity.isCompletable()) {
+                    caseInstanceEntity.setCompletable(completionEvaluationResult.isCompletable());
                 }
             }
         }
