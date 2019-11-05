@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
+ * @author Micha Kiener
  */
 public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
@@ -86,9 +87,12 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             return;
         }
 
-        String satisfiedExitCriterion = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
+        // when evaluating an exit sentry, we take the optional exit event type and exit type into account as well, when terminating the case instance
+        Criterion satisfiedExitCriterion = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
         if (satisfiedExitCriterion != null) {
-            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), satisfiedExitCriterion);
+            // propagate the exit event type and exit type, if provided with the exit sentry / criterion
+            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), satisfiedExitCriterion.getId(),
+                satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
 
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
@@ -134,7 +138,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
             if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
                 
-                String satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
+                Criterion satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
                 if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
                     boolean activatePlanItemInstance = true;
                     if (!planItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
@@ -159,7 +163,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
                     if (activatePlanItemInstance) {
                         criteriaChanged = true;
-                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity, satisfiedEntryCriterion);
+                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity,
+                            satisfiedEntryCriterion != null ? satisfiedEntryCriterion.getId() : null);
                     }
 
                 }
@@ -168,10 +173,15 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             
             if (!PlanItemInstanceState.END_STATES.contains(state)) {
                 
-                String satisfiedExitCriterion = evaluateExitCriteria(planItemInstanceEntity, planItem);
+                Criterion satisfiedExitCriterion = evaluateExitCriteria(planItemInstanceEntity, planItem);
                 if (satisfiedExitCriterion != null) {
                     criteriaChanged = true;
-                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion);
+
+                    // if we have a satisfied exit sentry, we also pass on its optional exit event type and exit type which has an effect on how the exit
+                    // sentry gets executed and if the plan item is terminated (might transition using the complete event and be left in completion or by
+                    // default, will transition using exit and be left as terminated
+                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion.getId(),
+                        satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
 
                 } else if (planItem.getPlanItemDefinition() instanceof Stage) {
 
@@ -225,7 +235,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return criteriaChanged || activeChildren > 0;
     }
 
-    protected String evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
+    protected Criterion evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
         List<Criterion> criteria = planItem.getEntryCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(planItemInstanceEntity, criteria);
@@ -234,7 +244,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
 
     // EntityWithSentryPartInstances -> can be used for both case instance and plan item instance
-    protected String evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) {
+    protected Criterion evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) {
         List<Criterion> criteria = hasExitCriteria.getExitCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(entityWithSentryPartInstances, criteria);
@@ -243,10 +253,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
 
     /**
-     * @return Returns the id of the criterion that is satisfied.
-     *         If none is satisfied, null is returned.
+     * @return Returns the criterion that is satisfied. If none is satisfied, null is returned.
      */
-    protected String evaluateCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, List<Criterion> criteria) {
+    protected Criterion evaluateCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, List<Criterion> criteria) {
         for (Criterion criterion : criteria) {
 
             Sentry sentry = criterion.getSentry();
@@ -263,7 +272,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             LOGGER.debug("{}: single onPart matches life cycle event: [{}]", criterion, planItemLifeCycleEvent);
                         }
 
-                        return criterion.getId();
+                        return criterion;
                     }
                 }
 
@@ -274,7 +283,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         LOGGER.debug("{}: single ifPart has evaluated to true", criterion);
                     }
 
-                    return criterion.getId();
+                    return criterion;
                 }
                 
             } else {
@@ -339,11 +348,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         LOGGER.debug("{}: all onParts and ifParts are satisfied", criterion);
                     }
 
-                    return criterion.getId();
+                    return criterion;
                 }
-
             }
-
         }
 
         return null;
@@ -530,7 +537,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             || (ExpressionUtil.hasRepetitionRule(entryDependentPlanItem) && ExpressionUtil.evaluateRepetitionRule(commandContext, caseInstanceEntity, entryDependentPlanItem.getItemControl().getRepetitionRule().getCondition())))) {
 
                     // If the sentry satisfied, the plan item becomes active and all parent stages that are not yet activate are made active
-                    String satisfiedCriterion = evaluateDependentPlanItemEntryCriteria(entryDependentPlanItem);
+                    Criterion satisfiedCriterion = evaluateDependentPlanItemEntryCriteria(entryDependentPlanItem);
                     if (satisfiedCriterion != null) {
 
                         // Creating plan item instances for all parent stages that do not exist yet
@@ -590,7 +597,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         }
 
                         // All plan item instances are created. Now activate them.
-                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion);
+                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion.getId());
                         for (int i = parentPlanItemInstancesToActivate.size() - 1; i >= 0; i--) {
                             PlanItemInstanceEntity parentPlanItemInstance = parentPlanItemInstancesToActivate.get(i);
                             if (parentPlanItemInstance == null) { // newly created one
@@ -605,7 +612,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
     }
 
-    protected String evaluateDependentPlanItemEntryCriteria(PlanItem entryDependentPlanItem) {
+    protected Criterion evaluateDependentPlanItemEntryCriteria(PlanItem entryDependentPlanItem) {
         List<Criterion> entryCriteria = entryDependentPlanItem.getEntryCriteria();
         if (!entryCriteria.isEmpty()) {
 
@@ -616,12 +623,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 .collect(Collectors.toList());
 
             if (!matchingCriteria.isEmpty()) {
-                String satisfiedCriterionId = evaluateCriteria(caseInstanceEntity, matchingCriteria);// Resolved against case entity as there's no plan item instance yet
-                if (StringUtils.isNotEmpty(satisfiedCriterionId)) {
-                    return satisfiedCriterionId;
-                }
+                return evaluateCriteria(caseInstanceEntity, matchingCriteria);// Resolved against case entity as there's no plan item instance yet
             }
-
         }
 
         return null;

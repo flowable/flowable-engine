@@ -159,7 +159,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     protected void exitChildPlanItemInstances(String exitCriterionId) {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
             if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId);
+                // don't propagate the exit event type and exit type to child plan items, it only has an impact where it was set using the exit sentry
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId, null, null);
             }
         }
     }

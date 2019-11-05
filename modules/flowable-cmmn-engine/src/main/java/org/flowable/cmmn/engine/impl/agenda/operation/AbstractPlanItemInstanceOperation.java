@@ -217,7 +217,9 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
 
                 if (isOrphan) {
                     for (PlanItemInstanceEntity eventListenerPlanItemInstanceEntity : eventListenerPlanItemInstance) {
-                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(eventListenerPlanItemInstanceEntity);
+                        // don't propagate the exit event type and exit type, if used on orphaned child plan items
+                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(eventListenerPlanItemInstanceEntity,
+                            null, null);
                     }
                 }
 
