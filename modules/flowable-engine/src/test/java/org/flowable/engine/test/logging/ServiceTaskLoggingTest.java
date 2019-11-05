@@ -59,6 +59,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(7, FlowableLoggingListener.TEST_LOGGING_NODES.size());
         
         ObjectNode loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.ID).asText());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TRANSACTION_ID).asText());
         assertEquals(LoggingSessionConstants.TYPE_PROCESS_STARTED, loggingNode.get("type").asText());
         assertTrue(loggingNode.get("message").asText().contains("Started process instance with id "));
         assertNotNull(loggingNode.get("scopeId").asText());
@@ -70,6 +72,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
         
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(1);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.ID).asText());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TRANSACTION_ID).asText());
         assertEquals(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE, loggingNode.get("type").asText());
         assertEquals("In StartEvent, executing NoneStartEventActivityBehavior", loggingNode.get("message").asText());
         assertNotNull(loggingNode.get("scopeId").asText());
@@ -86,6 +90,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
         
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(2);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.ID).asText());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TRANSACTION_ID).asText());
         assertEquals(LoggingSessionConstants.TYPE_SEQUENCE_FLOW_TAKE, loggingNode.get("type").asText());
         assertEquals("Sequence flow will be taken for flow1, theStart --> task", loggingNode.get("message").asText());
         assertNotNull(loggingNode.get("scopeId").asText());
@@ -103,6 +109,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
         
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(3);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.ID).asText());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TRANSACTION_ID).asText());
         assertEquals(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE, loggingNode.get("type").asText());
         assertEquals("In ServiceTask, executing ClassDelegate", loggingNode.get("message").asText());
         assertNotNull(loggingNode.get("scopeId").asText());
@@ -120,6 +128,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
         
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(4);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.ID).asText());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TRANSACTION_ID).asText());
         assertEquals(LoggingSessionConstants.TYPE_SERVICE_TASK_ENTER, loggingNode.get("type").asText());
         assertEquals("Executing service task with java class org.flowable.engine.test.logging.ServiceTaskLoggingTest$ExceptionServiceTaskDelegate", loggingNode.get("message").asText());
         assertNotNull(loggingNode.get("scopeId").asText());
@@ -136,6 +146,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
         
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(5);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.ID).asText());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TRANSACTION_ID).asText());
         assertEquals(LoggingSessionConstants.TYPE_SERVICE_TASK_EXCEPTION, loggingNode.get("type").asText());
         assertEquals("Service task with java class org.flowable.engine.test.logging.ServiceTaskLoggingTest$ExceptionServiceTaskDelegate threw exception Test exception", loggingNode.get("message").asText());
         assertNotNull(loggingNode.get("scopeId").asText());
@@ -154,6 +166,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
         
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(6);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.ID).asText());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TRANSACTION_ID).asText());
         assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE_FAILURE, loggingNode.get("type").asText());
         assertEquals("Exception at closing command context for bpmn engine", loggingNode.get("message").asText());
         assertEquals("bpmn", loggingNode.get("engineType").asText());

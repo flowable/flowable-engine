@@ -24,6 +24,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -32,10 +33,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class LoggingSessionUtil {
     
+    public static final String ID = "__id";
+    public static final String TRANSACTION_ID = "__transactionId";
     public static final String TIMESTAMP = "__timeStamp";
     public static final String LOG_NUMBER = "__logNumber";
     
     protected static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+    protected static StrongUuidGenerator idGenerator = new StrongUuidGenerator();
     
     public static void addLoggingData(String type, String message, String scopeId, String subScopeId, String scopeType, 
                     String scopeDefinitionId, String elementId, String elementName, String elementType, String elementSubType) {
@@ -82,6 +86,7 @@ public class LoggingSessionUtil {
     }
     
     public static void addLoggingData(String type, ObjectNode data) {
+        data.put(ID, idGenerator.getNextId());
         data.put(TIMESTAMP, formatDate(new Date()));
         data.put("type", type);
         

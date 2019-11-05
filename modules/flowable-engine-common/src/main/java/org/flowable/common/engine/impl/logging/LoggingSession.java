@@ -50,6 +50,14 @@ public class LoggingSession implements Session {
             commandContext.addCloseListener(commandContextCloseListener);
         }
         
+        String transactionId = null;
+        if (loggingData.size() > 0) {
+            transactionId = loggingData.get(0).get(LoggingSessionUtil.TRANSACTION_ID).asText();
+        } else {
+            transactionId = data.get(LoggingSessionUtil.ID).asText();
+        }
+        
+        data.put(LoggingSessionUtil.TRANSACTION_ID, transactionId);
         data.put(LoggingSessionUtil.LOG_NUMBER, loggingData.size() + 1);
         loggingData.add(data);
     }
