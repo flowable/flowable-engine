@@ -14,6 +14,9 @@ package org.flowable.common.engine.impl.logging;
 
 public interface LoggingSessionConstants {
     
+    String TYPE_PROCESS_STARTED = "processStarted";
+    String TYPE_PROCESS_COMPLETED = "processCompleted";
+    
     String TYPE_SERVICE_TASK_ENTER = "serviceTaskEnter";
     String TYPE_SERVICE_TASK_EXIT = "serviceTaskExit";
     String TYPE_SERVICE_TASK_BEFORE_TRIGGER = "serviceTaskBeforeTrigger";
