@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.logging;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -60,6 +61,23 @@ public class LoggingSessionUtil {
         ObjectNode loggingNode = getObjectMapper().createObjectNode();
         loggingNode.put("message", message);
         loggingNode.put("engineType", engineType);
+        
+        LoggingSession loggingSession = Context.getCommandContext().getSession(LoggingSession.class);
+        List<ObjectNode> loggingData = loggingSession.getLoggingData();
+        if (loggingData != null) {
+            for (ObjectNode itemNode : loggingData) {
+                if (itemNode.has("scopeId") && itemNode.has("scopeDefinitionKey")) {
+                    loggingNode.put("scopeId", itemNode.get("scopeId").asText());
+                    loggingNode.put("scopeType", itemNode.get("scopeType").asText());
+                    loggingNode.put("scopeDefinitionId", itemNode.get("scopeDefinitionId").asText());
+                    loggingNode.put("scopeDefinitionKey", itemNode.get("scopeDefinitionKey").asText());
+                    if (itemNode.has("scopeDefinitionName") && !itemNode.get("scopeDefinitionName").isNull()) {
+                        loggingNode.put("scopeDefinitionName", itemNode.get("scopeDefinitionName").asText());
+                    }
+                }
+            }
+        }
+        
         addLoggingData(type, loggingNode);
     }
     

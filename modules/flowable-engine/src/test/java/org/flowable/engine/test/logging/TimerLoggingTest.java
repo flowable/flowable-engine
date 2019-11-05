@@ -129,6 +129,11 @@ public class TimerLoggingTest extends ResourceFlowableTestCase {
         assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE, loggingNode.get("type").asText());
         assertEquals("Closed command context for bpmn engine", loggingNode.get("message").asText());
         assertEquals("bpmn", loggingNode.get("engineType").asText());
+        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals(7, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
         
