@@ -164,6 +164,181 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
     }
     
     @Test
+    @Deployment(resources="org/flowable/engine/test/logging/failingAsyncServiceTask.bpmn20.xml")
+    public void testFailingServiceTaskException() {
+        FlowableLoggingListener.clear();
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("failingServiceTask").latestVersion().singleResult();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingServiceTask");
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            
+        assertEquals(5, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+        
+        ObjectNode loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
+        assertEquals(LoggingSessionConstants.TYPE_PROCESS_STARTED, loggingNode.get("type").asText());
+        assertTrue(loggingNode.get("message").asText().contains("Started process instance with id "));
+        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals(1, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(1);
+        assertEquals(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE, loggingNode.get("type").asText());
+        assertEquals("In StartEvent, executing NoneStartEventActivityBehavior", loggingNode.get("message").asText());
+        assertNotNull(loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertNotNull(loggingNode.get("subScopeId").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("theStart", loggingNode.get("elementId").asText());
+        assertFalse(loggingNode.has("elementName"));
+        assertEquals("StartEvent", loggingNode.get("elementType").asText());
+        assertEquals("NoneStartEventActivityBehavior", loggingNode.get("activityBehavior").asText());
+        assertEquals(2, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(2);
+        assertEquals(LoggingSessionConstants.TYPE_SEQUENCE_FLOW_TAKE, loggingNode.get("type").asText());
+        assertEquals("Sequence flow will be taken for flow1, theStart --> task", loggingNode.get("message").asText());
+        assertNotNull(loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertNotNull(loggingNode.get("subScopeId").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("flow1", loggingNode.get("elementId").asText());
+        assertFalse(loggingNode.has("elementName"));
+        assertEquals("SequenceFlow", loggingNode.get("elementType").asText());
+        assertEquals("theStart", loggingNode.get("sourceRef").asText());
+        assertEquals("task", loggingNode.get("targetRef").asText());
+        assertEquals(3, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(3);
+        assertEquals(LoggingSessionConstants.TYPE_SERVICE_TASK_ASYNC_JOB, loggingNode.get("type").asText());
+        assertEquals("Created async job for task, with job id " + job.getId(), loggingNode.get("message").asText());
+        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("task", loggingNode.get("elementId").asText());
+        assertEquals("Test task", loggingNode.get("elementName").asText());
+        assertEquals("ServiceTask", loggingNode.get("elementType").asText());
+        assertEquals(job.getId(), loggingNode.get("jobId").asText());
+        assertEquals(4, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(4);
+        assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE, loggingNode.get("type").asText());
+        assertEquals("Closed command context for bpmn engine", loggingNode.get("message").asText());
+        assertEquals("bpmn", loggingNode.get("engineType").asText());
+        assertEquals(5, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        FlowableLoggingListener.clear();
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        assertEquals(8, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
+        assertEquals(LoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, loggingNode.get("type").asText());
+        assertEquals("Locking job for task, with job id " + job.getId(), loggingNode.get("message").asText());
+        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("task", loggingNode.get("elementId").asText());
+        assertEquals("Test task", loggingNode.get("elementName").asText());
+        assertEquals("ServiceTask", loggingNode.get("elementType").asText());
+        assertEquals(job.getId(), loggingNode.get("jobId").asText());
+        assertEquals(1, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        Map<String, ObjectNode> loggingMap = new HashMap<>();
+        int commandContextCounter = 1;
+        for (ObjectNode logObjectNode : FlowableLoggingListener.TEST_LOGGING_NODES) {
+            String logType = logObjectNode.get("type").asText();
+            if (LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE.equals(logType)) {
+                logType = logObjectNode.get("elementType").asText() + logType;
+            } else if (LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE.equals(logType)) {
+                logType = commandContextCounter + logType;
+                commandContextCounter++;
+            }
+            loggingMap.put(logType, logObjectNode);
+        }
+        
+        loggingNode = loggingMap.get(LoggingSessionConstants.TYPE_SERVICE_TASK_EXECUTE_ASYNC_JOB);
+        assertEquals(LoggingSessionConstants.TYPE_SERVICE_TASK_EXECUTE_ASYNC_JOB, loggingNode.get("type").asText());
+        assertEquals("Executing async job for task, with job id " + job.getId(), loggingNode.get("message").asText());
+        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("task", loggingNode.get("elementId").asText());
+        assertEquals("Test task", loggingNode.get("elementName").asText());
+        assertEquals("ServiceTask", loggingNode.get("elementType").asText());
+        assertEquals(job.getId(), loggingNode.get("jobId").asText());
+        int beforeJobNumber = loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt();
+        assertTrue(beforeJobNumber > 0);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = loggingMap.get("ServiceTask" + LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE);
+        assertEquals(LoggingSessionConstants.TYPE_ACTIVITY_BEHAVIOR_EXECUTE, loggingNode.get("type").asText());
+        assertEquals("In ServiceTask, executing ServiceTaskExpressionActivityBehavior", loggingNode.get("message").asText());
+        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("task", loggingNode.get("elementId").asText());
+        assertEquals("Test task", loggingNode.get("elementName").asText());
+        assertEquals("ServiceTask", loggingNode.get("elementType").asText());
+        assertEquals("${failureExpressionValue}", loggingNode.get("elementSubType").asText());
+        assertEquals("ServiceTaskExpressionActivityBehavior", loggingNode.get("activityBehavior").asText());
+        int newJobNumber = loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt();
+        assertTrue(newJobNumber > beforeJobNumber);
+        beforeJobNumber = newJobNumber;
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = loggingMap.get(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE_FAILURE);
+        assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE_FAILURE, loggingNode.get("type").asText());
+        assertEquals("Exception at closing command context for bpmn engine", loggingNode.get("message").asText());
+        assertEquals("bpmn", loggingNode.get("engineType").asText());
+        newJobNumber = loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt();
+        assertTrue(newJobNumber > beforeJobNumber);
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        assertEquals(8, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
+        assertEquals(LoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, loggingNode.get("type").asText());
+        assertEquals("Locking job for task, with job id " + job.getId(), loggingNode.get("message").asText());
+        assertEquals(processInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.BPMN, loggingNode.get("scopeType").asText());
+        assertEquals(execution.getId(), loggingNode.get("subScopeId").asText());
+        assertEquals(processDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(processDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(processDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("task", loggingNode.get("elementId").asText());
+        assertEquals("Test task", loggingNode.get("elementName").asText());
+        assertEquals("ServiceTask", loggingNode.get("elementType").asText());
+        assertEquals(job.getId(), loggingNode.get("jobId").asText());
+        assertEquals(1, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+    }
+    
+    @Test
     @Deployment(resources="org/flowable/engine/test/logging/serviceAndUserTask.bpmn20.xml")
     public void testVariableCreateLogging() {
         FlowableLoggingListener.clear();

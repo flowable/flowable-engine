@@ -34,6 +34,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegate;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -259,11 +261,18 @@ public class BpmnLoggingSessionUtil {
                 EventDefinition eventDefinition = eventDefinitions.get(0);
                 activitySubType = eventDefinition.getClass().getSimpleName();
             }
+            
         } else if (flowElement instanceof ServiceTask) {
             ServiceTask serviceTask = (ServiceTask) flowElement;
             if (serviceTask.getBehavior() != null && serviceTask.getBehavior() instanceof ClassDelegate) {
                 ClassDelegate classDelegate = (ClassDelegate) serviceTask.getBehavior();
                 activitySubType = classDelegate.getClassName();
+                
+            } else if (serviceTask.getBehavior() != null && serviceTask.getBehavior() instanceof ServiceTaskExpressionActivityBehavior) {
+                activitySubType = serviceTask.getImplementation();
+            
+            } else if (serviceTask.getBehavior() != null && serviceTask.getBehavior() instanceof ServiceTaskDelegateExpressionActivityBehavior) {
+                activitySubType = serviceTask.getImplementation();
             }
         }
         
