@@ -12,10 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
+import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
+
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.model.Criterion;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -38,10 +41,33 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
         this.exitEventType = exitEventType;
     }
 
+    /**
+     * Overriden to check, if the optional exit event type is set to 'complete' and if so, throw an exception, if the case is not yet completable.
+     */
+    @Override
+    public void run() {
+        if (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType)) {
+            checkCaseToBeCompletable();
+        }
+        super.run();
+    }
+
+    /**
+     * Checks, if the case is completable and if not, raises an exception.
+     */
+    protected void checkCaseToBeCompletable() {
+        // if the case should exit with a complete event instead of exit, we need to make sure it is completable
+        if (!getCaseInstanceEntity().isCompletable()) {
+            // we can't complete the case as it is currently not completable, so we need to throw an exception
+            throw new FlowableIllegalArgumentException(
+                "Cannot exit case with 'complete' event type as the case '" + getCaseInstanceEntityId() + "' is not yet completable.");
+        }
+    }
+
     @Override
     protected String getNewState() {
         // depending on the exit event type, we will end up in the complete state, even though the case was actually terminated / exited
-        if (Criterion.EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType)) {
+        if (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType)) {
             return CaseInstanceState.COMPLETED;
         }
         return CaseInstanceState.TERMINATED;
