@@ -47,7 +47,7 @@ public class PlanItemExitSentryTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task F", AVAILABLE);
 
         // trigger exit sentry with Task A still in enabled state -> nothing must be changed
-        cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances,"Task A"));
+        cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances,"Kill active tasks A"));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
