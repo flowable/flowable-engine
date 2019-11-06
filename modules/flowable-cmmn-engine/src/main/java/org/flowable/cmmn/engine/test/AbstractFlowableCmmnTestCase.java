@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 
 import java.time.Instant;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -155,8 +156,9 @@ public abstract class AbstractFlowableCmmnTestCase {
         }
 
         assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
+        List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
-            assertTrue("State '" + state + "' not found in plan item instances states '" + planItemInstanceStates + "'", planItemInstanceStates.contains(state));
+            assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
         }
     }
 
