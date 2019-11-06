@@ -36,7 +36,6 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
-import org.flowable.cmmn.model.PlanItem;
 import org.junit.After;
 import org.junit.runner.RunWith;
 
@@ -172,6 +171,15 @@ public abstract class AbstractFlowableCmmnTestCase {
         if (!planItemInstanceStates.isEmpty()) {
             fail(planItemInstanceStates.size() + " plan item instance(s) found with name " + name + ", but should be 0");
         }
+    }
+
+    protected List<PlanItemInstance> getAllPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .orderByEndTime().asc()
+            .includeEnded()
+            .list();
     }
 
     protected List<PlanItemInstance> getPlanItemInstances(String caseInstanceId) {
