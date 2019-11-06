@@ -406,4 +406,70 @@ public class PlanItemExitSentryTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task F", AVAILABLE);
     }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/PlanItemExitSentryTest.multipleTests.cmmn")
+    public void testExitSentryTerminatingActiveTaskD() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("sentryExitTypeTestOne").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+
+        assertEquals(10, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task D", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task E", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task F", AVAILABLE);
+
+        // complete Task E, which will start Task D (and start another Task E as it has repetition)
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task C", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task D", ACTIVE, WAITING_FOR_REPETITION);
+
+        // trigger exit sentry on Task D which must kill it, but leave it in waiting for repetition state
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "exitActiveTasksD", true);
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertPlanItemInstanceState(planItemInstances, "Task D", WAITING_FOR_REPETITION);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/PlanItemExitSentryTest.multipleTests.cmmn")
+    public void testExitSentryTerminatingMultipleActiveTasksD() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("sentryExitTypeTestOne").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+
+        assertEquals(10, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task D", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task E", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task F", AVAILABLE);
+
+        // complete Task E, which will start Task D (and start another Task E as it has repetition)
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task C", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task D", ACTIVE, WAITING_FOR_REPETITION);
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task C", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task D", ACTIVE, ACTIVE, WAITING_FOR_REPETITION);
+
+        // trigger exit sentry on Task D which must kill all active instances, but leave it in waiting for repetition state
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "exitActiveTasksD", true);
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertPlanItemInstanceState(planItemInstances, "Task D", WAITING_FOR_REPETITION);
+    }
 }

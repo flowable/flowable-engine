@@ -53,7 +53,7 @@
                         <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion2" flowable:sentryRef="sentry5"></entryCriterion>
-                    <exitCriterion id="exitCriterion4" flowable:sentryRef="sentry6"></exitCriterion>
+                    <exitCriterion id="exitCriterion4" flowable:sentryRef="sentry6" flowable:exitType="activeInstances"></exitCriterion>
                 </planItem>
                 <planItem id="planItem8" name="Task E" definitionRef="humanTask5">
                     <itemControl>
@@ -65,7 +65,7 @@
                         <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion3" flowable:sentryRef="sentry7"></entryCriterion>
-                    <exitCriterion id="exitCriterion5" flowable:sentryRef="sentry8"></exitCriterion>
+                    <exitCriterion id="exitCriterion5" flowable:sentryRef="sentry8" flowable:exitType="activeAndEnabledInstances"></exitCriterion>
                 </planItem>
                 <sentry id="sentry1" name="exitActiveTasksA">
                     <extensionElements>
