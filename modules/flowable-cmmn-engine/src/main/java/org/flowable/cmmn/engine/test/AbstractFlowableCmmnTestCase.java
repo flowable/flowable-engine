@@ -36,7 +36,6 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
-import org.flowable.cmmn.model.PlanItem;
 import org.junit.After;
 import org.junit.runner.RunWith;
 
@@ -174,10 +173,37 @@ public abstract class AbstractFlowableCmmnTestCase {
         }
     }
 
+    protected List<PlanItemInstance> getAllPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .orderByEndTime().asc()
+            .includeEnded()
+            .list();
+    }
+
     protected List<PlanItemInstance> getPlanItemInstances(String caseInstanceId) {
         return cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(caseInstanceId)
             .orderByName().asc()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getCompletedPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceStateCompleted()
+            .includeEnded()
+            .orderByName().asc()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getTerminatedPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .planItemInstanceStateTerminated()
+            .includeEnded()
             .list();
     }
 

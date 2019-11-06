@@ -38,29 +38,23 @@ public class CaseCompletableReEvaluationTest extends FlowableCmmnTestCase {
     public void testCaseReEvaluationOfCompletableFlag() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("evaluateCaseCompletableFlagTest").start();
 
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(2, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Complete case if completable", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
 
         // start task A -> the case must not be completable anymore
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(2, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Complete case if completable", UNAVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
 
         // complete task A which will complete the case
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
 
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
