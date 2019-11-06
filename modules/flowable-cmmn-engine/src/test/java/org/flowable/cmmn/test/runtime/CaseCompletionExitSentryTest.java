@@ -33,7 +33,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Testing the exit sentry on stage scenarios.
+ * Testing the exit sentry on case scenarios.
  *
  * @author Micha Kiener
  */
@@ -122,7 +122,7 @@ public class CaseCompletionExitSentryTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/CaseCompletionExitSentryTest.testCompleteCaseThroughExitSentry.cmmn")
-    public void testCompleteStageThroughExitSentryWithForceComplete() {
+    public void testCompleteCaseThroughExitSentryWithForceComplete() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("exitSentryTestCaseTwo").start();
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
