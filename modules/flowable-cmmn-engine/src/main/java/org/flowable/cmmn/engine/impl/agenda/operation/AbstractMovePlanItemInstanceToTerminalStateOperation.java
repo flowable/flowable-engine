@@ -93,7 +93,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         if (isEvaluateRepetitionRule() && hasRepetitionRuleAndNoEntryCriteria(planItem)) {
-            return ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity);
+            return ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceEntity.getStagePlanItemInstanceEntity());
         }
 
         // If the plan item instance is in AVAILABLE (and the new state is terminated), and it's repeatable and it gets terminated
