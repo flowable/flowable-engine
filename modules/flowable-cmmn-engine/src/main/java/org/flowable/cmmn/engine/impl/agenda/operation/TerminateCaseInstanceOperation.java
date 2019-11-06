@@ -42,7 +42,7 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     }
 
     /**
-     * Overriden to check, if the optional exit event type is set to 'complete' and if so, throw an exception, if the case is not yet completable.
+     * Overridden to check, if the optional exit event type is set to 'complete' and if so, throw an exception, if the case is not yet completable.
      */
     @Override
     public void run() {
