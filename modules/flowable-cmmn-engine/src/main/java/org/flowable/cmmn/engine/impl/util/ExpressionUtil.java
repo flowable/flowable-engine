@@ -83,7 +83,7 @@ public class ExpressionUtil {
         if (repetitionRule != null) {
             // we first check, if there is a max instance count of one set and if so, check, if there is an active instance available already
             if (RepetitionRule.MAX_INSTANCE_COUNT_ONE.equals(repetitionRule.getMaxInstanceCount()) &&
-                !searchNonFinishedEqualPlanItemInstances(planItemInstanceEntity.getPlanItem(), planItemInstanceContainer).isEmpty()) {
+                !searchNonFinishedEqualPlanItemInstances(planItemInstanceEntity, planItemInstanceContainer).isEmpty()) {
                 // we found a non-final plan item instance with the same plan item definition, so no need to create a new one
                 return false;
             }
@@ -94,12 +94,15 @@ public class ExpressionUtil {
         return false;
     }
 
-    public static List<PlanItemInstance> searchNonFinishedEqualPlanItemInstances(PlanItem planItem, PlanItemInstanceContainer planItemInstanceContainer) {
+    public static List<PlanItemInstance> searchNonFinishedEqualPlanItemInstances(PlanItemInstanceEntity planItemInstanceEntity,
+        PlanItemInstanceContainer planItemInstanceContainer) {
+
         if (planItemInstanceContainer != null && planItemInstanceContainer.getChildPlanItemInstances() != null) {
             return planItemInstanceContainer.getChildPlanItemInstances()
                 .stream()
-                .filter(pi -> planItem.getId().equals(pi.getPlanItem().getId()))
+                .filter(pi -> planItemInstanceEntity.getPlanItem().getId().equals(pi.getPlanItem().getId()))
                 .filter(pi -> !PlanItemInstanceState.isInTerminalState(pi))
+                .filter(pi -> !pi.getId().equals(planItemInstanceEntity.getId()))
                 .collect(Collectors.toList());
         }
 

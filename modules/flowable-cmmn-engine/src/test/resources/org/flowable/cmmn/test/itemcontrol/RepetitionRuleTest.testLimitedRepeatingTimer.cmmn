@@ -5,7 +5,7 @@
       <planItem id="planItem1" definitionRef="sid-0AAFF650-1A45-4861-A7EF-E2B4E21A0D19"></planItem>
       <planItem id="planItem2" name="A" definitionRef="sid-A960E6C9-FE1A-492A-9C71-5812BF5C179B">
         <itemControl>
-          <repetitionRule flowable:counterVariable="repetitionCounter">
+          <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited">
             <condition><![CDATA[${repetitionCounter <= 2}]]></condition>
           </repetitionRule>
         </itemControl>

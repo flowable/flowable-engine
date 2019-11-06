@@ -26,7 +26,7 @@
                 </planItem>
                 <planItem id="planItem3" name="Task B" definitionRef="humanTask2">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited"></repetitionRule>
                         <manualActivationRule></manualActivationRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry2"></entryCriterion>
@@ -50,7 +50,7 @@
                 </planItem>
                 <planItem id="planItem7" name="Task D" definitionRef="humanTask4">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited"></repetitionRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion2" flowable:sentryRef="sentry5"></entryCriterion>
                     <exitCriterion id="exitCriterion4" flowable:sentryRef="sentry6" flowable:exitType="activeInstances"></exitCriterion>
@@ -62,7 +62,7 @@
                 </planItem>
                 <planItem id="planItem9" name="Task F" definitionRef="humanTask6">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited"></repetitionRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion3" flowable:sentryRef="sentry7"></entryCriterion>
                     <exitCriterion id="exitCriterion5" flowable:sentryRef="sentry8" flowable:exitType="activeAndEnabledInstances"></exitCriterion>
