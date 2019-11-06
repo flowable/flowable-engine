@@ -125,7 +125,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         int activeChildren = 0;
         boolean criteriaChanged = false;
         
-        // Need to store new child plan item instances in a list until the loop is done, to avoid concurrentmodifications
+        // Need to store new child plan item instances in a list until the loop is done, to avoid concurrent modifications
         List<PlanItemInstanceEntity> newChildPlanItemInstances = null;
 
         // Check the existing plan item instances: this means the plan items that have been created and became available.
@@ -142,7 +142,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
                     boolean activatePlanItemInstance = true;
                     if (!planItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
-                        boolean isRepeating = ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity);
+                        boolean isRepeating = ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer);
                         if (isRepeating) {
 
                             PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity);
@@ -591,7 +591,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
                         // Special care needed in case the plan item instance is repeating
                         if (!entryDependentPlanItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(entryDependentPlanItemInstance)) {
-                            if (ExpressionUtil.evaluateRepetitionRule(commandContext, entryDependentPlanItemInstance)) {
+                            if (ExpressionUtil.evaluateRepetitionRule(commandContext, entryDependentPlanItemInstance, (PlanItemInstanceContainer) null)) {
                                 createPlanItemInstanceDuplicateForRepetition(entryDependentPlanItemInstance);
                             }
                         }

@@ -12,10 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -65,12 +73,37 @@ public class ExpressionUtil {
             && planItem.getItemControl().getRepetitionRule() != null;
     }
 
-    public static boolean evaluateRepetitionRule(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        if (hasRepetitionRule(planItemInstanceEntity)) {
-            String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
+    public static boolean evaluateRepetitionRule(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
+        PlanItemInstanceContainer planItemInstanceContainer) {
+        RepetitionRule repetitionRule = null;
+        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getItemControl() != null) {
+            repetitionRule = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule();
+        }
+
+        if (repetitionRule != null) {
+            // we first check, if there is a max instance count of one set and if so, check, if there is an active instance available already
+            if (RepetitionRule.MAX_INSTANCE_COUNT_ONE.equals(repetitionRule.getMaxInstanceCount()) &&
+                !searchNonFinishedEqualPlanItemInstances(planItemInstanceEntity.getPlanItem(), planItemInstanceContainer).isEmpty()) {
+                // we found a non-final plan item instance with the same plan item definition, so no need to create a new one
+                return false;
+            }
+
+            String repetitionCondition = repetitionRule.getCondition();
             return evaluateRepetitionRule(commandContext, planItemInstanceEntity, repetitionCondition);
         }
         return false;
+    }
+
+    public static List<PlanItemInstance> searchNonFinishedEqualPlanItemInstances(PlanItem planItem, PlanItemInstanceContainer planItemInstanceContainer) {
+        if (planItemInstanceContainer != null && planItemInstanceContainer.getChildPlanItemInstances() != null) {
+            return planItemInstanceContainer.getChildPlanItemInstances()
+                .stream()
+                .filter(pi -> planItem.getId().equals(pi.getPlanItem().getId()))
+                .filter(pi -> !PlanItemInstanceState.isInTerminalState(pi))
+                .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
     }
 
     public static boolean evaluateRepetitionRule(CommandContext commandContext, VariableContainer variableContainer, String repetitionCondition) {
