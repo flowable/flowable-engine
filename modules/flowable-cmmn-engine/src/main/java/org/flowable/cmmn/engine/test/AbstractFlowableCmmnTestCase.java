@@ -181,6 +181,24 @@ public abstract class AbstractFlowableCmmnTestCase {
             .list();
     }
 
+    protected List<PlanItemInstance> getCompletedPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceStateCompleted()
+            .includeEnded()
+            .orderByName().asc()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getTerminatedPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .planItemInstanceStateTerminated()
+            .includeEnded()
+            .list();
+    }
+
     protected String getPlanItemInstanceIdByName(List<PlanItemInstance> planItemInstances, String name) {
         return getPlanItemInstanceByName(planItemInstances, name, null).getId();
     }
