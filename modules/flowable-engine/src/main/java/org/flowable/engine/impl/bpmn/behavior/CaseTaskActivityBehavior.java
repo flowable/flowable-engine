@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.IOParameter;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -132,6 +133,10 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
 
         caseInstanceService.startCaseInstanceByKey(caseDefinitionKey, caseInstanceId,
                         caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(), inParameters);
+
+        // Bidirectional storing of reference to avoid queries later on
+        executionEntity.setReferenceId(caseInstanceId);
+        executionEntity.setReferenceType(CallbackTypes.EXECUTION_CHILD_CASE);
     }
 
     protected String getCaseDefinitionKey(String caseDefinitionKeyExpression, VariableContainer variableContainer, ExpressionManager expressionManager) {
@@ -154,6 +159,10 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
     
     public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables) {
         execution.setVariables(variables);
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        // Set the reference id and type to null since the execution could be reused
+        executionEntity.setReferenceId(null);
+        executionEntity.setReferenceType(null);
         leave(execution);
     }
 }

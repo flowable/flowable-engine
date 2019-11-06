@@ -212,6 +212,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String callbackId;
     protected String callbackType;
 
+    // Reference
+    protected String referenceId;
+    protected String referenceType;
+
     public ExecutionEntityImpl() {
 
     }
@@ -268,6 +272,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("identityLinkCount", identityLinkCount);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
         return persistentState;
     }
 
@@ -1242,6 +1248,26 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    @Override
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    @Override
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @Override
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    @Override
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
 
     protected String getRelatedActivityInstanceId(ExecutionEntity sourceExecution) {

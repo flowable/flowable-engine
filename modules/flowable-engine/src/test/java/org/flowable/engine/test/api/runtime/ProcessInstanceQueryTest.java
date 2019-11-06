@@ -2074,4 +2074,19 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
         Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").list()).isNullOrEmpty();
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidReferenceId() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceReferenceId("foo").list()).isNullOrEmpty();
+    }
+
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByInvalidReferenceType() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceReferenceType("foo").list()).isNullOrEmpty();
+    }
 }

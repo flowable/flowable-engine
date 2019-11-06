@@ -140,6 +140,10 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     void setCallbackType(String callbackType);
     
     void setVariable(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
+
+    void setReferenceId(String referenceId);
+
+    void setReferenceType(String referenceType);
     
     Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
 

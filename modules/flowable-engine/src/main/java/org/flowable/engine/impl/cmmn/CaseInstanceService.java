@@ -19,7 +19,6 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
 
 /**
  * @author Tijs Rademakers
- * @author Valentin Zickner
  */
 public interface CaseInstanceService {
     
@@ -37,6 +36,6 @@ public interface CaseInstanceService {
 
     void deleteCaseInstance(String caseInstanceId);
 
-    Set<String> findChildCaseIdsForExecutionId(String executionId);
+    void deleteCaseInstancesForExecutionId(String executionId);
 
 }

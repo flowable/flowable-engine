@@ -25,8 +25,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -790,11 +792,14 @@ public class ExecutionEntityManagerImpl
 
     protected void deleteSubCases(ExecutionEntity executionEntity, CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        if (processEngineConfiguration != null && processEngineConfiguration.getCaseInstanceService() != null) {
-            CaseInstanceService caseInstanceService = processEngineConfiguration.getCaseInstanceService();
-            Set<String> childCaseInstanceIds = caseInstanceService.findChildCaseIdsForExecutionId(executionEntity.getId());
-            for (String childCaseInstanceId : childCaseInstanceIds) {
-                caseInstanceService.deleteCaseInstance(childCaseInstanceId);
+        CaseInstanceService caseInstanceService = processEngineConfiguration.getCaseInstanceService();
+        if (caseInstanceService != null) {
+            if (executionEntity.getReferenceId() != null && CallbackTypes.EXECUTION_CHILD_CASE.equals(executionEntity.getReferenceType())) {
+                caseInstanceService.deleteCaseInstance(executionEntity.getReferenceId());
+            } else if (executionEntity.getCurrentFlowElement() instanceof CaseServiceTask) {
+                // backwards compatibility in case there is no reference
+                // (cases created before the double reference in the execution) was added
+                caseInstanceService.deleteCaseInstancesForExecutionId(executionEntity.getId());
             }
         }
     }
