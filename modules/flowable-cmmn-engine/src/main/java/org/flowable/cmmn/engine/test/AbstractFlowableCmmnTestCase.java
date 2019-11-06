@@ -160,6 +160,33 @@ public abstract class AbstractFlowableCmmnTestCase {
         }
     }
 
+    protected List<PlanItemInstance> getPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .list();
+    }
+
+    protected String getPlanItemInstanceIdByName(List<PlanItemInstance> planItemInstances, String name) {
+        return getPlanItemInstanceByName(planItemInstances, name).getId();
+    }
+
+    protected PlanItemInstance getPlanItemInstanceByName(List<PlanItemInstance> planItemInstances, String name) {
+        List<PlanItemInstance> matchingPlanItemInstances = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .collect(Collectors.toList());
+
+        if (matchingPlanItemInstances.isEmpty()) {
+            fail("No plan item instances found with name " + name);
+        }
+
+        if (matchingPlanItemInstances.size() > 1) {
+            fail("Found " + matchingPlanItemInstances.size() + " plan item instances with name " + name);
+        }
+
+        return matchingPlanItemInstances.get(0);
+    }
+
     protected void waitForJobExecutorToProcessAllJobs() {
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 20000L, 200L, true);
     }

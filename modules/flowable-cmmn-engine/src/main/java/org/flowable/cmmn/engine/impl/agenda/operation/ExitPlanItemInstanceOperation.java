@@ -12,14 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
+import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES;
+import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_INSTANCES;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
-import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -45,17 +49,46 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     @Override
     protected String getNewState() {
         // depending on the exit event type, we want to leave the stage in completed state, not terminated
-        if (isStage() && (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType))) {
+        if (shouldStageGoIntoCompletedState()) {
             return PlanItemInstanceState.COMPLETED;
         }
+
+        // check the exit type for a regular plan item, not a stage to be something else than default
+        if (shouldPlanItemStayInCurrentState()) {
+            // if there is an exit type set to only terminate active instances and this one is only available or enabled, don't change its state
+            return planItemInstanceEntity.getState();
+        }
+
         return PlanItemInstanceState.TERMINATED;
+    }
+
+    @Override
+    protected boolean abortOperationIfNewStateEqualsOldState() {
+        // on an exit operation, we abort the operation, if we don't go into terminated state, but remain in the current state
+        return true;
+    }
+
+    /**
+     * @return true, if this plan item is a stage and according the exit sentry exit event type needs to go in complete state instead of terminated
+     */
+    protected boolean shouldStageGoIntoCompletedState() {
+        return isStage() && (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType));
+    }
+
+    protected boolean shouldPlanItemStayInCurrentState() {
+        return !isStage() &&
+            ((EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) &&
+                (ENABLED.equals(planItemInstanceEntity.getState()) || AVAILABLE.equals(planItemInstanceEntity.getState())))
+                ||
+            (EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES.equals(exitType) &&
+                AVAILABLE.equals(planItemInstanceEntity.getState())));
     }
     
     @Override
     protected String getLifeCycleTransition() {
         // depending on the exit event type, we want to use the complete transition, not the exit one, so depending on-parts get triggered waiting for the
         // complete transition
-        if (isStage() && (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType))) {
+        if (shouldStageGoIntoCompletedState()) {
             return PlanItemTransition.COMPLETE;
         }
         return PlanItemTransition.EXIT;
@@ -68,7 +101,8 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
                 // if the stage should exit with a complete event instead of exit, we need to make sure it is completable
                 if (!PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(commandContext, planItemInstanceEntity, true).isCompletable()) {
                     // we can't complete the stage as it is currently not completable, so we need to throw an exception
-                    throw new FlowableIllegalArgumentException("Cannot exit stage with 'complete' event type as the stage '" + planItemInstanceEntity.getId() + "' is not yet completable.");
+                    throw new FlowableIllegalArgumentException(
+                        "Cannot exit stage with 'complete' event type as the stage '" + planItemInstanceEntity.getId() + "' is not yet completable.");
                 }
             }
 
@@ -93,7 +127,9 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
 
     @Override
     protected boolean isEvaluateRepetitionRule() {
-        return false;
+        // by default, we don't create new instances for repeatable plan items being terminated, however, if the exit type is set to only terminate active or
+        // enabled instances, we might want to immediately create a new instance for repetition, but only, if the current one was terminated, of course
+        return (EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) || EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES.equals(exitType)) && TERMINATED.equals(getNewState());
     }
 
     protected boolean isStage() {
