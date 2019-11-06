@@ -231,7 +231,11 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         if (!skipUserTask) {
             handleAssignments(taskService, beforeContext.getAssignee(), beforeContext.getOwner(),
                             beforeContext.getCandidateUsers(), beforeContext.getCandidateGroups(), task, expressionManager, execution);
-            
+
+            if (processEngineConfiguration.getCreateUserTaskInterceptor() != null) {
+                CreateUserTaskAfterContext afterContext = new CreateUserTaskAfterContext(userTask, task, execution);
+                processEngineConfiguration.getCreateUserTaskInterceptor().afterCreateUserTask(afterContext);
+            }
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
@@ -245,11 +249,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             TaskHelper.deleteTask(task, null, false, false, false); // false: no events fired for skipped user task
             leave(execution);
         }
-        
-        if (processEngineConfiguration.getCreateUserTaskInterceptor() != null) {
-            CreateUserTaskAfterContext afterContext = new CreateUserTaskAfterContext(userTask, task, execution);
-            processEngineConfiguration.getCreateUserTaskInterceptor().afterCreateUserTask(afterContext);
-        }
+
     }
 
     @Override
@@ -329,7 +329,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
                             IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         }
-                        
+
                     }
                 }
             }
@@ -355,7 +355,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
                             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
-                        
+
                     }
 
                 }
@@ -385,7 +385,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                                             task.getId(), null, groupId, customGroupIdentityLinkType);
                             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
-                        
+
                     }
 
                 }
@@ -397,7 +397,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     /**
      * Extract a candidate list from a string.
-     * 
+     *
      * @param str
      * @return
      */
