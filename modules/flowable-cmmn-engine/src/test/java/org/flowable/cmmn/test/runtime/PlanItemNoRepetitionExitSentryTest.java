@@ -25,6 +25,11 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Test;
 
+/**
+ * Testing exit sentries on plan items with exit type attribute and different combinations without repetition, but manual activation and as well with if-parts.
+ *
+ * @author Micha Kiener
+ */
 public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
     @Test
