@@ -12,9 +12,8 @@
  */
 package org.flowable.cmmn.engine.configurator.impl.cmmn;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
@@ -23,14 +22,15 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnEngineEntityConstants;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Tijs Rademakers
- * @author Valentin Zickner
  */
 public class DefaultCaseInstanceService implements CaseInstanceService {
     
@@ -109,18 +109,28 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
 
     @Override
     public void deleteCaseInstance(String caseInstanceId) {
-        cmmnEngineConfiguration.getCmmnRuntimeService().terminateCaseInstance(caseInstanceId);
+        cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+            CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+            if (caseInstanceEntity == null || caseInstanceEntity.isDeleted()) {
+                return null;
+            }
+
+            CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(caseInstanceEntity.getId());
+            return null;
+        });
     }
 
     @Override
-    public Set<String> findChildCaseIdsForExecutionId(String executionId) {
+    public void deleteCaseInstancesForExecutionId(String executionId) {
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
-        return cmmnRuntimeService.createCaseInstanceQuery()
-                .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
-                .caseInstanceCallbackId(executionId)
-                .list()
-                .stream()
-                .map(CaseInstance::getId)
-                .collect(Collectors.toSet());
+        List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+            .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
+            .caseInstanceCallbackId(executionId)
+            .list();
+
+        for (CaseInstance caseInstance : caseInstances) {
+            deleteCaseInstance(caseInstance.getId());
+        }
     }
+
 }

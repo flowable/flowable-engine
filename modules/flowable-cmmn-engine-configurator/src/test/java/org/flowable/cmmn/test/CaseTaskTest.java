@@ -23,13 +23,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Assumptions;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.ExecutionQueryImpl;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -65,7 +71,13 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                             .singleResult();
             
             assertNotNull(caseInstance);
-            
+
+            Execution caseTaskExecution = processEngineRuntimeService.createExecutionQuery()
+                .executionReferenceId(caseInstance.getId())
+                .executionReferenceType(CallbackTypes.EXECUTION_CHILD_CASE)
+                .singleResult();
+            assertThat(caseTaskExecution).isNotNull();
+
             List<Task> caseTasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
             assertEquals(1, caseTasks.size());
             
@@ -361,12 +373,16 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             Task task = processEngineTaskService.createTaskQuery()
                     .processInstanceId(processInstance.getProcessInstanceId())
                     .singleResult();
-            Assumptions.assumeThat(task).isNotNull();
-            Assumptions.assumeThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
+            Assertions.assertThat(task).isNotNull();
+            Assertions.assertThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
 
             long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
                     .count();
-            Assumptions.assumeThat(numberOfActiveCaseInstances).isEqualTo(1);
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(1);
+
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNotNull();
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
 
             // Act
             processEngineTaskService.complete(task.getId());
@@ -393,13 +409,54 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             Task task = processEngineTaskService.createTaskQuery()
                     .processInstanceId(processInstance.getProcessInstanceId())
                     .singleResult();
-            Assumptions.assumeThat(task).isNotNull();
-            Assumptions.assumeThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
+            Assertions.assertThat(task).isNotNull();
+            Assertions.assertThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
 
             long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
                     .count();
-            Assumptions.assumeThat(numberOfActiveCaseInstances).isEqualTo(2);
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(2);
 
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNotNull();
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+
+            // Act
+            processEngineTaskService.complete(task.getId());
+
+            // Assert
+            long numberOfActiveCaseInstancesAfterCompletion = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstancesAfterCompletion).isEqualTo(0);
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn"})
+    public void testCaseTaskWithTwoCaseTasksWithTerminateEndEventWithoutReference() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithTwoParallelCasesAndWithTerminateEndEventOnDifferentExecution.bpmn20.xml")
+                .deploy();
+
+        try {
+            // Arrange
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateByEndEvent");
+            Task task = processEngineTaskService.createTaskQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .singleResult();
+            Assertions.assertThat(task).isNotNull();
+            Assertions.assertThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
+
+            processEngineManagementService.executeCommand(new ClearExecutionReferenceCmd());
+
+            long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(2);
+
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNull();
+            assertThat(caseTask1Execution.getReferenceType()).isNull();
             // Act
             processEngineTaskService.complete(task.getId());
 
@@ -424,12 +481,57 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateBySignalTestCase");
             long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
                     .count();
-            Assumptions.assumeThat(numberOfActiveCaseInstances).isEqualTo(1);
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(1);
 
             Execution myExternalSignalExecution = processEngineRuntimeService.createExecutionQuery()
                     .processInstanceId(processInstance.getProcessInstanceId())
                     .signalEventSubscriptionName("myExternalSignal")
                     .singleResult();
+
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNotNull();
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+            assertThat(caseInstance.getId()).isEqualTo(caseTask1Execution.getReferenceId());
+
+            // Act
+            processEngineRuntimeService.signalEventReceived("myExternalSignal", myExternalSignalExecution.getId());
+
+            // Assert
+            long numberOfActiveCaseInstancesAfterCompletion = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstancesAfterCompletion).isEqualTo(0);
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+
+    }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn"})
+    public void testCaseTaskWithTerminatingSignalBoundaryEventWithoutReference() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithTerminatingSignalBoundaryEvent.bpmn20.xml")
+                .deploy();
+
+        try {
+            // Arrange
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateBySignalTestCase");
+            long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(1);
+
+            processEngineManagementService.executeCommand(new ClearExecutionReferenceCmd());
+
+            Execution myExternalSignalExecution = processEngineRuntimeService.createExecutionQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .signalEventSubscriptionName("myExternalSignal")
+                    .singleResult();
+
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNull();
+            assertThat(caseTask1Execution.getReferenceType()).isNull();
 
             // Act
             processEngineRuntimeService.signalEventReceived("myExternalSignal", myExternalSignalExecution.getId());
@@ -456,12 +558,54 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateTwoCasesWithinSubprocessBySignalEvent");
             long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
                     .count();
-            Assumptions.assumeThat(numberOfActiveCaseInstances).isEqualTo(2);
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(2);
 
             Execution myExternalSignalExecution = processEngineRuntimeService.createExecutionQuery()
                     .processInstanceId(processInstance.getProcessInstanceId())
                     .signalEventSubscriptionName("myExternalSignal")
                     .singleResult();
+
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNotNull();
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+
+            // Act
+            processEngineRuntimeService.signalEventReceived("myExternalSignal", myExternalSignalExecution.getId());
+
+            // Assert
+            long numberOfActiveCaseInstancesAfterCompletion = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstancesAfterCompletion).isEqualTo(0);
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+
+    }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn"})
+    public void testCaseTasksInSubProcessWithTerminatingSignalBoundaryEventWithoutReference() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTasksInSubProcessWithTerminatingSignalBoundaryEvent.bpmn20.xml")
+                .deploy();
+
+        try {
+            // Arrange
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateTwoCasesWithinSubprocessBySignalEvent");
+            long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(2);
+
+            processEngineManagementService.executeCommand(new ClearExecutionReferenceCmd());
+
+            Execution myExternalSignalExecution = processEngineRuntimeService.createExecutionQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .signalEventSubscriptionName("myExternalSignal")
+                    .singleResult();
+
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNull();
+            assertThat(caseTask1Execution.getReferenceType()).isNull();
 
             // Act
             processEngineRuntimeService.signalEventReceived("myExternalSignal", myExternalSignalExecution.getId());
@@ -488,12 +632,16 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateOneOfTwoCasesBySignalTestCase");
             long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
                     .count();
-            Assumptions.assumeThat(numberOfActiveCaseInstances).isEqualTo(2);
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(2);
 
             Execution myExternalSignalExecution = processEngineRuntimeService.createExecutionQuery()
                     .processInstanceId(processInstance.getProcessInstanceId())
                     .signalEventSubscriptionName("myExternalSignal")
                     .singleResult();
+
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNotNull();
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
 
             // Act
             processEngineRuntimeService.signalEventReceived("myExternalSignal", myExternalSignalExecution.getId());
@@ -509,6 +657,66 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
 
+    }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn"})
+    public void testCaseTasksWithTerminatingSignalBoundaryEventOnOnlyOneOfTwoCaseTaskWithoutReference() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithTerminatingSignalBoundaryEventOnOnlyOneOfTwoCaseTask.bpmn20.xml")
+                .deploy();
+
+        try {
+            // Arrange
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("terminateOneOfTwoCasesBySignalTestCase");
+            long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstances).isEqualTo(2);
+
+            processEngineManagementService.executeCommand(new ClearExecutionReferenceCmd());
+
+            Execution myExternalSignalExecution = processEngineRuntimeService.createExecutionQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .signalEventSubscriptionName("myExternalSignal")
+                    .singleResult();
+
+            Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
+            assertThat(caseTask1Execution.getReferenceId()).isNull();
+            assertThat(caseTask1Execution.getReferenceType()).isNull();
+
+            // Act
+            processEngineRuntimeService.signalEventReceived("myExternalSignal", myExternalSignalExecution.getId());
+
+            // Assert
+            long numberOfActiveCaseInstancesAfterCompletion = cmmnRuntimeService.createCaseInstanceQuery()
+                    .count();
+            Assertions.assertThat(numberOfActiveCaseInstancesAfterCompletion).isEqualTo(1);
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                    .singleResult();
+            cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+
+    }
+
+
+    static class ClearExecutionReferenceCmd implements Command<Void> {
+
+        @Override
+        public Void execute(CommandContext commandContext) {
+            List<Execution> query = new ExecutionQueryImpl(commandContext.getCurrentEngineConfiguration().getCommandExecutor())
+                .list();
+            ExecutionEntityManager entityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+            for (Execution execution : query) {
+                ExecutionEntity executionEntity = (ExecutionEntity) execution;
+                executionEntity.setReferenceId(null);
+                executionEntity.setReferenceType(null);
+                entityManager.update(executionEntity);
+            }
+
+            return null;
+        }
     }
 
 }

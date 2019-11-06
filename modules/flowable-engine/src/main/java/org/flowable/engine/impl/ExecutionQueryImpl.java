@@ -94,6 +94,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected List<String> deploymentIds;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     
     protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
     protected ExecutionQueryImpl currentOrQueryObject;
@@ -374,6 +376,26 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             this.withoutTenantId = true;
         }
         
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery executionReferenceId(String referenceId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery executionReferenceType(String referenceType) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
+        }
         return this;
     }
 
@@ -1020,6 +1042,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public String getName() {
