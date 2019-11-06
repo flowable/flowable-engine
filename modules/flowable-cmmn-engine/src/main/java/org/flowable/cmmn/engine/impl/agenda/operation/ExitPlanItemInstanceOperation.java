@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.EVALUATE_STATES;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
@@ -76,12 +77,13 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     }
 
     protected boolean shouldPlanItemStayInCurrentState() {
-        return !isStage() &&
-            ((EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) &&
-                (ENABLED.equals(planItemInstanceEntity.getState()) || AVAILABLE.equals(planItemInstanceEntity.getState())))
+        return !isStage() && (
+            (EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) &&
+                (ENABLED.equals(planItemInstanceEntity.getState()) || EVALUATE_STATES.contains(planItemInstanceEntity.getState())))
                 ||
             (EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES.equals(exitType) &&
-                AVAILABLE.equals(planItemInstanceEntity.getState())));
+                EVALUATE_STATES.contains(planItemInstanceEntity.getState()))
+        );
     }
     
     @Override
