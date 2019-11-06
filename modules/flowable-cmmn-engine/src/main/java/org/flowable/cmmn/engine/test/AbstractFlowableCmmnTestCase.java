@@ -163,7 +163,7 @@ public abstract class AbstractFlowableCmmnTestCase {
         }
     }
 
-    protected void assertNoPlanItem(List<PlanItemInstance> planItemInstances, String name) {
+    protected void assertNoPlanItemInstance(List<PlanItemInstance> planItemInstances, String name) {
         List<String> planItemInstanceStates = planItemInstances.stream()
             .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
             .map(PlanItemInstance::getState)
