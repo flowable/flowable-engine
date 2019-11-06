@@ -36,6 +36,7 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
+import org.flowable.cmmn.model.PlanItem;
 import org.junit.After;
 import org.junit.runner.RunWith;
 
@@ -159,6 +160,17 @@ public abstract class AbstractFlowableCmmnTestCase {
         List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
             assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
+        }
+    }
+
+    protected void assertNoPlanItem(List<PlanItemInstance> planItemInstances, String name) {
+        List<String> planItemInstanceStates = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .map(PlanItemInstance::getState)
+            .collect(Collectors.toList());
+
+        if (!planItemInstanceStates.isEmpty()) {
+            fail(planItemInstanceStates.size() + " plan item instance(s) found with name " + name + ", but should be 0");
         }
     }
 
