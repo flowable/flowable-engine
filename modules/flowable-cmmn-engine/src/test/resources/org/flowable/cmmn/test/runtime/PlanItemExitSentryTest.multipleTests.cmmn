@@ -30,8 +30,8 @@
                         <manualActivationRule></manualActivationRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry2"></entryCriterion>
-                    <exitCriterion id="exitCriterion2" flowable:sentryRef="sentry3"></exitCriterion>
-                    <exitCriterion id="exitCriterion3" flowable:sentryRef="sentry4"></exitCriterion>
+                    <exitCriterion id="exitCriterion2" flowable:sentryRef="sentry3" flowable:exitType="activeInstances"></exitCriterion>
+                    <exitCriterion id="exitCriterion3" flowable:sentryRef="sentry4" flowable:exitType="activeAndEnabledInstances"></exitCriterion>
                 </planItem>
                 <planItem id="planItem4" name="Kill active tasks B" definitionRef="userEventListener2">
                     <itemControl>
@@ -153,6 +153,7 @@
                         <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
                         <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
                         <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                        <flowable:planItemLifecycleListener targetState="enabled" expression="${planItemInstance.setVariable('enableTaskB', false)}"></flowable:planItemLifecycleListener>
                     </extensionElements>
                 </humanTask>
                 <userEventListener id="userEventListener2" name="Kill active tasks B">

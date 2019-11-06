@@ -168,12 +168,17 @@ public abstract class AbstractFlowableCmmnTestCase {
     }
 
     protected String getPlanItemInstanceIdByName(List<PlanItemInstance> planItemInstances, String name) {
-        return getPlanItemInstanceByName(planItemInstances, name).getId();
+        return getPlanItemInstanceByName(planItemInstances, name, null).getId();
     }
 
-    protected PlanItemInstance getPlanItemInstanceByName(List<PlanItemInstance> planItemInstances, String name) {
+    protected String getPlanItemInstanceIdByNameAndState(List<PlanItemInstance> planItemInstances, String name, String state) {
+        return getPlanItemInstanceByName(planItemInstances, name, state).getId();
+    }
+
+    protected PlanItemInstance getPlanItemInstanceByName(List<PlanItemInstance> planItemInstances, String name, String state) {
         List<PlanItemInstance> matchingPlanItemInstances = planItemInstances.stream()
             .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .filter(planItemInstance -> state != null ? Objects.equals(state, planItemInstance.getState()) : true)
             .collect(Collectors.toList());
 
         if (matchingPlanItemInstances.isEmpty()) {
