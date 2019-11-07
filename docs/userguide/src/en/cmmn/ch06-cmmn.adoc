@@ -1081,6 +1081,40 @@ To summarize:
     2. It is not marked as _autoComplete_ and all remaining child plan items are in *AVAILABLE* state and are _completionNeutral_ and not _required_
     3. It is _autoComplete_ and all remaining plan items are _not required_ in *ENABLED* or *AVAILABLE* state (regardless of its completion neutrality, as required rule gets precedence)
 
+
+==== Item control: Parent Completion Rule
+
+In addition to the _completion neutral rule_ (which is going to be deprecated), the _parent completion rule_ offers way more flexibility whenever it comes down to evaluating a stage or the case plan model to be completable.
+There is the _auto complete_ possibility to automatically complete a stage whenever all the required and active work is done, but sometimes, you want a more fine-grained way on how existing plan item instances get treated around the evaluation of its parent being completable.
+With the parent completion rule, you can define the behavior of a plan item on its parent completion evaluation.
+
+Here is a list of types currently supported for the parent completion rule:
+
+* *default*: Use this value if the default behavior is required according the CMMN specification.
+* *ignore*: With this value, the plan item is fully ignored when it is evaluated for its parent completion state. This is particularly useful, if you have plan items (e.g. a case page) to be ignored completely as they don't have an impact on the case execution or stage completion evaluation.
+* *ignoreIfAvailable*: With this value, the plan item only gets ignored, if it is in _available_ state, but will prevent the stage from being completed, if it is _active_ or _enabled_.
+* *ignoreIfAvailableOrEnabled*: This value includes the _enabled_ (waiting for manual activation) state to be ignored, only an _active_ instance will prevent the stage from being completed.
+* *ignoreAfterFirstCompletion*: This value is interesting for instance if you have a user task which has repetition and you want to make sure, it was completed at least once, but afterwards, it must not prevent its parent from being completed, even if it is _active_.
+* *ignoreAfterFirstCompletionIfAvailableOrEnabled*: In contrast to the previous one, use this value, if you want a plan item being ignored after its first completion, if it is in _available_ or _enabled_ state, but is currently not _active_.
+
+Here is an example on how to use the *parent completion rule* for a plan item. This example uses it in combination with repetition, the required rule and even manual activation.
+So it will prevent it's parent from being completed, if it was not started and completed at least once, but no longer, if it was completed once and is not in _active_ state afterwards.
+
+[source,xml,linenums]
+----
+<planItem id="planItem1" name="Task A" definitionRef="humanTask1">
+    <itemControl>
+        <extensionElements>
+            <flowable:parentCompletionRule type="ignoreAfterFirstCompletionIfAvailableOrEnabled" />
+        </extensionElements>
+        <repetitionRule></repetitionRule>
+        <requiredRule></requiredRule>
+        <manualActivationRule></manualActivationRule>
+    </itemControl>
+</planItem>
+----
+
+
 [[cmmn_sentry_evaluation]]
 === Sentry evaluation
 
