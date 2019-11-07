@@ -768,6 +768,89 @@ An exit criterion is visualized as a diamond shape (white color inside) on the b
 
 image::images/cmmn.exitcriteria.png[align="center"]
 
+Beyond the specification, Flowable supports additional attributes on an exit sentry which adds more flexibility and options on how a plan item is terminated when the exit sentry triggers.
+
+====== exitType
+This attribute can be used for exit sentries on plan items, not stages or the case plan model though, and helps define how to exit the plan item.
+It particularly makes sense in combination with repetition. A possible use case might be that you want to terminate active instances of a repetitive plan item, but maybe later on it becomes available again as the conditions change in the case. With the exit type other than the default, this is possible as the plan item is not terminated for good, but only active or active and enabled instances.
+
+Possible values are:
+
+* *default*: The default exit type works as the spec says, it will terminate (exit) the plan item and all not yet finished instances as well.
+* *activeInstances*: If this exit type is chosen, the exit sentry only terminates active instances, but leaves enabled, available ones in place, so they can become active later on.
+* *activeAndEnabledInstances*: In addition to the previous one, this exit type also terminates enabled instances (e.g. ready for manual activation), but leaves available ones in place.
+
+Example of an extended exit sentry on a human task:
+
+[source,xml,linenums]
+----
+<planItem id="planItem1" name="Task 1" definitionRef="humanTask1">
+    <itemControl>
+        <repetitionRule></repetitionRule>
+    </itemControl>
+    <exitCriterion id="exitCriterion1" sentryRef="sentry1" flowable:exitType="activeAndEnabledInstances"></exitCriterion>
+</planItem>
+----
+
+====== exitEventType
+This attribute can be used for exit sentries on stages or the case plan model as it offers an alternative exit than terminate. Imagine a stage where you don't want to put autocompletion on, but rather have a user listener becoming available whenever the stage is completable and let the user decide when the stage should actually complete by triggering an exit sentry on the stage.
+Using this combination according to spec will exit the stage and leave it in terminated state and triggering the exit event for further processing.
+Maybe not what you want. With the _exitEventType_ you can specify how the stage is exiting other than the default behavior.
+
+Possible values are:
+
+* *exit* This is the default behavior compliant to the spec. It will terminate the stage and all of its children and leave it _terminated_ state, using _exit_ as the event type being triggered.
+* *complete* This value can be used to terminate the stage, but leave it in _completed_ state (instead of _terminated_) and trigger the _complete_ event, instead of the _exit_ one. Basically, this behavior is exactly the same as if the stage would have been auto-completed. The engine will throw an exception, if the stage is not completable at the moment the exit sentry with this exit event type is triggered.
+* *forceComplete* This value is similar to the _complete_ one, but does not check the stage to be completable upfront, but forces it to complete, even if there are still active child plan items at the moment the exit sentry is triggered. They will be terminated first, then the stage completes with _complete_ event and be left in _completed_ state.
+
+Full example on how to use the exit event type attribute in combination with a user listener to manually complete the stage.
+It contains two important parts: the _flowable:exitEventType="complete"_ attribute on the exit criterion and the _flowable:availableCondition="${cmmn:isStageCompletable()}"_ on the user event listener which makes the listener only available, if the stage is currently completable, otherwise it is unavailable.
+Once the user listener triggers, the exit sentry is executed and will complete the stage, not terminate it and leave it in _completed_ state, triggering the _complete_ event, not the _exit_ event.
+
+image::images/cmmn-exit-sentry-on-stage.png[align="center"]
+
+Here you find the CMMN model in XML:
+
+[source,xml,linenums]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+             xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+             xmlns:design="http://flowable.org/design"
+             targetNamespace="http://flowable.org/cmmn">
+  <case id="stageWithUserListenerForCompletion" name="Stage with user listener for completion">
+    <casePlanModel id="casePlanModel1" name="Case plan model">
+      <planItem id="planItem4" definitionRef="expandedStage1">
+        <exitCriterion id="exitCriterion1" flowable:sentryRef="sentry1" flowable:exitEventType="complete"></exitCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem3">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <stage id="expandedStage1" name="Stage A">
+        <planItem id="planItem1" name="Task A" definitionRef="humanTask1"></planItem>
+        <planItem id="planItem2" name="Task B" definitionRef="humanTask2">
+          <itemControl>
+            <repetitionRule></repetitionRule>
+            <manualActivationRule></manualActivationRule>
+          </itemControl>
+        </planItem>
+        <planItem id="planItem3" name="Complete stage" definitionRef="userEventListener1"></planItem>
+        <humanTask id="humanTask1" name="Task A"></humanTask>
+        <humanTask id="humanTask2" name="Task B"></humanTask>
+        <userEventListener id="userEventListener1" name="Complete stage" flowable:availableCondition="${cmmn:isStageCompletable()}"></userEventListener>
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>
+----
+
+
 ==== Event Listeners
 
 ===== Timer Event Listener
