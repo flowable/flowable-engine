@@ -12,8 +12,6 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.flowable.cmmn.model.RepetitionRule.DEFAULT_REPETITION_ELEMENT_INDEX_VARIABLE_NAME;
-import static org.flowable.cmmn.model.RepetitionRule.DEFAULT_REPETITION_ELEMENT_VARIABLE_NAME;
 import static org.flowable.cmmn.model.RepetitionRule.DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE;
 import static org.flowable.cmmn.model.RepetitionRule.MAX_INSTANCE_COUNT_ONE;
 import static org.flowable.cmmn.model.RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED;
@@ -61,16 +59,16 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
         Map<String, CaseElement> caseElements = cmmnModel.getCases().get(0).getAllCaseElements();
 
         assertRepetitionRuleAttributes(caseElements, "Task A", null,
-            DEFAULT_REPETITION_ELEMENT_VARIABLE_NAME, DEFAULT_REPETITION_ELEMENT_INDEX_VARIABLE_NAME, DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE);
+            null, null, DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE);
 
         assertRepetitionRuleAttributes(caseElements, "Task B", null,
-            DEFAULT_REPETITION_ELEMENT_VARIABLE_NAME, DEFAULT_REPETITION_ELEMENT_INDEX_VARIABLE_NAME, MAX_INSTANCE_COUNT_ONE);
+            null, null, MAX_INSTANCE_COUNT_ONE);
 
         assertRepetitionRuleAttributes(caseElements, "Task C", null,
-            DEFAULT_REPETITION_ELEMENT_VARIABLE_NAME, DEFAULT_REPETITION_ELEMENT_INDEX_VARIABLE_NAME, MAX_INSTANCE_COUNT_UNLIMITED);
+            null, null, MAX_INSTANCE_COUNT_UNLIMITED);
 
         assertRepetitionRuleAttributes(caseElements, "Task D", null,
-            DEFAULT_REPETITION_ELEMENT_VARIABLE_NAME, DEFAULT_REPETITION_ELEMENT_INDEX_VARIABLE_NAME, DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE);
+            null, null, DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE);
 
         assertRepetitionRuleAttributes(caseElements, "Task E", "entriesForTaskE",
             "item", "itemIndex", DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE);
