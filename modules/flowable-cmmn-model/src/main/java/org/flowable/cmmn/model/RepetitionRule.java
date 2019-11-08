@@ -22,8 +22,6 @@ public class RepetitionRule extends PlanItemRule {
     public static final String MAX_INSTANCE_COUNT_UNLIMITED = "unlimited";
 
     public static final String DEFAULT_REPETITION_COUNTER_VARIABLE_NAME = "repetitionCounter";
-    public static final String DEFAULT_REPETITION_ELEMENT_VARIABLE_NAME = "item";
-    public static final String DEFAULT_REPETITION_ELEMENT_INDEX_VARIABLE_NAME = "itemIndex";
     public static final String DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE = MAX_INSTANCE_COUNT_ONE;
 
     protected String repetitionCounterVariableName;
@@ -52,9 +50,6 @@ public class RepetitionRule extends PlanItemRule {
     }
 
     public String getElementVariableName() {
-        if (elementVariableName == null) {
-            return DEFAULT_REPETITION_ELEMENT_VARIABLE_NAME;
-        }
         return elementVariableName;
     }
 
@@ -63,9 +58,6 @@ public class RepetitionRule extends PlanItemRule {
     }
 
     public String getElementIndexVariableName() {
-        if (elementIndexVariableName == null) {
-            return DEFAULT_REPETITION_ELEMENT_INDEX_VARIABLE_NAME;
-        }
         return elementIndexVariableName;
     }
 
