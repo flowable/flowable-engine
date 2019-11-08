@@ -22,7 +22,6 @@ public class RepetitionRule extends PlanItemRule {
     public static final String MAX_INSTANCE_COUNT_UNLIMITED = "unlimited";
 
     public static final String DEFAULT_REPETITION_COUNTER_VARIABLE_NAME = "repetitionCounter";
-    public static final String DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE = MAX_INSTANCE_COUNT_ONE;
 
     protected String repetitionCounterVariableName;
     protected String collectionVariableName;
@@ -66,9 +65,6 @@ public class RepetitionRule extends PlanItemRule {
     }
 
     public String getMaxInstanceCount() {
-        if (maxInstanceCount == null) {
-            return DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE;
-        }
         return maxInstanceCount;
     }
 
