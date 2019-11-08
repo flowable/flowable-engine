@@ -32,6 +32,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
+ * @author Micha Kiener
  */
 public class ExpressionUtil {
 
@@ -94,6 +95,13 @@ public class ExpressionUtil {
         return false;
     }
 
+    /**
+     * Searches for non-finished plan item instances within the given container to be of the same plan item as the given instance.
+     *
+     * @param planItemInstanceEntity the plan item instance to search for instances of the same plan item within the container
+     * @param planItemInstanceContainer the container to search for child plan item instances of the same plan item
+     * @return the list of equal plan item instances, might be empty, but never null
+     */
     public static List<PlanItemInstance> searchNonFinishedEqualPlanItemInstances(PlanItemInstanceEntity planItemInstanceEntity,
         PlanItemInstanceContainer planItemInstanceContainer) {
 
