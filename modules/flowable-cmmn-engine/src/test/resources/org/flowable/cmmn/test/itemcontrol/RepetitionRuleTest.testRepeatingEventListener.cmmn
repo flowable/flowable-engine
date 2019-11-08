@@ -4,13 +4,13 @@
     <casePlanModel id="casePlanModel" flowable:includeInStageOverview="false">
       <planItem id="planItem1" name="The task" definitionRef="sid-282C462F-EA10-4CA1-BB29-EBE4679E0A32">
         <itemControl>
-          <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited"></repetitionRule>
+          <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
         </itemControl>
         <entryCriterion id="sid-64C41403-6366-4F3F-AF18-A3BFAF3AA1F2" sentryRef="sentry1"></entryCriterion>
       </planItem>
       <planItem id="planItem2" definitionRef="sid-5825F740-94F7-4973-9DFA-805E3818284E">
         <itemControl>
-          <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited"></repetitionRule>
+          <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
         </itemControl>
       </planItem>
       <sentry id="sentry1">
