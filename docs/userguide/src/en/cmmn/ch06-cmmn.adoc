@@ -975,6 +975,46 @@ If the timer event listener is repeating (for example, _R/PT1H_), the _occur_ ev
 
 Note that Flowable allows to have repeating user and generic event listeners. This is contrary to the CMMN specification (which disallows it), but we believe it is needed for having a more flexible way of using event listeners (for example to model a case where a user might multiple times trigger an action that leads to the creation of tasks).
 
+===== Repetition Rule: Max instance count attribute
+
+There is an extended attribute in the Flowable CMMN model for the repetition rule to take more control about the number of concurrently active plan item instances.
+Let's assume you have a plan item with repetition and an entry sentry with a condition. According to the specification, this would create an endless number of plan item instances as long as the condition is true, which might not be the desired behavior.
+With the _maxInstanceCount_ attribute on the repetition rule, you can define, if there might be an unlimited number of instances (default according to the spec) or if there should be only one instance at a time.
+If you have repetition and set the _maxInstanceCount_ to _unlimited_, you need to control the condition in a way that it only creates as many instances as you want or combine it with an on-part (trigger) to only create a new instances whenever that trigger is fired.
+
+Example with a user task having repetition in combination with an entry sentry and a condition and making sure there is only one instance created at a time:
+
+[source,xml,linenums]
+----
+...
+<planItem id="planItem1" name="Task 1" definitionRef="humanTask1">
+  <itemControl>
+    <repetitionRule flowable:maxInstanceCount="one"></repetitionRule>
+  </itemControl>
+  <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry1"></entryCriterion>
+</planItem>
+<sentry id="sentry1">
+  <ifPart>
+    <condition><![CDATA[${vars:getOrDefault('enableTaskA', false)}]]></condition>
+  </ifPart>
+</sentry>
+...
+----
+
+Example with a user task having repetition and a repetition condition to control the number of instances being created (in this example 5 tasks will be created):
+
+[source,xml,linenums]
+----
+<planItem id="planItem1" name="Task 1" definitionRef="humanTask1">
+  <itemControl>
+    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited">
+      <condition><![CDATA[${vars:getOrDefault('repetitionCounter', 0) <= 5}]]></condition>
+    </repetitionRule>
+  </itemControl>
+</planItem>
+----
+
+
 ==== Item control: Manual Activation Rule
 
 Plan items on the case model can have a _manual activation rule_: an expression that can be used to indicate a certain plan item needs to be _manually activated by an end-user_.
