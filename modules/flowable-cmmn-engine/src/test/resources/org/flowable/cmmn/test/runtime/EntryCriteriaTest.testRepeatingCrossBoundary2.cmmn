@@ -4,7 +4,7 @@
     <casePlanModel id="casePlanModel" flowable:includeInStageOverview="false">
       <planItem id="planItem2" name="Stage One" definitionRef="sid-CAAA8230-0F80-4451-A5B9-6F0711C52982">
         <itemControl>
-          <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited"></repetitionRule>
+          <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
         </itemControl>
       </planItem>
       <planItem id="planItem6" name="Stage Two" definitionRef="sid-5EC86376-3F7A-414F-9755-F7D0D7241836">
@@ -31,7 +31,7 @@
         <stage id="sid-5314D089-0E04-4D33-B6E7-3E2ADB2B1BFF" name="Stage Three" flowable:includeInStageOverview="true">
           <planItem id="planItem3" name="B" definitionRef="sid-16E8682F-DB84-4BC1-BFB9-5ACAF5490D40">
             <itemControl>
-              <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited"></repetitionRule>
+              <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
             </itemControl>
             <entryCriterion id="sid-27E54D99-D6FE-4277-9028-E143818B6B90" sentryRef="sentry1"></entryCriterion>
             <entryCriterion id="oneentrycriterion1" sentryRef="sentry2"></entryCriterion>

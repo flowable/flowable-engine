@@ -65,7 +65,7 @@
                     <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
                     <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
                     <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
-                    <flowable:planItemLifecycleListener targetState="active" expression="${planItemInstance.setVariable('enableTaskB', false)}"></flowable:planItemLifecycleListener>
+                    <flowable:planItemLifecycleListener targetState="enabled" expression="${planItemInstance.setVariable('enableTaskB', false)}"></flowable:planItemLifecycleListener>
                 </extensionElements>
             </humanTask>
             <humanTask id="humanTask3" name="Task C" flowable:assignee="${initiator}" flowable:formFieldValidation="false">

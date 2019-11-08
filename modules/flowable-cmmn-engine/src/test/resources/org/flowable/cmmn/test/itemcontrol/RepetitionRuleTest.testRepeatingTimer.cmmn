@@ -5,7 +5,7 @@
       <planItem id="planItem1" definitionRef="sid-5427322D-539C-4DC0-AD47-6DA9421ED309"></planItem>
       <planItem id="planItem2" name="Task after timer" definitionRef="sid-2255BF13-E956-49AA-9054-F3EAD06DA08F">
         <itemControl>
-          <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="unlimited">
+          <repetitionRule flowable:counterVariable="repetitionCounter">
             <condition><![CDATA[${true}]]></condition>
           </repetitionRule>
         </itemControl>
