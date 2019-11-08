@@ -72,4 +72,42 @@ public class StageRepetitionMaxCountTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/StageRepetitionMaxCountTest.multipleTests.cmmn")
+    public void testMaxCountOneWithIfPartCombinationWithEventDeferred() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("stageWithRepetitionAndMaxInstanceCount").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(2, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+
+        // start Stage A which should start Task A as well
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "enableStageA", true);
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "enableStageB", true);
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+
+        // complete Task A which terminates Stage A and starts Stage B
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "enableStageA", false);
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+
+        // complete Task B
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task B", ACTIVE));
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+    }
 }
