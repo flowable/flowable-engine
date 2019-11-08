@@ -12,7 +12,6 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.flowable.cmmn.model.RepetitionRule.DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE;
 import static org.flowable.cmmn.model.RepetitionRule.MAX_INSTANCE_COUNT_ONE;
 import static org.flowable.cmmn.model.RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED;
 import static org.junit.Assert.assertEquals;
@@ -59,7 +58,7 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
         Map<String, CaseElement> caseElements = cmmnModel.getCases().get(0).getAllCaseElements();
 
         assertRepetitionRuleAttributes(caseElements, "Task A", null,
-            null, null, DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE);
+            null, null, null);
 
         assertRepetitionRuleAttributes(caseElements, "Task B", null,
             null, null, MAX_INSTANCE_COUNT_ONE);
@@ -68,10 +67,10 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
             null, null, MAX_INSTANCE_COUNT_UNLIMITED);
 
         assertRepetitionRuleAttributes(caseElements, "Task D", null,
-            null, null, DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE);
+            null, null, null);
 
         assertRepetitionRuleAttributes(caseElements, "Task E", "entriesForTaskE",
-            "item", "itemIndex", DEFAULT_REPETITION_MAX_INSTANCE_COUNT_VALUE);
+            "item", "itemIndex", null);
     }
 
     protected void assertRepetitionRuleAttributes(Map<String, CaseElement> caseElements, String planItemName,
