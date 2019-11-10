@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -24,8 +25,10 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
+import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskAfterContext;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskBeforeContext;
 import org.flowable.cmmn.model.HumanTask;
@@ -36,11 +39,16 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
+import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -91,6 +99,25 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleCategory(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
 
             TaskHelper.insertTask(taskEntity, true);
+            
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_CREATE, "Human task '" + 
+                                taskEntity.getName() + "' created", taskEntity, planItemInstanceEntity);
+                
+                if (StringUtils.isNotEmpty(taskEntity.getAssignee())) {
+                    ObjectNode loggingNode = CmmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task assignee value to " + 
+                                    taskEntity.getAssignee(), taskEntity, planItemInstanceEntity);
+                    loggingNode.put("taskAssignee", taskEntity.getAssignee());
+                    LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_ASSIGNEE, loggingNode);
+                }
+                
+                if (StringUtils.isNotEmpty(taskEntity.getOwner())) {
+                    ObjectNode loggingNode = CmmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task owner value to " + 
+                                    taskEntity.getOwner(), taskEntity, planItemInstanceEntity);
+                    loggingNode.put("taskOwner", taskEntity.getOwner());
+                    LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_OWNER, loggingNode);
+                }
+            }
 
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
@@ -251,45 +278,77 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         }
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void handleCandidateUsers(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
         
         List<String> candidateUsers = beforeContext.getCandidateUsers();
         if (candidateUsers != null && !candidateUsers.isEmpty()) {
+            List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
             for (String candidateUser : candidateUsers) {
                 Expression userIdExpr = expressionManager.createExpression(candidateUser);
                 Object value = userIdExpr.getValue(planItemInstanceEntity);
+                List<IdentityLinkEntity> identityLinkEntities = null;
                 if (value instanceof String) {
                     List<String> candidates = extractCandidates((String) value);
-                    taskEntity.addCandidateUsers(candidates);
+                    identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(taskEntity.getId(), candidates);
 
                 } else if (value instanceof Collection) {
-                    taskEntity.addCandidateUsers((Collection<String>) value);
+                    identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(taskEntity.getId(), (Collection) value);
 
                 } else {
                     throw new FlowableException("Expression did not resolve to a string or collection of strings");
+                }
+                
+                if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, identityLinkEntities);
+                    allIdentityLinkEntities.addAll(identityLinkEntities);
+                }
+            }
+            
+            if (!allIdentityLinkEntities.isEmpty()) {
+                if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+                    CmmnLoggingSessionUtil.addTaskIdentityLinkData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS, 
+                                    "Added " + allIdentityLinkEntities.size() + " candidate user identity links to task", true,
+                                    allIdentityLinkEntities, taskEntity, planItemInstanceEntity);
                 }
             }
         }
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void handleCandidateGroups(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
             ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
         
         List<String> candidateGroups = beforeContext.getCandidateGroups();
         if (candidateGroups != null && !candidateGroups.isEmpty()) {
+            List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
             for (String candidateGroup : candidateGroups) {
                 Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
                 Object value = groupIdExpr.getValue(planItemInstanceEntity);
+                List<IdentityLinkEntity> identityLinkEntities = null;
                 if (value instanceof String) {
                     List<String> candidates = extractCandidates((String) value);
-                    taskEntity.addCandidateGroups(candidates);
+                    identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(taskEntity.getId(), candidates);
 
                 } else if (value instanceof Collection) {
-                    taskEntity.addCandidateGroups((Collection<String>) value);
+                    identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(taskEntity.getId(), (Collection) value);
 
                 } else {
                     throw new FlowableIllegalArgumentException("Expression did not resolve to a string or collection of strings");
+                }
+                
+                if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, identityLinkEntities);
+                    allIdentityLinkEntities.addAll(identityLinkEntities);
+                }
+            }
+            
+            if (!allIdentityLinkEntities.isEmpty()) {
+                if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+                    CmmnLoggingSessionUtil.addTaskIdentityLinkData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS, 
+                                    "Added " + allIdentityLinkEntities.size() + " candidate group identity links to task", true,
+                                    allIdentityLinkEntities, taskEntity, planItemInstanceEntity);
                 }
             }
         }

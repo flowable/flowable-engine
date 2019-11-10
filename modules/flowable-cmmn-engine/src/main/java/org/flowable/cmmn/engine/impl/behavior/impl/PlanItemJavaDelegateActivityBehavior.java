@@ -13,10 +13,13 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 
 /**
  * @author Joram Barrez
@@ -31,7 +34,19 @@ public class PlanItemJavaDelegateActivityBehavior extends CoreCmmnActivityBehavi
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+            CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_ENTER, 
+                            "Executing service task with java class " + planItemJavaDelegate.getClass().getName(), planItemInstanceEntity);
+        }
+        
         planItemJavaDelegate.execute(planItemInstanceEntity);
+        
+        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+            CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT, 
+                            "Executed service task with java class " + planItemJavaDelegate.getClass().getName(), planItemInstanceEntity);
+        }
+        
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 

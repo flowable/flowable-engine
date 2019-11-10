@@ -13,9 +13,11 @@
 package org.flowable.cmmn.engine.impl.job;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -35,7 +37,14 @@ public class AsyncActivatePlanItemInstanceJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         if (variableScope instanceof PlanItemInstanceEntity) {
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
+            if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Executing async job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),
+                                CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_EXECUTE_ASYNC_JOB, job, planItemInstanceEntity.getPlanItemDefinition(), planItemInstanceEntity);
+            }
+            
             CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation((PlanItemInstanceEntity) variableScope, configuration); // configuration == entryCriterionId
+            
         } else {
             throw new FlowableException("Invalid usage of " + TYPE + " job handler, variable scope is of type " + variableScope.getClass());
         }

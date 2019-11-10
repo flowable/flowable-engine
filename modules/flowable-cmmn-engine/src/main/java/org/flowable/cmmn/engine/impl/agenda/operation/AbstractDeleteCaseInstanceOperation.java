@@ -14,11 +14,14 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 
 /**
  * @author Joram Barrez
@@ -42,6 +45,16 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     protected void deleteCaseInstance() {
         updateChildPlanItemInstancesState();
         CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntity.getId(), false, getDeleteReason());
+        
+        if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+            String loggingType = null;
+            if (CaseInstanceState.TERMINATED.equals(getNewState())) {
+                loggingType = CmmnLoggingSessionConstants.TYPE_CASE_TERMINATED;
+            } else {
+                loggingType = CmmnLoggingSessionConstants.TYPE_CASE_COMPLETED;
+            }
+            CmmnLoggingSessionUtil.addLoggingData(loggingType, "Completed case instance with id " + caseInstanceEntity.getId(), caseInstanceEntity);
+        }
         
         String newState = getNewState();
         CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
