@@ -107,6 +107,8 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.flowable").artifactId("flowable-job-service").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-batch-service").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-batch-service-api").versionAsInProject(),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-event-registry-api").versionAsInProject(),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-event-registry").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-cmmn-model").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-cmmn-api").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-engine").versionAsInProject(),
