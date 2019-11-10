@@ -75,7 +75,7 @@ The base exception in Flowable is the org.flowable.engine.FlowableException, an 
 
 In the example above, when an id is passed for which no task exists, an exception will be thrown. Also, since the javadoc **explicitly states that taskId cannot be null, an FlowableIllegalArgumentException will be thrown when null is passed**.
 
-Even though we want to avoid a big exception hierarchy, the following subclasses are thrown in specific cases. All other errors that occur during process-execution or API-invocation that don’t fit into the possible exceptions below, are thrown as regular FlowableExceptionss.
+Even though we want to avoid a big exception hierarchy, the following subclasses are thrown in specific cases. All other errors that occur during process-execution or API-invocation that don’t fit into the possible exceptions below, are thrown as regular FlowableExceptions.
 
 -   FlowableWrongDbException: Thrown when the Flowable engine discovers a mismatch between the database schema version and the engine version.
 
