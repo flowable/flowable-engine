@@ -17,14 +17,14 @@
                 <planItem id="planItem4" name="Case Page Task One" definitionRef="casePageTask1">
                     <itemControl>
                         <extensionElements>
-                            <flowable:parentCompletionRule type="alwaysIgnore" />
+                            <flowable:parentCompletionRule type="ignore" />
                         </extensionElements>
                     </itemControl>
                 </planItem>
 
                 <task id="nestedTask" name="Nested Task" isBlocking="true" />
                 
-                <task id="casePageTask1" name="Page 1" flowable:type="casePage" />
+                <task id="casePageTask1" name="Page 1" flowable:type="casePage" flowable:formKey="${keyVar}" />
 
             </stage>
 

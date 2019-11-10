@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 
 import java.time.Instant;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -155,9 +156,80 @@ public abstract class AbstractFlowableCmmnTestCase {
         }
 
         assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
+        List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
-            assertTrue("State '" + state + "' not found in plan item instances states '" + planItemInstanceStates + "'", planItemInstanceStates.contains(state));
+            assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
         }
+    }
+
+    protected void assertNoPlanItemInstance(List<PlanItemInstance> planItemInstances, String name) {
+        List<String> planItemInstanceStates = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .map(PlanItemInstance::getState)
+            .collect(Collectors.toList());
+
+        if (!planItemInstanceStates.isEmpty()) {
+            fail(planItemInstanceStates.size() + " plan item instance(s) found with name " + name + ", but should be 0");
+        }
+    }
+
+    protected List<PlanItemInstance> getAllPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .orderByEndTime().asc()
+            .includeEnded()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getCompletedPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceStateCompleted()
+            .includeEnded()
+            .orderByName().asc()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getTerminatedPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .planItemInstanceStateTerminated()
+            .includeEnded()
+            .list();
+    }
+
+    protected String getPlanItemInstanceIdByName(List<PlanItemInstance> planItemInstances, String name) {
+        return getPlanItemInstanceByName(planItemInstances, name, null).getId();
+    }
+
+    protected String getPlanItemInstanceIdByNameAndState(List<PlanItemInstance> planItemInstances, String name, String state) {
+        return getPlanItemInstanceByName(planItemInstances, name, state).getId();
+    }
+
+    protected PlanItemInstance getPlanItemInstanceByName(List<PlanItemInstance> planItemInstances, String name, String state) {
+        List<PlanItemInstance> matchingPlanItemInstances = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .filter(planItemInstance -> state != null ? Objects.equals(state, planItemInstance.getState()) : true)
+            .collect(Collectors.toList());
+
+        if (matchingPlanItemInstances.isEmpty()) {
+            fail("No plan item instances found with name " + name);
+        }
+
+        if (matchingPlanItemInstances.size() > 1) {
+            fail("Found " + matchingPlanItemInstances.size() + " plan item instances with name " + name);
+        }
+
+        return matchingPlanItemInstances.get(0);
     }
 
     protected void waitForJobExecutorToProcessAllJobs() {

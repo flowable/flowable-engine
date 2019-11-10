@@ -32,15 +32,14 @@ public abstract class AbstractCaseInstanceOperation extends CmmnOperation {
     
     @Override
     public void run() {
-        if (caseInstanceEntity == null) {
-            caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceEntityId);
-        }
-        if (caseInstanceEntityId == null) {
-            caseInstanceEntityId = caseInstanceEntity.getId();
-        }
+        getCaseInstanceEntity();
+        getCaseInstanceEntityId();
     }
 
     public String getCaseInstanceEntityId() {
+        if (caseInstanceEntityId == null) {
+            caseInstanceEntityId = caseInstanceEntity.getId();
+        }
         return caseInstanceEntityId;
     }
 
@@ -49,6 +48,9 @@ public abstract class AbstractCaseInstanceOperation extends CmmnOperation {
     }
 
     public CaseInstanceEntity getCaseInstanceEntity() {
+        if (caseInstanceEntity == null) {
+            caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceEntityId);
+        }
         return caseInstanceEntity;
     }
 

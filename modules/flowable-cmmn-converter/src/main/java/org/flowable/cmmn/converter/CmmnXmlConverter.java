@@ -510,15 +510,13 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
             } else if (planItemDefinition instanceof CasePageTask) {
                 // check, if the parent completion rule is set and if not, set it to the default value for a case page which is always ignore
-                CasePageTask casePageTask = (CasePageTask) planItemDefinition;
-
                 if (planItem.getItemControl() == null) {
                     PlanItemControl planItemControl = new PlanItemControl();
                     planItem.setItemControl(planItemControl);
                 }
                 if (planItem.getItemControl().getParentCompletionRule() == null) {
                     ParentCompletionRule parentCompletionRule = new ParentCompletionRule();
-                    parentCompletionRule.setType(ParentCompletionRule.ALWAYS_IGNORE);
+                    parentCompletionRule.setType(ParentCompletionRule.IGNORE);
 
                     planItem.getItemControl().setParentCompletionRule(parentCompletionRule);
                 }

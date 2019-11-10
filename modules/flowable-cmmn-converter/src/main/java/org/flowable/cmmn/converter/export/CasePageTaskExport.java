@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import java.util.List;
+
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +33,10 @@ public class CasePageTaskExport extends AbstractPlanItemDefinitionExport<CasePag
 
         xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE, CasePageTask.TYPE);
         
+        if (StringUtils.isNotEmpty(casePageTask.getFormKey())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, casePageTask.getFormKey());
+        }
+        
         if (StringUtils.isNotEmpty(casePageTask.getLabel())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_LABEL, casePageTask.getLabel());
         }
@@ -38,10 +44,41 @@ public class CasePageTaskExport extends AbstractPlanItemDefinitionExport<CasePag
         if (StringUtils.isNotEmpty(casePageTask.getIcon())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_ICON, casePageTask.getIcon());
         }
+        
+        if (StringUtils.isNotEmpty(casePageTask.getAssignee())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_ASSIGNEE, casePageTask.getAssignee());
+        }
+        
+        if (StringUtils.isNotEmpty(casePageTask.getOwner())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_OWNER, casePageTask.getOwner());
+        }
+        
+        if (casePageTask.getCandidateUsers() != null && !casePageTask.getCandidateUsers().isEmpty()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CANDIDATE_USERS,
+                    convertListToCommaSeparatedString(casePageTask.getCandidateUsers()));
+        }
+
+        if (casePageTask.getCandidateGroups() != null && !casePageTask.getCandidateGroups().isEmpty()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CANDIDATE_GROUPS,
+                    convertListToCommaSeparatedString(casePageTask.getCandidateGroups()));
+        }
     }
 
     @Override
     protected Class<? extends CasePageTask> getExportablePlanItemDefinitionClass() {
         return CasePageTask.class;
+    }
+    
+    protected static String convertListToCommaSeparatedString(List<String> values) {
+        StringBuilder valueBuilder = new StringBuilder();
+        for (String value : values) {
+            if (valueBuilder.length() > 0) {
+                valueBuilder.append(",");
+            }
+
+            valueBuilder.append(value);
+        }
+
+        return valueBuilder.toString();
     }
 }

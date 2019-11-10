@@ -12,13 +12,21 @@
  */
 package org.flowable.cmmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CasePageTask extends Task {
 
     public static final String TYPE = "casePage";
     
     protected String type;
+    protected String formKey;
     protected String label;
     protected String icon;
+    protected String assignee;
+    protected String owner;
+    protected List<String> candidateUsers = new ArrayList<>();
+    protected List<String> candidateGroups = new ArrayList<>();
 
     public CasePageTask() {
         type = TYPE;
@@ -48,6 +56,46 @@ public class CasePageTask extends Task {
         this.icon = icon;
     }
 
+    public String getFormKey() {
+        return formKey;
+    }
+
+    public void setFormKey(String formKey) {
+        this.formKey = formKey;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public List<String> getCandidateUsers() {
+        return candidateUsers;
+    }
+
+    public void setCandidateUsers(List<String> candidateUsers) {
+        this.candidateUsers = candidateUsers;
+    }
+
+    public List<String> getCandidateGroups() {
+        return candidateGroups;
+    }
+
+    public void setCandidateGroups(List<String> candidateGroups) {
+        this.candidateGroups = candidateGroups;
+    }
+
     @Override
     public CasePageTask clone() {
         CasePageTask clone = new CasePageTask();
@@ -59,8 +107,14 @@ public class CasePageTask extends Task {
         super.setValues(otherElement);
         
         setType(otherElement.getType());
+        setFormKey(otherElement.getFormKey());
         setLabel(otherElement.getLabel());
         setIcon(otherElement.getIcon());
+        setAssignee(otherElement.getAssignee());
+        setOwner(otherElement.getOwner());
+        
+        setCandidateGroups(new ArrayList<>(otherElement.getCandidateGroups()));
+        setCandidateUsers(new ArrayList<>(otherElement.getCandidateUsers()));
     }
 
 }

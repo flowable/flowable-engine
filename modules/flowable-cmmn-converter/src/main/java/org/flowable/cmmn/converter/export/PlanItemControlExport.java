@@ -27,6 +27,7 @@ import org.flowable.cmmn.model.RequiredRule;
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Micha Kiener
  */
 public class PlanItemControlExport implements CmmnXmlConstants {
 
@@ -72,6 +73,22 @@ public class PlanItemControlExport implements CmmnXmlConstants {
             if (StringUtils.isNotEmpty(repetitionRule.getRepetitionCounterVariableName())) {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
                         ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
+            }
+            if (StringUtils.isNotEmpty(repetitionRule.getMaxInstanceCount())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME, repetitionRule.getMaxInstanceCount());
+            }
+            if (StringUtils.isNotEmpty(repetitionRule.getCollectionVariableName())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_REPETITION_COLLECTION_VARIABLE_NAME, repetitionRule.getCollectionVariableName());
+            }
+            if (StringUtils.isNotEmpty(repetitionRule.getElementVariableName())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_REPETITION_ELEMENT_VARIABLE_NAME, repetitionRule.getElementVariableName());
+            }
+            if (StringUtils.isNotEmpty(repetitionRule.getElementIndexVariableName())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME, repetitionRule.getElementIndexVariableName());
             }
             if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
                 xtw.writeStartElement(ELEMENT_CONDITION);

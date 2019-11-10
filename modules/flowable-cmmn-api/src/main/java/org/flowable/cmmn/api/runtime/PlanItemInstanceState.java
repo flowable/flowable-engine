@@ -53,7 +53,11 @@ public interface PlanItemInstanceState {
      */
     String ASYNC_ACTIVE = "async-active";
 
+    Set<String> ACTIVE_STATES = new HashSet<>(Arrays.asList(ACTIVE, ASYNC_ACTIVE));
+
     Set<String> EVALUATE_ENTRY_CRITERIA_STATES = new HashSet<>(Arrays.asList(AVAILABLE, WAITING_FOR_REPETITION));
+
+    Set<String> EVALUATE_STATES = new HashSet<>(Arrays.asList(AVAILABLE, UNAVAILABLE, WAITING_FOR_REPETITION));
 
     Set<String> TERMINAL_STATES = new HashSet<>(Arrays.asList(COMPLETED, TERMINATED, FAILED));
 

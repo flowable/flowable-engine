@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
@@ -43,8 +44,10 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         String originalState = planItemInstanceEntity.getState();
 
         super.run();
+
+        String plannedNewState = getNewState();
         
-        if (isRepeatingOnDelete(originalState) && !isWaitingForRepetitionPlanItemInstanceExists(planItemInstanceEntity)) {
+        if (isRepeatingOnDelete(originalState, plannedNewState) && !isWaitingForRepetitionPlanItemInstanceExists(planItemInstanceEntity)) {
 
             // Create new repeating instance
             PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true);
@@ -79,7 +82,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     @Override
     protected abstract void internalExecute();
 
-    protected boolean isRepeatingOnDelete(String originalState) {
+    protected boolean isRepeatingOnDelete(String originalState, String newState) {
         
         // If there are no entry criteria and the repetition rule evaluates to true: a new instance needs to be created.
 
@@ -90,15 +93,16 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         if (isEvaluateRepetitionRule() && hasRepetitionRuleAndNoEntryCriteria(planItem)) {
-            return evaluateRepetitionRule(planItemInstanceEntity);
+            return ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity);
         }
 
-        // If the plan item instance is in AVAILABLE, and it's repeatable and it gets terminated
+        // If the plan item instance is in AVAILABLE (and the new state is terminated), and it's repeatable and it gets terminated
         // this means it has never moved away from available.
         // This means there never was a wait_for_repetition instance created (because the plan item instance
         // never goes back to available but to wait_for_repetition).
         // In this specific case, we need to create the wait_for_repetition for future repetitions
         if (PlanItemInstanceState.AVAILABLE.equals(originalState)
+                && PlanItemInstanceState.TERMINATED.equals(newState)
                 && hasRepetitionRuleEntryCriteria(planItem)
                 && isWithoutStageOrParentIsNotTerminated(planItemInstanceEntity)) { // only when the parent is not yet terminated, a new instance should be created
             return true; // the repetition rule doesn't matter, as it can happen on any entry condition that becomes true
@@ -158,7 +162,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     protected void exitChildPlanItemInstances(String exitCriterionId) {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
             if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId);
+                // don't propagate the exit event type and exit type to child plan items, it only has an impact where it was set using the exit sentry
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId, null, null);
             }
         }
     }

@@ -528,7 +528,7 @@ public class CmmnRestResponseFactory {
         result.setCreateTime(planItemInstance.getCreateTime());
         result.setStartUserId(planItemInstance.getStartUserId());
         result.setStage(planItemInstance.isStage());
-        result.setCompleteable(planItemInstance.isCompleteable());
+        result.setCompleteable(planItemInstance.isCompletable());
         result.setTenantId(planItemInstance.getTenantId());
 
         return result;

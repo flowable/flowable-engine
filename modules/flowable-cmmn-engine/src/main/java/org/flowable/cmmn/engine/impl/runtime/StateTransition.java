@@ -42,7 +42,6 @@ public class StateTransition {
                 PlanItemTransition.START, 
                 PlanItemTransition.ENABLE, 
                 PlanItemTransition.PARENT_SUSPEND, 
-                PlanItemTransition.COMPLETE,
                 PlanItemTransition.EXIT);
         
         addPlanItemTransition(PlanItemInstanceState.ENABLED,

@@ -32,6 +32,7 @@ public class HistoricIdentityLinkEntityImpl extends AbstractIdentityLinkServiceN
     protected String taskId;
     protected String processInstanceId;
     protected String scopeId;
+    protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
     protected Date createTime;
@@ -64,6 +65,10 @@ public class HistoricIdentityLinkEntityImpl extends AbstractIdentityLinkServiceN
         
         if (this.scopeId != null) {
             persistentState.put("scopeId", this.scopeId);
+        }
+        
+        if (this.subScopeId != null) {
+            persistentState.put("subScopeId", this.subScopeId);
         }
         
         if (this.scopeType!= null) {
@@ -155,6 +160,16 @@ public class HistoricIdentityLinkEntityImpl extends AbstractIdentityLinkServiceN
     @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
+    }
+    
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
     }
 
     @Override

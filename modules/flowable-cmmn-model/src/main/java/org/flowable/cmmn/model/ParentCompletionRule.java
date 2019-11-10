@@ -15,11 +15,12 @@ package org.flowable.cmmn.model;
 public class ParentCompletionRule extends PlanItemRule {
     
     public final static String DEFAULT = "default";
-    public final static String ALWAYS_IGNORE = "alwaysIgnore";
+    public final static String IGNORE = "ignore";
     public final static String IGNORE_IF_AVAILABLE = "ignoreIfAvailable";
     public final static String IGNORE_IF_AVAILABLE_OR_ENABLED = "ignoreIfAvailableOrEnabled";
-    public final static String ALWAYS_IGNORE_AFTER_FIRST_COMPLETION = "alwaysIgnoreAfterFirstCompletion";
-    
+    public final static String IGNORE_AFTER_FIRST_COMPLETION = "ignoreAfterFirstCompletion";
+    public final static String IGNORE_AFTER_FIRST_COMPLETION_IF_AVAILABLE_OR_ENABLED = "ignoreAfterFirstCompletionIfAvailableOrEnabled";
+
     protected String type;
     
     public String getType() {

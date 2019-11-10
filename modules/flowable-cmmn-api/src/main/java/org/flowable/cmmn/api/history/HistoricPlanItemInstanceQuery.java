@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.api.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +39,10 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     HistoricPlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
     HistoricPlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId);
+    HistoricPlanItemInstanceQuery planItemInstanceFormKey(String formKey);
+    HistoricPlanItemInstanceQuery planItemInstanceExtraValue(String extraValue);
+    HistoricPlanItemInstanceQuery involvedUser(String involvedUser);
+    HistoricPlanItemInstanceQuery involvedGroups(Collection<String> involvedGroups);
     HistoricPlanItemInstanceQuery onlyStages();
     HistoricPlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId();

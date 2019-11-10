@@ -280,6 +280,11 @@ public interface CmmnRuntimeService {
     List<IdentityLink> getIdentityLinksForCaseInstance(String instanceId);
     
     /**
+     * Retrieves the {@link IdentityLink}s associated with the given plan item instance. Such an identity link informs how a certain user is involved with a plan item instance.
+     */
+    List<IdentityLink> getIdentityLinksForPlanItemInstance(String instanceId);
+    
+    /**
      * Retrieves the {@link EntityLink}s associated with the given case instance.
      */
     List<EntityLink> getEntityLinkChildrenForCaseInstance(String instanceId);

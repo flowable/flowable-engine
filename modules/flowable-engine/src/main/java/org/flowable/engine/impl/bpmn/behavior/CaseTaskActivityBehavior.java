@@ -19,9 +19,11 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.IOParameter;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -127,8 +129,22 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
             EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), caseInstanceId, ScopeTypes.CMMN);
         }
 
-        caseInstanceService.startCaseInstanceByKey(caseServiceTask.getCaseDefinitionKey(), caseInstanceId,
+        String caseDefinitionKey = getCaseDefinitionKey(caseServiceTask.getCaseDefinitionKey(), execution, expressionManager);
+
+        caseInstanceService.startCaseInstanceByKey(caseDefinitionKey, caseInstanceId,
                         caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(), inParameters);
+
+        // Bidirectional storing of reference to avoid queries later on
+        executionEntity.setReferenceId(caseInstanceId);
+        executionEntity.setReferenceType(CallbackTypes.EXECUTION_CHILD_CASE);
+    }
+
+    protected String getCaseDefinitionKey(String caseDefinitionKeyExpression, VariableContainer variableContainer, ExpressionManager expressionManager) {
+        if (StringUtils.isNotEmpty(caseDefinitionKeyExpression)) {
+            return (String) expressionManager.createExpression(caseDefinitionKeyExpression).getValue(variableContainer);
+        } else {
+            return caseDefinitionKeyExpression;
+        }
     }
     
     @Override
@@ -143,6 +159,10 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
     
     public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables) {
         execution.setVariables(variables);
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        // Set the reference id and type to null since the execution could be reused
+        executionEntity.setReferenceId(null);
+        executionEntity.setReferenceType(null);
         leave(execution);
     }
 }

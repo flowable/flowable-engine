@@ -20,6 +20,7 @@ import org.flowable.cmmn.model.RepetitionRule;
 
 /**
  * @author Joram Barrez
+ * @author Micha Kiener
  */
 public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
     
@@ -39,8 +40,21 @@ public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
             
             RepetitionRule repetitionRule = new RepetitionRule();
             repetitionRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+
             repetitionRule.setRepetitionCounterVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, 
                     CmmnXmlConstants.ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME));
+
+            repetitionRule.setMaxInstanceCount(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME));
+
+            repetitionRule.setCollectionVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_REPETITION_COLLECTION_VARIABLE_NAME));
+
+            repetitionRule.setElementVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_REPETITION_ELEMENT_VARIABLE_NAME));
+
+            repetitionRule.setElementIndexVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME));
             
             PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
             planItemControl.setRepetitionRule(repetitionRule);
