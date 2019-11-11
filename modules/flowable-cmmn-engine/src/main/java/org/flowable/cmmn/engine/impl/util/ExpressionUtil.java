@@ -74,6 +74,16 @@ public class ExpressionUtil {
             && planItem.getItemControl().getRepetitionRule() != null;
     }
 
+    /**
+     * Returns true, if: the given plan item instance has a repetition rule at all and if so, if it has a condition witch is satisfied and all in combination
+     * with the optional max instance count attribute. If the repetition rule evaluates to true, this normally means that there should be an additional
+     * instance of the plan item created.
+     *
+     * @param commandContext the command context in which this evaluation is taking place
+     * @param planItemInstanceEntity the plan item instance entity to test for a repetition rule to evaluate to true
+     * @param planItemInstanceContainer the container (usually the parent stage of the plan item instance) to get access to child plan items
+     * @return true, if there is a repetition rule of the plan item instance currently evaluating to true with all of its conditions and attributes
+     */
     public static boolean evaluateRepetitionRule(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
         PlanItemInstanceContainer planItemInstanceContainer) {
         RepetitionRule repetitionRule = null;
