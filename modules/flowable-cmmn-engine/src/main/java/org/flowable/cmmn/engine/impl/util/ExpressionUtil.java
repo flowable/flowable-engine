@@ -82,10 +82,10 @@ public class ExpressionUtil {
         }
 
         if (repetitionRule != null) {
-            // we first check, if there is a max instance count of one set and if so, check, if there is an active instance available already
-            if (RepetitionRule.MAX_INSTANCE_COUNT_ONE.equals(repetitionRule.getMaxInstanceCount()) &&
-                !searchNonFinishedEqualPlanItemInstances(planItemInstanceEntity, planItemInstanceContainer).isEmpty()) {
-                // we found a non-final plan item instance with the same plan item definition, so no need to create a new one
+            // we first check, if there is a max instance count set and if so, check, if there are enough active instances available already
+            if (!repetitionRule.isUnlimitedInstanceCount() && repetitionRule.getMaxInstanceCount() <=
+                searchNonFinishedEqualPlanItemInstances(planItemInstanceEntity, planItemInstanceContainer).size()) {
+                // we found enough non-final plan item instances with the same plan item definition, so no need to create a new one
                 return false;
             }
 

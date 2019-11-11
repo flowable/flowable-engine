@@ -74,9 +74,12 @@ public class PlanItemControlExport implements CmmnXmlConstants {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
                         ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
             }
-            if (StringUtils.isNotEmpty(repetitionRule.getMaxInstanceCount())) {
+            if (repetitionRule.isUnlimitedInstanceCount()) {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
-                    ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME, repetitionRule.getMaxInstanceCount());
+                    ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME, RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED);
+            } else {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME, Integer.toString(repetitionRule.getMaxInstanceCount()));
             }
             if (StringUtils.isNotEmpty(repetitionRule.getCollectionVariableName())) {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,

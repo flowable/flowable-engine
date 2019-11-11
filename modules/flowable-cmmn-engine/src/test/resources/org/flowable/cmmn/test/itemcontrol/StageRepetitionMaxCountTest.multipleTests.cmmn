@@ -8,7 +8,7 @@
             </extensionElements>
             <planItem id="planItem2" name="Stage A" definitionRef="expandedStage1">
                 <itemControl>
-                    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                 </itemControl>
                 <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry3"></entryCriterion>
                 <entryCriterion id="entryCriterion3" flowable:sentryRef="sentry4"></entryCriterion>
@@ -16,7 +16,7 @@
             </planItem>
             <planItem id="planItem4" name="Stage B" definitionRef="expandedStage2">
                 <itemControl>
-                    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                 </itemControl>
                 <entryCriterion id="entryCriterion2" flowable:sentryRef="sentry1"></entryCriterion>
                 <exitCriterion id="exitCriterion5" flowable:sentryRef="sentry2"></exitCriterion>

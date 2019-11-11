@@ -14,47 +14,47 @@
                 </extensionElements>
                 <planItem id="planItem1" name="Task A" definitionRef="humanTask1">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                     </itemControl>
                 </planItem>
                 <planItem id="planItem2" name="Task B" definitionRef="humanTask2">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                         <manualActivationRule></manualActivationRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry1"></entryCriterion>
                 </planItem>
                 <planItem id="planItem3" name="Task C" definitionRef="humanTask3">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                     </itemControl>
                 </planItem>
                 <planItem id="planItem4" name="Task D" definitionRef="humanTask4">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion2" flowable:sentryRef="sentry2"></entryCriterion>
                 </planItem>
                 <planItem id="planItem5" name="Task E" definitionRef="humanTask5">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                     </itemControl>
                 </planItem>
                 <planItem id="planItem6" name="Task F" definitionRef="humanTask6">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                         <manualActivationRule></manualActivationRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion3" flowable:sentryRef="sentry3"></entryCriterion>
                 </planItem>
                 <planItem id="planItem7" name="Task G" definitionRef="humanTask7">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                     </itemControl>
                 </planItem>
                 <planItem id="planItem8" name="Task H" definitionRef="humanTask8">
                     <itemControl>
-                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                     </itemControl>
                     <entryCriterion id="entryCriterion4" flowable:sentryRef="sentry4"></entryCriterion>
                 </planItem>
