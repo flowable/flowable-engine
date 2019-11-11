@@ -18,7 +18,8 @@ package org.flowable.cmmn.model;
  */
 public class RepetitionRule extends PlanItemRule {
 
-    public static final String MAX_INSTANCE_COUNT_UNLIMITED = "unlimited";
+    public static final String MAX_INSTANCE_COUNT_UNLIMITED_VALUE = "unlimited";
+    public static final Integer MAX_INSTANCE_COUNT_UNLIMITED = -1;
 
     public static final String DEFAULT_REPETITION_COUNTER_VARIABLE_NAME = "repetitionCounter";
 
@@ -26,8 +27,7 @@ public class RepetitionRule extends PlanItemRule {
     protected String collectionVariableName;
     protected String elementVariableName;
     protected String elementIndexVariableName;
-    protected int maxInstanceCount;
-    protected boolean unlimitedInstanceCount;
+    protected Integer maxInstanceCount;
 
     public String getRepetitionCounterVariableName() {
         if (repetitionCounterVariableName == null) {
@@ -64,19 +64,15 @@ public class RepetitionRule extends PlanItemRule {
         this.elementIndexVariableName = elementIndexVariableName;
     }
 
-    public boolean isUnlimitedInstanceCount() {
-        return unlimitedInstanceCount;
+    public boolean hasLimitedInstanceCount() {
+        return maxInstanceCount != null && maxInstanceCount > 0;
     }
 
-    public void setUnlimitedInstanceCount(boolean unlimitedInstanceCount) {
-        this.unlimitedInstanceCount = unlimitedInstanceCount;
-    }
-
-    public int getMaxInstanceCount() {
+    public Integer getMaxInstanceCount() {
         return maxInstanceCount;
     }
 
-    public void setMaxInstanceCount(int maxInstanceCount) {
+    public void setMaxInstanceCount(Integer maxInstanceCount) {
         this.maxInstanceCount = maxInstanceCount;
     }
 

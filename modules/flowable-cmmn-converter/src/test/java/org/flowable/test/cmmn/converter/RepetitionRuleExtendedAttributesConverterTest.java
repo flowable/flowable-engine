@@ -56,23 +56,23 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
         Map<String, CaseElement> caseElements = cmmnModel.getCases().get(0).getAllCaseElements();
 
         assertRepetitionRuleAttributes(caseElements, "Task A", null,
-            null, null, true, 0);
+            null, null, null);
 
         assertRepetitionRuleAttributes(caseElements, "Task B", null,
-            null, null, false,1);
+            null, null, 1);
 
         assertRepetitionRuleAttributes(caseElements, "Task C", null,
-            null, null, true, 0);
+            null, null, RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED);
 
         assertRepetitionRuleAttributes(caseElements, "Task D", null,
-            null, null, true, 0);
+            null, null, null);
 
         assertRepetitionRuleAttributes(caseElements, "Task E", "entriesForTaskE",
-            "item", "itemIndex", true, 0);
+            "item", "itemIndex", null);
     }
 
     protected void assertRepetitionRuleAttributes(Map<String, CaseElement> caseElements, String planItemName,
-        String collectionVariableName, String elementVariableName, String elementIndexVariableName, boolean unlimitedInstanceCount, int maxInstanceCount) {
+        String collectionVariableName, String elementVariableName, String elementIndexVariableName, Integer maxInstanceCount) {
         List<CaseElement> planItems = caseElements.values().stream()
             .filter(caseElement -> caseElement instanceof PlanItem && planItemName.equals(caseElement.getName()))
             .collect(Collectors.toList());
@@ -91,7 +91,6 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
         assertEquals(collectionVariableName, repetitionRule.getCollectionVariableName());
         assertEquals(elementVariableName, repetitionRule.getElementVariableName());
         assertEquals(elementIndexVariableName, repetitionRule.getElementIndexVariableName());
-        assertEquals(unlimitedInstanceCount, repetitionRule.isUnlimitedInstanceCount());
         assertEquals(maxInstanceCount, repetitionRule.getMaxInstanceCount());
     }
 }

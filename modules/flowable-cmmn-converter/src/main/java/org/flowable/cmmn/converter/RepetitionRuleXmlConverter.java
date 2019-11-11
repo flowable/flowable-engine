@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 /**
  * @author Joram Barrez
@@ -45,12 +46,18 @@ public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
                     CmmnXmlConstants.ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME));
 
             String maxInstanceCountValue = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME);
-
-            if (maxInstanceCountValue == null || RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED.equals(maxInstanceCountValue)) {
-                repetitionRule.setUnlimitedInstanceCount(true);
-            } else if (maxInstanceCountValue != null) {
-                repetitionRule.setUnlimitedInstanceCount(false);
-                repetitionRule.setMaxInstanceCount(parseInt(maxInstanceCountValue));
+            if (maxInstanceCountValue == null) {
+                repetitionRule.setMaxInstanceCount(null);
+            } else {
+                if (RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED_VALUE.equals(maxInstanceCountValue)) {
+                    repetitionRule.setMaxInstanceCount(RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED);
+                } else {
+                    int maxInstanceCount = Integer.parseInt(maxInstanceCountValue);
+                    if (maxInstanceCount == 0) {
+                        throw new FlowableIllegalArgumentException("A 'maxInstanceCount' on a repetition rule with value '0' is not allowed, either set it to '-1' or 'unlimited' or any other positive value..");
+                    }
+                    repetitionRule.setMaxInstanceCount(maxInstanceCount);
+                }
             }
 
             repetitionRule.setCollectionVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
