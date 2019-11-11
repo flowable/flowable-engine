@@ -979,7 +979,7 @@ Note that Flowable allows to have repeating user and generic event listeners. Th
 
 There is an extended attribute in the Flowable CMMN model for the repetition rule to take more control about the number of concurrently active plan item instances.
 Let's assume you have a plan item with repetition and an entry sentry with a condition. According to the specification, this would create an endless number of plan item instances as long as the condition is true, which might not be the desired behavior.
-With the _maxInstanceCount_ attribute on the repetition rule, you can define, if there might be an unlimited number of instances (default according to the spec) or if there should be only one instance at a time.
+With the _maxInstanceCount_ attribute on the repetition rule, you can define, if there might be an unlimited number of instances (default according to the spec) or if there should be only one instance at a time or any particular maximum instance count.
 If you have repetition and set the _maxInstanceCount_ to _unlimited_, you need to control the condition in a way that it only creates as many instances as you want or combine it with an on-part (trigger) to only create a new instances whenever that trigger is fired.
 
 Example with a user task having repetition in combination with an entry sentry and a condition and making sure there is only one instance created at a time:
@@ -989,7 +989,7 @@ Example with a user task having repetition in combination with an entry sentry a
 ...
 <planItem id="planItem1" name="Task 1" definitionRef="humanTask1">
   <itemControl>
-    <repetitionRule flowable:maxInstanceCount="one"></repetitionRule>
+    <repetitionRule flowable:maxInstanceCount="1"></repetitionRule>
   </itemControl>
   <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry1"></entryCriterion>
 </planItem>
