@@ -79,7 +79,7 @@ public class RepetitionRule extends PlanItemRule {
     @Override
     public String toString() {
         return "RepetitionRule{" +
-                " maxInstanceCount='" + maxInstanceCount + "'" +
+                " maxInstanceCount='" + (hasLimitedInstanceCount() ? maxInstanceCount : "unlimited") + "'" +
                 " repetitionCounterVariableName='" + repetitionCounterVariableName + "'" +
                 " collectionVariableName='" + collectionVariableName + "'" +
                 " elementVariableName='" + elementVariableName + "'" +
