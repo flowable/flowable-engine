@@ -238,6 +238,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_EVENT_TYPE = "eventType";
     public static final String ATTRIBUTE_TRIGGERABLE = "triggerable";
     public static final String ATTRIBUTE_TRIGGER_EVENT_TYPE = "triggerEventType";
+    public static final String ATTRIBUTE_SEND_SYNCHRONOUSLY = "sendSynchronously";
     public static final String ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER = "triggerEventCorrelationParameter";
 
     public static final String ELEMENT_SEQUENCE_FLOW = "sequenceFlow";

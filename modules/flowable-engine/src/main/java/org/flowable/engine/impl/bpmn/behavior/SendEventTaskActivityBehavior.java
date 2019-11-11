@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +36,8 @@ import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.service.JobService;
@@ -62,27 +66,37 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         if (eventDefinition == null) {
             throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType());
         }
-        
-        JobService jobService = CommandContextUtil.getJobService();
-        
-        JobEntity job = jobService.createJob();
-        job.setExecutionId(execution.getId());
-        job.setProcessInstanceId(execution.getProcessInstanceId());
-        job.setProcessDefinitionId(execution.getProcessDefinitionId());
-        job.setElementId(sendEventServiceTask.getId());
-        job.setElementName(sendEventServiceTask.getName());
-        job.setJobHandlerType(AsyncSendEventJobHandler.TYPE);
-
-        // Inherit tenant id (if applicable)
-        if (execution.getTenantId() != null) {
-            job.setTenantId(execution.getTenantId());
-        }
-        
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
-        executionEntity.getJobs().add(job);
-        
-        jobService.createAsyncJob(job, true);
-        jobService.scheduleAsyncJob(job);
+
+        boolean sendSynchronously = sendEventServiceTask.isSendSynchronously();
+        if (!sendSynchronously) {
+            JobService jobService = CommandContextUtil.getJobService();
+
+            JobEntity job = jobService.createJob();
+            job.setExecutionId(execution.getId());
+            job.setProcessInstanceId(execution.getProcessInstanceId());
+            job.setProcessDefinitionId(execution.getProcessDefinitionId());
+            job.setElementId(sendEventServiceTask.getId());
+            job.setElementName(sendEventServiceTask.getName());
+            job.setJobHandlerType(AsyncSendEventJobHandler.TYPE);
+
+            // Inherit tenant id (if applicable)
+            if (execution.getTenantId() != null) {
+                job.setTenantId(execution.getTenantId());
+            }
+
+            executionEntity.getJobs().add(job);
+
+            jobService.createAsyncJob(job, true);
+            jobService.scheduleAsyncJob(job);
+        } else {
+            Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceBpmnUtil.createEventPayloadInstances(executionEntity,
+                CommandContextUtil.getProcessEngineConfiguration(CommandContextUtil.getCommandContext()).getExpressionManager(),
+                execution.getCurrentFlowElement(),
+                eventDefinition);
+            EventInstanceImpl eventInstance = new EventInstanceImpl(eventDefinition, Collections.emptyList(), eventPayloadInstances);
+            eventRegistry.sendEvent(eventInstance);
+        }
 
         if (sendEventServiceTask.isTriggerable()) {
             EventDefinition triggerEventDefinition = null;
@@ -106,6 +120,9 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             
             CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
             executionEntity.getEventSubscriptions().add(eventSubscription);
+        } else if (sendSynchronously) {
+            // If ths send task is specifically marked to send synchronously and is not triggerable then leave
+            leave(execution);
         }
     }
     

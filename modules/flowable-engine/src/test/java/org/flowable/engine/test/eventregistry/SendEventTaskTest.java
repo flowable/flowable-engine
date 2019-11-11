@@ -133,6 +133,32 @@ public class SendEventTaskTest extends FlowableTestCase {
     
     @Test
     @Deployment
+    public void testSendEventSynchronously() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        taskService.complete(task.getId());
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNull();
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+        JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
+        assertThat(jsonNode).hasSize(1);
+        assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("test");
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
+    }
+
+    @Test
+    @Deployment
     public void testSendEventWithExpressions() throws Exception {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                         .processDefinitionKey("process")
@@ -213,6 +239,49 @@ public class SendEventTaskTest extends FlowableTestCase {
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
     }
     
+    @Test
+    @Deployment
+    public void testTriggerableSendEventSynchronously() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(0);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        taskService.complete(task.getId());
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myTriggerEvent");
+        assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNull();
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+        JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
+        assertThat(jsonNode).hasSize(1);
+        assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("test");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ObjectNode json = objectMapper.createObjectNode();
+        json.put("type", "myTriggerEvent");
+        json.put("customerId", "testId");
+        processEngineConfiguration.getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(eventSubscription).isNull();
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "anotherVariable")).isEqualTo("testId");
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
+    }
+
     @Test
     @Deployment
     public void testTriggerableSendEventWithCorrelation() throws Exception {

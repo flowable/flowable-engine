@@ -22,6 +22,7 @@ public class SendEventServiceTask extends ServiceTask {
 
     protected String eventType;
     protected String triggerEventType;
+    protected boolean sendSynchronously;
     protected List<IOParameter> eventInParameters = new ArrayList<>();
     protected List<IOParameter> eventOutParameters = new ArrayList<>();
 
@@ -39,6 +40,14 @@ public class SendEventServiceTask extends ServiceTask {
 
     public void setTriggerEventType(String triggerEventType) {
         this.triggerEventType = triggerEventType;
+    }
+
+    public boolean isSendSynchronously() {
+        return sendSynchronously;
+    }
+
+    public void setSendSynchronously(boolean sendSynchronously) {
+        this.sendSynchronously = sendSynchronously;
     }
 
     public List<IOParameter> getEventInParameters() {
@@ -68,6 +77,7 @@ public class SendEventServiceTask extends ServiceTask {
         super.setValues(otherElement);
         setEventType(otherElement.getEventType());
         setTriggerEventType(otherElement.getTriggerEventType());
+        setSendSynchronously(otherElement.isSendSynchronously());
         
         eventInParameters = new ArrayList<>();
         if (otherElement.getEventInParameters() != null && !otherElement.getEventInParameters().isEmpty()) {

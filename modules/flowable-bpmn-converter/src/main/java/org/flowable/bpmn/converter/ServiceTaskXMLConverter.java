@@ -195,6 +195,10 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
             writeQualifiedAttribute(ATTRIBUTE_TRIGGER_EVENT_TYPE, sendEventServiceTask.getTriggerEventType(), xtw);
         }
+
+        if (sendEventServiceTask.isSendSynchronously()) {
+            writeQualifiedAttribute(ATTRIBUTE_SEND_SYNCHRONOUSLY, "true", xtw);
+        }
     }
 
     protected void writeServiceTaskAdditionalAttributes(ServiceTask element, XMLStreamWriter xtw) throws Exception {
@@ -314,6 +318,11 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         String triggerEventType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TRIGGER_EVENT_TYPE, xtr);
         if (StringUtils.isNotEmpty(triggerEventType)) {
             sendEventServiceTask.setTriggerEventType(triggerEventType);
+        }
+
+        String sendSynchronously = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SEND_SYNCHRONOUSLY, xtr);
+        if ("true".equalsIgnoreCase(sendSynchronously)) {
+            sendEventServiceTask.setSendSynchronously(true);
         }
 
         parseChildElements(getXMLElementName(), sendEventServiceTask, sendEventServiceChildParserMap, bpmnModel, xtr);

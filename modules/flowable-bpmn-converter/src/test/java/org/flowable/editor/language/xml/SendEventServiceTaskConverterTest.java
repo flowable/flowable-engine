@@ -13,6 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -56,6 +57,7 @@ public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
         assertEquals("myEvent", sendEventServiceTask.getEventType());
         assertTrue(sendEventServiceTask.isTriggerable());
         assertEquals("triggerMyEvent", sendEventServiceTask.getTriggerEventType());
+        assertFalse(sendEventServiceTask.isSendSynchronously());
 
         List<IOParameter> parameters = sendEventServiceTask.getEventInParameters();
         assertEquals(2, parameters.size());
