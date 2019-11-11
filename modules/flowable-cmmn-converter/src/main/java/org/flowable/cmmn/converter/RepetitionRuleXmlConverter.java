@@ -44,8 +44,14 @@ public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
             repetitionRule.setRepetitionCounterVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, 
                     CmmnXmlConstants.ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME));
 
-            repetitionRule.setMaxInstanceCount(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
-                CmmnXmlConstants.ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME));
+            String maxInstanceCountValue = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME);
+
+            if (maxInstanceCountValue == null || RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED.equals(maxInstanceCountValue)) {
+                repetitionRule.setUnlimitedInstanceCount(true);
+            } else if (maxInstanceCountValue != null) {
+                repetitionRule.setUnlimitedInstanceCount(false);
+                repetitionRule.setMaxInstanceCount(parseInt(maxInstanceCountValue));
+            }
 
             repetitionRule.setCollectionVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
                 CmmnXmlConstants.ATTRIBUTE_REPETITION_COLLECTION_VARIABLE_NAME));
@@ -62,6 +68,13 @@ public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
             return repetitionRule;
         }
         return null;
+    }
+
+    protected Integer parseInt(String value) {
+        if (value == null) {
+            return null;
+        }
+        return Integer.parseInt(value);
     }
     
 }

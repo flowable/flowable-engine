@@ -8,7 +8,7 @@
             </extensionElements>
             <planItem id="planItem1" name="Task A" definitionRef="humanTask1">
                 <itemControl>
-                    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="one"></repetitionRule>
+                    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1"></repetitionRule>
                     <manualActivationRule></manualActivationRule>
                 </itemControl>
                 <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry1"></entryCriterion>

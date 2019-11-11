@@ -12,7 +12,6 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.flowable.cmmn.model.RepetitionRule.MAX_INSTANCE_COUNT_ONE;
 import static org.flowable.cmmn.model.RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -61,7 +60,7 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
             null, null, null);
 
         assertRepetitionRuleAttributes(caseElements, "Task B", null,
-            null, null, MAX_INSTANCE_COUNT_ONE);
+            null, null, "1");
 
         assertRepetitionRuleAttributes(caseElements, "Task C", null,
             null, null, MAX_INSTANCE_COUNT_UNLIMITED);
