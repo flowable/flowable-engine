@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.RepetitionRule;
@@ -65,6 +66,23 @@ public class ExpressionUtil {
                 isRequired = evaluateBooleanExpression(commandContext, planItemInstanceEntity, requiredCondition);
             }
             return isRequired;
+        }
+        return false;
+    }
+
+    /**
+     * Checks the given plan item to have at least one on-part.
+     *
+     * @param planItem the plan item to check for an on-part
+     * @return true, if there is at least one on-part, false otherwise
+     */
+    public static boolean hasOnParts(PlanItem planItem) {
+        if (planItem.getEntryCriteria() != null && planItem.getEntryCriteria().size() > 0) {
+            for (Criterion criterion : planItem.getEntryCriteria()) {
+                if (criterion.getSentry() != null && criterion.getSentry().getOnParts() != null && criterion.getSentry().getOnParts().size() > 0) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -119,7 +137,7 @@ public class ExpressionUtil {
         String collectionExpression = repetitionRule.getCollectionVariableName();
 
         if (!(collectionExpression.startsWith("${") || collectionExpression.startsWith("#{"))) {
-            collectionExpression = "${" + collectionExpression + "}";
+            collectionExpression = "${vars:getOrDefault('" + collectionExpression + "', null)}";
         }
 
         Object collection = evaluateExpression(commandContext, planItemInstanceEntity, collectionExpression);

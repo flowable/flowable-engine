@@ -41,7 +41,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertEquals(3, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
-        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
         List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
 
@@ -55,7 +55,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertEquals(7, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
-        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
     }
 
 }

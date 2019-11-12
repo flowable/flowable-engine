@@ -133,7 +133,6 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         for (int planItemInstanceIndex = 0; planItemInstanceIndex < planItemInstances.size(); planItemInstanceIndex++) {
 
             PlanItemInstanceEntity planItemInstanceEntity = planItemInstances.get(planItemInstanceIndex);
-            PlanItem planItem = planItemInstanceEntity.getPlanItem();
             String state = planItemInstanceEntity.getState();
 
             // check, if the plan item is in an evaluation state (e.g. available or weiting for repetition) to check for its activation
@@ -225,38 +224,53 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         boolean activatePlanItemInstance = true;
 
-        if (!planItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
+        // check for a repetition rule on the plan item
+        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
+            boolean noEntryCriteria = planItem.getEntryCriteria().isEmpty();
+
             // first check, if we run on a collection variable for repetition and if so, we ignore the max instance count and any other repetition
             // condition and just use the collection to create plan item instances accordingly
             if (ExpressionUtil.hasRepetitionOnCollection(planItemInstanceEntity)) {
                 // the plan item should be repeated based on a collection variable
                 // evaluate the variable content and check, if we need to start creating instances accordingly
                 List<Object> collection = ExpressionUtil.evaluateRepetitionCollectionVariableValue(commandContext, planItemInstanceEntity);
-                if (collection != null && collection.size() > 0) {
-                    RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
-                    for (int ii = 0; ii < collection.size(); ii++) {
-                        // create and activate a new plan item instance for each item in the collection
-                        PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForCollectionRepetition(
-                            repetitionRule, planItemInstanceEntity,
-                            satisfiedEntryCriterion != null ? satisfiedEntryCriterion.getId() : null, collection, ii);
 
-                        evaluationResult.addChildPlanItemInstance(childPlanItemInstanceEntity);
-                    }
-                }
-
-                // if there is an on-part, we keep the current plan item instance for further triggering the on-part and evaluating the collection again
-                if (planItem.getEntryCriteria() != null && planItem.getEntryCriteria().get(0).getSentry().getOnParts() != null) {
-                    // don't activate this plan item instance, but keep it in available or waiting for repetition state for the next on-part triggering
+                // if the collection is null (meaning it is not yet available) and we don't have any entry criteria (e.g an on-part or even combined with
+                // an if-part), we don't handle the repetition yet, but wait for its collection to become available
+                // but if we have an on-part, we always handle the collection, even if it is null or empty
+                if (noEntryCriteria && collection == null) {
+                    // keep this plan item in its current state and don't activate it or handle the repetition collection yet as it is not available yet
                     activatePlanItemInstance = false;
                 } else {
-                    // if there is no on-part, we don't need this plan item instance anymore, so terminate it
-                    CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
+
+                    if (collection != null && collection.size() > 0) {
+                        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+                        for (int ii = 0; ii < collection.size(); ii++) {
+                            // create and activate a new plan item instance for each item in the collection
+                            PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForCollectionRepetition(
+                                repetitionRule, planItemInstanceEntity,
+                                satisfiedEntryCriterion != null ? satisfiedEntryCriterion.getId() : null, collection, ii);
+
+                            evaluationResult.addChildPlanItemInstance(childPlanItemInstanceEntity);
+                        }
+                    }
+
+                    // if there is an on-part, we keep the current plan item instance for further triggering the on-part and evaluating the collection again
+                    if (planItem.getEntryCriteria() != null && ExpressionUtil.hasOnParts(planItem)) {
+                        // don't activate this plan item instance, but keep it in available or waiting for repetition state for the next on-part triggering
+                        activatePlanItemInstance = false;
+                    } else {
+                        // if there is no on-part, we don't need this plan item instance anymore, so terminate it
+                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
+                    }
                 }
-            } else {
-                boolean isRepeating = ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer);
-                if (isRepeating) {
+            } else if (!noEntryCriteria) {
+                // check the plan item to be repeating by evaluating its repetition rule
+                if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer)) {
+                    // create a new duplicated plan item instance in waiting for repetition as this one is becoming active
                     evaluationResult.addChildPlanItemInstance(createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity));
                 } else {
+                    // the repetition rule does not evaluate to true, so we keep this instance in its current state and don't activate it
                     activatePlanItemInstance = false;
                 }
             }
