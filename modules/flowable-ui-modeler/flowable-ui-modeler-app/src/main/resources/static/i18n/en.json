@@ -217,6 +217,12 @@
             "DESCRIPTION" : "Service task logic defined with a delegate expression."
           }
         },
+        "SERVICETASKFAILEDJOBRETRYTIMECYCLEPACKAGE" : {
+          "SERVICETASKFAILEDJOBRETRYTIMECYCLE" : {
+            "TITLE" : "Failed job retry time cycle",
+            "DESCRIPTION" : "Service task logic defined with a failed job retry time cycle."
+          }
+        },
         "SERVICETASKFIELDSPACKAGE" : {
           "SERVICETASKFIELDS" : {
             "TITLE" : "Class fields",

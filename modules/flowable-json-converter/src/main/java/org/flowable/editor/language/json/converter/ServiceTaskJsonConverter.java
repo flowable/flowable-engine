@@ -154,6 +154,10 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             if (serviceTask.isUseLocalScopeForResultVariable()) {
                 propertiesNode.put(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, serviceTask.isUseLocalScopeForResultVariable());
             }
+            
+            if(StringUtils.isNotEmpty(serviceTask.getFailedJobRetryTimeCycleValue())) {
+            	propertiesNode.put(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, serviceTask.getFailedJobRetryTimeCycleValue());
+            }
 
             addFieldExtensions(serviceTask.getFieldExtensions(), propertiesNode);
             addMapException(serviceTask.getMapExceptions(), propertiesNode);
@@ -186,6 +190,10 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
 
         if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, elementNode)) {
             task.setUseLocalScopeForResultVariable(true);
+        }
+        
+        if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, elementNode))) {
+            task.setFailedJobRetryTimeCycleValue(getPropertyValueAsString(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, elementNode));
         }
 
         task.setSkipExpression(getPropertyValueAsString(PROPERTY_SKIP_EXPRESSION, elementNode));
