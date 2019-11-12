@@ -46,6 +46,7 @@ import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
@@ -137,23 +138,56 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             String state = planItemInstanceEntity.getState();
 
             if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
-                
+
+                // evaluate the entry criteria of the plan item and return it, if at least one was satisfied
                 Criterion satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
                 if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
+                    // entry criteria is satisfied for this plan item instance, so we can basically activate it, but we need to check further options like
+                    // repetition
                     boolean activatePlanItemInstance = true;
                     if (!planItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
-                        boolean isRepeating = ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer);
-                        if (isRepeating) {
-
-                            PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity);
-
-                            if (newChildPlanItemInstances == null) {
-                                newChildPlanItemInstances = new ArrayList<>(1);
+                        // first check, if we run on a collection variable for repetition and if so, we ignore the max instance count and any other repetition
+                        // condition and just use the collection to create plan item instances accordingly
+                        if (ExpressionUtil.hasRepetitionOnCollection(planItemInstanceEntity)) {
+                            // the plan item should be repeated based on a collection variable
+                            // evaluate the variable content and check, if we need to start creating instances accordingly
+                            List<Object> collection = ExpressionUtil.evaluateRepetitionCollectionVariableValue(commandContext, planItemInstanceEntity);
+                            if (collection != null && collection.size() > 0) {
+                                RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+                                if (newChildPlanItemInstances == null) {
+                                    newChildPlanItemInstances = new ArrayList<>(collection.size());
+                                }
+                                for (int ii = 0; ii < collection.size(); ii++) {
+                                    // create and activate a new plan item instance for each item in the collection
+                                    PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForCollectionRepetition(
+                                        repetitionRule, planItemInstanceEntity,
+                                        satisfiedEntryCriterion != null ? satisfiedEntryCriterion.getId() : null, collection, ii);
+                                    newChildPlanItemInstances.add(childPlanItemInstanceEntity);
+                                }
                             }
-                            newChildPlanItemInstances.add(childPlanItemInstanceEntity);
 
+                            // if there is an on-part, we keep the current plan item instance for further triggering the on-part and evaluating the collection again
+                            if (planItem.getEntryCriteria() != null && planItem.getEntryCriteria().get(0).getSentry().getOnParts() != null) {
+                                // don't activate this plan item instance, but keep it in available or waiting for repetition state for the next on-part triggering
+                                activatePlanItemInstance = false;
+                            } else {
+                                // if there is no on-part, we don't need this plan item instance anymore, so terminate it
+                                CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
+                            }
                         } else {
-                            activatePlanItemInstance = false;
+                            boolean isRepeating = ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer);
+                            if (isRepeating) {
+
+                                PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity);
+
+                                if (newChildPlanItemInstances == null) {
+                                    newChildPlanItemInstances = new ArrayList<>(1);
+                                }
+                                newChildPlanItemInstances.add(childPlanItemInstanceEntity);
+
+                            } else {
+                                activatePlanItemInstance = false;
+                            }
                         }
                     }
 
@@ -640,6 +674,27 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
+        return childPlanItemInstanceEntity;
+    }
+
+    protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForCollectionRepetition(RepetitionRule repetitionRule,
+        PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, List<Object> collection, int index) {
+        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
+
+        if (repetitionRule.hasElementVariable()) {
+            childPlanItemInstanceEntity.setVariableLocal(repetitionRule.getElementVariableName(), collection.get(index));
+        }
+        if (repetitionRule.hasElementIndexVariable()) {
+            childPlanItemInstanceEntity.setVariableLocal(repetitionRule.getElementIndexVariableName(), index);
+        }
+
+        String oldState = childPlanItemInstanceEntity.getState();
+        String newState = PlanItemInstanceState.ACTIVE;
+        childPlanItemInstanceEntity.setState(newState);
+        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+
+        // createPlanItemInstance operations will also sync planItemInstance history
+        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(childPlanItemInstanceEntity, entryCriterionId);
         return childPlanItemInstanceEntity;
     }
 
