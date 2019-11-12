@@ -81,6 +81,63 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableTest.multipleTests.cmmn")
+    public void testRepetitionOnCollectionTriggeredByUserTaskSeveralTimes() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestOne").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
+
+        // complete Task A by providing the collection used for repetition
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
+            .variable("taskOutputList", taskOutputList)
+            .trigger();
+
+        // now we need to have 4 instances of Task B with adequate local variables
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(7, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList);
+
+        // complete all active tasks
+        completePlanItems(caseInstance.getId(), "Task B", 4);
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(3, planItemInstances.size());
+
+        taskOutputList = Arrays.asList("E", "F");
+
+        // complete Task A again by providing a different collection used for repetition
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
+            .variable("taskOutputList", taskOutputList)
+            .trigger();
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(5, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList);
+
+        // now let's complete all Tasks B -> nothing must happen additionally
+        completePlanItems(caseInstance.getId(), "Task B", 2);
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableTest.multipleTests.cmmn")
     public void testRepetitionOnCollectionTriggeredByCollectionVariableSet() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestOne").start();
 
@@ -156,6 +213,21 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
             Object itemIndexValue = cmmnRuntimeService.getLocalVariable(task.getId(), "itemIndex");
             assertEquals(itemValue, itemVariableValues.get(ii));
             assertEquals(itemIndexValue, ii);
+        }
+    }
+
+    protected void completePlanItems(String caseInstanceId, String planItemName, int expectedCount) {
+        // now let's complete all Tasks B -> nothing must happen additionally
+        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceName(planItemName)
+            .planItemInstanceStateActive()
+            .orderByCreateTime().asc()
+            .list();
+
+        assertEquals(expectedCount, tasks.size());
+        for (PlanItemInstance task : tasks) {
+            cmmnRuntimeService.triggerPlanItemInstance(task.getId());
         }
     }
 }
