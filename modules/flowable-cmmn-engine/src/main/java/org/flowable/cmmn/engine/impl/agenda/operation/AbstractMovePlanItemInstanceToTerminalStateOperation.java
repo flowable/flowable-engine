@@ -116,11 +116,19 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                 || !PlanItemInstanceState.isInTerminalState(planItemInstanceEntity.getStagePlanItemInstanceEntity());
     }
 
+    /**
+     * Returns true, if the given plan item has a repetition rule, but no entry criteria to be satisfied and no collection based repetition. A collection
+     * based repetition is similar to entry criteria as it needs to be available in order to repeat the plan item.
+     *
+     * @param planItem the plan item to test
+     * @return true, if the plan item has a repetition rule without any conditions like entry criteria or a collection to be based on for repetition
+     */
     protected boolean hasRepetitionRuleAndNoEntryCriteria(PlanItem planItem) {
         return planItem != null
             && planItem.getEntryCriteria().isEmpty()
             && planItem.getItemControl() != null
-            && planItem.getItemControl().getRepetitionRule() != null;
+            && planItem.getItemControl().getRepetitionRule() != null
+            && !planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
     }
 
     protected boolean hasRepetitionRuleEntryCriteria(PlanItem planItem) {
