@@ -56,6 +56,26 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList);
     }
 
+    protected void assertPlanItemLocalVariables(String caseInstanceId, String planItemName, List<?> itemVariableValues) {
+        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceName("Task B")
+            .planItemInstanceStateActive()
+            .orderByCreateTime().asc()
+            .list();
+
+        assertEquals(itemVariableValues.size(), tasks.size());
+        for (int ii = 0; ii < tasks.size(); ii++) {
+            PlanItemInstance task = tasks.get(ii);
+
+            Object itemValue = cmmnRuntimeService.getLocalVariable(task.getId(), "item");
+            Object itemIndexValue = cmmnRuntimeService.getLocalVariable(task.getId(), "itemIndex");
+            assertEquals(itemValue, itemVariableValues.get(ii));
+            assertEquals(itemIndexValue, ii);
+        }
+    }
 }
