@@ -104,6 +104,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         if (PlanItemInstanceState.AVAILABLE.equals(originalState)
                 && PlanItemInstanceState.TERMINATED.equals(newState)
                 && hasRepetitionRuleEntryCriteria(planItem)
+                && !hasRepetitionOnCollection(planItem)
                 && isWithoutStageOrParentIsNotTerminated(planItemInstanceEntity)) { // only when the parent is not yet terminated, a new instance should be created
             return true; // the repetition rule doesn't matter, as it can happen on any entry condition that becomes true
         }
@@ -129,6 +130,13 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             && planItem.getItemControl() != null
             && planItem.getItemControl().getRepetitionRule() != null
             && !planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
+    }
+
+    protected boolean hasRepetitionOnCollection(PlanItem planItem) {
+        return planItem != null
+            && planItem.getItemControl() != null
+            && planItem.getItemControl().getRepetitionRule() != null
+            && planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
     }
 
     protected boolean hasRepetitionRuleEntryCriteria(PlanItem planItem) {

@@ -135,7 +135,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             PlanItemInstanceEntity planItemInstanceEntity = planItemInstances.get(planItemInstanceIndex);
             String state = planItemInstanceEntity.getState();
 
-            // check, if the plan item is in an evaluation state (e.g. available or weiting for repetition) to check for its activation
+            // check, if the plan item is in an evaluation state (e.g. available or waiting for repetition) to check for its activation
             if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
                 evaluateForActivation(planItemInstanceEntity, planItemInstanceContainer, evaluationResult);
             }
@@ -235,10 +235,10 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 // evaluate the variable content and check, if we need to start creating instances accordingly
                 List<Object> collection = ExpressionUtil.evaluateRepetitionCollectionVariableValue(commandContext, planItemInstanceEntity);
 
-                // if the collection is null (meaning it is not yet available) and we don't have any entry criteria (e.g an on-part or even combined with
+                // if the collection is null (meaning it is not yet available) and we don't have any on-part criteria (e.g an on-part or even combined with
                 // an if-part), we don't handle the repetition yet, but wait for its collection to become available
                 // but if we have an on-part, we always handle the collection, even if it is null or empty
-                if (noEntryCriteria && collection == null) {
+                if (collection == null && !ExpressionUtil.hasOnParts(planItem)) {
                     // keep this plan item in its current state and don't activate it or handle the repetition collection yet as it is not available yet
                     activatePlanItemInstance = false;
                 } else {
@@ -248,18 +248,24 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         for (int ii = 0; ii < collection.size(); ii++) {
                             // create and activate a new plan item instance for each item in the collection
                             PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForCollectionRepetition(
-                                repetitionRule, planItemInstanceEntity,
-                                satisfiedEntryCriterion != null ? satisfiedEntryCriterion.getId() : null, collection, ii);
+                                repetitionRule, planItemInstanceEntity, null, collection, ii);
 
                             evaluationResult.addChildPlanItemInstance(childPlanItemInstanceEntity);
                         }
                     }
 
+                    // we handled the collection, now we need to make sure that evaluation does not trigger again as it might get evaluated again
+                    // before it is terminated or made available again, so we remove the sentry related data of the plan item
+                    CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteSentryRelatedData(planItemInstanceEntity.getId());
+
+                    // don't activate this plan item instance, but keep it in available or waiting for repetition state for the next on-part triggering,
+                    // if there is an on-part, otherwise we will directly terminate it without having activated it, it was only used to wait in available
+                    // state until all criteria was satisfied, including having the collection variable
+                    activatePlanItemInstance = false;
+
                     // if there is an on-part, we keep the current plan item instance for further triggering the on-part and evaluating the collection again
-                    if (planItem.getEntryCriteria() != null && ExpressionUtil.hasOnParts(planItem)) {
-                        // don't activate this plan item instance, but keep it in available or waiting for repetition state for the next on-part triggering
-                        activatePlanItemInstance = false;
-                    } else {
+                    // otherwise we terminate the plan item
+                    if (!ExpressionUtil.hasOnParts(planItem)) {
                         // if there is no on-part, we don't need this plan item instance anymore, so terminate it
                         CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
                     }
@@ -359,7 +365,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             // There can be zero or more on parts and zero or one if part.
             // All defined parts need to be satisfied for the sentry to trigger.
 
-            if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one one part and no if part: no need to fetch the previously satisfied onparts
+            if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one on part and no if part: no need to fetch the previously satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
                     if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {

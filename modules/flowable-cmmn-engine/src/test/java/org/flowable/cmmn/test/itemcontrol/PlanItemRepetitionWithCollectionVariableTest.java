@@ -15,7 +15,6 @@ package org.flowable.cmmn.test.itemcontrol;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -253,41 +252,5 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertNoPlanItemInstance(planItemInstances, "Task C");
-    }
-
-    protected void assertPlanItemLocalVariables(String caseInstanceId, String planItemName, List<?> itemVariableValues, List<Integer> itemIndexVariableValues) {
-        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstanceId)
-            .planItemInstanceName(planItemName)
-            .planItemInstanceStateActive()
-            .orderByCreateTime().asc()
-            .list();
-
-        assertEquals(itemVariableValues.size(), tasks.size());
-        for (int ii = 0; ii < tasks.size(); ii++) {
-            PlanItemInstance task = tasks.get(ii);
-
-            Object itemValue = cmmnRuntimeService.getLocalVariable(task.getId(), "item");
-            Object itemIndexValue = cmmnRuntimeService.getLocalVariable(task.getId(), "itemIndex");
-            assertEquals(itemVariableValues.get(ii), itemValue);
-            assertEquals(itemIndexVariableValues.get(ii), itemIndexValue);
-        }
-    }
-
-    protected void completePlanItems(String caseInstanceId, String planItemName, int expectedCount, int numberToComplete) {
-        // now let's complete all Tasks B -> nothing must happen additionally
-        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstanceId)
-            .planItemInstanceName(planItemName)
-            .planItemInstanceStateActive()
-            .orderByCreateTime().asc()
-            .list();
-
-        assertEquals(expectedCount, tasks.size());
-        assertTrue(numberToComplete <= expectedCount);
-        int completedCount = 0;
-        while (completedCount < numberToComplete) {
-            cmmnRuntimeService.triggerPlanItemInstance(tasks.get(completedCount++).getId());
-        }
     }
 }

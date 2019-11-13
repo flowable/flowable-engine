@@ -37,12 +37,14 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
 
     List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceId);
     
-    List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId);
-    
+    List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planItemId);
+
+    void deleteSentryRelatedData(String planItemId);
+
     void deleteByCaseDefinitionId(String caseDefinitionId);
-    
+
     void deleteByStageInstanceId(String stageInstanceId);
-    
+
     void deleteByCaseInstanceId(String caseInstanceId);
-    
+
 }
