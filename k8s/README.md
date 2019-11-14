@@ -37,6 +37,8 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/mast
 
 ### Install local storageclass
 
+This configures a storage class on the Kubernetes cluster with a default configuration (/tmp/data). Please modify when needed.
+
 ```console
 kubectl apply -f resources/local-storageclass.yaml
 ```
@@ -44,12 +46,21 @@ kubectl apply -f resources/local-storageclass.yaml
 ## Deploy Flowable OSS
 
 ```console
-helm install flowable \
+helm repo add flowable https://flowable.org/helm/
+```
+```console
+helm install flowable/flowable \
     --name=flowable \
     --set flowable.host.external=<cluster public ip / hostname>
 ```
 
 ***flowable.host.external** will be used for client redirects*  
+
+Check for individual pod status
+
+```console
+kubectl get pods -n default
+```
 
 ## Undeploy Flowable OSS
 
