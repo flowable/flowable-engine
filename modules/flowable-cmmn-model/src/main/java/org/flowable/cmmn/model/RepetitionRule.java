@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Joram Barrez
  * @author Micha Kiener
@@ -44,6 +46,10 @@ public class RepetitionRule extends PlanItemRule {
         return collectionVariableName;
     }
 
+    public boolean hasCollectionVariable() {
+        return StringUtils.isNotEmpty(collectionVariableName);
+    }
+
     public void setCollectionVariableName(String collectionVariableName) {
         this.collectionVariableName = collectionVariableName;
     }
@@ -52,12 +58,20 @@ public class RepetitionRule extends PlanItemRule {
         return elementVariableName;
     }
 
+    public boolean hasElementVariable() {
+        return StringUtils.isNotEmpty(elementVariableName);
+    }
+
     public void setElementVariableName(String elementVariableName) {
         this.elementVariableName = elementVariableName;
     }
 
     public String getElementIndexVariableName() {
         return elementIndexVariableName;
+    }
+
+    public boolean hasElementIndexVariable() {
+        return StringUtils.isNotEmpty(elementIndexVariableName);
     }
 
     public void setElementIndexVariableName(String elementIndexVariableName) {

@@ -1015,6 +1015,45 @@ Example with a user task having repetition and a repetition condition to control
 ----
 
 
+===== Repetition Rule: Repetition collection variable
+
+Similar to the multi instance type in BPMN, you can also use the repetition rule in CMMN in combination with items in a collection.
+There are extended attributes for the repetition rule to make use of a collection of elements to create plan item instances for.
+
+Here is the list of the available, extended attributes to control the repetition rule out of a collection (list) of items:
+
+* *collectionVariable*, set this attribute to the name of the variable with the collection or an expression resolving to a collection
+* *elementVariable*, if the collection variable is set, you can optionally set an element variable to be used at runtime to hold the element as a local variable of the plan item instance
+* *elementIndexVariable*, if the collection variable is set, you can optionally set an element index variable to be used at runtime to hold the index (0 based) as a local variable of the plan item instance
+
+Depending on how the collection gets used with repetition, the time when it is evaluated might be a bit different.
+
+If there is an on-part (an event triggering the plan item) combined with the collection variable, it gets evaluated whenever that on-part is triggered and if the collection is null or empty at that time, no plan item instances are created.
+
+If there is an on-part in combination with an if-part and a collection based repetition, the behavior is the same, however, the if-part might have deferred event trigger handling, which means the plan item is waiting for the if-part to be satisfied, before the collection is checked for the repetition.
+Or in other words: the collection needs to be present at the time the if-part is satisfied and the on-part triggers (or was triggered before), then the collection gets evaluated and according its elements, new plan item instances are being started.
+
+If there is no on-part and no if-part, the collection variable gets evaluated every on every evaluation cycle and as soon as it is not null, it is used to create new plan item instances, even if it is empty.
+This is done once and the plan item is then terminated. When using a repetition on collection that way, make sure the collection variable becomes available exactly at the moment you want to evaluate it for repetition, otherwise, combine it with an if-part.
+
+If there is an if-part (but no on-part) in combination with a collection variable for repetition, evaluation waits until the if-part is satisfied and afterwards, the collection variable is evaluated to be non-null.
+When the if-part is satisfied and the collection is not null (but might be empty), the collection is used for repetition, then the plan item terminates.
+
+Here is an example of a repetition rule combined with a collection variable:
+
+[source,xml,linenums]
+----
+<planItem id="planItem1" name="Task (${vars:getOrDefault('item', 'na')} - ${vars:getOrDefault('itemIndex', 'na')})" definitionRef="humanTask1">
+    <itemControl>
+        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:collectionVariable="myCollection" flowable:elementVariable="item" flowable:elementIndexVariable="itemIndex"></repetitionRule>
+    </itemControl>
+</planItem>
+----
+
+The example uses a collection variable named _myCollection_ and has an element and even element index variable specified. They both get used for the plan item instance name used in its name expression.
+As there is no entry sentry, the collection gets evaluated in each evaluation cycle and as soon as _myCollection_ is no longer null, it is used for repetition.
+
+
 ==== Item control: Manual Activation Rule
 
 Plan items on the case model can have a _manual activation rule_: an expression that can be used to indicate a certain plan item needs to be _manually activated by an end-user_.

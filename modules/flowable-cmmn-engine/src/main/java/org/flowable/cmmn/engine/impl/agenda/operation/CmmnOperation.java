@@ -13,7 +13,9 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -86,6 +88,7 @@ public abstract class CmmnOperation implements Runnable {
                         caseInstanceId,
                         stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
                         tenantId,
+                        null,
                         true);
                 planItemInstances.add(childPlanItemInstance);
                 CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
@@ -116,18 +119,28 @@ public abstract class CmmnOperation implements Runnable {
     }
 
     protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
+        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntityToCopy, null, addToParent);
+    }
+
+    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
+        Map<String, Object> localVariables, boolean addToParent) {
+
+        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntityToCopy)) {
+            int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
+            if (localVariables == null) {
+                localVariables = new HashMap<>(0);
+            }
+            localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
+        }
+
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance(
                 planItemInstanceEntityToCopy.getPlanItem(),
                 planItemInstanceEntityToCopy.getCaseDefinitionId(),
                 planItemInstanceEntityToCopy.getCaseInstanceId(),
                 planItemInstanceEntityToCopy.getStageInstanceId(),
                 planItemInstanceEntityToCopy.getTenantId(),
+                localVariables,
                 addToParent);
-
-        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntityToCopy)) {
-            int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
-            setRepetitionCounter(planItemInstanceEntity, counter);
-        }
 
         return planItemInstanceEntity;
     }

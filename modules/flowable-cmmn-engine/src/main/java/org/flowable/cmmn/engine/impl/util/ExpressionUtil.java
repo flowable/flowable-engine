@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,11 +23,13 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -37,8 +41,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class ExpressionUtil {
 
     public static boolean evaluateBooleanExpression(CommandContext commandContext, VariableContainer variableContainer, String condition) {
-        Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(condition);
-        Object evaluationResult = expression.getValue(variableContainer);
+        Object evaluationResult = evaluateExpression(commandContext, variableContainer, condition);
         if (evaluationResult instanceof Boolean) {
             return (boolean) evaluationResult;
         } else if (evaluationResult instanceof String) {
@@ -46,6 +49,11 @@ public class ExpressionUtil {
         } else {
             throw new FlowableException("Expression condition " + condition + " did not evaluate to a boolean value");
         }
+    }
+
+    public static Object evaluateExpression(CommandContext commandContext, VariableContainer variableContainer, String expression) {
+        Expression exp = CommandContextUtil.getExpressionManager(commandContext).createExpression(expression);
+        return exp.getValue(variableContainer);
     }
 
     public static boolean isRequiredPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
@@ -62,24 +70,104 @@ public class ExpressionUtil {
         return false;
     }
 
-    public static boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null) {
-            return hasRepetitionRule(planItemInstanceEntity.getPlanItem());
+    /**
+     * Checks the given plan item to have at least one on-part.
+     *
+     * @param planItem the plan item to check for an on-part
+     * @return true, if there is at least one on-part, false otherwise
+     */
+    public static boolean hasOnParts(PlanItem planItem) {
+        if (planItem.getEntryCriteria() != null && planItem.getEntryCriteria().size() > 0) {
+            for (Criterion criterion : planItem.getEntryCriteria()) {
+                if (criterion.getSentry() != null && criterion.getSentry().getOnParts() != null && criterion.getSentry().getOnParts().size() > 0) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
-    public static boolean hasRepetitionRule(PlanItem planItem) {
-        return planItem.getItemControl() != null
-            && planItem.getItemControl().getRepetitionRule() != null;
+    public static boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
+        return getRepetitionRule(planItemInstanceEntity) != null;
     }
 
+    public static boolean hasRepetitionRule(PlanItem planItem) {
+        return planItem.getItemControl() != null && planItem.getItemControl().getRepetitionRule() != null;
+    }
+
+    /**
+     * Returns the repetition rule, if the given plan item instance has one, null otherwise.
+     *
+     * @param planItemInstanceEntity the plan item instance to check for a repetition rule
+     * @return the repetition rule of the plan item, if available, null otherwise
+     */
+    public static RepetitionRule getRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getItemControl() != null) {
+            return planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule();
+        }
+        return null;
+    }
+
+    /**
+     * Returns true, if the given plan item instance has a repetition rule which is based on a collection variable, false, if there is no repetition rule at
+     * all or if it is not based on a collection variable.
+     *
+     * @param planItemInstanceEntity the plan item instance to check for a repetition rule based on a collection
+     * @return true, if the plan item has a repetition rule based on a collection variable
+     */
+    public static boolean hasRepetitionOnCollection(PlanItemInstanceEntity planItemInstanceEntity) {
+        RepetitionRule repetitionRule = getRepetitionRule(planItemInstanceEntity);
+        return repetitionRule != null && repetitionRule.hasCollectionVariable();
+    }
+
+    /**
+     * Evaluates the collection variable name or expression given by the plan items repetition rule and returns its evaluated collection as a list.
+     *
+     * @param commandContext the command context to be used for evaluating the expression
+     * @param planItemInstanceEntity the plan item instance to evaluate the collection variable given by its repetition rule
+     * @return the collection variable value as a list of objects, might be null, if there is no repetition rule or no collection or the variable or expression
+     *      evaluates to null
+     */
+    public static List<Object> evaluateRepetitionCollectionVariableValue(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        RepetitionRule repetitionRule = getRepetitionRule(planItemInstanceEntity);
+        if (repetitionRule == null || !repetitionRule.hasCollectionVariable()) {
+            return null;
+        }
+
+        String collectionExpression = repetitionRule.getCollectionVariableName();
+
+        if (!(collectionExpression.startsWith("${") || collectionExpression.startsWith("#{"))) {
+            collectionExpression = "${vars:getOrDefault('" + collectionExpression + "', null)}";
+        }
+
+        Object collection = evaluateExpression(commandContext, planItemInstanceEntity, collectionExpression);
+        if (collection == null) {
+            return null;
+        }
+
+        if (collection instanceof List) {
+            return (List) collection;
+        }
+        if (collection instanceof Collection) {
+            return new ArrayList<>((Collection) collection);
+        }
+        throw new FlowableIllegalArgumentException("Could not evaluate collection for repetition rule on plan item with id '" + planItemInstanceEntity.getId() +
+            "', collection variable name '" + repetitionRule.getCollectionVariableName() + "' evaluated to '" + collection + "', but needs to be a collection");
+    }
+
+    /**
+     * Returns true, if: the given plan item instance has a repetition rule at all and if so, if it has a condition witch is satisfied and all in combination
+     * with the optional max instance count attribute. If the repetition rule evaluates to true, this normally means that there should be an additional
+     * instance of the plan item created.
+     *
+     * @param commandContext the command context in which this evaluation is taking place
+     * @param planItemInstanceEntity the plan item instance entity to test for a repetition rule to evaluate to true
+     * @param planItemInstanceContainer the container (usually the parent stage of the plan item instance) to get access to child plan items
+     * @return true, if there is a repetition rule of the plan item instance currently evaluating to true with all of its conditions and attributes
+     */
     public static boolean evaluateRepetitionRule(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
         PlanItemInstanceContainer planItemInstanceContainer) {
-        RepetitionRule repetitionRule = null;
-        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getItemControl() != null) {
-            repetitionRule = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule();
-        }
+        RepetitionRule repetitionRule = getRepetitionRule(planItemInstanceEntity);
 
         if (repetitionRule != null) {
             // we first check, if there is a max instance count set and if so, check, if there are enough active instances available already
