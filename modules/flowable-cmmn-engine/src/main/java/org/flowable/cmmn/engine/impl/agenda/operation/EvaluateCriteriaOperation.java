@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -661,6 +662,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                                     caseInstanceEntity.getId(),
                                     previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null,
                                     caseInstanceEntity.getTenantId(),
+                                    null,
                                     true);
                                 parentPlanItemInstancesToActivate.add(parentPlanItemInstance);
 
@@ -688,6 +690,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null,
                             // previous is closest parent stage plan item instance
                             caseInstanceEntity.getTenantId(),
+                            null,
                             true);
                         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(entryDependentPlanItemInstance);
 
@@ -747,14 +750,17 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
     protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForCollectionRepetition(RepetitionRule repetitionRule,
         PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, List<Object> collection, int index) {
-        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
 
+        // check, if we need to set local variables as the item or item index
+        Map<String, Object> localVariables = new HashMap<>(2);
         if (repetitionRule.hasElementVariable()) {
-            childPlanItemInstanceEntity.setVariableLocal(repetitionRule.getElementVariableName(), collection.get(index));
+            localVariables.put(repetitionRule.getElementVariableName(), collection.get(index));
         }
         if (repetitionRule.hasElementIndexVariable()) {
-            childPlanItemInstanceEntity.setVariableLocal(repetitionRule.getElementIndexVariableName(), index);
+            localVariables.put(repetitionRule.getElementIndexVariableName(), index);
         }
+
+        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false);
 
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.ACTIVE;

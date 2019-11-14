@@ -86,7 +86,8 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
                             planItemInstanceEntity.getCaseDefinitionId(), 
                             planItemInstanceEntity.getCaseInstanceId(), 
                             planItemInstanceEntity.getStageInstanceId(), 
-                            planItemInstanceEntity.getTenantId(), 
+                            planItemInstanceEntity.getTenantId(),
+                            null,
                             true);
             
             // The plan item instance state needs to be set to available manually. 

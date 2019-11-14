@@ -60,19 +60,15 @@ public class PlanItemInstanceEntityManagerImpl
     
     @Override
     public PlanItemInstanceEntity createChildPlanItemInstance(PlanItem planItem, String caseDefinitionId, String caseInstanceId, 
-            String stagePlanItemInstanceId, String tenantId, boolean addToParent) {
+            String stagePlanItemInstanceId, String tenantId, Map<String, Object> localVariables, boolean addToParent) {
         
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
-        CaseInstanceEntity caseInstanceEntity = getCaseInstanceEntityManager().findById(caseInstanceId);
-        
+
         PlanItemInstanceEntity planItemInstanceEntity = create();
         planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
         planItemInstanceEntity.setCaseInstanceId(caseInstanceId);
-        if (planItem.getName() != null) {
-            Expression nameExpression = expressionManager.createExpression(planItem.getName());
-            planItemInstanceEntity.setName(nameExpression.getValue(caseInstanceEntity).toString());
-        }
+
         planItemInstanceEntity.setCreateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
         planItemInstanceEntity.setElementId(planItem.getId());
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
@@ -89,11 +85,23 @@ public class PlanItemInstanceEntityManagerImpl
         planItemInstanceEntity.setTenantId(tenantId);
        
         insert(planItemInstanceEntity);
+
+
+        // adding variables must be done after the entity was inserted, before it does not yet have an id for the variables to be referenced
+        if (localVariables != null && localVariables.size() > 0) {
+            planItemInstanceEntity.setVariablesLocal(localVariables);
+        }
+
+        // the name might have an expression being based on local variables, so we can only set the name after insertion
+        if (planItem.getName() != null) {
+            Expression nameExpression = expressionManager.createExpression(planItem.getName());
+            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
+        }
         
         if (addToParent) {
             addPlanItemInstanceToParent(commandContext, planItemInstanceEntity);
         }
-        
+
         return planItemInstanceEntity;
     }
     
