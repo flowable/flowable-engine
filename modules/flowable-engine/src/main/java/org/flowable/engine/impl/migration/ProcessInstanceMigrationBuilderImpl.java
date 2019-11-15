@@ -38,6 +38,7 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
         migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion());
         migrationDocumentBuilder.setTenantId(document.getMigrateToProcessDefinitionTenantId());
         migrationDocumentBuilder.addActivityMigrationMappings(document.getActivityMigrationMappings());
+        migrationDocumentBuilder.setPreUpgradeScript(document.getPreUpgradeScript());
         return this;
     }
 

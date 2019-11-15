@@ -10,33 +10,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.engine.migration;
 
-import java.util.List;
-import java.util.Map;
-
 /**
- * @author Dennis Federico
+ * @author martin.grofcik
  */
-public interface ProcessInstanceMigrationDocument {
+public class Script {
+    protected String script;
+    protected String language;
 
-    String getMigrateToProcessDefinitionId();
+    public Script() {
+    }
 
-    String getMigrateToProcessDefinitionKey();
+    public Script(String script, String language) {
+        this.script = script;
+        this.language = language;
+    }
 
-    Integer getMigrateToProcessDefinitionVersion();
-
-    String getMigrateToProcessDefinitionTenantId();
-
-    Script getPreUpgradeScript();
-
-    List<ActivityMigrationMapping> getActivityMigrationMappings();
-
-    Map<String, Map<String, Object>> getActivitiesLocalVariables();
-
-    Map<String, Object> getProcessInstanceVariables();
-
-    String asJsonString();
-
+    public String getScript() {
+        return script;
+    }
+    public void setScript(String script) {
+        this.script = script;
+    }
+    public String getLanguage() {
+        return language;
+    }
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 }

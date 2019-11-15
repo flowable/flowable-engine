@@ -18,9 +18,12 @@ import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentCons
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_ID_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.LANGUAGE;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.LOCAL_VARIABLES_JSON_SECTION;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_SCRIPT;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PROCESS_INSTANCE_VARIABLES_JSON_SECTION;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.SCRIPT;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_IDS_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_ID_JSON_PROPERTY;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_ID_JSON_PROPERTY;
@@ -91,6 +94,11 @@ public class ProcessInstanceMigrationDocumentConverter {
             documentNode.put(TO_PROCESS_DEFINITION_TENANT_ID_JSON_PROPERTY, processInstanceMigrationDocument.getMigrateToProcessDefinitionTenantId());
         }
 
+        JsonNode preUpgradeScriptNode = convertToJsonPreUpgradeScript(processInstanceMigrationDocument.getPreUpgradeScript(), objectMapper);
+        if (preUpgradeScriptNode != null && !preUpgradeScriptNode.isNull()) {
+            documentNode.set(PRE_UPGRADE_SCRIPT, preUpgradeScriptNode);
+        }
+
         ArrayNode mappingNodes = convertToJsonActivityMigrationMappings(processInstanceMigrationDocument.getActivityMigrationMappings());
         if (mappingNodes != null && !mappingNodes.isNull()) {
             documentNode.set(ACTIVITY_MAPPINGS_JSON_SECTION, mappingNodes);
@@ -149,6 +157,13 @@ public class ProcessInstanceMigrationDocumentConverter {
                 .map(JsonNode::textValue).orElse(null);
             documentBuilder.setTenantId(processDefinitionTenantId);
 
+            JsonNode preUpgradeScriptNode = rootNode.get(PRE_UPGRADE_SCRIPT);
+            if (preUpgradeScriptNode != null) {
+                String language = Optional.ofNullable(preUpgradeScriptNode.get(LANGUAGE)).map(JsonNode::asText).orElse("javascript");
+                String script = Optional.ofNullable(preUpgradeScriptNode.get(SCRIPT)).map(JsonNode::asText).orElse("javascript");
+                documentBuilder.setPreUpgradeScript(new Script(language, script));
+            }
+
             JsonNode activityMigrationMappings = rootNode.get(ACTIVITY_MAPPINGS_JSON_SECTION);
             if (activityMigrationMappings != null) {
 
@@ -187,6 +202,13 @@ public class ProcessInstanceMigrationDocumentConverter {
         Map<String, Object> processInstanceVariables = processInstanceMigrationDocument.getProcessInstanceVariables();
         if (processInstanceVariables != null && !processInstanceVariables.isEmpty()) {
             return objectMapper.valueToTree(processInstanceVariables);
+        }
+        return null;
+    }
+
+    protected static JsonNode convertToJsonPreUpgradeScript(Script script, ObjectMapper objectMapper) {
+        if (script != null) {
+            return objectMapper.valueToTree(script);
         }
         return null;
     }

@@ -27,6 +27,8 @@ public interface ProcessInstanceMigrationDocumentBuilder {
 
     ProcessInstanceMigrationDocumentBuilder setTenantId(String processDefinitionTenantId);
 
+    ProcessInstanceMigrationDocumentBuilder setPreUpgradeScript(Script script);
+
     ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings);
 
     ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(ActivityMigrationMapping activityMigrationMapping);

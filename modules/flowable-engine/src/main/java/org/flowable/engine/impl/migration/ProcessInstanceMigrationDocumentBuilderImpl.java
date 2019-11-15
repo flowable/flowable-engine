@@ -22,6 +22,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
+import org.flowable.engine.migration.Script;
 
 /**
  * @author Dennis Federico
@@ -34,6 +35,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     protected String migrateToProcessDefinitionTenantId;
     protected List<ActivityMigrationMapping> activityMigrationMappings = new ArrayList<>();
     protected Map<String, Object> processInstanceVariables = new HashMap<>();
+    protected Script preUpgradeScript;
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId) {
@@ -51,6 +53,12 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     @Override
     public ProcessInstanceMigrationDocumentBuilder setTenantId(String processDefinitionTenantId) {
         this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPreUpgradeScript(Script script) {
+        this.preUpgradeScript = script;
         return this;
     }
 
@@ -93,6 +101,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
         ProcessInstanceMigrationDocumentImpl document = new ProcessInstanceMigrationDocumentImpl();
         document.setMigrateToProcessDefinitionId(migrateToProcessDefinitionId);
         document.setMigrateToProcessDefinition(migrateToProcessDefinitionKey, migrateToProcessDefinitionVersion, migrateToProcessDefinitionTenantId);
+        document.setPreUpgradeScript(preUpgradeScript);
         document.setActivityMigrationMappings(activityMigrationMappings);
         document.setProcessInstanceVariables(processInstanceVariables);
 

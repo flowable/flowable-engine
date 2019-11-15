@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
+import org.flowable.engine.migration.Script;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -39,6 +40,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     protected List<ActivityMigrationMapping> activityMigrationMappings;
     protected Map<String, Map<String, Object>> activitiesLocalVariables;
     protected Map<String, Object> processInstanceVariables;
+    protected Script preUpgradeScript;
 
     public static ProcessInstanceMigrationDocument fromJson(String processInstanceMigrationDocumentJson) {
         return ProcessInstanceMigrationDocumentConverter.convertFromJson(processInstanceMigrationDocumentJson);
@@ -59,6 +61,10 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
     }
 
+    public void setPreUpgradeScript(Script script) {
+        this.preUpgradeScript = script;
+    }
+
     @Override
     public String getMigrateToProcessDefinitionId() {
         return migrateToProcessDefinitionId;
@@ -77,6 +83,11 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     @Override
     public String getMigrateToProcessDefinitionTenantId() {
         return migrateToProcessDefinitionTenantId;
+    }
+
+    @Override
+    public Script getPreUpgradeScript() {
+        return preUpgradeScript;
     }
 
     public void setActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings) {
