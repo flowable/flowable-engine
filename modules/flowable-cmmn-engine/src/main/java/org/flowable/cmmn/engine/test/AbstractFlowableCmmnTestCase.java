@@ -193,7 +193,6 @@ public abstract class AbstractFlowableCmmnTestCase {
     }
 
     protected void completePlanItems(String caseInstanceId, String planItemName, int expectedCount, int numberToComplete) {
-        // now let's complete all Tasks B -> nothing must happen additionally
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(caseInstanceId)
             .planItemInstanceName(planItemName)
