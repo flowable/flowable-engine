@@ -480,16 +480,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
     @Override
     public CallActivityBehavior createCallActivityBehavior(CallActivity callActivity) {
-        String expressionRegex = "\\$+\\{+.+\\}";
-
-        CallActivityBehavior callActivityBehaviour = null;
-        if (StringUtils.isNotEmpty(callActivity.getCalledElement()) && callActivity.getCalledElement().matches(expressionRegex)) {
-            callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(callActivity.getCalledElement()), callActivity);
-        } else {
-            callActivityBehaviour = new CallActivityBehavior(callActivity.getCalledElement(), callActivity);
-        }
-
-        return callActivityBehaviour;
+        return new CallActivityBehavior(callActivity);
     }
     
     @Override
