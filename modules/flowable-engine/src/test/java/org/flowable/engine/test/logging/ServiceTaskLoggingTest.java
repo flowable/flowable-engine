@@ -179,6 +179,7 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertEquals(7, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
         
+        LoggingSessionLoggerOutput.printLogNodes(FlowableLoggingListener.TEST_LOGGING_NODES);
         FlowableLoggingListener.clear();
     }
     
