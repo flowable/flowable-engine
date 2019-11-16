@@ -18,7 +18,6 @@ import java.util.List;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryPartInstanceDataManager;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez
