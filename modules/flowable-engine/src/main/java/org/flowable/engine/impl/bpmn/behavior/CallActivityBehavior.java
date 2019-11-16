@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
@@ -33,10 +34,12 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -52,6 +55,8 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.flowable.engine.impl.bpmn.helper.DynamicPropertyUtil.getActiveValue;
+
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).
  *
@@ -64,26 +69,16 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
     private static final long serialVersionUID = 1L;
 
+    private static final String EXPRESSION_REGEX = "\\$+\\{+.+\\}";
     public static final String CALLED_ELEMENT_TYPE_KEY = "key";
     public static final String CALLED_ELEMENT_TYPE_ID = "id";
 
     protected CallActivity callActivity;
-    protected String calledElement;
     protected String calledElementType;
-    protected Expression calledElementExpression;
     protected Boolean fallbackToDefaultTenant;
     protected List<MapExceptionEntry> mapExceptions;
 
-    public CallActivityBehavior(String processDefinitionKey, CallActivity callActivity) {
-        this.calledElement = processDefinitionKey;
-        this.callActivity = callActivity;
-        this.calledElementType = callActivity.getCalledElementType();
-        this.mapExceptions = callActivity.getMapExceptions();
-        this.fallbackToDefaultTenant = callActivity.getFallbackToDefaultTenant();
-    }
-
-    public CallActivityBehavior(Expression processDefinitionExpression, CallActivity callActivity) {
-        this.calledElementExpression = processDefinitionExpression;
+    public CallActivityBehavior(CallActivity callActivity) {
         this.callActivity = callActivity;
         this.calledElementType = callActivity.getCalledElementType();
         this.mapExceptions = callActivity.getMapExceptions();
@@ -247,7 +242,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         ProcessDefinition processDefinition;
         switch (StringUtils.isNotEmpty(calledElementType) ? calledElementType : CALLED_ELEMENT_TYPE_KEY) {
             case CALLED_ELEMENT_TYPE_ID:
-                processDefinition = getProcessDefinitionById(execution);
+                processDefinition = getProcessDefinitionById(execution, processEngineConfiguration);
                 break;
             case CALLED_ELEMENT_TYPE_KEY:
                 processDefinition = getProcessDefinitionByKey(execution, callActivity.isSameDeployment(), processEngineConfiguration);
@@ -310,13 +305,13 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         leave(execution);
     }
 
-    protected ProcessDefinition getProcessDefinitionById(DelegateExecution execution) {
+    protected ProcessDefinition getProcessDefinitionById(DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
         return CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager()
-            .findDeployedProcessDefinitionById(getCalledElementValue(execution));
+            .findDeployedProcessDefinitionById(getCalledElementValue(execution, processEngineConfiguration));
     }
 
     protected ProcessDefinition getProcessDefinitionByKey(DelegateExecution execution, boolean isSameDeployment, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        String processDefinitionKey = getCalledElementValue(execution);
+        String processDefinitionKey = getCalledElementValue(execution, processEngineConfiguration);
         String tenantId = execution.getTenantId();
 
         ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
@@ -358,12 +353,15 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         return processDefinition;
     }
 
-    protected String getCalledElementValue(DelegateExecution execution) {
-        String calledElementValue;
-        if (calledElementExpression != null) {
-            calledElementValue = (String) calledElementExpression.getValue(execution);
-        } else {
-            calledElementValue = calledElement;
+    protected String getCalledElementValue(DelegateExecution execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        String calledElementValue = callActivity.getCalledElement();
+        if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()){
+            ObjectNode taskElementProperties = BpmnOverrideContext
+                    .getBpmnOverrideElementProperties(callActivity.getId(), execution.getProcessDefinitionId());
+            calledElementValue = getActiveValue(callActivity.getCalledElement(), DynamicBpmnConstants.CALL_ACTIVITY_CALLED_ELEMENT, taskElementProperties);
+        }
+        if (StringUtils.isNotEmpty(calledElementValue) && calledElementValue.matches(EXPRESSION_REGEX)) {
+            calledElementValue = (String) processEngineConfiguration.getExpressionManager().createExpression(calledElementValue).getValue(execution);
         }
         return calledElementValue;
     }
@@ -383,13 +381,5 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     // Allow a subclass to override how variables are initialized.
     protected void initializeVariables(ExecutionEntity subProcessInstance, Map<String, Object> variables) {
         subProcessInstance.setVariables(variables);
-    }
-
-    public void setCalledElement(String calledElement) {
-        this.calledElement = calledElement;
-    }
-
-    public String getCalledElement() {
-        return calledElement;
     }
 }

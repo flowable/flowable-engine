@@ -12,8 +12,6 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.flowable.cmmn.model.RepetitionRule.MAX_INSTANCE_COUNT_ONE;
-import static org.flowable.cmmn.model.RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -61,10 +59,10 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
             null, null, null);
 
         assertRepetitionRuleAttributes(caseElements, "Task B", null,
-            null, null, MAX_INSTANCE_COUNT_ONE);
+            null, null, 1);
 
         assertRepetitionRuleAttributes(caseElements, "Task C", null,
-            null, null, MAX_INSTANCE_COUNT_UNLIMITED);
+            null, null, RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED);
 
         assertRepetitionRuleAttributes(caseElements, "Task D", null,
             null, null, null);
@@ -74,7 +72,7 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
     }
 
     protected void assertRepetitionRuleAttributes(Map<String, CaseElement> caseElements, String planItemName,
-        String collectionVariableName, String elementVariableName, String elementIndexVariableName, String maxInstanceCount) {
+        String collectionVariableName, String elementVariableName, String elementIndexVariableName, Integer maxInstanceCount) {
         List<CaseElement> planItems = caseElements.values().stream()
             .filter(caseElement -> caseElement instanceof PlanItem && planItemName.equals(caseElement.getName()))
             .collect(Collectors.toList());

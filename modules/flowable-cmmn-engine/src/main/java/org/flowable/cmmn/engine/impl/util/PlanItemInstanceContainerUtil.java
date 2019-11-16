@@ -95,7 +95,7 @@ public class PlanItemInstanceContainerUtil {
                     if (ExpressionUtil.isRequiredPlanItemInstance(commandContext, planItemInstance)) {
                         // if the plan item is repeatable, we need to further investigate, as a required plan item might have a special rule set to be ignored
                         // after first completion
-                        if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstance)) {
+                        if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstance, (PlanItemInstanceContainer) null)) {
                             alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItemInstance);
                             if (shouldIgnorePlanItemForCompletion(commandContext, planItemInstance, alreadyCompleted)) {
                                 continue;
@@ -124,7 +124,7 @@ public class PlanItemInstanceContainerUtil {
                     }
 
                     // special care if the plan item is repeatable
-                    if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstance)) {
+                    if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstance, (PlanItemInstanceContainer) null)) {
                         if (alreadyCompleted == null) {
                             alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItemInstance);
                         }

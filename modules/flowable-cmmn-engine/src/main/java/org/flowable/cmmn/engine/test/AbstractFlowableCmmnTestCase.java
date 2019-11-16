@@ -173,6 +173,42 @@ public abstract class AbstractFlowableCmmnTestCase {
         }
     }
 
+    protected void assertPlanItemLocalVariables(String caseInstanceId, String planItemName, List<?> itemVariableValues, List<Integer> itemIndexVariableValues) {
+        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceName(planItemName)
+            .planItemInstanceStateActive()
+            .orderByCreateTime().asc()
+            .list();
+
+        assertEquals(itemVariableValues.size(), tasks.size());
+        for (int ii = 0; ii < tasks.size(); ii++) {
+            PlanItemInstance task = tasks.get(ii);
+
+            Object itemValue = cmmnRuntimeService.getLocalVariable(task.getId(), "item");
+            Object itemIndexValue = cmmnRuntimeService.getLocalVariable(task.getId(), "itemIndex");
+            assertEquals(itemVariableValues.get(ii), itemValue);
+            assertEquals(itemIndexVariableValues.get(ii), itemIndexValue);
+        }
+    }
+
+    protected void completePlanItems(String caseInstanceId, String planItemName, int expectedCount, int numberToComplete) {
+        // now let's complete all Tasks B -> nothing must happen additionally
+        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceName(planItemName)
+            .planItemInstanceStateActive()
+            .orderByCreateTime().asc()
+            .list();
+
+        assertEquals(expectedCount, tasks.size());
+        assertTrue(numberToComplete <= expectedCount);
+        int completedCount = 0;
+        while (completedCount < numberToComplete) {
+            cmmnRuntimeService.triggerPlanItemInstance(tasks.get(completedCount++).getId());
+        }
+    }
+
     protected List<PlanItemInstance> getAllPlanItemInstances(String caseInstanceId) {
         return cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(caseInstanceId)

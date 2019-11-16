@@ -375,6 +375,18 @@ public class DynamicBpmnServiceImpl extends CommonEngineServiceImpl<ProcessEngin
     }
 
     @Override
+    public ObjectNode changeCallActivityCalledElement(String id, String calledElement){
+        ObjectNode infoNode = configuration.getObjectMapper().createObjectNode();
+        changeCallActivityCalledElement(id, calledElement, infoNode);
+        return infoNode;
+    }
+
+    @Override
+    public void changeCallActivityCalledElement(String id, String calledElement, ObjectNode infoNode){
+        setElementProperty(id, CALL_ACTIVITY_CALLED_ELEMENT, calledElement, infoNode);
+    }
+
+    @Override
     public ObjectNode getBpmnElementProperties(String id, ObjectNode infoNode) {
         ObjectNode propertiesNode = null;
         ObjectNode bpmnNode = getBpmnNode(infoNode);

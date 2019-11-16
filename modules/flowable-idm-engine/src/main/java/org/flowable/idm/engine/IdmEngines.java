@@ -70,8 +70,7 @@ public abstract class IdmEngines {
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext(); ) {
-                URL resource = iterator.next();
+            for (URL resource : configUrls) {
                 LOGGER.info("Initializing idm engine using configuration '{}'", resource);
                 initIdmEngineFromResource(resource);
             }
