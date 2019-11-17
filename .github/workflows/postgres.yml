@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openjdk:8
     strategy:
+      fail-fast: false
       matrix:
         postgres: [9, 10, 11, 12]
     services:
@@ -47,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openjdk:8
     strategy:
+      fail-fast: false
       matrix:
         postgres: [9, 10, 11, 12]
     services:
@@ -83,6 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openjdk:8
     strategy:
+      fail-fast: false
       matrix:
         postgres: [9, 10, 11, 12]
     services:

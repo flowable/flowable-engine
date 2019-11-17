@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openjdk:8
     strategy:
+      fail-fast: false
       matrix:
         db2: ["11.5.0.0a"]
     services:
@@ -55,6 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openjdk:8
     strategy:
+      fail-fast: false
       matrix:
         db2: ["11.5.0.0a"]
     services:
@@ -99,6 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openjdk:8
     strategy:
+      fail-fast: false
       matrix:
         db2: ["11.5.0.0a"]
     services:
