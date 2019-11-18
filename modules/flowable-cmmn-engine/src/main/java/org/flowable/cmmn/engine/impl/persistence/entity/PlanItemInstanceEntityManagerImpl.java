@@ -57,10 +57,14 @@ public class PlanItemInstanceEntityManagerImpl
     public PlanItemInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceDataManager planItemInstanceDataManager) {
         super(cmmnEngineConfiguration, planItemInstanceDataManager);
     }
-    
+
     @Override
-    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItem planItem, String caseDefinitionId, String caseInstanceId, 
-            String stagePlanItemInstanceId, String tenantId, Map<String, Object> localVariables, boolean addToParent) {
+    public PlanItemInstanceBuilder createPlanItemInstanceBuilder() {
+        return new PlanItemInstanceBuilderImpl(this);
+    }
+
+    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItem planItem, String caseDefinitionId, String caseInstanceId,
+            String stagePlanItemInstanceId, String tenantId, Map<String, Object> localVariables, boolean addToParent, boolean silentNameExpressionEvaluation) {
         
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
@@ -95,7 +99,19 @@ public class PlanItemInstanceEntityManagerImpl
         // the name might have an expression being based on local variables, so we can only set the name after insertion
         if (planItem.getName() != null) {
             Expression nameExpression = expressionManager.createExpression(planItem.getName());
-            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
+            String name;
+            if (silentNameExpressionEvaluation) {
+                try {
+                    name = nameExpression.getValue(planItemInstanceEntity).toString();
+                } catch (Exception e) {
+                    // we silently catch this exception as it is expected to a possible failure due to the state of the name evaluation
+                    // we use the expression itself as a fallback in this case
+                    name = planItem.getName();
+                }
+            } else {
+                name = nameExpression.getValue(planItemInstanceEntity).toString();
+            }
+            planItemInstanceEntity.setName(name);
         }
         
         if (addToParent) {

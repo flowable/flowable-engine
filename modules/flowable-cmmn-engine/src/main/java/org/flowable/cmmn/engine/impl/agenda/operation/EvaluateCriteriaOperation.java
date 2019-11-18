@@ -657,14 +657,16 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             List<PlanItemInstanceEntity> parentPlanItemInstances = existingPlanItemInstancesMap.get(parentPlanItem.getId());
 
                             if (parentPlanItemInstances == null || parentPlanItemInstances.isEmpty()) {
-                                PlanItemInstanceEntity parentPlanItemInstance = planItemInstanceEntityManager.createChildPlanItemInstance(
-                                    parentPlanItem,
-                                    caseInstanceEntity.getCaseDefinitionId(),
-                                    caseInstanceEntity.getId(),
-                                    previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null,
-                                    caseInstanceEntity.getTenantId(),
-                                    null,
-                                    true);
+                                PlanItemInstanceEntity parentPlanItemInstance = planItemInstanceEntityManager
+                                    .createPlanItemInstanceBuilder()
+                                    .planItem(parentPlanItem)
+                                    .caseDefinitionId(caseInstanceEntity.getCaseDefinitionId())
+                                    .caseInstanceId(caseInstanceEntity.getId())
+                                    .stagePlanItemInstanceId(previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null)
+                                    .tenantId(caseInstanceEntity.getTenantId())
+                                    .addToParent(true)
+                                    .create();
+
                                 parentPlanItemInstancesToActivate.add(parentPlanItemInstance);
 
                                 previousParentPlanItemInstance = parentPlanItemInstance;
@@ -684,15 +686,17 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         }
 
                         // Creating plan item instance for the activated plan item
-                        PlanItemInstanceEntity entryDependentPlanItemInstance = planItemInstanceEntityManager.createChildPlanItemInstance(
-                            entryDependentPlanItem,
-                            caseInstanceEntity.getCaseDefinitionId(),
-                            caseInstanceEntity.getId(),
-                            previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null,
+                        PlanItemInstanceEntity entryDependentPlanItemInstance = planItemInstanceEntityManager
+                            .createPlanItemInstanceBuilder()
+                            .planItem(entryDependentPlanItem)
+                            .caseDefinitionId(caseInstanceEntity.getCaseDefinitionId())
+                            .caseInstanceId(caseInstanceEntity.getId())
+                            .stagePlanItemInstanceId(previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null)
                             // previous is closest parent stage plan item instance
-                            caseInstanceEntity.getTenantId(),
-                            null,
-                            true);
+                            .tenantId(caseInstanceEntity.getTenantId())
+                            .addToParent(true)
+                            .create();
+
                         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(entryDependentPlanItemInstance);
 
                         // Special care needed in case the plan item instance is repeating
@@ -737,7 +741,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
 
     protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForRepetition(PlanItemInstanceEntity planItemInstanceEntity) {
-        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
+        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
 
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
@@ -761,7 +765,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             localVariables.put(repetitionRule.getElementIndexVariableName(), index);
         }
 
-        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false);
+        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
 
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.ACTIVE;

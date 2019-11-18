@@ -13,21 +13,22 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
-import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez
  */
 public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemInstanceEntity> {
-    
-    PlanItemInstanceEntity createChildPlanItemInstance(PlanItem planItem, String caseDefinitionId, String caseInstanceId,
-        String stagePlanItemInstanceId, String tenantId, Map<String, Object> localVariables, boolean addToParent);
-    
+
+    /**
+     * Returns a builder to create a new plan item instance.
+     * @return the plan item instance builder
+     */
+    PlanItemInstanceBuilder createPlanItemInstanceBuilder();
+
     PlanItemInstanceQuery createPlanItemInstanceQuery();
 
     long countByCriteria(PlanItemInstanceQuery planItemInstanceQuery);
