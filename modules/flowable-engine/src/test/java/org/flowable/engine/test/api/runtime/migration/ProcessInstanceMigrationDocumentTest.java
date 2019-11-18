@@ -27,6 +27,7 @@ import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.Script;
 import org.junit.jupiter.api.Test;
 
 public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
@@ -100,6 +101,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator().containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
+        assertThat(migrationDocument.getPreUpgradeScript()).isEqualToComparingFieldByField(new Script("groovy", "1+1"));
     }
 
     @Test
@@ -173,6 +175,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
         ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
             .migrateToProcessDefinition(definitionId)
+            .preUpgradeScript(new Script("groovy", "1+1"))
             .addActivityMigrationMapping(oneToOneMapping)
             .addActivityMigrationMapping(oneToManyMapping)
             .addActivityMigrationMapping(manyToOneMapping)
@@ -193,6 +196,8 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator().containsAnyOf(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
+        assertThat(migrationDocument.getPreUpgradeScript().getLanguage()).isEqualTo("groovy");
+        assertThat(migrationDocument.getPreUpgradeScript().getScript()).isEqualTo("1+1");
     }
 
     @Test

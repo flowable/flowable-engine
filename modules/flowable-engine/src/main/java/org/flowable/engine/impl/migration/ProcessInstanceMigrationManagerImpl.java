@@ -43,6 +43,7 @@ import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.dynamic.AbstractDynamicStateManager;
@@ -52,6 +53,7 @@ import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationStatusJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
@@ -63,6 +65,7 @@ import org.flowable.engine.migration.ProcessInstanceBatchMigrationResult;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
+import org.flowable.engine.migration.Script;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -70,7 +73,7 @@ import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
- 
+
 public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateManager implements ProcessInstanceMigrationManager {
 
     Predicate<ExecutionEntity> isSubProcessExecution = executionEntity -> executionEntity.getCurrentFlowElement() instanceof SubProcess;
@@ -382,6 +385,10 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         LOGGER.debug("Start migration of process instance with Id:'{}' to process definition identified by {}", processInstance.getId(), printProcessDefinitionIdentifierMessage(document));
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+
+        LOGGER.debug("Execute pre upgrade process instance script");
+        executeScript(processInstance, procDefToMigrateTo, document.getPreUpgradeScript(), commandContext);
+
         List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders((ExecutionEntity) processInstance, procDefToMigrateTo, document, commandContext);
 
         LOGGER.debug("Updating Process definition reference of process root execution with id:'{}' to '{}'", processInstance.getId(), procDefToMigrateTo.getId());
@@ -416,7 +423,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         LOGGER.debug("Process migration ended for process instance with Id:'{}'", processInstance.getId());
     }
-
     @Override
     protected Map<String, List<ExecutionEntity>> resolveActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext) {
         return Collections.emptyMap();
@@ -429,6 +435,21 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             currentFlowElement instanceof ReceiveTask && newFlowElement instanceof ReceiveTask) &&
             (((Task) currentFlowElement).getLoopCharacteristics() == null && !getFlowElementMultiInstanceParentId(currentFlowElement).isPresent()) &&
             (((Task) newFlowElement).getLoopCharacteristics() == null && !getFlowElementMultiInstanceParentId(newFlowElement).isPresent());
+    }
+
+    protected void executeScript(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, Script script, CommandContext commandContext) {
+        if (script == null) {
+            LOGGER.debug("Script execution is empty.");
+        } else {
+            ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
+
+            try {
+                scriptingEngines.evaluate(script.getScript(), script.getLanguage(), (ExecutionEntityImpl) processInstance);
+            } catch (FlowableException e) {
+                LOGGER.warn("Exception while executing upgrade of process instance {} : {}", processInstance.getId(), e.getMessage());
+                throw e;
+            }
+        }
     }
 
     protected List<ChangeActivityStateBuilderImpl> prepareChangeStateBuilders(ExecutionEntity processInstanceExecution, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {

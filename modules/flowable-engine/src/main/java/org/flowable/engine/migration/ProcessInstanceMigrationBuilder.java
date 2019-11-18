@@ -67,6 +67,14 @@ public interface ProcessInstanceMigrationBuilder {
     ProcessInstanceMigrationBuilder withMigrateToProcessDefinitionTenantId(String processDefinitionTenantId);
 
     /**
+     * The script executed before process instance migration
+     *
+     * @param script the script to execute
+     * @return process instance migration builder
+     */
+    ProcessInstanceMigrationBuilder preUpgradeScript(Script script);
+
+    /**
      * Adds an activity mapping to the process instance migration plan. Addition order is relevant and "auto-mapping" has priority. There can only be one mapping for a given "from" activity.
      *
      * @param mapping

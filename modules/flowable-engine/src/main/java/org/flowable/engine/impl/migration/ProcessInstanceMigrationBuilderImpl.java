@@ -22,6 +22,7 @@ import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
+import org.flowable.engine.migration.Script;
 
 public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigrationBuilder {
 
@@ -64,6 +65,12 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     @Override
     public ProcessInstanceMigrationBuilder withMigrateToProcessDefinitionTenantId(String processDefinitionTenantId) {
         this.migrationDocumentBuilder.setTenantId(processDefinitionTenantId);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder preUpgradeScript(Script script) {
+        this.migrationDocumentBuilder.setPreUpgradeScript(script);
         return this;
     }
 

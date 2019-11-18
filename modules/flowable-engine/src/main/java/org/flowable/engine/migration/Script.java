@@ -22,7 +22,7 @@ public class Script {
     public Script() {
     }
 
-    public Script(String script, String language) {
+    public Script(String language, String script) {
         this.script = script;
         this.language = language;
     }
