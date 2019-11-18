@@ -178,6 +178,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             .caseInstanceId(caseInstanceId)
             .planItemInstanceName(planItemName)
             .planItemInstanceStateActive()
+            .orderByName().asc()
             .orderByCreateTime().asc()
             .list();
 
