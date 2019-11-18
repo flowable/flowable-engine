@@ -69,8 +69,7 @@ public abstract class ContentEngines {
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
-                URL resource = iterator.next();
+            for (URL resource : configUrls) {
                 LOGGER.info("Initializing content engine using configuration '{}'", resource);
                 initContentEngineFromResource(resource);
             }

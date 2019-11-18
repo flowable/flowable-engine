@@ -40,7 +40,7 @@ The **FormManagementService** is typically not needed when coding custom applica
 
 The base exception in Flowable is the org.flowable.engine.FlowableException, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the [the javadocs](http://www.flowable.org/docs/javadocs/index.html). For example, an extract from FormRuleService:
 
-Even though we want to avoid a big exception hierarchy, the following subclasses are thrown in specific cases. All other errors that occur during process-execution or API-invocation that don’t fit into the possible exceptions below, are thrown as regular FlowableExceptionss.
+Even though we want to avoid a big exception hierarchy, the following subclasses are thrown in specific cases. All other errors that occur during process-execution or API-invocation that don’t fit into the possible exceptions below, are thrown as regular FlowableExceptions.
 
 -   FlowableOptimisticLockingException: Thrown when an optimistic lock occurs in the data store caused by concurrent access of the same data entry.
 

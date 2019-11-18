@@ -69,8 +69,7 @@ public abstract class FormEngines {
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
-                URL resource = iterator.next();
+            for (URL resource : configUrls) {
                 LOGGER.info("Initializing form engine using configuration '{}'", resource);
                 initFormEngineFromResource(resource);
             }

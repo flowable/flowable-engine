@@ -14,7 +14,6 @@ package org.flowable.engine.test.bpmn.event.timer.compatibility;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 

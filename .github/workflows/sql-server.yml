@@ -11,6 +11,7 @@ jobs:
     name: SQL Server ${{ matrix.mssql }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mssql: [2017-latest-ubuntu]
     services:
@@ -60,6 +61,7 @@ jobs:
     name: DMN SQL Server ${{ matrix.mssql }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mssql: [2017-latest-ubuntu]
     services:
@@ -110,6 +112,7 @@ jobs:
     name: Content SQL Server ${{ matrix.mssql }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mssql: [2017-latest-ubuntu]
     services:

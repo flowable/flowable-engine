@@ -40,10 +40,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
     public void testManualActivatedTaskWithRepetition() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("requiredTaskWithRepetitionAndManualActivation").start();
 
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(3, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -51,15 +48,10 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "User Listener A", UNAVAILABLE);
 
         // activate task and complete it the first time will make the user listener available
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .orderByEndTime().asc()
-            .includeEnded()
-            .list();
+        planItemInstances = getAllPlanItemInstances(caseInstance.getId());
 
         assertEquals(4, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -67,7 +59,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "User Listener A", AVAILABLE);
 
         // trigger user listener to complete stage
-        cmmnRuntimeService.completeUserEventListenerInstance(planItemInstances.get(3).getId());
+        cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "User Listener A"));
 
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
@@ -79,10 +71,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
     public void testManualActivatedTaskWithRepetitionIgnoreAfterFirstCompletion() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("requiredTaskWithRepetitionAndManualActivation").start();
 
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(3, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -91,15 +80,10 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
 
         // Completing the task should not complete the case instance, even when set to 'ignoreAfterFirstCompletion',
         // as the event listener is still there in the available state.
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .orderByEndTime().asc()
-            .includeEnded()
-            .list();
+        planItemInstances = getAllPlanItemInstances(caseInstance.getId());
 
         assertEquals(4, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -107,7 +91,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "User Listener A", AVAILABLE);
 
         // trigger user listener to complete stage
-        cmmnRuntimeService.completeUserEventListenerInstance(planItemInstances.get(3).getId());
+        cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "User Listener A"));
 
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
@@ -119,10 +103,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
     public void testManualActivatedTaskWithRepetitionIgnoredAfterFirstCompletion() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("requiredTaskWithRepetitionAndManualActivation").start();
 
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(3, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -130,8 +111,8 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "User Listener A", UNAVAILABLE);
 
         // activate task and complete it the first time will complete the case as it will be ignored after first completion
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
 
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
@@ -143,10 +124,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
     public void testNestedComplexCompletion() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestingPlanItems").start();
 
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(7, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -158,13 +136,10 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ENABLED);
 
         // start and complete Task A -> nothing yet to happen
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(6, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -175,12 +150,9 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ENABLED);
 
         // complete Task C -> nothing yet to happen
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(5, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -190,12 +162,9 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ENABLED);
 
         // start Task B -> nothing yet to happen
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(5, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -205,19 +174,16 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ENABLED);
 
         // complete Task B -> Stage B and then Stage A need to complete
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(1, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Task E", ENABLED);
 
         // start and complete Task E -> case must be completed, as Task E is ignored after first completion
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(0).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task E"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task E"));
 
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
@@ -229,10 +195,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
     public void testNestedComplexCompletionAlternatePath() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestingPlanItems").start();
 
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(7, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -244,13 +207,10 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ENABLED);
 
         // start Task D and E -> nothing yet to happen
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(5).getId());
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(6).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task D"));
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task E"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(7, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -262,13 +222,10 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ACTIVE);
 
         // complete Task C and Task D -> still nothing yet to happen
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(4).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(5).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task D"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(5, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -278,13 +235,10 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ACTIVE);
 
         // start and complete Task A -> nothing yet to happen
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(4, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -293,12 +247,9 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ACTIVE);
 
         // start Task B -> nothing yet to happen
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(4, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -307,12 +258,9 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ACTIVE);
 
         // complete Task E -> nothing further changes
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task E"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(4, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -321,7 +269,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task E", ENABLED);
 
         // complete Task B -> case must be completed now
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
 
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
@@ -334,10 +282,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = runComplexCompletionTestScenario(false);
 
         // because autocompletion is off, we still stay in Stage A
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(4, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -363,10 +308,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
             .variable("autocompleteEnabled", autocompleteEnabled)
             .start();
 
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(9, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -380,12 +322,9 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task H", ENABLED);
 
         // complete Task A -> will enable B and D, C stays in available as it has a condition
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(9, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -400,10 +339,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         // activate Task C by setting the flag making its condition true
         cmmnRuntimeService.setVariable(caseInstance.getId(), "activateTaskC", true);
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(9, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -416,14 +352,11 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task H", ENABLED);
 
         // start Task B and D and complete C
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(1).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(3).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task D", ENABLED));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(8, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -435,13 +368,10 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task H", ENABLED);
 
         // complete Task B and D
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task D", ACTIVE));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(6, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -452,17 +382,14 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task H", ENABLED);
 
         // start and complete Task H
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(5).getId());
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(5).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task H"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task H"));
 
         // enable Task F through making its condition true and then start it
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableTaskF", true);
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(3).getId());
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task F"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(5, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -472,13 +399,10 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task G", ENABLED);
 
         // complete Task F and start Task G
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
-        cmmnRuntimeService.startPlanItemInstance(planItemInstances.get(4).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task F"));
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task G"));
 
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .orderByName().asc()
-            .list();
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
 
         assertEquals(4, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -487,7 +411,7 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task G", ACTIVE);
 
         // complete Task G and depending on autocompletion being on or off, we stay in Stage A or the case will be completed
-        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task G"));
 
         return caseInstance;
     }

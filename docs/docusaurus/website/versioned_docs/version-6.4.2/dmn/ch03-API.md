@@ -54,7 +54,7 @@ The base exception in Flowable is the org.flowable.engine.FlowableException, an 
 
 In the example above, when a key is passed for which no decisions exist, an exception will be thrown. Also, as the javadoc **explicitly states that decisionKey cannot be null, a FlowableIllegalArgumentException will be thrown when null is passed**.
 
-Even though we want to avoid a big exception hierarchy, the following subclasses are thrown in specific cases. All other errors that occur during process-execution or API-invocation that don’t fit into the possible exceptions below are thrown as regular FlowableExceptionss.
+Even though we want to avoid a big exception hierarchy, the following subclasses are thrown in specific cases. All other errors that occur during process-execution or API-invocation that don’t fit into the possible exceptions below are thrown as regular FlowableExceptions.
 
 -   FlowableOptimisticLockingException: Thrown when an optimistic lock occurs in the data store caused by concurrent access of the same data entry.
 
@@ -102,7 +102,7 @@ Dmn engines are cached statically over multiple unit tests when the configuratio
 
 By using FlowableDmnExtension, you can annotate test methods with org.flowable.dmn.engine.test.DmnDeployment
 or org.flowable.dmn.engine.test.DmnDeploymentAnnotation.
-If both @DmnDeployment and @DmnDeploymentAnnotatio are used then the @DmnDeployment
+If both @DmnDeployment and @DmnDeploymentAnnotation are used then the @DmnDeployment
 takes precedence and @DmnDeploymentAnnotation will be ignored.
 When a test method is annotated with @DmnDeployment,
 before each test the dmn files defined in DmnDeployment\#resources will be deployed.

@@ -100,15 +100,16 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 EntityLinkUtil.createNewEntityLink(planItemInstanceEntity.getCaseInstanceId(), taskEntity.getId(), ScopeTypes.TASK);
             }
 
-            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
-            
-            cmmnEngineConfiguration.getListenerNotificationHelper()
-                .executeTaskListeners(humanTask, taskEntity, TaskListener.EVENTNAME_CREATE);
-            
             if (cmmnEngineConfiguration.getCreateHumanTaskInterceptor() != null) {
                 CreateHumanTaskAfterContext afterContext = new CreateHumanTaskAfterContext(humanTask, taskEntity, planItemInstanceEntity);
                 cmmnEngineConfiguration.getCreateHumanTaskInterceptor().afterCreateHumanTask(afterContext);
             }
+
+            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
+
+            cmmnEngineConfiguration.getListenerNotificationHelper()
+                .executeTaskListeners(humanTask, taskEntity, TaskListener.EVENTNAME_CREATE);
+            
 
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.

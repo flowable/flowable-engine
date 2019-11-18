@@ -67,7 +67,7 @@ The next example, gets all variable-updates that have been done in process with 
       .orderByVariableName().asc()
       .list()
 
-This example gets all [form-properties](#formProperties) that were submitted in any task or when starting the process with id "123". Only HistoricFormPropertiess will be returned by this query.
+This example gets all [form-properties](#formProperties) that were submitted in any task or when starting the process with id "123". Only HistoricFormProperties will be returned by this query.
 
     historyService.createHistoricDetailQuery()
       .formProperties()
