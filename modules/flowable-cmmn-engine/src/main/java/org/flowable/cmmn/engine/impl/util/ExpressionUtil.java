@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -128,7 +126,8 @@ public class ExpressionUtil {
      * @return the collection variable value as a list of objects, might be null, if there is no repetition rule or no collection or the variable or expression
      *      evaluates to null
      */
-    public static List<Object> evaluateRepetitionCollectionVariableValue(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    @SuppressWarnings("unchecked")
+    public static Iterable<Object> evaluateRepetitionCollectionVariableValue(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         RepetitionRule repetitionRule = getRepetitionRule(planItemInstanceEntity);
         if (repetitionRule == null || !repetitionRule.hasCollectionVariable()) {
             return null;
@@ -145,14 +144,13 @@ public class ExpressionUtil {
             return null;
         }
 
-        if (collection instanceof List) {
-            return (List) collection;
+        if (collection instanceof Iterable) {
+            return (Iterable<Object>) collection;
         }
-        if (collection instanceof Collection) {
-            return new ArrayList<>((Collection) collection);
-        }
+
         throw new FlowableIllegalArgumentException("Could not evaluate collection for repetition rule on plan item with id '" + planItemInstanceEntity.getId() +
-            "', collection variable name '" + repetitionRule.getCollectionVariableName() + "' evaluated to '" + collection + "', but needs to be a collection");
+            "', collection variable name '" + repetitionRule.getCollectionVariableName() + "' evaluated to '" + collection +
+            "', but needs to be a collection, an iterable or an ArrayNode (JSON).");
     }
 
     /**
