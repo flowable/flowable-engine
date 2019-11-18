@@ -39,7 +39,7 @@ public class ScriptServiceTask extends ServiceTask {
 
     public String getScript() {
         Optional<String> script = fieldExtensions.stream()
-                .filter(e -> e.getFieldName().equalsIgnoreCase("script"))
+                .filter(e -> e.getFieldName().equalsIgnoreCase("scripttext"))
                 .findFirst()
                 .map(FieldExtension::getStringValue);
         return script.orElseThrow(() -> new FlowableException("Missing script"));
