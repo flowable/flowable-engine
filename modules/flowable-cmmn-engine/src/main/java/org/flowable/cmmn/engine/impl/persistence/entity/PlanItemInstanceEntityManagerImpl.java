@@ -63,19 +63,18 @@ public class PlanItemInstanceEntityManagerImpl
         return new PlanItemInstanceBuilderImpl(this);
     }
 
-    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItem planItem, String caseDefinitionId, String caseInstanceId,
-            String stagePlanItemInstanceId, String tenantId, Map<String, Object> localVariables, boolean addToParent, boolean silentNameExpressionEvaluation) {
+    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItemInstanceBuilderImpl builder) {
         
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
 
         PlanItemInstanceEntity planItemInstanceEntity = create();
-        planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
-        planItemInstanceEntity.setCaseInstanceId(caseInstanceId);
+        planItemInstanceEntity.setCaseDefinitionId(builder.getCaseDefinitionId());
+        planItemInstanceEntity.setCaseInstanceId(builder.getCaseInstanceId());
 
         planItemInstanceEntity.setCreateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
-        planItemInstanceEntity.setElementId(planItem.getId());
-        PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+        planItemInstanceEntity.setElementId(builder.getPlanItem().getId());
+        PlanItemDefinition planItemDefinition = builder.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition != null) {
             planItemInstanceEntity.setPlanItemDefinitionId(planItemDefinition.getId());
 
@@ -85,28 +84,28 @@ public class PlanItemInstanceEntityManagerImpl
         } else {
             planItemInstanceEntity.setStage(false);
         }
-        planItemInstanceEntity.setStageInstanceId(stagePlanItemInstanceId);
-        planItemInstanceEntity.setTenantId(tenantId);
+        planItemInstanceEntity.setStageInstanceId(builder.getStagePlanItemInstanceId());
+        planItemInstanceEntity.setTenantId(builder.getTenantId());
        
         insert(planItemInstanceEntity);
 
 
         // adding variables must be done after the entity was inserted, before it does not yet have an id for the variables to be referenced
-        if (localVariables != null && localVariables.size() > 0) {
-            planItemInstanceEntity.setVariablesLocal(localVariables);
+        if (builder.hasLocalVariables()) {
+            planItemInstanceEntity.setVariablesLocal(builder.getLocalVariables());
         }
 
         // the name might have an expression being based on local variables, so we can only set the name after insertion
-        if (planItem.getName() != null) {
-            Expression nameExpression = expressionManager.createExpression(planItem.getName());
+        if (builder.getPlanItem().getName() != null) {
+            Expression nameExpression = expressionManager.createExpression(builder.getPlanItem().getName());
             String name;
-            if (silentNameExpressionEvaluation) {
+            if (builder.isSilentNameExpressionEvaluation()) {
                 try {
                     name = nameExpression.getValue(planItemInstanceEntity).toString();
                 } catch (Exception e) {
                     // we silently catch this exception as it is expected to a possible failure due to the state of the name evaluation
                     // we use the expression itself as a fallback in this case
-                    name = planItem.getName();
+                    name = builder.getPlanItem().getName();
                 }
             } else {
                 name = nameExpression.getValue(planItemInstanceEntity).toString();
@@ -114,7 +113,7 @@ public class PlanItemInstanceEntityManagerImpl
             planItemInstanceEntity.setName(name);
         }
         
-        if (addToParent) {
+        if (builder.addToParent) {
             addPlanItemInstanceToParent(commandContext, planItemInstanceEntity);
         }
 

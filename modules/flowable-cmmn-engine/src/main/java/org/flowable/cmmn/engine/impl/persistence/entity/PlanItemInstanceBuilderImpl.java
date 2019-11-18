@@ -81,8 +81,35 @@ public class PlanItemInstanceBuilderImpl  implements PlanItemInstanceBuilder {
     @Override
     public PlanItemInstanceEntity create() {
         validateData();
-        return planItemInstanceEntityManager.createChildPlanItemInstance(planItem, caseDefinitionId, caseInstanceId, stagePlanItemInstanceId, tenantId,
-            localVariables, addToParent, silentNameExpressionEvaluation);
+        return planItemInstanceEntityManager.createChildPlanItemInstance(this);
+    }
+
+    public PlanItem getPlanItem() {
+        return planItem;
+    }
+    public String getCaseDefinitionId() {
+        return caseDefinitionId;
+    }
+    public String getCaseInstanceId() {
+        return caseInstanceId;
+    }
+    public String getStagePlanItemInstanceId() {
+        return stagePlanItemInstanceId;
+    }
+    public String getTenantId() {
+        return tenantId;
+    }
+    public Map<String, Object> getLocalVariables() {
+        return localVariables;
+    }
+    public boolean hasLocalVariables() {
+        return localVariables != null && localVariables.size() > 0;
+    }
+    public boolean isAddToParent() {
+        return addToParent;
+    }
+    public boolean isSilentNameExpressionEvaluation() {
+        return silentNameExpressionEvaluation;
     }
 
     protected void validateData() {
