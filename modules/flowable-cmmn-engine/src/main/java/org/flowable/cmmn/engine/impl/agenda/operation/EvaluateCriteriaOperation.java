@@ -234,7 +234,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             if (ExpressionUtil.hasRepetitionOnCollection(planItemInstanceEntity)) {
                 // the plan item should be repeated based on a collection variable
                 // evaluate the variable content and check, if we need to start creating instances accordingly
-                List<Object> collection = ExpressionUtil.evaluateRepetitionCollectionVariableValue(commandContext, planItemInstanceEntity);
+                Iterable<Object> collection = ExpressionUtil.evaluateRepetitionCollectionVariableValue(commandContext, planItemInstanceEntity);
 
                 // if the collection is null (meaning it is not yet available) and we don't have any on-part criteria (e.g an on-part or even combined with
                 // an if-part), we don't handle the repetition yet, but wait for its collection to become available
@@ -244,12 +244,13 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     activatePlanItemInstance = false;
                 } else {
 
-                    if (collection != null && collection.size() > 0) {
+                    if (collection != null) {
                         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
-                        for (int ii = 0; ii < collection.size(); ii++) {
+                        int index = 0;
+                        for (Object item : collection) {
                             // create and activate a new plan item instance for each item in the collection
                             PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForCollectionRepetition(
-                                repetitionRule, planItemInstanceEntity, null, collection, ii);
+                                repetitionRule, planItemInstanceEntity, null, item, index++);
 
                             evaluationResult.addChildPlanItemInstance(childPlanItemInstanceEntity);
                         }
@@ -749,12 +750,12 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
 
     protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForCollectionRepetition(RepetitionRule repetitionRule,
-        PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, List<Object> collection, int index) {
+        PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Object item, int index) {
 
         // check, if we need to set local variables as the item or item index
         Map<String, Object> localVariables = new HashMap<>(2);
         if (repetitionRule.hasElementVariable()) {
-            localVariables.put(repetitionRule.getElementVariableName(), collection.get(index));
+            localVariables.put(repetitionRule.getElementVariableName(), item);
         }
         if (repetitionRule.hasElementIndexVariable()) {
             localVariables.put(repetitionRule.getElementIndexVariableName(), index);

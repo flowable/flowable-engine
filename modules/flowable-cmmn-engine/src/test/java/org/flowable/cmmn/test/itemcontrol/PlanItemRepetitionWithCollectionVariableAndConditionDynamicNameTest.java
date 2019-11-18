@@ -33,7 +33,7 @@ import org.junit.Test;
 public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest extends FlowableCmmnTestCase {
 
     @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynmicNameTest.multipleTests.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest.multipleTests.cmmn")
     public void testRepetitionOnCollectionTriggeredByUserTaskWithDeferredEvent() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestThree").start();
 
@@ -85,7 +85,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
     }
 
     @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynmicNameTest.multipleTests.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest.multipleTests.cmmn")
     public void testRepetitionOnCollectionTriggeredByUserTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestThree").start();
 
@@ -135,7 +135,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
     }
 
     @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynmicNameTest.multipleTests.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest.multipleTests.cmmn")
     public void testRepetitionOnCollectionTriggeredByUserTaskSeveralTimes() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestThree").start();
 
@@ -199,7 +199,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
     }
 
     @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynmicNameTest.multipleTests.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest.multipleTests.cmmn")
     public void testRepetitionOnCollectionTriggeredByUserTaskSeveralTimesWithPartialCompletionInBetween() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestThree").start();
 
@@ -265,7 +265,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
     }
 
     @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynmicNameTest.multipleTests.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest.multipleTests.cmmn")
     public void testRepetitionOnCollectionTriggeredByCollectionVariableSet() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestThree").start();
 
@@ -334,7 +334,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
     }
 
     @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynmicNameTest.multipleTests.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest.multipleTests.cmmn")
     public void testRepetitionOnCollectionTriggeredBySatisfyingIfPartAfterCollectionSet() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestThree").start();
 
