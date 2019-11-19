@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.api.repository;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
@@ -61,6 +62,8 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
     CaseDefinitionQuery caseDefinitionResourceNameLike(String resourceNameLike);
     
     CaseDefinitionQuery startableByUser(String userId);
+
+    CaseDefinitionQuery startableByUserOrGroups(String userId, Collection<String> groups);
 
     CaseDefinitionQuery caseDefinitionTenantId(String tenantId);
 
