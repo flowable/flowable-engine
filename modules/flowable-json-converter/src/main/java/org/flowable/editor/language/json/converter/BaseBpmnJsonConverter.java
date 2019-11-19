@@ -190,6 +190,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     if (StringUtils.isNotEmpty(loopDef.getCompletionCondition())) {
                         propertiesNode.put(PROPERTY_MULTIINSTANCE_CONDITION, loopDef.getCompletionCondition());
                     }
+                    if (StringUtils.isNotEmpty(loopDef.getElementIndexVariable())) {
+                        propertiesNode.put(PROPERTY_MULTIINSTANCE_INDEX_VARIABLE, loopDef.getElementIndexVariable());
+                    }
                 }
             }
 
@@ -327,6 +330,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 String multiInstanceCardinality = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_CARDINALITY, elementNode);
                 String multiInstanceCollection = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_COLLECTION, elementNode);
                 String multiInstanceCondition = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_CONDITION, elementNode);
+                String multiInstanceIndexVariable = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_INDEX_VARIABLE, elementNode);
 
                 if (StringUtils.isNotEmpty(multiInstanceType) && !"none".equalsIgnoreCase(multiInstanceType)) {
 
@@ -342,6 +346,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     multiInstanceObject.setInputDataItem(multiInstanceCollection);
                     multiInstanceObject.setElementVariable(multiInstanceVariable);
                     multiInstanceObject.setCompletionCondition(multiInstanceCondition);
+                    multiInstanceObject.setElementIndexVariable(multiInstanceIndexVariable);
                     activity.setLoopCharacteristics(multiInstanceObject);
                 }
 
