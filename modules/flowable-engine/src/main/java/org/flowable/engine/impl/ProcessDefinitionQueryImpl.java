@@ -309,6 +309,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     public Collection<String> getAuthorizationGroups() {
         if (authorizationGroupsSet) {
+            // if authorizationGroupsSet is true then startableByUserOrGroups was called
+            // and the groups passed in that methods have precedence
             return authorizationGroups;
         } else if (authorizationUserId == null) {
             return null;

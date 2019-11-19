@@ -259,6 +259,8 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     }
     
     public Collection<String> getAuthorizationGroups() {
+        // if authorizationGroupsSet is true then startableByUserOrGroups was called
+        // and the groups passed in that methods have precedence
         if (authorizationGroupsSet) {
             return authorizationGroups;
         } else if (authorizationUserId == null) {
