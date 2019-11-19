@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -56,6 +57,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     protected boolean latest;
     protected SuspensionState suspensionState;
     protected String authorizationUserId;
+    protected Collection<String> authorizationGroups;
+    protected boolean authorizationGroupsSet;
     protected String procDefId;
     protected String tenantId;
     protected String tenantIdLike;
@@ -304,8 +307,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         return this;
     }
 
-    public List<String> getAuthorizationGroups() {
-        if (authorizationUserId == null) {
+    public Collection<String> getAuthorizationGroups() {
+        if (authorizationGroupsSet) {
+            return authorizationGroups;
+        } else if (authorizationUserId == null) {
             return null;
         }
         return CommandContextUtil.getProcessEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(authorizationUserId);
@@ -317,6 +322,17 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
             throw new FlowableIllegalArgumentException("userId is null");
         }
         this.authorizationUserId = userId;
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionQuery startableByUserOrGroups(String userId, Collection<String> groups) {
+        if (userId == null && (groups == null || groups.isEmpty())) {
+            throw new FlowableIllegalArgumentException("userId is null and groups are null or empty");
+        }
+        this.authorizationUserId = userId;
+        this.authorizationGroups = groups;
+        this.authorizationGroupsSet = true;
         return this;
     }
 
@@ -485,5 +501,9 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     public String getEventSubscriptionType() {
         return eventSubscriptionType;
+    }
+
+    public boolean isIncludeAuthorization() {
+        return authorizationUserId != null || (authorizationGroups != null && !authorizationGroups.isEmpty());
     }
 }
