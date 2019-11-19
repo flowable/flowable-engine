@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.cmmn;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 

@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.EVALUATE_STATES;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
