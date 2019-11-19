@@ -537,6 +537,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
             } else if (eventDefinition instanceof TimerEventDefinition) {
                 TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;
+                if(StringUtils.isNotEmpty(timerDefinition.getCalendarName())) {
+                    propertiesNode.put(PROPERTY_CALENDAR_NAME, timerDefinition.getCalendarName());
+                }
                 if (StringUtils.isNotEmpty(timerDefinition.getTimeDuration())) {
                     propertiesNode.put(PROPERTY_TIMER_DURATON, timerDefinition.getTimeDuration());
                 }
@@ -623,8 +626,12 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         String timeCycle = getPropertyValueAsString(PROPERTY_TIMER_CYCLE, objectNode);
         String timeDuration = getPropertyValueAsString(PROPERTY_TIMER_DURATON, objectNode);
         String endDate = getPropertyValueAsString(PROPERTY_TIMER_CYCLE_END_DATE, objectNode);
+        String calendarName = getPropertyValueAsString(PROPERTY_CALENDAR_NAME, objectNode);
 
         TimerEventDefinition eventDefinition = new TimerEventDefinition();
+        if (StringUtils.isNotEmpty(calendarName)){
+            eventDefinition.setCalendarName(calendarName);
+        }
         if (StringUtils.isNotEmpty(timeDate)) {
             eventDefinition.setTimeDate(timeDate);
 
