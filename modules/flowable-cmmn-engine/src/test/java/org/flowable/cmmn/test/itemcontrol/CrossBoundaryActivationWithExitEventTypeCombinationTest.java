@@ -28,6 +28,11 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Testing the exit event type combination with cross boundary activation and event listeners.
+ *
+ * @author Micha Kiener
+ */
 public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends FlowableCmmnTestCase {
 
     @Test

@@ -14,6 +14,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -192,8 +193,9 @@ public class PlanItemInstanceEntityManagerImpl
         // if the plan item has repetition, we don't remove any event listeners for entry dependencies, as they might trigger in the future and re-create
         // the plan item as it has repetition and therefore, we also don't remove any exit sentry dependant event listeners, as if in the future, the plan
         // item becomes active again, those event listeners might trigger again to terminate it, so we need them to stay in place
+        // furthermore, don't investigate into not-yet-created child plan items having event listeners as they might become active at a later state
         if (ExpressionUtil.hasRepetitionRule(planItem)) {
-            eventListenerDependencies = new ArrayList<>();
+            return Collections.emptyList();
         } else {
             eventListenerDependencies = Stream.concat(
                 planItem.getEntryDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener),
