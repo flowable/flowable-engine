@@ -31,7 +31,20 @@ public class FlowableInfoContributor implements InfoContributor {
 
     protected Map<String, Object> version() {
         Map<String, Object> info = new HashMap<>();
-        info.put("version", FlowableVersions.CURRENT_VERSION);
+        info.put("dbVersion", FlowableVersions.CURRENT_VERSION);
+        info.put("version", getVersion());
         return info;
+    }
+
+    /**
+     * Return the full version string of the present Flowable codebase, or {@code null}
+     * if it cannot be determined.
+     *
+     * @return the version of Flowable or {@code null}
+     * @see Package#getImplementationVersion()
+     */
+    private static String getVersion() {
+        Package pkg = FlowableInfoContributor.class.getPackage();
+        return (pkg != null) ? pkg.getImplementationVersion() : null;
     }
 }

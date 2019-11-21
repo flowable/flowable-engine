@@ -1,0 +1,32 @@
+<div class="modal-header-wrapper">
+	<div class="modal-header">
+		<div class="pull-right">
+            <a class="action" ng-click="cancel()">&times; {{'GENERAL.ACTION.CANCEL-AND-CLOSE' | translate}}</a>
+        </div>
+        <h2>{{'PROCESS-DEFINITION.POPUP.SHOW-PROCESS-MODEL.TITLE' | translate}} '{{model.name &amp;&amp; model.name || model.key}}' 
+            <span id="navigationTree">| <a href="javascript:_navigateTo('FLOWABLE_ROOT_PROCESS')">Root</a></span>
+        </h2>
+	</div>
+</div>
+<div class="modal-body modal-body-medium">
+    <div class="text-center">
+        <button type="button" id="executeMigrationDocument" class="btn btn-sm btn-default" style="display:none">Execute batch migration</button>
+        <button type="button" id="addMappingButton" class="btn btn-sm btn-default" style="display:none">Add mapping</button>
+    </div>
+    <div class="text-center">
+        <span id="currentMappingValues"></span>
+    </div>
+	<div id="bpmnModel" style="margin-left:auto;margin-right:auto"></div>
+	<hr id="migrationDivider" />
+	<div id="targetModel" style="margin-left:auto;margin-right:auto"></div>
+</div>
+
+<div class="modal-footer-wrapper">
+	<div class="modal-footer">
+		<div class="pull-right">
+	       <button type="button" class="btn btn-sm btn-default" ng-click="cancel()" ng-disabled="status.loading"
+		       	translate="GENERAL.ACTION.CLOSE">
+	       	</button>
+		</div>
+	</div>
+</div>	

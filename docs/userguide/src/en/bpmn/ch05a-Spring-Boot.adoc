@@ -4,7 +4,7 @@
 
 === Spring Boot
 
-Spring Boot is an application framework which, according to link:$$http://projects.spring.io/spring-boot/$$[its website], _makes it easy to create stand-alone, production-grade Spring based Applications that can you can "just run". It takes an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need very little Spring configuration_.
+Spring Boot is an application framework which, according to link:$$http://projects.spring.io/spring-boot/$$[its website], _makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run". It takes an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need very little Spring configuration_.
 
 For more information on Spring Boot, see link:$$http://projects.spring.io/spring-boot/$$[http://projects.spring.io/spring-boot/]
 
@@ -166,7 +166,7 @@ The XML content of the process definition is shown below. Notice that, for the m
     <process id="oneTaskProcess" name="The One Task Process">
         <startEvent id="theStart" />
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
-        <userTask id="theTask" name="my task" assignee="kermit" />
+        <userTask id="theTask" name="my task" flowable:assignee="kermit" />
         <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
         <endEvent id="theEnd" />
     </process>
@@ -300,7 +300,7 @@ public class MyRestController {
     @Autowired
     private MyService myService;
 
-    @RequestMapping(value="/process", method= RequestMethod.POST)
+    @PostMapping(value="/process")
     public void startProcessInstance() {
         myService.startProcess();
     }
@@ -535,7 +535,7 @@ public class MyRestController {
     @Autowired
     private MyService myService;
 
-    @RequestMapping(value="/process", method= RequestMethod.POST)
+    @PostMapping(value="/process")
     public void startProcessInstance(@RequestBody StartProcessRepresentation startProcessRepresentation) {
         myService.startProcess(startProcessRepresentation.getAssignee());
     }
@@ -625,7 +625,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 ----
 {
   "flowable": {
-    "version": "6.4.1"
+    "version": "6.5.0-SNAPSHOT"
   }
 }
 ----
@@ -656,12 +656,12 @@ flowable.database-schema= # In some situations you want to set the schema to use
 flowable.database-schema-update=true # The strategy that should be used for the database schema.
 flowable.db-history-used=true # Whether db history should be used.
 flowable.deployment-name=SpringBootAutoDeployment # The name of the auto deployment.
-flowable.history-level= # The history level that needs to be used.
+flowable.history-level=audit # The history level that needs to be used.
 flowable.process-definition-location-prefix=classpath*:/processes/ # The folder in which processes need to be searched for auto deployment.
 flowable.process-definition-location-suffixes=**.bpmn20.xml,**.bpmn # The suffixes (extensions) of the files that needs to be deployed from the 'processDefinitionLocationPrefix' location.
 
 # Process {sc-flowable-boot}/process/FlowableProcessProperties.java[FlowableProcessProperties]
-flowable.process.definition-cache-limit=-1 # The maximum amount of process definitions available in the process definition cache. Per default it is 1 (all process definitions).
+flowable.process.definition-cache-limit=-1 # The maximum amount of process definitions available in the process definition cache. Per default it is -1 (all process definitions).
 flowable.process.enable-safe-xml=true # Enables extra checks on the BPMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml. Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
 flowable.process.servlet.load-on-startup=-1 # Load on startup of the Process dispatcher servlet.
 flowable.process.servlet.name=Flowable BPMN Rest API # The name of the Process servlet.
@@ -672,7 +672,7 @@ flowable.process.async-executor-activate=true # Whether the async executor shoul
 flowable.process.async.executor.async-job-lock-time-in-millis=300000 # The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
 flowable.process.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
 flowable.process.async.executor.default-queue-size-full-wait-time-in-millis=0 # The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
-flowable.process.async.executor.default-timer-job-acquire-wait-time-in-millis=1000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+flowable.process.async.executor.default-timer-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
 flowable.process.async.executor.max-async-jobs-due-per-acquisition=1 # ???
 flowable.process.async.executor.retry-wait-time-in-millis=500 # ???
 flowable.process.async.executor.timer-lock-time-in-millis=300000 # The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
@@ -694,7 +694,7 @@ flowable.cmmn.async-executor-activate=true # Whether the async executor should b
 flowable.cmmn.async.executor.async-job-lock-time-in-millis=300000 # The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
 flowable.cmmn.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
 flowable.cmmn.async.executor.default-queue-size-full-wait-time-in-millis=0 # The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
-flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis=1000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
 flowable.cmmn.async.executor.max-async-jobs-due-per-acquisition=1 # ???
 flowable.cmmn.async.executor.retry-wait-time-in-millis=500 # ???
 flowable.cmmn.async.executor.timer-lock-time-in-millis=300000 # The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
@@ -775,6 +775,22 @@ flowable.mail.server.use-ssl=false # Sets whether SSL/TLS encryption should be e
 flowable.mail.server.use-tls=false # Set or disable the STARTTLS encryption.
 flowable.mail.server.username= # The username that needs to be used for the mail server authentication. If empty no authentication would be used.
 
+# Flowable Http {sc-flowable-boot}/FlowableHttpProperties.java[FlowableHttpProperties]
+flowable.http.user-system-properties=false # Whether to use system properties (e.g. http.proxyPort).
+flowable.http.connect-timeout=5s # Connect timeout for the http client
+flowable.http.socket-timeout=5s # Socket timeout for the http client
+flowable.http.connection-request-timeout=5s # Connection Request Timeout for the http client
+flowable.http.request-retry-limit=3 # Request retry limit for the http client
+flowable.http.disable-cert-verify=false # Whether to disable certificate validation for the http client
+
+# Flowable REST
+flowable.rest.app.cors.enabled=true # Whether to enable CORS requests at all. If false, the other properties have no effect
+flowable.rest.app.cors.allow-credentials=true # Whether to include credentials in a CORS request
+flowable.rest.app.cors.allowed-origins=* # Comma-separated URLs to accept CORS requests from
+flowable.rest.app.cors.allowed-headers=* # Comma-separated HTTP headers to allow in a CORS request
+flowable.rest.app.cors.allowed-methods=DELETE,GET,PATCH,POST,PUT # Comma-separated HTTP verbs to allow in a CORS request
+flowable.rest.app.cors.exposed-headers=* # Comma-separated list of headers to expose in CORS response
+
 # Actuator
 management.endpoint.flowable.cache.time-to-live=0ms # Maximum time that a response can be cached.
 management.endpoint.flowable.enabled=true # Whether to enable the flowable endpoint.
@@ -834,7 +850,7 @@ If empty no authentication would be used.
 |flowable.process-definitions.cache.max
 |-1
 |The maximum amount of process definitions available in the process definition cache.
- Per default it is 1 (all process definitions)
+ Per default it is -1 (all process definitions)
 |===============
 
 [[springBootFlowableAutoConfiguration]]

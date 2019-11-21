@@ -15,6 +15,9 @@ package org.flowable.validation.validator.impl;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
+import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -40,7 +43,9 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
             for (StartEvent startEvent : startEvents) {
                 if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
                     EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-                    if (!(eventDefinition instanceof org.flowable.bpmn.model.ErrorEventDefinition) &&
+                    if (!(eventDefinition instanceof ConditionalEventDefinition) &&
+                            !(eventDefinition instanceof ErrorEventDefinition) &&
+                            !(eventDefinition instanceof EscalationEventDefinition) &&
                             !(eventDefinition instanceof MessageEventDefinition) &&
                             !(eventDefinition instanceof SignalEventDefinition) &&
                             !(eventDefinition instanceof TimerEventDefinition)) {

@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.listener;
 
+import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.task.service.delegate.TaskListener;
@@ -32,5 +33,11 @@ public interface CmmnListenerFactory {
     PlanItemInstanceLifecycleListener createExpressionLifeCycleListener(FlowableListener listener);
 
     PlanItemInstanceLifecycleListener createDelegateExpressionLifeCycleListener(FlowableListener listener);
+
+    CaseInstanceLifecycleListener createClassDelegateCaseLifeCycleListener(FlowableListener listener);
+
+    CaseInstanceLifecycleListener createExpressionCaseLifeCycleListener(FlowableListener listener);
+
+    CaseInstanceLifecycleListener createDelegateExpressionCaseLifeCycleListener(FlowableListener listener);
 
 }

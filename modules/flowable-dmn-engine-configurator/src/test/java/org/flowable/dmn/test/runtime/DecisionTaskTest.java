@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -327,7 +328,7 @@ public class DecisionTaskTest {
         DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) cmmnEngineConfiguration.getEngineConfigurations().get(
                         EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         
-        String originalDefaultTenantValue = dmnEngineConfiguration.getDefaultTenantValue();
+        DefaultTenantProvider originalDefaultTenantProvider = dmnEngineConfiguration.getDefaultTenantProvider();
         dmnEngineConfiguration.setFallbackToDefaultTenant(true);
         dmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         
@@ -355,7 +356,7 @@ public class DecisionTaskTest {
             
         } finally {
             dmnEngineConfiguration.setFallbackToDefaultTenant(false);
-            dmnEngineConfiguration.setDefaultTenantValue(originalDefaultTenantValue);
+            dmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
             cmmnRule.getCmmnRepositoryService().deleteDeployment(cmmnDeployment.getId(), true);
         }
     }

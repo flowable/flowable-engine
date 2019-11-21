@@ -18,11 +18,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.impl.cmd.DeleteHistoricActivityInstancesCmd;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -67,13 +69,11 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricActivityInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstancesByQueryCriteria(this);
     }
 
@@ -193,6 +193,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQuery tenantIdIn(List<String> tenantIds) {
         this.tenantIds = tenantIds;
         return this;
@@ -285,6 +286,20 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     public HistoricActivityInstanceQueryImpl activityInstanceId(String activityInstanceId) {
         this.activityInstanceId = activityInstanceId;
         return this;
+    }
+
+    @Override
+    public void delete() {
+        if (commandExecutor != null) {
+            commandExecutor.execute(new DeleteHistoricActivityInstancesCmd(this));
+        } else {
+            new DeleteHistoricActivityInstancesCmd(this).execute(Context.getCommandContext());
+        }
+    }
+
+    @Override
+    public void deleteWithRelatedData() {
+        delete();
     }
 
     // getters and setters

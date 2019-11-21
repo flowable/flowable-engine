@@ -15,18 +15,21 @@ package org.flowable.cmmn.spring.autodeployment;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Default implementation of {@link AutoDeploymentStrategy} that groups all {@link Resource}s into a single deployment.
+ * Default implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that groups all {@link Resource}s into a single deployment.
  * This implementation is equivalent to the previously used implementation.
  * 
  * @author Tiese Barrell
  * @author Joram Barrez
  */
-public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class DefaultAutoDeploymentStrategy extends AbstractCmmnAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAutoDeploymentStrategy.class);
 
@@ -35,29 +38,41 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
      */
     public static final String DEPLOYMENT_MODE = "default";
 
+    public DefaultAutoDeploymentStrategy() {
+    }
+
+    public DefaultAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final CmmnRepositoryService repositoryService) {
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, CmmnEngine engine) {
+        CmmnRepositoryService repositoryService = engine.getCmmnRepositoryService();
+
+        // Create a single deployment for all resources using the name hint as the literal name
+        final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
+
+        for (final Resource resource : resources) {
+            addResource(resource, deploymentBuilder);
+        }
 
         try {
-            // Create a single deployment for all resources using the name hint as the literal name
-            final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
-
-            for (final Resource resource : resources) {
-                deploymentBuilder.addInputStream(determineResourceName(resource), resource.getInputStream());
-            }
 
             deploymentBuilder.deploy();
 
-        } catch (Exception e) {
-            // Any exception should not stop the bootup of the engine
-            LOGGER.warn("Exception while autodeploying CMMN definitions. "
-                + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+        } catch (RuntimeException e) {
+            if (isThrowExceptionOnDeploymentFailure()) {
+                throw e;
+            } else {
+                LOGGER.warn("Exception while autodeploying CMMN definitions. "
+                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
+            }
         }
 
     }

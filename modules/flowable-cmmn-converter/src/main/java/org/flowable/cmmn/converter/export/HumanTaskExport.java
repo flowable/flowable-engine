@@ -23,19 +23,6 @@ import org.flowable.cmmn.model.HumanTask;
 
 public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask> {
 
-    protected static String convertListToCommaSeparatedString(List<String> values) {
-        StringBuilder valueBuilder = new StringBuilder();
-        for (String value : values) {
-            if (valueBuilder.length() > 0) {
-                valueBuilder.append(",");
-            }
-
-            valueBuilder.append(value);
-        }
-
-        return valueBuilder.toString();
-    }
-
     @Override
     protected Class<HumanTask> getExportablePlanItemDefinitionClass() {
         return HumanTask.class;
@@ -73,6 +60,10 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, humanTask.getFormKey());
         }
         
+        if (StringUtils.isNotEmpty(humanTask.getValidateFormFields())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FIELD_VALIDATION, humanTask.getValidateFormFields());
+        }
+
         if (StringUtils.isNotEmpty(humanTask.getPriority())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_PRIORITY, humanTask.getPriority());
         }
@@ -92,4 +83,16 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
         return FlowableListenerExport.writeFlowableListeners(xtw, CmmnXmlConstants.ELEMENT_TASK_LISTENER, humanTask.getTaskListeners(), extensionElementsWritten);
     }
 
+    protected static String convertListToCommaSeparatedString(List<String> values) {
+        StringBuilder valueBuilder = new StringBuilder();
+        for (String value : values) {
+            if (valueBuilder.length() > 0) {
+                valueBuilder.append(",");
+            }
+
+            valueBuilder.append(value);
+        }
+
+        return valueBuilder.toString();
+    }
 }

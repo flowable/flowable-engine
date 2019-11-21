@@ -17,43 +17,37 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryPartInstanceDataManager;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Joram Barrez
  */
-public class SentryPartInstanceEntityManagerImpl extends AbstractCmmnEntityManager<SentryPartInstanceEntity> implements SentryPartInstanceEntityManager {
-
-    protected SentryPartInstanceDataManager sentryPartInstanceDataManager;
+public class SentryPartInstanceEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, SentryPartInstanceEntity, SentryPartInstanceDataManager>
+    implements SentryPartInstanceEntityManager {
 
     public SentryPartInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, SentryPartInstanceDataManager sentryPartInstanceDataManager) {
-        super(cmmnEngineConfiguration);
-        this.sentryPartInstanceDataManager = sentryPartInstanceDataManager;
-    }
-
-    @Override
-    protected DataManager<SentryPartInstanceEntity> getDataManager() {
-        return sentryPartInstanceDataManager;
+        super(cmmnEngineConfiguration, sentryPartInstanceDataManager);
     }
 
     @Override
     public List<SentryPartInstanceEntity> findSentryPartInstancesByCaseInstanceId(String caseInstanceId) {
-        return sentryPartInstanceDataManager.findSentryPartInstancesByCaseInstanceId(caseInstanceId);
+        return dataManager.findSentryPartInstancesByCaseInstanceId(caseInstanceId);
     }
 
     @Override
     public List<SentryPartInstanceEntity> findSentryPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(String caseInstanceId) {
-        return sentryPartInstanceDataManager.findSentryPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(caseInstanceId);
+        return dataManager.findSentryPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(caseInstanceId);
     }
 
     @Override
     public List<SentryPartInstanceEntity> findSentryPartInstancesByPlanItemInstanceId(String planItemId) {
-        return sentryPartInstanceDataManager.findSentryPartInstancesByPlanItemInstanceId(planItemId);
+        return dataManager.findSentryPartInstancesByPlanItemInstanceId(planItemId);
     }
     
     @Override
     public void deleteByCaseInstanceId(String caseInstanceId) {
-        sentryPartInstanceDataManager.deleteByCaseInstanceId(caseInstanceId);
+        dataManager.deleteByCaseInstanceId(caseInstanceId);
     }
 
 }

@@ -51,6 +51,11 @@ public class HistoricIdentityLinkServiceImpl extends CommonServiceImpl<IdentityL
     }
     
     @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
+    
+    @Override
     public HistoricIdentityLinkEntity createHistoricIdentityLink() {
         return getHistoricIdentityLinkEntityManager().create();
     }
@@ -83,6 +88,21 @@ public class HistoricIdentityLinkServiceImpl extends CommonServiceImpl<IdentityL
     @Override
     public void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
         getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {
+        getHistoricIdentityLinkEntityManager().deleteHistoricProcessIdentityLinksForNonExistingInstances();
+    }
+    
+    @Override
+    public void deleteHistoricCaseIdentityLinksForNonExistingInstances() {
+        getHistoricIdentityLinkEntityManager().deleteHistoricCaseIdentityLinksForNonExistingInstances();
+    }
+    
+    @Override
+    public void deleteHistoricTaskIdentityLinksForNonExistingInstances() {
+        getHistoricIdentityLinkEntityManager().deleteHistoricTaskIdentityLinksForNonExistingInstances();
     }
 
     public HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {

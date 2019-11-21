@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.query.NativeQuery;
-import org.flowable.common.engine.impl.BaseNativeQuery;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -48,22 +47,22 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public T sql(String sqlStatement) {
         this.sqlStatement = sqlStatement;
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public T parameter(String name, Object value) {
         parameters.put(name, value);
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public U singleResult() {
         this.resultType = ResultType.SINGLE_RESULT;
         if (commandExecutor != null) {
@@ -72,8 +71,8 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
         return executeSingleResult(Context.getCommandContext());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public List<U> list() {
         this.resultType = ResultType.LIST;
         if (commandExecutor != null) {
@@ -82,8 +81,8 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
         return executeList(Context.getCommandContext(), generateParameterMap());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public List<U> listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
         this.maxResults = maxResults;

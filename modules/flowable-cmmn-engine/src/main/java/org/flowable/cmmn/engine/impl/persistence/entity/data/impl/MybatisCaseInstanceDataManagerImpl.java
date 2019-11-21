@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataMan
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseInstanceByCaseDefinitionIdMatcher;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 
@@ -77,6 +78,10 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
             params.put("caseInstanceId", caseInstanceId);
         } else if (planItemInstanceId != null) {
             params.put("planItemInstanceId", planItemInstanceId);
+        }
+
+        if (params.isEmpty()) {
+            throw new FlowableIllegalArgumentException("selectCaseInstanceEagerFetchPlanItemInstances needs either caseInstanceId or planItemInstanceId");
         }
 
         // The case instance will be fetched and will have all plan item instances in the childPlanItemInstances property.
@@ -156,7 +161,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     public List<CaseInstance> findByCriteria(CaseInstanceQueryImpl query) {
         // Not going through cache as the case instance should always be loaded with all related plan item instances
         // when not doing a query call
-        return getDbSqlSession().selectListNoCacheCheck("selectCaseInstancesByQueryCriteria", query);
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectCaseInstancesByQueryCriteria", query, getManagedEntityClass());
     }
 
     @SuppressWarnings("unchecked")
@@ -177,7 +182,8 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         }
         caseInstanceQuery.setFirstResult(0);
 
-        List<CaseInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectCaseInstanceWithVariablesByQueryCriteria", caseInstanceQuery);
+        List<CaseInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(
+                        "selectCaseInstanceWithVariablesByQueryCriteria", caseInstanceQuery, getManagedEntityClass());
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {

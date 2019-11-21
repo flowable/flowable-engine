@@ -43,6 +43,8 @@ public interface ProcessEngine {
      */
     String getName();
 
+    void handleExecutors();
+
     void close();
 
     RepositoryService getRepositoryService();
@@ -60,6 +62,8 @@ public interface ProcessEngine {
     ManagementService getManagementService();
 
     DynamicBpmnService getDynamicBpmnService();
+
+    ProcessMigrationService getProcessMigrationService();
 
     ProcessEngineConfiguration getProcessEngineConfiguration();
 }

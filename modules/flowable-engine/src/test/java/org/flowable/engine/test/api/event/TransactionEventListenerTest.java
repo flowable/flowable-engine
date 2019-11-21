@@ -139,7 +139,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         public void onEvent(FlowableEvent event) {
             String eventType = event.getType().name();
             if (!eventsReceived.containsKey(eventType)) {
-                eventsReceived.put(eventType, new ArrayList<FlowableEvent>());
+                eventsReceived.put(eventType, new ArrayList<>());
             }
             eventsReceived.get(eventType).add(event);
         }

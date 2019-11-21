@@ -30,13 +30,13 @@ import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
-import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
@@ -95,6 +95,16 @@ public interface HistoryService {
      * Deletes historic process instance. All historic activities, historic task and historic details (variable updates, form properties) are deleted as well.
      */
     void deleteHistoricProcessInstance(String processInstanceId);
+    
+    /**
+     * Deletes historic task and activity data for removed process instances
+     */
+    void deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();
+    
+    /**
+     * Deletes historic identity links, detail info, variable data and entity links for removed process instances
+     */
+    void deleteRelatedDataOfRemovedHistoricProcessInstances();
 
     /**
      * creates a native query to search for {@link HistoricProcessInstance}s via SQL

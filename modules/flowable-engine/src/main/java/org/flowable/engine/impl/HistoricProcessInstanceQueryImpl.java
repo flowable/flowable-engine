@@ -16,21 +16,30 @@ package org.flowable.engine.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
+import org.flowable.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd;
+import org.flowable.engine.impl.cmd.DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,7 +51,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Bernd Ruecker
  * @author Joram Barrez
  */
-public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> implements HistoricProcessInstanceQuery {
+public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> 
+        implements HistoricProcessInstanceQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
     
@@ -683,7 +693,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -696,7 +705,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     @Override
     public List<HistoricProcessInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         List<HistoricProcessInstance> results = null;
         
@@ -707,6 +715,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         
         if (includeProcessVariables) {
             results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
+
+            if (processInstanceId != null) {
+                addCachedVariableForQueryById(commandContext, results);
+            }
+
         } else {
             results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesByQueryCriteria(this);
         }
@@ -722,6 +735,33 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
 
         return results;
+    }
+
+    protected void addCachedVariableForQueryById(CommandContext commandContext, List<HistoricProcessInstance> results) {
+
+        // Unlike the ExecutionEntityImpl, variables are not stored on the HistoricExecutionEntityImpl.
+        // The solution for the non-historical entity is to use the variable cache on the entity, inspect the variables
+        // of the current transaction and add them if necessary.
+        // For the historical entity, we need to detect this use case specifically (i.e. byId is used) and check the entityCache.
+
+        for (HistoricProcessInstance historicProcessInstance : results) {
+            if (Objects.equals(processInstanceId, historicProcessInstance.getId())) {
+
+                EntityCache entityCache = commandContext.getSession(EntityCache.class);
+                List<HistoricVariableInstanceEntity> cachedVariableEntities = entityCache.findInCache(HistoricVariableInstanceEntity.class);
+                for (HistoricVariableInstanceEntity cachedVariableEntity : cachedVariableEntities) {
+
+                    if (historicProcessInstance.getId().equals(cachedVariableEntity.getProcessInstanceId())) {
+
+                        // Variables from the cache have precedence
+                        ((HistoricProcessInstanceEntity) historicProcessInstance).getQueryVariables().add(cachedVariableEntity);
+
+                    }
+
+                }
+
+            }
+        }
     }
 
     protected void localize(HistoricProcessInstance processInstance, CommandContext commandContext) {
@@ -766,6 +806,27 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
     }
 
+    @Override
+    public void delete() {
+        if (commandExecutor != null) {
+            commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(this));
+        } else {
+            new DeleteHistoricProcessInstancesCmd(this).execute(Context.getCommandContext());
+        }
+    }
+
+    @Override
+    public void deleteWithRelatedData() {
+        if (commandExecutor != null) {
+            CommandConfig config = new CommandConfig().transactionRequiresNew();
+            commandExecutor.execute(config, new DeleteHistoricProcessInstancesCmd(this));
+            commandExecutor.execute(config, new DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd());
+            commandExecutor.execute(config, new DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd());
+        } else {
+            throw new FlowableException("deleting historic process instances with related data requires CommandExecutor");
+        }
+    }
+
     public String getBusinessKey() {
         return businessKey;
     }
@@ -803,6 +864,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+    
+    public String getId() {
         return processInstanceId;
     }
 

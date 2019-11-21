@@ -13,7 +13,6 @@
 package org.flowable.cmmn.engine.impl.deployer;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -267,10 +266,7 @@ public class CmmnDeployer implements EngineDeployer {
 
         if (expressions != null) {
             IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService();
-            Iterator<String> iterator = expressions.iterator();
-            while (iterator.hasNext()) {
-                @SuppressWarnings("cast")
-                String expression = iterator.next();
+            for (String expression : expressions) {
                 IdentityLinkEntity identityLink = identityLinkService.createIdentityLink();
                 identityLink.setScopeDefinitionId(caseDefinition.getId());
                 identityLink.setScopeType(ScopeTypes.CMMN);

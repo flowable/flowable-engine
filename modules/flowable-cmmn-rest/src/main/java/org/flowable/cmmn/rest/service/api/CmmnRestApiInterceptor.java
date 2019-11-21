@@ -59,6 +59,8 @@ public interface CmmnRestApiInterceptor {
     
     void createTask(Task task, TaskRequest request);
     
+    void updateTask(Task task, TaskRequest request);
+
     void deleteTask(Task task);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);

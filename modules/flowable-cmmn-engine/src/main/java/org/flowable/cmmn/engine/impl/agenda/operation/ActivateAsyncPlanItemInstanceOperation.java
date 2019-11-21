@@ -61,6 +61,8 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
         job.setSubScopeId(planItemInstanceEntity.getId());
         job.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
         job.setScopeType(ScopeTypes.CMMN);
+        job.setElementId(task.getId());
+        job.setElementName(task.getName());
         job.setJobHandlerConfiguration(entryCriterionId);
         job.setTenantId(planItemInstanceEntity.getTenantId());
         jobService.createAsyncJob(job, task.isExclusive());
@@ -72,18 +74,10 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[Async activate PlanItem] ");
-
-        if (planItem.getName() != null) {
-            stringBuilder.append(planItem.getName());
-            stringBuilder.append(" (");
-            stringBuilder.append(planItem.getId());
-            stringBuilder.append(")");
-        } else {
-            stringBuilder.append(planItem.getId());
-        }
+        stringBuilder.append(planItem);
 
         if (entryCriterionId != null) {
-            stringBuilder.append("via entry criterion ").append(entryCriterionId);
+            stringBuilder.append(" via entry criterion ").append(entryCriterionId);
         }
 
         return stringBuilder.toString();

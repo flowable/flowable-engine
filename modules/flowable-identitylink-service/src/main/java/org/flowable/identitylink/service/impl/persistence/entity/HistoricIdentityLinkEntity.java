@@ -40,6 +40,8 @@ public interface HistoricIdentityLinkEntity extends HistoricIdentityLink, Entity
     
     void setScopeId(String scopeId);
     
+    void setSubScopeId(String subScopeId);
+    
     void setScopeType(String scopeType);
     
     void setScopeDefinitionId(String scopeDefinitionId);

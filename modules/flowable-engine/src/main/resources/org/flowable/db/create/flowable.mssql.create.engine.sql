@@ -63,6 +63,8 @@ create table ACT_RU_EXECUTION (
     ID_LINK_COUNT_ int,
     CALLBACK_ID_ nvarchar(255),
     CALLBACK_TYPE_ nvarchar(255),
+    REFERENCE_ID_ nvarchar(255),
+    REFERENCE_TYPE_ nvarchar(255),
     primary key (ID_)
 );
 
@@ -85,21 +87,6 @@ create table ACT_RE_PROCDEF (
     DERIVED_FROM_ROOT_ nvarchar(64),
     DERIVED_VERSION_ int not null default 0,
     ENGINE_VERSION_ nvarchar(255),
-    primary key (ID_)
-);
-
-create table ACT_RU_EVENT_SUBSCR (
-    ID_ nvarchar(64) not null,
-    REV_ int,
-    EVENT_TYPE_ nvarchar(255) not null,
-    EVENT_NAME_ nvarchar(255),
-    EXECUTION_ID_ nvarchar(64),
-    PROC_INST_ID_ nvarchar(64),
-    ACTIVITY_ID_ nvarchar(64),
-    CONFIGURATION_ nvarchar(255),
-    CREATED_ datetime not null,
-    PROC_DEF_ID_ nvarchar(64),
-    TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
 );
 
@@ -149,7 +136,6 @@ create table ACT_RU_ACTINST (
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
-create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_EXECUTION_PROC on ACT_RU_EXECUTION(PROC_DEF_ID_);
@@ -164,7 +150,6 @@ create index ACT_IDX_TASK_EXEC on ACT_RU_TASK(EXECUTION_ID_);
 create index ACT_IDX_TASK_PROCINST on ACT_RU_TASK(PROC_INST_ID_);
 create index ACT_IDX_EXEC_PROC_INST_ID on ACT_RU_EXECUTION(PROC_INST_ID_);
 create index ACT_IDX_TASK_PROC_DEF_ID on ACT_RU_TASK(PROC_DEF_ID_);
-create index ACT_IDX_EVENT_SUBSCR_EXEC_ID on ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
 create index ACT_IDX_JOB_EXECUTION_ID on ACT_RU_JOB(EXECUTION_ID_);
 create index ACT_IDX_JOB_PROCESS_INSTANCE_ID on ACT_RU_JOB(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_JOB_PROC_DEF_ID on ACT_RU_JOB(PROC_DEF_ID_);
@@ -345,7 +330,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.4.1.3', 1);
+values ('schema.version', '6.5.0.4', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.4.1.3)', 1);
+values ('schema.history', 'create(6.5.0.4)', 1);

@@ -1,0 +1,161 @@
+name: Flowable SQL Server Build
+
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
+
+jobs:
+  test_mssql:
+    name: SQL Server ${{ matrix.mssql }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mssql: [2017-latest-ubuntu]
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
+        env:
+          SA_PASSWORD: flowableStr0ngPassword
+          ACCEPT_EULA: Y
+        ports:
+          - 1433/tcp
+        # needed because the mssql container does not provide a health check
+        options: >-
+          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
+          --health-start-period 10s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 10
+      - name: Prepare Database
+        run: ./.github/actions/scripts/prepare-mssql.sh
+        env:
+          # use localhost for the host here because we have specified a vm for the job.
+          # If we were running the job on a container this would be mssql
+          MSSQL_HOST: localhost
+          MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Test
+        # use localhost for the host here because we have specified a vm for the job.
+        # If we were running the job on a container this would be mssql
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          -Dmaven.javadoc.skip=true -B -V
+          -PcleanDb,mssql
+          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
+  test_mssql_dmn:
+    name: DMN SQL Server ${{ matrix.mssql }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mssql: [2017-latest-ubuntu]
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
+        env:
+          SA_PASSWORD: flowableStr0ngPassword
+          ACCEPT_EULA: Y
+        ports:
+          - 1433/tcp
+        # needed because the mssql container does not provide a health check
+        options: >-
+          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
+          --health-start-period 10s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 10
+      - name: Prepare Database
+        run: ./.github/actions/scripts/prepare-mssql.sh
+        env:
+          # use localhost for the host here because we have specified a vm for the job.
+          # If we were running the job on a container this would be mssql
+          MSSQL_HOST: localhost
+          MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Test
+        # use localhost for the host here because we have specified a vm for the job.
+        # If we were running the job on a container this would be mssql
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          -Dmaven.javadoc.skip=true -B -V
+          -Pdmn,mssql
+          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
+          -pl org.flowable:flowable-dmn-engine -am
+  test_mssql_content:
+    name: Content SQL Server ${{ matrix.mssql }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mssql: [2017-latest-ubuntu]
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
+        env:
+          SA_PASSWORD: flowableStr0ngPassword
+          ACCEPT_EULA: Y
+        ports:
+          - 1433/tcp
+        # needed because the mssql container does not provide a health check
+        options: >-
+          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
+          --health-start-period 10s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 10
+      - name: Prepare Database
+        run: ./.github/actions/scripts/prepare-mssql.sh
+        env:
+          # use localhost for the host here because we have specified a vm for the job.
+          # If we were running the job on a container this would be mssql
+          MSSQL_HOST: localhost
+          MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Test
+        # use localhost for the host here because we have specified a vm for the job.
+        # If we were running the job on a container this would be mssql
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          -Dmaven.javadoc.skip=true -B -V
+          -Pcontent,mssql
+          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
+          -pl org.flowable:flowable-content-engine -am

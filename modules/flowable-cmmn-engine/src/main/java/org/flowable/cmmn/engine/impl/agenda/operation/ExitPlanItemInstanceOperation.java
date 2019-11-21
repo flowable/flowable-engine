@@ -12,49 +12,131 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.EVALUATE_STATES;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
+import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
+import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
+import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES;
+import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_INSTANCES;
+
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
+ * @author Micha Kiener
  */
 public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceToTerminalStateOperation {
 
     protected String exitCriterionId;
+    protected String exitType;
+    protected String exitEventType;
+    protected Boolean isStage = null;
     
-    public ExitPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId) {
+    public ExitPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType) {
         super(commandContext, planItemInstanceEntity);
         this.exitCriterionId = exitCriterionId;
+        this.exitType = exitType;
+        this.exitEventType = exitEventType;
     }
     
     @Override
     protected String getNewState() {
+        // depending on the exit event type, we want to leave the stage in completed state, not terminated
+        if (shouldStageGoIntoCompletedState()) {
+            return PlanItemInstanceState.COMPLETED;
+        }
+
+        // check the exit type for a regular plan item, not a stage to be something else than default
+        if (shouldPlanItemStayInCurrentState()) {
+            // if there is an exit type set to only terminate active instances and this one is only available or enabled, don't change its state
+            return planItemInstanceEntity.getState();
+        }
+
         return PlanItemInstanceState.TERMINATED;
+    }
+
+    @Override
+    protected boolean abortOperationIfNewStateEqualsOldState() {
+        // on an exit operation, we abort the operation, if we don't go into terminated state, but remain in the current state
+        return true;
+    }
+
+    /**
+     * @return true, if this plan item is a stage and according the exit sentry exit event type needs to go in complete state instead of terminated
+     */
+    protected boolean shouldStageGoIntoCompletedState() {
+        return isStage() && (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType));
+    }
+
+    protected boolean shouldPlanItemStayInCurrentState() {
+        return !isStage() && (
+            (EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) &&
+                (ENABLED.equals(planItemInstanceEntity.getState()) || EVALUATE_STATES.contains(planItemInstanceEntity.getState())))
+                ||
+            (EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES.equals(exitType) &&
+                EVALUATE_STATES.contains(planItemInstanceEntity.getState()))
+        );
     }
     
     @Override
     protected String getLifeCycleTransition() {
+        // depending on the exit event type, we want to use the complete transition, not the exit one, so depending on-parts get triggered waiting for the
+        // complete transition
+        if (shouldStageGoIntoCompletedState()) {
+            return PlanItemTransition.COMPLETE;
+        }
         return PlanItemTransition.EXIT;
     }
     
     @Override
     protected void internalExecute() {
-        if (isStage(planItemInstanceEntity)) {
+        if (isStage()) {
+            if (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType)) {
+                // if the stage should exit with a complete event instead of exit, we need to make sure it is completable
+                if (!PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(commandContext, planItemInstanceEntity, true).isCompletable()) {
+                    // we can't complete the stage as it is currently not completable, so we need to throw an exception
+                    throw new FlowableIllegalArgumentException(
+                        "Cannot exit stage with 'complete' event type as the stage '" + planItemInstanceEntity.getId() + "' is not yet completable.");
+                }
+            }
+
+            // regardless of the exit event type, we need to exit the child plan items as well (we don't propagate the exit event type though, children are
+            // always exited, not completed)
             exitChildPlanItemInstances(exitCriterionId);
         }
 
         planItemInstanceEntity.setExitCriterionId(exitCriterionId);
         planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
-        planItemInstanceEntity.setExitTime(planItemInstanceEntity.getEndedTime());
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceExit(planItemInstanceEntity);
+
+        if (isStage() && (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType))) {
+            // if the stage should exit with event type complete or even force-complete, we end the stage differently than with a regular exit
+            planItemInstanceEntity.setCompletedTime(planItemInstanceEntity.getEndedTime());
+            CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCompleted(planItemInstanceEntity);
+        } else {
+            // regular exit
+            planItemInstanceEntity.setExitTime(planItemInstanceEntity.getEndedTime());
+            CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceExit(planItemInstanceEntity);
+        }
     }
 
     @Override
     protected boolean isEvaluateRepetitionRule() {
-        return false;
+        // by default, we don't create new instances for repeatable plan items being terminated, however, if the exit type is set to only terminate active or
+        // enabled instances, we might want to immediately create a new instance for repetition, but only, if the current one was terminated, of course
+        return (EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) || EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES.equals(exitType)) && TERMINATED.equals(getNewState());
     }
-    
+
+    protected boolean isStage() {
+        if (isStage == null) {
+            isStage = isStage(planItemInstanceEntity);
+        }
+        return isStage;
+    }
 }

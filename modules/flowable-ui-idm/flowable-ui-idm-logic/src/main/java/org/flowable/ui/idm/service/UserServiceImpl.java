@@ -70,11 +70,16 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
     }
 
     public void updateUserDetails(String userId, String firstName, String lastName, String email) {
+        updateUserDetails(userId, firstName, lastName, email, null);
+    }
+
+    public void updateUserDetails(String userId, String firstName, String lastName, String email, String tenantId) {
         User user = identityService.createUserQuery().userId(userId).singleResult();
         if (user != null) {
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setEmail(email);
+            user.setTenantId(tenantId);
             identityService.saveUser(user);
         }
     }
@@ -105,13 +110,22 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
     }
 
     public User createNewUser(String id, String firstName, String lastName, String email, String password) {
+        return createNewUser(id, firstName, lastName, email, password, null);
+    }
+
+    @Override
+    public User createNewUser(String id, String firstName, String lastName, String email, String password, String tenantId) {
         if (StringUtils.isBlank(id) ||
-                StringUtils.isBlank(password) ||
-                StringUtils.isBlank(firstName)) {
+            StringUtils.isBlank(password) ||
+            StringUtils.isBlank(firstName)) {
             throw new BadRequestException("Id, password and first name are required");
         }
 
-        if (email != null && identityService.createUserQuery().userEmail(email).count() > 0) {
+        if (StringUtils.isNotBlank(email) && identityService.createUserQuery().userEmail(email).count() > 0) {
+            throw new ConflictingRequestException("User already registered", "ACCOUNT.SIGNUP.ERROR.ALREADY-REGISTERED");
+        }
+        
+        if (identityService.createUserQuery().userId(id).count() > 0) {
             throw new ConflictingRequestException("User already registered", "ACCOUNT.SIGNUP.ERROR.ALREADY-REGISTERED");
         }
 
@@ -119,9 +133,10 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
+        user.setTenantId(tenantId);
         identityService.saveUser(user);
 
-        User savedUser = identityService.createUserQuery().userEmail(email).singleResult();
+        User savedUser = identityService.createUserQuery().userId(id).singleResult();
         savedUser.setPassword(password);
         identityService.updateUserPassword(savedUser);
 

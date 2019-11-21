@@ -15,6 +15,8 @@ package org.flowable.engine.test.bpmn.event.message;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -493,7 +495,9 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testSingleBoundaryMessageEventWithBoundaryTimerEvent() {
-        final Date startTime = new Date();
+
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        final Date startTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(487));
         processEngineConfiguration.getClock().setCurrentTime(startTime);
 
         runtimeService.startProcessInstanceByKey("process");

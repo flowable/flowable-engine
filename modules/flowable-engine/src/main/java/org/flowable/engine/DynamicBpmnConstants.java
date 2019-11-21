@@ -17,6 +17,8 @@ public interface DynamicBpmnConstants {
     String BPMN_NODE = "bpmn";
     String LOCALIZATION_NODE = "localization";
 
+    String GLOBAL_PROCESS_DEFINITION_PROPERTIES = "_flowableGlobalProcessDefinitionProperties";
+    String ENABLE_SKIP_EXPRESSION = "enableSkipExpression";
     String TASK_SKIP_EXPRESSION = "taskSkipExpression";
 
     String SERVICE_TASK_CLASS_NAME = "serviceTaskClassName";
@@ -41,6 +43,8 @@ public interface DynamicBpmnConstants {
     String DMN_TASK_DECISION_TABLE_KEY = "dmnTaskDecisionTableKey";
 
     String SEQUENCE_FLOW_CONDITION = "sequenceFlowCondition";
+
+    String CALL_ACTIVITY_CALLED_ELEMENT =  "callActivityCalledElement";
 
     String LOCALIZATION_LANGUAGE = "language";
     String LOCALIZATION_NAME = "name";

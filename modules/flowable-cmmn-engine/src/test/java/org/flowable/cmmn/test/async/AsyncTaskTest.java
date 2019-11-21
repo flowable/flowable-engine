@@ -12,12 +12,15 @@
  */
 package org.flowable.cmmn.test.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -39,12 +42,17 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task before service task", task.getName());
         cmmnTaskService.complete(task.getId());
+        
+        Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(job);
+        assertEquals("asyncServiceTask", job.getElementId());
+        assertEquals("Async service task", job.getElementName());
 
         waitForJobExecutorToProcessAllJobs();
       
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task after service task", task.getName());
-        assertEquals("executed", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
+        assertEquals("executed", cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
     }
     
     @Test
@@ -66,7 +74,7 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         cmmnManagementService.executeJob(job.getId());
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Task after service task", task.getName());
-        assertEquals("executed", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
+        assertEquals("executed", cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
     }
     
     @Test
@@ -79,13 +87,25 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         
         // Now 3 async jobs should be created for the 3 async human tasks
         assertEquals(3L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        List<Job> jobs = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).list();
+        assertEquals(3, jobs.size());
+        for (Job job : jobs) {
+            assertTrue(job.getElementId().startsWith("sid-"));
+            assertThat(job.getElementName()).isIn("B", "C", "D");
+        }
+        
         waitForJobExecutorToProcessAllJobs();
         
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(3, tasks.size());
-        assertEquals("B", tasks.get(0).getName());
-        assertEquals("C", tasks.get(1).getName());
-        assertEquals("D", tasks.get(2).getName());
+        assertThat(tasks).extracting(Task::getName).containsExactly("B", "C", "D");
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+            .orderByName().asc()
+            .list();
+        assertThat(planItemInstances).extracting(PlanItemInstance::getName).containsExactly("B", "C", "D");
+        assertThat(planItemInstances).extracting(PlanItemInstance::getCreateTime).isNotNull();
     }
     
     @Test
@@ -152,6 +172,45 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         assertCaseInstanceEnded(caseInstance);
         assertEquals(0L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testAsyncExclusiveServiceTaskAfterStageExit() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAsyncExclusive").start();
+
+        // Trigger the user event listener first. This will execute the first exclusive async service task
+        cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).singleResult().getId());
+
+        // There should be one job and it needs to be exclusive
+        Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job.isExclusive()).isTrue();
+
+        waitForJobExecutorToProcessAllJobs();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serviceTaskVar1")).isEqualTo("firstST");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serviceTaskVar2")).isNull();
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).contains("Task in stage", "Task outside stage");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemInstanceName("Second service task outside stage")
+            .singleResult();
+        assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        // Completing 'Task in stage' exits the stage, which will start the service task.
+        // The service task is async and exclusive. It will set the 'serviceTaskVar2' variable.
+        cmmnTaskService.complete(tasks.get(0).getId());
+
+        // There should be one job and it needs to be exclusive
+        job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job.isExclusive()).isTrue();
+
+        waitForJobExecutorToProcessAllJobs();
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serviceTaskVar1")).isEqualTo("firstST");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serviceTaskVar2")).isEqualTo("secondST");
     }
     
 }

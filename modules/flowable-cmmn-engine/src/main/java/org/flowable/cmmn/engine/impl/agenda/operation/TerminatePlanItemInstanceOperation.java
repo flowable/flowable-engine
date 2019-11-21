@@ -23,8 +23,13 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class TerminatePlanItemInstanceOperation extends AbstractMovePlanItemInstanceToTerminalStateOperation {
 
-    public TerminatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected String exitType;
+    protected String exitEventType;
+
+    public TerminatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
         super(commandContext, planItemInstanceEntity);
+        this.exitType = exitType;
+        this.exitEventType = exitEventType;
     }
 
     @Override

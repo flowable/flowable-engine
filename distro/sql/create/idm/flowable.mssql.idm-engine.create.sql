@@ -6,7 +6,7 @@ create table ACT_ID_PROPERTY (
 );
 
 insert into ACT_ID_PROPERTY
-values ('schema.version', '6.3.1.0', 1);
+values ('schema.version', '6.5.0.4', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ nvarchar(64),
@@ -35,6 +35,7 @@ create table ACT_ID_USER (
     REV_ int,
     FIRST_ nvarchar(255),
     LAST_ nvarchar(255),
+    DISPLAY_NAME_ nvarchar(255),
     EMAIL_ nvarchar(255),
     PWD_ nvarchar(255),
     PICTURE_ID_ nvarchar(64),

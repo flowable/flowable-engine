@@ -11,10 +11,14 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.4.1</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-cmmn-api</artifactId>
@@ -46,6 +50,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-entitylink-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-eventsubscription-service</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -84,14 +92,8 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <scope>test</scope>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -106,6 +108,16 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -153,8 +165,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-dmn-api</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.subethamail</groupId>
+            <artifactId>subethasmtp-wiser</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -182,6 +200,12 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${argLine} -Xmx3g</argLine>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
@@ -273,6 +297,30 @@
                                             todir="target/test-classes"
                                             overwrite="true" />
                                     </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>cleanDb</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>drop-idm-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>org.flowable.cmmn.engine.impl.db.DbSchemaDrop</mainClass>
+                                    <classpathScope>test</classpathScope>
                                 </configuration>
                             </execution>
                         </executions>
@@ -406,7 +454,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -423,7 +471,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -440,7 +488,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -456,8 +504,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -473,8 +521,30 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>mssql</id>
+            <activation>
+                <property>
+                    <name>databasemssql</name>
+                    <value>mssql</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -487,7 +557,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.1.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -500,16 +569,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        
-        <profile>
-            <id>java8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <argLine>-Xmx3g</argLine>
-            </properties>
         </profile>
     </profiles>
 

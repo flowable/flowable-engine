@@ -194,7 +194,7 @@ public class FileSystemContentStorage implements ContentStorage {
 
         if (shouldExist != file.exists()) {
             if (shouldExist) {
-                throw new ContentNotFoundException("Content with id: " + id + " was not found (path: " + file.toString() + ")");
+                throw new ContentNotFoundException("Content with id: " + id + " was not found (path: " + file + ")");
             } else {
                 throw new ContentNotFoundException("Content with id: " + id + " already exists.");
             }
@@ -298,7 +298,7 @@ public class FileSystemContentStorage implements ContentStorage {
 
                 StringBuffer buffer = new StringBuffer();
                 for (int i = 0; i < indexes.length; i++) {
-                    buffer.append(String.valueOf(indexes[i])).append(File.separatorChar);
+                    buffer.append(indexes[i]).append(File.separatorChar);
                 }
 
                 File newFolder = new File(rootFolder, buffer.toString());

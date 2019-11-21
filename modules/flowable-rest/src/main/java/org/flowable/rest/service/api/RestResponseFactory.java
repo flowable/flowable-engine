@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
@@ -47,12 +49,12 @@ import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -74,11 +76,14 @@ import org.flowable.rest.service.api.history.HistoricDetailResponse;
 import org.flowable.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.flowable.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.flowable.rest.service.api.history.HistoricTaskInstanceResponse;
+import org.flowable.rest.service.api.history.HistoricTaskLogEntryResponse;
 import org.flowable.rest.service.api.history.HistoricVariableInstanceResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.identity.MembershipResponse;
 import org.flowable.rest.service.api.identity.UserInfoResponse;
 import org.flowable.rest.service.api.identity.UserResponse;
+import org.flowable.rest.service.api.management.BatchPartResponse;
+import org.flowable.rest.service.api.management.BatchResponse;
 import org.flowable.rest.service.api.management.JobResponse;
 import org.flowable.rest.service.api.management.TableResponse;
 import org.flowable.rest.service.api.repository.DecisionTableResponse;
@@ -93,6 +98,7 @@ import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.flowable.rest.service.api.runtime.task.TaskResponse;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -839,6 +845,34 @@ public class RestResponseFactory {
         return result;
     }
 
+    public List<HistoricTaskLogEntryResponse> createHistoricTaskLogEntryResponseList(List<HistoricTaskLogEntry> logEntries) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<HistoricTaskLogEntryResponse> responseList = new ArrayList<>();
+        for (HistoricTaskLogEntry instance : logEntries) {
+            responseList.add(createHistoricTaskLogEntryResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public HistoricTaskLogEntryResponse createHistoricTaskLogEntryResponse(HistoricTaskLogEntry logEntry, RestUrlBuilder urlBuilder) {
+        HistoricTaskLogEntryResponse response = new HistoricTaskLogEntryResponse();
+        response.setLogNumber(logEntry.getLogNumber());
+        response.setType(logEntry.getType());
+        response.setTaskId(logEntry.getTaskId());
+        response.setTimeStamp(logEntry.getTimeStamp());
+        response.setUserId(logEntry.getUserId());
+        response.setData(logEntry.getData());
+        response.setExecutionId(logEntry.getExecutionId());
+        response.setProcessInstanceId(logEntry.getProcessInstanceId());
+        response.setProcessDefinitionId(logEntry.getProcessDefinitionId());
+        response.setScopeId(logEntry.getScopeId());
+        response.setScopeDefinitionId(logEntry.getScopeDefinitionId());
+        response.setSubScopeId(logEntry.getSubScopeId());
+        response.setScopeType(logEntry.getScopeType());
+        response.setTenantId(logEntry.getTenantId());
+        return response;
+    }
+
     public List<HistoricActivityInstanceResponse> createHistoricActivityInstanceResponseList(List<HistoricActivityInstance> activityInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<HistoricActivityInstanceResponse> responseList = new ArrayList<>();
@@ -1010,6 +1044,8 @@ public class RestResponseFactory {
         response.setExecutionId(job.getExecutionId());
         response.setProcessDefinitionId(job.getProcessDefinitionId());
         response.setProcessInstanceId(job.getProcessInstanceId());
+        response.setElementId(job.getElementId());
+        response.setElementName(job.getElementName());
         response.setRetries(job.getRetries());
         response.setCreateTime(job.getCreateTime());
         response.setTenantId(job.getTenantId());
@@ -1027,6 +1063,69 @@ public class RestResponseFactory {
         if (job.getExecutionId() != null) {
             response.setExecutionUrl(urlBuilder.buildUrl(RestUrls.URL_EXECUTION, job.getExecutionId()));
         }
+
+        return response;
+    }
+    
+    public List<BatchResponse> createBatchResponse(List<Batch> batches) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<BatchResponse> responseList = new ArrayList<>();
+        for (Batch instance : batches) {
+            responseList.add(createBatchResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public BatchResponse createBatchResponse(Batch batch) {
+        return createBatchResponse(batch, createUrlBuilder());
+    }
+
+    public BatchResponse createBatchResponse(Batch batch, RestUrlBuilder urlBuilder) {
+        BatchResponse response = new BatchResponse();
+        response.setId(batch.getId());
+        response.setBatchType(batch.getBatchType());
+        response.setSearchKey(batch.getBatchSearchKey());
+        response.setSearchKey2(batch.getBatchSearchKey2());
+        response.setCreateTime(batch.getCreateTime());
+        response.setCompleteTime(batch.getCompleteTime());
+        response.setStatus(batch.getStatus());
+        response.setTenantId(batch.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_BATCH, batch.getId()));
+
+        return response;
+    }
+    
+    public List<BatchPartResponse> createBatchPartResponse(List<BatchPart> batchParts) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<BatchPartResponse> responseList = new ArrayList<>();
+        for (BatchPart instance : batchParts) {
+            responseList.add(createBatchPartResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public BatchPartResponse createBatchPartResponse(BatchPart batchPart) {
+        return createBatchPartResponse(batchPart, createUrlBuilder());
+    }
+
+    public BatchPartResponse createBatchPartResponse(BatchPart batchPart, RestUrlBuilder urlBuilder) {
+        BatchPartResponse response = new BatchPartResponse();
+        response.setId(batchPart.getId());
+        response.setBatchId(batchPart.getBatchId());
+        response.setBatchType(batchPart.getBatchType());
+        response.setSearchKey(batchPart.getBatchSearchKey());
+        response.setSearchKey2(batchPart.getBatchSearchKey2());
+        response.setScopeId(batchPart.getScopeId());
+        response.setSubScopeId(batchPart.getSubScopeId());
+        response.setScopeType(batchPart.getScopeType());
+        response.setCreateTime(batchPart.getCreateTime());
+        response.setCompleteTime(batchPart.getCompleteTime());
+        response.setStatus(batchPart.getStatus());
+        response.setTenantId(batchPart.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_BATCH_PART, batchPart.getId()));
+        response.setBatchUrl(urlBuilder.buildUrl(RestUrls.URL_BATCH, batchPart.getBatchId()));
 
         return response;
     }
@@ -1099,7 +1198,8 @@ public class RestResponseFactory {
         response.setId(user.getId());
         response.setEmail(user.getEmail());
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_USER, user.getId()));
-
+        response.setTenantId(user.getTenantId());
+        
         if (incudePassword) {
             response.setPassword(user.getPassword());
         }

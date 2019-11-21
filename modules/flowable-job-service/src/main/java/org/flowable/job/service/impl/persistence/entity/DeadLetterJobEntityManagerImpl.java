@@ -25,45 +25,46 @@ import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataMa
 /**
  * @author Tijs Rademakers
  */
-public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLetterJobEntity> implements DeadLetterJobEntityManager {
-
-    protected DeadLetterJobDataManager jobDataManager;
+public class DeadLetterJobEntityManagerImpl
+    extends AbstractJobServiceEngineEntityManager<DeadLetterJobEntity, DeadLetterJobDataManager>
+    implements DeadLetterJobEntityManager {
 
     public DeadLetterJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, DeadLetterJobDataManager jobDataManager) {
-        super(jobServiceConfiguration);
-        this.jobDataManager = jobDataManager;
+        super(jobServiceConfiguration, jobDataManager);
     }
 
     @Override
     public List<DeadLetterJobEntity> findJobsByExecutionId(String id) {
-        return jobDataManager.findJobsByExecutionId(id);
+        return dataManager.findJobsByExecutionId(id);
     }
     
     @Override
     public List<DeadLetterJobEntity> findJobsByProcessInstanceId(String id) {
-        return jobDataManager.findJobsByProcessInstanceId(id);
+        return dataManager.findJobsByProcessInstanceId(id);
     }
 
     @Override
     public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery);
+        return dataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override
     public long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
-        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+        return dataManager.findJobCountByQueryCriteria(jobQuery);
     }
 
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
     @Override
     public void insert(DeadLetterJobEntity jobEntity, boolean fireCreateEvent) {
-        getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+        if (getServiceConfiguration().getInternalJobManager() != null) {
+            getServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+        }
 
-        jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
+        jobEntity.setCreateTime(getServiceConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
     }
 
@@ -79,11 +80,13 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
-        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        if (getServiceConfiguration().getInternalJobManager() != null) {
+            getServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        }
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
         }
     }
     
@@ -110,12 +113,4 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         return newJobEntity;
     }
 
-    @Override
-    protected DeadLetterJobDataManager getDataManager() {
-        return jobDataManager;
-    }
-
-    public void setJobDataManager(DeadLetterJobDataManager jobDataManager) {
-        this.jobDataManager = jobDataManager;
-    }
 }

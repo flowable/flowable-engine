@@ -22,11 +22,15 @@ import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
+import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * @author Joram Barrez
@@ -34,6 +38,8 @@ import org.flowable.identitylink.api.IdentityLink;
 public interface CmmnRuntimeService {
 
     CaseInstanceBuilder createCaseInstanceBuilder();
+
+    PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId);
     
     void triggerPlanItemInstance(String planItemInstanceId);
     
@@ -59,13 +65,101 @@ public interface CmmnRuntimeService {
 
     void completeUserEventListenerInstance(String userEventListenerInstanceId);
     
+    /**
+     * All variables visible from the given case instance scope.
+     *
+     * @param caseInstanceId
+     *     id of case instance, cannot be null.
+     * @return the variables or an empty map if no such variables are found.
+     * @throws FlowableObjectNotFoundException
+     *     when no case instance is found for the given caseInstanceId.
+     */
     Map<String, Object> getVariables(String caseInstanceId);
     
+    /**
+     * All variables visible from the given case instance scope.
+     *
+     * @param caseInstanceId
+     *     id of case instance, cannot be null.
+     * @return the variable instances or an empty map if no such variables are found.
+     * @throws FlowableObjectNotFoundException
+     *     when no case instance is found for the given caseInstanceId.
+     */
+    Map<String, VariableInstance> getVariableInstances(String caseInstanceId);
+    
+    /**
+     * All variable values that are defined in the plan item instance scope, without taking outer scopes into account.
+     *
+     * @param planItemInstanceId
+     *     id of plan item instance, cannot be null.
+     * @return the variables or an empty map if no such variables are found.
+     * @throws FlowableObjectNotFoundException
+     *     when no plan item instance is found for the given planItemInstanceId.
+     */
     Map<String, Object> getLocalVariables(String planItemInstanceId);
     
+    /**
+     * All variable values that are defined in the plan item instance scope, without taking outer scopes into account.
+     *
+     * @param planItemInstanceId
+     *     id of plan item instance, cannot be null.
+     * @return the variables or an empty map if no such variables are found.
+     * @throws FlowableObjectNotFoundException
+     *     when no plan item instance is found for the given planItemInstanceId.
+     */
+    Map<String, VariableInstance> getLocalVariableInstances(String planItemInstanceId);
+    
+    /**
+     * The variable value. Returns null when no variable value is found with the given name or when the value is set to null.
+     *
+     * @param caseInstanceId
+     *     id of case instance, cannot be null.
+     * @param variableName
+     *     name of variable, cannot be null.
+     * @return the variable value or null if the variable is undefined or the value of the variable is null.
+     * @throws FlowableObjectNotFoundException
+     *     when no case instance is found for the given caseInstanceId.
+     */
     Object getVariable(String caseInstanceId, String variableName);
     
+    /**
+     * The variable. Returns null when no variable value is found with the given name or when the value is set to null.
+     *
+     * @param caseInstanceId
+     *     id of case instance, cannot be null.
+     * @param variableName
+     *     name of variable, cannot be null.
+     * @return the variable or null if the variable is undefined.
+     * @throws FlowableObjectNotFoundException
+     *     when no case instance is found for the given caseInstanceId.
+     */
+    VariableInstance getVariableInstance(String caseInstanceId, String variableName);
+    
+    /**
+     * The local variable value. Returns null when no variable value is found with the given name or when the value is set to null.
+     *
+     * @param planItemInstanceId
+     *     id of plan item instance, cannot be null.
+     * @param variableName
+     *     name of variable, cannot be null.
+     * @return the variable value or null if the variable is undefined or the value of the variable is null.
+     * @throws FlowableObjectNotFoundException
+     *     when no plan item instance is found for the given planItemInstanceId.
+     */
     Object getLocalVariable(String planItemInstanceId, String variableName);
+    
+    /**
+     * The local variable. Returns null when no variable value is found with the given name or when the value is set to null.
+     *
+     * @param planItemInstanceId
+     *     id of plan item instance, cannot be null.
+     * @param variableName
+     *     name of variable, cannot be null.
+     * @return the variable or null if the variable is undefined.
+     * @throws FlowableObjectNotFoundException
+     *     when no plan item instance is found for the given planItemInstanceId.
+     */
+    VariableInstance getLocalVariableInstance(String planItemInstanceId, String variableName);
     
     /**
      * Check whether or not this case instance has variable set with the given name, Searching for the variable is done in all scopes that are visible to the given case instance.
@@ -86,7 +180,7 @@ public interface CmmnRuntimeService {
     
     void removeLocalVariable(String planItemInstanceId, String variableName);
     
-    void removeLocalVariables(String caseInstanceId, Collection<String> variableNames);
+    void removeLocalVariables(String planItemInstanceId, Collection<String> variableNames);
 
     /**
      * Set or change the name of the case instance.
@@ -103,8 +197,26 @@ public interface CmmnRuntimeService {
     MilestoneInstanceQuery createMilestoneInstanceQuery();
     
     GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery();
+    
+    SignalEventListenerInstanceQuery createSignalEventListenerInstanceQuery();
 
     UserEventListenerInstanceQuery createUserEventListenerInstanceQuery();
+    
+    /**
+     * Creates a new {@link EventSubscriptionQuery} instance, that can be used to query the event subscriptions.
+     */
+    EventSubscriptionQuery createEventSubscriptionQuery();
+    
+    /**
+     * Gives back a stage overview of the case instance which includes the stage information of the case model.
+     * 
+     * @param caseInstanceId
+     *            id of the case instance, cannot be null.
+     * @return list of stage info objects 
+     * @throws FlowableObjectNotFoundException
+     *             when the case instance doesn't exist.
+     */
+    List<StageResponse> getStageOverview(String caseInstanceId);
     
     /**
      * Involves a user with a case instance. The type of identity link is defined by the given identityLinkType.
@@ -116,7 +228,7 @@ public interface CmmnRuntimeService {
      * @param identityLinkType
      *            type of identityLink, cannot be null.
      * @throws FlowableObjectNotFoundException
-     *             when the process instance doesn't exist.
+     *             when the case instance doesn't exist.
      */
     void addUserIdentityLink(String caseInstanceId, String userId, String identityLinkType);
 
@@ -168,6 +280,11 @@ public interface CmmnRuntimeService {
     List<IdentityLink> getIdentityLinksForCaseInstance(String instanceId);
     
     /**
+     * Retrieves the {@link IdentityLink}s associated with the given plan item instance. Such an identity link informs how a certain user is involved with a plan item instance.
+     */
+    List<IdentityLink> getIdentityLinksForPlanItemInstance(String instanceId);
+    
+    /**
      * Retrieves the {@link EntityLink}s associated with the given case instance.
      */
     List<EntityLink> getEntityLinkChildrenForCaseInstance(String instanceId);
@@ -191,5 +308,14 @@ public interface CmmnRuntimeService {
      * Create a {@link ChangePlanItemStateBuilder}, that allows to set various options for changing the state of a process instance.
      */
     ChangePlanItemStateBuilder createChangePlanItemStateBuilder();
-    
+
+    /**
+     * Updates the business key for the provided case instance
+     *
+     * @param caseInstanceId
+     *     id of the case instance to set the business key, cannot be null
+     * @param businessKey
+     *     new businessKey value
+     */
+    void updateBusinessKey(String caseInstanceId, String businessKey);
 }

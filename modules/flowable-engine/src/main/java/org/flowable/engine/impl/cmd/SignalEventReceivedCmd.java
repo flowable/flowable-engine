@@ -24,12 +24,13 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 
 /**
  * @author Joram Barrez
@@ -69,9 +70,9 @@ public class SignalEventReceivedCmd implements Command<Void> {
 
         List<SignalEventSubscriptionEntity> signalEvents = null;
 
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
+        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         if (executionId == null) {
-            signalEvents = eventSubscriptionEntityManager.findSignalEventSubscriptionsByEventName(eventName, tenantId);
+            signalEvents = eventSubscriptionService.findSignalEventSubscriptionsByEventName(eventName, tenantId);
         } else {
 
             ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
@@ -90,7 +91,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
                 return null;
             }
 
-            signalEvents = eventSubscriptionEntityManager.findSignalEventSubscriptionsByNameAndExecution(eventName, executionId);
+            signalEvents = eventSubscriptionService.findSignalEventSubscriptionsByNameAndExecution(eventName, executionId);
 
             if (signalEvents.isEmpty()) {
                 throw new FlowableException("Execution '" + executionId + "' has not subscribed to a signal event with name '" + eventName + "'.");
@@ -112,7 +113,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
                                     payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
                                     signalEventSubscriptionEntity.getProcessDefinitionId()));
 
-                    eventSubscriptionEntityManager.eventReceived(signalEventSubscriptionEntity, payload, async);
+                    EventSubscriptionUtil.eventReceived(signalEventSubscriptionEntity, payload, async);
                 }
             }
         }

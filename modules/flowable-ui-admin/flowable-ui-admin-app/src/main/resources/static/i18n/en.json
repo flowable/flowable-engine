@@ -35,6 +35,7 @@
             "INSTANCES": "Instances",
             "TASKS": "Tasks",
             "JOBS": "Jobs",
+            "BATCHES": "Batches",
             "EVENT-SUBSCRIPTIONS": "Event subscriptions",
             "CONFIGURATION": "Configuration",
             "CONFIGURATION-ENGINE": "Engine",
@@ -81,7 +82,8 @@
             "EDIT-CATEGORY": "Edit category",
             "SHOW-ALL-JOBS": "Show all jobs",
             "SHOW-ALL-PROCESSES": "Show all processes",
-            "SHOW-DIAGRAM": "Show process diagram"
+            "SHOW-DIAGRAM": "Show process diagram",
+            "MIGRATE-PROCESSDEFINITION": "Migration process definition instances"
         },
         "POPUP": {
             "EDIT-CATEGORY": {
@@ -514,6 +516,90 @@
             "CASE-DEFINITION": "Case definition",
             "RETRIES": "Retries",
             "EXCEPTION": "Exception"
+        }
+    },
+    "BATCHES": {
+        "TITLE": "Batches",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching batches.",
+        "LIST-MESSAGE-EMPTY": "No matching batches.",
+        "FILTER": {
+            "BATCH-TYPE": "Batch type",
+            "SEARCH-KEY": "Search key",
+            "SEARCH-KEY2": "Search key2",
+            "TENANT-ID": "Tenant identifier",
+            "CREATE-TIME-BEFORE": "Create time before",
+            "CREATE-TIME-AFTER": "Create time after"
+        },
+        "SORT": {
+            "ID": "Batch ID",
+            "CREATE-TIME": "Create time"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "CREATE-TIME": "Create time",
+            "SEARCH-KEY": "Search key",
+            "SEARCH-KEY2": "Search key2"
+        }
+    },
+    "BATCH": {
+        "ID": "ID:",
+        "TYPE": "Batch type:",
+        "SEARCH-KEY": "Search key:",
+        "SEARCH-KEY2": "Search key2:",
+        "CREATE-TIME": "Create time:",
+        "COMPLETE-TIME": "Complete time:",
+        "STATUS": "Status:",
+        "TENANT": "Tenant:",
+        "TO-PROCESS-DEFINITION": "Migrate to process definition:",
+        "ACTIVITY-MAPPINGS": "Activity mappings:", 
+        "SUCCESS-BATCH-PARTS-SIZE": "This batch has {{length}} parts that succeeded.",
+        "SUCCESS-BATCH-PARTS-EMPTY": "This batch has no succeeded parts.",
+        "FAIL-BATCH-PARTS-SIZE": "This batch has {{length}} parts that failed.",
+        "FAIL-BATCH-PARTS-EMPTY": "This batch has no failed parts.",
+        "TITLE": {
+            "BATCH-DOCUMENT": "Batch document",
+            "SUCCESS-PARTS": "Succeeded parts",
+            "FAIL-PARTS": "Failed parts"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "CREATE-TIME": "Create time",
+            "SCOPE-ID": "Scope id",
+            "SCOPE-TYPE": "Scope type"
+        },
+        "ACTION": {
+            "DELETE": "Delete batch"
+        },
+        "POPUP": {
+            "DELETE": {
+                "TITLE": "Delete batch",
+                "CONFIRM-DELETE": "Delete batch"
+            }
+        }
+    },
+    "BATCH-PART": {
+        "ID": "ID:",
+        "TYPE": "Batch type:",
+        "SEARCH-KEY": "Search key:",
+        "SEARCH-KEY2": "Search key2:",
+        "CREATE-TIME": "Create time:",
+        "COMPLETE-TIME": "Complete time:",
+        "STATUS": "Status:",
+        "STATUS-SUCCESS": "The instance was migrated successfully",
+        "STATUS-FAIL": "The instance migration failed",
+        "STATUS-MESSAGE": "Migration message",
+        "TENANT": "Tenant:",
+        "TITLE": {
+            "BATCH-PART-DOCUMENT": "Batch part document"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "CREATE-TIME": "Create time",
+            "SCOPE-ID": "Scope id",
+            "SCOPE-TYPE": "Scope type"
+        },
+        "ACTION": {
+            "RETURN-TO-BATCH": "Return to batch"
         }
     },
     "EVENT-SUBSCRIPTION": {

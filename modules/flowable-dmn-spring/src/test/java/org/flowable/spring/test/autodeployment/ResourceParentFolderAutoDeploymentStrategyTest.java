@@ -79,7 +79,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
         when(fileMock1.getParentFile()).thenReturn(parentFile1Mock);
         when(fileMock2.getParentFile()).thenReturn(parentFile2Mock);
 
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, dmnEngineMock);
 
         verify(repositoryServiceMock, times(2)).createDeployment();
         verify(deploymentBuilderMock, times(2)).enableDuplicateFiltering();
@@ -97,7 +97,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
         when(fileMock1.getParentFile()).thenReturn(parentFile1Mock);
         when(fileMock2.getParentFile()).thenReturn(parentFile1Mock);
 
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, dmnEngineMock);
 
         verify(repositoryServiceMock, times(1)).createDeployment();
         verify(deploymentBuilderMock, times(1)).enableDuplicateFiltering();
@@ -115,7 +115,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
         when(fileMock2.getParentFile()).thenReturn(parentFile1Mock);
         when(fileMock3.getParentFile()).thenReturn(parentFile1Mock);
 
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, dmnEngineMock);
 
         verify(repositoryServiceMock, times(1)).createDeployment();
         verify(deploymentBuilderMock, times(1)).enableDuplicateFiltering();
@@ -133,7 +133,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
         when(fileMock2.getParentFile()).thenReturn(parentFile2Mock);
         when(fileMock3.getParentFile()).thenReturn(parentFile1Mock);
 
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, dmnEngineMock);
 
         verify(repositoryServiceMock, times(2)).createDeployment();
         verify(deploymentBuilderMock, times(2)).enableDuplicateFiltering();
@@ -148,7 +148,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
     public void testDeployResources_NoParent() {
 
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, dmnEngineMock);
 
         verify(repositoryServiceMock, times(3)).createDeployment();
         verify(deploymentBuilderMock, times(3)).enableDuplicateFiltering();
@@ -163,7 +163,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
     @Test
     public void testDeployResourcesNoResources() {
         final Resource[] resources = new Resource[] {};
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, dmnEngineMock);
 
         verify(repositoryServiceMock, never()).createDeployment();
         verify(deploymentBuilderMock, never()).enableDuplicateFiltering();
@@ -179,7 +179,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
         when(resourceMock3.getFilename()).thenReturn(resourceName3);
 
         final Resource[] resources = new Resource[] { resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, dmnEngineMock);
 
         verify(repositoryServiceMock, times(1)).createDeployment();
         verify(deploymentBuilderMock, times(1)).enableDuplicateFiltering();

@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -65,8 +66,10 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         String decisionKey = executeDecisionInfo.getDecisionKey();
         String parentDeploymentId = executeDecisionInfo.getParentDeploymentId();
         String tenantId = executeDecisionInfo.getTenantId();
-        
-        if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && StringUtils.isNotEmpty(tenantId)) {
+
+        if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) &&
+                        !dmnEngineConfiguration.isAlwaysLookupLatestDefinitionVersion() && StringUtils.isNotEmpty(tenantId)) {
+            
             List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
                 new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
 
@@ -82,11 +85,12 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                 if (decisionTable == null) {
                     // if fallback to default tenant is enabled do a final lookup query
                     if (executeDecisionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
-                        if (StringUtils.isNotEmpty(dmnEngineConfiguration.getDefaultTenantValue())) {
-                            decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, dmnEngineConfiguration.getDefaultTenantValue());
+                        String defaultTenant = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.DMN, decisionKey);
+                        if (StringUtils.isNotEmpty(defaultTenant)) {
+                            decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, defaultTenant);
                             if (decisionTable == null) {
                                 throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                                    ". There was also no fall back decision table found for default tenant " + dmnEngineConfiguration.getDefaultTenantValue());
+                                    ". There was also no fall back decision table found for default tenant " + defaultTenant);
                             }
                             
                         } else {
@@ -105,7 +109,9 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                 }
             }
             
-        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId)) {
+        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && 
+                        !dmnEngineConfiguration.isAlwaysLookupLatestDefinitionVersion()) {
+            
             List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
                 new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
 
@@ -128,12 +134,13 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
             decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
             if (decisionTable == null) {
                 if (executeDecisionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
-                    if (StringUtils.isNotEmpty(dmnEngineConfiguration.getDefaultTenantValue())) {
-                        decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, dmnEngineConfiguration.getDefaultTenantValue());
+                    String defaultTenant = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.DMN, decisionKey);
+                    if (StringUtils.isNotEmpty(defaultTenant)) {
+                        decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, defaultTenant);
                         if (decisionTable == null) {
                             throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                                ". There was also no fall back decision table found for default tenant " + 
-                                            dmnEngineConfiguration.getDefaultTenantValue() + ".");
+                                ". There was also no fall back decision table found for default tenant " +
+                                    defaultTenant + ".");
                         }
                         
                     } else {
@@ -161,6 +168,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         }
 
         executeDecisionInfo.setDecisionDefinitionId(decisionTable.getId());
+        executeDecisionInfo.setDecisionVersion(decisionTable.getVersion());
         executeDecisionInfo.setDeploymentId(decisionTable.getDeploymentId());
 
         return decisionTable;

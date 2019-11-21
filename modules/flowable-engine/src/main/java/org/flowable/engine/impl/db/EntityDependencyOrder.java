@@ -16,15 +16,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl;
+import org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl;
+import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
-import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailAssignmentEntityImpl;
@@ -33,15 +35,16 @@ import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanc
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricScopeInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityImpl;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
@@ -91,6 +94,9 @@ public class EntityDependencyOrder {
          * FK to Deployment FK to ByteArray
          */
         DELETE_ORDER.add(ModelEntityImpl.class);
+        
+        DELETE_ORDER.add(BatchPartEntityImpl.class);
+        DELETE_ORDER.add(BatchEntityImpl.class);
 
         /*
          * FK to ByteArray
@@ -123,6 +129,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(ByteArrayEntityImpl.class);
         DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
         DELETE_ORDER.add(JobByteArrayEntityImpl.class);
+        DELETE_ORDER.add(BatchByteArrayEntityImpl.class);
 
         /*
          * FK from ModelEntity FK from JobEntity FK from VariableInstanceEntity
@@ -139,6 +146,9 @@ public class EntityDependencyOrder {
         /*
          * FK to Execution
          */
+        DELETE_ORDER.add(SignalEventSubscriptionEntityImpl.class);
+        DELETE_ORDER.add(MessageEventSubscriptionEntityImpl.class);
+        DELETE_ORDER.add(CompensateEventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(EventSubscriptionEntityImpl.class);
 
         /*

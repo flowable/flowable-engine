@@ -12,10 +12,8 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
-import java.io.InputStream;
-import java.text.ParseException;
-import java.util.Date;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
@@ -35,17 +33,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/app")
@@ -73,7 +75,7 @@ public class ModelResource {
     /**
      * GET /rest/models/{modelId} -> Get process model
      */
-    @RequestMapping(value = "/rest/models/{modelId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models/{modelId}", produces = "application/json")
     public ModelRepresentation getModel(@PathVariable String modelId) {
         return modelService.getModelRepresentation(modelId);
     }
@@ -81,7 +83,7 @@ public class ModelResource {
     /**
      * GET /rest/models/{modelId}/thumbnail -> Get process model thumbnail
      */
-    @RequestMapping(value = "/rest/models/{modelId}/thumbnail", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(value = "/rest/models/{modelId}/thumbnail", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getModelThumbnail(@PathVariable String modelId) {
         Model model = modelService.getModel(modelId);
         return model.getThumbnail();
@@ -90,7 +92,7 @@ public class ModelResource {
     /**
      * PUT /rest/models/{modelId} -> update process model properties
      */
-    @RequestMapping(value = "/rest/models/{modelId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/models/{modelId}")
     public ModelRepresentation updateModel(@PathVariable String modelId, @RequestBody ModelRepresentation updatedModel) {
         // Get model, write-permission required if not a favorite-update
         Model model = modelService.getModel(modelId);
@@ -102,7 +104,7 @@ public class ModelResource {
 
         try {
             updatedModel.updateModel(model);
-            
+
             if (model.getModelType() != null) {
                 ObjectNode modelNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
                 modelNode.put("name", model.getName());
@@ -119,7 +121,7 @@ public class ModelResource {
                 }
                 model.setModelEditorJson(modelNode.toString());
             }
-            
+
             modelRepository.save(model);
 
             ModelRepresentation result = new ModelRepresentation(model);
@@ -134,7 +136,7 @@ public class ModelResource {
      * DELETE /rest/models/{modelId} -> delete process model or, as a non-owner, remove the share info link for that user specifically
      */
     @ResponseStatus(value = HttpStatus.OK)
-    @RequestMapping(value = "/rest/models/{modelId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/models/{modelId}")
     public void deleteModel(@PathVariable String modelId) {
 
         // Get model to check if it exists, read-permission required for delete
@@ -152,7 +154,7 @@ public class ModelResource {
     /**
      * GET /rest/models/{modelId}/editor/json -> get the JSON model
      */
-    @RequestMapping(value = "/rest/models/{modelId}/editor/json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/models/{modelId}/editor/json", produces = "application/json")
     public ObjectNode getModelJSON(@PathVariable String modelId) {
         Model model = modelService.getModel(modelId);
         ObjectNode modelNode = objectMapper.createObjectNode();
@@ -187,7 +189,7 @@ public class ModelResource {
     /**
      * POST /rest/models/{modelId}/editor/json -> save the JSON model
      */
-    @RequestMapping(value = "/rest/models/{modelId}/editor/json", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/models/{modelId}/editor/json")
     public ModelRepresentation saveModel(@PathVariable String modelId, @RequestBody MultiValueMap<String, String> values) {
 
         // Validation: see if there was another update in the meantime
@@ -245,9 +247,9 @@ public class ModelResource {
     }
 
     /**
-     * POST /rest/models/{modelId}/editor/newversion -> create a new model version
+     * POST /rest/models/{modelId}/newversion -> create a new model version
      */
-    @RequestMapping(value = "/rest/models/{modelId}/newversion", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/models/{modelId}/newversion")
     public ModelRepresentation importNewVersion(@PathVariable String modelId, @RequestParam("file") MultipartFile file) {
         InputStream modelStream = null;
         try {

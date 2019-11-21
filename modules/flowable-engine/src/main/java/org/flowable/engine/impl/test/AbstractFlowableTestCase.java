@@ -37,6 +37,7 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -82,6 +83,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected IdentityService identityService;
     protected ManagementService managementService;
     protected DynamicBpmnService dynamicBpmnService;
+    protected ProcessMigrationService processMigrationService;
 
     @BeforeEach
     public final void initializeServices(ProcessEngine processEngine) {
@@ -95,6 +97,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         identityService = processEngine.getIdentityService();
         managementService = processEngine.getManagementService();
         dynamicBpmnService = processEngine.getDynamicBpmnService();
+        processMigrationService = processEngine.getProcessMigrationService();
     }
 
     protected static void cleanDeployments(ProcessEngine processEngine) {
@@ -215,7 +218,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         }
 
         // runtime activities
-        assertEquals(0L, runtimeService.createActivityInstanceQuery().count());
+        assertEquals(0L, runtimeService.createActivityInstanceQuery().processInstanceId(processInstanceId).count());
     }
 
     public static void assertActivityInstancesAreSame(HistoricActivityInstance historicActInst, ActivityInstance activityInstance) {
@@ -267,8 +270,23 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
      */
     public BpmnModel createOneTaskTestProcess() {
         BpmnModel model = new BpmnModel();
-        org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
+        org.flowable.bpmn.model.Process process = createOneTaskProcess();
         model.addProcess(process);
+
+        return model;
+    }
+    
+    public BpmnModel createOneTaskTestProcessWithCandidateStarterGroup() {
+        BpmnModel model = new BpmnModel();
+        org.flowable.bpmn.model.Process process = createOneTaskProcess();
+        process.getCandidateStarterGroups().add("testGroup");
+        model.addProcess(process);
+
+        return model;
+    }
+    
+    protected org.flowable.bpmn.model.Process createOneTaskProcess() {
+        org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process();
         process.setId("oneTaskProcess");
         process.setName("The one task process");
 
@@ -290,8 +308,8 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
         process.addFlowElement(new SequenceFlow("start", "theTask"));
         process.addFlowElement(new SequenceFlow("theTask", "theEnd"));
-
-        return model;
+        
+        return process;
     }
 
     public BpmnModel createTwoTasksTestProcess() {
@@ -336,6 +354,16 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
      */
     public String deployOneTaskTestProcess() {
         BpmnModel bpmnModel = createOneTaskTestProcess();
+        Deployment deployment = repositoryService.createDeployment().addBpmnModel("oneTasktest.bpmn20.xml", bpmnModel).deploy();
+
+        deploymentIdsForAutoCleanup.add(deployment.getId()); // For auto-cleanup
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+        return processDefinition.getId();
+    }
+    
+    public String deployOneTaskTestProcessWithCandidateStarterGroup() {
+        BpmnModel bpmnModel = createOneTaskTestProcessWithCandidateStarterGroup();
         Deployment deployment = repositoryService.createDeployment().addBpmnModel("oneTasktest.bpmn20.xml", bpmnModel).deploy();
 
         deploymentIdsForAutoCleanup.add(deployment.getId()); // For auto-cleanup

@@ -1,0 +1,158 @@
+
+trigger:
+  branches:
+      include:
+      - '*'
+pr: none
+
+resources:
+  containers:
+  - container: openjdk8
+    image: repo.flowable.com/infra/openjdk:8
+    endpoint: FlowableDockerRegistry
+
+  - container: oracle11
+    image: repo.flowable.com/infra/oracle:11.2.0.2-xe
+    endpoint: FlowableDockerRegistry
+    options: --shm-size=2g
+    ports:
+      - 1521/tcp
+    env:
+      ORACLE_USER: flowable
+      ORACLE_USER_PASSWORD: flowable
+
+  - container: oracle18
+    image: repo.flowable.com/infra/oracle:18.4.0-xe
+    endpoint: FlowableDockerRegistry
+    options: --shm-size=6g
+    env:
+      ORACLE_USER: flowable
+      ORACLE_USER_PASSWORD: flowable
+    ports:
+      - 1521/tcp
+
+jobs:
+- job: oracle
+  displayName: Oracle
+  timeoutInMinutes: 120
+  pool:
+    vmImage: 'ubuntu-16.04'
+
+  strategy:
+    matrix:
+      oracle11:
+        oracleService: oracle11
+        oracleDriverVersion: 11.2.0.4
+        oracleDriverArtifact: ojdbc6
+#      Disable Oracle18 for now since it cannot be booted up on Azure Pipelines
+#      oracle18:
+#        oracleService: oracle18
+#        oracleDriverVersion: 18.3
+#        oracleDriverArtifact: ojdbc8
+
+  container: openjdk8
+  services:
+    oracle: $[ variables['oracleService'] ]
+
+  steps:
+    - checkout: self
+      fetchDepth: 10
+    - bash: >-
+        ./mvnw clean install
+        -Dmaven.javadoc.skip=true -B -V
+        -Dmaven.repo.local=/opt/m2/repository
+        -PcleanDb,oracle
+        -Djdbc.url=jdbc:oracle:thin:@oracle:1521:XE
+        -Djdbc.username=flowable
+        -Djdbc.password=flowable
+        -Djdbc.driver=oracle.jdbc.driver.OracleDriver
+        -Doracle.jdbc.version=$(oracleDriverVersion)
+        -Doracle.jdbc.artifact=$(oracleDriverArtifact)
+      displayName: Install and Test
+    - task: PublishTestResults@2
+      displayName: Publish Test Results
+      inputs:
+        testResultsFiles: '**/target/surefire-reports/TEST-*.xml'
+- job: oracle_content
+  displayName: Oracle Content
+  pool:
+    vmImage: 'ubuntu-16.04'
+
+  strategy:
+    matrix:
+      oracle11:
+        oracleService: oracle11
+        oracleDriverVersion: 11.2.0.4
+        oracleDriverArtifact: ojdbc6
+#      Disable Oracle18 for now since it cannot be booted up on Azure Pipelines
+#      oracle18:
+#        oracleService: oracle18
+#        oracleDriverVersion: 18.3
+#        oracleDriverArtifact: ojdbc8
+
+  container: openjdk8
+  services:
+    oracle: $[ variables['oracleService'] ]
+
+  steps:
+    - checkout: self
+      fetchDepth: 10
+    - bash: >-
+        ./mvnw clean install
+        -Dmaven.javadoc.skip=true -B -V
+        -Dmaven.repo.local=/opt/m2/repository
+        -Pcontent,oracle
+        -Djdbc.url=jdbc:oracle:thin:@oracle:1521:XE
+        -Djdbc.username=flowable
+        -Djdbc.password=flowable
+        -Djdbc.driver=oracle.jdbc.driver.OracleDriver
+        -Doracle.jdbc.version=$(oracleDriverVersion)
+        -Doracle.jdbc.artifact=$(oracleDriverArtifact)
+        -pl org.flowable:flowable-content-engine -am
+      displayName: Install and Test
+    - task: PublishTestResults@2
+      displayName: Publish Test Results
+      inputs:
+        testResultsFiles: '**/target/surefire-reports/TEST-*.xml'
+- job: oracle_dmn
+  displayName: Oracle DMN
+  pool:
+    vmImage: 'ubuntu-16.04'
+
+  strategy:
+    matrix:
+      oracle11:
+        oracleService: oracle11
+        oracleDriverVersion: 11.2.0.4
+        oracleDriverArtifact: ojdbc6
+#      Disable Oracle18 for now since it cannot be booted up on Azure Pipelines
+#      oracle18:
+#        oracleService: oracle18
+#        oracleDriverVersion: 18.3
+#        oracleDriverArtifact: ojdbc8
+
+  container: openjdk8
+  services:
+    oracle: $[ variables['oracleService'] ]
+
+  steps:
+    - checkout: self
+      fetchDepth: 10
+    - bash: >-
+          ./mvnw clean install
+          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.repo.local=/opt/m2/repository
+          -Pdmn,oracle
+          -Djdbc.url=jdbc:oracle:thin:@oracle:1521:XE
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=oracle.jdbc.driver.OracleDriver
+          -Doracle.jdbc.version=$(oracleDriverVersion)
+          -Doracle.jdbc.artifact=$(oracleDriverArtifact)
+          -pl org.flowable:flowable-dmn-engine -am
+      displayName: Install and Test
+    - task: PublishTestResults@2
+      displayName: Publish Test Results
+      condition: always()
+      inputs:
+        testResultsFiles: '**/target/surefire-reports/TEST-*.xml'

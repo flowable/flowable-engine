@@ -79,7 +79,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         // After setting the clock to time '1 hour and 5 seconds', the second
         // timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobs(7000L, 25L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
         assertEquals(0L, jobQuery.count());
 
         // which means that the third task is reached
@@ -128,7 +128,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         // After setting the clock to time '1 hour and 5 seconds', the second
         // timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobs(7000L, 25L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
         assertEquals(0L, jobQuery.count());
 
         // start execution listener is not executed
@@ -371,6 +371,10 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals("First Task", tasks.get(0).getName());
         jobList = managementService.createTimerJobQuery().list();
         assertEquals(1, jobList.size());
+        
+        Job job = managementService.createTimerJobQuery().singleResult();
+        assertEquals("boundaryTimerEvent", job.getElementId());
+        assertEquals("Timer event", job.getElementName());
 
         // after another 8 minutes (the timer will have to execute because it wasa set to be executed @ 10 minutes after process start)
         long tenMinutes = 8L * 60L * 1000L;

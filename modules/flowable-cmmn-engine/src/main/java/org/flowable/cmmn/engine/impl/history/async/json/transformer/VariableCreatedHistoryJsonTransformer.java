@@ -12,6 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDoubleFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getIntegerFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getLongFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -28,12 +34,6 @@ import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDoubleFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getIntegerFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getLongFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
 /**
  * @author Joram Barrez
@@ -59,6 +59,8 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         historicVariableInstanceEntity.setSubScopeId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SUB_SCOPE_ID));
         historicVariableInstanceEntity.setScopeType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE));
         historicVariableInstanceEntity.setTaskId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_TASK_ID));
+        historicVariableInstanceEntity.setExecutionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_EXECUTION_ID));
+        historicVariableInstanceEntity.setProcessInstanceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PROCESS_INSTANCE_ID));
         historicVariableInstanceEntity.setRevision(getIntegerFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REVISION));
         historicVariableInstanceEntity.setName(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_NAME));
         

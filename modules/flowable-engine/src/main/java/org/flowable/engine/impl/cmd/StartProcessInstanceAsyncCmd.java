@@ -48,23 +48,25 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
 
         processInstanceHelper.processAvailableEventSubProcesses(processInstance, process, commandContext);
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
         }
 
-        executeAsynchronous(execution);
+        executeAsynchronous(execution, process);
 
         return processInstance;
     }
 
-    protected void executeAsynchronous(ExecutionEntity execution) {
+    protected void executeAsynchronous(ExecutionEntity execution, Process process) {
         JobService jobService = CommandContextUtil.getJobService();
 
         JobEntity job = jobService.createJob();
         job.setExecutionId(execution.getId());
         job.setProcessInstanceId(execution.getProcessInstanceId());
         job.setProcessDefinitionId(execution.getProcessDefinitionId());
+        job.setElementId(process.getId());
+        job.setElementName(process.getName());
         job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
 
         // Inherit tenant id (if applicable)

@@ -13,6 +13,7 @@
 
 package org.flowable.engine.repository;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -122,6 +123,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
      * Only selects process definitions which given userId is authorized to start
      */
     ProcessDefinitionQuery startableByUser(String userId);
+
+    /**
+     * Only selects process definition which the given userId or groups are authorized to start.
+     */
+    ProcessDefinitionQuery startableByUserOrGroups(String userId, Collection<String> groups);
 
     /**
      * Only selects process definitions which are suspended

@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.flowable</groupId>
     	<artifactId>flowable-ui-task</artifactId>
-    	<version>6.4.1</version>
+    	<version>6.5.0-SNAPSHOT</version>
 	</parent>
 	<packaging>jar</packaging>
 
@@ -137,6 +137,7 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
 		</dependency>
 
 		<!-- JODA TIME -->
@@ -172,7 +173,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>2.1.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>

@@ -13,12 +13,13 @@
 
 package org.flowable.rest.service.api.management;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.util.Date;
 
 import org.flowable.common.rest.util.DateToStringSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans
@@ -33,6 +34,8 @@ public class JobResponse {
     protected String processDefinitionUrl;
     protected String executionId;
     protected String executionUrl;
+    protected String elementId;
+    protected String elementName;
     protected Integer retries;
     protected String exceptionMessage;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
@@ -110,6 +113,24 @@ public class JobResponse {
 
     public void setExecutionUrl(String executionUrl) {
         this.executionUrl = executionUrl;
+    }
+    
+    @ApiModelProperty(example = "timer")
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+    
+    @ApiModelProperty(example = "Timer task")
+    public String getElementName() {
+        return elementName;
+    }
+
+    public void setElementName(String elementName) {
+        this.elementName = elementName;
     }
 
     @ApiModelProperty(example = "3")

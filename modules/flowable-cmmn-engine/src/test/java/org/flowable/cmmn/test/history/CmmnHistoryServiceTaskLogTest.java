@@ -170,7 +170,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
         assertThat(taskLogEntries).size().isEqualTo(2);
         assertThat(taskLogEntries.get(1)).
-            extracting(assigneeTaskLogEntry -> new String(assigneeTaskLogEntry.getData())).
+            extracting(assigneeTaskLogEntry -> assigneeTaskLogEntry.getData()).
             isEqualTo("{\"newAssigneeId\":\"newAssignee\",\"previousAssigneeId\":\"initialAssignee\"}");
         assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
         assertThat(taskLogEntries.get(1)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
@@ -474,7 +474,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries).size().isEqualTo(2);
             assertThat(logEntries.get(1)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-            assertThat(new String(logEntries.get(1).getData())).contains(
+            assertThat(logEntries.get(1).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"groupId\":\"newCandidateGroup\""
             );
@@ -501,7 +501,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-            assertThat(new String(logEntries.get(2).getData())).contains(
+            assertThat(logEntries.get(2).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"groupId\":\"newCandidateGroup\""
             );
@@ -526,7 +526,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(logEntries).size().isEqualTo(3);
             assertThat(logEntries.get(2)).
                 extracting(HistoricTaskLogEntry::getType).isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-            assertThat(new String(logEntries.get(2).getData())).contains(
+            assertThat(logEntries.get(2).getData()).contains(
                 "\"type\":\"candidate\"",
                 "\"userId\":\"newCandidateUser\""
             );
@@ -764,6 +764,28 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             deleteTaskWithLogEntries("1");
             deleteTaskWithLogEntries("2");
             deleteTaskWithLogEntries("3");
+        }
+    }
+
+    @Test
+    public void testTaskLogEntriesDeletedOnDeploymentDelete() {
+        CaseInstance caseInstance = null;
+        try {
+            cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/history/CmmnHistoryServiceTaskLogTest.testTaskLogEntriesDeletedOnDeploymentDelete.cmmn").deploy();
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            cmmnTaskService.complete(task.getId());
+
+            assertEquals(6, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count());
+            assertEquals(6, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).count());
+
+        } finally {
+            cmmnRepositoryService.deleteDeployment(cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionId(caseInstance.getCaseDefinitionId()).singleResult().getDeploymentId(), true);
+
+            assertEquals(0, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count());
+            assertEquals(0, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseDefinitionId(caseInstance.getCaseDefinitionId()).count());
         }
     }
     

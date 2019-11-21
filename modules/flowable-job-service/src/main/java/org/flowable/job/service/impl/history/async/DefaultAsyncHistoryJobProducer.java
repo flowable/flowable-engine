@@ -44,8 +44,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         
         AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
         if (jobServiceConfiguration.isAsyncHistoryJsonGroupingEnabled() && historyObjectNodes.size() >= jobServiceConfiguration.getAsyncHistoryJsonGroupingThreshold()) {
-            String jobType = jobServiceConfiguration.isAsyncHistoryJsonGzipCompressionEnabled() ? 
-                    jobServiceConfiguration.getJobTypeAsyncHistoryZipped() : jobServiceConfiguration.getJobTypeAsyncHistory();
+            String jobType = getJobType(jobServiceConfiguration, true);
             HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobServiceConfiguration, jobType);
             ArrayNode arrayNode = jobServiceConfiguration.getObjectMapper().createArrayNode();
             for (ObjectNode historyJsonNode : historyObjectNodes) {
@@ -56,8 +55,9 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
             
         } else {
             List<HistoryJobEntity> historyJobEntities = new ArrayList<>(historyObjectNodes.size());
+            String jobType = getJobType(jobServiceConfiguration, false);
             for (ObjectNode historyJsonNode : historyObjectNodes) {
-                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobServiceConfiguration, jobServiceConfiguration.getJobTypeAsyncHistory());
+                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobServiceConfiguration, jobType);
                 addJsonToJob(commandContext, jobServiceConfiguration, jobEntity, historyJsonNode, false);
                 historyJobEntities.add(jobEntity);
             }
@@ -98,6 +98,15 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
             return baos.toByteArray();
         } catch (IOException e) {
             throw new FlowableException("Error while compressing json", e);
+        }
+    }
+
+    protected String getJobType(JobServiceConfiguration jobServiceConfiguration, boolean groupingEnabled) {
+        if (groupingEnabled) {
+            return jobServiceConfiguration.isAsyncHistoryJsonGzipCompressionEnabled() ?
+                jobServiceConfiguration.getJobTypeAsyncHistoryZipped() : jobServiceConfiguration.getJobTypeAsyncHistory();
+        } else {
+            return jobServiceConfiguration.getJobTypeAsyncHistory();
         }
     }
     

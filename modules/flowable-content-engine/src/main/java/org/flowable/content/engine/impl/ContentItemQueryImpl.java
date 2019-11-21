@@ -19,9 +19,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentItemQuery;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
@@ -30,7 +31,7 @@ import org.flowable.content.engine.impl.util.CommandContextUtil;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, ContentItem> implements ContentItemQuery, Serializable {
+public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, ContentItem> implements ContentItemQuery, QueryCacheValues, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String id;
@@ -323,13 +324,11 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getContentItemEntityManager().findContentItemCountByQueryCriteria(this);
     }
 
     @Override
     public List<ContentItem> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getContentItemEntityManager().findContentItemsByQueryCriteria(this);
     }
 

@@ -29,6 +29,9 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.interceptor.CreateHumanTaskAfterContext;
+import org.flowable.cmmn.engine.interceptor.CreateHumanTaskBeforeContext;
+import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
@@ -268,6 +271,29 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertEquals(1, entityLinksByScopeIdAndType.size());
         assertEquals(HierarchyType.ROOT, entityLinksByScopeIdAndType.get(0).getHierarchyType());
     }
+    
+    @Test
+    @CmmnDeployment(resources="org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void testCreateHumanTaskInterceptor() {
+        TestCreateHumanTaskInterceptor testCreateHumanTaskInterceptor = new TestCreateHumanTaskInterceptor();
+        cmmnEngineConfiguration.setCreateHumanTaskInterceptor(testCreateHumanTaskInterceptor);
+        
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertNotNull(task);
+            assertEquals("The Task", task.getName());
+            assertEquals("This is a test documentation", task.getDescription());
+            assertEquals("johnDoe", task.getAssignee());
+            assertEquals("testCategory", task.getCategory());
+            
+            assertEquals(1, testCreateHumanTaskInterceptor.getBeforeCreateHumanTaskCounter());
+            assertEquals(1, testCreateHumanTaskInterceptor.getAfterCreateHumanTaskCounter());
+            
+        } finally {
+            cmmnEngineConfiguration.setCreateHumanTaskInterceptor(null);
+        }
+    }
 
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
         IdentityLinkEntityImpl identityLinkEntityCandidateUser = new IdentityLinkEntityImpl();
@@ -281,6 +307,31 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                 identityLinkEntityCandidateUser,
                 identityLinkEntityCandidateGroup
         ).collect(toSet());
+    }
+    
+    protected class TestCreateHumanTaskInterceptor implements CreateHumanTaskInterceptor {
+        
+        protected int beforeCreateHumanTaskCounter = 0;
+        protected int afterCreateHumanTaskCounter = 0;
+        
+        @Override
+        public void beforeCreateHumanTask(CreateHumanTaskBeforeContext context) {
+            beforeCreateHumanTaskCounter++;
+            context.setCategory("testCategory");
+        }
+
+        @Override
+        public void afterCreateHumanTask(CreateHumanTaskAfterContext context) {
+            afterCreateHumanTaskCounter++;
+        }
+
+        public int getBeforeCreateHumanTaskCounter() {
+            return beforeCreateHumanTaskCounter;
+        }
+
+        public int getAfterCreateHumanTaskCounter() {
+            return afterCreateHumanTaskCounter;
+        }
     }
 
 }

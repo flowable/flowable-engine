@@ -53,6 +53,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_CANDIDATEUSERS),
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_CANDIDATEGROUPS),
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_CATEGORY),
+            new ExtensionAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION));
 
@@ -94,6 +95,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         userTask.setBusinessCalendarName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_BUSINESS_CALENDAR_NAME, xtr));
         userTask.setCategory(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_CATEGORY, xtr));
         userTask.setFormKey(formKey);
+        userTask.setValidateFormFields(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FIELD_VALIDATION, xtr));
         userTask.setAssignee(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_ASSIGNEE, xtr));
         userTask.setOwner(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_OWNER, xtr));
         userTask.setPriority(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_PRIORITY, xtr));
@@ -135,6 +137,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         writeQualifiedAttribute(ATTRIBUTE_TASK_USER_BUSINESS_CALENDAR_NAME, userTask.getBusinessCalendarName(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_USER_CATEGORY, userTask.getCategory(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_FORM_FORMKEY, userTask.getFormKey(), xtw);
+        writeQualifiedAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION, userTask.getValidateFormFields(), xtw);
         if (userTask.getPriority() != null) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_USER_PRIORITY, userTask.getPriority(), xtw);
         }
@@ -226,7 +229,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
     protected void writeAdditionalChildElements(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
     }
 
-    public class HumanPerformerParser extends BaseChildElementParser {
+    public static class HumanPerformerParser extends BaseChildElementParser {
 
         @Override
         public String getElementName() {
@@ -245,7 +248,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         }
     }
 
-    public class PotentialOwnerParser extends BaseChildElementParser {
+    public static class PotentialOwnerParser extends BaseChildElementParser {
 
         @Override
         public String getElementName() {
@@ -299,7 +302,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         }
     }
 
-    public class CustomIdentityLinkParser extends BaseChildElementParser {
+    public static class CustomIdentityLinkParser extends BaseChildElementParser {
 
         @Override
         public String getElementName() {

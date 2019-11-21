@@ -40,7 +40,7 @@ public class AbstractFlowableContentTest {
     protected ContentService contentService;
 
     @Before
-    public void initFormEngine() {
+    public void initContentEngine() {
         if (cachedContentEngine == null) {
             cachedContentEngine = rule.getContentEngine();
         }

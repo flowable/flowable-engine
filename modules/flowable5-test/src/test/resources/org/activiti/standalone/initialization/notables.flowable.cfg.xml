@@ -8,7 +8,10 @@
   
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="false" />
-    <property name="jdbcUrl" value="jdbc:h2:mem:ProcessEngineInitializationTest;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:ProcessEngineInitializationTest;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+    <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+    <property name="jdbcUsername" value="${jdbc.username:sa}" />
+    <property name="jdbcPassword" value="${jdbc.password:}" />
     
     <!-- job executor configurations -->
     <property name="asyncExecutorActivate" value="false" />

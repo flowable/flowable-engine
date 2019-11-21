@@ -16,7 +16,6 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.event.FlowableIdmEventType;
@@ -29,23 +28,17 @@ import org.flowable.idm.engine.impl.persistence.entity.data.GroupDataManager;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> implements GroupEntityManager {
-
-    protected GroupDataManager groupDataManager;
+public class GroupEntityManagerImpl
+    extends AbstractIdmEngineEntityManager<GroupEntity, GroupDataManager>
+    implements GroupEntityManager {
 
     public GroupEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, GroupDataManager groupDataManager) {
-        super(idmEngineConfiguration);
-        this.groupDataManager = groupDataManager;
-    }
-
-    @Override
-    protected DataManager<GroupEntity> getDataManager() {
-        return groupDataManager;
+        super(idmEngineConfiguration, groupDataManager);
     }
 
     @Override
     public Group createNewGroup(String groupId) {
-        GroupEntity groupEntity = groupDataManager.create();
+        GroupEntity groupEntity = dataManager.create();
         groupEntity.setId(groupId);
         groupEntity.setRevision(0); // Needed as groups can be transient and not save when they are returned
         return groupEntity;
@@ -53,12 +46,12 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
 
     @Override
     public void delete(String groupId) {
-        GroupEntity group = groupDataManager.findById(groupId);
+        GroupEntity group = dataManager.findById(groupId);
 
         if (group != null) {
 
             getMembershipEntityManager().deleteMembershipByGroupId(groupId);
-            if (getEventDispatcher().isEnabled()) {
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                 getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIPS_DELETED, groupId, null));
             }
 
@@ -73,27 +66,27 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
 
     @Override
     public List<Group> findGroupByQueryCriteria(GroupQueryImpl query) {
-        return groupDataManager.findGroupByQueryCriteria(query);
+        return dataManager.findGroupByQueryCriteria(query);
     }
 
     @Override
     public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
-        return groupDataManager.findGroupCountByQueryCriteria(query);
+        return dataManager.findGroupCountByQueryCriteria(query);
     }
 
     @Override
     public List<Group> findGroupsByUser(String userId) {
-        return groupDataManager.findGroupsByUser(userId);
+        return dataManager.findGroupsByUser(userId);
     }
 
     @Override
     public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap) {
-        return groupDataManager.findGroupsByNativeQuery(parameterMap);
+        return dataManager.findGroupsByNativeQuery(parameterMap);
     }
 
     @Override
     public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
-        return groupDataManager.findGroupCountByNativeQuery(parameterMap);
+        return dataManager.findGroupCountByNativeQuery(parameterMap);
     }
 
     @Override
@@ -103,15 +96,11 @@ public class GroupEntityManagerImpl extends AbstractEntityManager<GroupEntity> i
 
     @Override
     public List<Group> findGroupsByPrivilegeId(String privilegeId) {
-        return groupDataManager.findGroupsByPrivilegeId(privilegeId);
+        return dataManager.findGroupsByPrivilegeId(privilegeId);
     }
 
-    public GroupDataManager getGroupDataManager() {
-        return groupDataManager;
-    }
-
-    public void setGroupDataManager(GroupDataManager groupDataManager) {
-        this.groupDataManager = groupDataManager;
+    protected MembershipEntityManager getMembershipEntityManager() {
+        return engineConfiguration.getMembershipEntityManager();
     }
 
 }

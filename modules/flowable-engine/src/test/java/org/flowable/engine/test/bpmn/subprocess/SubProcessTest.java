@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.subprocess;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +29,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
@@ -66,7 +70,8 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     @Deployment
     public void testSimpleSubProcessWithTimer() {
 
-        Date startTime = new Date();
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date startTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(677));
 
         // After staring the process, the task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
@@ -153,16 +158,17 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testNestedSimpleSubprocessWithTimerOnInnerSubProcess() {
-        Date startTime = new Date();
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date startTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(370));
 
         // After staring the process, the task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSubProcessWithTimer");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
-        // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and
+        // Setting the clock forward 1 hour 5 second (timer fires in 1 hour) and
         // fire up the job executor
-        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (60 * 60 * 1000) + 1000));
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (60 * 60 * 1000) + 5000));
         waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         // The inner subprocess should be destroyed, and the escalated task should be active
@@ -455,5 +461,62 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         taskService.complete(currentTask.getId());
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+    }
+
+    @Test
+    @Deployment
+    public void testAsyncMiSequentialSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testAsyncMiSubProcess")
+                .variable("myList", Arrays.asList("one", "two", "three"))
+                .start();
+        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        managementService.executeJob(job.getId());
+
+        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        String variable = (String) runtimeService.getVariable(task.getExecutionId(), "counter");
+        assertEquals("one", variable);
+        taskService.complete(task.getId());
+
+        Job secondJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotSame(job.getId(), secondJob.getId());
+        managementService.executeJob(secondJob.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("two", (String) runtimeService.getVariable(task.getExecutionId(), "counter"));
+        taskService.complete(task.getId());
+
+        Job thirdJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotSame(secondJob.getId(), thirdJob.getId());
+        managementService.executeJob(thirdJob.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("three", (String) runtimeService.getVariable(task.getExecutionId(), "counter"));
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment
+    public void testAsyncMiParallelSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testAsyncMiSubProcess")
+                .variable("myList", Arrays.asList("one", "two", "three"))
+                .start();
+        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, jobs.size());
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+
+        assertEquals(3, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().forEach(task -> taskService.complete(task.getId()));
+
+        assertProcessEnded(processInstance.getId());
     }
 }

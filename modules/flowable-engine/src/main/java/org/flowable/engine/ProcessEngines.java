@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -88,9 +87,8 @@ public abstract class ProcessEngines {
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
-                URL resource = iterator.next();
-                LOGGER.info("Initializing process engine using configuration '{}'", resource.toString());
+            for (URL resource : configUrls) {
+                LOGGER.info("Initializing process engine using configuration '{}'", resource);
                 initProcessEngineFromResource(resource);
             }
 
@@ -101,7 +99,7 @@ public abstract class ProcessEngines {
             }
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                LOGGER.info("Initializing process engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing process engine using Spring configuration '{}'", resource);
                 initProcessEngineFromSpringResource(resource);
             }
 
@@ -123,7 +121,7 @@ public abstract class ProcessEngines {
             processEngineInfosByResourceUrl.put(resource.toString(), processEngineInfo);
 
         } catch (Exception e) {
-            throw new FlowableException("couldn't initialize process engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
+            throw new FlowableException("couldn't initialize process engine from spring configuration resource " + resource + ": " + e.getMessage(), e);
         }
     }
 

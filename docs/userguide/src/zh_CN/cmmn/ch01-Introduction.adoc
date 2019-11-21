@@ -1,0 +1,26 @@
+
+== 说明
+[[license]]
+=== 许可证
+Flowable在链接下发布:http://www.apache.org/licenses/LICENSE-2.0.html[Apache V2许可证]
+[[download]]
+=== 下载
+下载url：http://www.flowable.org/downloads.html
+[[sources]]
+=== 来源
+(发行版包含了大部分作为JAR文件的源文件。Flowable的源代码可以在以下链接中找到url：https://github.com/flowable/flowable-engine)
+[[experimental]]
+=== 实验特性
+标有*[EXPERIMENTAL]*的章节介绍不应认为是稳定的
+所有具有.impl的类，在包名中是内部实现类，不能以任何方式被认为是稳定的或有保证的。但是，如果用户指南将任何类提到为配置值，则支持它们，并且可以认为它们是稳定的。
+[[required.software]]
+=== 安装必需的软件
+运行Flowable需要JDK 8或以上版本。可以访问 Oracle Java SE downloads页面url：http://www.oracle.com/technetwork/java/javase/downloads/index.html。该页面上也有安装指导。安装完成后，可以执行 java -version 。能看到JDK的版本信息就说明安装成功了。
+
+[[reporting.problems]]
+=== 报告问题
+
+问题和评论可以在链接上讨论url:https://forum.flowable.org。问题可以在链接中创建url：https://github.com/flowable/flowengine/issue [我们的Github问题跟踪器]。
+[[internal]]
+=== 内部实现类
+在JAR文件中，包中的所有类都有.impl.在它们里面是实现类，应该被认为是内部的。对于实现类中的类或接口，没有提供稳定性保证。

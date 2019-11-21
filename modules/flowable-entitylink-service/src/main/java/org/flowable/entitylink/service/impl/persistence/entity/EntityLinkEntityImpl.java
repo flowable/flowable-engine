@@ -127,7 +127,8 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
     public Date getCreateTime() {
         return createTime;
     }
-    
+
+    @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }

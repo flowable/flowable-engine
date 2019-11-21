@@ -16,6 +16,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
@@ -85,7 +86,11 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = null;
+        if (processEngineConfiguration != null) {
+            eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        }
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             processEngineConfiguration.getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
                             execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
@@ -111,6 +116,8 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         job.setExecutionId(execution.getId());
         job.setProcessInstanceId(execution.getProcessInstanceId());
         job.setProcessDefinitionId(execution.getProcessDefinitionId());
+        job.setElementId(flowNode.getId());
+        job.setElementName(flowNode.getName());
         job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
 
         // Inherit tenant id (if applicable)

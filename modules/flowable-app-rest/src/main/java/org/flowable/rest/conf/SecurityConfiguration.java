@@ -51,13 +51,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .csrf().disable();
-        
+
+        if (restAppProperties.getCors().isEnabled()) {
+            httpSecurity.apply(new PropertyBasedCorsFilter(restAppProperties));
+        }
+
         // Swagger docs
         if (isSwaggerDocsEnabled()) {
             httpSecurity
                 .authorizeRequests()
                 .antMatchers("/docs/**").permitAll();
-            
+
         } else {
             httpSecurity
                 .authorizeRequests()
@@ -82,7 +86,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .anyRequest()
             .authenticated().and().httpBasic();
-            
         }
     }
     
@@ -97,5 +100,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected boolean isSwaggerDocsEnabled() {
         return restAppProperties.isSwaggerDocsEnabled();
     }
-    
 }

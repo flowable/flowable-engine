@@ -1,0 +1,157 @@
+[[chDeployment]]
+
+== 部署
+
+
+=== DMN定义
+
+文件名后缀符合 +.dmn+的文件,可以部署到DMN引擎中。
+
+当DMN引擎嵌入到流程引擎中,DMN定义文件可以和其他流程相关资源一起,打包到流程包（business archive BAR）里。流程引擎的部署服务会识别DMN资源,将其引入到DMN引擎中。
+
+[NOTE]
+====
+流程包中包含的自定义表达式函数的Java class文件*不会添加到classpath中*。这些自定义的决策表达式class文件应该添加到DMN引擎的classpath,这样引擎才能发现并使用这些决策表达式。
+====
+
+
+==== DMN定义文件,决策 和决策表
+一个DMN定义包含(不仅仅是)许多决策。一个决策一个表达式。DMN规范定义(描述)了多种类型的表达式。目前在Flowable DMN中,我们支持决策表类型的表达式。
+部署一个DMN定义是,定义中的每个*包含决策表*的决策定义,会分开插入到ACT_DMN_DECISION表里。
+
+
+==== 编程方式部署
+
+可以这样部署一个DMN定义:
+
+[source,java,linenums]
+----
+String dmnDefinition = "path/to/definition-one.dmn"; //Don't forget the .dmn extension!
+
+repositoryService.createDeployment()
+    .name("Deployment of DMN definition-one")
+    .addClasspathResource(dmnDefinition)
+    .deploy();
+
+----
+
+也可以使用诸如`addInputStream`的其他方式部署DMN定义。以下是一个使用外部文件部署DMN定义的例子：
+
+[source,java,linenums]
+----
+File dmnFile = new File("/path/to/definition-two.dmn"); //Don't forget the .dmn extension!
+
+repositoryService.createDeployment()
+    .name("Deployment of DMN definition-two")
+    .addInputStream(dmnFile.getName(), new FileInputStream(dmnFile))
+    .deploy();
+
+----
+
+部署的文件,名称可以是任意文本,但是作为有效的DMN定义文件,定义文件名后缀应该是(".dmn")。
+
+==== Java 类
+
+当决策执行时,使用的自定义Java class文件,需要放在引擎的classpath中。
+
+在部署DMN定义时,这些class文件可以没有放到引擎的classpath下。
+
+在测试时需要添加自定义Java类。需要把包含这些class文件的jar包放到flowable-ui-app或flowable-app-rest工程的lib下(${webserver}/${appname}/WEB-INF/lib/)。千万不要忘记这些依赖。另外,也可以将这些依赖放到tomcat中,+${tomcat.home}/lib+。
+
+
+==== 创建单应用
+
+不用确保所有DMN引擎classpath中包含所有代理类,并且使用了正确的spring配置,你可以考虑在自己的webapp里引入flowable-rest,这样就只有一个+Dmn引擎+.
+
+[[versioningOfDMNDefinitions]]
+
+=== DMB决策版本控制
+
+DMN没有版本控制的概念。这实际上很好，因为作为开发项目的一部分，可执行DMN定义文件可能位于版本控制系统存储库（例如Subversion、Git或Mercurial）中。部署期间创建DMN决策的版本。在部署过程中，flowable将为+decision+分配一个版本，然后将其存储在flowable db中。
+
+因为DMN定义中的每个DMN决策都是一个DMN定义,将执行以下步骤来初始化属性+key+、+version+、+name+和+id+：
+
+* 定义文件中 decision +id+ 属性在决策表中是 +key+.
+* 定义文件中 decision +name+ 属性在决策表中是 +name+.
+* 一个有特定的key的决策在首次部署时,版本标记为1。对于之后所有拥有相同key的发布,版本号相对于之前最高版本号+1。所以key属性是用来区分不同的决策。
+* id属性时在集群环境中,保证决策表的唯一的[数字]标识。
+
+
+以下面的流程为例：
+
+[source,xml,linenums]
+----
+<definitions id="myDefinitions" >
+  <decision id="myDecision" name="My important decision" >
+    <decisionTable id="decisionTable1" hitPolicy="FIRST" >
+    ...
+----
+
+当部署了该决策,决策表在数据库中是这样的：
+
+[options="header"]
+|===============
+|id|key|name|version
+|e29d4126-ed4d-11e6-9e00-7282cbd6ce64|myDecision|My important decision|1
+
+|===============
+
+
+当我们再发布这个流程的更新版本（比如：更改了用户任务）,流程定义的++id++ 和之前是一样的。
+流程定义表会包含一下信息：
+
+[options="header"]
+|===============
+|id|key|name|version
+|e29d4126-ed4d-11e6-9e00-7282cbd6ce64|myDecision|My important decision|1
+|e9c2a6c0-c085-11e6-9096-6ab56fad108a|myDecision|My important decision|2
+
+|===============
+
+当调用了 ++dmnRuleService.executeDecisionByKey("myDecision")++ , 之后会调用版本号 ++2++ 的决策定义,因为这个是决策定义的最新版本。
+
+如果我们创建第二个决策,定义如下所示,然后发布到flowable DMN中,数据库表中会增加第三行。
+
+[source,xml,linenums]
+----
+<definitions id="myNewDefinitions" >
+  <decision id="myNewDecision" name="My important decision" >
+    <decisionTable id="decisionTable1" hitPolicy="FIRST" >
+      ...
+----
+
+表中数据是这样的:
+
+[options="header"]
+|===============
+|id|key|name|version
+|e29d4126-ed4d-11e6-9e00-7282cbd6ce64|myDecision|My important decision|1
+|e9c2a6c0-c085-11e6-9096-6ab56fad108a|myDecision|My important decision|2
+|d317d3f7-e948-11e6-9ce6-b28c070b517d|myNewDecision|My important decision|1
+
+|===============
+
+注意：新的决策的key和第一个决策的key是不一样的。尽管name属性是一样的（正常情况下，表意清晰的话，我们需要把name属性也改掉）,FlowableDMN引擎通过 ++id++ 属性来区分不同的决策。新增的决策将会以版本1部署。
+
+[[deploymentCategory]]
+
+=== 分类
+
+DMN部署和决策表都可以自定义分类。
+DMN部署分类可以这样定义：
+
+[source,java,linenums]
+----
+dmnRepository
+    .createDeployment()
+    .category("yourCategory")
+    ...
+    .deploy();
+----
+
+决策表分类可以这样定义：
+
+[source,java,linenums]
+----
+dmnRepository.setDecisionTableCategory("e9c2a6c0-c085-11e6-9096-6ab56fad108a", "yourCategory");
+----

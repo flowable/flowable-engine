@@ -181,7 +181,7 @@ The directory structure of the generated project would be like this:
                     └── my-process.bpmn20.xml
 ----
 
-You can modify java unit test case and its corresponding process model, or add new test cases and process models.
+You can modify the Java unit test case and its corresponding process model, or add new test cases and process models.
 If you are using the project to articulate a bug or a feature, test case should fail initially. It should then pass
 after the desired bug is fixed or the desired feature is implemented.
 Please make sure to clean the project by typing *mvn clean* before sending it.

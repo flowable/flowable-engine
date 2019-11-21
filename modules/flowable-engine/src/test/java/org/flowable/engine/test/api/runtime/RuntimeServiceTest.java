@@ -210,7 +210,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceByProcessInstanceBuilderAsync() {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        repositoryService.createProcessDefinitionQuery().singleResult();
 
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
 

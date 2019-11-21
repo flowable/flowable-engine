@@ -7,10 +7,10 @@
   <bean id="processEngineConfiguration"
     class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/flowablecompatibility?characterEncoding=UTF-8" />
-    <property name="jdbcDriver" value="com.mysql.jdbc.Driver" />
-    <property name="jdbcUsername" value="flowable" />
-    <property name="jdbcPassword" value="flowable" />
+    <property name="jdbcUrl" value="${jdbc.url:jdbc:mysql://127.0.0.1:3306/flowablecompatibility?characterEncoding=UTF-8}" />
+    <property name="jdbcDriver" value="${jdbc.driver:com.mysql.jdbc.Driver}" />
+    <property name="jdbcUsername" value="${jdbc.username:flowable}" />
+    <property name="jdbcPassword" value="${jdbc.password:flowable}" />
 
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />

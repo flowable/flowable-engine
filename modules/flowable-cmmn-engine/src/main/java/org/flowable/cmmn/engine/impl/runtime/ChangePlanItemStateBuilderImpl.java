@@ -30,7 +30,10 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     protected String caseInstanceId;
     protected List<MovePlanItemInstanceIdContainer> movePlanItemInstanceIdList = new ArrayList<>();
     protected List<MovePlanItemDefinitionIdContainer> movePlanItemDefinitionIdList = new ArrayList<>();
+    protected List<String> activatePlanItemDefinitionIdList = new ArrayList<>();
+    protected List<String> changePlanItemToAvailableIdList = new ArrayList<>();
     protected Map<String, Object> caseVariables = new HashMap<>();
+    protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
 
     public ChangePlanItemStateBuilderImpl() {
     }
@@ -106,18 +109,56 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     }
 
     @Override
-    public ChangePlanItemStateBuilder caseVariable(String caseVariableName, Object caseVariableValue) {
-        if (this.caseVariables == null) {
-            this.caseVariables = new HashMap<>();
-        }
+    public ChangePlanItemStateBuilder activatePlanItemDefinitionId(String planItemDefinitionId) {
+        activatePlanItemDefinitionIdList.add(planItemDefinitionId);
+        return this;
+    }
 
+    @Override
+    public ChangePlanItemStateBuilder activatePlanItemDefinitionIds(List<String> planItemDefinitionIds) {
+        activatePlanItemDefinitionIdList.addAll(planItemDefinitionIds);
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder changePlanItemInstanceToAvailableByPlanItemDefinitionId(String planItemDefinitionId) {
+        changePlanItemToAvailableIdList.add(planItemDefinitionId);
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder changePlanItemInstancesToAvailableByPlanItemDefinitionId(List<String> planItemDefinitionIds) {
+        changePlanItemToAvailableIdList.addAll(planItemDefinitionIds);
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder caseVariable(String caseVariableName, Object caseVariableValue) {
         this.caseVariables.put(caseVariableName, caseVariableValue);
         return this;
     }
 
     @Override
     public ChangePlanItemStateBuilder caseVariables(Map<String, Object> caseVariables) {
-        this.caseVariables = caseVariables;
+        this.caseVariables.putAll(caseVariables);
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder childInstanceTaskVariable(String planItemDefinitionId, String name, Object value) {
+        if (!this.childInstanceTaskVariables.containsKey(planItemDefinitionId)) {
+            this.childInstanceTaskVariables.put(planItemDefinitionId, new HashMap<>());
+        }
+        this.childInstanceTaskVariables.get(planItemDefinitionId).put(name, value);
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder childInstanceTaskVariables(String planItemDefinitionId, Map<String, Object> variables) {
+        if (!this.childInstanceTaskVariables.containsKey(planItemDefinitionId)) {
+            this.childInstanceTaskVariables.put(planItemDefinitionId, new HashMap<>());
+        }
+        this.childInstanceTaskVariables.get(planItemDefinitionId).putAll(variables);
         return this;
     }
 
@@ -141,7 +182,19 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
         return movePlanItemDefinitionIdList;
     }
 
+    public List<String> getActivatePlanItemDefinitionIdList() {
+        return activatePlanItemDefinitionIdList;
+    }
+
+    public List<String> getChangePlanItemToAvailableIdList() {
+        return changePlanItemToAvailableIdList;
+    }
+
     public Map<String, Object> getCaseVariables() {
         return caseVariables;
+    }
+
+    public Map<String, Map<String, Object>> getChildInstanceTaskVariables() {
+        return childInstanceTaskVariables;
     }
 }

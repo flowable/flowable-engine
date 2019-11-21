@@ -12,21 +12,24 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
-import java.util.Iterator;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivateAsyncPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ChangePlanItemInstanceToAvailableOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceForRepetitionOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.DisablePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.DismissPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EnablePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.InitiatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
@@ -118,37 +121,6 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
     
     protected void internalPlanEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent planItemLifeCycleEvent, boolean evaluateCaseInstanceCompleted) {
-        
-        // To avoid too many evaluations of the 'same situation', the currently planned operations are looked at
-        // and when one is found that matches the pattern of one that is now to be planned, it is removed as the new one will
-        // do the same thing at a later point in the execution.
-        
-        Iterator<Runnable> plannedOperations = operations.iterator();
-        boolean found = false;
-        while (!found && plannedOperations.hasNext()) {
-            Runnable operation = plannedOperations.next();
-            if (operation instanceof EvaluateCriteriaOperation) {
-                EvaluateCriteriaOperation evaluateCriteriaOperation = (EvaluateCriteriaOperation) operation;
-                if (evaluateCriteriaOperation.getCaseInstanceEntityId() != null
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent() != null
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getTransition() != null
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getPlanItem() != null
-                        && planItemLifeCycleEvent != null
-                        && evaluateCriteriaOperation.getCaseInstanceEntityId().equals(caseInstanceEntityId)
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getTransition().equals(planItemLifeCycleEvent.getTransition())
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getPlanItem().getId().equals(planItemLifeCycleEvent.getPlanItem().getId())
-                        && evaluateCriteriaOperation.isEvaluateCaseInstanceCompleted() == evaluateCaseInstanceCompleted) {
-                    LOGGER.debug("Deferred criteria evaluation for case instance with id '{}' to later in the execution. Plan item = {}, Plan item definition = {}, transition = {}",
-                        caseInstanceEntityId,
-                        planItemLifeCycleEvent.getPlanItem().getId(),
-                        planItemLifeCycleEvent.getPlanItem().getPlanItemDefinition(),
-                        planItemLifeCycleEvent.getTransition());
-                    plannedOperations.remove();
-                    found = true;
-                }
-            }
-        }
-        
         EvaluateCriteriaOperation evaluateCriteriaOperation = new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, planItemLifeCycleEvent);
         evaluateCriteriaOperation.setEvaluateCaseInstanceCompleted(evaluateCaseInstanceCompleted);
         addOperation(evaluateCriteriaOperation, caseInstanceEntityId);
@@ -165,6 +137,16 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
 
     @Override
+    public void planInitiatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new InitiatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
+    }
+
+    @Override
+    public void planDismissPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new DismissPlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
+    }
+
+    @Override
     public void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         addOperation(new ActivatePlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId), planItemInstanceEntity.getCaseInstanceId());
     }
@@ -172,6 +154,12 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         addOperation(new StartPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId), planItemInstanceEntity.getCaseInstanceId());
+    }
+    
+    @Override
+    public void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Map<String, Object> variables) {
+        addOperation(new StartPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId, variables), 
+                        planItemInstanceEntity.getCaseInstanceId());
     }
     
     @Override
@@ -200,13 +188,18 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
 
     @Override
-    public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId) {
-        addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitCriterionId), planItemInstanceEntity.getCaseInstanceId());
+    public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType) {
+        addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitCriterionId, exitType, exitEventType), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
+    public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
+        addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitType, exitEventType), planItemInstanceEntity.getCaseInstanceId());
+    }
+    
+    @Override
+    public void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ChangePlanItemInstanceToAvailableOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
@@ -221,12 +214,12 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
 
     @Override
     public void planManualTerminateCaseInstanceOperation(String caseInstanceEntityId) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, true, null), caseInstanceEntityId);
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, true, null, null, null), caseInstanceEntityId);
     }
 
     @Override
-    public void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, false, exitCriterionId), caseInstanceEntityId);
+    public void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId, String exitType, String exitEventType) {
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, false, exitCriterionId, exitType, exitEventType), caseInstanceEntityId);
     }
 
 }

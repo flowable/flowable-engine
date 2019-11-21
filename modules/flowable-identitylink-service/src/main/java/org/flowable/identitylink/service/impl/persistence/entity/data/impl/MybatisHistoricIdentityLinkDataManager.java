@@ -23,6 +23,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentit
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksByProcInstMatcher;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksByScopeIdAndTypeMatcher;
+import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksBySubScopeIdAndTypeMatcher;
 
 /**
  * @author Joram Barrez
@@ -31,6 +32,7 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
 
     protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByProcInstMatcher = new HistoricIdentityLinksByProcInstMatcher();
     protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByScopeIdAndTypeMatcher = new HistoricIdentityLinksByScopeIdAndTypeMatcher();
+    protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksBySubScopeIdAndTypeMatcher = new HistoricIdentityLinksBySubScopeIdAndTypeMatcher();
 
     @Override
     public Class<? extends HistoricIdentityLinkEntity> getManagedEntityClass() {
@@ -62,6 +64,14 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
     }
     
     @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("subScopeId", subScopeId);
+        parameters.put("scopeType", scopeType);
+        return getList("selectHistoricIdentityLinksBySubScopeIdAndType", parameters, historicIdentityLinksBySubScopeIdAndTypeMatcher, true);
+    }
+    
+    @Override
     public void deleteHistoricIdentityLinksByScopeIdAndType(String scopeId, String scopeType) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("scopeId", scopeId);
@@ -75,5 +85,20 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
         parameters.put("scopeDefinitionId", scopeDefinitionId);
         parameters.put("scopeType", scopeType);
         getDbSqlSession().delete("deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType", parameters, HistoricIdentityLinkEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricProcessIdentityLinks", null, HistoricIdentityLinkEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteHistoricCaseIdentityLinksForNonExistingInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricCaseIdentityLinks", null, HistoricIdentityLinkEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteHistoricTaskIdentityLinksForNonExistingInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskIdentityLinks", null, HistoricIdentityLinkEntityImpl.class);
     }
 }

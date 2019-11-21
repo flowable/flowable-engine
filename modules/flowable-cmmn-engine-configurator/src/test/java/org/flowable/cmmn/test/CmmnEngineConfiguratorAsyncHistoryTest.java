@@ -47,8 +47,17 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
     
     @After
     public void cleanup() {
+        processEngine.getRepositoryService()
+            .createDeploymentQuery()
+            .list()
+            .forEach(deployment -> processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true));
+        cmmnEngine.getCmmnRepositoryService()
+            .createDeploymentQuery()
+            .list()
+            .forEach(deployment -> cmmnEngine.getCmmnRepositoryService().deleteDeployment(deployment.getId(), true));
+        // Execute history jobs for the delete deployments
         processEngine.getManagementService().createHistoryJobQuery().list()
-            .forEach(historyJob -> processEngine.getManagementService().deleteHistoryJob(historyJob.getId()));
+            .forEach(historyJob -> processEngine.getManagementService().executeHistoryJob(historyJob.getId()));
         
         cmmnEngine.close();
         processEngine.close();
@@ -103,8 +112,8 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
             // Execution scope should be all (see the CmmnEngineConfigurator)
             assertEquals(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL, historyJob.getScopeType());
         }
-        assertEquals(bpmnHistoryJobs, 1);
-        assertEquals(cmmnHistoryJobs, 2);
+        assertEquals(1, bpmnHistoryJobs);
+        assertEquals(2, cmmnHistoryJobs);
         
         // Starting the async history executor should process all of these
         CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngine.getCmmnEngineConfiguration(), 10000L, 200L, true);
@@ -124,6 +133,7 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
         
         HistoryJob historyJob = processEngine.getManagementService().createHistoryJobQuery().singleResult();
         assertEquals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, historyJob.getJobHandlerType());
+        processEngine.getManagementService().executeHistoryJob(historyJob.getId());
     }
 
 }

@@ -238,10 +238,18 @@ function _drawEventIcon(paper, element)
 		{
 			_drawTimerIcon(paper, element);
 		}
+		else if ("conditional" === element.eventDefinition.type)
+        {
+            _drawConditionalIcon(paper, element);
+        }
 		else if ("error" === element.eventDefinition.type)
 		{
 			_drawErrorIcon(paper, element);
 		}
+		else if ("escalation" === element.eventDefinition.type)
+        {
+            _drawEscalationIcon(paper, element);
+        }
 		else if ("signal" === element.eventDefinition.type)
 		{
 			_drawSignalIcon(paper, element);
@@ -251,6 +259,20 @@ function _drawEventIcon(paper, element)
 			_drawMessageIcon(paper, element);
 		}
 	}
+}
+
+function _drawConditionalIcon(paper, element)
+{
+    var fill = "none";
+    
+    var path = paper.path("M 10 10 L 22 10 M 10 14 L 22 14 M 10 18 L 22 18 M 10 22 L 22 22");
+    path.attr({
+        "stroke": "black",
+        "stroke-width": 1,
+        "fill": fill
+    });
+    path.transform("T" + (element.x - 1) + "," + (element.y - 1));
+    return path;
 }
 
 function _drawTimerIcon(paper, element)
@@ -304,6 +326,24 @@ function _drawErrorIcon(paper, element)
 
 	path.transform("T" + x + "," + y);
 	return path;
+}
+
+function _drawEscalationIcon(paper, element)
+{
+    var fill = "none";
+    if (element.type === "ThrowEvent")
+    {
+        fill = "black";
+    }
+
+    var path = paper.path("M 16,8.75 L22,23.75 L16,17 L10,23.75z");
+    path.attr({
+        "stroke": "black",
+        "stroke-width": 1,
+        "fill": fill
+    });
+    path.transform("T" + (element.x - 1) + "," + (element.y - 1));
+    return path;
 }
 
 function _drawSignalIcon(paper, element)

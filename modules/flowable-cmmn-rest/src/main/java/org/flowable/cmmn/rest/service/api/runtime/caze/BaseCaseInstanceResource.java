@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,10 +57,10 @@ public class BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
-    
+
     @Autowired
     protected CmmnRepositoryService repositoryService;
-    
+
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
 
@@ -107,28 +107,28 @@ public class BaseCaseInstanceResource {
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.caseInstanceWithoutTenantId();
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessCaseInstanceInfoWithQuery(query, queryRequest);
         }
 
         DataResponse<CaseInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
-        
-        Set<String> caseDefinitionIds = new HashSet<String>();
+
+        Set<String> caseDefinitionIds = new HashSet<>();
         List<CaseInstanceResponse> caseInstanceList = responseList.getData();
         for (CaseInstanceResponse caseInstanceResponse : caseInstanceList) {
             if (!caseDefinitionIds.contains(caseInstanceResponse.getCaseDefinitionId())) {
                 caseDefinitionIds.add(caseInstanceResponse.getCaseDefinitionId());
             }
         }
-        
+
         if (caseDefinitionIds.size() > 0) {
             List<CaseDefinition> caseDefinitionList = repositoryService.createCaseDefinitionQuery().caseDefinitionIds(caseDefinitionIds).list();
-            Map<String, CaseDefinition> caseDefinitionMap = new HashMap<String, CaseDefinition>();
+            Map<String, CaseDefinition> caseDefinitionMap = new HashMap<>();
             for (CaseDefinition caseDefinition : caseDefinitionList) {
                 caseDefinitionMap.put(caseDefinition.getId(), caseDefinition);
             }
-            
+
             for (CaseInstanceResponse caseInstanceResponse : caseInstanceList) {
                 if (caseDefinitionMap.containsKey(caseInstanceResponse.getCaseDefinitionId())) {
                     CaseDefinition caseDefinition = caseDefinitionMap.get(caseInstanceResponse.getCaseDefinitionId());
@@ -137,20 +137,20 @@ public class BaseCaseInstanceResource {
                 }
             }
         }
-        
+
         return responseList;
     }
-    
+
     protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
         CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
         }
-        
+
         return caseInstance;
     }
 
@@ -205,6 +205,14 @@ public class BaseCaseInstanceResource {
             case LIKE:
                 if (actualValue instanceof String) {
                     caseInstanceQuery.variableValueLike(variable.getName(), (String) actualValue);
+                } else {
+                    throw new FlowableIllegalArgumentException("Only string variable values are supported for like, but was: " + actualValue.getClass().getName());
+                }
+                break;
+
+            case LIKE_IGNORE_CASE:
+                if (actualValue instanceof String) {
+                    caseInstanceQuery.variableValueLikeIgnoreCase(variable.getName(), (String) actualValue);
                 } else {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported for like, but was: " + actualValue.getClass().getName());
                 }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot-samples</artifactId>
-        <version>6.4.1</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>flowable-spring-boot-sample-jpa</artifactId>
@@ -19,6 +19,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          <scope>test</scope>
         </dependency>
     </dependencies>
 

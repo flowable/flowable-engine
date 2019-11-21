@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
@@ -28,18 +28,12 @@ import org.flowable.engine.task.Event;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntity> implements CommentEntityManager {
-
-    protected CommentDataManager commentDataManager;
+public class CommentEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<CommentEntity, CommentDataManager>
+    implements CommentEntityManager {
 
     public CommentEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, CommentDataManager commentDataManager) {
-        super(processEngineConfiguration);
-        this.commentDataManager = commentDataManager;
-    }
-
-    @Override
-    protected DataManager<CommentEntity> getDataManager() {
-        return commentDataManager;
+        super(processEngineConfiguration, commentDataManager);
     }
 
     @Override
@@ -49,7 +43,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
         insert(commentEntity, false);
 
         Comment comment = (Comment) commentEntity;
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
@@ -73,7 +67,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
 
         CommentEntity updatedCommentEntity = update(commentEntity, false);
 
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
@@ -94,65 +88,65 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
     @Override
     public List<Comment> findCommentsByTaskId(String taskId) {
         checkHistoryEnabled();
-        return commentDataManager.findCommentsByTaskId(taskId);
+        return dataManager.findCommentsByTaskId(taskId);
     }
 
     @Override
     public List<Comment> findCommentsByTaskIdAndType(String taskId, String type) {
         checkHistoryEnabled();
-        return commentDataManager.findCommentsByTaskIdAndType(taskId, type);
+        return dataManager.findCommentsByTaskIdAndType(taskId, type);
     }
 
     @Override
     public List<Comment> findCommentsByType(String type) {
         checkHistoryEnabled();
-        return commentDataManager.findCommentsByType(type);
+        return dataManager.findCommentsByType(type);
     }
 
     @Override
     public List<Event> findEventsByTaskId(String taskId) {
         checkHistoryEnabled();
-        return commentDataManager.findEventsByTaskId(taskId);
+        return dataManager.findEventsByTaskId(taskId);
     }
 
     @Override
     public List<Event> findEventsByProcessInstanceId(String processInstanceId) {
         checkHistoryEnabled();
-        return commentDataManager.findEventsByProcessInstanceId(processInstanceId);
+        return dataManager.findEventsByProcessInstanceId(processInstanceId);
     }
 
     @Override
     public void deleteCommentsByTaskId(String taskId) {
         checkHistoryEnabled();
-        commentDataManager.deleteCommentsByTaskId(taskId);
+        dataManager.deleteCommentsByTaskId(taskId);
     }
 
     @Override
     public void deleteCommentsByProcessInstanceId(String processInstanceId) {
         checkHistoryEnabled();
-        commentDataManager.deleteCommentsByProcessInstanceId(processInstanceId);
+        dataManager.deleteCommentsByProcessInstanceId(processInstanceId);
     }
 
     @Override
     public List<Comment> findCommentsByProcessInstanceId(String processInstanceId) {
         checkHistoryEnabled();
-        return commentDataManager.findCommentsByProcessInstanceId(processInstanceId);
+        return dataManager.findCommentsByProcessInstanceId(processInstanceId);
     }
 
     @Override
     public List<Comment> findCommentsByProcessInstanceId(String processInstanceId, String type) {
         checkHistoryEnabled();
-        return commentDataManager.findCommentsByProcessInstanceId(processInstanceId, type);
+        return dataManager.findCommentsByProcessInstanceId(processInstanceId, type);
     }
 
     @Override
     public Comment findComment(String commentId) {
-        return commentDataManager.findComment(commentId);
+        return dataManager.findComment(commentId);
     }
 
     @Override
     public Event findEvent(String commentId) {
-        return commentDataManager.findEvent(commentId);
+        return dataManager.findEvent(commentId);
     }
 
     @Override
@@ -162,7 +156,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
         delete(commentEntity, false);
 
         Comment comment = (Comment) commentEntity;
-        if (getEventDispatcher().isEnabled()) {
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
@@ -184,12 +178,12 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
         }
     }
 
-    public CommentDataManager getCommentDataManager() {
-        return commentDataManager;
+    protected ExecutionEntityManager getExecutionEntityManager() {
+        return engineConfiguration.getExecutionEntityManager();
     }
 
-    public void setCommentDataManager(CommentDataManager commentDataManager) {
-        this.commentDataManager = commentDataManager;
+    protected HistoryManager getHistoryManager() {
+        return engineConfiguration.getHistoryManager();
     }
 
 }

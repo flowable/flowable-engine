@@ -121,4 +121,13 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(tasks.size()).isEqualTo(1);
         assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("subProcessWaitState");
     }
+
+    @Test
+    @Deployment
+    public void testVarargs() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("bean", new TestVarargsBean());
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testVarargsInExpression", variables);
+        assertEquals("ABC", runtimeService.getVariable(pi.getId(), "result"));
+    }
 }

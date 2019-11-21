@@ -19,8 +19,7 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
+import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
@@ -29,18 +28,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Frederik Heremans
  */
-public class IdentityServiceTest extends CustomConfigurationFlowableTestCase {
-
-    public IdentityServiceTest() {
-        super(IdentityServiceTest.class.getName());
-    }
-
-    @Override
-    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        processEngineConfiguration.setIdmEngineConfigurator(
-            new PasswordEncoderIdmEngineConfigurator()
-        );
-    }
+public class IdentityServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testUserInfo() {
@@ -394,36 +382,6 @@ public class IdentityServiceTest extends CustomConfigurationFlowableTestCase {
         assertFalse(identityService.checkPassword("userId", null));
         assertFalse(identityService.checkPassword(null, "passwd"));
         assertFalse(identityService.checkPassword(null, null));
-    }
-
-    @Test
-    public void testChangePassword() {
-        try {
-            User user = identityService.newUser("johndoe");
-            user.setPassword("xxx");
-            identityService.saveUser(user);
-
-            user = identityService.createUserQuery().userId("johndoe").list().get(0);
-            user.setFirstName("John Doe");
-            identityService.saveUser(user);
-            User johndoe = identityService.createUserQuery().userId("johndoe").list().get(0);
-            assertFalse(johndoe.getPassword().equals("xxx"));
-            assertEquals("John Doe", johndoe.getFirstName());
-            assertTrue(identityService.checkPassword("johndoe", "xxx"));
-
-            user = identityService.createUserQuery().userId("johndoe").list().get(0);
-            user.setPassword("yyy");
-            identityService.saveUser(user);
-            assertTrue(identityService.checkPassword("johndoe", "xxx"));
-
-            user = identityService.createUserQuery().userId("johndoe").list().get(0);
-            user.setPassword("yyy");
-            identityService.updateUserPassword(user);
-            assertTrue(identityService.checkPassword("johndoe", "yyy"));
-
-        } finally {
-            identityService.deleteUser("johndoe");
-        }
     }
 
     @Test

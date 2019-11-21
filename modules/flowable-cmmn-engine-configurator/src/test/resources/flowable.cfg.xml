@@ -5,10 +5,10 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
   
     <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
-        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
-        <property name="jdbcDriver" value="org.h2.Driver" />
-        <property name="jdbcUsername" value="sa" />
-        <property name="jdbcPassword" value="" />
+        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+        <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+        <property name="jdbcUsername" value="${jdbc.username:sa}" />
+        <property name="jdbcPassword" value="${jdbc.password:}" />
         <property name="databaseSchemaUpdate" value="true" />
         
         <property name="asyncExecutor" ref="processAsyncExecutor" />
@@ -17,21 +17,23 @@
         <property name="asyncFailedJobWaitTime" value="1" />
         
         <property name="enableEntityLinks" value="true" />
+        <property name="enableProcessDefinitionInfoCache" value="true" />
         
         <property name="configurators">
             <list>
                 <bean class="org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator">
                     <property name="cmmnEngineConfiguration" ref="cmmnEngineConfiguration" />
                 </bean>
+                <bean class="org.flowable.cmmn.test.validate.TestValidationFormEngineConfigurator"/>
             </list>
         </property>
     </bean>
     
     <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
-        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
-        <property name="jdbcDriver" value="org.h2.Driver" />
-        <property name="jdbcUsername" value="sa" />
-        <property name="jdbcPassword" value="" />
+        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+        <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+        <property name="jdbcUsername" value="${jdbc.username:sa}" />
+        <property name="jdbcPassword" value="${jdbc.password:}" />
         <property name="databaseSchemaUpdate" value="true" />
         
         <property name="asyncExecutor" ref="asyncExecutor" />
@@ -40,6 +42,9 @@
         <property name="asyncFailedJobWaitTime" value="1" />
         
         <property name="enableEntityLinks" value="true" />
+
+        <property name="formFieldValidationEnabled" value="true"/>
+        <property name="enableHistoricTaskLogging" value="true"/>
     </bean>
     
     <bean id="processAsyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">

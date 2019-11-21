@@ -29,6 +29,7 @@ import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricFormProperty;
@@ -42,6 +43,10 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.api.Job;
@@ -176,7 +181,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
                 LOGGER.debug("retrieving flowable tables from jdbc metadata");
                 String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
                 String tableNameFilter = databaseTablePrefix + "ACT_%";
-                if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
+                        || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
                     tableNameFilter = databaseTablePrefix + "act_%";
                 }
                 if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
@@ -260,7 +266,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
             result.setTableName(tableName);
             DatabaseMetaData metaData = getDbSqlSession().getSqlSession().getConnection().getMetaData();
 
-            if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+            if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
+                    || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
                 tableName = tableName.toLowerCase();
             }
 

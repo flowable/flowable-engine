@@ -14,7 +14,6 @@ package org.flowable.engine.impl.el;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.VariableContainerELResolver;
-import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -31,8 +30,7 @@ public class ProcessVariableScopeELResolver extends VariableContainerELResolver 
 
     public static final String EXECUTION_KEY = "execution";
     public static final String TASK_KEY = "task";
-    public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
-    
+
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
@@ -48,10 +46,6 @@ public class ProcessVariableScopeELResolver extends VariableContainerELResolver 
                     executionEntity = CommandContextUtil.getExecutionEntityManager().findById(executionId);
                 }
                 return executionEntity;
-                
-            } else if (LOGGED_IN_USER_KEY.equals(property)) {
-                context.setPropertyResolved(true);
-                return Authentication.getAuthenticatedUserId();
                 
             } else {
                 return super.getValue(context, base, property);

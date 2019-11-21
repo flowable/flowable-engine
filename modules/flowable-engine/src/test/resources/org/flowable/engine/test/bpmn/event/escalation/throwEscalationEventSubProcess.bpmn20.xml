@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="throwEscalationEvent">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBefore" />
+  
+    <userTask id="taskBefore" />
+    <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="throwEvent" />
+    
+    <intermediateThrowEvent id="throwEvent">
+        <escalationEventDefinition escalationRef="escalationTest" />
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow3" sourceRef="throwEvent" targetRef="taskAfter" />
+    
+    <userTask id="taskAfter" />
+    <sequenceFlow id="flow4" sourceRef="taskAfter" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

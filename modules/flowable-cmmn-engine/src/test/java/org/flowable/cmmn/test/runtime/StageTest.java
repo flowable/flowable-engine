@@ -12,15 +12,27 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.flowable.cmmn.api.StageResponse;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 /**
@@ -229,5 +241,384 @@ public class StageTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTerminatedStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        List<PlanItemInstance> activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
+            .planItemInstanceStateActive().list();
+        assertThat(activeStages)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId)
+            .containsExactly("expandedStage2");
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().list();
+        assertPlanItemInstanceState(planItemInstances, "in progress", PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Hidden", PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Close", PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Draft", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Service task 1", PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Service task 2", PlanItemInstanceState.COMPLETED);
+
+        Task closeTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(closeTask).isNotNull();
+        cmmnTaskService.complete(closeTask.getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().list();
+        assertPlanItemInstanceState(planItemInstances, "in progress", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Hidden", PlanItemInstanceState.TERMINATED);
+        assertPlanItemInstanceState(planItemInstances, "Close", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Draft", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Service task 1", PlanItemInstanceState.TERMINATED);
+        assertPlanItemInstanceState(planItemInstances, "Service task 2", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Reopen Task", PlanItemInstanceState.ACTIVE);
+
+        activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
+            .planItemInstanceStateActive().list();
+        assertThat(activeStages)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId)
+            .containsExactly("expandedStage3");
+
+        Task reopenTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(reopenTask).isNotNull();
+        cmmnTaskService.complete(reopenTask.getId());
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().list();
+        assertPlanItemInstanceState(planItemInstances, "in progress", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Hidden", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Close", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Draft", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Service task 1", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Service task 2", PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Reopen Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.TERMINATED);
+        assertPlanItemInstanceState(planItemInstances, "In progress Task", PlanItemInstanceState.ACTIVE);
+
+        activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
+            .planItemInstanceStateActive().list();
+        assertThat(activeStages)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId)
+            .containsExactlyInAnyOrder("expandedStage1", "expandedStage2");
+
+        Task inProgressTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(inProgressTask).isNotNull();
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testStageFlagSet() {
+        Date now = new Date();
+        setClockTo(now);
+        cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testCase")
+            .variable("showInStage", true)
+            .start();
+
+        CaseInstance testStagesOnly = cmmnRuntimeService.createCaseInstanceQuery()
+            .caseDefinitionKey("testCase")
+            .singleResult();
+        assertThat(testStagesOnly).isNotNull();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(testStagesOnly.getId()).planItemDefinitionType("stage").count()).isEqualTo(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(testStagesOnly.getId()).onlyStages().count()).isEqualTo(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(testStagesOnly.getId()).onlyStages().list()).extracting(PlanItemInstance::isStage).containsOnly(true);
+        
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().onlyStages().list();
+        assertEquals(3, historicPlanItemInstances.size());
+        Map<String, Boolean> stageIncludeInOverviewMap = new HashMap<>();
+        for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+            stageIncludeInOverviewMap.put(historicPlanItemInstance.getName(), historicPlanItemInstance.isShowInOverview());
+        }
+        
+        assertTrue(stageIncludeInOverviewMap.get("Stage 1"));
+        assertFalse(stageIncludeInOverviewMap.get("Stage 1.1"));
+        assertTrue(stageIncludeInOverviewMap.get("Stage 2"));
+        
+        cmmnRuntimeService.completeStagePlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 1").singleResult().getId());
+        
+        historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().onlyStages().list();
+        assertEquals(4, historicPlanItemInstances.size());
+        stageIncludeInOverviewMap = new HashMap<>();
+        for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+            stageIncludeInOverviewMap.put(historicPlanItemInstance.getName(), historicPlanItemInstance.isShowInOverview());
+        }
+        
+        assertTrue(stageIncludeInOverviewMap.get("Stage 1"));
+        assertFalse(stageIncludeInOverviewMap.get("Stage 1.1"));
+        assertTrue(stageIncludeInOverviewMap.get("Stage 2"));
+        assertTrue(stageIncludeInOverviewMap.get("Stage 2.1"));
+    }
     
+    @Test
+    @CmmnDeployment
+    public void testGetStageOverview() {
+        Date now = new Date();
+        setClockTo(now);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testCase")
+            .variable("showInStage", true)
+            .start();
+
+        List<StageResponse> stages = cmmnRuntimeService.getStageOverview(caseInstance.getId());
+        assertEquals(3, stages.size());
+        
+        Map<String, StageResponse> stageMap = new HashMap<>();
+        for (StageResponse stageResponse : stages) {
+            stageMap.put(stageResponse.getName(), stageResponse);
+        }
+        
+        assertEquals("Stage 1", stageMap.get("Stage 1").getName());
+        assertTrue(stageMap.get("Stage 1").isCurrent());
+        assertFalse(stageMap.get("Stage 1").isEnded());
+        assertNull(stageMap.get("Stage 1").getEndTime());
+        assertEquals("Stage 2", stageMap.get("Stage 2").getName());
+        assertFalse(stageMap.get("Stage 2").isCurrent());
+        assertFalse(stageMap.get("Stage 2").isEnded());
+        assertNull(stageMap.get("Stage 2").getEndTime());
+        assertEquals("Stage 2.1", stageMap.get("Stage 2.1").getName());
+        assertFalse(stageMap.get("Stage 2.1").isCurrent());
+        assertFalse(stageMap.get("Stage 2.1").isEnded());
+        assertNull(stageMap.get("Stage 2.1").getEndTime());
+        
+        cmmnRuntimeService.completeStagePlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 1").singleResult().getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        stages = cmmnHistoryService.getStageOverview(caseInstance.getId());
+        assertEquals(3, stages.size());
+        
+        stageMap = new HashMap<>();
+        for (StageResponse stageResponse : stages) {
+            stageMap.put(stageResponse.getName(), stageResponse);
+        }
+        
+        assertEquals("Stage 1", stageMap.get("Stage 1").getName());
+        assertFalse(stageMap.get("Stage 1").isCurrent());
+        assertTrue(stageMap.get("Stage 1").isEnded());
+        assertNotNull(stageMap.get("Stage 1").getEndTime());
+        assertEquals("Stage 2", stageMap.get("Stage 2").getName());
+        assertFalse(stageMap.get("Stage 2").isCurrent());
+        assertTrue(stageMap.get("Stage 2").isEnded());
+        assertNotNull(stageMap.get("Stage 2").getEndTime());
+        assertEquals("Stage 2.1", stageMap.get("Stage 2.1").getName());
+        assertFalse(stageMap.get("Stage 2.1").isCurrent());
+        assertTrue(stageMap.get("Stage 2.1").isEnded());
+        assertNotNull(stageMap.get("Stage 2.1").getEndTime());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testGetStageAndMilestoneOverview() {
+        Date now = new Date();
+        setClockTo(now);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testCase")
+            .variable("showInStage", true)
+            .variable("showMilestoneInOverview", true)
+            .start();
+
+        List<StageResponse> stages = cmmnRuntimeService.getStageOverview(caseInstance.getId());
+        assertEquals(5, stages.size());
+        
+        Map<String, StageResponse> stageMap = new HashMap<>();
+        for (StageResponse stageResponse : stages) {
+            stageMap.put(stageResponse.getName(), stageResponse);
+        }
+        
+        assertEquals("Milestone 1", stageMap.get("Milestone 1").getName());
+        assertFalse(stageMap.get("Milestone 1").isCurrent());
+        assertTrue(stageMap.get("Milestone 1").isEnded());
+        assertNotNull(stageMap.get("Milestone 1").getEndTime());
+        
+        assertEquals("Stage 1", stageMap.get("Stage 1").getName());
+        assertTrue(stageMap.get("Stage 1").isCurrent());
+        assertFalse(stageMap.get("Stage 1").isEnded());
+        assertNull(stageMap.get("Stage 1").getEndTime());
+        
+        assertEquals("Stage 2", stageMap.get("Stage 2").getName());
+        assertFalse(stageMap.get("Stage 2").isCurrent());
+        assertFalse(stageMap.get("Stage 2").isEnded());
+        assertNull(stageMap.get("Stage 2").getEndTime());
+        
+        assertEquals("Milestone 2.1", stageMap.get("Milestone 2.1").getName());
+        assertFalse(stageMap.get("Milestone 2.1").isCurrent());
+        assertFalse(stageMap.get("Milestone 2.1").isEnded());
+        assertNull(stageMap.get("Milestone 2.1").getEndTime());
+        
+        assertEquals("Stage 2.1", stageMap.get("Stage 2.1").getName());
+        assertFalse(stageMap.get("Stage 2.1").isCurrent());
+        assertFalse(stageMap.get("Stage 2.1").isEnded());
+        assertNull(stageMap.get("Stage 2.1").getEndTime());
+        
+        cmmnRuntimeService.completeStagePlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 1").singleResult().getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        stages = cmmnHistoryService.getStageOverview(caseInstance.getId());
+        assertEquals(5, stages.size());
+        
+        stageMap = new HashMap<>();
+        for (StageResponse stageResponse : stages) {
+            stageMap.put(stageResponse.getName(), stageResponse);
+        }
+        
+        assertEquals("Milestone 1", stageMap.get("Milestone 1").getName());
+        assertFalse(stageMap.get("Milestone 1").isCurrent());
+        assertTrue(stageMap.get("Milestone 1").isEnded());
+        assertNotNull(stageMap.get("Milestone 1").getEndTime());
+        
+        assertEquals("Stage 1", stageMap.get("Stage 1").getName());
+        assertFalse(stageMap.get("Stage 1").isCurrent());
+        assertTrue(stageMap.get("Stage 1").isEnded());
+        assertNotNull(stageMap.get("Stage 1").getEndTime());
+        
+        assertEquals("Stage 2", stageMap.get("Stage 2").getName());
+        assertFalse(stageMap.get("Stage 2").isCurrent());
+        assertTrue(stageMap.get("Stage 2").isEnded());
+        assertNotNull(stageMap.get("Stage 2").getEndTime());
+        
+        assertEquals("Milestone 2.1", stageMap.get("Milestone 2.1").getName());
+        assertFalse(stageMap.get("Milestone 2.1").isCurrent());
+        assertTrue(stageMap.get("Milestone 2.1").isEnded());
+        assertNotNull(stageMap.get("Milestone 2.1").getEndTime());
+        
+        assertEquals("Stage 2.1", stageMap.get("Stage 2.1").getName());
+        assertFalse(stageMap.get("Stage 2.1").isCurrent());
+        assertTrue(stageMap.get("Stage 2.1").isEnded());
+        assertNotNull(stageMap.get("Stage 2.1").getEndTime());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedRepeatingStageWithMultipleOnParts() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testNestedRepeatingStageWithMultipleOnParts").start();
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Nested Task").singleResult()).isNotNull();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertPlanItemInstanceState(planItemInstances, "stage1", PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "stage2", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        UserEventListenerInstance exitStageEventListener = cmmnRuntimeService.createUserEventListenerInstanceQuery().name("exit stage").singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(exitStageEventListener.getId());
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Nested Task").singleResult()).isNull();
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().caseInstanceId(caseInstance.getId()).list();
+        assertPlanItemInstanceState(planItemInstances, "stage1", PlanItemInstanceState.TERMINATED);
+        assertPlanItemInstanceState(planItemInstances, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery().
+            caseInstanceId(caseInstance.getId()).list();
+        userEventListenerInstances.forEach(userEventListenerInstance -> cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId()));
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Nested Task").singleResult()).isNotNull();
+        cmmnTaskService.createTaskQuery().list().forEach(task -> cmmnTaskService.complete(task.getId()));
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testActivateTerminatedRepeatingStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testActivateTerminatedRepeatingStage")
+            .start();
+
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.ENABLED);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.AVAILABLE);
+
+        cmmnRuntimeService
+            .createPlanItemInstanceTransitionBuilder(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult().getId())
+            .start();
+
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ENABLED);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(caseInstance, "B", PlanItemInstanceState.ACTIVE);
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("B", task.getName());
+
+        cmmnTaskService.complete(task.getId());
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ENABLED);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.COMPLETED);
+        assertPlanItemInstanceState(caseInstance, "B", PlanItemInstanceState.COMPLETED);
+
+        cmmnRuntimeService
+            .createPlanItemInstanceTransitionBuilder(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult().getId())
+            .start();
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        assertPlanItemInstanceState(caseInstance, "A", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ENABLED);
+        assertPlanItemInstanceState(caseInstance, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ACTIVE);
+        assertPlanItemInstanceState(caseInstance, "B", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ACTIVE);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingStageInTerminatedCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testRepeatingStageInTerminatedCase")
+            .variable("terminateTheCase", true)
+            .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingStageInTerminatedCase2() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testRepeatingStageInTerminatedCase")
+            .variable("terminateTheCase", true)
+            .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingStageInTerminatedCase3() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        List<PlanItemInstance> activeStages = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).onlyStages()
+            .planItemInstanceStateActive().list();
+        assertThat(activeStages)
+            .extracting(PlanItemInstance::getPlanItemDefinitionId)
+            .containsExactly("expandedStage2");
+
+        Task closeTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(closeTask).isNotNull();
+        cmmnTaskService.complete(closeTask.getId());
+
+        Task reopenTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(reopenTask).isNotNull();
+        cmmnTaskService.complete(reopenTask.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testAllServiceTasksInRepeatedStages() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testRepeatingStageInTerminatedCase")
+            .variable("terminateTheCase", true)
+            .start();
+        assertCaseInstanceEnded(caseInstance);
+    }
+
 }

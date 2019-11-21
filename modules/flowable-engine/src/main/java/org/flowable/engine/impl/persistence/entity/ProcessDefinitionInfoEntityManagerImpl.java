@@ -13,28 +13,20 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class ProcessDefinitionInfoEntityManagerImpl extends
-        AbstractEntityManager<ProcessDefinitionInfoEntity> implements ProcessDefinitionInfoEntityManager {
-
-    protected ProcessDefinitionInfoDataManager processDefinitionInfoDataManager;
+public class ProcessDefinitionInfoEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<ProcessDefinitionInfoEntity, ProcessDefinitionInfoDataManager>
+    implements ProcessDefinitionInfoEntityManager {
 
     public ProcessDefinitionInfoEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration,
             ProcessDefinitionInfoDataManager processDefinitionInfoDataManager) {
 
-        super(processEngineConfiguration);
-        this.processDefinitionInfoDataManager = processDefinitionInfoDataManager;
-    }
-
-    @Override
-    protected DataManager<ProcessDefinitionInfoEntity> getDataManager() {
-        return processDefinitionInfoDataManager;
+        super(processEngineConfiguration, processDefinitionInfoDataManager);
     }
 
     @Override
@@ -65,8 +57,9 @@ public class ProcessDefinitionInfoEntityManagerImpl extends
 
             if (processDefinitionInfo.getInfoJsonId() == null) {
                 processDefinitionInfo.setInfoJsonId(ref.getId());
-                updateProcessDefinitionInfo(processDefinitionInfo);
             }
+            
+            updateProcessDefinitionInfo(processDefinitionInfo);
         }
     }
 
@@ -80,7 +73,7 @@ public class ProcessDefinitionInfoEntityManagerImpl extends
 
     @Override
     public ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId) {
-        return processDefinitionInfoDataManager.findProcessDefinitionInfoByProcessDefinitionId(processDefinitionId);
+        return dataManager.findProcessDefinitionInfoByProcessDefinitionId(processDefinitionId);
     }
 
     @Override

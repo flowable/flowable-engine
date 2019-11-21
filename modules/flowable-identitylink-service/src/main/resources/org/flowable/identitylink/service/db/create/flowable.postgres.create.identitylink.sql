@@ -8,6 +8,7 @@ create table ACT_RU_IDENTITYLINK (
     PROC_INST_ID_ varchar(64),
     PROC_DEF_ID_ varchar (64),
     SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
     SCOPE_DEFINITION_ID_ varchar(255),
     primary key (ID_)
@@ -16,6 +17,7 @@ create table ACT_RU_IDENTITYLINK (
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_IDENT_LNK_SCOPE on ACT_RU_IDENTITYLINK(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_IDENT_LNK_SUB_SCOPE on ACT_RU_IDENTITYLINK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_IDENT_LNK_SCOPE_DEF on ACT_RU_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.4.1.3', 1);
+insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.5.0.4', 1);

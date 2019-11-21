@@ -53,7 +53,7 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQueryImpl query) {
-        return getDbSqlSession().selectList("selectHistoricCaseInstancesByQueryCriteria", query);
+        return getDbSqlSession().selectList("selectHistoricCaseInstancesByQueryCriteria", query, getManagedEntityClass());
     }
 
     @Override
@@ -78,7 +78,8 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
         }
         historicCaseInstanceQuery.setFirstResult(0);
 
-        List<HistoricCaseInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectHistoricCaseInstancesWithVariablesByQueryCriteria", historicCaseInstanceQuery);
+        List<HistoricCaseInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(
+                        "selectHistoricCaseInstancesWithVariablesByQueryCriteria", historicCaseInstanceQuery, getManagedEntityClass());
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {
@@ -103,4 +104,8 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
         getDbSqlSession().delete("deleteHistoricCaseInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
     }
 
+    @Override
+    public void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
+        getDbSqlSession().delete("bulkDeleteHistoricCaseInstances", historicCaseInstanceQuery, getManagedEntityClass());
+    }
 }

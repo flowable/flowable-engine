@@ -12,6 +12,7 @@
  */
 package org.flowable.ui.modeler.rest.app;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
@@ -20,9 +21,9 @@ import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.validation.ValidationError;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,12 +37,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RequestMapping("/app")
 public class ModelValidationRestResource {
 
-    @RequestMapping(value = "/rest/model/validate",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/rest/model/validate", consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<ValidationError> validate(@RequestBody JsonNode body){
-        BpmnModel bpmnModel = new BpmnJsonConverter().convertToBpmnModel(body);
-        ProcessValidator validator = new ProcessValidatorFactory().createDefaultProcessValidator();
-        List<ValidationError> errors = validator.validate(bpmnModel);
-        return errors;
+        if (body != null && body.has("stencilset")) {
+            JsonNode stencilset = body.get("stencilset");
+            if (stencilset.has("namespace")) {
+                String namespace = stencilset.get("namespace").asText();
+                if (namespace.endsWith("bpmn2.0#")) {
+                    BpmnModel bpmnModel = new BpmnJsonConverter().convertToBpmnModel(body);
+                    ProcessValidator validator = new ProcessValidatorFactory().createDefaultProcessValidator();
+                    List<ValidationError> errors = validator.validate(bpmnModel);
+                    return errors;
+                }
+            }
+        }
+        return Collections.emptyList();
     }
 
 }

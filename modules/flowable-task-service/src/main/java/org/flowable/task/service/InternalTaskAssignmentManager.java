@@ -37,8 +37,6 @@ public interface InternalTaskAssignmentManager {
     
     void addUserIdentityLink(Task task, IdentityLink identityLink);
 
-    void addUserIdentityLinkToParent(Task task, String userId);
-
     void addGroupIdentityLink(Task task, IdentityLink identityLink);
 
     void deleteUserIdentityLink(Task task, IdentityLink identityLink);

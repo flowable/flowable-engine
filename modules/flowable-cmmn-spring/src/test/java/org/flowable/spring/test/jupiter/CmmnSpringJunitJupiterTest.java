@@ -22,7 +22,6 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.CmmnDeploymentId;
@@ -63,7 +62,7 @@ public class CmmnSpringJunitJupiterTest {
     @Test
     @CmmnDeployment
     public void simpleCaseTest(FlowableCmmnTestHelper flowableTestHelper, @CmmnDeploymentId String deploymentId, CmmnEngine extensionCmmnEngine) {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("junitJupiterCase").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("junitJupiterCase").start();
 
         assertThat(flowableTestHelper.getDeploymentIdFromDeploymentAnnotation())
             .isEqualTo(deploymentId)

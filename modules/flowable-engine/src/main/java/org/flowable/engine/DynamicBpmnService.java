@@ -55,6 +55,18 @@ public interface DynamicBpmnService {
     ObjectNode changeScriptTaskScript(String id, String script);
 
     void changeScriptTaskScript(String id, String script, ObjectNode infoNode);
+    
+    ObjectNode changeSkipExpression(String id, String skipExpression);
+
+    void changeSkipExpression(String id, String skipExpression, ObjectNode infoNode);
+    
+    void removeSkipExpression(String id, ObjectNode infoNode);
+    
+    ObjectNode enableSkipExpression();
+    
+    void enableSkipExpression(ObjectNode infoNode);
+    
+    void removeEnableSkipExpression(ObjectNode infoNode);
 
     ObjectNode changeUserTaskName(String id, String name);
 
@@ -171,6 +183,10 @@ public interface DynamicBpmnService {
     ObjectNode changeSequenceFlowCondition(String id, String condition);
 
     void changeSequenceFlowCondition(String id, String condition, ObjectNode infoNode);
+
+    ObjectNode changeCallActivityCalledElement(String id, String calledElement);
+
+    void changeCallActivityCalledElement(String id, String calledElement, ObjectNode infoNode);
 
     ObjectNode getBpmnElementProperties(String id, ObjectNode infoNode);
 

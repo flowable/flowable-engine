@@ -250,17 +250,22 @@
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
-      <if test="authorizationUserId != null">
-        AND (exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and IDN.USER_ID_ = #{authorizationUserId})
-        <if test="authorizationGroups != null &amp;&amp; authorizationGroups.size() &gt; 0">
-         OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and IDN.GROUP_ID_ IN
-            <foreach item="group" index="index" collection="authorizationGroups" 
-                     open="(" separator="," close=")">
-              #{group}
-            </foreach>
-         )
-         </if>
-        )
+      <if test="includeAuthorization">
+          AND
+          <trim prefix="(" prefixOverrides="OR" suffix=")">
+             <if test="authorizationUserId != null">
+                 exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and IDN.USER_ID_ = #{authorizationUserId})
+             </if>
+              <if test="authorizationGroups != null &amp;&amp; authorizationGroups.size() &gt; 0">
+                  OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and IDN.GROUP_ID_ IN
+                  <foreach item="group" index="index" collection="authorizationGroups"
+                           open="(" separator="," close=")">
+                      #{group}
+                  </foreach>
+                  )
+              </if>
+
+          </trim>
       </if>
     </where>
   </sql>

@@ -92,7 +92,7 @@ public class DatabaseConfiguration {
             return liquibase;
 
         } catch (Exception e) {
-            throw new InternalServerErrorException("Error creating liquibase database");
+            throw new InternalServerErrorException("Error creating liquibase database", e);
         } finally {
             closeDatabase(liquibase);
         }

@@ -104,7 +104,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
             try {
                 restVariable = objectMapper.readValue(request.getInputStream(), RestVariable.class);
             } catch (Exception e) {
-                throw new FlowableIllegalArgumentException("request body could not be transformed to a RestVariable instance.");
+                throw new FlowableIllegalArgumentException("request body could not be transformed to a RestVariable instance.", e);
             }
 
             if (restVariable == null) {

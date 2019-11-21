@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.Message;
@@ -63,6 +64,9 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
 
                 } else if (eventDefinition instanceof ErrorEventDefinition) {
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessErrorStartEventActivityBehavior(element));
+                
+                } else if (eventDefinition instanceof EscalationEventDefinition) {
+                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEscalationStartEventActivityBehavior(element));
                 }
             }
 

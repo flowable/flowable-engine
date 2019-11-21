@@ -63,6 +63,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -128,6 +129,7 @@ public class BaseSpringRestTestCase {
     protected DynamicBpmnService dynamicBpmnService;
     protected FormRepositoryService formRepositoryService;
     protected org.flowable.form.api.FormService formEngineFormService;
+    protected ProcessMigrationService processInstanceMigrationService;
 
     protected static CloseableHttpClient client;
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
@@ -176,6 +178,7 @@ public class BaseSpringRestTestCase {
         dynamicBpmnService = appContext.getBean(DynamicBpmnService.class);
         formRepositoryService = appContext.getBean(FormRepositoryService.class);
         formEngineFormService = appContext.getBean(org.flowable.form.api.FormService.class);
+        processInstanceMigrationService = appContext.getBean(ProcessMigrationService.class);
         
         if (server == null) {
             TestServer testServer = TestServerUtil.createAndStartServer(appContext);
@@ -328,6 +331,13 @@ public class BaseSpringRestTestCase {
         }
     }
 
+    public JsonNode readContent(CloseableHttpResponse response) {
+        try {
+            return objectMapper.readTree(response.getEntity().getContent());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
     public void closeResponse(CloseableHttpResponse response) {
         if (response != null) {
             try {
@@ -363,7 +373,7 @@ public class BaseSpringRestTestCase {
             if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
                 Long count = tableCounts.get(tableName);
                 if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count.toString()).append(" record(s) ");
+                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
                 }
             }
         }

@@ -58,11 +58,11 @@
 		      </div>
 		      <div id="process-treeview-wrapper" ng-controller="ProcessNavigatorController">
                     <div class="process-treeview-header">
-                        Process Navigator
+                        {{'GENERAL.OTHERS.PROCESS_NAVIGATOR' | translate}}
                     </div>
                     <div class="process-treeview-body" ng-show="isEditorReady">
                         <div class="process-treeview-process-title" title="{{treeview.id}}" ng-class="{'current-process': treeview.current}" >
-                            Process: {{treeview.name}}
+                            {{'GENERAL.OTHERS.PROCESS' | translate}}: {{treeview.name}}
                             <img ng-show="!treeview.current" ng-src="editor-app/images/pencil.png" class="pull-right" ng-click="edit(treeview.id)" />
                         </div>
                         <ul class="process-treeview-list" ng-if="treeview.children">
@@ -70,7 +70,7 @@
                             </li>
                         </ul>
                         <div ng-if="!treeview.children || treeview.children.length == 0" style="padding-left: 5px;">
-                            No structural elements used.
+                            {{'GENERAL.OTHERS.NO_STRUCTURAL_ELEMENTS_USED' | translate}}
                         </div>
                     </div>
               </div>
@@ -109,7 +109,7 @@
                         <div class="Oryx_button"
                              ng-repeat="item in quickMenuItems"
                              id="{{item.id}}"
-                             title="{{item.description}}"
+                             title="{{item.description | translate}}"
                              ng-click="quickAddItem(item.id)"
                              ng-model="draggedElement"
                              data-drag="true"
@@ -145,7 +145,7 @@
                                 <div>
                                     <div class="property-row" ng-repeat="property in selectedItem.properties"
                                          ng-click="propertyClicked($index)" ng-class="{'clear' : $index%2 == 0}">
-                                        <span class="title" ng-if="!property.hidden">{{ property.title }}&nbsp;:</span>
+                                        <span class="title" ng-if="!property.hidden" title="{{ property.description | translate}}">{{ property.title | translate }}&nbsp;:</span>
                                         <span class="title-removed" ng-if="property.hidden"><i>{{ property.title }}&nbsp;({{'PROPERTY.REMOVED' | translate}})&nbsp;:</i></span>
                                         <span class="value">
 	                                    <ng-include

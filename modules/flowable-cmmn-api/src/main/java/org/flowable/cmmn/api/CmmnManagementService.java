@@ -216,6 +216,8 @@ public interface CmmnManagementService {
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
     
+    void handleHistoryCleanupTimerJob();
+    
     /**
      * Returns a new HistoryJobQuery implementation, that can be used to dynamically query the history jobs.
      */

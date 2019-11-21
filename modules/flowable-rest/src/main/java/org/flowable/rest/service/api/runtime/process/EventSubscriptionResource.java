@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

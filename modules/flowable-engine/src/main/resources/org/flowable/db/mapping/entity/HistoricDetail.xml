@@ -153,6 +153,21 @@
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
   
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> HIDETAIL </if> from ${prefix}ACT_HI_DETAIL HIDETAIL where HIDETAIL.PROC_INST_ID_ is not null and HIDETAIL.PROC_INST_ID_ != '' and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where HIDETAIL.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_DETAIL HIDETAIL where HIDETAIL.PROC_INST_ID_ is not null and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where HIDETAIL.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+  
   <!-- HISTORIC DETAILS RESULTMAP -->
   <resultMap id="historicDetailResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />

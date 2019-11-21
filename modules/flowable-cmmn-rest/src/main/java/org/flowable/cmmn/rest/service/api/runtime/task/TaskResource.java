@@ -26,6 +26,7 @@ import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableForbiddenException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
@@ -89,6 +90,10 @@ public class TaskResource extends TaskBaseResource {
         // Populate the task properties based on the request
         populateTaskFromRequest(task, taskRequest);
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.updateTask(task, taskRequest);
+        }
+
         // Save the task and fetch again, it's possible that an
         // assignment-listener has updated
         // fields after it was saved so we can't use the in-memory task
@@ -151,9 +156,11 @@ public class TaskResource extends TaskBaseResource {
             @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
 
         Task taskToDelete = getTaskFromRequest(taskId);
-        if (taskToDelete.getScopeId() != null) {
-            // Can't delete a task that is part of a process instance
+        if (taskToDelete.getScopeId() != null && ScopeTypes.CMMN.equals(taskToDelete.getScopeType())) {
+            // Can't delete a task that is part of a case instance
             throw new FlowableForbiddenException("Cannot delete a task that is part of a case instance.");
+        } else if (taskToDelete.getExecutionId() != null) {
+            throw new FlowableForbiddenException("Cannot delete a task that is part of a process instance.");
         }
         
         if (restApiInterceptor != null) {

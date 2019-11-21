@@ -14,8 +14,8 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateTaskRelatedEntityCountCfgCmd.class);
 
-    public static String PROPERTY_TASK_RELATED_ENTITY_COUNT = "cfg.task-related-entities-count";
+    public static final String PROPERTY_TASK_RELATED_ENTITY_COUNT = "cfg.task-related-entities-count";
 
     @Override
     public Void execute(CommandContext commandContext) {

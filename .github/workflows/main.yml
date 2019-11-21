@@ -1,0 +1,46 @@
+name: Flowable Main Build
+
+on: [push, pull_request]
+
+jobs:
+  test_jdk8:
+    name: Linux (OpenJDK 8)
+    runs-on: ubuntu-latest
+    container: openjdk:8
+    steps:
+    - uses: actions/checkout@master
+      with:
+        fetch-depth: 10
+    - name: Install
+      # Need to do install first in order for the OSGi tests to work
+      run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+    - name: Test
+      run: ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false
+
+  test_jdk11:
+    name: Linux (OpenJDK 11)
+    runs-on: ubuntu-latest
+    container: openjdk:11
+    steps:
+    - uses: actions/checkout@master
+      with:
+        fetch-depth: 10
+    - name: Install
+      # Need to do install first in order for the OSGi tests to work
+      run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+    - name: Test
+      run: ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false
+
+  test_jdk13:
+    name: Linux (OpenJDK 13)
+    runs-on: ubuntu-latest
+    container: openjdk:13
+    steps:
+    - uses: actions/checkout@master
+      with:
+        fetch-depth: 10
+    - name: Install
+      # Need to do install first in order for the OSGi tests to work
+      run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+    - name: Test
+      run: ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false

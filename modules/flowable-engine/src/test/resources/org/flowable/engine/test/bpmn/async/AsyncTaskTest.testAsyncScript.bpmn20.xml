@@ -9,7 +9,7 @@
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="script" />
     
-    <scriptTask id="script" activiti:async="true" scriptFormat="juel">
+    <scriptTask id="script" name="Script" activiti:async="true" scriptFormat="juel">
     	<script>#{execution.setVariable('invoked','true')}</script>
     </scriptTask>
     

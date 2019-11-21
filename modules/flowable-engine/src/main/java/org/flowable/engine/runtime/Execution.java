@@ -75,4 +75,8 @@ public interface Execution {
      * Returns the description of this execution.
      */
     String getDescription();
+
+    String getReferenceId();
+
+    String getReferenceType();
 }

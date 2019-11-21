@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +36,9 @@ import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.AfterEach;
@@ -487,6 +492,69 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableIllegalArgumentException e) {
 
+        }
+    }
+
+    @Test
+    public void testQueryByFormKey() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().taskFormKey("testFormKey").list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .taskFormKey("testFormKey")
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
+    public void testQueryByFormKeyOr() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().or().taskId("invalid").taskFormKey("testFormKey").list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().or()
+                .taskFormKey("testFormKey")
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
+        }
+    }
+
+    @Test
+    public void testQueryWithFormKey() {
+        Task task = taskService.newTask();
+        task.setFormKey("testFormKey");
+        taskService.saveTask(task);
+        taskIds.add(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().taskWithFormKey().list();
+
+        assertEquals(1, tasks.size());
+        assertEquals("testFormKey", tasks.get(0).getFormKey());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                .taskWithFormKey()
+                .list();
+            assertEquals(1, historicTasks.size());
+            assertEquals("testFormKey", historicTasks.get(0).getFormKey());
         }
     }
 
@@ -1960,6 +2028,53 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+    public void testTaskDefinitionKeys() throws Exception {
+
+        // Start process instance, 2 tasks will be available
+        runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).list();
+        assertThat(tasks)
+            .extracting(TaskInfo::getTaskDefinitionKey, TaskInfo::getName)
+            .containsExactlyInAnyOrder(
+                tuple("taskKey1", "Task A"),
+                tuple("taskKey123", "Task B")
+            );
+
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).count()).isEqualTo(2L);
+
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).list()).isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
+    public void testTaskDefinitionKeysOr() throws Exception {
+
+        // Start process instance, 2 tasks will be available
+        runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
+
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().or().taskId("invalid")
+            .taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).list();
+        assertThat(tasks)
+            .extracting(TaskInfo::getTaskDefinitionKey, TaskInfo::getName)
+            .containsExactlyInAnyOrder(
+                tuple("taskKey1", "Task A"),
+                tuple("taskKey123", "Task B")
+            );
+
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).endOr().count())
+            .isEqualTo(2L);
+
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).endOr().count())
+            .isEqualTo(0L);
+
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).endOr().list())
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
     public void testTaskDefinitionKeyLike() throws Exception {
 
         // Start process instance, 2 tasks will be available
@@ -3041,20 +3156,21 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testNativeQueryPaging() {
-        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class));
-        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class, false));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class, false));
         assertEquals(5, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).listPage(0, 5).size());
         assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).listPage(10, 12).size());
     }
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class));
-        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(org.flowable.task.api.Task.class, false));
+        assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class, false));
         assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).list().size());
         assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class)).count());
 
-        assertEquals(144, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM ACT_RU_TASK T1, ACT_RU_TASK T2").count());
+        assertEquals(144, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM "
+            + managementService.getTableName(Task.class) + " T1, " + managementService.getTableName(Task.class) + " T2").count());
 
         // join task and variable instances
         assertEquals(
@@ -3068,14 +3184,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals("gonzoTask", tasks.get(0).getName());
 
         // select with distinct
-        assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT DISTINCT T1.* FROM ACT_RU_TASK T1").list().size());
+        assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT DISTINCT T1.* FROM " + managementService.getTableName(Task.class) + " T1").list().size());
 
         assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = 'gonzoTask'").count());
         assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = 'gonzoTask'").list().size());
 
         // use parameters
-        assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class) + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask")
-                .count());
+        assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(org.flowable.task.api.Task.class)
+            + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask").count());
     }
 
     @Test

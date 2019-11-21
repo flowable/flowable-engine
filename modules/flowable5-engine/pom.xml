@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.4.1</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -68,9 +68,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
-			<groupId>org.hibernate.javax.persistence</groupId>
-			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<groupId>javax.persistence</groupId>
+			<artifactId>javax.persistence-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -186,7 +185,6 @@
 						<exclude>**/*TestCase.java</exclude>
 						<exclude>**/RepeatingServiceTaskTest.java</exclude>
 					</excludes>
-					<runOrder>alphabetical</runOrder>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -270,7 +268,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
-						<version>2.2</version>
 						<executions>
 							<execution>
 								<goals>
@@ -300,7 +297,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>2.1.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -308,6 +304,30 @@
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>cleanDb</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>drop-idm-schema</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>java</goal>
+								</goals>
+								<configuration>
+									<mainClass>org.activiti.engine.impl.db.DbSchemaDrop</mainClass>
+									<classpathScope>test</classpathScope>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -510,12 +530,10 @@
 						<configuration>
 							<excludes>
 								<exclude>**/*TestCase.java</exclude>
-
 								<!-- Disabling tests that run exclusively using standalone config -->
 								<exclude>**/ProcessDiagramRetrievalTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -580,12 +598,10 @@
 						<configuration>
 							<excludes>
 								<exclude>**/*TestCase.java</exclude>
-
 								<!-- Disabling tests that run exclusively using standalone config -->
 								<exclude>**/ProcessDiagramRetrievalTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -638,7 +654,6 @@
 								<exclude>**/RepeatingServiceTaskTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -733,7 +748,6 @@
 								<exclude>**/RepeatingServiceTaskTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -781,7 +795,6 @@
 								<exclude>**/ProcessInstanceLogQueryTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -804,7 +817,6 @@
 								<include>**/JdbcMetaDataTest.java</include>
 							</includes>
 							<excludes />
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 					<plugin>
@@ -865,7 +877,7 @@
 			<dependencies>
 				<dependency>
 					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -882,7 +894,7 @@
 			<dependencies>
 				<dependency>
 					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -898,8 +910,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.ibm.db2.jcc</groupId>
-					<artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>

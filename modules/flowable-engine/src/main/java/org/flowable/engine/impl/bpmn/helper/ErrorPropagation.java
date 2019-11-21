@@ -36,11 +36,13 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -177,8 +179,13 @@ public class ErrorPropagation {
                                                 "ERROR_EVENT " + errorId, false, false, false);
 
                 // Event
-                if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
+                ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+                FlowableEventDispatcher eventDispatcher = null;
+                if (processEngineConfiguration != null) {
+                    eventDispatcher = processEngineConfiguration.getEventDispatcher();
+                }
+                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                    processEngineConfiguration.getEventDispatcher()
                             .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
                 }
             }
@@ -191,7 +198,12 @@ public class ErrorPropagation {
     }
 
     protected static void executeEventHandler(Event event, ExecutionEntity parentExecution, ExecutionEntity currentExecution, String errorId) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        FlowableEventDispatcher eventDispatcher = null;
+        if (processEngineConfiguration != null) {
+            eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        }
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
             if (bpmnModel != null) {
 
@@ -200,7 +212,7 @@ public class ErrorPropagation {
                     errorCode = errorId;
                 }
 
-                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                processEngineConfiguration.getEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createErrorEvent(FlowableEngineEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
                                 parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
             }

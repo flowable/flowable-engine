@@ -27,11 +27,13 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -210,6 +212,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String callbackId;
     protected String callbackType;
 
+    // Reference
+    protected String referenceId;
+    protected String referenceType;
+
     public ExecutionEntityImpl() {
 
     }
@@ -266,6 +272,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("identityLinkCount", identityLinkCount);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
         return persistentState;
     }
 
@@ -721,12 +729,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         
         CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
         
+        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         // Record historic variable
-        CommandContextUtil.getHistoryManager().recordVariableCreate(variableInstance);
+        CommandContextUtil.getHistoryManager().recordVariableCreate(variableInstance, clock.getCurrentTime());
 
         // Record historic detail
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true,
-            getRelatedActivityInstanceId(sourceExecution));
+            getRelatedActivityInstanceId(sourceExecution), clock.getCurrentTime());
 
         return variableInstance;
     }
@@ -749,10 +758,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, ExecutionEntity sourceExecution) {
         super.updateVariableInstance(variableInstance, value);
 
+        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true,
-            getRelatedActivityInstanceId(sourceExecution));
+            getRelatedActivityInstanceId(sourceExecution), clock.getCurrentTime());
 
-        CommandContextUtil.getHistoryManager().recordVariableUpdate(variableInstance);
+        CommandContextUtil.getHistoryManager().recordVariableUpdate(variableInstance, clock.getCurrentTime());
     }
 
     @Override
@@ -761,12 +771,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         
         CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstance, true);
         
+        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         // Record historic variable deletion
         CommandContextUtil.getHistoryManager().recordVariableRemoved(variableInstance);
 
         // Record historic detail
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, this, true,
-            getRelatedActivityInstanceId(this));
+            getRelatedActivityInstanceId(this), clock.getCurrentTime());
     }
     
     @Override
@@ -805,7 +816,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     protected void ensureEventSubscriptionsInitialized() {
         if (eventSubscriptions == null) {
-            eventSubscriptions = CommandContextUtil.getEventSubscriptionEntityManager().findEventSubscriptionsByExecution(id);
+            eventSubscriptions = CommandContextUtil.getEventSubscriptionService().findEventSubscriptionsByExecution(id);
         }
     }
 
@@ -1070,6 +1081,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public Map<String, Object> getProcessVariables() {
         Map<String, Object> variables = new HashMap<>();
+
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
@@ -1077,6 +1089,15 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
                 }
             }
         }
+
+        // The variables from the cache have precedence
+        if (variableInstances != null) {
+            for (String variableName : variableInstances.keySet()) {
+                variables.put(variableName, variableInstances.get(variableName).getValue());
+            }
+        }
+
+
         return variables;
     }
 
@@ -1227,6 +1248,26 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    @Override
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    @Override
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @Override
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    @Override
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
 
     protected String getRelatedActivityInstanceId(ExecutionEntity sourceExecution) {

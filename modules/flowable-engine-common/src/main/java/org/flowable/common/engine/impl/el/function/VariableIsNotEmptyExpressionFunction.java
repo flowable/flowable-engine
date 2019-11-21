@@ -23,8 +23,8 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableIsNotEmptyExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableIsNotEmptyExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("isNotEmpty", "notEmpty"), "isNotEmpty");
+    public VariableIsNotEmptyExpressionFunction() {
+        super(Arrays.asList("isNotEmpty", "notEmpty"), "isNotEmpty");
     }
     
     @Override

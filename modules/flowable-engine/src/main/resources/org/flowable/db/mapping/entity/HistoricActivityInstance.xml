@@ -219,87 +219,116 @@
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
     select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
+    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql">
+        <property name="queryTablePrefixSelect" value="RES"/>
+        <property name="queryTablePrefix" value="RES."/>
+    </include>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
     select count(RES.ID_)
-    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
+    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql">
+        <property name="queryTablePrefixSelect" value="RES"/>
+        <property name="queryTablePrefix" value="RES."/>
+    </include>
   </select>
   
+  <delete id="bulkDeleteHistoricActivityInstances">
+    delete 
+    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql">
+        <property name="queryTablePrefixSelect" value=""/>
+        <property name="queryTablePrefix" value=""/>
+    </include>
+  </delete>
+  
+  <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> ACTINST </if> from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and ACTINST.PROC_INST_ID_ != '' and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where ACTINST.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" parameterType="java.util.Map" databaseId="oracle">
+      delete from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and
+      NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where ACTINST.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+  
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_ACTINST RES
+    from ${prefix}ACT_HI_ACTINST ${queryTablePrefixSelect}
     <where>
       <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
+        ${queryTablePrefix}PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="activityInstanceId != null">
-        and RES.ID_ = #{activityInstanceId}
+        and ${queryTablePrefix}ID_ = #{activityInstanceId}
       </if>
       <if test="executionId != null">
-        and RES.EXECUTION_ID_ = #{executionId}
+        and ${queryTablePrefix}EXECUTION_ID_ = #{executionId}
       </if>
       <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        and ${queryTablePrefix}PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="activityId != null">
-        and RES.ACT_ID_ = #{activityId}
+        and ${queryTablePrefix}ACT_ID_ = #{activityId}
       </if>
       <if test="activityName != null">
-        and RES.ACT_NAME_ = #{activityName}
+        and ${queryTablePrefix}ACT_NAME_ = #{activityName}
       </if>
       <if test="activityType != null">
-        and RES.ACT_TYPE_ = #{activityType}
+        and ${queryTablePrefix}ACT_TYPE_ = #{activityType}
       </if>
       <if test="activityTypes != null and !activityTypes.isEmpty()">
-        and RES.ACT_TYPE_ in
+        and ${queryTablePrefix}ACT_TYPE_ in
          <foreach item="item" index="index" collection="activityTypes" open="(" separator="," close=")">
               #{item}
          </foreach>
       </if>
       <if test="startedBefore != null">
-          and RES.START_TIME_ &lt;= #{startedBefore}
+          and ${queryTablePrefix}START_TIME_ &lt;= #{startedBefore}
       </if>
       <if test="startedAfter != null">
-          and RES.START_TIME_ &gt;= #{startedAfter}
+          and ${queryTablePrefix}START_TIME_ &gt;= #{startedAfter}
       </if>
       <if test="finishedBefore != null">
-          and RES.END_TIME_ &lt;= #{finishedBefore}
+          and ${queryTablePrefix}END_TIME_ &lt;= #{finishedBefore}
       </if>
       <if test="finishedAfter != null">
-        and RES.END_TIME_ &gt;= #{finishedAfter}
+        and ${queryTablePrefix}END_TIME_ &gt;= #{finishedAfter}
       </if>
       <if test="assignee != null">
-        and RES.ASSIGNEE_ = #{assignee}
+        and ${queryTablePrefix}ASSIGNEE_ = #{assignee}
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and ${queryTablePrefix}TENANT_ID_ = #{tenantId}
       </if>
       <if test="tenantIds != null &amp;&amp; !tenantIds.isEmpty()">
-        and RES.TENANT_ID_ in
+        and ${queryTablePrefix}TENANT_ID_ in
         <foreach item="tenantId" index="index" collection="tenantIds" open="(" separator="," close=")">
             #{tenantId}
          </foreach>
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
       </if>
       <if test="withoutTenantId">
-        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+        and (${queryTablePrefix}TENANT_ID_ = '' or ${queryTablePrefix}TENANT_ID_ is null)
       </if>
       <if test="unfinished">
-        and RES.END_TIME_ is null
+        and ${queryTablePrefix}END_TIME_ is null
       </if>
       <if test="finished">
-       and RES.END_TIME_ is not null
+       and ${queryTablePrefix}END_TIME_ is not null
       </if>
       <if test="deleteReason != null">
-        and RES.DELETE_REASON_ = #{deleteReason}
+        and ${queryTablePrefix}DELETE_REASON_ = #{deleteReason}
       </if>
       <if test="deleteReasonLike != null">
-        and RES.DELETE_REASON_ like #{deleteReasonLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}DELETE_REASON_ like #{deleteReasonLike}${wildcardEscapeClause}
       </if>
     </where>
   </sql>

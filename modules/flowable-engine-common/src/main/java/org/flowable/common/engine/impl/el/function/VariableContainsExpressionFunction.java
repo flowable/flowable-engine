@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -37,13 +37,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public class VariableContainsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableContainsExpressionFunction(String variableScopeName) {
-        super(variableScopeName, "contains");
+    public VariableContainsExpressionFunction() {
+        super("contains");
     }
     
     @SuppressWarnings({ "rawtypes"})
-    public static boolean contains(VariableScope variableScope, String variableName, Object... values) {
-        Object variableValue = getVariableValue(variableScope, variableName);
+    public static boolean contains(VariableContainer variableContainer, String variableName, Object... values) {
+        Object variableValue = getVariableValue(variableContainer, variableName);
         if (variableValue != null) {
             if (variableValue instanceof String) {
                 String variableStringValue = (String) variableValue;

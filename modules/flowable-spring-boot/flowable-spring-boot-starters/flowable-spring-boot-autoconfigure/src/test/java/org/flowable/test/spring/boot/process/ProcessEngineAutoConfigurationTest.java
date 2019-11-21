@@ -18,6 +18,8 @@ import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDep
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,9 +36,11 @@ import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -50,6 +54,9 @@ import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.process.Process;
+import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
+import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -61,6 +68,8 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Filip Hrisafov
@@ -77,6 +86,30 @@ public class ProcessEngineAutoConfigurationTest {
         ))
         .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class)
         .withClassLoader(new FilteredClassLoader(EntityManagerFactory.class));
+
+    @Test
+    public void httpProperties() {
+        contextRunner.withPropertyValues(
+            "flowable.http.useSystemProperties=true",
+            "flowable.http.connectTimeout=PT0.250S",
+            "flowable.http.socketTimeout=PT0.500S",
+            "flowable.http.connectionRequestTimeout=PT1S",
+            "flowable.http.requestRetryLimit=1",
+            "flowable.http.disableCertVerify=true"
+        ).run(context -> {
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+            HttpClientConfig httpClientConfig = processEngine.getProcessEngineConfiguration().getHttpClientConfig();
+
+            assertThat(httpClientConfig.isUseSystemProperties()).isTrue();
+            assertThat(httpClientConfig.getConnectTimeout()).isEqualTo(250);
+            assertThat(httpClientConfig.getSocketTimeout()).isEqualTo(500);
+            assertThat(httpClientConfig.getConnectionRequestTimeout()).isEqualTo(1000);
+            assertThat(httpClientConfig.getRequestRetryLimit()).isEqualTo(1);
+            assertThat(httpClientConfig.isDisableCertVerify()).isTrue();
+
+            deleteDeployments(processEngine);
+        });
+    }
 
     @Test
     public void standaloneProcessEngineWithBasicDatasource() {
@@ -103,10 +136,160 @@ public class ProcessEngineAutoConfigurationTest {
                         );
                 });
 
+            SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngine
+                .getProcessEngineConfiguration();
+
+            Collection<AutoDeploymentStrategy<ProcessEngine>> deploymentStrategies = springProcessEngineConfiguration.getDeploymentStrategies();
+
+            assertThat(deploymentStrategies).element(0)
+                .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
+                });
+
+            assertThat(deploymentStrategies).element(1)
+                .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
+                });
+
+            assertThat(deploymentStrategies).element(2)
+                .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
+                });
+
             deleteDeployments(processEngine);
         });
     }
     
+    @Test
+    public void standaloneProcessEngineWithBasicDatasourceAndAutoDeploymentWithLocking() {
+        contextRunner
+            .withPropertyValues(
+                "flowable.auto-deployment.engine.bpmn.use-lock=true",
+                "flowable.auto-deployment.engine.bpmn.lock-wait-time=10m",
+                "flowable.auto-deployment.engine.bpmn.throw-exception-on-deployment-failure=false",
+                "flowable.auto-deployment.engine.bpmn.lock-name=testLock"
+            )
+            .run(context -> {
+                assertThat(context).as("Process engine").hasSingleBean(ProcessEngine.class);
+                assertThat(context)
+                    .doesNotHaveBean(AppEngine.class)
+                    .doesNotHaveBean(IdGenerator.class)
+                    .doesNotHaveBean("processAppEngineConfigurationConfigurer");
+
+                ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+                assertThat(processEngine.getProcessEngineConfiguration().getIdGenerator()).isInstanceOf(StrongUuidGenerator.class);
+
+                assertAllServicesPresent(context, processEngine);
+                assertAutoDeployment(context);
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactly(
+                                SpringProcessEngineConfiguration.class
+                            );
+                    });
+
+                SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngine
+                    .getProcessEngineConfiguration();
+
+                Collection<AutoDeploymentStrategy<ProcessEngine>> deploymentStrategies = springProcessEngineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
+                    });
+
+                assertThat(deploymentStrategies).element(1)
+                    .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
+                    });
+
+                assertThat(deploymentStrategies).element(2)
+                    .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
+                    });
+
+                deleteDeployments(processEngine);
+            });
+    }
+
+    @Test
+    public void standaloneProcessEngineWithBasicDatasourceAndCustomAutoDeploymentStrategies() {
+        contextRunner.withUserConfiguration(CustomAutoDeploymentStrategyConfiguration.class)
+            .run(context -> {
+                assertThat(context).as("Process engine").hasSingleBean(ProcessEngine.class);
+                assertThat(context)
+                    .doesNotHaveBean(AppEngine.class)
+                    .doesNotHaveBean(IdGenerator.class)
+                    .doesNotHaveBean("processAppEngineConfigurationConfigurer");
+
+                ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+                assertThat(processEngine.getProcessEngineConfiguration().getIdGenerator()).isInstanceOf(StrongUuidGenerator.class);
+
+                assertAllServicesPresent(context, processEngine);
+                assertAutoDeployment(context);
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactly(
+                                SpringProcessEngineConfiguration.class
+                            );
+                    });
+
+                SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngine
+                    .getProcessEngineConfiguration();
+
+                Collection<AutoDeploymentStrategy<ProcessEngine>> deploymentStrategies = springProcessEngineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOf(TestProcessEngineAutoDeploymentStrategy.class);
+
+                assertThat(deploymentStrategies).element(1)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                assertThat(deploymentStrategies).element(2)
+                    .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                assertThat(deploymentStrategies).element(3)
+                    .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                deleteDeployments(processEngine);
+            });
+    }
+
     @Test
     public void processEngineWithBasicDataSourceAndAppEngine() {
         contextRunner.withConfiguration(AutoConfigurations.of(
@@ -258,7 +441,7 @@ public class ProcessEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, ProcessEngine processEngine) {
         List<Method> methods = Stream.of(ProcessEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
+            .filter(method -> !(method.getReturnType().equals(void.class) || method.getName().equals("getName"))).collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {
             try {
@@ -290,7 +473,7 @@ public class ProcessEngineAutoConfigurationTest {
         List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().list();
         assertThat(definitions)
             .extracting(ProcessDefinition::getKey)
-            .containsExactly("integrationGatewayProcess", "simpleTasks", "vacationRequest", "waiter");
+            .containsExactly("inclusiveGateway", "integrationGatewayProcess", "simpleTasks", "vacationRequest", "waiter");
         
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().latestVersion().processDefinitionKey("simpleTasks").singleResult();
         assertThat(processDefinition.getVersion()).isOne();
@@ -300,9 +483,9 @@ public class ProcessEngineAutoConfigurationTest {
         
         List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
 
-        assertThat(deployments).hasSize(3)
+        assertThat(deployments).hasSize(4)
             .extracting(Deployment::getName)
-            .contains("SpringBootAutoDeployment", "simple.bar", "vacationRequest.zip");
+            .contains("SpringBootAutoDeployment", "simple.bar", "vacationRequest.zip", "processTask.bar");
         
         AppRepositoryService appRepositoryService = context.getBean(AppRepositoryService.class);
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().list();
@@ -318,9 +501,9 @@ public class ProcessEngineAutoConfigurationTest {
         assertThat(appDefinition.getVersion()).isOne();
         
         List<AppDeployment> appDeployments = appRepositoryService.createDeploymentQuery().list();
-        assertThat(appDeployments).hasSize(2)
+        assertThat(appDeployments).hasSize(3)
             .extracting(AppDeployment::getName)
-            .contains("simple.bar", "vacationRequest.zip");
+            .contains("simple.bar", "vacationRequest.zip", "processTask.bar");
     }
     
     private static ProcessEngineConfiguration processEngine(AppEngine appEngine) {
@@ -362,6 +545,29 @@ public class ProcessEngineAutoConfigurationTest {
         @Process
         public IdGenerator processQualifiedCustomIdGenerator() {
             return new StrongUuidGenerator();
+        }
+    }
+
+    @Configuration
+    static class CustomAutoDeploymentStrategyConfiguration {
+
+        @Bean
+        @Order(10)
+        public TestProcessEngineAutoDeploymentStrategy testProcessEngineAutoDeploymentStrategy() {
+            return new TestProcessEngineAutoDeploymentStrategy();
+        }
+    }
+
+    static class TestProcessEngineAutoDeploymentStrategy implements AutoDeploymentStrategy<ProcessEngine> {
+
+        @Override
+        public boolean handlesMode(String mode) {
+            return false;
+        }
+
+        @Override
+        public void deployResources(String deploymentNameHint, Resource[] resources, ProcessEngine engine) {
+
         }
     }
 }

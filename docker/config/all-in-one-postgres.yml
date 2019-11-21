@@ -22,4 +22,8 @@ services:
             - POSTGRES_DB=flowable
         ports:
             - 5433:5432
+        volumes:
+            - all-in-one_pgdata:/var/lib/postgresql/data
         command: postgres
+volumes: 
+    all-in-one_pgdata:

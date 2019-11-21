@@ -1,0 +1,151 @@
+host:
+  # Public / external hostname (f.e. LB)
+  external: localhost
+# Global database name, user and password
+database:
+  name: flowable
+  username: flowable
+  password: flowable
+  # specify to overwrite dynamic template values 
+  # datasourceDriverClassName:
+  # datasourceUrl:
+cloudSql:
+  enabled: false
+  # Google Cloud SQL instance connection name
+  # instanceConnectionName: 
+  # Google credentials file name stored as secret in the cluster
+  credentials: cloudsql-credentials.json
+
+ingress:
+  enabled: true
+  sslRedirect: false
+
+idm:
+  enabled: true
+  replicas: 1
+  service:
+    name: flowable-idm
+  contextUrl: /
+  ingressPath: flowable-idm
+  image:
+    repository: flowable/flowable-idm
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+  javaOpts: "-Xms512m -Xmx512m"
+
+# Enable either Flowable Task or Flowable REST
+task:
+  enabled: true
+  replicas: 1
+  service:
+    name: flowable-task
+  contextUrl: /
+  ingressPath: flowable-task
+  image:
+    repository: flowable/flowable-task
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+  javaOpts: "-Xmx1g -Xms1g"
+
+# Enable either Flowable Task or Flowable REST
+rest:
+  enabled: false
+  replicas: 1
+  service:
+    name: flowable-rest
+  contextUrl: /
+  ingressPath: flowable-rest
+  image:
+    repository: flowable/flowable-rest
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+  javaOpts: "-Xmx1g -Xms1g"
+
+modeler:
+  enabled: true
+  replicas: 1
+  service:
+    name: flowable-modeler
+  contextUrl: /
+  ingressPath: flowable-modeler
+  image:
+    repository: flowable/flowable-modeler
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+  javaOpts: "-Xms512m -Xmx512m"
+
+admin:
+  enabled: true
+  replicas: 1
+  service:
+    name: flowable-admin
+  contextUrl: /
+  ingressPath: flowable-admin
+  image:
+    repository: flowable/flowable-admin
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "512Mi"
+  javaOpts: "-Xms512m -Xmx512m"
+
+# NGINX Ingress controller https://github.com/kubernetes/ingress-nginx
+nginx-ingress:
+  # disable when the cluster already has an nginx-ingress deployed
+  enabled: false
+  rbac:
+    create: true
+  # the controller will set the endpoint records on the ingress objects to reflect those on the service
+  controller:
+    publishService:
+      enabled: true
+
+postgres:
+  enabled: true
+  service:
+    name: flowable-postgres
+  image: postgres:9.6
+  storage:
+    storageClassName: "standard"
+#    storageClassName: "ssd"
+    size: 1Gi
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"

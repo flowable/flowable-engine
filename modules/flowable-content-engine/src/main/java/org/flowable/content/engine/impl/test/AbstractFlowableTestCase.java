@@ -40,6 +40,7 @@ public abstract class AbstractFlowableTestCase extends AbstractContentTestCase {
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_CO_DATABASECHANGELOG");
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_CO_DATABASECHANGELOGLOCK");
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_GE_PROPERTY");
     }
 
     protected ContentEngine contentEngine;

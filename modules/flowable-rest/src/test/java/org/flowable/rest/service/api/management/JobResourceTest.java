@@ -65,6 +65,8 @@ public class JobResourceTest extends BaseSpringRestTestCase {
         assertEquals(timerJob.getExecutionId(), responseNode.get("executionId").textValue());
         assertEquals(timerJob.getProcessDefinitionId(), responseNode.get("processDefinitionId").textValue());
         assertEquals(timerJob.getProcessInstanceId(), responseNode.get("processInstanceId").textValue());
+        assertEquals("escalationTimer", responseNode.get("elementId").textValue());
+        assertEquals("Escalation", responseNode.get("elementName").textValue());
         assertEquals(timerJob.getRetries(), responseNode.get("retries").intValue());
         assertEquals(timerJob.getDuedate(), getDateFromISOString(responseNode.get("dueDate").textValue()));
         assertEquals("", responseNode.get("tenantId").textValue());

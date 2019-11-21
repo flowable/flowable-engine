@@ -44,12 +44,17 @@ public class MybatisHistoricMilestoneInstanceDataManager extends AbstractCmmnDat
     @SuppressWarnings("unchecked")
     @Override
     public List<HistoricMilestoneInstance> findHistoricMilestoneInstancesByQueryCriteria(HistoricMilestoneInstanceQueryImpl query) {
-        return getDbSqlSession().selectList("selectHistoricMilestoneInstancesByQueryCriteria", query);
+        return getDbSqlSession().selectList("selectHistoricMilestoneInstancesByQueryCriteria", query, getManagedEntityClass());
     }
     
     @Override
     public long findHistoricMilestoneInstancesCountByQueryCriteria(HistoricMilestoneInstanceQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectHistoricMilestoneInstanceCountByQueryCriteria", query);
+    }
+    
+    @Override
+    public void deleteHistoricMilestoneInstancesForNonExistingCaseInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricMilestoneInstancesForNonExistingCaseInstances", null, getManagedEntityClass());
     }
     
 }

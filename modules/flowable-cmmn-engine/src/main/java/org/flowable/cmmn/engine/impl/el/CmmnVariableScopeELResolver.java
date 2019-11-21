@@ -26,6 +26,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class CmmnVariableScopeELResolver extends VariableContainerELResolver {
 
     public static final String PLAN_ITEM_INSTANCE_KEY = "planItemInstance";
+    public static final String PLAN_ITEM_INSTANCES_KEY = "planItemInstances";
     public static final String CASE_INSTANCE_KEY = "caseInstance";
     public static final String TASK_KEY = "task";
 
@@ -52,6 +53,10 @@ public class CmmnVariableScopeELResolver extends VariableContainerELResolver {
                 // (Happens for example for cross boundary plan items)
                 context.setPropertyResolved(true);
                 return variableContainer;
+
+            } else if (PLAN_ITEM_INSTANCES_KEY.equals(property)) {
+                context.setPropertyResolved(true);
+                return new PlanItemInstancesWrapper(variableContainer);
 
             } else {
                 return super.getValue(context, base, property);

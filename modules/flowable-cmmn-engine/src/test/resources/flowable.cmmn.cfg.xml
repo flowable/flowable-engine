@@ -5,10 +5,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration">
-	    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
-        <property name="jdbcDriver" value="org.h2.Driver" />
-        <property name="jdbcUsername" value="sa" />
-        <property name="jdbcPassword" value="" />
+
+        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+        <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+        <property name="jdbcUsername" value="${jdbc.username:sa}" />
+        <property name="jdbcPassword" value="${jdbc.password:}" />
         <property name="databaseSchemaUpdate" value="true" />
         
         <property name="asyncExecutor" ref="asyncExecutor" />
@@ -19,6 +20,24 @@
         <property name="enableEntityLinks" value="true" />
 
         <property name="enableHistoricTaskLogging" value="true" />
+
+        <property name="mailServerPort" value="5025" />
+
+        <property name="mailServers">
+            <map>
+                <entry key="myEmailTenant">
+                    <bean class="org.flowable.common.engine.impl.cfg.mail.MailServerInfo">
+                        <property name="mailServerHost" value="localhost" />
+                        <property name="mailServerPort" value="5025" />
+                        <property name="mailServerUseSSL" value="false" />
+                        <property name="mailServerUseTLS" value="false" />
+                        <property name="mailServerDefaultFrom" value="flowable@myTenant" />
+                        <property name="mailServerUsername" value="flowable@myTenant" />
+                        <property name="mailServerPassword" value="password" />
+                    </bean>
+                </entry>
+            </map>
+        </property>
     </bean>
 
     <bean id="testBean" class="org.flowable.cmmn.test.delegate.TestBean" />

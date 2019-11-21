@@ -35,8 +35,8 @@ public abstract class AbstractPlanItemInstanceHistoryJsonTransformer extends Abs
         historicPlanItemInstanceEntity.setStageInstanceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STAGE_INSTANCE_ID));
         historicPlanItemInstanceEntity.setStage(getBooleanFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_IS_STAGE));
         historicPlanItemInstanceEntity.setElementId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ELEMENT_ID));
-        historicPlanItemInstanceEntity.setPlanItemDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PLAN_DEFINITION_ID));
-        historicPlanItemInstanceEntity.setPlanItemDefinitionType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PLAN_DEFINITION_TYPE));
+        historicPlanItemInstanceEntity.setPlanItemDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PLAN_ITEM_DEFINITION_ID));
+        historicPlanItemInstanceEntity.setPlanItemDefinitionType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PLAN_ITEM_DEFINITION_TYPE));
         historicPlanItemInstanceEntity.setStartUserId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_START_USER_ID));
         historicPlanItemInstanceEntity.setCreateTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME));
         historicPlanItemInstanceEntity.setReferenceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID));

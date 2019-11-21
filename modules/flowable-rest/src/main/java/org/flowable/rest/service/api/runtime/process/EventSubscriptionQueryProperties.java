@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.query.QueryProperty;
-import org.flowable.engine.impl.EventSubscriptionQueryProperty;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryProperty;
 
 /**
  * @author Tijs Rademakers

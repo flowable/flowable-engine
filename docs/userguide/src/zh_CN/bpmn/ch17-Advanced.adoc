@@ -1,0 +1,865 @@
+[[_advanced]]
+== 高级
+
+本章介绍的Flowable的高级使用技巧，超出了一般的执行BPMN 2.0流程的范畴。因此，要理解这里讨论的主题，需要对Flowable足够熟练与精通。
+
+[[_async_executor]]
+=== 异步执行器
+
+Flowable V5版本中，在之前的作业执行器(job executor)之外，还提供了异步执行器(async executor)。异步执行器已被许多Flowable的用户及我们自己的跑分证明，性能比老的作业执行器好。
+
+从Flowable V6起，将只提供异步执行器。在V6中，对异步执行器进行了完全的重构，以提升性能及易用性。当然仍然与已有的API兼容。
+
+[[async_executor_design]]
+
+==== 异步执行器的设计
+
+Flowable有两种作业类型：定时器（例如边界事件或用户任务中的定时器）以及异步操作（带有__flowable:async="true"__属性的服务任务）。
+
+**定时器**很容易理解：保存在ACT_RU_TIMER_JOB表中，并带有给定的到期日期。异步执行器中有一个线程，周期性地检查是否有需要触发的定时器（也就是说，到期日期在当前时间“之前”）。当需要触发定时器时，从JOB表中移除该定时器，并创建一个异步作业(async job)。
+
+**异步作业**在执行流程实例（即调用API）时插入数据库。如果当前Flowable引擎启用了异步执行器，则该异步作业将被__锁定(locked)__。即在ACT_RU_JOB表中插入一个作业条目，并设置其__lock owner(锁持有人)__与__lock expiration time(锁到期时间)__。在API调用成功后触发的事务监听器(transaction commit listener)，将会触发同一引擎中的异步执行器，让其执行该作业（因此可以保证数据库中已经保存了数据）。为此，异步执行器使用（可配置的）线程池，从其中取出线程用于执行作业，并使流程可以异步进行。如果Flowable引擎未启用异步执行器，则异步作业仍会插入ACT_RU_JOB表，但不会被锁定。
+
+与检查定时器的线程类似，异步执行器中也有一个用于“获取”新的异步作业的线程。这里的异步作业，指的是表中存储但未被锁定的作业。这个线程会将这些作业锁定给当前Flowable引擎，并发送至异步执行器。
+
+用于执行作业的线程池从一个内存队列中获取作业。当队列满了时（可配置），作业将会被解锁，并重新存回数据库。这样，其他的异步执行器就可以重新操作它们。
+
+如果在执行作业期间发生了异常，这个异步作业将会转化为一个定时器作业，并带有一个到期日期。之后，它将会像普通定时器作业一样被获取，并重新变回异步作业，以实现重试。当一个作业已经重试了（可配置）几次，仍然失败，则作业被视为“死亡(dead)”，并被移至ACT_RU_DEADLETTER_JOB表。“死信(deadletter)”的概念在各种其他系统中也广泛使用。管理员需要检查失败作业的异常信息，并进行相应操作。
+
+流程定义与流程实例都可以被暂停。这些定义或实例所关联的暂停作业，将被移至ACT_RU_SUSPENDED_JOB表，以确保用于获取作业的查询语句中的where条件尽量少。
+
+综上所述：对于熟悉作业/异步执行器的旧实现的人来说，主要目标是让查询尽可能简单。在过去（V6以前），所有作业类型/状态使用一张表。为了满足所有使用场景，导致“where”条件十分庞大。现在已经解决了这个问题，我们的跑分也证明这个新设计带来了更好的性能，也更有弹性。
+
+[[_async_executor_configuration]]
+==== 配置异步执行器
+
+异步执行器是一个高度可配置的组件。建议先查看异步执行器的默认配置，检查它们是否符合你的流程的要求。
+
+另外，也可以扩展默认的实现，或者替换为你自己实现的__org.flowable.engine.impl.asyncexecutor.AsyncExecutor__接口。
+
+可以在流程引擎配置中使用setter设置下列参数：
+
+.异步执行器配置选项
+[options="header"]
+|===============
+|名称|默认值|描述
+
+|asyncExecutorThreadPoolQueueSize|100|在获取待执行的作业之后，线程池中某个线程实际执行作业之前，放置这些作业的队列的长度。
+|asyncExecutorCorePoolSize|8|用于执行作业的线程池中，最小的活动(kept alive)线程数量。
+|asyncExecutorMaxPoolSize|8|用于执行作业的线程池中，创建线程的最大数量。
+|asyncExecutorThreadKeepAliveTime|5000|在销毁执行作业所用的线程前，需要保持活动的时间（以毫秒计）。设置为>0的值会消耗资源，但在有大量执行作业的时候，可以避免总是创建新线程。如果设置为0，则线程会在执行完作业后立刻被销毁。
+|asyncExecutorNumberOfRetries|3|作业被移入“死信”表之前的最大重试次数。
+|asyncExecutorMaxTimerJobsPerAcquisition|1|在一次获取定时器作业的查询中，获取作业的数量。默认值为1，因为这样可以降低潜在的乐观锁异常情况。较大的数值性能较好，但在不同的引擎间发生乐观锁异常的几率也会变大。
+|asyncExecutorMaxAsyncJobsDuePerAcquisition|1|在一次获取异步作业的查询中，获取作业的数量。默认值为1，因为这样可以降低潜在的乐观锁异常情况。较大的数值性能较好，但在不同的引擎间发生乐观锁异常的几率也会变大。
+|asyncExecutorDefaultTimerJobAcquireWaitTime|10000|获取定时器作业的线程在两次获取作业的查询之间等待的时间（以毫秒记）。只在上一次查询未找到新的定时器作业，或者获取的作业数量少于__asyncExecutorMaxTimerJobsPerAcquisition__中设置的值时才会等待。
+|asyncExecutorDefaultAsyncJobAcquireWaitTime|10000|获取异步作业的线程在两次获取作业的查询之间等待的时间（以毫秒记）。只在上一次查询未找到新的异步作业，或者获取的作业数量少于__asyncExecutorMaxAsyncJobsDuePerAcquisition__中设置的值时才会等待。
+|asyncExecutorDefaultQueueSizeFullWaitTime|0|
+在内部作业队列已满之后，执行下一次查询之前，获取作业（包括定时器作业及异步作业）的线程将等待的时间（以毫秒记）。默认值为0（为保证向后兼容性）。设置为较大的值，可以让异步执行器有机会多执行掉一些队列作业，腾出队列空间。
+|asyncExecutorTimerLockTimeInMillis|5分钟|异步执行器获取定时器作业之后锁定的时间（以毫秒记）。在这段时间内，其它异步执行器不会尝试获取或锁定这个作业。
+|asyncExecutorAsyncJobLockTimeInMillis|5分钟|异步执行器获取异步作业之后锁定的时间（以毫秒记）。在这段时间内，其它异步执行器不会尝试获取或锁定这个作业。
+|asyncExecutorSecondsToWaitOnShutdown|60|当请求关闭执行器（或流程引擎）后，等待执行作业的线程池安全关闭的时间（以秒记）。
+|asyncExecutorResetExpiredJobsInterval|60秒|在两次__超时作业（expired job）__检查之间等待的时间（以毫秒记）。超时作业指的是已经锁定（某个执行器已经为其写入了锁持有人以及超时时间），但一直没有完成的作业。在检查中，会解锁超时作业，即移除其锁持有人以及超时时间。这样其他执行器就可以重新获取它。作业的锁超时时间在当前时间之前则视作超时。
+|asyncExecutorResetExpiredJobsPageSize|3|异步执行器的__超时重置（reset expired）__检查线程一次获取的作业数量。
+|===============
+
+[[_message_queue_based_async_executor]]
+==== 基于消息队列的异步执行器
+
+阅读<<async_executor_design,异步执行器的设计>>章节之后，很明显架构的灵感来自消息队列。异步执行器设计思路保证了可以很轻松地用消息队列代替线程池的工作，处理异步作业。
+
+跑分显示，相比基于线程池的异步执行器，消息队列性能出众，吞吐量大。但需要额外的中间件，当然也就增加了安装配置、维护及监控的复杂度。对于多数用户来说，基于线程池的异步执行器性能已经足够用了。但能够知道在性能要求增长之后，仍有改进方案，也是挺好的。
+
+目前，唯一直接可用的是带有JMS的Spring。选择首先支持Spring的原因是，Spring提供了非常好的功能，解决了使用线程以及处理多个消息消费者造成的麻烦。但是其实集成也很简单，因此可以轻松改用任何其他消息队列实现或协议（Stomp、AMPQ等等）。我们欢迎用户反馈下一个应该支持什么消息队列。
+
+使用消息队列后，当引擎创建新的异步作业时，会在消息队列中放入一条包含有作业标识的消息（处在一个事务提交监听器中，这样就可以确保该作业条目已经提交至数据库）。之后消息消费者可以获取作业标识，并获取及执行该作业。异步执行器不再创建线程池，而是会在另一个单独线程中插入及查询定时器。当定时器到时触发时，将会被移至异步作业表，同时向消息队列发送一条消息。消息队列也可能失败，所以__超时重置__线程会按照原逻辑处理。只不过不是__解锁__作业，而是重发消息。异步执行器不再轮询异步作业。
+
+主要由两个类实现：
+
+* __org.flowable.engine.impl.asyncexecutor.JobManager__接口的实现，将消息发送至消息队列而不是线程池。
+
+* __javax.jms.MessageListener__接口的实现。从消息队列中消费消息，并使用消息中的作业标识获取及执行该作业。
+
+首先添加__flowable-jms-spring-executor__依赖：
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.flowable</groupId>
+  <artifactId>flowable-jms-spring-executor</artifactId>
+  <version>${flowable.version}</version>
+</dependency>
+----
+
+在流程引擎配置中进行如下设置启用基于消息队列的异步执行器：
+
+* __asyncExecutorActivate__为__true__
+* __asyncExecutorMessageQueueMode__为__true__
+* __org.flowable.spring.executor.jms.MessageBasedJobManager__注入为__JobManager__
+
+下面是一个基于Java配置的完整例子，使用__ActiveMQ__作为消息中间件。
+
+请注意：
+
+* 需要为__MessageBasedJobManager__注入一个配置了正确的__connectionFactory__的__JMSTemplate__。
+* 我们使用Spring的__MessageListenerContainer__，因为它大幅简化了线程与多消费者的使用。
+
+[source,java,linenums]
+----
+@Configuration
+public class SpringJmsConfig {
+
+  @Bean
+  public DataSource dataSource() {
+    // 略
+  }
+
+  @Bean(name = "transactionManager")
+  public PlatformTransactionManager transactionManager() {
+    DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
+    transactionManager.setDataSource(dataSource());
+    return transactionManager;
+  }
+
+  @Bean
+  public SpringProcessEngineConfiguration processEngineConfiguration() {
+    SpringProcessEngineConfiguration configuration = new SpringProcessEngineConfiguration();
+    configuration.setDataSource(dataSource());
+    configuration.setTransactionManager(transactionManager());
+    configuration.setDatabaseSchemaUpdate(SpringProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+    configuration.setAsyncExecutorMessageQueueMode(true);
+    configuration.setAsyncExecutorActivate(true);
+    configuration.setJobManager(jobManager());
+    return configuration;
+  }
+
+  @Bean
+  public ProcessEngine processEngine() {
+    return processEngineConfiguration().buildProcessEngine();
+  }
+
+  @Bean
+  public MessageBasedJobManager jobManager() {
+    MessageBasedJobManager jobManager = new MessageBasedJobManager();
+    jobManager.setJmsTemplate(jmsTemplate());
+    return jobManager;
+  }
+
+  @Bean
+  public ConnectionFactory connectionFactory() {
+      ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+      activeMQConnectionFactory.setUseAsyncSend(true);
+      activeMQConnectionFactory.setAlwaysSessionAsync(true);
+      return new CachingConnectionFactory(activeMQConnectionFactory);
+  }
+
+  @Bean
+  public JmsTemplate jmsTemplate() {
+      JmsTemplate jmsTemplate = new JmsTemplate();
+      jmsTemplate.setDefaultDestination(new ActiveMQQueue("flowable-jobs"));
+      jmsTemplate.setConnectionFactory(connectionFactory());
+      return jmsTemplate;
+  }
+
+  @Bean
+  public MessageListenerContainer messageListenerContainer() {
+      DefaultMessageListenerContainer messageListenerContainer = new DefaultMessageListenerContainer();
+      messageListenerContainer.setConnectionFactory(connectionFactory());
+      messageListenerContainer.setDestinationName("flowable-jobs");
+      messageListenerContainer.setMessageListener(jobMessageListener());
+      messageListenerContainer.setConcurrentConsumers(2);
+      messageListenerContainer.start();
+      return messageListenerContainer;
+  }
+
+  @Bean
+  public JobMessageListener jobMessageListener() {
+    JobMessageListener jobMessageListener = new JobMessageListener();
+    jobMessageListener.setProcessEngineConfiguration(processEngineConfiguration());
+    return jobMessageListener;
+  }
+
+}
+----
+
+在上面的代码中，__flowable-jms-spring-executor__模块提供的只有__JobMessageListener__与__MessageBasedJobManager__两个类。其他的所有代码都来自Spring。因此，如果想要替换为其他的队列/协议，就需要替换这些类。
+
+[[advanced_parseHandlers]]
+
+=== 深入流程解析
+
+BPMN 2.0 XML需要解析为Flowable的内部模型，才能在Flowable引擎中执行。部署流程时，或是在内存中找不到流程时，会从数据库中读取XML并进行解析。
+
+++BpmnParser++类会为每个流程创建一个++BpmnParser++实例，作为解析过程的容器。解析本身很简单：引擎对于每一个BPMN 2.0元素都有一个对应的++org.flowable.engine.parse.BpmnParseHandler++的实例，解析器将BPMN 2.0元素类映射至++BpmnParseHandler++实例。默认情况下，Flowable使用++BpmnParseHandler++实例处理所有支持的元素，并为流程的步骤附加执行监听器，以创建历史。
+
+可以在Flowable引擎中添加++org.flowable.engine.parse.BpmnParseHandler++的自定义实例。比如常见使用场景是，为特定步骤添加执行监听器，向某个事件处理队列发送事件。Flowable处理历史就使用的是这种方式。要添加这种自定义处理器，需要调整Flowable配置：
+
+[source,xml,linenums]
+----
+<property name="preBpmnParseHandlers">
+  <list>
+    <bean class="org.flowable.parsing.MyFirstBpmnParseHandler" />
+  </list>
+</property>
+
+<property name="postBpmnParseHandlers">
+  <list>
+    <bean class="org.flowable.parsing.MySecondBpmnParseHandler" />
+    <bean class="org.flowable.parsing.MyThirdBpmnParseHandler" />
+  </list>
+</property>
+----
+
+在++preBpmnParseHandlers++参数中配置的++BpmnParseHandler++实例将添加在默认处理器之前。类似的，++postBpmnParseHandlers++中实例将添加在默认处理器之后。有时顺序会影响自定义解析处理器中包含的逻辑，需要特别注意。
+
+++org.flowable.engine.parse.BpmnParseHandler++是一个简单的接口：
+
+[source,java,linenums]
+----
+public interface BpmnParseHandler {
+
+  Collection<Class>? extends BaseElement>> getHandledTypes();
+
+  void parse(BpmnParse bpmnParse, BaseElement element);
+
+}
+----
+
+++getHandledTypes()++方法返回该解析器处理的所有类型的集合。集合的泛型提示，可用的类型是++BaseElement++的子类。也可以扩展++AbstractBpmnParseHandler++类，并覆盖++getHandledType()++方法，它只返回一个类而不是一个集合。这个类也包含了一些默认解析处理器通用的辅助方法。当解析器遇到匹配该方法的返回类型的元素时，将调用这个++BpmnParseHandler++实例进行解析。在下面的例子里，当遇到BPMN 2.0 XML中的流程元素时，就会执行其++executeParse++方法（这是一个类型转换方法，替代++BpmnParseHandler++接口中的普通++parse++方法）中的逻辑。
+
+[source,java,linenums]
+----
+public class TestBPMNParseHandler extends AbstractBpmnParseHandler<Process> {
+
+  protected Class<? extends BaseElement> getHandledType() {
+    return Process.class;
+  }
+
+  protected void executeParse(BpmnParse bpmnParse, Process element) {
+     ..
+  }
+
+}
+----
+
+**重要提示：**在实现自定义解析处理器时，不要使用任何用于解析BPMN 2.0结构的内部类。否则会很难查找bug。安全的做法是实现__BpmnParseHandler__接口，或扩展内部抽象类__org.flowable.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler__。
+
+可以（但不常用）替换默认用于将BPMN 2.0元素解析为Flowable内部模型的++BpmnParseHandler++实例。可以通过下面的代码片段实现：
+
+[source,xml,linenums]
+----
+<property name="customDefaultBpmnParseHandlers">
+  <list>
+    ...
+  </list>
+</property>
+----
+
+简单的例子，强制所有服务任务都异步执行：
+
+[source,java,linenums]
+----
+public class CustomUserTaskBpmnParseHandler extends ServiceTaskParseHandler {
+
+  protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
+
+    // 进行常规操作
+    super.executeParse(bpmnParse, serviceTask);
+
+    // 保证异步执行
+    serviceTask.setAsynchronous(true);
+  }
+
+}
+----
+
+
+[[advanced.uuid.generator]]
+
+
+=== 高并发下使用的UUID ID生成器
+
+在某些（非常）高并发负载的情况下，默认的ID生成器可能会由于不能足够快地获取新的id块而产生异常。每个流程引擎都有一个ID生成器。默认的ID生成器会在数据库中保存一块ID，这样其他引擎就不能使用同一个块中的ID。引擎运行时，当ID生成器发现ID块已经用完，就会启动一个新的事务，来获取一个新的块。在（非常）有限的使用场景下，当负载非常高时可能导致问题。对于大多数用例来说，默认的ID生成器已经足够使用了。默认的++org.flowable.engine.impl.db.DbIdGenerator++也有一个++idBlockSize++参数，用于配置保留的ID块的大小，调整获取ID的行为。
+
+可以使用++org.flowable.engine.impl.persistence.StrongUuidGenerator++替换默认的ID生成器。它会在本地生成唯一的link:$$http://en.wikipedia.org/wiki/Universally_unique_identifier$$[UUID]，并将其用于所有实体的标识符。因为UUID不需要访问数据库就能生成，因此在非常高并发的使用场景下更合适。请注意取决于机器，性能可能与默认的ID生成器不同（更好更坏都有可能）。
+
+可以在flowable配置中，像下面这样配置UUID生成器：
+
+[source,xml,linenums]
+----
+<property name="idGenerator">
+    <bean class="org.flowable.engine.impl.persistence.StrongUuidGenerator" />
+</property>
+----
+
+使用UUID id生成器需要添加下列额外依赖：
+
+[source,xml,linenums]
+----
+ <dependency>
+    <groupId>com.fasterxml.uuid</groupId>
+    <artifactId>java-uuid-generator</artifactId>
+    <version>3.1.3</version>
+</dependency>
+----
+
+
+[[advanced.tenancy]]
+
+
+=== 多租户
+
+总的来说，多租户是指一个软件为多个不同组织提供服务。其核心是数据隔离，一个组织不能看到其他组织的数据。在这个语境中，一个这样的组织（或部门、团队，等等）被称为一个__租户（tenant）__。
+
+请注意它与多实例部署有本质区别。多实例部署是指每一个组织都分别运行一个Flowable流程引擎实例（且使用不同的数据库账户）。尽管Flowable比较轻量级，运行一个流程引擎实例不会花费太多资源，但多实例部署仍然增加了复杂度与维护量。但是，在某些使用场景中，多实例部署可能是正确的解决方案。
+
+Flowable中的多租户主要围绕着隔离数据实现。要注意__Flowable并不强制多租户规则__。换句话说，查询与使用数据时，不会验证进行操作的用户是否属于正确的租户。这应该在调用Flowable引擎的层次实现。Flowable负责确保可以存储租户信息，并可在获取流程数据时使用。
+
+在Flowable流程引擎中部署流程定义时，可以传递一个__租户标识符（tenant identifier）__。这是一个字符串（可以是UUID，部门id，等等……），限制为256个字符长，唯一标识一个租户：
+
+[source,java,linenums]
+----
+repositoryService.createDeployment()
+            .addClassPathResource(...)
+            .tenantId("myTenantId")
+            .deploy();
+----
+
+
+在部署时传入一个租户ID意味着：
+
+* 部署中包含的所有流程定义都将从该部署继承租户标识符。
+* 从这些流程定义启动的所有流程实例都将从流程定义继承租户标识符。
+* 在执行流程实例时，创建所有任务都将从流程实例继承租户标识符。独立任务也可以有租户标识符。
+* 执行流程实例时，创建的所有执行都将从流程实例继承租户标识符。
+* （在流程内或通过API）触发信号抛出事件时可以提供租户标识符。这个信号将只在该租户的上下文中执行。也就是说，如果有多个使用相同名字的信号捕获事件，只会触发带有正确租户标识符的捕获事件。
+* 所有作业（定时器与异步操作）要么从流程定义（如定时器启动事件），要么从流程实例（运行时创建的作业，如异步操作）继承租户标识符。这样就可以在自定义作业执行器中，为租户设置优先级。
+* 所有历史实体（历史流程实例、任务与活动）都从其对应的运行时对象继承租户标识符。
+* 另外，模型也可以有租户标识符（模型用于Flowable Modeler存储BPMN 2.0）。
+
+所有查询API都可以通过租户标识符进行过滤。例如（也可以换成其他实体的查询）：
+
+[source,java,linenums]
+----
+runtimeService.createProcessInstanceQuery()
+    .processInstanceTenantId("myTenantId")
+    .processDefinitionKey("myProcessDefinitionKey")
+    .variableValueEquals("myVar", "someValue")
+    .list()
+----
+
+查询API也可以使用__like__语义通过租户标识符过滤，也可以过滤掉没有租户标识符的实体。
+
+**重要的实现细节：**由于数据库的原因（更确切地说，对唯一约束中null的处理），__默认的__代表__没有租户__的租户标识符为**空字符串**。这是因为（流程定义key，流程定义版本，租户标识符）的组合需要是唯一的（由数据库约束保证）。也请注意租户标识符不能设置为null，不然会影响查询，因为某些数据库（Oracle）会将空字符串当做null值处理（这也就是为什么__.withoutTenantId__查询不检查空字符串还是null）。所以可以为多个租户部署（有相同的流程定义key的）同一个流程定义，并且每一个租户都有他们自己的版本。不影响未使用租户时的使用方式。
+
+**请注意，集群运行多个Flowable实例与上面所说不冲突。**
+
+[实验性] 可以调用__repositoryService__的__changeDeploymentTenantId(String deploymentId, String newTenantId)__方法修改租户标识符。并将连带修改每一处之前继承的租户标识符。在从非多租户环境迁移至多租户部署时很有用。查看该方法的Javadoc了解更多信息。
+
+[[advanced.custom.sql.queries]]
+
+=== 执行自定义SQL
+
+Flowable提供了与数据库交互的高级API。例如，要获取数据，查询API与原生（Native）查询API各有用武之地。但有时会需要更高的灵活性。下面介绍如何在Flowable流程引擎范围内（所以可以使用相同的事务设置等）的数据存储中，执行完全自定义的SQL语句（select、insert、update与delete都可以）。
+
+Flowable引擎使用其底层框架MyBatis的功能自定义SQL语句。可以在link:$$http://mybatis.github.io/mybatis-3/java-api.html$$[MyBatis用户手册]找到更多信息。
+
+[[_annotation_based_mapped_statements]]
+==== 基于注解的映射语句
+
+使用基于注解的映射语句（Annotation based Mapped Statement）时，首先要做的是创建一个MyBatis映射类。例如，假设在某个用例中，不需要完整的任务数据，而只需要其中很少一部分，就可以通过映射类（Mapper）完成，像是这样：
+
+[source,java,linenums]
+----
+public interface MyTestMapper {
+
+    @Select("SELECT ID_ as id, NAME_ as name, CREATE_TIME_ as createTime FROM ACT_RU_TASK")
+    List<Map<String, Object>> selectTasks();
+
+}
+----
+
+必须像下面这样为流程引擎配置映射类：
+
+[source,xml,linenums]
+----
+...
+<property name="customMybatisMappers">
+  <set>
+    <value>org.flowable.standalone.cfg.MyTestMapper</value>
+  </set>
+</property>
+...
+----
+
+请注意这是一个接口。底层的MyBatis框架会构造一个它的实例，并在运行时使用。也请注意方法的返回值没有类型，而只是一个map的list（代表了带有列数据的行的列表）。如果需要，可以通过MyBatis映射类设置类型。
+
+使用__managementService.executeCustomSql__方法执行上面的查询。这个方法使用__CustomSqlExecution__的实例作为包装器，将引擎需要处理的内部数据隐藏起来。
+
+不幸的是，Java泛型降低了可读性。下面的两个泛型类是映射类与其返回类型类。只是简单的调用映射方法，并返回其结果（若有）。
+
+[source,java,linenums]
+----
+CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution =
+          new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(MyTestMapper.class) {
+
+  public List<Map<String, Object>> execute(MyTestMapper customMapper) {
+    return customMapper.selectTasks();
+  }
+
+};
+
+List<Map<String, Object>> results = managementService.executeCustomSql(customSqlExecution);
+----
+
+在这个例子里，上面列出的Map只包含__id, name与创建时间__，而不是完整的任务对象。
+
+按照上面的方法可以使用任何SQL。另一个更复杂的例子：
+
+[source,java,linenums]
+----
+    @Select({
+        "SELECT task.ID_ as taskId, variable.LONG_ as variableValue FROM ACT_RU_VARIABLE variable",
+        "inner join ACT_RU_TASK task on variable.TASK_ID_ = task.ID_",
+        "where variable.NAME_ = #{variableName}"
+    })
+    List<Map<String, Object>> selectTaskWithSpecificVariable(String variableName);
+----
+
+任务表join变量表，只选择变量有特定名字的记录，并返回任务id与对应的数字值。
+
+请参考单元测试__org.flowable.standalone.cfg.CustomMybatisMapperTest__及src/test/java/org/flowable/standalone/cfg/与src/test/resources/org/flowable/standalone/cfg/目录中的其它类与资源，了解基于注解的映射语句的更多使用例子。
+
+[[_xml_based_mapped_statements]]
+==== 基于XML的映射语句
+
+可以使用基于XML的映射语句（XML based Mapped Statement），在XML文件中定义语句。对于不需要完整的任务数据，而只需要其中很少一部分数据的用例，XML文件像是下面这样：
+
+[source,xml,linenums]
+----
+<mapper namespace="org.flowable.standalone.cfg.TaskMapper">
+
+  <resultMap id="customTaskResultMap" type="org.flowable.standalone.cfg.CustomTask">
+    <id property="id" column="ID_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <select id="selectCustomTaskList" resultMap="customTaskResultMap">
+    select RES.ID_, RES.NAME_, RES.CREATE_TIME_ from ACT_RU_TASK RES
+  </select>
+
+</mapper>
+----
+
+结果映射为如下的__org.flowable.standalone.cfg.CustomTask__类的实例：
+
+[source,java,linenums]
+----
+public class CustomTask {
+
+  protected String id;
+  protected String name;
+  protected Date createTime;
+
+  public String getId() {
+    return id;
+  }
+  public String getName() {
+    return name;
+  }
+  public Date getCreateTime() {
+    return createTime;
+  }
+}
+----
+
+必须像下面这样为流程引擎配置提供映射XML文件：
+
+[source,xml,linenums]
+----
+...
+<property name="customMybatisXMLMappers">
+  <set>
+    <value>org/flowable/standalone/cfg/custom-mappers/CustomTaskMapper.xml</value>
+  </set>
+</property>
+...
+----
+
+这样执行语句：
+
+[source,java,linenums]
+----
+List<CustomTask> tasks = managementService.executeCommand(new Command<List<CustomTask>>() {
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public List<CustomTask> execute(CommandContext commandContext) {
+        return (List<CustomTask>) commandContext.getDbSqlSession().selectList("selectCustomTaskList");
+      }
+    });
+----
+
+XML映射语句在需要更复杂语句的时候很好用。Flowable内部就使用XML映射语句，所以能使用底层功能。
+
+假设某个用例下，需要基于id、name、type、userId等字段，查询附件数据。要实现这个用例，可以创建下面这样的扩展了__org.flowable.engine.impl.AbstractQuery__的查询类__AttachmentQuery__：
+
+[source,java,linenums]
+----
+public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> {
+
+  protected String attachmentId;
+  protected String attachmentName;
+  protected String attachmentType;
+  protected String userId;
+
+  public AttachmentQuery(ManagementService managementService) {
+    super(managementService);
+  }
+
+  public AttachmentQuery attachmentId(String attachmentId){
+    this.attachmentId = attachmentId;
+    return this;
+  }
+
+  public AttachmentQuery attachmentName(String attachmentName){
+    this.attachmentName = attachmentName;
+    return this;
+  }
+
+  public AttachmentQuery attachmentType(String attachmentType){
+    this.attachmentType = attachmentType;
+    return this;
+  }
+
+  public AttachmentQuery userId(String userId){
+    this.userId = userId;
+    return this;
+  }
+
+  @Override
+  public long executeCount(CommandContext commandContext) {
+    return (Long) commandContext.getDbSqlSession()
+                   .selectOne("selectAttachmentCountByQueryCriteria", this);
+  }
+
+  @Override
+  public List<Attachment> executeList(CommandContext commandContext, Page page) {
+    return commandContext.getDbSqlSession()
+            .selectList("selectAttachmentByQueryCriteria", this);
+  }
+----
+
+请注意在扩展__AbstractQuery__时，子类需要为super构造函数传递一个__ManagementService__的实例，并需要实现__executeCount__与__executeList__来调用映射语句。
+
+包含映射语句的XML文件如下：
+
+[source,xml,linenums]
+----
+<mapper namespace="org.flowable.standalone.cfg.AttachmentMapper">
+
+  <select id="selectAttachmentCountByQueryCriteria" parameterType="org.flowable.standalone.cfg.AttachmentQuery" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectAttachmentByQueryCriteriaSql"/>
+  </select>
+
+  <select id="selectAttachmentByQueryCriteria" parameterType="org.flowable.standalone.cfg.AttachmentQuery" resultMap="org.flowable.engine.impl.persistence.entity.AttachmentEntity.attachmentResultMap">
+    ${limitBefore}
+    select distinct RES.* ${limitBetween}
+    <include refid="selectAttachmentByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectAttachmentByQueryCriteriaSql">
+  from ${prefix}ACT_HI_ATTACHMENT RES
+  <where>
+   <if test="attachmentId != null">
+     RES.ID_ = #{attachmentId}
+   </if>
+   <if test="attachmentName != null">
+     and RES.NAME_ = #{attachmentName}
+   </if>
+   <if test="attachmentType != null">
+     and RES.TYPE_ = #{attachmentType}
+   </if>
+   <if test="userId != null">
+     and RES.USER_ID_ = #{userId}
+   </if>
+  </where>
+  </sql>
+</mapper>
+----
+
+可以在语句中使用例如分页、排序、表名前缀等功能（因为parameterType为__AbstractQuery__的子类）。可以使用引擎定义的__org.flowable.engine.impl.persistence.entity.AttachmentEntity.attachmentResultMap__来映射结果。
+
+最后，可以这样使用__AttachmentQuery__：
+
+[source,java,linenums]
+----
+....
+// 获取附件的总数
+long count = new AttachmentQuery(managementService).count();
+
+// 获取id为10025的附件
+Attachment attachment = new AttachmentQuery(managementService).attachmentId("10025").singleResult();
+
+// 获取前10个附件
+List<Attachment> attachments = new AttachmentQuery(managementService).listPage(0, 10);
+
+// 获取用户kermit上传的所有附件
+attachments = new AttachmentQuery(managementService).userId("kermit").list();
+....
+----
+
+请参考单元测试__org.flowable.standalone.cfg.CustomMybatisXMLMapperTest___及src/test/java/org/flowable/standalone/cfg/与src/test/resources/org/flowable/standalone/cfg/目录中的其它类与资源，了解基于XML的映射语句的更多使用例子。
+
+[[advanced.process.engine.configurators]]
+
+
+=== 使用ProcessEngineConfigurator进行高级流程引擎配置
+
+深入控制流程引擎配置的高级方法是使用__ProcessEngineConfigurator__。创建一个__org.flowable.engine.cfg.ProcessEngineConfigurator__接口的实现，并将它注入到流程引擎配置中：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="...SomeProcessEngineConfigurationClass">
+
+    ...
+
+    <property name="configurators">
+        <list>
+            <bean class="com.mycompany.MyConfigurator">
+                ...
+            </bean>
+        </list>
+    </property>
+
+    ...
+
+</bean>
+----
+
+这个接口需要实现两个方法。__configure__方法，使用一个__ProcessEngineConfiguration__实例作为参数。可以使用这个方式添加自定义配置，并且这个方法会保证**在流程引擎创建之前，所有默认配置已经完成之后**被调用。另一个方法是__getPriority__方法，可以指定配置器的顺序，以备某些配置器对其他的有依赖。
+
+这种配置器的一个例子是<<chapter_ldap,集成LDAP>>，使用配置器将默认的用户与组管理类替换为可以处理LDAP用户的实现。可见配置器可以相当大程度地改变及调整流程引擎，以适应非常高级的使用场景。另一个例子是使用自定义的缓存替换流程引擎缓存：
+
+[source,java,linenums]
+----
+public class ProcessDefinitionCacheConfigurator extends AbstractProcessEngineConfigurator {
+
+    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+            MyCache myCache = new MyCache();
+            processEngineConfiguration.setProcessDefinitionCache(enterpriseProcessDefinitionCache);
+    }
+
+}
+----
+
+也可以使用link:$$http://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html$$[ServiceLoader]的方法，从classpath中自动发现流程引擎配置器。也就是说必须将包含配置器实现的jar放在classpath下，并且jar的__META-INF/services__目录下需要有名为**org.flowable.engine.cfg.ProcessEngineConfigurator**的文件，内容是自定义实现的全限定类名。当流程引擎启动时，日志会提示找到这些配置器：
+
+----
+INFO  org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl  - Found 1 auto-discoverable Process Engine Configurators
+INFO  org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl  - Found 1 Process Engine Configurators in total:
+INFO  org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl  - class org.flowable.MyCustomConfigurator
+----
+
+请注意某些环境下可能不能使用ServiceLoader方法。可以通过ProcessEngineConfiguration的__enableConfiguratorServiceLoader__参数显式禁用（默认为true）。
+
+[[advanced.task.query.switching]]
+
+=== 高级查询API：在运行时与历史任务查询间无缝切换
+
+BPM用户界面的核心组件是任务列表。一般来说，最终用户执行待办任务，通过不同方式过滤收件箱中的任务。有时也需要在列表中显示历史任务，并进行类似的过滤。为了简化代码，__TaskQuery__与__HistoricTaskInstanceQuery__有共同的父接口，其中包含了所有公共操作（大多数操作都是公共的）。
+
+这个公共接口是__org.flowable.engine.task.TaskInfoQuery__类。__org.flowable.engine.task.Task__与__org.flowable.engine.task.HistoricTaskInstance__都有公共父类__org.flowable.engine.task.TaskInfo__（并带有公共参数），作为__list()__等方法的返回值。然而，有时Java泛型会帮倒忙：如果想要直接使用__TaskInfoQuery__类型，将会像是这样：
+
+[source,java,linenums]
+----
+TaskInfoQuery<? extends TaskInfoQuery<?,?>, ? extends TaskInfo> taskInfoQuery
+----
+
+呃……好吧。为了“解决”这个问题，可以使用__org.flowable.engine.task.TaskInfoQueryWrapper__类来避免泛型（下面的代码来自REST的代码，将返回一个任务列表，且用户可以选择查看进行中还是已完成的任务）：
+
+[source,java,linenums]
+----
+TaskInfoQueryWrapper taskInfoQueryWrapper = null;
+if (runtimeQuery) {
+	taskInfoQueryWrapper = new TaskInfoQueryWrapper(taskService.createTaskQuery());
+} else {
+	taskInfoQueryWrapper = new TaskInfoQueryWrapper(historyService.createHistoricTaskInstanceQuery());
+}
+
+List<? extends TaskInfo> taskInfos = taskInfoQueryWrapper.getTaskInfoQuery().or()
+	.taskNameLike("%k1%")
+	.taskDueAfter(new Date(now.getTime() + (3 * 24L * 60L * 60L * 1000L)))
+.endOr()
+.list();
+----
+
+
+[[advanced.custom.session.manager]]
+
+
+=== 通过覆盖标准SessionFactory自定义身份管理
+
+如果不想像<<chapter_ldap,集成LDAP>>中那样使用完整的__ProcessEngineConfigurator__实现，但仍然希望在框架中插入自定义的身份管理，也可以覆盖__IdmIdentityServiceImpl__类，或者直接实现__IdmIdentityService__接口，并使用实现类作为__ProcessEngineConfiguration__中的__idmIdentityService__参数。在Spring中，可以简单地向__ProcessEngineConfiguration__bean定义添加下面的代码实现：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="...SomeProcessEngineConfigurationClass">
+
+    ...
+
+    <property name="idmIdentityService">
+        <bean class="com.mycompany.IdmIdentityServiceBean"/>
+    </property>
+
+    ...
+
+</bean>
+
+----
+
+__LDAPIdentityServiceImpl__类是一个介绍如何实现__IdmIdentityService__接口中方法的很好的例子。你需要自行判断需要在自定义身份服务类中实现什么方法。例如下面的调用：
+
+[source,java,linenums]
+----
+long potentialOwners = identityService.createUserQuery().memberOfGroup("management").count();
+----
+
+会调用__IdmIdentityService__接口的下列成员：
+
+[source,java,linenums]
+----
+UserQuery createUserQuery();
+----
+
+<<chapter_ldap,集成LDAP>>中的代码包含了如何实现这些的完整示例。可以在GitHub查看代码：link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ldap/src/main/java/org/flowable/ldap/LDAPIdentityServiceImpl.java$$[LDAPIdentityServiceImpl]。
+
+[[advanced.safe.bpmn.xml]]
+
+=== 启用安全BPMN 2.0 XML 
+
+在大多数情况下，部署至Flowable引擎的BPMN 2.0流程处在开发团队等的严格控制下。然而，有的时候会希望能够向引擎上传任意的BPMN 2.0 XML。在这种情况下，需要考虑动机不良的用户可能会像link:$$http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml-can-bring-down-your-server/$$[这里]描述的一样，破坏服务器。
+
+要避免上面链接中描述的攻击，可以在流程引擎配置中设置__enableSafeBpmnXml__参数：
+
+[source,xml,linenums]
+----
+<property name="enableSafeBpmnXml" value="true"/>
+----
+
+**默认情况下这个功能是禁用的！**原因是它依赖link:$$http://download.java.net/jdk7/archive/b123/docs/api/javax/xml/transform/stax/StAXSource.html$$[StaxSource]类。而不幸的是，某些平台（JDK6，JBoss等）不能使用这个类（由于使用的是过时的XML解析器），因此不能启用安全BPMN 2.0 XML功能。
+
+如果运行Flowable的平台支持，请一定要启用这个功能。
+
+[[advanced.event.logging]]
+
+=== 事件日志
+
+Flowable引入了事件日志机制。日志机制基于<<eventDispatcher,Flowable引擎的事件机制>>，并默认禁用。总的来说，来源于引擎的事件会被捕获，并创建一个包含了所有事件数据（甚至更多）的map，提供给__org.flowable.engine.impl.event.logger.EventFlusher__，由它将这些数据保存其他地方。默认情况下，使用简单的基于数据库的事件处理器/保存器，用Jackson将上述map序列化为JSON，并将其作为__EventLogEntryEntity__实例存入数据库。默认会在数据库中创建__$$ACT_EVT_LOG$$__表保存事件日志。如果不使用事件日志，可以删除这个表。
+
+要启用数据库记录器：
+
+[source,java,linenums]
+----
+processEngineConfigurationImpl.setEnableDatabaseEventLogging(true);
+----
+
+或在运行时：
+
+[source,java,linenums]
+----
+databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(),
+                                      processEngineConfiguration.getObjectMapper());
+runtimeService.addEventListener(databaseEventLogger);
+----
+
+如果默认的数据库记录不符合要求，可以扩展EventLogger类。__createEventFlusher()__方法需要返回__org.flowable.engine.impl.event.logger.EventFlusher__接口的实例。可以使用__managementService.getEventLogEntries(startLogNr, size);__获取__EventLogEntryEntity__实例。
+
+显然，这个表中的数据也可以JSON的形式存入NoSQL存储，如MongoDB，Elastic Search等。也容易看出这里使用的类（org.flowable.engine.impl.event.logger.EventLogger/EventFlusher与许多其他EventHandler类）是可插拔的，可以按你的使用场景调整。（比如将JSON直接发送给队列或NoSQL，而不存入数据库）
+
+请注意这个事件日志机制是独立于Flowable的“传统”历史管理器的。尽管所有数据都保存在数据库表中，但并未对查询或快速恢复做优化。实际使用场景主要是审计及存入大数据存储。
+
+[[_disabling_bulk_inserts]]
+=== 禁用批量插入
+
+默认情况下，引擎会将对同一个数据库表的多个插入语句组合在一起，作为__批量插入__。这样能够提高性能，并已在所有支持的数据库中实现及测试。
+
+然而，即使是支持及测试过的数据库，也可能有某个特定版本不支持批量插入（例如有报告说DB2在z/OS上不支持，尽管一般来说DB2是支持的）。这时可以在流程引擎配置中禁用批量插入：
+
+[source,xml,linenums]
+----
+<property name="bulkInsertEnabled" value="false" />
+----
+
+[[advancedSecureScripting]]
+=== 安全脚本
+
+默认情况下，使用<<bpmnScriptTask,脚本任务>>时，执行的脚本与Java代码具有相似的能力。可以完全访问JVM，永远运行（无限循环），或占用大量内存。
+
+相较而言，Java代码需要放在classpath的jar中，与流程定义的生命周期不一样。最终用户一般不会撰写Java代码，这基本上是开发者的工作。
+
+而脚本是流程定义的一部分，生命周期一致。脚本任务不需要额外的jar部署步骤，而是在流程部署后就可以执行。有时，脚本任务中的脚本不是由开发者撰写的。所以会产生这个问题：脚本可以完全访问JVM，也可以在执行脚本时阻塞许多系统资源。因此允许执行来自任何人的脚本并不是一个好主意。
+
+可以启用__安全脚本__功能解决这个问题。目前，这个功能只实现了__javascript__脚本，在项目中添加__flowable-secure-javascript__依赖启用。Maven：
+
+[source,xml,linenums]
+----
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-secure-javascript</artifactId>
+    <version>${flowable.version}</version>
+</dependency>
+----
+
+添加这个依赖会同时引入Rhino依赖（参见link:$https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino$$[https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino]）。Rhino是一个用于JDK的javascript引擎。过去包含在JDK6与7中，并已被Nashorn引擎取代。然而，Rhino项目仍然在继续开发。许多（包括Flowable用于实现安全脚本的）功能都在之后才加入。在撰写本手册的时候，Nashorn**还没有**实现安全脚本功能需要的功能。
+
+这意味着脚本可能存在一些（基本很少）区别（例如，Rhino使用__importPackage__，而Nashorn使用__load()__）。
+
+通过专门的__Configurator__对象配置安全脚本，并在流程引擎实例化之前将其传递给流程引擎配置：
+
+[source,java,linenums]
+----
+SecureJavascriptConfigurator configurator = new SecureJavascriptConfigurator()
+  .setWhiteListedClasses(new HashSet<String>(Arrays.asList("java.util.ArrayList")))
+  .setMaxStackDepth(10)
+  .setMaxScriptExecutionTime(3000L)
+  .setMaxMemoryUsed(3145728L)
+  .setNrOfInstructionsBeforeStateCheckCallback(10);
+
+processEngineConfig.addConfigurator(configurator);
+----
+
+可以使用下列设置：
+
+* *enableClassWhiteListing*: 为true时，会将所有类加入黑名单。需要在白名单中添加希望运行的所有类，严格控制暴露给脚本的东西。默认为__false__。
+* *whiteListedClasses*: 一个全限定类名字符串的集合，表示允许在脚本中使用的类。例如，要在脚本中使用__execution__对象，需要在这个集合中添加__org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl__字符串。默认为__空__。
+* *maxStackDepth*: 限制在脚本中调用函数时的最大栈深度。可以用于避免在脚本中递归调用方法而导致的栈溢出异常。默认为__-1__（禁用）。
+* *maxScriptExecutionTime*: 脚本允许运行的最大时间。默认为__-1__（禁用）。
+* *maxMemoryUsed*: 脚本允许使用的最大内存数量，以字节计。请注意脚本引擎自己也要需要一定量的内存，也会算在这里。默认为__-1__（禁用）。
+* *nrOfInstructionsBeforeStateCheckCallback*: 脚本每执行x个指令，就通过回调函数进行一次脚本执行时间与内存检测。请注意这不是指脚本指令，而是指java字节码指令（一行脚本可能有上百行字节码指令）。默认为100。
+
+__请注意：____maxMemoryUsed__设置只能用于支持com.sun.management.ThreadMXBean#getThreadAllocatedBytes()方法的JVM，如Oracle JDK。
+
+ScriptExecutionListener与ScriptTaskListener也有安全形式：__org.flowable.scripting.secure.listener.SecureJavascriptExecutionListener__与__org.flowable.scripting.secure.listener.SecureJavascriptTaskListener__。
+
+像这样使用：
+
+[source,xml,linenums]
+----
+<flowable:executionListener event="start" class="org.flowable.scripting.secure.listener.SecureJavascriptExecutionListener">
+  <flowable:field name="script">
+    <flowable:string>
+        <![CDATA[
+            execution.setVariable('test');
+        ]]>
+    </flowable:string>
+  </flowable:field>
+  <flowable:field name="language" stringValue="javascript" />
+</flowable:executionListener>
+----
+
+可以通过link:$$https://github.com/Flowable/Flowable/tree/master/modules/flowable-secure-javascript/src/test/resources$$[GitHub上的单元测试]，
+查看不安全脚本以及通过__安全脚本__功能将其变得安全的例子，

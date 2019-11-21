@@ -40,9 +40,11 @@ import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
+import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.FixedValue;
@@ -103,7 +105,6 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
     protected Expression resultVariablePrefix;
     // Exception mapping
     protected List<MapExceptionEntry> mapExceptions;
-
     protected HttpServiceTask httpServiceTask;
     protected HttpActivityExecutor httpActivityExecutor;
 
@@ -136,84 +137,100 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
         }
         httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(retryCount, false));
 
-        this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator(), 
+        // client builder settings
+        if (config.isUseSystemProperties()) {
+            httpClientBuilder.useSystemProperties();
+        }
+
+        this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator(),
                 CommandContextUtil.getProcessEngineConfiguration().getObjectMapper());
     }
 
     @Override
     public void execute(DelegateExecution execution) {
 
-        HttpRequest request = new HttpRequest();
+        String skipExpressionText = httpServiceTask.getSkipExpression();
 
-        try {
-            request.setMethod(getStringFromField(requestMethod, execution));
-            request.setUrl(getStringFromField(requestUrl, execution));
-            request.setHeaders(getStringFromField(requestHeaders, execution));
-            request.setBody(getStringFromField(requestBody, execution));
-            request.setBodyEncoding(getStringFromField(requestBodyEncoding, execution));
-            request.setTimeout(getIntFromField(requestTimeout, execution));
-            request.setNoRedirects(getBooleanFromField(disallowRedirects, execution));
-            request.setIgnoreErrors(getBooleanFromField(ignoreException, execution));
-            request.setSaveRequest(getBooleanFromField(saveRequestVariables, execution));
-            request.setSaveResponse(getBooleanFromField(saveResponseParameters, execution));
-            request.setSaveResponseTransient(getBooleanFromField(saveResponseParametersTransient, execution));
-            request.setSaveResponseAsJson(getBooleanFromField(saveResponseVariableAsJson, execution));
-            request.setPrefix(getStringFromField(resultVariablePrefix, execution));
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
 
-            String failCodes = getStringFromField(failStatusCodes, execution);
-            String handleCodes = getStringFromField(handleStatusCodes, execution);
+        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionText,
+                execution.getCurrentActivityId(), execution, commandContext);
 
-            if (failCodes != null) {
-                request.setFailCodes(getStringSetFromField(failCodes));
+        if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText,
+                execution.getCurrentActivityId(), execution, commandContext)) {
+
+            HttpRequest request = new HttpRequest();
+
+            try {
+                request.setMethod(getStringFromField(requestMethod, execution));
+                request.setUrl(getStringFromField(requestUrl, execution));
+                request.setHeaders(getStringFromField(requestHeaders, execution));
+                request.setBody(getStringFromField(requestBody, execution));
+                request.setBodyEncoding(getStringFromField(requestBodyEncoding, execution));
+                request.setTimeout(getIntFromField(requestTimeout, execution));
+                request.setNoRedirects(getBooleanFromField(disallowRedirects, execution));
+                request.setIgnoreErrors(getBooleanFromField(ignoreException, execution));
+                request.setSaveRequest(getBooleanFromField(saveRequestVariables, execution));
+                request.setSaveResponse(getBooleanFromField(saveResponseParameters, execution));
+                request.setSaveResponseTransient(getBooleanFromField(saveResponseParametersTransient, execution));
+                request.setSaveResponseAsJson(getBooleanFromField(saveResponseVariableAsJson, execution));
+                request.setPrefix(getStringFromField(resultVariablePrefix, execution));
+
+                String failCodes = getStringFromField(failStatusCodes, execution);
+                String handleCodes = getStringFromField(handleStatusCodes, execution);
+
+                if (failCodes != null) {
+                    request.setFailCodes(getStringSetFromField(failCodes));
+                }
+                if (handleCodes != null) {
+                    request.setHandleCodes(getStringSetFromField(handleCodes));
+                }
+
+                if (request.getPrefix() == null) {
+                    request.setPrefix(execution.getCurrentFlowElement().getId());
+                }
+
+                // Save request fields
+                if (request.isSaveRequest()) {
+                    execution.setVariable(request.getPrefix() + "RequestMethod", request.getMethod());
+                    execution.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
+                    execution.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
+                    execution.setVariable(request.getPrefix() + "RequestBody", request.getBody());
+                    execution.setVariable(request.getPrefix() + "RequestBodyEncoding", request.getBodyEncoding());
+                    execution.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());
+                    execution.setVariable(request.getPrefix() + "DisallowRedirects", request.isNoRedirects());
+                    execution.setVariable(request.getPrefix() + "FailStatusCodes", failCodes);
+                    execution.setVariable(request.getPrefix() + "HandleStatusCodes", handleCodes);
+                    execution.setVariable(request.getPrefix() + "IgnoreException", request.isIgnoreErrors());
+                    execution.setVariable(request.getPrefix() + "SaveRequestVariables", request.isSaveRequest());
+                    execution.setVariable(request.getPrefix() + "SaveResponseParameters", request.isSaveResponse());
+                }
+
+            } catch (Exception e) {
+                if (e instanceof FlowableException) {
+                    throw (FlowableException) e;
+                } else {
+                    throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in execution " + execution.getId(), e);
+                }
             }
-            if (handleCodes != null) {
-                request.setHandleCodes(getStringSetFromField(handleCodes));
-            }
 
-            if (request.getPrefix() == null) {
-                request.setPrefix(execution.getCurrentFlowElement().getId());
-            }
+            httpActivityExecutor.validate(request);
 
-            // Save request fields
-            if (request.isSaveRequest()) {
-                execution.setVariable(request.getPrefix() + "RequestMethod", request.getMethod());
-                execution.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
-                execution.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
-                execution.setVariable(request.getPrefix() + "RequestBody", request.getBody());
-                execution.setVariable(request.getPrefix() + "RequestBodyEncoding", request.getBodyEncoding());
-                execution.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());
-                execution.setVariable(request.getPrefix() + "DisallowRedirects", request.isNoRedirects());
-                execution.setVariable(request.getPrefix() + "FailStatusCodes", failCodes);
-                execution.setVariable(request.getPrefix() + "HandleStatusCodes", handleCodes);
-                execution.setVariable(request.getPrefix() + "IgnoreException", request.isIgnoreErrors());
-                execution.setVariable(request.getPrefix() + "SaveRequestVariables", request.isSaveRequest());
-                execution.setVariable(request.getPrefix() + "SaveResponseParameters", request.isSaveResponse());
-            }
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            HttpClientConfig httpClientConfig = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
 
-        } catch (Exception e) {
-            if (e instanceof FlowableException) {
-                throw (FlowableException) e;
-            } else {
-                throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in execution " + execution.getId(), e);
-            }
+            httpActivityExecutor.execute(
+                    request,
+                    execution,
+                    execution.getId(),
+                    createHttpRequestHandler(httpServiceTask.getHttpRequestHandler(), processEngineConfiguration),
+                    createHttpResponseHandler(httpServiceTask.getHttpResponseHandler(), processEngineConfiguration),
+                    getStringFromField(responseVariableName, execution),
+                    mapExceptions,
+                    httpClientConfig.getSocketTimeout(),
+                    httpClientConfig.getConnectTimeout(),
+                    httpClientConfig.getConnectionRequestTimeout());
         }
-
-        httpActivityExecutor.validate(request);
-        
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        HttpClientConfig httpClientConfig = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
-
-        httpActivityExecutor.execute(
-                request,
-                execution,
-                execution.getId(),
-                createHttpRequestHandler(httpServiceTask.getHttpRequestHandler(), processEngineConfiguration),
-                createHttpResponseHandler(httpServiceTask.getHttpResponseHandler(), processEngineConfiguration),
-                getStringFromField(responseVariableName, execution),
-                mapExceptions,
-                httpClientConfig.getSocketTimeout(),
-                httpClientConfig.getConnectTimeout(),
-                httpClientConfig.getConnectionRequestTimeout());
 
         leave(execution);
     }
@@ -257,10 +274,10 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
             FieldDeclaration fieldDeclaration;
             if (StringUtils.isNotEmpty(fieldExtension.getExpression())) {
                 fieldDeclaration = new FieldDeclaration(fieldExtension.getFieldName(), Expression.class.getName(),
-                                processEngineConfiguration.getExpressionManager().createExpression(fieldExtension.getExpression()));
+                        processEngineConfiguration.getExpressionManager().createExpression(fieldExtension.getExpression()));
             } else {
                 fieldDeclaration = new FieldDeclaration(fieldExtension.getFieldName(), Expression.class.getName(),
-                                new FixedValue(fieldExtension.getStringValue()));
+                        new FixedValue(fieldExtension.getStringValue()));
             }
 
             fieldDeclarations.add(fieldDeclaration);

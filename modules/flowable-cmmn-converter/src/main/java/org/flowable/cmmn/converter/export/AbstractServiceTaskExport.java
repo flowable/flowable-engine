@@ -31,10 +31,12 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
     @Override
     public void writePlanItemDefinitionSpecificAttributes(ServiceTask serviceTask, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(serviceTask, xtw);
+        TaskExport.writeCommonTaskAttributes(serviceTask, xtw);
 
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE, serviceTask.getType());
         }
+        
         switch (serviceTask.getType()) {
             case ServiceTask.JAVA_TASK:
                 if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {

@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 import org.assertj.core.api.Condition;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
+import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -65,12 +65,12 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSequentialMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "seqTasks"))
             .withProcessInstanceVariable("nrOfLoops", 3);
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -79,9 +79,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("seqTasks");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -96,9 +96,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("seqTasks");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -154,12 +154,12 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "parallelTasks"))
             .withProcessInstanceVariable("nrOfLoops", 3);
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -168,9 +168,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procParallelMultiInst.getId());
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(3);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(3);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("parallelTasks", "parallelTasks", "parallelTasks");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
@@ -186,9 +186,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procParallelMultiInst.getId());
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(2);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(2);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         //Two executions are inactive, the completed instance and the MI root
         assertThat(executions).haveExactly(2, new Condition<>((Execution execution) -> !((ExecutionEntity) execution).isActive(), "inactive"));
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -243,15 +243,15 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("seqTasks");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
         Map<String, Object> miTaskVars = taskService.getVariables(task.getId());
-        assertThat(miTaskVars).extracting("loopCounter").containsExactly(0);
+        assertThat(miTaskVars).extracting("loopCounter").isEqualTo(0);
 
         //Complete one...
         completeTask(task);
@@ -263,29 +263,28 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
 
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("seqTasks");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
         miTaskVars = taskService.getVariables(task.getId());
-        assertThat(miTaskVars).extracting("loopCounter").containsOnly(1);
+        assertThat(miTaskVars).extracting("loopCounter").isEqualTo(1);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("seqTasks", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSimpleOneTask.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        Map<String, Object> variables = taskService.getVariables(task.getId());
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
@@ -332,9 +331,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
 
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(3);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(3);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(3);
@@ -353,9 +352,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
 
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(2);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(2);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -364,11 +363,11 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(tasks).allSatisfy(hasLoopCounter);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTasks", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -412,15 +411,15 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("seqTasks");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
         Map<String, Object> miTaskVars = taskService.getVariables(task.getId());
-        assertThat(miTaskVars).extracting("loopCounter").containsExactly(0);
+        assertThat(miTaskVars).extracting("loopCounter").isEqualTo(0);
 
         //Complete one...
         completeTask(task);
@@ -432,22 +431,22 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
 
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("seqTasks");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
         miTaskVars = taskService.getVariables(task.getId());
-        assertThat(miTaskVars).extracting("loopCounter").containsOnly(1);
+        assertThat(miTaskVars).extracting("loopCounter").isEqualTo(1);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("seqTasks", "parallelTasks"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -456,9 +455,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procParallelMultiInst.getId());
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(3);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(3);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactly("parallelTasks", "parallelTasks", "parallelTasks");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
@@ -474,9 +473,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procParallelMultiInst.getId());
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(2);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(2);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         //Two executions are inactive, the completed instance and the MI root
         assertThat(executions).haveExactly(2, new Condition<>((Execution execution) -> !((ExecutionEntity) execution).isActive(), "inactive"));
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -540,9 +539,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
 
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(3);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(3);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(3);
@@ -561,9 +560,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
 
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(2);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(2);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).hasSize(2);
@@ -572,11 +571,11 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(tasks).allSatisfy(hasLoopCounter);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSequentialMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelTasks", "seqTasks"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -585,9 +584,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("seqTasks");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -602,9 +601,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("seqTasks");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -659,12 +658,12 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSequentialMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "sequentialMISubProcess"))
             .withProcessInstanceVariable("nrOfLoops", 3);
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -673,9 +672,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask1");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -694,9 +693,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask1");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -737,12 +736,12 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSimpleOneTask.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "parallelMISubProcess"))
             .withProcessInstanceVariable("nrOfLoops", 3);
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -752,9 +751,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).haveExactly(1, new Condition<>((Execution execution) -> ((ExecutionEntity) execution).isMultiInstanceRoot(), "is Multi Instance root"));
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(3);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(3);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsOnly("subTask1");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
@@ -774,9 +773,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).haveExactly(1, new Condition<>((Execution execution) -> ((ExecutionEntity) execution).isMultiInstanceRoot(), "is Multi Instance root"));
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(2);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(2);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsOnly("subTask1");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
@@ -821,9 +820,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask1");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -842,11 +841,11 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("sequentialMISubProcess", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
@@ -896,9 +895,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procParallelMultiInst.getId());
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(3);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(3);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsOnly("subTask1");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
@@ -918,9 +917,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).haveExactly(1, new Condition<>((Execution execution) -> ((ExecutionEntity) execution).isMultiInstanceRoot(), "is Multi Instance root"));
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(2);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(2);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsOnly("subTask1");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procParallelMultiInst.getId());
@@ -933,11 +932,11 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("subTask1", "subTask2");
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSimpleOneTask.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("parallelMISubProcess", "userTask1Id"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
@@ -1023,11 +1022,11 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(taskService.getVariable(task.getId(), "loopCounter")).isEqualTo(1);
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procSequentialMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("nestedSequentialMISubProcess", "sequentialMISubProcess"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //Confirm
@@ -1037,9 +1036,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(2);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(2);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask1");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -1058,9 +1057,9 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(executions).extracting("processDefinitionId").containsOnly(procSequentialMultiInst.getId());
         miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(1);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(2);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(1);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(2);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("subTask1");
         assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procSequentialMultiInst.getId());
@@ -1137,11 +1136,11 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procNestedParallelMultiInst.getId());
 
         //Prepare and action the migration
-        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = runtimeService.createProcessInstanceMigrationBuilder()
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(procParallelMultiInst.getId())
             .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("nestedParallelMISubProcess", "parallelMISubProcess"));
         ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
-        assertThat(processInstanceMigrationValidationResult.getValidationMessages()).isEmpty();
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
         processInstanceMigrationBuilder.migrate(processInstance.getId());
 
         //IMPORTANT: Might not be the expected result, but it is currently the correct one, as there are two MI roots (nestedParallelMISubProcess) migrating independently

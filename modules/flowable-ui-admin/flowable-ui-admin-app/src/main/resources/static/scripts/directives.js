@@ -169,6 +169,7 @@ angular.module('flowableAdminApp')
                 
                 $scope.gridOptions = {
                         columnDefs: columnDefs,
+                        enableColumnResize: true,
                         enableRowSelection: false,
                         enableSorting: false,
                         enableRowHeaderSelection: false,
@@ -233,6 +234,7 @@ angular.module('flowableAdminApp')
                 $scope.gridOptions = {
                         columnDefs: columnDefs,
                         data: data,
+                        enableColumnResize: true,
                         enableRowSelection: false,
                         enableSorting: false,
                         enableRowHeaderSelection: false,

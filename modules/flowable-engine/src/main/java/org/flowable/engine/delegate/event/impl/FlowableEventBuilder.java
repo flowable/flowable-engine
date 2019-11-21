@@ -26,8 +26,10 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableConditionalEvent;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
+import org.flowable.engine.delegate.event.FlowableEscalationEvent;
 import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCancelledEvent;
@@ -354,8 +356,8 @@ public class FlowableEventBuilder {
         return newEvent;
     }
 
-    public static FlowableMessageEvent createMessageEvent(FlowableEngineEventType type, String activityId, String messageName, Object payload, String executionId, String processInstanceId,
-            String processDefinitionId) {
+    public static FlowableMessageEvent createMessageEvent(FlowableEngineEventType type, String activityId, String messageName, Object payload, 
+                    String executionId, String processInstanceId, String processDefinitionId) {
         FlowableMessageEventImpl newEvent = new FlowableMessageEventImpl(type);
         newEvent.setActivityId(activityId);
         newEvent.setExecutionId(executionId);
@@ -363,6 +365,30 @@ public class FlowableEventBuilder {
         newEvent.setProcessInstanceId(processInstanceId);
         newEvent.setMessageName(messageName);
         newEvent.setMessageData(payload);
+        return newEvent;
+    }
+    
+    public static FlowableConditionalEvent createConditionalEvent(FlowableEngineEventType type, String activityId, String conditionExpression,
+                    String executionId, String processInstanceId, String processDefinitionId) {
+        
+        FlowableConditionalEventImpl newEvent = new FlowableConditionalEventImpl(type);
+        newEvent.setActivityId(activityId);
+        newEvent.setExecutionId(executionId);
+        newEvent.setProcessDefinitionId(processDefinitionId);
+        newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setConditionExpression(conditionExpression);
+        return newEvent;
+    }
+    
+    public static FlowableEscalationEvent createEscalationEvent(FlowableEngineEventType type, String activityId, String escalationCode, String escalationName,
+                    String executionId, String processInstanceId, String processDefinitionId) {
+        FlowableEscalationEventImpl newEvent = new FlowableEscalationEventImpl(type);
+        newEvent.setActivityId(activityId);
+        newEvent.setExecutionId(executionId);
+        newEvent.setProcessDefinitionId(processDefinitionId);
+        newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setEscalationCode(escalationCode);
+        newEvent.setEscalationName(escalationName);
         return newEvent;
     }
 

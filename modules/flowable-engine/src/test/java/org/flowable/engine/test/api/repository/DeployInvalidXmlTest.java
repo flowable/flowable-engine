@@ -60,7 +60,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
     // Need to put this in a String here, if we use a separate file, the cpu usage
     // of Eclipse skyrockets, regardless of the file is opened or not
 
-    private static String UNSAFE_XML = "<?xml version='1.0' encoding='UTF-8'?>" + "<!-- Billion Laugh attacks : http://portal.sliderocket.com/CJAKM/xml-attacks -->" + "<!DOCTYPE lols ["
+    private static final String UNSAFE_XML = "<?xml version='1.0' encoding='UTF-8'?>" + "<!-- Billion Laugh attacks : http://portal.sliderocket.com/CJAKM/xml-attacks -->" + "<!DOCTYPE lols ["
             + "<!ENTITY lol 'lol'>" + "<!ENTITY lol1 '&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;'>" + "<!ENTITY lol2 '&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;'>"
             + "<!ENTITY lol3 '&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;'>" + "<!ENTITY lol4 '&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;'>"
             + "<!ENTITY lol5 '&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;'>" + "<!ENTITY lol6 '&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;'>"

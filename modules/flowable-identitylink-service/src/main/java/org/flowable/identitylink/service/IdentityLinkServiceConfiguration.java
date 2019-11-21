@@ -54,6 +54,10 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     protected HistoryLevel historyLevel;
     
     protected ObjectMapper objectMapper;
+    
+    public IdentityLinkServiceConfiguration(String engineName) {
+        super(engineName);
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////

@@ -26,6 +26,10 @@ public interface CmmnClassDelegateFactory {
 
     CmmnClassDelegate createLifeCycleListener(String className, String sourceState, String targetState, List<FieldExtension> fieldExtensions);
 
-    Object defaultInstantiateDelegate(Class<?> clazz, ServiceTask serviceTask);
+    default Object defaultInstantiateDelegate(Class<?> clazz, ServiceTask serviceTask) {
+        return defaultInstantiateDelegate(clazz, serviceTask, false);
+    }
+
+    Object defaultInstantiateDelegate(Class<?> clazz, ServiceTask serviceTask, boolean allExpressions);
 
 }

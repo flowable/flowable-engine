@@ -26,8 +26,8 @@ import java.util.Date;
  */
 public class HistoricDetailResponse {
 
-    public static String FORM_PROPERTY = "formProperty";
-    public static String VARIABLE_UPDATE = "variableUpdate";
+    public static final String FORM_PROPERTY = "formProperty";
+    public static final String VARIABLE_UPDATE = "variableUpdate";
 
     protected String id;
     protected String processInstanceId;

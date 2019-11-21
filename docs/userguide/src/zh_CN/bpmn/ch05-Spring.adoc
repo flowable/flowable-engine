@@ -1,0 +1,328 @@
+[[springintegration]]
+
+== 集成Spring
+
+尽管完全可以脱离Spring使用Flowable，我们仍提供了很多非常好的集成特性，并将在这一章节介绍。
+
+=== ProcessEngineFactoryBean
+
+可以将++ProcessEngine++配置为普通的Spring bean。入口是++org.flowable.spring.ProcessEngineFactoryBean++类。这个bean处理流程引擎配置，并创建流程引擎。所以在Spring中创建与设置的参数与<<configuration,配置>>章节中介绍的相同。Spring集成所用的配置与引擎bean为：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
+    ...
+</bean>
+
+<bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
+  <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+</bean>
+
+----
+
+请注意++processEngineConfiguration++ bean现在使用++org.flowable.spring.SpringProcessEngineConfiguration++类。
+
+[[_transactions]]
+=== 事务
+
+我们会逐步说明(Flowable)发行版里，Spring示例中的++SpringTransactionIntegrationTest++。下面是我们示例中使用的Spring配置文件（SpringTransactionIntegrationTest-context.xml）。下面的小节包含了dataSource(数据源)，transactionManager(事务管理器)，processEngine(流程引擎)以及Flowable引擎服务。
+
+将DataSource传递给++SpringProcessEngineConfiguration++（使用“dataSource”参数）时，Flowable会在内部使用++org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy++对得到的数据源进行包装（wrap）。这是为了保证从数据源获取的SQL连接与Spring的事务可以协同工作。这样也就不需要在Spring配置中对数据源进行代理（proxy）。但仍然可以将代理++TransactionAwareDataSourceProxy++传递给++SpringProcessEngineConfiguration++——在这种情况下，不会再进行包装。
+
+**请确保如果自行在Spring配置中声明了++TransactionAwareDataSourceProxy++，则不要将它用在已经配置Spring事务的资源上（例如DataSourceTransactionManager与JPATransactionManager。它们需要未经代理的数据源）。**
+
+[source,xml,linenums]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                             http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                             http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                           http://www.springframework.org/schema/tx
+                             http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+    <property name="driverClass" value="org.h2.Driver" />
+    <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
+    <property name="username" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+
+  <bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
+    <property name="dataSource" ref="dataSource" />
+    <property name="transactionManager" ref="transactionManager" />
+    <property name="databaseSchemaUpdate" value="true" />
+    <property name="asyncExecutorActivate" value="false" />
+  </bean>
+
+  <bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
+    <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+  </bean>
+
+  <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+  <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+  <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+  <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+  <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
+
+...
+----
+
+这个Spring配置文件也包含了在这个示例中要用到的bean与配置：
+
+[source,xml,linenums]
+----
+<beans>
+  ...
+  <tx:annotation-driven transaction-manager="transactionManager"/>
+
+  <bean id="userBean" class="org.flowable.spring.test.UserBean">
+    <property name="runtimeService" ref="runtimeService" />
+  </bean>
+
+  <bean id="printer" class="org.flowable.spring.test.Printer" />
+
+</beans>
+----
+
+可以使用任何Spring支持的方式创建应用上下文(application context)。在这个例子中，可以使用classpath中的XML资源配置来创建Spring应用上下文：
+
+
+[source,java,linenums]
+----
+ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+	"org/flowable/examples/spring/SpringTransactionIntegrationTest-context.xml");
+----
+
+或者在单元测试中：
+
+[source,java,linenums]
+----
+@ContextConfiguration(
+  "classpath:org/flowable/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
+----
+
+然后就可以获取服务bean，并调用它们的方法。ProcessEngineFactoryBean会为服务加上额外的拦截器(interceptor)，并为Flowable服务方法设置Propagation.REQUIRED事务级别。这样，我们就可以使用repositoryService部署流程：
+
+[source,java,linenums]
+----
+RepositoryService repositoryService =
+  (RepositoryService) applicationContext.getBean("repositoryService");
+String deploymentId = repositoryService
+  .createDeployment()
+  .addClasspathResource("org/flowable/spring/test/hello.bpmn20.xml")
+  .deploy()
+  .getId();
+
+----
+
+还有另一种方法也可以使用。如果userBean.hello()方法在Spring事务中，Flowable服务方法调用就会加入这个事务。
+
+[source,java,linenums]
+----
+UserBean userBean = (UserBean) applicationContext.getBean("userBean");
+userBean.hello();
+----
+
+UserBean看起来像下面这样。请记着在上面的Spring bean配置中，我们已经将repositoryService注入了userBean。
+
+[source,java,linenums]
+----
+public class UserBean {
+
+  /** 已经由Spring注入 */
+  private RuntimeService runtimeService;
+
+  @Transactional
+  public void hello() {
+    // 可以在你的领域模型（domain model）中进行事务操作，
+    // 它会与Flowable RuntimeService的startProcessInstanceByKey
+    // 合并在同一个事务里
+    runtimeService.startProcessInstanceByKey("helloProcess");
+  }
+
+  public void setRuntimeService(RuntimeService runtimeService) {
+    this.runtimeService = runtimeService;
+  }
+}
+----
+
+[[springExpressions]]
+
+
+=== 表达式
+
+当使用ProcessEngineFactoryBean时，默认BPMN流程中所有的<<apiExpressions,表达式>>都可以“看见”所有的Spring bean。可以通过配置的map，限制表达式能使用的bean，甚至可以完全禁止表达式使用bean。下面的例子只暴露了一个bean（printer），可以使用“printer”作为key访问。**要完全禁止表达式使用bean，可以将SpringProcessEngineConfiguration的‘beans’参数设为空list。如果不设置‘beans’参数，则上下文中的所有bean都将可以使用。**
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
+  ...
+  <property name="beans">
+    <map>
+      <entry key="printer" value-ref="printer" />
+    </map>
+  </property>
+</bean>
+
+<bean id="printer" class="org.flowable.examples.spring.Printer" />
+----
+
+这样就可以在表达式中使用这个bean了。例如，SpringTransactionIntegrationTest ++hello.bpmn20.xml++展示了如何通过UEL方法表达式(method expression)调用Spring bean：
+
+[source,xml,linenums]
+----
+<definitions id="definitions">
+
+  <process id="helloProcess">
+
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="print" />
+
+    <serviceTask id="print" flowable:expression="#{printer.printMessage()}" />
+    <sequenceFlow id="flow2" sourceRef="print" targetRef="end" />
+
+    <endEvent id="end" />
+
+  </process>
+
+</definitions>
+----
+
+其中++Printer++为：
+
+[source,java,linenums]
+----
+public class Printer {
+
+  public void printMessage() {
+    System.out.println("hello world");
+  }
+}
+----
+
+Spring bean配置（上面已经展示过）为：
+
+[source,xml,linenums]
+----
+<beans>
+  ...
+
+  <bean id="printer" class="org.flowable.examples.spring.Printer" />
+
+</beans>
+----
+
+[[_automatic_resource_deployment]]
+=== 自动部署资源
+
+集成Spring也提供了部署资源的特殊方式。在流程引擎配置中，可以指定一组资源。当创建流程引擎时，会扫描并部署这些资源。可以用过滤器阻止重复部署：只有当资源确实发生变化时，才会重新部署至Flowable数据库。在Spring容器经常重启（例如测试时）的时候，这很有用。
+
+这里有个例子：
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
+  ...
+  <property name="deploymentResources"
+    value="classpath*:/org/flowable/spring/test/autodeployment/autodeploy.*.bpmn20.xml" />
+</bean>
+
+<bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
+  <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+</bean>
+----
+
+默认情况下，上面的配置方式会将符合这个过滤器的所有资源组织在一起，作为Flowable引擎的一个部署。重复检测过滤器将作用于整个部署，避免重复地部署未改变资源。有时这不是你想要的。例如，如果用这种方式部署了一组资源，即使只有其中的一个资源发生了改变，整个部署都会被视作已改变，因此这个部署中所有的所有流程定义都会被重新部署。这将导致每个流程定义都会刷新版本号（流程定义id会变化），即使实际上只有一个流程发生了变化。
+
+可以使用++SpringProcessEngineConfiguration++中的额外参数+deploymentMode+，定制部署的方式。这个参数定义了对于一组符合过滤器的资源，组织部署的方式。默认这个参数有3个可用值：
+
+* ++default++: 将所有资源组织在一个部署中，整体用于重复检测过滤。这是默认值，在未设置这个参数时也会用这个值。
+* ++single-resource++: 为每个资源创建一个单独的部署，并用于重复检测过滤。如果希望单独部署每一个流程定义，并且只有在它发生变化时才创建新的流程定义版本，就应该使用这个值。
+* ++resource-parent-folder++: 为同一个目录下的资源创建一个单独的部署，并用于重复检测过滤。这个参数值可以为大多数资源创建独立的部署。同时仍可以通过将部分资源放在同一个目录下，将它们组织在一起。这里有一个将++deploymentMode++设置为++single-resource++的例子：
+
+
+[source,xml,linenums]
+----
+<bean id="processEngineConfiguration"
+    class="org.flowable.spring.SpringProcessEngineConfiguration">
+  ...
+  <property name="deploymentResources" value="classpath*:/flowable/*.bpmn" />
+  <property name="deploymentMode" value="single-resource" />
+</bean>
+----
+
+如果上述++deploymentMode++的参数值不能满足要求，还可以自定义组织部署的行为。创建++SpringProcessEngineConfiguration++的子类，并覆盖++getAutoDeploymentStrategy(String deploymentMode)++方法。这个方法用于确定对给定的++deploymentMode++参数值，应使用何种部署策略。
+
+
+[[springUnitTest]]
+
+
+=== 单元测试
+
+与Spring集成后，业务流程可以非常简单地使用标准的 <<apiUnitTesting,Flowable测试工具>>进行测试。下面的例子展示了如何通过典型的基于Spring的单元测试，对业务流程进行测试：
+
+[source,java,linenums]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
+public class MyBusinessProcessTest {
+
+  @Autowired
+  private RuntimeService runtimeService;
+
+  @Autowired
+  private TaskService taskService;
+
+  @Autowired
+  @Rule
+  public FlowableRule flowableSpringRule;
+
+  @Test
+  @Deployment
+  public void simpleProcessTest() {
+    runtimeService.startProcessInstanceByKey("simpleProcess");
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("My Task", task.getName());
+
+    taskService.complete(task.getId());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+  }
+}
+----
+
+请注意要让这个例子可以正常工作，需要在Spring配置中定义__org.flowable.engine.test.FlowableRule__ bean（在上面的例子中通过@Autowire注入）。
+
+
+[source,xml,linenums]
+----
+<bean id="flowableRule" class="org.flowable.engine.test.Flowable">
+  <property name="processEngine" ref="processEngine" />
+</bean>
+
+----
+
+
+[[_jpa_with_hibernate_4_2_x]]
+=== 通过Hibernate 4.2.x使用JPA
+
+要在Flowable引擎的服务任务或者监听器逻辑中使用Hibernate 4.2.x JPA，需要添加Spring ORM的额外依赖。对Hibernate 4.1.x或更低则不需要。需要添加的依赖为：
+
+[source,xml,linenums]
+----
+<dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-orm</artifactId>
+  <version>${org.springframework.version}</version>
+</dependency>
+----
+
+

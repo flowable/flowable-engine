@@ -1,0 +1,75 @@
+[[license]]
+=== 翻译(说明)
+
+由[分享牛Flowable中国社区] 翻译，任何意见建议,欢迎联系QQ:3152981878。
+如果想一起成为开源代码贡献人员，欢迎大家加入qq交流群为社区贡献添砖加瓦。qq贡献群：1023773998
+
+
+=== 协议
+
+Flowable在link:$$http://www.apache.org/licenses/LICENSE-2.0.html$$[Apache V2 协议]下发布。
+
+[[download]]
+
+=== 下载
+
+link:$$http://www.flowable.org/downloads.html$$[http://www.flowable.org/downloads.html]
+[[sources]]
+
+=== 源码
+
+Flowable的发布包里包含了大部分源码，以JAR文件方式提供。Flowable的源码也可以通过以下链接获得：
+  link:$$https://github.com/flowable/flowable-engine$$[https://github.com/flowable/flowable-engine]
+
+
+[[required.software]]
+
+
+=== 必要的软件
+
+==== JDK 8+
+
+运行Flowable需要JDK 8或以上版本。可以访问 link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[Oracle Java SE downloads页面] 点击“Download JDK”按钮获取。该页面上也有安装指导。安装完成后，可以执行 +java -version+ 。能看到JDK的版本信息就说明安装成功了。
+
+==== IDE
+
+可以自行选择用于Flowable开发的IDE。如果想要使用Flowable Designer，则需要Eclipse Mars或Neon。
+到 link:$$http://www.eclipse.org/downloads/$$[Eclipse下载页面]选择Eclipse版本并下载。解压下载的文件，
+然后执行++eclipse++文件夹下的eclipse文件。手册后续有专门一章介绍如何<<eclipseDesignerInstallation,安装我们的Eclipse Designer插件>>。
+
+
+[[reporting.problems]]
+
+=== 反馈问题
+
+我们希望开发者在报告或提问之前，先看看link:$$http://www.catb.org/~esr/faqs/smart-questions.html$$[提问的智慧]。
+
+看完提问的智慧，你可以在link:$$http://forums.flowable.org$$[用户论坛]提问、评论以及提交改进建议，也可以在link:$$https://github.com/flowable/flowable-engine/issues$$[我们的Github问题跟踪系统]创建bug报告。
+
+
+[[experimental]]
+
+=== 实验性功能
+
+标记有**[实验性]**的章节介绍的功能还不够稳定。
+
+++.impl.++包下的类都是内部实现类，不保证稳定。但是，在用户手册中作为配置参数介绍的类则是被官方支持的，可以保证稳定。
+
+
+[[internal]]
+
+=== 内部实现类
+
+在JAR文件中，所有++.impl.++包下的类（比如++org.flowable.engine.impl.db++）都是实现类，只应在内部使用。实现类中的所有类或接口都不保证稳定。
+
+[[_versioning_strategy]]
+=== 版本策略
+
+使用三个整数的形式标记版本：**MAJOR.MINOR.MICRO**。其中 **MAJOR**版本代表核心引擎的演进。**MINOR**版本代表新功能与新API。**MICRO**版本代表bug修复与改进。
+
+总的来说，Flowable希望在**MINOR**与**MICRO**版本中，对所有非内部实现类保持“源代码兼容性”，即应用可以正确构建，且不改变语义。Flowable也希望在**MINOR**与**MICRO**版本中，保持“二进制兼容性”，即用新版本的Flowable直接替换老版本的Jar文件，仍然可以正常工作。
+
+如果在**MINOR**版本中修改了API，将保留原有版本，并使用__@Deprecated__注解。这种废弃的API将在两个**MINOR**版本之后移除。
+
+[[translator_info]]
+

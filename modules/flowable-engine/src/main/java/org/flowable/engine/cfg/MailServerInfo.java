@@ -15,79 +15,9 @@ package org.flowable.engine.cfg;
 
 /**
  * @author Tom Baeyens
+ *
+ * @deprecated Use {@link org.flowable.common.engine.impl.cfg.mail.MailServerInfo}
  */
-public class MailServerInfo {
+public class MailServerInfo extends org.flowable.common.engine.impl.cfg.mail.MailServerInfo {
 
-    protected String mailServerDefaultFrom;
-    protected String mailServerForceTo;
-    protected String mailServerHost;
-    protected int mailServerPort;
-    protected String mailServerUsername;
-    protected String mailServerPassword;
-    protected boolean mailServerUseSSL;
-    protected boolean mailServerUseTLS;
-
-    public String getMailServerDefaultFrom() {
-        return mailServerDefaultFrom;
-    }
-
-    public void setMailServerDefaultFrom(String mailServerDefaultFrom) {
-        this.mailServerDefaultFrom = mailServerDefaultFrom;
-    }
-
-    public String getMailServerForceTo() {
-        return mailServerForceTo;
-    }
-
-    public void setMailServerForceTo(String mailServerForceTo) {
-        this.mailServerForceTo = mailServerForceTo;
-    }
-
-    public String getMailServerHost() {
-        return mailServerHost;
-    }
-
-    public void setMailServerHost(String mailServerHost) {
-        this.mailServerHost = mailServerHost;
-    }
-
-    public int getMailServerPort() {
-        return mailServerPort;
-    }
-
-    public void setMailServerPort(int mailServerPort) {
-        this.mailServerPort = mailServerPort;
-    }
-
-    public String getMailServerUsername() {
-        return mailServerUsername;
-    }
-
-    public void setMailServerUsername(String mailServerUsername) {
-        this.mailServerUsername = mailServerUsername;
-    }
-
-    public String getMailServerPassword() {
-        return mailServerPassword;
-    }
-
-    public void setMailServerPassword(String mailServerPassword) {
-        this.mailServerPassword = mailServerPassword;
-    }
-
-    public boolean isMailServerUseSSL() {
-        return mailServerUseSSL;
-    }
-
-    public void setMailServerUseSSL(boolean mailServerUseSSL) {
-        this.mailServerUseSSL = mailServerUseSSL;
-    }
-
-    public boolean isMailServerUseTLS() {
-        return mailServerUseTLS;
-    }
-
-    public void setMailServerUseTLS(boolean mailServerUseTLS) {
-        this.mailServerUseTLS = mailServerUseTLS;
-    }
 }

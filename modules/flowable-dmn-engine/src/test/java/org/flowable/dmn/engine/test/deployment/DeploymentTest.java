@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
@@ -206,6 +207,47 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertNotNull(decisionTableWithCategory);
 
         deleteDeployments();
+    }
+    
+    @Test
+    public void deploySingleDecisionWithParentDeploymentId() {
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
+                .parentDeploymentId("someDeploymentId")
+                .deploy();
+        
+        org.flowable.dmn.api.DmnDeployment newDeployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
+                .deploy();
+        
+        try {
+            DmnDecisionTable decision = repositoryService.createDecisionTableQuery().deploymentId(deployment.getId()).singleResult();
+            assertNotNull(decision);
+            assertEquals("decision", decision.getKey());
+            assertEquals(1, decision.getVersion());
+            
+            DmnDecisionTable newDecision = repositoryService.createDecisionTableQuery().deploymentId(newDeployment.getId()).singleResult();
+            assertNotNull(newDecision);
+            assertEquals("decision", newDecision.getKey());
+            assertEquals(2, newDecision.getVersion());
+            
+            DecisionExecutionAuditContainer auditContainer = ruleService.createExecuteDecisionBuilder()
+                            .decisionKey("decision")
+                            .parentDeploymentId("someDeploymentId")
+                            .executeWithAuditTrail();
+            assertEquals("decision", auditContainer.getDecisionKey());
+            assertEquals(1, auditContainer.getDecisionVersion());
+            
+            dmnEngineConfiguration.setAlwaysLookupLatestDefinitionVersion(true);
+            auditContainer = ruleService.createExecuteDecisionBuilder().decisionKey("decision").executeWithAuditTrail();
+            assertEquals("decision", auditContainer.getDecisionKey());
+            assertEquals(2, auditContainer.getDecisionVersion());
+        
+        } finally {
+            dmnEngineConfiguration.setAlwaysLookupLatestDefinitionVersion(false);
+            repositoryService.deleteDeployment(deployment.getId());
+            repositoryService.deleteDeployment(newDeployment.getId());
+        }
     }
 
     @Test

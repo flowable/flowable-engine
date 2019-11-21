@@ -62,6 +62,7 @@ public interface CmmnStencilConstants {
 
     String PROPERTY_FORMKEY = "formkeydefinition";
     String PROPERTY_FORM_REFERENCE = "formreference";
+    String PROPERTY_FORM_FIELD_VALIDATION = "formfieldvalidation";
 
     String PROPERTY_IS_BLOCKING = "isblocking";
     String PROPERTY_IS_BLOCKING_EXPRESSION = "isblockingexpression";
@@ -136,11 +137,16 @@ public interface CmmnStencilConstants {
     String PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY = "fallbackToDefaultTenant";
 
     String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
+    String PROPERTY_CASE_IN_PARAMETERS = "casetaskinparameters";
+    String PROPERTY_CASE_OUT_PARAMETERS = "casetaskoutparameters";
+    String PROPERTY_CASE_BUSINESS_KEY = "casetaskbusinesskey";
+    String PROPERTY_CASE_INHERIT_BUSINESS_KEY = "casetaskinheritbusinesskey";
 
     String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
     String PROPERTY_PROCESS_IN_PARAMETERS = "processtaskinparameters";
     String PROPERTY_PROCESS_OUT_PARAMETERS = "processtaskoutparameters";
     String PROPERTY_FALLBACK_TO_DEFAULT_TENANT = "fallbacktodefaulttenant";
+    String PROPERTY_ID_VARIABLE_NAME = "idvariablename";
 
     String PROPERTY_IN_PARAMETERS = "inParameters";
     String PROPERTY_OUT_PARAMETERS = "outParameters";
@@ -170,5 +176,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_TIMER_EXPRESSION = "timerexpression";
     String PROPERTY_TIMER_START_TRIGGER_SOURCE_REF = "timerstarttriggersourceref";
     String PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT = "transitionevent";
+
+    String PROPERTY_EVENT_LISTENER_AVAILABLE_CONDITION = "availablecondition";
 
 }

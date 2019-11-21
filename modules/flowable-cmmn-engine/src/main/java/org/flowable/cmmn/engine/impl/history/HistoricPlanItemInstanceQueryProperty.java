@@ -13,10 +13,10 @@
 
 package org.flowable.cmmn.engine.impl.history;
 
-import org.flowable.common.engine.api.query.QueryProperty;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Dennis Federico
@@ -29,6 +29,16 @@ public class HistoricPlanItemInstanceQueryProperty implements QueryProperty {
 
     public static final HistoricPlanItemInstanceQueryProperty CREATE_TIME = new HistoricPlanItemInstanceQueryProperty("RES.CREATE_TIME_");
     public static final HistoricPlanItemInstanceQueryProperty ENDED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.ENDED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty LAST_AVAILABLE_TIME = new HistoricPlanItemInstanceQueryProperty("RES.LAST_AVAILABLE_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty LAST_ENABLED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.LAST_ENABLED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty LAST_DISABLED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.LAST_DISABLED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty LAST_STARTED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.LAST_STARTED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty LAST_SUSPENDED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.LAST_SUSPENDED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty LAST_UPDATED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.LAST_UPDATED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty COMPLETED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.COMPLETED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty OCCURRED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.OCCURRED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty TERMINATED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.TERMINATED_TIME_");
+    public static final HistoricPlanItemInstanceQueryProperty EXIT_TIME = new HistoricPlanItemInstanceQueryProperty("RES.EXIT_TIME_");
     public static final HistoricPlanItemInstanceQueryProperty NAME = new HistoricPlanItemInstanceQueryProperty("RES.NAME_");
 
     private String name;

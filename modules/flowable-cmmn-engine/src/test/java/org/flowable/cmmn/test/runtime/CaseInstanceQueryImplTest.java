@@ -297,7 +297,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
     @Test
     public void getCaseInstanceByStartedAfter() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+        cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             start();
         
@@ -678,7 +678,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
     @Test
     public void getCaseInstanceByVariable() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+        cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             variable("queryVariable", "queryVariableValue").
             start();
@@ -687,7 +687,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             variable("queryVariable", "queryVariableValue").
             variable("queryVariable2", "queryVariableValue2").
             start();
-        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder().
+        cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             variable("queryVariable", "queryVariableValue").
             variable("queryVariable3", "queryVariableValue3").

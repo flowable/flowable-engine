@@ -33,10 +33,19 @@ public class ChangePlanItemStateCmd implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        if (changePlanItemStateBuilder.getMovePlanItemInstanceIdList().size() == 0 && changePlanItemStateBuilder.getMovePlanItemDefinitionIdList().size() == 0) {
-            throw new FlowableIllegalArgumentException("No move plan item instance or plan item definition ids provided");
+        if (changePlanItemStateBuilder.getMovePlanItemInstanceIdList().size() == 0 && changePlanItemStateBuilder.getMovePlanItemDefinitionIdList().size() == 0
+                        && changePlanItemStateBuilder.getActivatePlanItemDefinitionIdList().size() == 0
+                        && changePlanItemStateBuilder.getChangePlanItemToAvailableIdList().size() == 0) {
+            
+            throw new FlowableIllegalArgumentException("No move plan item instance or (activate) plan item definition ids provided");
 
         } else if (changePlanItemStateBuilder.getMovePlanItemDefinitionIdList().size() > 0 && changePlanItemStateBuilder.getCaseInstanceId() == null) {
+            throw new FlowableIllegalArgumentException("Case instance id is required");
+        
+        } else if (changePlanItemStateBuilder.getActivatePlanItemDefinitionIdList().size() > 0 && changePlanItemStateBuilder.getCaseInstanceId() == null) {
+            throw new FlowableIllegalArgumentException("Case instance id is required");
+            
+        } else if (changePlanItemStateBuilder.getChangePlanItemToAvailableIdList().size() > 0 && changePlanItemStateBuilder.getCaseInstanceId() == null) {
             throw new FlowableIllegalArgumentException("Case instance id is required");
         }
 

@@ -2,6 +2,9 @@
 
 This is a fork of [Anapsix Docker Alpine Java image](https://github.com/anapsix/docker-alpine-java) containing some modifications.
 
+## Deprecated
+Current base image used for Flowable images is https://hub.docker.com/r/adoptopenjdk/openjdk8
+
 #### modifications
 
 * Alpine version 3.8.1; *which includes a fix to prevent potential remote execution*

@@ -12,6 +12,8 @@
  */
 package org.flowable.standalone.escapeclause;
 
+import java.nio.charset.StandardCharsets;
+
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.junit.jupiter.api.AfterEach;
@@ -42,8 +44,8 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         repositoryService.saveModel(model);
         modelTwoId = model.getId();
 
-        repositoryService.addModelEditorSource(modelOneId, "bytes".getBytes("utf-8"));
-        repositoryService.addModelEditorSource(modelTwoId, "bytes".getBytes("utf-8"));
+        repositoryService.addModelEditorSource(modelOneId, "bytes".getBytes(StandardCharsets.UTF_8));
+        repositoryService.addModelEditorSource(modelTwoId, "bytes".getBytes(StandardCharsets.UTF_8));
 
     }
 
@@ -55,57 +57,57 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
     @Test
     public void testQueryByNameLike() throws Exception {
-        ModelQuery query = repositoryService.createModelQuery().modelNameLike("%\\%%");
+        ModelQuery query = repositoryService.createModelQuery().modelNameLike("%|%%");
         Model model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey1", model.getKey());
-        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
 
-        query = repositoryService.createModelQuery().modelNameLike("%\\_%");
+        query = repositoryService.createModelQuery().modelNameLike("%|_%");
         model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey2", model.getKey());
-        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
 
     @Test
     public void testQueryByCategoryLike() throws Exception {
-        ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%\\%%");
+        ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%|%%");
         Model model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey1", model.getKey());
-        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
 
-        query = repositoryService.createModelQuery().modelCategoryLike("%\\_%");
+        query = repositoryService.createModelQuery().modelCategoryLike("%|_%");
         model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey2", model.getKey());
-        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
 
     @Test
     public void testQueryByTenantIdLike() throws Exception {
-        ModelQuery query = repositoryService.createModelQuery().modelTenantIdLike("%\\%%");
+        ModelQuery query = repositoryService.createModelQuery().modelTenantIdLike("%|%%");
         Model model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey1", model.getKey());
-        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
 
-        query = repositoryService.createModelQuery().modelTenantIdLike("%\\_%");
+        query = repositoryService.createModelQuery().modelTenantIdLike("%|_%");
         model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey2", model.getKey());
-        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+        assertEquals("bytes", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }

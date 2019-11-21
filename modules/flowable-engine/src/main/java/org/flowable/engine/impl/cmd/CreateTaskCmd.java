@@ -47,6 +47,7 @@ public class CreateTaskCmd implements Command<Task> {
                 }
             }
         }
+
         return task;
     }
 }

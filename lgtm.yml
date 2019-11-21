@@ -1,0 +1,3 @@
+path_classifiers:
+  library:
+    - "**/src/main/resources/static/libs/"

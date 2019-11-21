@@ -220,6 +220,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 $scope.gridTasks = {
                     data: 'tasks.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -249,6 +250,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 $scope.gridVariables = {
                     data: 'variables.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -271,6 +273,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 $scope.gridSubprocesses = {
                     data: 'subprocesses.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -296,6 +299,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 $scope.gridJobs = {
                     data: 'jobs.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -320,6 +324,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 $scope.gridDecisionTables = {
                     data: 'decisionTables.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -349,6 +354,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 $scope.gridFormInstances = {
                     data: 'formInstances.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -563,7 +569,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
     }]);
 
 flowableAdminApp.controller('DeleteProcessModalInstanceCtrl',
-    ['$rootScope', '$scope', '$modalInstance', '$http', 'process', function ($rootScope, $scope, $modalInstance, $http, process, action) {
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'process', 'action', function ($rootScope, $scope, $modalInstance, $http, process, action) {
 
         $scope.process = process;
         $scope.action = action;
@@ -639,7 +645,7 @@ flowableAdminApp.controller('ShowProcessInstanceMigrationPopupCtrl',
         
         $http({
             method: 'GET',
-            url: '/app/rest/admin/process-definitions?key=' + $scope.processDefinition.key
+            url: '/app/rest/admin/process-definitions?key=' + $scope.processDefinition.key + '&size=1000'
         }).success(function (response, status, headers, config) {
             var definitionList = response.data;
             var finalResult = [];

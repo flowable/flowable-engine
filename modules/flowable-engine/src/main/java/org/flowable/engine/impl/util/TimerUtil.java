@@ -177,6 +177,8 @@ public class TimerUtil {
             timer.setExecutionId(executionEntity.getId());
             timer.setProcessDefinitionId(executionEntity.getProcessDefinitionId());
             timer.setProcessInstanceId(executionEntity.getProcessInstanceId());
+            timer.setElementId(executionEntity.getCurrentFlowElement().getId());
+            timer.setElementName(executionEntity.getCurrentFlowElement().getName());
             
             // Inherit tenant identifier (if applicable)
             if (executionEntity.getTenantId() != null) {
@@ -206,7 +208,7 @@ public class TimerUtil {
             timerJobService.insertTimerJob(rescheduledTimerJob);
 
             FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
-            if (eventDispatcher.isEnabled()) {
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(
                         FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
                 

@@ -14,6 +14,7 @@ package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,7 +98,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
     protected Object transformFormFieldValueToVariableValue(FormField formField, Object formFieldValue) {
         
         Object result = formFieldValue;
-        if (formField.getType().equals(FormFieldTypes.DATE)) {
+        if (formField.getType().equals(FormFieldTypes.DATE) && formFieldValue instanceof String) {
             if (StringUtils.isNotEmpty((String) formFieldValue)) {
                 try {
                     result = LocalDate.parse((String) formFieldValue);
@@ -108,6 +109,8 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
                 }
             }
 
+        } else if (formField.getType().equals(FormFieldTypes.DATE) && formFieldValue instanceof Date) {
+            result = new LocalDate(formFieldValue);
         } else if (formField.getType().equals(FormFieldTypes.INTEGER) && formFieldValue instanceof String) {
             String strFieldValue = (String) formFieldValue;
             if (StringUtils.isNotEmpty(strFieldValue) && NumberUtils.isCreatable(strFieldValue)) {

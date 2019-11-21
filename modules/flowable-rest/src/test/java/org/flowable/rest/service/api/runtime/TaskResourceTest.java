@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -347,6 +349,83 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             for (HistoricTaskInstance task : historicTasks) {
                 historyService.deleteHistoricTaskInstance(task.getId());
             }
+        }
+    }
+
+    /**
+     * Test deleting a single task linked with a process instance. DELETE runtime/tasks/{taskId}
+     */
+    @Test
+    @Deployment(resources = "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml")
+    public void testDeleteTaskLinkedWithAProcessInstance() throws Exception {
+        String processInstanceId = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .start()
+            .getId();
+
+        // 1. Simple delete
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        assertThat(task.getExecutionId()).as("task executionId").isNotNull();
+        String taskId = task.getId();
+
+        // Execute the request
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+        CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_FORBIDDEN);
+        JsonNode responseNode = readContent(response);
+        closeResponse(response);
+
+        assertThatJson(responseNode)
+            .isEqualTo("{"
+                + "message: 'Forbidden',"
+                + "exception: 'Cannot delete a task that is part of a process instance.'"
+                + "}");
+
+        assertThat(taskService.createTaskQuery().taskId(task.getId()).singleResult()).isNotNull();
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            // Check that the historic task has not been deleted
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult()).isNotNull();
+        }
+
+        // 2. Cascade delete
+        // Execute the request
+        httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId) + "?cascadeHistory=true");
+        response = executeRequest(httpDelete, HttpStatus.SC_FORBIDDEN);
+        responseNode = readContent(response);
+        closeResponse(response);
+
+        assertThatJson(responseNode)
+            .isEqualTo("{"
+                + "message: 'Forbidden',"
+                + "exception: 'Cannot delete a task that is part of a process instance.'"
+                + "}");
+
+        assertThat(taskService.createTaskQuery().taskId(task.getId()).singleResult()).isNotNull();
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            // Check that the historic task has been deleted
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult()).isNotNull();
+        }
+
+        // 3. Delete with reason
+        // Execute the request
+        httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId) + "?deleteReason=fortestingpurposes");
+        response = executeRequest(httpDelete, HttpStatus.SC_FORBIDDEN);
+        responseNode = readContent(response);
+        closeResponse(response);
+
+        assertThatJson(responseNode)
+            .isEqualTo("{"
+                + "message: 'Forbidden',"
+                + "exception: 'Cannot delete a task that is part of a process instance.'"
+                + "}");
+
+        assertThat(taskService.createTaskQuery().taskId(task.getId()).singleResult()).isNotNull();
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            // Check that the historic task has been deleted and
+            // delete-reason has been set
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult()).isNotNull();
         }
     }
 

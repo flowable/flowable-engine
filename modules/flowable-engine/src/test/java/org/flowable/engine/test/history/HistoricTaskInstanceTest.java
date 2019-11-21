@@ -13,8 +13,12 @@
 
 package org.flowable.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -30,6 +34,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
@@ -220,6 +226,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         // Delete reason
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDeleteReason("deleted").count());
+        assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskWithoutDeleteReason().count());
 
         // org.flowable.task.service.Task definition ID
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("task").count());
@@ -298,6 +305,47 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().finished().count());
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().unfinished().count());
+    }
+
+    @Test
+    @Deployment
+    public void testHistoricTaskInstanceQueryByTaskDefinitionKeys() throws Exception {
+        Calendar start = Calendar.getInstance();
+        start.set(Calendar.MILLISECOND, 0);
+        processEngineConfiguration.getClock().setCurrentTime(start.getTime());
+
+        // First instance is finished
+        ProcessInstance finishedInstance = runtimeService.startProcessInstanceByKey("taskDefinitionKeysProcess", "myBusinessKey");
+        processEngineConfiguration.getClock().reset();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(finishedInstance.getId()).list();
+        for (Task task : tasks) {
+            taskService.complete(task.getId());
+        }
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).list())
+            .extracting(TaskInfo::getTaskDefinitionKey, TaskInfo::getName)
+            .containsExactlyInAnyOrder(
+                tuple("taskKey1", "Task A"),
+                tuple("taskKey123", "Task B")
+            );
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).count())
+            .isEqualTo(2L);
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).list()).isEmpty();
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).count()).isEqualTo(0L);
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid"))
+            .endOr().list())
+            .extracting(TaskInfo::getTaskDefinitionKey, TaskInfo::getName)
+            .containsExactlyInAnyOrder(
+                tuple("taskKey1", "Task A"),
+                tuple("taskKey123", "Task B")
+            );
+        assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid"))
+            .endOr().count()).isEqualTo(2L);
     }
 
     @Test
@@ -591,6 +639,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         // Delete reason
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().taskDeleteReason("deleted").endOr().count());
+        assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskWithoutDeleteReason().endOr().count());
 
         // org.flowable.task.service.Task definition ID
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("task").endOr().count());

@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.api.repository.BaseAppModel;
+import org.flowable.app.engine.impl.deployer.BaseAppModel;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.dmn.api.DmnDeployment;

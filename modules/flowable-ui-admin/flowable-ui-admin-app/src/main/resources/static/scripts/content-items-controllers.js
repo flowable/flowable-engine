@@ -78,6 +78,7 @@ flowableAdminApp.controller('ContentItemsController', ['$rootScope', '$scope', '
                 $scope.gridContentItems = {
                     data: 'contentItemsData.data',
                     enableRowReordering: true,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     rowHeight: 36,

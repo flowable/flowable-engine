@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.admin.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.ProcessInstanceService;
@@ -21,16 +23,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * REST controller for managing the current user's account.
@@ -44,7 +46,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
     @Autowired
     protected ProcessInstanceService clientService;
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}", produces = "application/json")
     public JsonNode getProcessInstance(@PathVariable String processInstanceId, @RequestParam(required = false, defaultValue = "false") boolean runtime) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -56,7 +58,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/tasks", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/tasks")
     public JsonNode getSubtasks(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -67,7 +69,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables")
     public JsonNode getVariables(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -78,7 +80,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}")
     @ResponseStatus(value = HttpStatus.OK)
     public void updateVariable(@PathVariable String processInstanceId, @PathVariable String variableName, @RequestBody ObjectNode body) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -90,7 +92,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables")
     @ResponseStatus(value = HttpStatus.OK)
     public void createVariable(@PathVariable String processInstanceId, @RequestBody ObjectNode body) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -102,7 +104,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/process-instances/{processInstanceId}/variables/{variableName}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteVariable(@PathVariable String processInstanceId, @PathVariable String variableName) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -114,7 +116,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/subprocesses", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/subprocesses")
     public JsonNode getSubProcesses(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -125,7 +127,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/jobs", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/jobs")
     public JsonNode getJobs(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
         try {
@@ -136,7 +138,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/process-instances/{processInstanceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void executeAction(@PathVariable String processInstanceId, @RequestBody JsonNode actionBody) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -148,7 +150,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/change-state", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/process-instances/{processInstanceId}/change-state")
     @ResponseStatus(value = HttpStatus.OK)
     public void changeActivityState(@PathVariable String processInstanceId, @RequestBody JsonNode changeStateBody) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -159,8 +161,8 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
-    
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/migrate", method = RequestMethod.POST)
+
+    @PostMapping(value = "/rest/admin/process-instances/{processInstanceId}/migrate")
     @ResponseStatus(value = HttpStatus.OK)
     public void migrateProcessInstance(@PathVariable String processInstanceId, @RequestBody String migrationDocument) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.PROCESS);
@@ -172,7 +174,7 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/decision-executions", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/decision-executions")
     public JsonNode getDecisionExecutions(@PathVariable String processInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         try {

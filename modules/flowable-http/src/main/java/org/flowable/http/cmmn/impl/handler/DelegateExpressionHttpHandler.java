@@ -12,6 +12,8 @@
  */
 package org.flowable.http.cmmn.impl.handler;
 
+import java.util.List;
+
 import org.apache.http.client.HttpClient;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.util.DelegateExpressionUtil;
@@ -25,8 +27,6 @@ import org.flowable.http.HttpRequest;
 import org.flowable.http.HttpResponse;
 import org.flowable.http.delegate.HttpRequestHandler;
 import org.flowable.http.delegate.HttpResponseHandler;
-
-import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -81,9 +81,9 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
 
             DelegateExpressionFieldInjectionMode injectionMode = CommandContextUtil.getProcessEngineConfiguration().getDelegateExpressionFieldInjectionMode();
             if (injectionMode == DelegateExpressionFieldInjectionMode.COMPATIBILITY) {
-                CmmnClassDelegate.applyFieldExtensions(fieldExtensions, delegate, variableScope, true);
+                CmmnClassDelegate.applyFieldExtensions(fieldExtensions, delegate, true);
             } else if (injectionMode == DelegateExpressionFieldInjectionMode.MIXED) {
-                CmmnClassDelegate.applyFieldExtensions(fieldExtensions, delegate, variableScope, false);
+                CmmnClassDelegate.applyFieldExtensions(fieldExtensions, delegate, false);
             }
 
         }

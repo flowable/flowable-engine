@@ -19,14 +19,14 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.junit.Assert;
@@ -170,7 +170,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testAsyncBehavior() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("async");
-        waitForJobExecutorToProcessAllJobs(7000L, 250L);
+        waitForJobExecutorToProcessAllJobs(20000L, 250L);
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 
@@ -224,7 +224,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 q.processInstanceId(processInstance.getProcessInstanceId());
 
                 List<EventSubscription> subs = CommandContextUtil
-                        .getEventSubscriptionEntityManager()
+                        .getEventSubscriptionService()
                         .findEventSubscriptionsByQueryCriteria(q);
 
                 assertEquals(1, subs.size());
@@ -254,7 +254,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 q.processInstanceId(processInstance.getProcessInstanceId());
 
                 List<EventSubscription> subs = CommandContextUtil
-                        .getEventSubscriptionEntityManager()
+                        .getEventSubscriptionService()
                         .findEventSubscriptionsByQueryCriteria(q);
 
                 assertEquals(1, subs.size());

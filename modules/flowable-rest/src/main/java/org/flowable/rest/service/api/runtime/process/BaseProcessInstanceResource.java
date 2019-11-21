@@ -178,7 +178,7 @@ public class BaseProcessInstanceResource {
 
         DataResponse<ProcessInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createProcessInstanceResponseList);
         
-        Set<String> processDefinitionIds = new HashSet<String>();
+        Set<String> processDefinitionIds = new HashSet<>();
         List<ProcessInstanceResponse> processInstanceList = responseList.getData();
         for (ProcessInstanceResponse processInstanceResponse : processInstanceList) {
             if (!processDefinitionIds.contains(processInstanceResponse.getProcessDefinitionId())) {
@@ -188,7 +188,7 @@ public class BaseProcessInstanceResource {
         
         if (processDefinitionIds.size() > 0) {
             List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionIds(processDefinitionIds).list();
-            Map<String, ProcessDefinition> processDefinitionMap = new HashMap<String, ProcessDefinition>();
+            Map<String, ProcessDefinition> processDefinitionMap = new HashMap<>();
             for (ProcessDefinition processDefinition : processDefinitionList) {
                 processDefinitionMap.put(processDefinition.getId(), processDefinition);
             }
@@ -256,6 +256,14 @@ public class BaseProcessInstanceResource {
             case LIKE:
                 if (actualValue instanceof String) {
                     processInstanceQuery.variableValueLike(variable.getName(), (String) actualValue);
+                } else {
+                    throw new FlowableIllegalArgumentException("Only string variable values are supported for like, but was: " + actualValue.getClass().getName());
+                }
+                break;
+
+            case LIKE_IGNORE_CASE:
+                if (actualValue instanceof String) {
+                    processInstanceQuery.variableValueLikeIgnoreCase(variable.getName(), (String) actualValue);
                 } else {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported for like, but was: " + actualValue.getClass().getName());
                 }

@@ -139,10 +139,10 @@
 
   <sql id="selectHistoricTaskLogEntriesByQueryCriteriaSql">
     from ${prefix}ACT_HI_TSK_LOG RES
-    <include refid="commonselectHistoricTaskLogEntriesByQueryCriteriaSql"/>
+    <include refid="commonSelectHistoricTaskLogEntriesByQueryCriteriaSql"/>
   </sql>
 
-  <sql id="commonselectHistoricTaskLogEntriesByQueryCriteriaSql">
+  <sql id="commonSelectHistoricTaskLogEntriesByQueryCriteriaSql">
     <where>
       <if test="taskId != null">
         RES.TASK_ID_ = #{taskId}
@@ -204,6 +204,36 @@
 
   <delete id="deleteHistoricTaskLogEntriesByTaskId" parameterType="string">
     delete from ${prefix}ACT_HI_TSK_LOG where TASK_ID_ = #{taskId}
+  </delete>
+  
+  <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingProcessInstances" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'" > TSKLOG </if> from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.PROC_INST_ID_ is not null and TSKLOG.PROC_INST_ID_ != '' and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TSKLOG.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingProcessInstances" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.PROC_INST_ID_ is not null and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TSKLOG.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_TSK_LOG where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingCaseInstances" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> TSKLOG </if> from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.SCOPE_ID_ is not null and TSKLOG.SCOPE_ID_ != '' and TSKLOG.SCOPE_TYPE_ = 'cmmn' and
+    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where TSKLOG.SCOPE_ID_ = CASEINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingCaseInstances" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.SCOPE_ID_ is not null and TSKLOG.SCOPE_TYPE_ = 'cmmn' and
+    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where TSKLOG.SCOPE_ID_ = CASEINST.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingCaseInstances" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_TSK_LOG where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and 
+    SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)
   </delete>
 
 </mapper>

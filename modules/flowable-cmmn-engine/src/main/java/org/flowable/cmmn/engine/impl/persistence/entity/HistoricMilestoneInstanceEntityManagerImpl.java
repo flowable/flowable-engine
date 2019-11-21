@@ -20,46 +20,37 @@ import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Joram Barrez
  */
-public class HistoricMilestoneInstanceEntityManagerImpl extends AbstractCmmnEntityManager<HistoricMilestoneInstanceEntity> implements HistoricMilestoneInstanceEntityManager {
-
-    protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
+public class HistoricMilestoneInstanceEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, HistoricMilestoneInstanceEntity, HistoricMilestoneInstanceDataManager>
+    implements HistoricMilestoneInstanceEntityManager {
 
     public HistoricMilestoneInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager) {
-        super(cmmnEngineConfiguration);
-        this.historicMilestoneInstanceDataManager = historicMilestoneInstanceDataManager;
-    }
-
-    @Override
-    protected DataManager<HistoricMilestoneInstanceEntity> getDataManager() {
-        return historicMilestoneInstanceDataManager;
+        super(cmmnEngineConfiguration, historicMilestoneInstanceDataManager);
     }
     
     @Override
     public HistoricMilestoneInstanceQuery createHistoricMilestoneInstanceQuery() {
-        return new HistoricMilestoneInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new HistoricMilestoneInstanceQueryImpl(engineConfiguration.getCommandExecutor());
     }
 
     @Override
     public List<HistoricMilestoneInstance> findHistoricMilestoneInstancesByQueryCriteria(HistoricMilestoneInstanceQuery query) {
-        return historicMilestoneInstanceDataManager.findHistoricMilestoneInstancesByQueryCriteria((HistoricMilestoneInstanceQueryImpl) query);
+        return dataManager.findHistoricMilestoneInstancesByQueryCriteria((HistoricMilestoneInstanceQueryImpl) query);
     }
 
     @Override
     public long findHistoricMilestoneInstanceCountByQueryCriteria(HistoricMilestoneInstanceQuery query) {
-        return historicMilestoneInstanceDataManager.findHistoricMilestoneInstancesCountByQueryCriteria((HistoricMilestoneInstanceQueryImpl) query);
+        return dataManager.findHistoricMilestoneInstancesCountByQueryCriteria((HistoricMilestoneInstanceQueryImpl) query);
     }
     
-    public HistoricMilestoneInstanceDataManager getHistoricMilestoneInstanceDataManager() {
-        return historicMilestoneInstanceDataManager;
+    @Override
+    public void deleteHistoricMilestoneInstancesForNonExistingCaseInstances() {
+        dataManager.deleteHistoricMilestoneInstancesForNonExistingCaseInstances();
     }
-
-    public void setHistoricMilestoneInstanceDataManager(HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager) {
-        this.historicMilestoneInstanceDataManager = historicMilestoneInstanceDataManager;
-    }
-
+    
 }

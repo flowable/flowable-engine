@@ -12,31 +12,92 @@
  */
 package org.flowable.cmmn.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Joram Barrez
+ * @author Micha Kiener
  */
 public class RepetitionRule extends PlanItemRule {
-    
-    public static String DEFAULT_REPETITION_COUNTER_VARIABLE_NAME = "repetitionCounter";
-    
+
+    public static final String MAX_INSTANCE_COUNT_UNLIMITED_VALUE = "unlimited";
+    public static final Integer MAX_INSTANCE_COUNT_UNLIMITED = -1;
+
+    public static final String DEFAULT_REPETITION_COUNTER_VARIABLE_NAME = "repetitionCounter";
+
     protected String repetitionCounterVariableName;
+    protected String collectionVariableName;
+    protected String elementVariableName;
+    protected String elementIndexVariableName;
+    protected Integer maxInstanceCount;
 
     public String getRepetitionCounterVariableName() {
-        if (repetitionCounterVariableName != null) {
-            return repetitionCounterVariableName;
-        } else {
+        if (repetitionCounterVariableName == null) {
             return DEFAULT_REPETITION_COUNTER_VARIABLE_NAME;
         }
+        return repetitionCounterVariableName;
     }
 
     public void setRepetitionCounterVariableName(String repetitionCounterVariableName) {
         this.repetitionCounterVariableName = repetitionCounterVariableName;
     }
 
+    public String getCollectionVariableName() {
+        return collectionVariableName;
+    }
+
+    public boolean hasCollectionVariable() {
+        return StringUtils.isNotEmpty(collectionVariableName);
+    }
+
+    public void setCollectionVariableName(String collectionVariableName) {
+        this.collectionVariableName = collectionVariableName;
+    }
+
+    public String getElementVariableName() {
+        return elementVariableName;
+    }
+
+    public boolean hasElementVariable() {
+        return StringUtils.isNotEmpty(elementVariableName);
+    }
+
+    public void setElementVariableName(String elementVariableName) {
+        this.elementVariableName = elementVariableName;
+    }
+
+    public String getElementIndexVariableName() {
+        return elementIndexVariableName;
+    }
+
+    public boolean hasElementIndexVariable() {
+        return StringUtils.isNotEmpty(elementIndexVariableName);
+    }
+
+    public void setElementIndexVariableName(String elementIndexVariableName) {
+        this.elementIndexVariableName = elementIndexVariableName;
+    }
+
+    public boolean hasLimitedInstanceCount() {
+        return maxInstanceCount != null && maxInstanceCount > 0;
+    }
+
+    public Integer getMaxInstanceCount() {
+        return maxInstanceCount;
+    }
+
+    public void setMaxInstanceCount(Integer maxInstanceCount) {
+        this.maxInstanceCount = maxInstanceCount;
+    }
+
     @Override
     public String toString() {
         return "RepetitionRule{" +
-                "repetitionCounterVariableName='" + repetitionCounterVariableName + '\'' +
-                "} " + super.toString();
+                " maxInstanceCount='" + (hasLimitedInstanceCount() ? maxInstanceCount : "unlimited") + "'" +
+                " repetitionCounterVariableName='" + repetitionCounterVariableName + "'" +
+                " collectionVariableName='" + collectionVariableName + "'" +
+                " elementVariableName='" + elementVariableName + "'" +
+                " elementIndexVariableName='" + elementIndexVariableName + "'" +
+                " } " + super.toString();
     }
 }

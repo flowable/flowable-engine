@@ -14,13 +14,14 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.Milestone;
 
 /**
  * @author Joram Barrez
  */
-public class MilestoneXmlConverter extends PlanItemDefinitiomXmlConverter {
+public class MilestoneXmlConverter extends PlanItemDefinitionXmlConverter {
     
     @Override
     public String getXMLElementName() {
@@ -36,6 +37,19 @@ public class MilestoneXmlConverter extends PlanItemDefinitiomXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Milestone mileStone = new Milestone();
         mileStone.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        
+        String displayOrderString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DISPLAY_ORDER);
+        if (StringUtils.isNotEmpty(displayOrderString)) {
+            mileStone.setDisplayOrder(Integer.valueOf(displayOrderString));
+        }
+
+        String includeInStageOverviewString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW);
+        if (StringUtils.isNotEmpty(includeInStageOverviewString)) {
+            mileStone.setIncludeInStageOverview(includeInStageOverviewString);
+        } else {
+            mileStone.setIncludeInStageOverview("true");  // True by default
+        }
+        
         return mileStone;
     }
     

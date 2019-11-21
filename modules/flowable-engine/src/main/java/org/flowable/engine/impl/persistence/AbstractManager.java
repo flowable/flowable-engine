@@ -25,7 +25,6 @@ import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
@@ -110,10 +109,6 @@ public abstract class AbstractManager {
 
     protected ExecutionEntityManager getExecutionEntityManager() {
         return getProcessEngineConfiguration().getExecutionEntityManager();
-    }
-
-    protected EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
-        return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
     }
 
     protected ActivityInstanceEntityManager getActivityInstanceEntityManager() {

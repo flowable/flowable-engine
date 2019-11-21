@@ -17,13 +17,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance> {
+public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance>, DeleteQuery<HistoricCaseInstanceQuery, HistoricCaseInstance> {
 
     /**
      * Only select historic case instances with the given identifier.
@@ -267,6 +268,14 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     HistoricCaseInstanceQuery variableValueLikeIgnoreCase(String name, String value);
+
+    /**
+     * Only select case instances that have a name like (case insensitive) the given name.
+     *
+     * @param nameLikeIgnoreCase
+     *          cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+     */
+    HistoricCaseInstanceQuery caseInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
     
     /**
      * Only select case instances which have a variable with the given name.
@@ -285,6 +294,7 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery variableNotExists(String name);
     
     HistoricCaseInstanceQuery orderByCaseInstanceId();
+    HistoricCaseInstanceQuery orderByCaseInstanceName();
     HistoricCaseInstanceQuery orderByCaseDefinitionKey();
     HistoricCaseInstanceQuery orderByCaseDefinitionId();
     HistoricCaseInstanceQuery orderByStartTime();

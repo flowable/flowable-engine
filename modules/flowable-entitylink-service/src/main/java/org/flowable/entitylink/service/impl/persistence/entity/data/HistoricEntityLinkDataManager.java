@@ -32,4 +32,8 @@ public interface HistoricEntityLinkDataManager extends DataManager<HistoricEntit
     void deleteHistoricEntityLinksByScopeIdAndType(String scopeId, String scopeType);
     
     void deleteHistoricEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+    
+    void deleteHistoricEntityLinksForNonExistingProcessInstances();
+    
+    void deleteHistoricEntityLinksForNonExistingCaseInstances();
 }

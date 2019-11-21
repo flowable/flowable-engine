@@ -49,6 +49,8 @@ import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -58,6 +60,9 @@ import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.TimerJobService;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskService;
@@ -386,6 +391,25 @@ public class CommandContextUtil {
         return getEntityLinkServiceConfiguration(commandContext).getHistoricEntityLinkService();
     }
     
+    // EVENT SUBSCRIPTION SERVICE
+
+    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
+        return getEventSubscriptionServiceConfiguration(getCommandContext());
+    }
+
+    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration(CommandContext commandContext) {
+        return (EventSubscriptionServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG);
+    }
+
+    public static EventSubscriptionService getEventSubscriptionService() {
+        return getEventSubscriptionService(getCommandContext());
+    }
+
+    public static EventSubscriptionService getEventSubscriptionService(CommandContext commandContext) {
+        return getEventSubscriptionServiceConfiguration(commandContext).getEventSubscriptionService();
+    }
+    
     // VARIABLE SERVICE
 
     public static VariableServiceConfiguration getVariableServiceConfiguration() {
@@ -422,6 +446,33 @@ public class CommandContextUtil {
     public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
         return (TaskServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
                         .get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+    }
+    
+    // JOB SERVICE
+    
+    public static JobService getJobService() {
+        return getJobService(getCommandContext());
+    }
+
+    public static JobService getJobService(CommandContext commandContext) {
+        return getJobServiceConfiguration(commandContext).getJobService();
+    }
+    
+    public static TimerJobService getTimerJobService() {
+        return getTimerJobService(getCommandContext());
+    }
+
+    public static TimerJobService getTimerJobService(CommandContext commandContext) {
+        return getJobServiceConfiguration(commandContext).getTimerJobService();
+    }
+    
+    public static JobServiceConfiguration getJobServiceConfiguration() {
+        return getJobServiceConfiguration(getCommandContext());
+    }
+
+    public static JobServiceConfiguration getJobServiceConfiguration(CommandContext commandContext) {
+        return (JobServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
     }
 
     public static CmmnEngineAgenda getAgenda() {

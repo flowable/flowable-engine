@@ -15,6 +15,7 @@ package org.flowable.cmmn.converter.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.TimerEventListener;
 
@@ -31,6 +32,17 @@ public class TimerEventListenerExport extends AbstractPlanItemDefinitionExport<T
     @Override
     protected String getPlanItemDefinitionXmlElementValue(TimerEventListener timerEventListener) {
         return ELEMENT_TIMER_EVENT_LISTENER;
+    }
+
+    @Override
+    protected void writePlanItemDefinitionSpecificAttributes(TimerEventListener timerEventListener, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(timerEventListener, xtw);
+
+        if (StringUtils.isNotEmpty(timerEventListener.getAvailableConditionExpression())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION,
+                timerEventListener.getAvailableConditionExpression());
+        }
     }
 
     @Override

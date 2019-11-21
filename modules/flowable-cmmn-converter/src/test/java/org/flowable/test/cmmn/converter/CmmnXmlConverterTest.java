@@ -14,8 +14,8 @@ package org.flowable.test.cmmn.converter;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -26,6 +26,8 @@ import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.FlowableListener;
+import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -40,7 +42,7 @@ import org.junit.Test;
 /**
  * @author Joram Barrez
  */
-public class CmmnXmlConverterTest {
+public class CmmnXmlConverterTest extends AbstractConverterTest {
 
     private CmmnXmlConverter cmmnXmlConverter;
 
@@ -184,6 +186,21 @@ public class CmmnXmlConverterTest {
         assertEquals("Nested Stage 2", nestedNestedStage.getName());
         assertEquals(1, nestedNestedStage.getPlanItems().size());
         assertEquals("rootTask", nestedNestedStage.getPlanItems().get(0).getPlanItemDefinition().getId());
+    }
+
+    @Test
+    public void testCaseLifecycleListener() throws Exception {
+        CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("case-lifecycle-listeners.cmmn"));
+        cmmnModel = exportAndReadXMLFile(cmmnModel);
+        
+        assertEquals(1, cmmnModel.getCases().size());
+        Case aCase = cmmnModel.getCases().get(0);
+        assertEquals(1, aCase.getLifecycleListeners().size());
+        FlowableListener caseListener = aCase.getLifecycleListeners().get(0);
+        assertEquals("active", caseListener.getSourceState());
+        assertEquals("completed", caseListener.getTargetState());
+        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, caseListener.getImplementationType());
+        assertEquals("${caseInstance.setVariable('stageThree', false)}", caseListener.getImplementation());
     }
 
     @Test

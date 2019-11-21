@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 public abstract class AbstractJobServiceEntity extends AbstractEntity {
 
+    @Override
     public String getIdPrefix() {
         return JobServiceEntityConstants.JOB_SERVICE_ID_PREFIX;
     }

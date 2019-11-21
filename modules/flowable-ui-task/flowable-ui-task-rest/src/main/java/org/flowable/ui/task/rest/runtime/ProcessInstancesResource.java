@@ -16,9 +16,9 @@ import org.flowable.ui.task.model.runtime.CreateProcessInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.ProcessInstanceRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableProcessInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,7 +28,7 @@ public class ProcessInstancesResource {
     @Autowired
     protected FlowableProcessInstanceService processInstanceService;
 
-    @RequestMapping(value = "/rest/process-instances", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/process-instances")
     public ProcessInstanceRepresentation startNewProcessInstance(@RequestBody CreateProcessInstanceRepresentation startRequest) {
         return processInstanceService.startNewProcessInstance(startRequest);
     }

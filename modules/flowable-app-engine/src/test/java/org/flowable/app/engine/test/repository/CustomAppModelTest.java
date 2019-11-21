@@ -55,4 +55,26 @@ public class CustomAppModelTest extends FlowableAppTestCase {
             appRepositoryService.deleteDeployment(deploymentId, true);
         }
     }
+
+    @Test
+    public void testAppDefinitionDeployedThroughDefaultConverter() {
+        String deploymentId = null;
+        try {
+            deploymentId = appRepositoryService.createDeployment().addClasspathResource("org/flowable/app/engine/test/extraInfoApp.app").deploy().getId();
+            AppDeployment appDeployment = appRepositoryService.createDeploymentQuery().singleResult();
+            assertNotNull(appDeployment);
+
+            AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().appDefinitionKey("extraInfoApp").singleResult();
+            assertNotNull(appDefinition);
+
+            AppModel appModel = appRepositoryService.getAppModel(appDefinition.getId());
+            assertNotNull(appModel);
+
+        } finally {
+            if (deploymentId != null) {
+                appRepositoryService.deleteDeployment(deploymentId, true);
+            }
+        }
+    }
+
 }

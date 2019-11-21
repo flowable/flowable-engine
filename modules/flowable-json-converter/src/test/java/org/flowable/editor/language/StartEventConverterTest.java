@@ -54,6 +54,7 @@ public class StartEventConverterTest extends AbstractConverterTest {
         assertEquals("start", startEvent.getId());
         assertEquals("startName", startEvent.getName());
         assertEquals("startFormKey", startEvent.getFormKey());
+        assertEquals("formFieldValidationValue", startEvent.getValidateFormFields());
         assertEquals("startInitiator", startEvent.getInitiator());
         assertEquals("startDoc", startEvent.getDocumentation());
 

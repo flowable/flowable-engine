@@ -40,6 +40,12 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     DeadLetterJobQuery processDefinitionId(String processDefinitionId);
     
+    /** Only select jobs which exist for the given element id */
+    DeadLetterJobQuery elementId(String elementId);
+    
+    /** Only select jobs which exist for the given element name */
+    DeadLetterJobQuery elementName(String elementName);
+    
     /** Only select jobs for the given scope identifier. */
     DeadLetterJobQuery scopeId(String scopeId);
 

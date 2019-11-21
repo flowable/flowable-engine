@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.admin.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.CaseInstanceService;
@@ -21,16 +23,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 @RequestMapping("/app")
@@ -41,7 +43,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
     @Autowired
     protected CaseInstanceService clientService;
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}", produces = "application/json")
     public JsonNode getProcessInstance(@PathVariable String caseInstanceId, @RequestParam(required = false, defaultValue = "false") boolean runtime) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -53,7 +55,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/tasks", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/tasks")
     public JsonNode getSubtasks(@PathVariable String caseInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -64,7 +66,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables")
     public JsonNode getVariables(@PathVariable String caseInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -75,7 +77,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables/{variableName}", method = RequestMethod.PUT)
+    @PutMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables/{variableName}")
     @ResponseStatus(value = HttpStatus.OK)
     public void updateVariable(@PathVariable String caseInstanceId, @PathVariable String variableName, @RequestBody ObjectNode body) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -87,7 +89,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables")
     @ResponseStatus(value = HttpStatus.OK)
     public void createVariable(@PathVariable String caseInstanceId, @RequestBody ObjectNode body) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -99,7 +101,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/case-instances/{caseInstanceId}/variables/{variableName}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteVariable(@PathVariable String caseInstanceId, @PathVariable String variableName) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -111,7 +113,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/jobs", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/jobs")
     public JsonNode getJobs(@PathVariable String caseInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
@@ -122,7 +124,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}", method = RequestMethod.POST)
+    @PostMapping(value = "/rest/admin/case-instances/{caseInstanceId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void executeAction(@PathVariable String caseInstanceId, @RequestBody JsonNode actionBody) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -134,7 +136,7 @@ public class CaseInstanceClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/case-instances/{caseInstanceId}/decision-executions", method = RequestMethod.GET)
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/decision-executions")
     public JsonNode getDecisionExecutions(@PathVariable String caseInstanceId) throws BadRequestException {
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
         try {

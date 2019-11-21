@@ -21,21 +21,55 @@ import org.flowable.cmmn.model.IOParameter;
  * @author Joram Barrez
  */
 public interface ProcessInstanceService {
-    
+
+    /**
+     * @return A new id that will be used when starting a process instance.
+     *         This is for example needed to set the bidrectional relation
+     *         when a case instance starts a process instance through a process task.
+     */
     String generateNewProcessInstanceId();
 
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String tenantId, 
-                    Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap);
+    /**
+     * Starts a process instance without a reference to a plan item instance (i.e. non-blocking behavior).
+     */
+    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String tenantId,
+                    Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey);
 
+    /**
+     * Starts a process instance with a reference to a plan item instance (i.e. blocking behavior).
+     */
     String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId,
-                    String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap);
-    
-    void triggerCaseTask(String executionId, Map<String, Object> variables);
-    
-    List<IOParameter> getOutputParametersOfCaseTask(String executionId);
+                    String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey);
 
+    /**
+     * Deletes the given process instance. Typically used to propagate termination.
+     */
     void deleteProcessInstance(String processInstanceId);
 
+    /**
+     * Returns the variable value for a given variable.
+     */
+    Object getVariable(String executionId, String variableName);
+
+    /**
+     * Returns all variables for the given execution (or process instance).
+     */
     Map<String, Object> getVariables(String executionId);
+
+    /**
+     * Resolves the given expression within the context of the passed execution.
+     */
+    Object resolveExpression(String executionId, String expression);
+
+    /**
+     * Triggeres a case instance that was started by a process instance.
+     */
+    void triggerCaseTask(String executionId, Map<String, Object> variables);
+
+    /**
+     * Retrieves the {@link IOParameter} out parameters of a case task currently being execution by the given execution.
+     */
+    List<IOParameter> getOutputParametersOfCaseTask(String executionId);
+
 
 }

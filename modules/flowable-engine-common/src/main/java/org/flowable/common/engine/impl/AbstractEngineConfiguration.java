@@ -17,7 +17,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +35,7 @@ import java.util.Set;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -44,6 +48,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
@@ -57,6 +62,8 @@ import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
+import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
+import org.flowable.common.engine.impl.interceptor.CrDbRetryInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContextFactory;
@@ -67,11 +74,17 @@ import org.flowable.common.engine.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.common.engine.impl.interceptor.LogInterceptor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
@@ -127,6 +140,11 @@ public abstract class AbstractEngineConfiguration {
 
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
 
+    /**
+     * Whether to use a lock when performing the database schema create or update operations.
+     */
+    protected boolean useLockForDatabaseSchemaUpdate = false;
+
     protected String xmlEncoding = "UTF-8";
 
     // COMMAND EXECUTORS ///////////////////////////////////////////////
@@ -175,6 +193,7 @@ public abstract class AbstractEngineConfiguration {
 
     public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 60; // currently Execution has most params (31). 2000 / 31 = 64.
 
+    protected String mybatisMappingFile;
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
     protected List<Interceptor> customMybatisInterceptors;
@@ -247,14 +266,19 @@ public abstract class AbstractEngineConfiguration {
     protected boolean tablePrefixIsSchema;
     
     /**
+     * Set to true if the latest version of a definition should be retrieved, ignoring a possible parent deployment id value
+     */
+    protected boolean alwaysLookupLatestDefinitionVersion;
+    
+    /**
      * Set to true if by default lookups should fallback to the default tenant (an empty string by default or a defined tenant value)
      */
     protected boolean fallbackToDefaultTenant;
-    
+
     /**
-     * Default tenant value that is used when looking up definitions when the global or local fallback to default tenant value is true
+     * Default tenant provider that is executed when looking up definitions, in case the global or local fallback to default tenant value is true
      */
-    protected String defaultTenantValue = NO_TENANT_ID;
+    protected DefaultTenantProvider defaultTenantProvider = (tenantId, scope, scopeKey) -> NO_TENANT_ID;
 
     /**
      * Enables the MyBatis plugin that logs the execution time of sql statements.
@@ -262,6 +286,24 @@ public abstract class AbstractEngineConfiguration {
     protected boolean enableLogSqlExecutionTime;
 
     protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+
+    /**
+     * Duration between the checks when acquiring a lock.
+     */
+    protected Duration lockPollRate = Duration.ofSeconds(10);
+
+    /**
+     * Duration to wait for the DB Schema lock before giving up.
+     */
+    protected Duration schemaLockWaitTime = Duration.ofMinutes(5);
+
+    // DATA MANAGERS //////////////////////////////////////////////////////////////////
+
+    protected PropertyDataManager propertyDataManager;
+
+    // ENTITY MANAGERS ////////////////////////////////////////////////////////////////
+
+    protected PropertyEntityManager propertyEntityManager;
 
     protected List<EngineDeployer> customPreDeployers;
     protected List<EngineDeployer> customPostDeployers;
@@ -274,6 +316,9 @@ public abstract class AbstractEngineConfiguration {
     protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
     protected EngineConfigurator idmEngineConfigurator;
 
+    public static final String PRODUCT_NAME_POSTGRES = "PostgreSQL";
+    public static final String PRODUCT_NAME_CRDB = "CockroachDB";
+
     public static final String DATABASE_TYPE_H2 = "h2";
     public static final String DATABASE_TYPE_HSQL = "hsql";
     public static final String DATABASE_TYPE_MYSQL = "mysql";
@@ -281,14 +326,16 @@ public abstract class AbstractEngineConfiguration {
     public static final String DATABASE_TYPE_POSTGRES = "postgres";
     public static final String DATABASE_TYPE_MSSQL = "mssql";
     public static final String DATABASE_TYPE_DB2 = "db2";
+    public static final String DATABASE_TYPE_COCKROACHDB = "cockroachdb";
 
     public static Properties getDefaultDatabaseTypeMappings() {
         Properties databaseTypeMappings = new Properties();
         databaseTypeMappings.setProperty("H2", DATABASE_TYPE_H2);
         databaseTypeMappings.setProperty("HSQL Database Engine", DATABASE_TYPE_HSQL);
         databaseTypeMappings.setProperty("MySQL", DATABASE_TYPE_MYSQL);
+        databaseTypeMappings.setProperty("MariaDB", DATABASE_TYPE_MYSQL);
         databaseTypeMappings.setProperty("Oracle", DATABASE_TYPE_ORACLE);
-        databaseTypeMappings.setProperty("PostgreSQL", DATABASE_TYPE_POSTGRES);
+        databaseTypeMappings.setProperty(PRODUCT_NAME_POSTGRES, DATABASE_TYPE_POSTGRES);
         databaseTypeMappings.setProperty("Microsoft SQL Server", DATABASE_TYPE_MSSQL);
         databaseTypeMappings.setProperty(DATABASE_TYPE_DB2, DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2", DATABASE_TYPE_DB2);
@@ -311,6 +358,7 @@ public abstract class AbstractEngineConfiguration {
         databaseTypeMappings.setProperty("DB2/PTX", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2/2", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2 UDB AS400", DATABASE_TYPE_DB2);
+        databaseTypeMappings.setProperty(PRODUCT_NAME_CRDB, DATABASE_TYPE_COCKROACHDB);
         return databaseTypeMappings;
     }
 
@@ -401,6 +449,23 @@ public abstract class AbstractEngineConfiguration {
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String databaseProductName = databaseMetaData.getDatabaseProductName();
             logger.debug("database product name: '{}'", databaseProductName);
+
+            // CRDB does not expose the version through the jdbc driver, so we need to fetch it through version().
+            if (PRODUCT_NAME_POSTGRES.equalsIgnoreCase(databaseProductName)) {
+                PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
+                ResultSet resultSet = preparedStatement.executeQuery();
+                String version = null;
+                if (resultSet.next()) {
+                    version = resultSet.getString("version");
+                }
+                resultSet.close();
+
+                if (StringUtils.isNotEmpty(version) && version.toLowerCase().startsWith(PRODUCT_NAME_CRDB.toLowerCase())) {
+                    databaseProductName = PRODUCT_NAME_CRDB;
+                    logger.info("CockroachDB version '{}' detected", version);
+                }
+            }
+
             databaseType = databaseTypeMappings.getProperty(databaseProductName);
             if (databaseType == null) {
                 throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
@@ -496,6 +561,10 @@ public abstract class AbstractEngineConfiguration {
             List<CommandInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new LogInterceptor());
 
+            if (DATABASE_TYPE_COCKROACHDB.equals(databaseType)) {
+                interceptors.add(new CrDbRetryInterceptor());
+            }
+
             CommandInterceptor transactionInterceptor = createTransactionInterceptor();
             if (transactionInterceptor != null) {
                 interceptors.add(transactionInterceptor);
@@ -569,6 +638,22 @@ public abstract class AbstractEngineConfiguration {
     public void initClock() {
         if (clock == null) {
             clock = new DefaultClockImpl();
+        }
+    }
+
+    // Data managers ///////////////////////////////////////////////////////////
+
+    public void initDataManagers() {
+        if (propertyDataManager == null) {
+            propertyDataManager = new MybatisPropertyDataManager();
+        }
+    }
+
+    // Entity managers //////////////////////////////////////////////////////////
+
+    public void initEntityManagers() {
+        if (propertyEntityManager == null) {
+            propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
         }
     }
 
@@ -679,6 +764,7 @@ public abstract class AbstractEngineConfiguration {
                 properties.put("limitBefore", "");
                 properties.put("limitAfter", "");
                 properties.put("limitBetween", "");
+                properties.put("limitBetweenNoDistinct", "");
                 properties.put("limitOuterJoinBetween", "");
                 properties.put("limitBeforeNativeQuery", "");
                 properties.put("blobType", "BLOB");
@@ -798,6 +884,14 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
+    public void setMybatisMappingFile(String file) {
+        this.mybatisMappingFile = file;
+    }
+
+    public String getMybatisMappingFile() {
+        return mybatisMappingFile;
+    }
+
     public abstract InputStream getMyBatisXmlConfigurationStream();
     
     public void initConfigurators() {
@@ -825,7 +919,7 @@ public abstract class AbstractEngineConfiguration {
             }
 
             if (nrOfServiceLoadedConfigurators > 0) {
-                logger.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
+                logger.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
             }
 
             if (!allConfigurators.isEmpty()) {
@@ -886,7 +980,11 @@ public abstract class AbstractEngineConfiguration {
             logger.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
-    }    
+    }
+
+    public LockManager getLockManager(String lockName) {
+        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate());
+    }
 
     // getters and setters
     // //////////////////////////////////////////////////////
@@ -1347,6 +1445,14 @@ public abstract class AbstractEngineConfiguration {
         return customSessionFactories;
     }
 
+    public AbstractEngineConfiguration addCustomSessionFactory(SessionFactory sessionFactory) {
+        if (customSessionFactories == null) {
+            customSessionFactories = new ArrayList<>();
+        }
+        customSessionFactories.add(sessionFactory);
+        return this;
+    }
+
     public AbstractEngineConfiguration setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
         this.customSessionFactories = customSessionFactories;
         return this;
@@ -1415,6 +1521,15 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public boolean isAlwaysLookupLatestDefinitionVersion() {
+        return alwaysLookupLatestDefinitionVersion;
+    }
+
+    public AbstractEngineConfiguration setAlwaysLookupLatestDefinitionVersion(boolean alwaysLookupLatestDefinitionVersion) {
+        this.alwaysLookupLatestDefinitionVersion = alwaysLookupLatestDefinitionVersion;
+        return this;
+    }
+
     public boolean isFallbackToDefaultTenant() {
         return fallbackToDefaultTenant;
     }
@@ -1424,12 +1539,26 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    /**
+     * @return name of the default tenant
+     * @deprecated use {@link AbstractEngineConfiguration#getDefaultTenantProvider()} instead
+     */
+    @Deprecated
     public String getDefaultTenantValue() {
-        return defaultTenantValue;
+        return getDefaultTenantProvider().getDefaultTenant(null, null, null);
     }
 
     public AbstractEngineConfiguration setDefaultTenantValue(String defaultTenantValue) {
-        this.defaultTenantValue = defaultTenantValue;
+        this.defaultTenantProvider = (tenantId, scope, scopeKey) -> defaultTenantValue;
+        return this;
+    }
+
+    public DefaultTenantProvider getDefaultTenantProvider() {
+        return defaultTenantProvider;
+    }
+
+    public AbstractEngineConfiguration setDefaultTenantProvider(DefaultTenantProvider defaultTenantProvider) {
+        this.defaultTenantProvider = defaultTenantProvider;
         return this;
     }
 
@@ -1456,6 +1585,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
+        return this;
+    }
+
+    public boolean isUseLockForDatabaseSchemaUpdate() {
+        return useLockForDatabaseSchemaUpdate;
+    }
+
+    public AbstractEngineConfiguration setUseLockForDatabaseSchemaUpdate(boolean useLockForDatabaseSchemaUpdate) {
+        this.useLockForDatabaseSchemaUpdate = useLockForDatabaseSchemaUpdate;
         return this;
     }
 
@@ -1504,6 +1642,46 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public void initEventDispatcher() {
+        if (this.eventDispatcher == null) {
+            this.eventDispatcher = new FlowableEventDispatcherImpl();
+        }
+
+        initAdditionalEventDispatchActions();
+
+        this.eventDispatcher.setEnabled(enableEventDispatcher);
+
+        initEventListeners();
+        initTypedEventListeners();
+    }
+
+    protected void initEventListeners() {
+        if (eventListeners != null) {
+            for (FlowableEventListener listenerToAdd : eventListeners) {
+                this.eventDispatcher.addEventListener(listenerToAdd);
+            }
+        }
+    }
+
+    protected void initAdditionalEventDispatchActions() {
+        if (this.additionalEventDispatchActions == null) {
+            this.additionalEventDispatchActions = new ArrayList<>();
+        }
+    }
+
+    protected void initTypedEventListeners() {
+        if (typedEventListeners != null) {
+            for (Map.Entry<String, List<FlowableEventListener>> listenersToAdd : typedEventListeners.entrySet()) {
+                // Extract types from the given string
+                FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(listenersToAdd.getKey());
+
+                for (FlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
+                    this.eventDispatcher.addEventListener(listenerToAdd, types);
+                }
+            }
+        }
+    }
+
     public Clock getClock() {
         return clock;
     }
@@ -1531,6 +1709,41 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
         this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+
+    public PropertyDataManager getPropertyDataManager() {
+        return propertyDataManager;
+    }
+
+    public Duration getLockPollRate() {
+        return lockPollRate;
+    }
+
+    public AbstractEngineConfiguration setLockPollRate(Duration lockPollRate) {
+        this.lockPollRate = lockPollRate;
+        return this;
+    }
+
+    public Duration getSchemaLockWaitTime() {
+        return schemaLockWaitTime;
+    }
+
+    public void setSchemaLockWaitTime(Duration schemaLockWaitTime) {
+        this.schemaLockWaitTime = schemaLockWaitTime;
+    }
+
+    public AbstractEngineConfiguration setPropertyDataManager(PropertyDataManager propertyDataManager) {
+        this.propertyDataManager = propertyDataManager;
+        return this;
+    }
+
+    public PropertyEntityManager getPropertyEntityManager() {
+        return propertyEntityManager;
+    }
+
+    public AbstractEngineConfiguration setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
+        this.propertyEntityManager = propertyEntityManager;
         return this;
     }
 

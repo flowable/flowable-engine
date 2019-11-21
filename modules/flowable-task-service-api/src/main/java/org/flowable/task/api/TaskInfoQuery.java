@@ -13,9 +13,8 @@
 package org.flowable.task.api;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
@@ -43,17 +42,17 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * @throws FlowableIllegalArgumentException
      *             When passed name list is empty or <code>null</code> or contains <code>null String</code>.
      */
-    T taskNameIn(List<String> nameList);
+    T taskNameIn(Collection<String> nameList);
 
     /**
      * Only select tasks with a name that is in the given list
      * 
-     * This method, unlike the {@link #taskNameIn(List)} method will not take in account the upper/lower case: both the input parameters as the column value are lowercased when the query is executed.
+     * This method, unlike the {@link #taskNameIn(Collection)} method will not take in account the upper/lower case: both the input parameters as the column value are lowercased when the query is executed.
      * 
      * @throws FlowableIllegalArgumentException
      *             When passed name list is empty or <code>null</code> or contains <code>null String</code>.
      */
-    T taskNameInIgnoreCase(List<String> nameList);
+    T taskNameInIgnoreCase(Collection<String> nameList);
 
     /**
      * Only select tasks with a name matching the parameter. The syntax is that of SQL: for example usage: nameLike(%test%)
@@ -115,7 +114,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * @throws FlowableIllegalArgumentException
      *             When passed name list is empty or <code>null</code> or contains <code>null String</code>.
      */
-    T taskAssigneeIds(List<String> assigneeListIds);
+    T taskAssigneeIds(Collection<String> assigneeListIds);
 
     /** Only select tasks for which the given user is the owner. */
     T taskOwner(String owner);
@@ -144,10 +143,10 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     /**
      * Only select tasks for which there exist an {@link IdentityLink} with the given Groups.
      */
-    T taskInvolvedGroups(Set<String> involvedGroup);
+    T taskInvolvedGroups(Collection<String> involvedGroup);
 
     /**
-     * Allows to select a task using {@link #taskCandidateGroup(String)} {@link #taskCandidateGroupIn(List)} or {@link #taskCandidateUser(String)} but ignore the assignee value instead of querying for an empty assignee.
+     * Allows to select a task using {@link #taskCandidateGroup(String)} {@link #taskCandidateGroupIn(Collection)} or {@link #taskCandidateUser(String)} but ignore the assignee value instead of querying for an empty assignee.
      */
     T ignoreAssigneeValue();
 
@@ -161,7 +160,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      *             When query is executed and {@link #taskCandidateGroup(String)} or {@link #taskCandidateUser(String)} has been executed on the query instance. When passed group list is empty or
      *             <code>null</code>.
      */
-    T taskCandidateGroupIn(List<String> candidateGroups);
+    T taskCandidateGroupIn(Collection<String> candidateGroups);
 
     /**
      * Only select tasks that have the given tenant id.
@@ -186,7 +185,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     /**
      * Only select tasks for the given process ids.
      */
-    T processInstanceIdIn(List<String> processInstanceIds);
+    T processInstanceIdIn(Collection<String> processInstanceIds);
 
     /** Only select tasks foe the given business key */
     T processInstanceBusinessKey(String processInstanceBusinessKey);
@@ -245,12 +244,12 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T scopeDefinitionId(String scopeDefinitionId);
     
     /**
-     * Select all tasks for the given process id and its children.
+     * Select all tasks for the given process instance id and its children.
      */
     T processInstanceIdWithChildren(String processInstanceId);
     
     /**
-     * Select all tasks for the given process id and its children.
+     * Select all tasks for the given case instance id and its children.
      */
     T caseInstanceIdWithChildren(String caseInstanceId);
 
@@ -280,6 +279,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T taskWithFormKey();
 
     /**
+     * Only select tasks with the given formKey.
+     */
+    T taskFormKey(String formKey);
+
+    /**
      * Only select tasks with the given taskDefinitionKey. The task definition key is the id of the userTask: &lt;userTask id="xxx" .../&gt;
      **/
     T taskDefinitionKey(String key);
@@ -289,6 +293,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * the userTask: &lt;userTask id="xxx" .../&gt;
      **/
     T taskDefinitionKeyLike(String keyLike);
+
+    /**
+     * Only select tasks with the given taskDefinitionKeys. The task definition key is the id of the userTask: &lt;userTask id="xxx" .../&gt;
+     **/
+    T taskDefinitionKeys(Collection<String> keys);
 
     /**
      * Only select tasks with the given due date.
@@ -329,7 +338,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T processDefinitionKeyLikeIgnoreCase(String processDefinitionKeyLikeIgnoreCase);
 
     /** Only select tasks that have a process definition for which the key is present in the given list **/
-    T processDefinitionKeyIn(List<String> processDefinitionKeys);
+    T processDefinitionKeyIn(Collection<String> processDefinitionKeys);
 
     /**
      * Only select tasks which created from the given task definition referenced by id.
@@ -358,7 +367,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      *             When passed category list is empty or <code>null</code> or contains <code>null String</code>.
      * @param processCategoryInList
      */
-    T processCategoryIn(List<String> processCategoryInList);
+    T processCategoryIn(Collection<String> processCategoryInList);
 
     /**
      * Only select tasks which are part of a process instance whose definition does not belong to the category which is present in the given list.
@@ -367,7 +376,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      *             When passed category list is empty or <code>null</code> or contains <code>null String</code>.
      * @param processCategoryNotInList
      */
-    T processCategoryNotIn(List<String> processCategoryNotInList);
+    T processCategoryNotIn(Collection<String> processCategoryNotInList);
 
     /**
      * Only select tasks which are part of a process instance which has the given deployment id.
@@ -377,7 +386,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     /**
      * Only select tasks which are part of a process instance which has the given deployment id.
      */
-    T deploymentIdIn(List<String> deploymentIds);
+    T deploymentIdIn(Collection<String> deploymentIds);
     
     /**
      * Only select tasks which are related to a case instance for to the given deployment id.
@@ -387,7 +396,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     /**
      * Only select tasks which are related to a case instances for the given deployment id.
      */
-    T cmmnDeploymentIdIn(List<String> cmmnDeploymentIds);
+    T cmmnDeploymentIdIn(Collection<String> cmmnDeploymentIds);
 
     /**
      * Only select tasks which have a local task variable with the given name set to the given value.
@@ -650,7 +659,13 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     /**
      * All query clauses called will be added to a single or-statement. This or-statement will be included with the other already existing clauses in the query, joined by an 'and'.
      * 
-     * Calling endOr() will add all clauses to the regular query again. Calling or() after endOr() has been called will result in an exception.
+     * Calling endOr() will add all clauses to the regular query again. Calling or() after or() has been called or calling endOr() after endOr() has been called will result in an exception.
+     * It is possible to call or() endOr() several times if each or() has a matching endOr(), e.g.:
+     * query.<ConditionA>
+     *  .or().<conditionB>.<conditionC>.endOr()
+     *  .<conditionD>.<conditionE>
+     *  .or().<conditionF>.<conditionG>.endOr()
+     * will result in: conditionA & (conditionB | conditionC) & conditionD & conditionE & (conditionF | conditionG)
      */
     T or();
 

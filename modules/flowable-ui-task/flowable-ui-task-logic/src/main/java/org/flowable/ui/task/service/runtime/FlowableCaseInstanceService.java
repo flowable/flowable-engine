@@ -251,7 +251,7 @@ public class FlowableCaseInstanceService {
             .caseDefinitionId(startRequest.getCaseDefinitionId())
             .name(startRequest.getName())
             .outcome(startRequest.getOutcome())
-            .variables(startRequest.getValues())
+            .startFormVariables(startRequest.getValues())
             .startWithForm();
 
         User user = null;

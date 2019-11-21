@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import java.util.Map;
+
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -30,9 +32,15 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planCreatePlanItemInstanceForRepetitionOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
+    void planInitiatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planDismissPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
     void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
     
     void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
+    
+    void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Map<String, Object> variables);
     
     void planEnablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
 
@@ -44,17 +52,19 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planOccurPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId);
+    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType);
 
-    void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType);
 
     void planTriggerPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planCompleteCaseInstanceOperation(CaseInstanceEntity caseInstanceEntity);
 
     void planManualTerminateCaseInstanceOperation(String caseInstanceEntityId);
 
-    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId);
+    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId, String exitType, String exitEventType);
 
     void planEvaluateCriteriaOperation(String caseInstanceEntityId);
     

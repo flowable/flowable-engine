@@ -14,6 +14,8 @@ package org.flowable.engine.test.bpmn.event.timer;
 
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -41,7 +43,8 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     public void testDurationStartTimerEvent() throws Exception {
 
         // Set the clock fixed
-        Date startTime = new Date();
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date startTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(373));
 
         // After process start, there should be timer created
         TimerJobQuery jobQuery = managementService.createTimerJobQuery();
@@ -79,7 +82,8 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testCycleDateStartTimerEvent() throws Exception {
-        processEngineConfiguration.getClock().setCurrentTime(new Date());
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(730)));
 
         // After process start, there should be timer created
         TimerJobQuery jobQuery = managementService.createTimerJobQuery();
@@ -117,7 +121,8 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testCycleWithLimitStartTimerEvent() throws Exception {
-        processEngineConfiguration.getClock().setCurrentTime(new Date());
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(620)));
 
         // After process start, there should be timer created
         TimerJobQuery jobQuery = managementService.createTimerJobQuery();
@@ -155,7 +160,8 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testVersionUpgradeShouldCancelJobs() throws Exception {
-        processEngineConfiguration.getClock().setCurrentTime(new Date());
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(293)));
 
         // After process start, there should be timer created
         TimerJobQuery jobQuery = managementService.createTimerJobQuery();

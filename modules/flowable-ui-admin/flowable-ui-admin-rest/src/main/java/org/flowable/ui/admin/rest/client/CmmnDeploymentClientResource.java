@@ -12,8 +12,7 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.CmmnDeploymentService;
@@ -22,12 +21,13 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -41,7 +41,7 @@ public class CmmnDeploymentClientResource extends AbstractClientResource {
     @Autowired
     protected CmmnDeploymentService clientService;
 
-    @RequestMapping(value = "/rest/admin/cmmn-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/cmmn-deployments/{deploymentId}", produces = "application/json")
     public JsonNode getCmmnDeployment(@PathVariable String deploymentId) throws BadRequestException {
 
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -53,7 +53,7 @@ public class CmmnDeploymentClientResource extends AbstractClientResource {
         }
     }
 
-    @RequestMapping(value = "/rest/admin/cmmn-deployments/{deploymentId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/rest/admin/cmmn-deployments/{deploymentId}")
     public void deleteCmmnDeployment(@PathVariable String deploymentId, HttpServletResponse httpResponse) {
         clientService.deleteDeployment(retrieveServerConfig(EndpointType.CMMN), httpResponse, deploymentId);
     }

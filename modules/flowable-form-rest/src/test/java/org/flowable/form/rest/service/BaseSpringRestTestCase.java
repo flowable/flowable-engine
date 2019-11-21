@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -219,7 +220,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
             if (expectedStatusCode != responseStatusCode) {
                 LOGGER.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
                 if (response.getEntity() != null) {
-                    LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent(), "utf-8"));
+                    LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
                 }
             }
 
@@ -271,27 +272,23 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     }
 
     protected void storeFormInstance(String url, String body) throws IOException {
-
         HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
         post.setEntity(new StringEntity(body));
         CloseableHttpResponse response = executeRequest(post, HttpStatus.SC_OK);
         closeResponse(response);
-
     }
 
     /**
      * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
      */
     protected void assertResultsPresentInDataResponse(String url, String submittedBy, String... expectedResourceIds) throws IOException {
-        int numberOfResultsExpected = expectedResourceIds.length;
-
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-       // assertEquals(numberOfResultsExpected, dataNode.size());
+        // assertEquals(numberOfResultsExpected, dataNode.size());
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));

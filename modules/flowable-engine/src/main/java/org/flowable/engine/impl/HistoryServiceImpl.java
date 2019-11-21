@@ -29,6 +29,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskLogEntryByLogNumberCmd;
+import org.flowable.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd;
+import org.flowable.engine.impl.cmd.DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkChildrenForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkChildrenForTaskCmd;
 import org.flowable.engine.impl.cmd.GetHistoricEntityLinkParentsForProcessInstanceCmd;
@@ -36,17 +38,17 @@ import org.flowable.engine.impl.cmd.GetHistoricEntityLinkParentsForTaskCmd;
 import org.flowable.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
-import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
-import org.flowable.task.service.impl.NativeHistoricTaskInstanceQueryImpl;
-import org.flowable.task.service.impl.NativeHistoricTaskLogEntryQueryImpl;
 import org.flowable.task.service.impl.HistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl;
+import org.flowable.task.service.impl.NativeHistoricTaskInstanceQueryImpl;
+import org.flowable.task.service.impl.NativeHistoricTaskLogEntryQueryImpl;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
@@ -106,6 +108,16 @@ public class HistoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void deleteHistoricProcessInstance(String processInstanceId) {
         commandExecutor.execute(new DeleteHistoricProcessInstanceCmd(processInstanceId));
+    }
+
+    @Override
+    public void deleteTaskAndActivityDataOfRemovedHistoricProcessInstances() {
+        commandExecutor.execute(new DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd());
+    }
+
+    @Override
+    public void deleteRelatedDataOfRemovedHistoricProcessInstances() {
+        commandExecutor.execute(new DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd());
     }
 
     @Override

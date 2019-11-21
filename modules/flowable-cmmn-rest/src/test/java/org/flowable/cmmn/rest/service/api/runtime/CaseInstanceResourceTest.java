@@ -137,37 +137,38 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
 
     @CmmnDeployment
     public void testStageOverview() throws Exception {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverview").start();
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testStageOverview")
+                .variable("includeInOverview", true)
+                .variable("includeInOverviewNegative", false)
+                .start();
 
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
 
         ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(4, stageOverviewResponse.size());
+        assertEquals(3, stageOverviewResponse.size());
         assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
-        assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
-        assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
 
         // We're doing a wrong time ordering, to test that the display order has precedence over the end time
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(4, stageOverviewResponse.size());
+        assertEquals(3, stageOverviewResponse.size());
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
-        assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
-        assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
 
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)));
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(4, stageOverviewResponse.size());
+        assertEquals(3, stageOverviewResponse.size());
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", true, false);
-        assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
-        assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
     }
 
     @CmmnDeployment
@@ -221,7 +222,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
         assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
-        assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(3), "Stage four", false, false);
 
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(9, ChronoUnit.DAYS)));
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
@@ -231,8 +232,86 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(0), "Stage two", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
-        assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(3), "Stage four", false, false);
     }
+    
+    @CmmnDeployment
+    public void testStageAndMilestoneOverview() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testStageOverview")
+                .variable("includeInOverview", true)
+                .variable("includeInOverviewNegative", false)
+                .start();
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
+
+        ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", false, true);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", false, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", false, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+
+        // We're doing a wrong time ordering, to test that the display order has precedence over the end time
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", false, true);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", false, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(6, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
+        assertStage(stageOverviewResponse.get(3), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(4), "Milestone four", true, false);
+        assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
+    }
+
+    @CmmnDeployment
+    public void testStageOverviewWithRepetition() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverviewWithRepetition").start();
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
+
+        ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(3, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
+        assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
+
+        // We're doing a wrong time ordering, to test that the display order has precedence over the end time
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(3, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(9, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertEquals(3, stageOverviewResponse.size());
+        assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
+    }
+
 
     protected ArrayNode getStageOverviewResponse(CaseInstance caseInstance) throws IOException {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
@@ -248,7 +327,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     protected void assertStage(JsonNode jsonNode, String name, boolean isEnded, boolean isCurrent) {
         assertEquals(name, jsonNode.get("name").asText());
         assertEquals("'ended' boolean is wrong", isEnded, jsonNode.get("ended").asBoolean());
-        assertEquals("current boolean is wrong", isCurrent, jsonNode.get("current").asBoolean());
+        assertEquals("'current' boolean is wrong", isCurrent, jsonNode.get("current").asBoolean());
     }
     
     public static class TestBean implements Serializable {

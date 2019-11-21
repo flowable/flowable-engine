@@ -13,7 +13,7 @@
 package org.flowable.crystalball.simulator.impl.replay;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
@@ -114,7 +114,7 @@ public class ReplayEventLogTest {
                 .processDefinitionKey(USERTASK_PROCESS)
                 .singleResult();
         assertNotNull(replayProcessInstance);
-        assertFalse(replayProcessInstance.getId().equals(processInstance.getId()));
+        assertNotEquals(replayProcessInstance.getId(), processInstance.getId());
         assertEquals(TEST_VALUE, runtimeService.getVariable(replayProcessInstance.getId(), TEST_VARIABLE));
         // there should be one task
         assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());

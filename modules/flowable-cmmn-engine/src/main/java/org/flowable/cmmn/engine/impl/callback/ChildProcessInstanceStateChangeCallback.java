@@ -12,11 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.callback;
 
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 
 /**
+ * Callback implementation for a child case instance returning it's state change to its parent.
+ *
  * @author Joram Barrez
  */
 public class ChildProcessInstanceStateChangeCallback implements RuntimeInstanceStateChangeCallback {
@@ -29,7 +32,7 @@ public class ChildProcessInstanceStateChangeCallback implements RuntimeInstanceS
     
     @Override
     public void stateChanged(CallbackData callbackData) {
-        if ("completed".equals(callbackData.getNewState()) || "cancelled".equals(callbackData.getNewState())) {
+        if (CaseInstanceState.COMPLETED.equals(callbackData.getNewState()) || "cancelled".equals(callbackData.getNewState())) {
             cmmnEngineConfiguration.getCmmnRuntimeService().triggerPlanItemInstance(callbackData.getCallbackId());
         }
     }

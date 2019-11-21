@@ -1,0 +1,119 @@
+name: Flowable Postgres Build
+
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
+
+jobs:
+  test_postgres:
+    name: Postgres ${{ matrix.postgres }}
+    runs-on: ubuntu-latest
+    container: openjdk:8
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: [9, 10, 11, 12]
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_PASSWORD: flowable
+          POSTGRES_USER: flowable
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a health check
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 10
+      - name: Test
+        # use postgres for the host here because we have specified a container for the job.
+        # If we were running the job on the VM this would be localhost
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          -Dmaven.javadoc.skip=true -B -V
+          -PcleanDb,postgresql
+          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=org.postgresql.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
+  test_postgres_dmn:
+    name: Postgres ${{ matrix.postgres }} DMN
+    runs-on: ubuntu-latest
+    container: openjdk:8
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: [9, 10, 11, 12]
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_PASSWORD: flowable
+          POSTGRES_USER: flowable
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a health check
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 10
+      - name: Test
+        # use postgres for the host here because we have specified a container for the job.
+        # If we were running the job on the VM this would be localhost
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          -Dmaven.javadoc.skip=true -B -V
+          -Pdmn,postgresql
+          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=org.postgresql.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
+          -pl org.flowable:flowable-dmn-engine -am
+  test_postgres_content:
+    name: Postgres ${{ matrix.postgres }} Content
+    runs-on: ubuntu-latest
+    container: openjdk:8
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: [9, 10, 11, 12]
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_PASSWORD: flowable
+          POSTGRES_USER: flowable
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a health check
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 10
+      - name: Test
+        # use postgres for the host here because we have specified a container for the job.
+        # If we were running the job on the VM this would be localhost
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          -Dmaven.javadoc.skip=true -B -V
+          -Pcontent,postgresql
+          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=org.postgresql.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
+          -pl org.flowable:flowable-content-engine -am

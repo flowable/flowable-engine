@@ -16,6 +16,10 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
+import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
@@ -23,6 +27,7 @@ import org.flowable.common.engine.api.management.TablePageQuery;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
@@ -54,6 +59,11 @@ public interface ManagementService {
      * Gets the table name (including any configured prefix) for an entity like Task, Execution or the like.
      */
     String getTableName(Class<?> entityClass);
+
+    /**
+     * Gets the table name for an entity like Task, Execution or the like.
+     */
+    String getTableName(Class<?> entityClass, boolean includePrefix);
 
     /**
      * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.
@@ -316,6 +326,31 @@ public interface ManagementService {
      *             when no job exists with the given id.
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
+    
+    void handleHistoryCleanupTimerJob();
+    
+    List<Batch> getAllBatches();
+    
+    List<Batch> findBatchesBySearchKey(String searchKey);
+    
+    String getBatchDocument(String batchId);
+    
+    BatchPart getBatchPart(String batchPartId);
+    
+    List<BatchPart> findBatchPartsByBatchId(String batchId);
+    
+    List<BatchPart> findBatchPartsByBatchIdAndStatus(String batchId, String status);
+    
+    String getBatchPartDocument(String batchPartId);
+    
+    /**
+     * Returns a new BatchQuery implementation, that can be used to dynamically query the batches.
+     */
+    BatchQuery createBatchQuery();
+    
+    BatchBuilder createBatchBuilder();
+    
+    void deleteBatch(String batchId);
 
     /** get the list of properties. */
     Map<String, String> getProperties();
@@ -344,6 +379,18 @@ public interface ManagementService {
      * @return the result of command execution
      */
     <T> T executeCommand(CommandConfig config, Command<T> command);
+
+    /**
+     * Acquire a lock manager for the requested lock.
+     * This is a stateless call, this means that every time a lock manager
+     * is requested a new one would be created. Make sure that you release the lock
+     * once you are done.
+     *
+     * @param lockName the name of the lock that is being requested
+     *
+     * @return the lock manager for the given lock
+     */
+    LockManager getLockManager(String lockName);
 
     /**
      * Executes the sql contained in the {@link CustomSqlExecution} parameter.

@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.flowable</groupId>
     	<artifactId>flowable-ui-idm</artifactId>
-    	<version>6.4.1</version>
+    	<version>6.5.0-SNAPSHOT</version>
 	</parent>
 	<packaging>jar</packaging>
 
@@ -63,6 +63,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
         </dependency>
         
 		<!-- JSON -->
@@ -79,6 +80,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- SPRING -->
@@ -137,7 +139,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>2.1.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>

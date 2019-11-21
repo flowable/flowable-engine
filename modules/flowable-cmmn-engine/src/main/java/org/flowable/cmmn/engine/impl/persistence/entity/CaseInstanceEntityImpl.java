@@ -13,14 +13,19 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -38,7 +43,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
-    protected boolean completeable;
+    protected boolean completable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
     protected Date lockTime;
@@ -61,7 +66,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         persistentState.put("startUserId", startUserId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
-        persistentState.put("completeable", completeable);
+        persistentState.put("completeable", completable);
         persistentState.put("tenantId", tenantId);
         persistentState.put("lockTime", lockTime);
         return persistentState;
@@ -124,12 +129,24 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         this.startUserId = startUserId;
     }
     @Override
-    public boolean isCompleteable() {
-        return completeable;
+    public boolean isCompletable() {
+        return completable;
     }
     @Override
-    public void setCompleteable(boolean completeable) {
-        this.completeable = completeable;
+    public void setCompletable(boolean completable) {
+        this.completable = completable;
+    }
+    /**
+     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     */
+    public boolean isCompleteable() {
+        return completable;
+    }
+    /**
+     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     */
+    public void setCompleteable(boolean completable) {
+        this.completable = completable;
     }
     @Override
     public String getCallbackId() {
@@ -160,6 +177,15 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
     public void setLockTime(Date lockTime) {
         this.lockTime = lockTime;
+    }
+
+    @Override
+    public List<PlanItem> getPlanItems() {
+        if (caseDefinitionId != null) {
+            return CaseDefinitionUtil.getCase(caseDefinitionId).getPlanModel().getPlanItems();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -225,6 +251,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public Map<String, Object> getCaseVariables() {
         Map<String, Object> caseVariables = new HashMap<>();
+
         if (this.queryVariables != null) {
             for (VariableInstanceEntity queryVariable : queryVariables) {
                 if (queryVariable.getId() != null && queryVariable.getTaskId() == null) {
@@ -232,10 +259,21 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
                 }
             }
         }
+
+        // The variables from the cache have precedence
+        if (variableInstances != null) {
+            for (String variableName : variableInstances.keySet()) {
+                caseVariables.put(variableName, variableInstances.get(variableName).getValue());
+            }
+        }
+
         return caseVariables;
     }
 
     public List<VariableInstanceEntity> getQueryVariables() {
+        if (queryVariables == null && Context.getCommandContext() != null) {
+            queryVariables = new VariableInitializingList();
+        }
         return queryVariables;
     }
 

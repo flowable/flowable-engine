@@ -46,6 +46,7 @@ import org.flowable.bpmn.converter.export.BPMNDIExport;
 import org.flowable.bpmn.converter.export.CollaborationExport;
 import org.flowable.bpmn.converter.export.DataStoreExport;
 import org.flowable.bpmn.converter.export.DefinitionsRootExport;
+import org.flowable.bpmn.converter.export.EscalationDefinitionExport;
 import org.flowable.bpmn.converter.export.FlowableListenerExport;
 import org.flowable.bpmn.converter.export.MultiInstanceExport;
 import org.flowable.bpmn.converter.export.ProcessExport;
@@ -330,6 +331,13 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_ID))) {
                         model.addError(xtr.getAttributeValue(null, ATTRIBUTE_ID), xtr.getAttributeValue(null, ATTRIBUTE_ERROR_CODE));
                     }
+                    
+                } else if (ELEMENT_ESCALATION.equals(xtr.getLocalName())) {
+
+                    if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_ID))) {
+                        model.addEscalation(xtr.getAttributeValue(null, ATTRIBUTE_ID), xtr.getAttributeValue(null, ATTRIBUTE_ESCALATION_CODE),
+                                        xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+                    }
 
                 } else if (ELEMENT_IMPORT.equals(xtr.getLocalName())) {
                     importParser.parse(xtr, model);
@@ -505,6 +513,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
             CollaborationExport.writePools(model, xtw);
             DataStoreExport.writeDataStores(model, xtw);
             SignalAndMessageDefinitionExport.writeSignalsAndMessages(model, xtw);
+            EscalationDefinitionExport.writeEscalations(model, xtw);
 
             for (Process process : model.getProcesses()) {
 
@@ -513,7 +522,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     continue;
                 }
 
-                ProcessExport.writeProcess(process, xtw);
+                ProcessExport.writeProcess(process, model, xtw);
 
                 for (FlowElement flowElement : process.getFlowElements()) {
                     createXML(flowElement, model, xtw);
@@ -602,6 +611,10 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             MultiInstanceExport.writeMultiInstance(subProcess, model, xtw);
 
+            for (FlowElement subElement : subProcess.getFlowElements()) {
+                createXML(subElement, model, xtw);
+            }
+
             if (subProcess instanceof AdhocSubProcess) {
                 AdhocSubProcess adhocSubProcess = (AdhocSubProcess) subProcess;
                 if (StringUtils.isNotEmpty(adhocSubProcess.getCompletionCondition())) {
@@ -609,10 +622,6 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     xtw.writeCData(adhocSubProcess.getCompletionCondition());
                     xtw.writeEndElement();
                 }
-            }
-
-            for (FlowElement subElement : subProcess.getFlowElements()) {
-                createXML(subElement, model, xtw);
             }
 
             for (Artifact artifact : subProcess.getArtifacts()) {

@@ -12,18 +12,16 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
@@ -47,16 +45,19 @@ import org.flowable.ui.admin.service.engine.ProcessInstanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/app")
@@ -85,7 +86,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         propertyMappers.put("UserTask", new UserTaskInfoMapper());
     }
 
-    @RequestMapping(value = "/rest/admin/process-definitions/{processDefinitionId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-definitions/{processDefinitionId}/model-json", produces = "application/json")
     public JsonNode getProcessDefinitionModelJSON(@PathVariable String processDefinitionId) {
 
         ServerConfig config = retrieveServerConfig(EndpointType.PROCESS);
@@ -111,7 +112,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         return displayNode;
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/model-json", produces = "application/json")
     public JsonNode getProcessInstanceModelJSON(@PathVariable String processInstanceId, @RequestParam(required = true) String processDefinitionId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
 
@@ -170,7 +171,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         return displayNode;
     }
 
-    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/history-model-json", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/rest/admin/process-instances/{processInstanceId}/history-model-json", produces = "application/json")
     public JsonNode getHistoryProcessInstanceModelJSON(@PathVariable String processInstanceId, @RequestParam(required = true) String processDefinitionId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
 
@@ -306,7 +307,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         }
 
         for (org.flowable.bpmn.model.Process process : pojoModel.getProcesses()) {
-            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, 
+            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray,
                             collapsedArray, diagramInfo, completedElements, currentElements, null);
         }
 
@@ -396,7 +397,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
                 if (element instanceof SubProcess) {
                     SubProcess subProcess = (SubProcess) element;
-                    
+
                     ObjectNode newCollapsedNode = collapsedNode;
                     // skip collapsed sub processes
                     if (graphicInfo != null && graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
@@ -407,9 +408,9 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                         newCollapsedNode.putArray("flows");
                         collapsedArray.add(newCollapsedNode);
                     }
-                    
-                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray, 
-                                    diagramInfo, currentElements, currentElements, newCollapsedNode);
+
+                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray,
+                                    diagramInfo, completedElements, currentElements, newCollapsedNode);
                 }
             }
         }
@@ -434,11 +435,25 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                         eventNode.put("timeDuration", timerDef.getTimeDuration());
                     }
 
+                } else if (eventDef instanceof ConditionalEventDefinition) {
+                    ConditionalEventDefinition conditionalDef = (ConditionalEventDefinition) eventDef;
+                    eventNode.put("type", "conditional");
+                    if (StringUtils.isNotEmpty(conditionalDef.getConditionExpression())) {
+                        eventNode.put("condition", conditionalDef.getConditionExpression());
+                    }
+
                 } else if (eventDef instanceof ErrorEventDefinition) {
                     ErrorEventDefinition errorDef = (ErrorEventDefinition) eventDef;
                     eventNode.put("type", "error");
                     if (StringUtils.isNotEmpty(errorDef.getErrorCode())) {
                         eventNode.put("errorCode", errorDef.getErrorCode());
+                    }
+
+                } else if (eventDef instanceof EscalationEventDefinition) {
+                    EscalationEventDefinition escalationDef = (EscalationEventDefinition) eventDef;
+                    eventNode.put("type", "escalation");
+                    if (StringUtils.isNotEmpty(escalationDef.getEscalationCode())) {
+                        eventNode.put("escalationCode", escalationDef.getEscalationCode());
                     }
 
                 } else if (eventDef instanceof SignalEventDefinition) {

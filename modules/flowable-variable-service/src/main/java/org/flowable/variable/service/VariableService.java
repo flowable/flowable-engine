@@ -59,6 +59,17 @@ public interface VariableService {
 
     VariableInstanceEntity createVariableInstance(String name, VariableType type, Object value);
 
+    /**
+     * Create a variable instance without setting the value on it.
+     * <b>IMPORTANT:</b> If you use this method you would have to call {@link VariableInstanceEntity#setValue(Object)}
+     * for setting the value
+     * @param name the name of the variable to create
+     * @param type the type of the creted variable
+     *
+     * @return the {@link VariableInstanceEntity} to be used
+     */
+    VariableInstanceEntity createVariableInstance(String name, VariableType type);
+
     void insertVariableInstance(VariableInstanceEntity variable);
 
     /**

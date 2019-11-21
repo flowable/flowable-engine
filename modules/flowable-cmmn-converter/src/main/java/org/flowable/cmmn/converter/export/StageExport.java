@@ -54,6 +54,10 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, stage.getFormKey());
         }
 
+        if (StringUtils.isNotEmpty(stage.getValidateFormFields())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FIELD_VALIDATION, stage.getValidateFormFields());
+        }
+
         if (stage.isAutoComplete()) {
             xtw.writeAttribute(ATTRIBUTE_IS_AUTO_COMPLETE, Boolean.toString(stage.isAutoComplete()));
         }
@@ -63,8 +67,8 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         if (stage.getDisplayOrder() != null) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DISPLAY_ORDER, String.valueOf(stage.getDisplayOrder()));
         }
-        if (!stage.isIncludeInStageOverview()) { // if it's missing, it's true by default
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW, "false");
+        if (StringUtils.isNotEmpty(stage.getIncludeInStageOverview()) && !"true".equalsIgnoreCase(stage.getIncludeInStageOverview())) { // if it's missing, it's true by default
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW, stage.getIncludeInStageOverview());
         }
     }
 

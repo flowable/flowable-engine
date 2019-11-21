@@ -268,7 +268,7 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testCompleteManualActivatedTaskWithCustomCommand() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("testManualActivation")
             .variable("initiator", "test123")
             .start();

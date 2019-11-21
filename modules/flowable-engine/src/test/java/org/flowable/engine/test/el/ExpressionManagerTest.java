@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -37,6 +38,48 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{1 == 1}");
         Object value = expression.getValue(new NoExecutionVariableScope());
         assertThat(value, Is.<Object>is(true));
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testIntJsonVariableSerialization() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("mapVariable", processEngineConfiguration.getObjectMapper().createObjectNode().put("minIntVar", Integer.MIN_VALUE));
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{mapVariable.minIntVar}");
+        Object value = managementService.executeCommand(commandContext ->
+            expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
+
+        assertThat(value, Is.is(Integer.MIN_VALUE));
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testShortJsonVariableSerialization() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("mapVariable", processEngineConfiguration.getObjectMapper().createObjectNode().put("minShortVar", Short.MIN_VALUE));
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{mapVariable.minShortVar}");
+        Object value = managementService.executeCommand(commandContext ->
+            expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
+
+        assertThat(value, Is.is((int) Short.MIN_VALUE));
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testFloatJsonVariableSerialization() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("mapVariable", processEngineConfiguration.getObjectMapper().createObjectNode().put("minFloatVar", new Float(-1.5)));
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{mapVariable.minFloatVar}");
+        Object value = managementService.executeCommand(commandContext ->
+            expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
+
+        assertThat(value, Is.is(-1.5d));
     }
 
     @Test

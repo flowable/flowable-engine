@@ -12,22 +12,17 @@
  */
 package org.flowable.cmmn.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Joram Barrez
  */
-public class ProcessTask extends Task {
+public class ProcessTask extends ChildTask {
 
     protected String processRefExpression;
     protected String processRef;
     protected Boolean fallbackToDefaultTenant;
+    protected String processInstanceIdVariableName;
 
     protected Process process;
-
-    protected List<IOParameter> inParameters = new ArrayList<>();
-    protected List<IOParameter> outParameters = new ArrayList<>();
 
     public String getProcessRefExpression() {
         return processRefExpression;
@@ -53,22 +48,6 @@ public class ProcessTask extends Task {
         this.process = process;
     }
 
-    public List<IOParameter> getInParameters() {
-        return inParameters;
-    }
-
-    public void setInParameters(List<IOParameter> inParameters) {
-        this.inParameters = inParameters;
-    }
-
-    public List<IOParameter> getOutParameters() {
-        return outParameters;
-    }
-
-    public void setOutParameters(List<IOParameter> outParameters) {
-        this.outParameters = outParameters;
-    }
-
     public void setFallbackToDefaultTenant(Boolean fallbackToDefaultTenant) {
         this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
@@ -77,4 +56,10 @@ public class ProcessTask extends Task {
         return fallbackToDefaultTenant;
     }
 
+    public String getProcessInstanceIdVariableName() {
+        return processInstanceIdVariableName;
+    }
+    public void setProcessInstanceIdVariableName(String processInstanceIdVariableName) {
+        this.processInstanceIdVariableName = processInstanceIdVariableName;
+    }
 }

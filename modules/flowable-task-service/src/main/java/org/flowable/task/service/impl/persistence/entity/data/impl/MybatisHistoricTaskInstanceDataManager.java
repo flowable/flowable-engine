@@ -65,7 +65,7 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-        return getDbSqlSession().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery);
+        return getDbSqlSession().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery, getManagedEntityClass());
     }
 
     @Override
@@ -85,7 +85,8 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
         }
         historicTaskInstanceQuery.setFirstResult(0);
 
-        List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery);
+        List<HistoricTaskInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(
+                        "selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery, getManagedEntityClass());
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {
@@ -114,5 +115,19 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     public long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectHistoricTaskInstanceCountByNativeQuery", parameterMap);
     }
+    
+    @Override
+    public void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskInstances", historicTaskInstanceQuery, HistoricTaskInstanceEntityImpl.class);
+    }
 
+    @Override
+    public void deleteHistoricTaskInstancesForNonExistingProcessInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskInstancesForNonExistingProcessInstances", null, HistoricTaskInstanceEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteHistoricTaskInstancesForNonExistingCaseInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances", null, HistoricTaskInstanceEntityImpl.class);
+    }
 }

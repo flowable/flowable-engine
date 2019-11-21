@@ -93,6 +93,9 @@
     <sql id="selectMilestoneInstancesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_RU_MIL_INST RES
         <where>
+            <if test="milestoneInstanceId != null">
+                RES.ID_ = #{milestoneInstanceId}
+            </if>
             <if test="name != null">
                 RES.NAME_ = #{name}
             </if>

@@ -40,5 +40,8 @@ public interface HistoricActivityInstanceDataManager extends DataManager<Histori
     List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+    
+    void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery);
 
+    void deleteHistoricActivityInstancesForNonExistingProcessInstances();
 }

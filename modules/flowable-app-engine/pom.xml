@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.4.1</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -252,6 +252,30 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>cleanDb</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>drop-idm-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>org.flowable.app.engine.impl.db.DbSchemaDrop</mainClass>
+                                    <classpathScope>test</classpathScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
         <!-- database qa profile -->
         <profile>
@@ -378,7 +402,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -395,7 +419,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -412,7 +436,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -428,8 +452,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -445,8 +469,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -459,7 +483,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.1.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>

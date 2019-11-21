@@ -19,9 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
@@ -42,25 +40,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> implements TaskEntityManager {
-
-    protected TaskDataManager taskDataManager;
+public class TaskEntityManagerImpl
+    extends AbstractTaskServiceEntityManager<TaskEntity, TaskDataManager>
+    implements TaskEntityManager {
 
     public TaskEntityManagerImpl(TaskServiceConfiguration taskServiceConfiguration, TaskDataManager taskDataManager) {
-        super(taskServiceConfiguration);
-        this.taskDataManager = taskDataManager;
-    }
-
-    @Override
-    protected DataManager<TaskEntity> getDataManager() {
-        return taskDataManager;
+        super(taskServiceConfiguration, taskDataManager);
     }
 
     @Override
     public TaskEntity create() {
         TaskEntity taskEntity = super.create();
         taskEntity.setCreateTime(getClock().getCurrentTime());
-        if (taskServiceConfiguration.isEnableTaskRelationshipCounts()) {
+        if (serviceConfiguration.isEnableTaskRelationshipCounts()) {
             ((CountingTaskEntity) taskEntity).setCountEnabled(true);
         }
         return taskEntity;
@@ -87,7 +79,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         taskEntity.setScopeType(taskBuilder.getScopeType());
         insert(taskEntity);
 
-        TaskEntity enrichedTaskEntity = this.taskServiceConfiguration.getTaskPostProcessor().enrich(taskEntity);
+        TaskEntity enrichedTaskEntity = serviceConfiguration.getTaskPostProcessor().enrich(taskEntity);
         update(enrichedTaskEntity, false);
         taskBuilder.getIdentityLinks().forEach(
                 identityLink -> {
@@ -104,9 +96,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                     FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
         }
 
-        if (taskServiceConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            taskServiceConfiguration.getHistoricTaskService().recordTaskCreated(taskEntity);
-        }
+        serviceConfiguration.getInternalHistoryTaskManager().recordTaskCreated(taskEntity);
 
         return enrichedTaskEntity;
     }
@@ -139,7 +129,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             taskEntity.setAssignee(assignee);
             
             if (taskEntity.getId() != null) {
-                getTaskServiceConfiguration().getInternalHistoryTaskManager().recordTaskInfoChange(taskEntity);
+                serviceConfiguration.getInternalHistoryTaskManager().recordTaskInfoChange(taskEntity, getClock().getCurrentTime());
                 update(taskEntity);
             }
         }
@@ -153,7 +143,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             taskEntity.setOwner(owner);
 
             if (taskEntity.getId() != null) {
-                getTaskServiceConfiguration().getInternalHistoryTaskManager().recordTaskInfoChange(taskEntity);
+                serviceConfiguration.getInternalHistoryTaskManager().recordTaskInfoChange(taskEntity, getClock().getCurrentTime());
                 update(taskEntity);
             }
         }
@@ -161,80 +151,72 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
 
     @Override
     public List<TaskEntity> findTasksByExecutionId(String executionId) {
-        return taskDataManager.findTasksByExecutionId(executionId);
+        return dataManager.findTasksByExecutionId(executionId);
     }
 
     @Override
     public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
-        return taskDataManager.findTasksByProcessInstanceId(processInstanceId);
+        return dataManager.findTasksByProcessInstanceId(processInstanceId);
     }
     
     @Override
     public List<TaskEntity> findTasksByScopeIdAndScopeType(String scopeId, String scopeType) {
-        return taskDataManager.findTasksByScopeIdAndScopeType(scopeId, scopeType);
+        return dataManager.findTasksByScopeIdAndScopeType(scopeId, scopeType);
     }
     
     @Override
     public List<TaskEntity> findTasksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
-        return taskDataManager.findTasksBySubScopeIdAndScopeType(subScopeId, scopeType);
+        return dataManager.findTasksBySubScopeIdAndScopeType(subScopeId, scopeType);
     }
 
     @Override
     public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
-        return taskDataManager.findTasksByQueryCriteria(taskQuery);
+        return dataManager.findTasksByQueryCriteria(taskQuery);
     }
 
     @Override
     public List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery) {
-        return taskDataManager.findTasksWithRelatedEntitiesByQueryCriteria(taskQuery);
+        return dataManager.findTasksWithRelatedEntitiesByQueryCriteria(taskQuery);
     }
 
     @Override
     public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
-        return taskDataManager.findTaskCountByQueryCriteria(taskQuery);
+        return dataManager.findTaskCountByQueryCriteria(taskQuery);
     }
 
     @Override
     public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap) {
-        return taskDataManager.findTasksByNativeQuery(parameterMap);
+        return dataManager.findTasksByNativeQuery(parameterMap);
     }
 
     @Override
     public long findTaskCountByNativeQuery(Map<String, Object> parameterMap) {
-        return taskDataManager.findTaskCountByNativeQuery(parameterMap);
+        return dataManager.findTaskCountByNativeQuery(parameterMap);
     }
 
     @Override
     public List<Task> findTasksByParentTaskId(String parentTaskId) {
-        return taskDataManager.findTasksByParentTaskId(parentTaskId);
+        return dataManager.findTasksByParentTaskId(parentTaskId);
     }
 
     @Override
     public void updateTaskTenantIdForDeployment(String deploymentId, String newTenantId) {
-        taskDataManager.updateTaskTenantIdForDeployment(deploymentId, newTenantId);
+        dataManager.updateTaskTenantIdForDeployment(deploymentId, newTenantId);
     }
     
     @Override
     public void updateAllTaskRelatedEntityCountFlags(boolean configProperty) {
-        taskDataManager.updateAllTaskRelatedEntityCountFlags(configProperty);
+        dataManager.updateAllTaskRelatedEntityCountFlags(configProperty);
     }
     
     @Override
     public void deleteTasksByExecutionId(String executionId) {
-        taskDataManager.deleteTasksByExecutionId(executionId);
-    }
-
-    public TaskDataManager getTaskDataManager() {
-        return taskDataManager;
-    }
-
-    public void setTaskDataManager(TaskDataManager taskDataManager) {
-        this.taskDataManager = taskDataManager;
+        dataManager.deleteTasksByExecutionId(executionId);
     }
 
     protected void logAssigneeChanged(TaskEntity taskEntity, String previousAssignee, String newAssignee) {
-        if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+        if (serviceConfiguration.isEnableHistoricTaskLogging()) {
+            ObjectNode dataNode = serviceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newAssigneeId", newAssignee);
             dataNode.put("previousAssigneeId", previousAssignee);
             recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_ASSIGNEE_CHANGED, taskEntity, dataNode);
@@ -242,8 +224,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     protected void logOwnerChanged(TaskEntity taskEntity, String previousOwner, String newOwner) {
-        if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+        if (serviceConfiguration.isEnableHistoricTaskLogging()) {
+            ObjectNode dataNode = serviceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newOwnerId", newOwner);
             dataNode.put("previousOwnerId", previousOwner);
             recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_OWNER_CHANGED, taskEntity, dataNode);
@@ -251,8 +233,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     protected void logPriorityChanged(TaskEntity taskEntity, Integer previousPriority, int newPriority) {
-        if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+        if (serviceConfiguration.isEnableHistoricTaskLogging()) {
+            ObjectNode dataNode = serviceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newPriority", newPriority);
             dataNode.put("previousPriority", previousPriority);
             recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_PRIORITY_CHANGED, taskEntity, dataNode);
@@ -260,8 +242,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     protected void logDueDateChanged(TaskEntity taskEntity, Date previousDueDate, Date newDueDate) {
-        if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+        if (serviceConfiguration.isEnableHistoricTaskLogging()) {
+            ObjectNode dataNode = serviceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newDueDate", newDueDate != null ? newDueDate.getTime() : null);
             dataNode.put("previousDueDate", previousDueDate != null ? previousDueDate.getTime() : null);
             recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_DUEDATE_CHANGED, taskEntity, dataNode);
@@ -269,8 +251,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     protected void logNameChanged(TaskEntity taskEntity, String previousName, String newName) {
-        if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
-            ObjectNode dataNode = taskServiceConfiguration.getObjectMapper().createObjectNode();
+        if (serviceConfiguration.isEnableHistoricTaskLogging()) {
+            ObjectNode dataNode = serviceConfiguration.getObjectMapper().createObjectNode();
             dataNode.put("newName", newName);
             dataNode.put("previousName", previousName);
             recordHistoryUserTaskLog(HistoricTaskLogEntryType.USER_TASK_NAME_CHANGED, taskEntity, dataNode);
@@ -278,16 +260,16 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     protected void logTaskCreatedEvent(TaskInfo task) {
-        if (this.getTaskServiceConfiguration().isEnableHistoricTaskLogging()) {
+        if (serviceConfiguration.isEnableHistoricTaskLogging()) {
             HistoricTaskLogEntryBuilder taskLogEntryBuilder = createHistoricTaskLogEntryBuilder(task, HistoricTaskLogEntryType.USER_TASK_CREATED);
             taskLogEntryBuilder.timeStamp(task.getCreateTime());
-            getTaskServiceConfiguration().getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
+            serviceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
         }
     }
 
     protected HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder(TaskInfo task, HistoricTaskLogEntryType userTaskCreated) {
         HistoricTaskLogEntryBuilder taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(task);
-        taskLogEntryBuilder.timeStamp(this.taskServiceConfiguration.getClock().getCurrentTime());
+        taskLogEntryBuilder.timeStamp(serviceConfiguration.getClock().getCurrentTime());
         taskLogEntryBuilder.userId(Authentication.getAuthenticatedUserId());
         taskLogEntryBuilder.type(userTaskCreated.name());
         return taskLogEntryBuilder;
@@ -326,18 +308,27 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected boolean wasPersisted(TaskEntity task) {
-        return ((Map<String, Object>) task.getOriginalPersistentState()).size() > 0;
+        if (task.getOriginalPersistentState() != null && ((Map<String, Object>) task.getOriginalPersistentState()).size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    @SuppressWarnings("unchecked")
     protected Object getOriginalState(TaskEntity task, String stateKey) {
-        return ((Map<String, Object>) task.getOriginalPersistentState()).get(stateKey);
+        if (task.getOriginalPersistentState() != null) {
+            return ((Map<String, Object>) task.getOriginalPersistentState()).get(stateKey);
+        }
+        return null;
     }
 
     protected void recordHistoryUserTaskLog(HistoricTaskLogEntryType logEntryType, TaskInfo task, ObjectNode dataNode) {
         HistoricTaskLogEntryBuilder taskLogEntryBuilder = createHistoricTaskLogEntryBuilder(task, logEntryType);
         taskLogEntryBuilder.data( dataNode.toString());
-        getTaskServiceConfiguration().getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
+        serviceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
     }
 
 }

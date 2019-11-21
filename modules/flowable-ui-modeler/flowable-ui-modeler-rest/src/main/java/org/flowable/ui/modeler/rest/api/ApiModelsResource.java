@@ -13,9 +13,6 @@
 package org.flowable.ui.modeler.rest.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
@@ -27,12 +24,14 @@ import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 public class ApiModelsResource {
@@ -48,19 +47,19 @@ public class ApiModelsResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @RequestMapping(value = "/editor/models", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/editor/models", produces = "application/json")
     public ResultListDataRepresentation getModels(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) Integer modelType,
             HttpServletRequest request) {
 
         return modelQueryService.getModels(filter, sort, modelType, request);
     }
 
-    @RequestMapping(value = "/editor/import-process-model", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/editor/import-process-model", produces = "application/json")
     public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return modelQueryService.importProcessModel(request, file);
     }
 
-    @RequestMapping(value = "/editor/models", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/editor/models", produces = "application/json")
     public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
 

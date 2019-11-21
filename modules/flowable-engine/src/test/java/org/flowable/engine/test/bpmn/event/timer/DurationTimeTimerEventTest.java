@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.event.timer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -35,6 +36,8 @@ import org.junit.jupiter.api.Test;
  * @author Filip Hrisafov
  */
 public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     private Map<Object, Object> initialBeans;
 
@@ -69,7 +72,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
 
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday.plus(200, ChronoUnit.SECONDS)));
 
-        waitForJobExecutorToProcessAllJobs(7000L, 200L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 200L);
 
         jobQuery = managementService.createTimerJobQuery();
         assertThat(jobQuery.count()).isEqualTo(0);
@@ -88,8 +91,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
         assertThat(jobs).hasSize(1);
-        assertThat(jobs.get(0).getDuedate()).isEqualTo(Date.from(yesterday.plus(100, ChronoUnit.SECONDS)));
-
+        assertThat(simpleDateFormat.format(jobs.get(0).getDuedate())).isEqualTo(simpleDateFormat.format(Date.from(yesterday.plus(100, ChronoUnit.SECONDS))));
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday.plus(200, ChronoUnit.SECONDS)));
 
         waitForJobExecutorToProcessAllJobs(10000L, 25L);
@@ -112,7 +114,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
         assertThat(jobs.get(0).getDuedate()).isNotNull();
 
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday.plus(200, ChronoUnit.SECONDS)));
-        waitForJobExecutorToProcessAllJobs(10000L, 100L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 100L);
         assertThat(jobQuery.count()).isEqualTo(0);
 
         assertProcessEnded(pi.getId());

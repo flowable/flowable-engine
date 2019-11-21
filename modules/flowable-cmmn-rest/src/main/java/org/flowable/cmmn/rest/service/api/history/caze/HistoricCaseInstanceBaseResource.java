@@ -105,6 +105,11 @@ public class HistoricCaseInstanceBaseResource {
                 query.unfinished();
             }
         }
+        if (queryRequest.getIncludeCaseVariables() != null) {
+            if (queryRequest.getIncludeCaseVariables()) {
+                query.includeCaseVariables();
+            }
+        }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }
@@ -123,7 +128,7 @@ public class HistoricCaseInstanceBaseResource {
         DataResponse<HistoricCaseInstanceResponse> responseList = paginateList(allRequestParams, queryRequest, query, "caseInstanceId", allowedSortProperties,
             restResponseFactory::createHistoricCaseInstanceResponseList);
         
-        Set<String> caseDefinitionIds = new HashSet<String>();
+        Set<String> caseDefinitionIds = new HashSet<>();
         List<HistoricCaseInstanceResponse> caseInstanceList = responseList.getData();
         for (HistoricCaseInstanceResponse caseInstanceResponse : caseInstanceList) {
             if (!caseDefinitionIds.contains(caseInstanceResponse.getCaseDefinitionId())) {
@@ -133,7 +138,7 @@ public class HistoricCaseInstanceBaseResource {
         
         if (caseDefinitionIds.size() > 0) {
             List<CaseDefinition> caseDefinitionList = repositoryService.createCaseDefinitionQuery().caseDefinitionIds(caseDefinitionIds).list();
-            Map<String, CaseDefinition> caseDefinitionMap = new HashMap<String, CaseDefinition>();
+            Map<String, CaseDefinition> caseDefinitionMap = new HashMap<>();
             for (CaseDefinition caseDefinition : caseDefinitionList) {
                 caseDefinitionMap.put(caseDefinition.getId(), caseDefinition);
             }

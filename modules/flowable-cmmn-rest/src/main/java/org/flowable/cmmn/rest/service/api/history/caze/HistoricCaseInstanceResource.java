@@ -13,13 +13,20 @@
 
 package org.flowable.cmmn.rest.service.api.history.caze;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -85,6 +92,36 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
         
         cmmnhistoryService.deleteHistoricCaseInstance(caseInstance.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
+    
+    @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/stage-overview", produces = "application/json")
+    public List<StageResponse> getStageOverview(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
+
+        return cmmnhistoryService.getStageOverview(caseInstance.getId());
+    }
+    
+    protected Date getPlanItemInstanceEndTime(List<HistoricPlanItemInstance> stagePlanItemInstances, Stage stage) {
+        return getPlanItemInstance(stagePlanItemInstances, stage)
+            .map(HistoricPlanItemInstance::getEndedTime)
+            .orElse(null);
+    }
+
+    protected Optional<HistoricPlanItemInstance> getPlanItemInstance(List<HistoricPlanItemInstance> stagePlanItemInstances, Stage stage) {
+        HistoricPlanItemInstance planItemInstance = null;
+        for (HistoricPlanItemInstance p : stagePlanItemInstances) {
+            if (p.getPlanItemDefinitionId().equals(stage.getId())) {
+                if (p.getEndedTime() == null) {
+                    planItemInstance = p; // one that's not ended yet has precedence
+                } else {
+                    if (planItemInstance == null) {
+                        planItemInstance = p;
+                    }
+                }
+
+            }
+        }
+        return Optional.ofNullable(planItemInstance);
     }
 
 }

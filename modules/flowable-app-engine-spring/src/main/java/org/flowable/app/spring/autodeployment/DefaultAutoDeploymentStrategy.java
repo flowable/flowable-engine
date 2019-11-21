@@ -13,23 +13,22 @@
 
 package org.flowable.app.spring.autodeployment;
 
-import java.io.IOException;
-import java.util.zip.ZipInputStream;
-
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
-import org.flowable.common.engine.api.FlowableException;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Default Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each resource by name.
+ * Default Implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that performs a separate deployment for each resource by name.
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class DefaultAutoDeploymentStrategy extends AbstractAppAutoDeploymentStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAutoDeploymentStrategy.class);
 
@@ -38,56 +37,48 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
      */
     public static final String DEPLOYMENT_MODE = "default";
 
+    public DefaultAutoDeploymentStrategy() {
+    }
+
+    public DefaultAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final Resource[] resources, final AppRepositoryService repositoryService) {
-        
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, AppEngine engine) {
+        AppRepositoryService repositoryService = engine.getAppRepositoryService();
+
         // Create a separate deployment for each resource using the resource name
 
         for (final Resource resource : resources) {
 
+            String resourceName = determineResourceName(resource);
+            if (resourceName.contains("/")) {
+                resourceName = resourceName.substring(resourceName.lastIndexOf('/') + 1);
+
+            } else if (resourceName.contains("\\")) {
+                resourceName = resourceName.substring(resourceName.lastIndexOf('\\') + 1);
+            }
+            final AppDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
+            addResource(resource, resourceName, deploymentBuilder);
+
             try {
-
-                String resourceName = determineResourceName(resource);
-                if (resourceName.contains("/")) {
-                    resourceName = resourceName.substring(resourceName.lastIndexOf("/") + 1);
-
-                } else if (resourceName.contains("\\")) {
-                    resourceName = resourceName.substring(resourceName.lastIndexOf("\\") + 1);
-                }
-
-                final AppDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
-
-                try {
-                    if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip")) {
-                        deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
-                    } else {
-                        deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-                    }
-
-                } catch (IOException e) {
-                    throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
-                }
 
                 deploymentBuilder.deploy();
 
-            } catch (Exception e) {
-                // Any exception should not stop the bootup of the engine
-                String resourceName = null;
-                if (resource != null) {
-                    try {
-                        resourceName = resource.getURL().toString();
-                    } catch (IOException ioe) {
-                        resourceName = resource.toString();
-                    }
+            } catch (RuntimeException e) {
+                if (isThrowExceptionOnDeploymentFailure()) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying app definition for resource {}. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", resource, e);
                 }
-                LOGGER.warn("Exception while autodeploying app definition for resource " + resourceName + ". "
-                    + "This exception can be ignored if the root cause indicates a unique constraint violation, "
-                    + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
             }
         }
     }

@@ -12,6 +12,8 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +21,9 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
@@ -44,7 +48,9 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_TIMER, BoundaryEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_CONDITIONAL, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_ERROR, BoundaryEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_ESCALATION, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_SIGNAL, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_MESSAGE, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_CANCEL, BoundaryEventJsonConverter.class);
@@ -65,8 +71,12 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         }
 
         EventDefinition eventDefinition = eventDefinitions.get(0);
-        if (eventDefinition instanceof ErrorEventDefinition) {
+        if (eventDefinition instanceof ConditionalEventDefinition) {
+            return STENCIL_EVENT_BOUNDARY_CONDITIONAL;
+        } else if (eventDefinition instanceof ErrorEventDefinition) {
             return STENCIL_EVENT_BOUNDARY_ERROR;
+        } else if (eventDefinition instanceof EscalationEventDefinition) {
+            return STENCIL_EVENT_BOUNDARY_ESCALATION;
         } else if (eventDefinition instanceof SignalEventDefinition) {
             return STENCIL_EVENT_BOUNDARY_SIGNAL;
         } else if (eventDefinition instanceof MessageEventDefinition) {
@@ -87,9 +97,24 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         ObjectNode dockNode = objectMapper.createObjectNode();
         GraphicInfo graphicInfo = model.getGraphicInfo(boundaryEvent.getId());
         GraphicInfo parentGraphicInfo = model.getGraphicInfo(boundaryEvent.getAttachedToRef().getId());
-        dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
-        dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
+        BigDecimal parentX = new BigDecimal(parentGraphicInfo.getX());
+        BigDecimal parentY = new BigDecimal(parentGraphicInfo.getY());
+
+        BigDecimal boundaryX = new BigDecimal(graphicInfo.getX());
+        BigDecimal boundaryWidth = new BigDecimal(graphicInfo.getWidth());
+        BigDecimal boundaryXMid = boundaryWidth.divide(new BigDecimal(2));
+
+        BigDecimal boundaryY = new BigDecimal(graphicInfo.getY());
+        BigDecimal boundaryHeight = new BigDecimal(graphicInfo.getHeight());
+        BigDecimal boundaryYMid = boundaryHeight.divide(new BigDecimal(2));
+
+        BigDecimal xBound = boundaryX.add(boundaryXMid).subtract(parentX).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal yBound = boundaryY.add(boundaryYMid).subtract(parentY).setScale(0,RoundingMode.HALF_UP);
+
+        dockNode.put(EDITOR_BOUNDS_X, xBound.intValue());
+        dockNode.put(EDITOR_BOUNDS_Y, yBound.intValue());
         dockersArrayNode.add(dockNode);
+
         flowElementNode.set("dockers", dockersArrayNode);
 
         propertiesNode.put(PROPERTY_CANCEL_ACTIVITY, boundaryEvent.isCancelActivity());
@@ -104,9 +129,16 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         if (STENCIL_EVENT_BOUNDARY_TIMER.equals(stencilId)) {
             convertJsonToTimerDefinition(elementNode, boundaryEvent);
             boundaryEvent.setCancelActivity(getPropertyValueAsBoolean(PROPERTY_CANCEL_ACTIVITY, elementNode));
+            
+        } else if (STENCIL_EVENT_BOUNDARY_CONDITIONAL.equals(stencilId)) {
+            convertJsonToConditionalDefinition(elementNode, boundaryEvent);
 
         } else if (STENCIL_EVENT_BOUNDARY_ERROR.equals(stencilId)) {
             convertJsonToErrorDefinition(elementNode, boundaryEvent);
+            
+        } else if (STENCIL_EVENT_BOUNDARY_ESCALATION.equals(stencilId)) {
+            convertJsonToEscalationDefinition(elementNode, boundaryEvent);
+            boundaryEvent.setCancelActivity(getPropertyValueAsBoolean(PROPERTY_CANCEL_ACTIVITY, elementNode));
 
         } else if (STENCIL_EVENT_BOUNDARY_SIGNAL.equals(stencilId)) {
             convertJsonToSignalDefinition(elementNode, boundaryEvent);

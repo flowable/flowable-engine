@@ -241,6 +241,7 @@ flowableApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', 
                 firstName: model.user.firstName,
                 lastName: model.user.lastName,
                 password: model.user.password,
+                tenantId: model.user.tenantId,
             };
 
             $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/users', data: data}).
@@ -263,7 +264,7 @@ flowableApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', 
                     if (status == 403) {
                         $scope.model.errorMessage = "Forbidden";
                     } else if (status == 409) {
-                        $scope.model.errorMessage = "A user with that email address already exists";
+                        $scope.model.errorMessage = "A user with that ID or email address already exists";
                     } else {
                         $scope.$hide();
                     }
@@ -283,6 +284,7 @@ flowableApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', 
                 email: model.user.email,
                 firstName: model.user.firstName,
                 lastName: model.user.lastName,
+                tenantId: model.user.tenantId,
             };
 
             $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/admin/users/' + $scope.model.user.id, data: data}).

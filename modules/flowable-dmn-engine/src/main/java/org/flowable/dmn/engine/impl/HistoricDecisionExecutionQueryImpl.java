@@ -17,9 +17,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -27,7 +28,8 @@ import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 /**
  * @author Tijs Rademakers
  */
-public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution> implements DmnHistoricDecisionExecutionQuery {
+public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution> 
+        implements DmnHistoricDecisionExecutionQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
     protected String id;
@@ -39,6 +41,8 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     protected String executionId;
     protected String activityId;
     protected String scopeType;
+    protected String processInstanceIdWithChildren;
+    protected String caseInstanceIdWithChildren;
     protected Boolean failed;
     protected String tenantId;
     protected String tenantIdLike;
@@ -131,6 +135,18 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     }
     
     @Override
+    public DmnHistoricDecisionExecutionQuery processInstanceIdWithChildren(String processInstanceId) {
+        this.processInstanceIdWithChildren = processInstanceId;
+        return this;
+    }
+
+    @Override
+    public DmnHistoricDecisionExecutionQuery caseInstanceIdWithChildren(String caseInstanceId) {
+        this.caseInstanceIdWithChildren = caseInstanceId;
+        return this;
+    }
+    
+    @Override
     public DmnHistoricDecisionExecutionQuery failed(Boolean failed) {
         if (failed == null) {
             throw new FlowableIllegalArgumentException("failed is null");
@@ -184,19 +200,12 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionCountByQueryCriteria(this);
     }
 
     @Override
     public List<DmnHistoricDecisionExecution> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionsByQueryCriteria(this);
-    }
-
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
     }
 
     // getters ////////////////////////////////////////////
@@ -237,6 +246,14 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
         return scopeType;
     }
     
+    public String getProcessInstanceIdWithChildren() {
+        return processInstanceIdWithChildren;
+    }
+
+    public String getCaseInstanceIdWithChildren() {
+        return caseInstanceIdWithChildren;
+    }
+
     public Boolean getFailed() {
         return failed;
     }

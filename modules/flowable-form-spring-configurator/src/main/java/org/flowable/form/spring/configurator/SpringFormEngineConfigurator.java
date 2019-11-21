@@ -37,8 +37,10 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
         initialiseCommonProperties(engineConfiguration, formEngineConfiguration);
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
         ((SpringFormEngineConfiguration) formEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
-        formEngineConfiguration.setExpressionManager(new SpringFormExpressionManager(
-                        springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+        if (formEngineConfiguration.getExpressionManager() == null) {
+            formEngineConfiguration.setExpressionManager(new SpringFormExpressionManager(
+                springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+        }
 
         initFormEngine();
         

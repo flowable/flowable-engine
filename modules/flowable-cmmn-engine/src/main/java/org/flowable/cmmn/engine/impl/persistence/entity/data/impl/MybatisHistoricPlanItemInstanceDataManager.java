@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
@@ -20,8 +22,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstance
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
-
-import java.util.List;
 
 /**
  * @author Dennis Federico
@@ -42,7 +42,7 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricPlanItemInstance> findByCriteria(HistoricPlanItemInstanceQueryImpl query) {
-        return getDbSqlSession().selectList("selectHistoricPlanItemInstancesByQueryCriteria", query);
+        return getDbSqlSession().selectList("selectHistoricPlanItemInstancesByQueryCriteria", query, getManagedEntityClass());
     }
 
     @Override
@@ -60,6 +60,11 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         getDbSqlSession().delete("deleteHistoricPlanItemInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
+    }
+    
+    @Override
+    public void deleteHistoricPlanItemInstancesForNonExistingCaseInstances() {
+        getDbSqlSession().delete("bulkDeleteHistoricPlanItemInstancesForNonExistingCaseInstances", null, getManagedEntityClass());
     }
 
     @Override

@@ -15,6 +15,7 @@ package org.flowable.engine.impl.jobexecutor;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
@@ -51,8 +52,9 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
         try {
             if (!processDefinitionEntity.isSuspended()) {
 
-                if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-                    CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
+                FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
                 }
 
                 // Find initial flow element matching the signal start event

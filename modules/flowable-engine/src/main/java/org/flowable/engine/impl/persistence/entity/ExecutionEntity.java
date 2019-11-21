@@ -25,6 +25,7 @@ import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -139,6 +140,10 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     void setCallbackType(String callbackType);
     
     void setVariable(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
+
+    void setReferenceId(String referenceId);
+
+    void setReferenceType(String referenceType);
     
     Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
 

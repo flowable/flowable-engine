@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +143,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "localTaskVariable")),
                     HttpStatus.SC_OK);
 
-            String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), "utf-8");
+            String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             closeResponse(response);
             assertEquals("This is a binary piece of text", actualResponseBytesAsText);
             assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
@@ -358,7 +359,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
             assertTrue(responseNode.get("value").isNull());
             assertEquals("local", responseNode.get("scope").asText());
             assertEquals("binary", responseNode.get("type").asText());
-            assertNotNull(responseNode.get("valueUrl").isNull());
+            assertNotNull(responseNode.get("valueUrl"));
             assertTrue(responseNode.get("valueUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "binaryVariable")));
 
             // Check actual value of variable in engine

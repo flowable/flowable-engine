@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Shared logic for resources related to Tasks.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class TaskBaseResource {
@@ -65,7 +65,7 @@ public class TaskBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
-    
+
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
 
@@ -237,7 +237,7 @@ public class TaskBaseResource {
                 taskQuery.includeTaskLocalVariables();
             }
         }
-        
+
         if (request.getCaseDefinitionId() != null) {
             taskQuery.caseDefinitionId(request.getCaseDefinitionId());
         }
@@ -265,7 +265,7 @@ public class TaskBaseResource {
         if (request.getCategory() != null) {
             taskQuery.taskCategory(request.getCategory());
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoWithQuery(taskQuery, request);
         }
@@ -341,6 +341,14 @@ public class TaskBaseResource {
             case LIKE:
                 if (actualValue instanceof String) {
                     taskQuery.taskVariableValueLike(variable.getName(), (String) actualValue);
+                } else {
+                    throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
+                }
+                break;
+
+            case LIKE_IGNORE_CASE:
+                if (actualValue instanceof String) {
+                    taskQuery.taskVariableValueLikeIgnoreCase(variable.getName(), (String) actualValue);
                 } else {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
                 }
@@ -423,6 +431,14 @@ public class TaskBaseResource {
                 }
                 break;
 
+            case LIKE_IGNORE_CASE:
+                if (actualValue instanceof String) {
+                    taskQuery.processVariableValueLikeIgnoreCase(variable.getName(), (String) actualValue);
+                } else {
+                    throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
+                }
+                break;
+
             default:
                 throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
             }
@@ -437,11 +453,11 @@ public class TaskBaseResource {
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoById(task);
         }
-        
+
         return task;
     }
 
@@ -453,11 +469,11 @@ public class TaskBaseResource {
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryTaskInfoById(task);
         }
-        
+
         return task;
     }
 }

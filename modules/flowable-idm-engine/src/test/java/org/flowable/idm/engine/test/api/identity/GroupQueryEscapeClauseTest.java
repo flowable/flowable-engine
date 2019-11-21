@@ -41,12 +41,12 @@ public class GroupQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
 
     @Test
     public void testQueryByNameLike() {
-        GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%\\%%");
+        GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%|%%");
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
         assertEquals("muppets", query.singleResult().getId());
 
-        query = idmIdentityService.createGroupQuery().groupNameLike("%\\_%");
+        query = idmIdentityService.createGroupQuery().groupNameLike("%|_%");
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
         assertEquals("frogs", query.singleResult().getId());

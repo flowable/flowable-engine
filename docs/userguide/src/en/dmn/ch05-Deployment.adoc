@@ -27,16 +27,29 @@ Deploying a DMN definition can be done like this:
 
 [source,java,linenums]
 ----
-String dmnDefinition = "path/to/definition-one.dmn";
-ZipInputStream inputStream = new ZipInputStream(new FileInputStream(barFileName));
+String dmnDefinition = "path/to/definition-one.dmn"; //Don't forget the .dmn extension!
 
 repositoryService.createDeployment()
-    .name("definition-one")
+    .name("Deployment of DMN definition-one")
     .addClasspathResource(dmnDefinition)
     .deploy();
 
 ----
 
+You can use other methods to add the DMN definitions to the deployment like `addInputStream`. This is an example to deploy a DMN definition from an external file:
+
+[source,java,linenums]
+----
+File dmnFile = new File("/path/to/definition-two.dmn"); //Don't forget the .dmn extension!
+
+repositoryService.createDeployment()
+    .name("Deployment of DMN definition-two")
+    .addInputStream(dmnFile.getName(), new FileInputStream(dmnFile))
+    .deploy();
+
+----
+
+The name of the deployment can be any text but the resource name must always contain a valid DMN resource name suffix (".dmn"). 
 
 ==== Java classes
 

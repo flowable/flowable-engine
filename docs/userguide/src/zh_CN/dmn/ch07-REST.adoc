@@ -1,0 +1,603 @@
+
+=== 部署
+
+*当使用tomcat时，请阅读 <<restUsageInTomcat,Usage in Tomcat>>.*
+
+
+==== 获取多个DMN部署
+----
+GET dmn-repository/deployments
+----
+
+.URL 查询参数
+
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|name|No|String|返回指定名称的部署.
+|nameLike|No|String|模糊查询指定名称.
+|category|No|String|返回指定类别.
+|categoryNotEquals|No|String|返回指定类别以外的部署.
+|tenantId|No|String|返回指定tenantId的部署.
+|tenantIdLike|No|String|模糊查询指定tenantId的部署.
+|withoutTenantId|No|Boolean|如果为true 则返回指定tenantId以外的部署，如果为false 则忽略掉该参数.
+|sort|No|'id' (default), 'name', 'deploytime' or 'tenantId'|属性进行排序，与“order”一起使用.
+|可以使用<<restPagingAndSort,paging and sorting query-parameters>>.
+|===============
+
+
+.REST 返回编码
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates the request was successful.
+
+|===============
+
+[options="header"]
+|===============
+|返回编码|描述
+|200|请求成功.
+|===============
+
+
+*Success response body:*
+*成功返回示例:*
+
+[source,json,linenums]
+----
+{
+  "data": [
+    {
+      "id": "03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+      "name": null,
+      "deploymentTime": "2016-12-14T10:16:37.000+01:00",
+      "category": null,
+      "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/deployments/03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+      "parentDeploymentId": "17510",
+      "tenantId": ""
+    }
+  ],
+  "total": 1,
+  "start": 0,
+  "sort": "id",
+  "order": "asc",
+  "size": 1
+}
+----
+
+
+==== 获取一个DMN部署
+
+----
+GET dmn-repository/deployments/{deploymentId}
+----
+
+.获取一个部署- URL 参数
+
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|deploymentId|Yes|String|部署唯一id.
+
+|===============
+
+
+.获取一个部署- 返回编码
+[options="header"]
+
+[options="header"]
+|===============
+|返回编码|描述
+|200|找到并返回指定部署.
+|404|为找到指定的部署.
+
+|===============
+
+*成功示例:*
+[source,json,linenums]
+----
+{
+  "id": "03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+  "name": null,
+  "deploymentTime": "2016-12-14T10:16:37.000+01:00",
+  "category": null,
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/deployments/03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+  "parentDeploymentId": "17510",
+  "tenantId": ""
+}
+----
+
+
+==== Create a new DMN deployment
+（创建一个DMN部署）
+
+----
+POST dmn-repository/deployments
+----
+
+*Request body:*
+*请求消息体:*
+
+The request body should contain data of type _multipart/form-data_. There should be exactly one file in the request: any additional files will be ignored. The deployment name is the name of the file-field passed in.
+（请求消息体应该包含 _multipart/form-data_ 类型。请求中应该只有一个文件:任何额外的文件都将被忽略。file-field 的名称作为部署的名称）
+An additional parameter (form-field) can be passed in the request body with name +tenantId+. The value of this field will be used as the identifier of the tenant in which this deployment is done.
+（可以在请求体中通过name +tenantId+传递附加参数(表单字段)。此字段的值将用作执行此部署的租户的标识符。）
+.Create a new DMN deployment - Response codes
+（创建一个DMN部署-返回编码）
+
+[options="header"]
+|===============
+|Response code|Description
+|201|Indicates the deployment was created.
+|400|Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.
+
+|===============
+
+[options="header"]
+|===============
+|返回编码|描述
+|201|指定的部署已经存在.
+|400|请求主体中不存在内容，或部署不支持该内容的mime-type。状态描述包含附加信息。
+
+|===============
+
+*Success response body:*
+(*成功示例:*)
+
+[source,json,linenums]
+----
+{
+  "id": "03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+  "name": "newDeployment1",
+  "deploymentTime": "2016-12-14T10:16:37.000+01:00",
+  "category": null,
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/deployments/03ab310d-c1de-11e6-a4f4-62ce84ef239e",
+  "tenantId" : "myTenant"
+}
+----
+
+
+==== Delete a DMN deployment
+（删除一个部署）
+
+----
+DELETE dmn-repository/deployments/{deploymentId}
+----
+
+.Delete a DMN deployment - URL parameters
+（删除一个部署- URL 参数）
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|deploymentId|Yes|String|The identifier of the deployment to delete.
+
+|===============
+
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|deploymentId|Yes|String|需要删除的部署的编号.
+
+|===============
+
+
+.Delete a DMN deployment - Response codes
+（删除一个部署 - 返回编码）
+[options="header"]
+|===============
+|Response code|Description
+|204|Indicates the deployment was found and has been deleted. Response-body is intentionally empty.
+|404|Indicates the requested deployment was not found.
+
+|===============
+
+[options="header"]
+|===============
+|返回编码|描述
+|204|指定的部署已经被删除。返回内容特意为空。
+|404|未找到指定的部署。
+
+|===============
+
+
+==== Get a DMN deployment resource content
+（获取DMN部署资源内容）
+----
+GET dmn-repository/deployments/{deploymentId}/resourcedata/{resourceId}
+----
+
+.Get a deployment resource content - URL parameters
+（获取DMN部署资源内容 - URL 参数）
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|deploymentId|Yes|String|The identifier of the deployment the requested resource is part of.
+|resourceId|Yes|String|The identifier of the resource to get the data for. *Make sure you URL-encode the resourceId in case it contains forward slashes. For example, use 'decisions%2Fmy-decision.dmn' instead of 'decisions/my-decision.dmn'.*
+
+|===============
+
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|deploymentId|Yes|String|指定部署编号。
+|resourceId|Yes|String|指定资源编号。确保resourceId的URL编码，以防它包含前斜杠。例如，使用 'decisions%2Fmy-decision.dmn'。而不是'decisions/my-decision.dmn'
+
+|===============
+
+
+
+.Get a deployment resource content - Response codes
+（.获取DMN部署资源内容 - 返回编码）
+[options="header"]
+|===============
+|Response code|Description
+|200|Indicates both deployment and resource have been found and the resource data has been returned.
+|404|Indicates the requested deployment was not found or there is no resource with the given identifier present in the deployment. The status-description contains additional information.
+
+|===============
+
+[options="header"]
+|===============
+|Response code|Description
+|200|已找到指定的部署和资源，并返回资源数据。
+|404|未找到所请求的部署，或部署中不存在指定的资源。状态描述包含附加信息。
+
+|===============
+
+*Success response body:*
+（*成功示例:*）
+
+
+The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources 'mimeType' property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.
+（响应体将包含请求资源的二进制资源内容。响应内容类型将与资源“mimeType”属性中返回的类型相同。此外，header还设置了一个content-disposition ，允许浏览器下载文件而不是显示它。）
+
+=== Decision Tables
+（决策表）
+
+==== List of decision tables
+（获取决策表列表）
+
+
+----
+GET dmn-repository/decision-tables
+----
+
+.List of process definitions - URL parameters
+（获取流程定义列表- URL 参数）
+[options="header"]
+|===============
+|Parameter|Required|Value|Description
+|version|No|integer|Only return process definitions with the given version.
+|name|No|String|Only return process definitions with the given name.
+|nameLike|No|String|Only return process definitions with a name like the given name.
+|key|No|String|Only return process definitions with the given key.
+|keyLike|No|String|Only return process definitions with a name like the given key.
+|resourceName|No|String|Only return process definitions with the given resource name.
+|resourceNameLike|No|String|Only return process definitions with a name like the given resource name.
+|category|No|String|Only return process definitions with the given category.
+|categoryLike|No|String|Only return process definitions with a category like the given name.
+|categoryNotEquals|No|String|Only return process definitions which don't have the given category.
+|deploymentId|No|String|Only return process definitions which are part of a deployment with the given identifier.
+|latest|No|Boolean|Only return the latest process definition versions. Can only be used together with 'key' and 'keyLike' parameters, using any other parameter will result in a 400-response.
+|sort|No|'name' (default), 'id', 'key', 'category', 'deploymentId' and 'version'|Property to sort on, to be used together with the 'order'.
+|The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
+
+|===============
+
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|version|No|integer|返回指定版本的流程定义。
+|name|No|String|返回指定名称的流程定义。
+|nameLike|No|String|模糊查询指定名称的流程定义。
+|key|No|String|返回指定key的流程定义。
+|keyLike|No|String|模糊查询指定key的流程定义。
+|resourceName|No|String|返回指定资源名称的流程定义。
+|resourceNameLike|No|String|模糊查询指定资源名称的流程定义。
+|category|No|String|返回指定类别的流程定义。
+|categoryLike|No|String|模糊查询指定名称的流程定义。
+|categoryNotEquals|No|String|返回指定类型以外的流程定义。
+|deploymentId|No|String|返回指定部署编号的流程定义。
+|latest|No|Boolean|返回最新版本的流程定义。只能与“key”和“keyLike”参数一起使用，使用任何其他参数都会得到400个响应。
+|sort|No|'name' (default), 'id', 'key', 'category', 'deploymentId' and 'version'|排序，与“order”一起使用。
+|可以使用<<restPagingAndSort,paging and sorting query-parameters>>.
+
+|===============
+
+
+.获取流程定义列表 - 返回编码
+
+[options="header"]
+|===============
+|返回编码|描述
+|200|请求成功，并返回决策表
+|400|参数以错误的格式传递，或'latest' 与'key' 和 'keyLike'以外的其他参数一起使用。状态消息包含其他信息。
+
+|===============
+
+
+*成功示例:*
+
+[source,json,linenums]
+----
+{
+  "data": [
+        {
+      "id": "46b0379c-c0a1-11e6-bc93-6ab56fad108a",
+      "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/decision-tables/46b0379c-c0a1-11e6-bc93-6ab56fad108a",
+      "category": null,
+      "name": "Decision Table One",
+      "key": "DecisionTableOne",
+      "description": null,
+      "version": 3,
+      "resourceName": "dmn-DecisionTableOne.dmn",
+      "deploymentId": "46aa6b3a-c0a1-11e6-bc93-6ab56fad108a",
+      "parentDeploymentId": "5001",
+      "tenantId": ""
+    }
+  ],
+  "total": 1,
+  "start": 0,
+  "sort": "name",
+  "order": "asc",
+  "size": 1
+}
+----
+
+
+==== 获取一个决策表
+
+----
+GET dmn-repository/decision-tables/{decisionTableId}
+----
+
+.获取一个决策表 - URL 参数
+[options="header"]
+
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|decisionTableId|Yes|String|决策表编号。
+
+|===============
+
+
+.获取一个决策表 - 返回编码
+[options="header"]
+
+[options="header"]
+|===============
+|Response code|Description
+|200|找到指定编号决策表并返回
+|404|未找到指定编号决策表
+
+|===============
+
+
+*成功示例:*
+
+[source,json,linenums]
+----
+{
+  "id": "46b0379c-c0a1-11e6-bc93-6ab56fad108a",
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/decision-tables/46b0379c-c0a1-11e6-bc93-6ab56fad108a",
+  "category": null,
+  "name": "Decision Table One",
+  "key": "DecisionTableOne",
+  "description": null,
+  "version": 3,
+  "resourceName": "dmn-DecisionTableOne.dmn",
+  "deploymentId": "46aa6b3a-c0a1-11e6-bc93-6ab56fad108a",
+  "parentDeploymentId": "5001",
+  "tenantId": ""
+}
+----
+
+
+==== 获取一个决策表资源内容
+----
+GET dmn-repository/decision-tables/{decisionTableId}/resourcedata
+----
+
+.获取一个决策表资源内容 - URL 参数
+
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|decisionTableId|Yes|String|决策表编号。
+
+|===============
+
+*返回:*
+
+与 +GET dmn-repository/deployment/{deploymentId}/resourcedata/{resourceId}+ 相同.
+
+
+==== 获取一个决策表DMN模型
+
+----
+GET dmn-repository/decision-tables/{decisionTableId}/model
+----
+
+.获取一个决策表DMN模型- URL 参数
+[options="header"]
+
+
+[options="header"]
+|===============
+|参数|必需|类型|描述
+|decisionTableId|Yes|String|决策表编号。
+
+|===============
+
+
+.获取一个决策表DMN模型- 返回编码
+[options="header"]
+
+
+[options="header"]
+|===============
+|返回编码|描述
+|200|找到指定决策表并返回模型。
+|404|未找到指定决策表。
+
+|===============
+
+
+*返回内容:*
+返回内容是+org.flowable.dmn.model.DmnDefinition+的JSON。并包含完整的DMN定义模型。
+
+[source,json,linenums]
+----
+{
+   "processes":[
+      {
+         "id":"oneTaskProcess",
+         "xmlRowNumber":7,
+         "xmlColumnNumber":60,
+         "extensionElements":{
+
+         },
+         "name":"The One Task Process",
+         "executable":true,
+         "documentation":"One task process description",
+
+    ]
+}
+----
+
+
+=== DMN规则服务
+
+==== 执行一个决策
+
+----
+POST dmn-rule/execute
+----
+
+*Request body:*
+
+请求体应该包含_multipart/form-data_类型的数据。需要decisionKey。tenantId、parentdeploymentd和inputVariables (restVariables)映射是可选的。
+
+*Response body:*
+
+[source,json,linenums]
+----
+{
+  "resultVariables": [
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 1"
+      }
+    ],
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 2"
+      }
+    ],
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 3"
+      }
+    ]
+  ],
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-rule/execute"
+}
+----
+.执行一个决策 - 返回编码
+[options="header"]
+
+
+[options="header"]
+|===============
+|返回编码|描述
+|201|已执行该决策。
+
+|===============
+
+==== 执行一个单结果决策
+----
+POST dmn-rule/execute/single-result
+----
+
+*Request body:*
+
+请求体应该包含_multipart/form-data_类型的数据。需要decisionKey。tenantId、parentdeploymentd和inputVariables (restVariables)映射是可选的。
+
+当多个规则有效时，返回500。
+
+*注意:使用复合输出的单个命中是有效的(参见下面的响应)*
+
+*Response body:*
+
+[source,json,linenums]
+----
+{
+  "resultVariables": [
+    {
+      "name": "output1",
+      "type": "string",
+      "value": "compound 1"
+    },
+    {
+      "name": "output2",
+      "type": "string",
+      "value": "compound 2"
+    }
+  ],
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-rule/execute/single-result"
+}
+----
+.执行一个单结果决策 - 返回编码
+[options="header"]
+
+
+[options="header"]
+|===============
+|返回编码|描述
+|201|已执行指定决策。
+|500|指定决策返回多个结果。
+
+|===============
+
+
+
+=== 引擎
+
+==== 获取一个DMN引擎信息
+
+----
+GET dmn-management/engine
+----
+
+返回此rest服务中使用的DMN引擎的只读视图。
+
+
+*响应成功:*
+
+[source,json,linenums]
+----
+{
+   "name":"default",
+   "version":"6.5.0-SNAPSHOT",
+   "resourceUrl":"file://flowable-dmn/flowable.dmn.cfg.xml",
+   "exception":null
+}
+----
+
+.获取引擎信息 - 返回编码
+[options="header"]
+
+[options="header"]
+|===============
+|返回编码|描述
+|200|返回指定引擎信息。
+
+|===============

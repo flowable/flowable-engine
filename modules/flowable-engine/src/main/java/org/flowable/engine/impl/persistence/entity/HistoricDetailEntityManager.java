@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,9 +26,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public interface HistoricDetailEntityManager extends EntityManager<HistoricDetailEntity> {
 
-    HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, String propertyValue, String taskId);
+    HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, String propertyValue, String taskId,
+        Date createTime);
 
-    HistoricDetailVariableInstanceUpdateEntity copyAndInsertHistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance);
+    HistoricDetailVariableInstanceUpdateEntity copyAndInsertHistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance,
+        Date createTime);
 
     long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
 
@@ -41,4 +44,5 @@ public interface HistoricDetailEntityManager extends EntityManager<HistoricDetai
 
     void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId);
 
+    void deleteHistoricDetailForNonExistingProcessInstances();
 }

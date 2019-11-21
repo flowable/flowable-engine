@@ -137,13 +137,12 @@ public class BaseVariableResource {
     }
 
     protected List<RestVariable> processCaseVariables(CaseInstance caseInstance, int variableType) {
-        List<RestVariable> result = new ArrayList<>();
-        
+
         // Check if it's a valid execution to get the variables for
         List<RestVariable> variables = addVariables(caseInstance, variableType);
 
         // Get unique variables from map
-        result.addAll(variables);
+        List<RestVariable> result = new ArrayList<>(variables);
         return result;
     }
 

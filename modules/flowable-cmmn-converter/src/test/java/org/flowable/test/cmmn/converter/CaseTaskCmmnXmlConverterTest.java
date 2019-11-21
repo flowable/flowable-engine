@@ -12,6 +12,7 @@
  */
 package org.flowable.test.cmmn.converter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -62,9 +64,17 @@ public class CaseTaskCmmnXmlConverterTest extends AbstractConverterTest {
         PlanItemDefinition planItemDefinition = planItemTask1.getPlanItemDefinition();
         assertTrue(planItemDefinition instanceof CaseTask);
         CaseTask task1 = (CaseTask) planItemDefinition;
-        assertEquals("caseDefinitionKey", task1.getCaseRef());
+        assertEquals("caseDefinitionKey", task1.getCaseRefExpression());
         
         assertTrue(task1.getFallbackToDefaultTenant());
+
+        assertThat(task1.getInParameters())
+                .isNotNull()
+                .hasSize(1);
+        IOParameter inParameter = task1.getInParameters().get(0);
+        assertThat(inParameter).isNotNull();
+        assertThat(inParameter.getSource()).isEqualTo("testSource");
+        assertThat(inParameter.getTarget()).isEqualTo("testTarget");
     }
 
 }

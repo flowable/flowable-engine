@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -35,12 +36,14 @@ import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**
  * @author Tom Baeyens
@@ -114,7 +117,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected ProcessInstance handleProcessInstanceWithForm(CommandContext commandContext, ProcessDefinition processDefinition, 
                     ProcessEngineConfigurationImpl processEngineConfiguration) {
         FormInfo formInfo = null;
-        Map<String, Object> formVariables = null;
+        Map<String, Object> processVariables = null;
 
         if (hasStartFormData()) {
 
@@ -135,12 +138,17 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                     }
 
                     if (formInfo != null) {
-                        formVariables = formService.getVariablesFromFormSubmission(formInfo, startFormVariables, outcome);
-                        if (formVariables != null) {
+                        if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
+                            formService.validateFormFields(formInfo, startFormVariables);
+                        }
+                        // The processVariables are the variables that should be used when starting the process
+                        // the actual variables should instead be used when saving the form instances
+                        processVariables = formService.getVariablesFromFormSubmission(formInfo, startFormVariables, outcome);
+                        if (processVariables != null) {
                             if (variables == null) {
                                 variables = new HashMap<>();
                             }
-                            variables.putAll(formVariables);
+                            variables.putAll(processVariables);
                         }
                     }
                 }
@@ -152,13 +160,21 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         if (formInfo != null) {
             FormService formService = CommandContextUtil.getFormService(commandContext);
-            formService.createFormInstance(formVariables, formInfo, null, processInstance.getId(), 
-                            processInstance.getProcessDefinitionId(), processInstance.getTenantId());
+            formService.createFormInstance(startFormVariables, formInfo, null, processInstance.getId(),
+                            processInstance.getProcessDefinitionId(), processInstance.getTenantId(), outcome);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, processInstance.getId(), null, null, variables, processInstance.getTenantId());
         }
 
         return processInstance;
+    }
+
+    protected boolean isFormFieldValidationEnabled(ProcessEngineConfigurationImpl processEngineConfiguration, StartEvent startEvent) {
+        if (processEngineConfiguration.isFormFieldValidationEnabled()) {
+            return TaskHelper.isFormFieldValidationEnabled(NoExecutionVariableScope.getSharedInstance() // process instance does not exist yet
+                , processEngineConfiguration, startEvent.getValidateFormFields());
+        }
+        return false;
     }
 
     protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {
@@ -192,9 +208,9 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
             processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
             if (processDefinition == null) {
                 if (fallbackToDefaultTenant || processEngineConfiguration.isFallbackToDefaultTenant()) {
-                    if (StringUtils.isNotEmpty(processEngineConfiguration.getDefaultTenantValue())) {
-                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, 
-                                        processEngineConfiguration.getDefaultTenantValue());
+                    String defaultTenant = processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);
+                    if (StringUtils.isNotEmpty(defaultTenant)) {
+                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, defaultTenant);
                         if (processDefinition != null) {
                             overrideDefinitionTenantId = tenantId;
                         }

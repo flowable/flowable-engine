@@ -77,9 +77,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected static final String DELETE_REASON_END = "MI_END";
 
     // Variable names for outer instance(as described in spec)
-    protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
-    protected final String NUMBER_OF_ACTIVE_INSTANCES = "nrOfActiveInstances";
-    protected final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
+    protected static final String NUMBER_OF_INSTANCES = "nrOfInstances";
+    protected static final String NUMBER_OF_ACTIVE_INSTANCES = "nrOfActiveInstances";
+    protected static final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
 
     // Instance members
     protected Activity activity;

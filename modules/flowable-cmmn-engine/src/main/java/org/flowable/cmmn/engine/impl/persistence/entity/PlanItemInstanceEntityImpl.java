@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -56,9 +58,10 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected boolean completeable;
+    protected boolean completable;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String extraValue;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Counts
@@ -98,9 +101,10 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
-        persistentState.put("completeable", completeable);
+        persistentState.put("completeable", completable);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
+        persistentState.put("extraValue", extraValue);
         persistentState.put("countEnabled", countEnabled);
         persistentState.put("variableCount", variableCount);
         persistentState.put("sentryPartInstanceCount", sentryPartInstanceCount);
@@ -319,12 +323,12 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.referenceType = referenceType;
     }
     @Override
-    public boolean isCompleteable() {
-        return completeable;
+    public boolean isCompletable() {
+        return completable;
     }
     @Override
-    public void setCompleteable(boolean completeable) {
-        this.completeable = completeable;
+    public void setCompletable(boolean completable) {
+        this.completable = completable;
     }
     @Override
     public String getEntryCriterionId() {
@@ -343,6 +347,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.exitCriterionId = exitCriterionId;
     }
     @Override
+    public String getFormKey() {
+        return extraValue;
+    }
+    @Override
+    public void setFormKey(String formKey) {
+        this.extraValue = formKey;
+    }
+    @Override
+    public String getExtraValue() {
+        return extraValue;
+    }
+    @Override
+    public void setExtraValue(String extraValue) {
+        this.extraValue = extraValue;
+    }
+    @Override
     public String getTenantId() {
         return tenantId;
     }
@@ -355,7 +375,17 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     public void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances) {
         this.childPlanItemInstances = childPlanItemInstances;
     }
-    
+
+    @Override
+    public List<PlanItem> getPlanItems() {
+        PlanItem planItem = getPlanItem();
+        if (planItem != null && planItem.getPlanItemDefinition() instanceof PlanFragment) {
+            return ((PlanFragment) planItem.getPlanItemDefinition()).getPlanItems();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
         return childPlanItemInstances;
@@ -363,7 +393,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     
     @Override
     public PlanItemInstanceEntity getStagePlanItemInstanceEntity() {
-        if (stagePlanItemInstance == null) {
+        if (stagePlanItemInstance == null && stageInstanceId != null) {
             stagePlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(stageInstanceId);
         }
         return stagePlanItemInstance;
@@ -458,5 +488,20 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     public void setSentryPartInstanceCount(int sentryPartInstanceCount) {
         this.sentryPartInstanceCount = sentryPartInstanceCount;
     }
-    
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("PlanItemInstance with id: ")
+            .append(id);
+
+        if (getName() != null) {
+            stringBuilder.append(", name: ").append(name);
+        }
+        stringBuilder.append(", definitionId: ")
+            .append(planItemDefinitionId)
+            .append(", state: ")
+            .append(state);
+        return stringBuilder.toString();
+    }
 }

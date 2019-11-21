@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class DefaultProcessValidatorTest {
 
         InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/validation/invalidProcess.bpmn20.xml");
         XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
+        InputStreamReader in = new InputStreamReader(xmlStream, StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
         BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
         Assert.assertNotNull(bpmnModel);
@@ -265,7 +266,7 @@ public class DefaultProcessValidatorTest {
                 "    <userTask id='theTask1' name='Input is one' /> " + "    <userTask id='theTask2' name='Default input' /> " + "  </process>" + "</definitions>";
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(flowWithoutConditionNoDefaultFlow.getBytes()), "UTF-8");
+        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(flowWithoutConditionNoDefaultFlow.getBytes()), StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
         BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
         Assert.assertNotNull(bpmnModel);

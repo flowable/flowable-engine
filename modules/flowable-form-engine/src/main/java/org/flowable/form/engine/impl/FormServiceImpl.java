@@ -42,6 +42,11 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
         super(engineConfiguration);
     }
 
+    @Override
+    public void validateFormFields(FormInfo formInfo, Map<String, Object> values) {
+        // empty validate form fields implementation
+    }
+
     public Map<String, Object> getVariablesFromFormSubmission(FormInfo formInfo, Map<String, Object> values) {
         return commandExecutor.execute(new GetVariablesFromFormSubmissionCmd(formInfo, values));
     }
@@ -52,45 +57,45 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public FormInstance createFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, 
-                    String processDefinitionId, String tenantId) {
+    public FormInstance createFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId,
+                    String processDefinitionId, String tenantId, String outcome) {
         
-        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId, tenantId));
+        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId, tenantId, outcome));
     }
 
     @Override
-    public FormInstance saveFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, 
-                    String processDefinitionId, String tenantId) {
+    public FormInstance saveFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId,
+                    String processDefinitionId, String tenantId, String outcome) {
         
-        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId, tenantId));
+        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId, tenantId, outcome));
     }
 
     @Override
-    public FormInstance saveFormInstanceByFormDefinitionId(Map<String, Object> variables, String formDefinitionId, 
-                    String taskId, String processInstanceId, String processDefinitionId, String tenantId) {
+    public FormInstance saveFormInstanceByFormDefinitionId(Map<String, Object> variables, String formDefinitionId,
+        String taskId, String processInstanceId, String processDefinitionId, String tenantId, String outcome) {
         
-        return commandExecutor.execute(new SaveFormInstanceCmd(formDefinitionId, variables, taskId, processInstanceId, processDefinitionId, tenantId));
+        return commandExecutor.execute(new SaveFormInstanceCmd(formDefinitionId, variables, taskId, processInstanceId, processDefinitionId, tenantId, outcome));
     }
     
     @Override
-    public FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, 
-                    String scopeId, String scopeType, String scopeDefinitionId, String tenantId) {
+    public FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId,
+                    String scopeId, String scopeType, String scopeDefinitionId, String tenantId, String outcome) {
         
-        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId));
+        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId, outcome));
     }
 
     @Override
-    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, 
-                    String scopeId, String scopeType, String scopeDefinitionId, String tenantId) {
+    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId,
+                    String scopeId, String scopeType, String scopeDefinitionId, String tenantId, String outcome) {
         
-        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId));
+        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId, outcome));
     }
 
     @Override
-    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formModelId, String taskId, 
-                    String scopeId, String scopeType, String scopeDefinitionId, String tenantId) {
+    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formModelId, String taskId,
+        String scopeId, String scopeType, String scopeDefinitionId, String tenantId, String outcome) {
         
-        return commandExecutor.execute(new SaveFormInstanceCmd(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId));
+        return commandExecutor.execute(new SaveFormInstanceCmd(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId, tenantId, outcome));
     }
 
     @Override

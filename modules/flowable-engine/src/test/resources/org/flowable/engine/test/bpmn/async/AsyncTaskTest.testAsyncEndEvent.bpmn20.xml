@@ -14,7 +14,7 @@
     
     <sequenceFlow sourceRef="task" targetRef="theEnd" />
         
-    <endEvent id="theEnd" activiti:async="true">
+    <endEvent id="theEnd" name="End event" activiti:async="true">
       <extensionElements>
         <activiti:executionListener event="start" class="org.flowable.examples.bpmn.executionlistener.ExampleExecutionListenerOne"></activiti:executionListener>
       </extensionElements>

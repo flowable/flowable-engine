@@ -19,6 +19,10 @@
                  jdbcType="VARCHAR"/>                 
   </typeHandlers>
   <mappers>
+    <!-- Common mappers -->
+    <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+
+    <!-- Engine mappers -->
     <mapper resource="org/flowable/cmmn/db/mapping/entity/TableData.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CmmnDeployment.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CmmnResource.xml" />
@@ -44,6 +48,9 @@
     <!-- Entity link support -->
     <mapper resource="org/flowable/entitylink/service/db/mapping/entity/EntityLink.xml" />
     <mapper resource="org/flowable/entitylink/service/db/mapping/entity/HistoricEntityLink.xml" />
+    
+    <!-- Event subscription support -->
+    <mapper resource="org/flowable/eventsubscription/service/db/mapping/entity/EventSubscription.xml" />
     
     <!-- Task support -->
     <mapper resource="org/flowable/task/service/db/mapping/common.xml" />

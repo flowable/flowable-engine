@@ -13,8 +13,10 @@
 package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Joram Barrez
@@ -24,7 +26,7 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
     protected String definitionRef;
     protected PlanItemDefinition planItemDefinition;
     protected PlanItemControl itemControl;
-    protected List<String> criteriaRefs = new ArrayList<>();
+    protected Set<String> criteriaRefs = new HashSet<>();
     protected List<Criterion> entryCriteria = new ArrayList<>();
     protected List<Criterion> exitCriteria = new ArrayList<>();
     protected List<Association> incomingAssociations = new ArrayList<>();
@@ -84,11 +86,11 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
         this.criteriaRefs.add(entryCriteriaRef);
     }
     
-    public List<String> getCriteriaRefs() {
+    public Set<String> getCriteriaRefs() {
         return criteriaRefs;
     }
 
-    public void setCriteriaRefs(List<String> criteriaRefs) {
+    public void setCriteriaRefs(Set<String> criteriaRefs) {
         this.criteriaRefs = criteriaRefs;
     }
     
@@ -215,7 +217,20 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
 
     @Override
     public String toString() {
-        return "PlanItem " + id + (name != null ? (" " + name) : "");
+        StringBuilder stringBuilder = new StringBuilder("PlanItem ");
+        if (getName() != null) {
+            stringBuilder.append("'").append(getName()).append("'");
+        }
+
+        stringBuilder.append(" (id: ");
+        stringBuilder.append(getId());
+
+        if (getPlanItemDefinition() != null) {
+            stringBuilder.append(", definitionId: ").append(getPlanItemDefinition().getId());
+        }
+
+        stringBuilder.append(")");
+        return stringBuilder.toString();
     }
     
 }

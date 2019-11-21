@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -30,6 +31,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryValue;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,7 +42,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Frederik Heremans
  * @author Daniel Meyer
  */
-public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution> implements ExecutionQuery {
+public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution> implements ExecutionQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
     protected String processDefinitionId;
@@ -90,6 +92,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String callbackId;
+    protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     
     protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
     protected ExecutionQueryImpl currentOrQueryObject;
@@ -370,6 +376,26 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             this.withoutTenantId = true;
         }
         
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery executionReferenceId(String referenceId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery executionReferenceType(String referenceType) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
+        }
         return this;
     }
 
@@ -791,7 +817,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -805,7 +830,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     @SuppressWarnings({ "unchecked" })
     @Override
     public List<Execution> executeList(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -927,6 +951,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public String getExecutionId() {
         return executionId;
     }
+    
+    public String getId() {
+        return executionId;
+    }
 
     public String getSuperProcessInstanceId() {
         return superProcessInstanceId;
@@ -1016,6 +1044,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return withoutTenantId;
     }
 
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
+    }
+
     public String getName() {
         return name;
     }
@@ -1079,4 +1115,5 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
     }
+
 }

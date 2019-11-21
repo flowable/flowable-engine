@@ -15,7 +15,7 @@ package org.flowable.entitylink.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEntityLinkDataManager;
@@ -23,57 +23,53 @@ import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEnti
 /**
  * @author Tijs Rademakers
  */
-public class HistoricEntityLinkEntityManagerImpl extends AbstractEntityManager<HistoricEntityLinkEntity> implements HistoricEntityLinkEntityManager {
-
-    protected HistoricEntityLinkDataManager historicEntityLinkDataManager;
+public class HistoricEntityLinkEntityManagerImpl
+    extends AbstractServiceEngineEntityManager<EntityLinkServiceConfiguration, HistoricEntityLinkEntity, HistoricEntityLinkDataManager>
+    implements HistoricEntityLinkEntityManager {
 
     public HistoricEntityLinkEntityManagerImpl(EntityLinkServiceConfiguration identityLinkServiceConfiguration, HistoricEntityLinkDataManager historicEntityLinkDataManager) {
-        super(identityLinkServiceConfiguration);
-        this.historicEntityLinkDataManager = historicEntityLinkDataManager;
+        super(identityLinkServiceConfiguration, historicEntityLinkDataManager);
     }
 
     @Override
     public HistoricEntityLinkEntity create() {
         HistoricEntityLinkEntity entityLinkEntity = super.create();
-        entityLinkEntity.setCreateTime(entityLinkServiceConfiguration.getClock().getCurrentTime());
+        entityLinkEntity.setCreateTime(getClock().getCurrentTime());
         return entityLinkEntity;
     }
 
     @Override
-    protected DataManager<HistoricEntityLinkEntity> getDataManager() {
-        return historicEntityLinkDataManager;
-    }
-
-    @Override
     public List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
-        return historicEntityLinkDataManager.findHistoricEntityLinksByScopeIdAndScopeType(scopeId, scopeType, linkType);
+        return dataManager.findHistoricEntityLinksByScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
     @Override
     public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
-        return historicEntityLinkDataManager.findHistoricEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
+        return dataManager.findHistoricEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
     }
     
     @Override
     public List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType) {
-        return historicEntityLinkDataManager.findHistoricEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType, linkType);
+        return dataManager.findHistoricEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType, linkType);
     }
 
     @Override
     public void deleteHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
-        historicEntityLinkDataManager.deleteHistoricEntityLinksByScopeIdAndType(scopeId, scopeType);
+        dataManager.deleteHistoricEntityLinksByScopeIdAndType(scopeId, scopeType);
     }
     
     @Override
     public void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
-        historicEntityLinkDataManager.deleteHistoricEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
+        dataManager.deleteHistoricEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
     }
-
-    public HistoricEntityLinkDataManager getHistoricEntityLinkDataManager() {
-        return historicEntityLinkDataManager;
+    
+    @Override
+    public void deleteHistoricEntityLinksForNonExistingProcessInstances() {
+        dataManager.deleteHistoricEntityLinksForNonExistingProcessInstances();
     }
-
-    public void setHistoricEntityLinkDataManager(HistoricEntityLinkDataManager historicEntityLinkDataManager) {
-        this.historicEntityLinkDataManager = historicEntityLinkDataManager;
+    
+    @Override
+    public void deleteHistoricEntityLinksForNonExistingCaseInstances() {
+        dataManager.deleteHistoricEntityLinksForNonExistingCaseInstances();
     }
 
 }

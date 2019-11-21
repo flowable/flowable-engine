@@ -18,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -186,7 +187,7 @@ public class CmmnHttpTaskTest {
 
         assertThat(caseInstance, is(notNullValue()));
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat((Integer) variables.get("httpGetResponseStatusCode"), is( 302));
+        assertThat(variables.get("httpGetResponseStatusCode"), is( 302));
     }
 
     @Test
@@ -205,15 +206,15 @@ public class CmmnHttpTaskTest {
 
         assertThat(caseInstance, is(notNullValue()));
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat((String) variables.get("get500RequestMethod"), is("GET"));
-        assertThat((String) variables.get("get500RequestUrl"), is("https://localhost:9799/api?code=500"));
-        assertThat((String) variables.get("get500RequestHeaders"), is("Accept: application/json"));
-        assertThat((Integer) variables.get("get500RequestTimeout"), is(5000));
-        assertThat((String) variables.get("get500HandleStatusCodes"), is("4XX, 5XX"));
-        assertThat((Boolean) variables.get("get500SaveRequestVariables"), is(true));
+        assertThat(variables.get("get500RequestMethod"), is("GET"));
+        assertThat(variables.get("get500RequestUrl"), is("https://localhost:9799/api?code=500"));
+        assertThat(variables.get("get500RequestHeaders"), is("Accept: application/json"));
+        assertThat(variables.get("get500RequestTimeout"), is(5000));
+        assertThat(variables.get("get500HandleStatusCodes"), is("4XX, 5XX"));
+        assertThat(variables.get("get500SaveRequestVariables"), is(true));
 
-        assertThat((Integer) variables.get("get500ResponseStatusCode"), is(500));
-        assertThat((String) variables.get("get500ResponseReason"), is("Server Error"));
+        assertThat(variables.get("get500ResponseStatusCode"), is(500));
+        assertThat(variables.get("get500ResponseReason"), is("Server Error"));
     }
 
     @Test
@@ -223,13 +224,13 @@ public class CmmnHttpTaskTest {
 
         assertThat(caseInstance, is(notNullValue()));
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat((String) variables.get("httpPostRequestMethod"), is("POST"));
-        assertThat((String) variables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=201"));
-        assertThat((String) variables.get("httpPostRequestHeaders"), is("Content-Type: application/json"));
-        assertThat((String) variables.get("httpPostRequestBody"), is("{\"test\":\"sample\",\"result\":true}"));
+        assertThat(variables.get("httpPostRequestMethod"), is("POST"));
+        assertThat(variables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=201"));
+        assertThat(variables.get("httpPostRequestHeaders"), is("Content-Type: application/json"));
+        assertThat(variables.get("httpPostRequestBody"), is("{\"test\":\"sample\",\"result\":true}"));
 
-        assertThat((Integer) variables.get("httpPostResponseStatusCode"), is(201));
-        assertThat((String) variables.get("httpPostResponseReason"), is("Created"));
+        assertThat(variables.get("httpPostResponseStatusCode"), is(201));
+        assertThat(variables.get("httpPostResponseReason"), is("Created"));
         assertThat((String) variables.get("httpPostResponseBody"), containsString("\"body\":\"{\\\"test\\\":\\\"sample\\\",\\\"result\\\":true}\""));
     }
 
@@ -240,7 +241,7 @@ public class CmmnHttpTaskTest {
 
         assertThat(caseInstance, is(notNullValue()));
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat((Integer) variables.get("httpPostResponseStatusCode"), is(302));
+        assertThat(variables.get("httpPostResponseStatusCode"), is(302));
     }
 
     @Test
@@ -250,8 +251,8 @@ public class CmmnHttpTaskTest {
 
         assertThat(caseInstance, is(notNullValue()));
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat((Integer) variables.get("httpDeleteResponseStatusCode"), is(400));
-        assertThat((String) variables.get("httpDeleteResponseReason"), is("Bad Request"));
+        assertThat(variables.get("httpDeleteResponseStatusCode"), is(400));
+        assertThat(variables.get("httpDeleteResponseReason"), is("Bad Request"));
     }
 
     @Test
@@ -264,19 +265,19 @@ public class CmmnHttpTaskTest {
 
         assertThat(caseInstance, is(notNullValue()));
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat((String) variables.get("httpPostRequestMethod"), is("PUT"));
-        assertThat((String) variables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=500"));
-        assertThat((String) variables.get("httpPostRequestHeaders"), is("Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"));
-        assertThat((String) variables.get("httpPostRequestBody"), is("test"));
+        assertThat(variables.get("httpPostRequestMethod"), is("PUT"));
+        assertThat(variables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=500"));
+        assertThat(variables.get("httpPostRequestHeaders"), is("Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"));
+        assertThat(variables.get("httpPostRequestBody"), is("test"));
 
-        assertThat((Integer) variables.get("httpPostResponseStatusCode"), is(500));
-        assertThat((String) variables.get("httpPostResponseReason"), is("Server Error"));
+        assertThat(variables.get("httpPostResponseStatusCode"), is(500));
+        assertThat(variables.get("httpPostResponseReason"), is("Server Error"));
 
         Map<String, String> headerMap = HttpServiceTaskTestServer.HttpServiceTaskTestServlet.headerMap;
         assertEquals("text/plain", headerMap.get("Content-Type"));
         assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
         assertEquals("localhost:7000", headerMap.get("Host"));
-        assertEquals(null, headerMap.get("Test"));
+        assertNull(headerMap.get("Test"));
     }
 
     @Test
@@ -303,19 +304,19 @@ public class CmmnHttpTaskTest {
 
         assertThat(caseInstance, is(notNullValue()));
         Map<String, Object> outputVariables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat((String) outputVariables.get("httpPostRequestMethod"), is("PUT"));
-        assertThat((String) outputVariables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=500"));
-        assertThat((String) outputVariables.get("httpPostRequestHeaders"), is("Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"));
-        assertThat((String) outputVariables.get("httpPostRequestBody"), is("test"));
+        assertThat(outputVariables.get("httpPostRequestMethod"), is("PUT"));
+        assertThat(outputVariables.get("httpPostRequestUrl"), is("https://localhost:9799/api?code=500"));
+        assertThat(outputVariables.get("httpPostRequestHeaders"), is("Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"));
+        assertThat(outputVariables.get("httpPostRequestBody"), is("test"));
 
-        assertThat((Integer) outputVariables.get("httpPostResponseStatusCode"), is(500));
-        assertThat((String) outputVariables.get("httpPostResponseReason"), is("Server Error"));
+        assertThat(outputVariables.get("httpPostResponseStatusCode"), is(500));
+        assertThat(outputVariables.get("httpPostResponseReason"), is("Server Error"));
 
         Map<String, String> headerMap = HttpServiceTaskTestServer.HttpServiceTaskTestServlet.headerMap;
         assertEquals("text/plain", headerMap.get("Content-Type"));
         assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
         assertEquals("localhost:7000", headerMap.get("Host"));
-        assertEquals(null, headerMap.get("Test"));
+        assertNull(headerMap.get("Test"));
     }
 
     protected CaseInstance createCaseInstance() {

@@ -91,11 +91,11 @@ public class ProfilingDbSqlSession extends DbSqlSession {
     }
 
     @Override
-    public List selectListWithRawParameterNoCacheCheck(String statement, Object parameter) {
+    public List selectListWithRawParameterNoCacheLoadAndStore(String statement, Object parameter) {
         if (getCurrentCommandExecution() != null) {
             getCurrentCommandExecution().addDbSelect(statement);
         }
-        return super.selectListWithRawParameterNoCacheCheck(statement, parameter);
+        return super.selectListWithRawParameterNoCacheLoadAndStore(statement, parameter);
     }
 
     // INSERTS

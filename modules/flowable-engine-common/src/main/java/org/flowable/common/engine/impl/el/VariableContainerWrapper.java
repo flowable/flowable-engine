@@ -22,6 +22,9 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 public class VariableContainerWrapper implements VariableContainer {
     
     protected Map<String, Object> variables;
+    protected String instanceId;
+    protected String scopeType;
+    protected String tenantId;
     
     public VariableContainerWrapper(Map<String, Object> variables) {
         this.variables = variables;
@@ -47,4 +50,27 @@ public class VariableContainerWrapper implements VariableContainer {
         throw new UnsupportedOperationException();
     }
 
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 }

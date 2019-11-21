@@ -14,7 +14,6 @@ package org.flowable.app.engine.impl.deployer;
 
 import org.flowable.app.api.repository.AppModel;
 import org.flowable.app.api.repository.AppResourceConverter;
-import org.flowable.app.api.repository.BaseAppModel;
 import org.flowable.common.engine.api.FlowableException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

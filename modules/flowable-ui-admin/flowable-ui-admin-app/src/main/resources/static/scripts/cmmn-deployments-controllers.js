@@ -78,6 +78,7 @@ flowableAdminApp.controller('CmmnDeploymentsController', ['$rootScope', '$scope'
           $scope.gridCmmnDeployments = {
               data: 'cmmnDeploymentsData.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               rowHeight: 36,

@@ -13,10 +13,12 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
@@ -24,6 +26,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.converter.util.CriterionUtil;
 import org.flowable.cmmn.converter.util.PlanItemUtil;
+import org.flowable.cmmn.engine.impl.agenda.PlanItemEvaluationResult;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -37,14 +40,19 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -54,6 +62,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
+ * @author Micha Kiener
  */
 public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
@@ -77,16 +86,23 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     public void run() {
         super.run();
 
-        String satisfiedExitCriterion = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
+        if (caseInstanceEntity.isDeleted()) {
+            return;
+        }
+
+        // when evaluating an exit sentry, we take the optional exit event type and exit type into account as well, when terminating the case instance
+        Criterion satisfiedExitCriterion = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
         if (satisfiedExitCriterion != null) {
-            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), satisfiedExitCriterion);
+            // propagate the exit event type and exit type, if provided with the exit sentry / criterion
+            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), satisfiedExitCriterion.getId(),
+                satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
 
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
-            if (evaluateCaseInstanceCompleted 
+            if (evaluateCaseInstanceCompleted
+                    && evaluatePlanModelComplete()
                     && !criteriaChangeOrActiveChildren
-                    && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
-                    && isPlanModelComplete()){
+                    && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
@@ -109,100 +125,221 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     protected boolean evaluatePlanItemsCriteria(PlanItemInstanceContainer planItemInstanceContainer) {
         List<PlanItemInstanceEntity> planItemInstances = planItemInstanceContainer.getChildPlanItemInstances();
 
-        int activeChildren = 0;
-        boolean criteriaChanged = false;
-        
-        // Need to store new child plan item instances in a list until the loop is done, to avoid concurrentmodifications
-        List<PlanItemInstanceEntity> newChildPlanItemInstances = null;
+        // create an evaluation result object, holding all evaluation results as well as a list of newly created child plan items, as to avoid concurrent
+        // modification, we add them at the end of the evaluation loop to the parent container
+        PlanItemEvaluationResult evaluationResult = new PlanItemEvaluationResult();
 
         // Check the existing plan item instances: this means the plan items that have been created and became available.
         // This does not include the plan items which haven't been created (for example because they're part of a stage which isn't active yet).
         for (int planItemInstanceIndex = 0; planItemInstanceIndex < planItemInstances.size(); planItemInstanceIndex++) {
 
             PlanItemInstanceEntity planItemInstanceEntity = planItemInstances.get(planItemInstanceIndex);
-            PlanItem planItem = planItemInstanceEntity.getPlanItem();
             String state = planItemInstanceEntity.getState();
 
+            // check, if the plan item is in an evaluation state (e.g. available or waiting for repetition) to check for its activation
             if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
-                
-                String satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
-                if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
-                    boolean activatePlanItemInstance = true;
-                    if (!planItem.getEntryCriteria().isEmpty() && hasRepetitionRule(planItemInstanceEntity)) {
-                        boolean isRepeating = evaluateRepetitionRule(planItemInstanceEntity);
-                        if (isRepeating) {
-
-                            PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity);
-
-                            if (newChildPlanItemInstances == null) {
-                                newChildPlanItemInstances = new ArrayList<>(1);
-                            }
-                            newChildPlanItemInstances.add(childPlanItemInstanceEntity);
-
-                        } else {
-                            activatePlanItemInstance = false;
-                        }
-                    }
-
-                    if (planItem.getPlanItemDefinition() instanceof EventListener) {
-                        activatePlanItemInstance = false; // event listeners occur, they don't become active
-                    }
-
-                    if (activatePlanItemInstance) {
-                        criteriaChanged = true;
-                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity, satisfiedEntryCriterion);
-                    }
-
-                }
-
+                evaluateForActivation(planItemInstanceEntity, planItemInstanceContainer, evaluationResult);
             }
-            
+
+            // check the plan item, if it is not yet in a final end state to see whether it can be completed or terminated
             if (!PlanItemInstanceState.END_STATES.contains(state)) {
-                
-                String satisfiedExitCriterion = evaluateExitCriteria(planItemInstanceEntity, planItem);
-                if (satisfiedExitCriterion != null) {
-                    criteriaChanged = true;
-                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion);
-
-                } else if (planItem.getPlanItemDefinition() instanceof Stage) {
-
-                    if (PlanItemInstanceState.ACTIVE.equals(state)) {
-                        boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity);
-                        if (criteriaChangeOrActiveChildrenForStage) {
-                            criteriaChanged = true;
-                            planItemInstanceEntity.setCompleteable(false); // an active child = stage cannot be completed anymore
-                        } else {
-                            Stage stage = (Stage) planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-                            if (isStageCompletable(planItemInstanceEntity, stage)) {
-                                criteriaChanged = true;
-                                CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
-                            }
-                        }
-                    }
-                } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
-                    activeChildren++;
+                if (evaluateForCompletion(planItemInstanceEntity, evaluationResult)) {
+                    continue;
                 }
             }
 
             if (planItemInstanceEntity.getState() == null) {
                 // plan item is still being created
-                criteriaChanged = true;
+                evaluationResult.markCriteriaChanged();
             }
         }
 
+        // There are potentially plan items with an 'available condition' that haven't been created before
+        if (evaluatePlanItemsWithAvailableCondition(planItemInstanceContainer)) {
+            evaluationResult.markCriteriaChanged();
+        }
+
+        // The direct child plan item instance have been checked.
+        // However, the event which triggered this evaluation could also impact cross border dependencies.
         evaluateDependentPlanItems();
 
         // After the loop, the newly created plan item instances can be added
-        if (newChildPlanItemInstances != null) {
-            for (PlanItemInstanceEntity newChildPlanItemInstance : newChildPlanItemInstances) {
+        if (evaluationResult.hasNewChildPlanItemInstances()) {
+            for (PlanItemInstanceEntity newChildPlanItemInstance : evaluationResult.getNewChildPlanItemInstances()) {
                 planItemInstanceContainer.getChildPlanItemInstances().add(newChildPlanItemInstance);
             }
         }
 
-        return criteriaChanged || activeChildren > 0;
+        return evaluationResult.criteriaChangedOrNewActiveChildren();
     }
 
-    protected String evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
+    /**
+     * Evaluates the given plan item for activation by looking at its entry criteria, repetition rule and whether the plan item is a special one like an
+     * event listener (they occur and will never actually be active).
+     *
+     * @param planItemInstanceEntity the plan item instance to evaluate
+     * @param planItemInstanceContainer the parent container of the plan item instance
+     * @param evaluationResult the object holding evaluation results, will be modified inside this method with gained information
+     */
+    public void evaluateForActivation(PlanItemInstanceEntity planItemInstanceEntity, PlanItemInstanceContainer planItemInstanceContainer,
+        PlanItemEvaluationResult evaluationResult) {
+        PlanItem planItem = planItemInstanceEntity.getPlanItem();
+
+        // evaluate the entry criteria of the plan item and return it, if at least one was satisfied
+        Criterion satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
+        if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
+            // entry criteria is satisfied for this plan item instance, so we can basically activate it, but we need to check further options like
+            // repetition
+
+            // evaluate the repetition rule, if any, will also create new child plan items and add them to the result, if necessary
+            boolean activatePlanItemInstance = evaluateRepetitionRule(planItemInstanceEntity, satisfiedEntryCriterion, planItemInstanceContainer, evaluationResult);
+
+            if (planItem.getPlanItemDefinition() instanceof EventListener && !(planItem.getPlanItemDefinition() instanceof SignalEventListener)) {
+                activatePlanItemInstance = false; // event listeners occur, they don't become active
+            }
+
+            // if we need to activate the plan item, mark the result as some criteria changed and plan the activation of the plan item by adding
+            // this as an operation to the agenda
+            if (activatePlanItemInstance) {
+                evaluationResult.markCriteriaChanged();
+                CommandContextUtil.getAgenda(commandContext)
+                    .planActivatePlanItemInstanceOperation(planItemInstanceEntity, satisfiedEntryCriterion != null ? satisfiedEntryCriterion.getId() : null);
+            }
+        }
+    }
+
+    /**
+     * Evaluates an optional repetition rule on the given plan item and handles it. This might also include handling of a repetition condition or repetition
+     * based on a collection variable with optional local item and item index variables to be set on the newly created plan item instances for repetition.
+     *
+     * @param planItemInstanceEntity the plan item instance to test for a repetition rule
+     * @param satisfiedEntryCriterion the optional, satisfied entry criterion activating the plan item, might be null
+     * @param planItemInstanceContainer the parent container of the gievn plan item
+     * @param evaluationResult the evaluation result used to collect information during the evaluation of a list of plan items, will be modified inside this
+     *          method to reflect gained information about further evaluation as well as any newly created plan item instances for repetition
+     * @return true, if the plan item must be activated, false otherwise
+     */
+    protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity, Criterion satisfiedEntryCriterion,
+        PlanItemInstanceContainer planItemInstanceContainer, PlanItemEvaluationResult evaluationResult) {
+
+        PlanItem planItem = planItemInstanceEntity.getPlanItem();
+        boolean activatePlanItemInstance = true;
+
+        // check for a repetition rule on the plan item
+        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
+            boolean noEntryCriteria = planItem.getEntryCriteria().isEmpty();
+
+            // first check, if we run on a collection variable for repetition and if so, we ignore the max instance count and any other repetition
+            // condition and just use the collection to create plan item instances accordingly
+            if (ExpressionUtil.hasRepetitionOnCollection(planItemInstanceEntity)) {
+                // the plan item should be repeated based on a collection variable
+                // evaluate the variable content and check, if we need to start creating instances accordingly
+                Iterable<Object> collection = ExpressionUtil.evaluateRepetitionCollectionVariableValue(commandContext, planItemInstanceEntity);
+
+                // if the collection is null (meaning it is not yet available) and we don't have any on-part criteria (e.g an on-part or even combined with
+                // an if-part), we don't handle the repetition yet, but wait for its collection to become available
+                // but if we have an on-part, we always handle the collection, even if it is null or empty
+                if (collection == null && !ExpressionUtil.hasOnParts(planItem)) {
+                    // keep this plan item in its current state and don't activate it or handle the repetition collection yet as it is not available yet
+                    activatePlanItemInstance = false;
+                } else {
+
+                    if (collection != null) {
+                        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+                        int index = 0;
+                        for (Object item : collection) {
+                            // create and activate a new plan item instance for each item in the collection
+                            PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForCollectionRepetition(
+                                repetitionRule, planItemInstanceEntity, null, item, index++);
+
+                            evaluationResult.addChildPlanItemInstance(childPlanItemInstanceEntity);
+                        }
+                    }
+
+                    // we handled the collection, now we need to make sure that evaluation does not trigger again as it might get evaluated again
+                    // before it is terminated or made available again, so we remove the sentry related data of the plan item
+                    CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteSentryRelatedData(planItemInstanceEntity.getId());
+
+                    // don't activate this plan item instance, but keep it in available or waiting for repetition state for the next on-part triggering,
+                    // if there is an on-part, otherwise we will directly terminate it without having activated it, it was only used to wait in available
+                    // state until all criteria was satisfied, including having the collection variable
+                    activatePlanItemInstance = false;
+
+                    // if there is an on-part, we keep the current plan item instance for further triggering the on-part and evaluating the collection again
+                    // otherwise we terminate the plan item
+                    if (!ExpressionUtil.hasOnParts(planItem)) {
+                        // if there is no on-part, we don't need this plan item instance anymore, so terminate it
+                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
+                    }
+                }
+            } else if (!noEntryCriteria) {
+                // check the plan item to be repeating by evaluating its repetition rule
+                if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer)) {
+                    // create a new duplicated plan item instance in waiting for repetition as this one is becoming active
+                    evaluationResult.addChildPlanItemInstance(createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity));
+                } else {
+                    // the repetition rule does not evaluate to true, so we keep this instance in its current state and don't activate it
+                    activatePlanItemInstance = false;
+                }
+            }
+        }
+
+        return activatePlanItemInstance;
+    }
+
+    /**
+     * Evaluates the given plan item for completion or termination by looking at its state and exit criteria. If it is a stage, it will evaluate its child
+     * plan items as well.
+     *
+     * @param planItemInstanceEntity the plan item instance to evaluate for completion or termination
+     * @param evaluationResult the object holding evaluation results, will be modified inside this method with gained information
+     * @return true, if further evaluation should be skipped as the plan item can be ignored for further processing, false otherwise
+     */
+    public boolean evaluateForCompletion(PlanItemInstanceEntity planItemInstanceEntity, PlanItemEvaluationResult evaluationResult) {
+        PlanItem planItem = planItemInstanceEntity.getPlanItem();
+        String state = planItemInstanceEntity.getState();
+
+        // search and evaluate for exit criteria on the plan item, for at least one satisfied exit criterion
+        Criterion satisfiedExitCriterion = evaluateExitCriteria(planItemInstanceEntity, planItem);
+        if (satisfiedExitCriterion != null) {
+            evaluationResult.markCriteriaChanged();
+
+            // if we have a satisfied exit sentry, we also pass on its optional exit event type and exit type which has an effect on how the exit
+            // sentry gets executed and if the plan item is terminated (might transition using the complete event and be left in completion or by
+            // default, will transition using exit and be left as terminated
+            CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion.getId(),
+                satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
+
+        } else if (planItem.getPlanItemDefinition() instanceof Stage) {
+
+            if (PlanItemInstanceState.ACTIVE.equals(state)) {
+                boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity);
+                if (criteriaChangeOrActiveChildrenForStage) {
+                    evaluationResult.markCriteriaChanged();
+                    planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
+                } else {
+                    Stage stage = (Stage) planItem.getPlanItemDefinition();
+                    if (isStageCompletable(planItemInstanceEntity, stage)) {
+                        evaluationResult.markCriteriaChanged();
+                        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+                    }
+                }
+            }
+        } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
+            // check, if the plan item can be ignored for further processing and if so, immediately return
+            if (planItem.getItemControl() != null && planItem.getItemControl().getParentCompletionRule() != null) {
+                ParentCompletionRule parentCompletionRule = planItem.getItemControl().getParentCompletionRule();
+                if (ParentCompletionRule.IGNORE.equals(parentCompletionRule.getType())) {
+                    return true;
+                }
+            }
+
+            evaluationResult.increaseActiveChildren();
+        }
+        return false;
+    }
+
+    protected Criterion evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
         List<Criterion> criteria = planItem.getEntryCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(planItemInstanceEntity, criteria);
@@ -210,7 +347,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return null;
     }
 
-    protected String evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) { // EntityWithSentryPartInstances -> can be used for both case instance and plan item instance
+    // EntityWithSentryPartInstances -> can be used for both case instance and plan item instance
+    protected Criterion evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) {
         List<Criterion> criteria = hasExitCriteria.getExitCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(entityWithSentryPartInstances, criteria);
@@ -219,10 +357,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
 
     /**
-     * @return Returns the id of the criterion that is satisfied.
-     *         If none is satisfied, null is returned.
+     * @return Returns the criterion that is satisfied. If none is satisfied, null is returned.
      */
-    protected String evaluateCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, List<Criterion> criteria) {
+    protected Criterion evaluateCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, List<Criterion> criteria) {
         for (Criterion criterion : criteria) {
 
             Sentry sentry = criterion.getSentry();
@@ -230,17 +367,27 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             // There can be zero or more on parts and zero or one if part.
             // All defined parts need to be satisfied for the sentry to trigger.
 
-            if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one one part and no if part: no need to fetch the previously satisfied onparts
+            if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one on part and no if part: no need to fetch the previously satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
                     if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
-                        return criterion.getId();
+
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("{}: single onPart matches life cycle event: [{}]", criterion, planItemLifeCycleEvent);
+                        }
+
+                        return criterion;
                     }
                 }
 
             } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) { // Only an if part: simply evaluate the if part
                 if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
-                    return criterion.getId();
+
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{}: single ifPart has evaluated to true", criterion);
+                    }
+
+                    return criterion;
                 }
                 
             } else {
@@ -265,6 +412,11 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
                     if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
                         if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
+
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("{}: onPart matches life cycle event [{}]", criterion, planItemLifeCycleEvent);
+                            }
+
                             createSentryPartInstanceEntity(entityWithSentryPartInstances, sentry, sentryOnPart, null);
                             satisfiedSentryOnPartIds.add(sentryOnPart.getId());
                         }
@@ -273,12 +425,21 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
                 boolean allOnPartsSatisfied = (satisfiedSentryOnPartIds.size() == sentry.getOnParts().size());
 
+                if (allOnPartsSatisfied && LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{}: all onParts have been satisfied", criterion);
+                }
+
                 // Evaluate the if part of the sentry:
                 // In the onEvent triggerMode all onParts need to be satisfied before the if is evaluated
                 if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied
                         && (isDefaultTriggerMode || (sentry.isOnEventTriggerMode() && allOnPartsSatisfied) )) {
 
                     if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
+
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("{}: ifPart evaluates to true", criterion);
+                        }
+
                         createSentryPartInstanceEntity(entityWithSentryPartInstances, sentry, null, sentry.getSentryIfPart());
                         sentryIfPartSatisfied = true;
                     }
@@ -286,11 +447,14 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 }
 
                 if (allOnPartsSatisfied && (sentryIfPartSatisfied || sentry.getSentryIfPart() == null)) {
-                    return criterion.getId();
+
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{}: all onParts and ifParts are satisfied", criterion);
+                    }
+
+                    return criterion;
                 }
-
             }
-
         }
 
         return null;
@@ -343,121 +507,111 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     protected boolean evaluateSentryIfPart(Sentry sentry, VariableContainer variableContainer) {
         Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
         Object result = conditionExpression.getValue(variableContainer);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Evaluation of sentry if condition {} results in '{}'", sentry.getSentryIfPart().getCondition(), result);
+        }
+
         if (result instanceof Boolean) {
             return (Boolean) result;
         }
         return false;
     }
 
-    protected boolean isEndStateReachedForAllRequiredChildPlanItems(PlanItemInstanceContainer planItemInstanceContainer) {
-        if (planItemInstanceContainer.getChildPlanItemInstances() != null) {
-            for (PlanItemInstanceEntity childPlanItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
-                if (PlanItemInstanceState.END_STATES.contains(childPlanItemInstance.getState())) {
-                    continue;
-                }
-                if (isRequiredPlanItemInstance(childPlanItemInstance)) {
-                    return false;
-                }
-                return isEndStateReachedForAllChildPlanItems(childPlanItemInstance);
-            }
-        }
-        return true;
-    }
-
-    protected boolean isRequiredPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
-        PlanItemControl planItemControl = planItemInstanceEntity.getPlanItem().getItemControl();
-        if (planItemControl != null && planItemControl.getRequiredRule() != null) {
-
-            boolean isRequired = true; // Having a required rule means required by default, unless the condition says otherwise
-            String requiredCondition = planItemControl.getRequiredRule().getCondition();
-            if (StringUtils.isNotEmpty(requiredCondition)) {
-                isRequired = evaluateBooleanExpression(commandContext, planItemInstanceEntity, requiredCondition);
-            }
-            return isRequired;
-        }
-        return false;
-    }
-
-
-    protected boolean isEndStateReachedForAllChildPlanItems(PlanItemInstanceContainer planItemInstanceContainer) {
-        if (planItemInstanceContainer.getChildPlanItemInstances() != null) {
-            for (PlanItemInstanceEntity childPlanItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
-                if (!PlanItemInstanceState.END_STATES.contains(childPlanItemInstance.getState())) {
-                    return false;
-                }
-                boolean allChildChildsEndStateReached = isEndStateReachedForAllChildPlanItems(childPlanItemInstance);
-                if (!allChildChildsEndStateReached) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    protected boolean isAvailableChildPlanCompletionNeutralOrNotActive(PlanItemInstanceContainer planItemInstanceContainer) {
-        if (planItemInstanceContainer.getChildPlanItemInstances() != null) {
-            for (PlanItemInstanceEntity childPlanItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
-                if (PlanItemInstanceState.END_STATES.contains(childPlanItemInstance.getState())) {
-                    continue;
-                }
-                if (PlanItemInstanceState.AVAILABLE.contains(childPlanItemInstance.getState()) && isCompletionNeutralPlanItemInstance(childPlanItemInstance)) {
-                    continue;
-                }
-                return false;
-            }
-        }
-        return true;
-    }
-
-    protected boolean isCompletionNeutralPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
-        PlanItemControl planItemControl = planItemInstanceEntity.getPlanItem().getItemControl();
-        if (planItemControl != null && planItemControl.getCompletionNeutralRule() != null) {
-
-            boolean isCompletionNeutral = true; // Having a required rule means required by default, unless the condition says otherwise
-            String condition = planItemControl.getCompletionNeutralRule().getCondition();
-            if (StringUtils.isNotEmpty(condition)) {
-                isCompletionNeutral = evaluateBooleanExpression(commandContext, planItemInstanceEntity, condition);
-            }
-            return isCompletionNeutral;
-        }
-        return false;
-    }
-
-
     protected boolean isStageCompletable(PlanItemInstanceEntity stagePlanItemInstanceEntity, Stage stage) {
-        boolean allRequiredChildrenInEndState = isEndStateReachedForAllRequiredChildPlanItems(stagePlanItemInstanceEntity);
-        if (allRequiredChildrenInEndState) {
-            stagePlanItemInstanceEntity.setCompleteable(true);
+        boolean autoComplete = ExpressionUtil.evaluateAutoComplete(commandContext, stagePlanItemInstanceEntity, stage);
+        CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
+            .shouldPlanItemContainerComplete(commandContext, stagePlanItemInstanceEntity, autoComplete);
+
+        if (completionEvaluationResult.isCompletable()) {
+            stagePlanItemInstanceEntity.setCompletable(true);
         }
 
-        if (stagePlanItemInstanceEntity.isCompleteable()) {
-            if (stage.isAutoComplete()) {
-                return true;
-            } else {
-                return isAvailableChildPlanCompletionNeutralOrNotActive(stagePlanItemInstanceEntity);
-            }
-        } else {
-            return false;
-        }
+        return completionEvaluationResult.shouldBeCompleted();
     }
-    
-    protected boolean isPlanModelComplete() {
-        boolean allRequiredChildrenInEndState = isEndStateReachedForAllRequiredChildPlanItems(caseInstanceEntity);
-        if (allRequiredChildrenInEndState) {
-            caseInstanceEntity.setCompleteable(true);
-        }
-        
-        boolean isAutoComplete = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel().isAutoComplete();
 
-        if (caseInstanceEntity.isCompleteable()) {
-            if (isAutoComplete) {
-                return true;
-            } else {
-                return isAvailableChildPlanCompletionNeutralOrNotActive(caseInstanceEntity);
+    protected boolean evaluatePlanModelComplete() {
+        boolean isAutoComplete = ExpressionUtil.evaluateAutoComplete(commandContext, caseInstanceEntity,
+            CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel());
+
+        CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
+            .shouldPlanItemContainerComplete(commandContext, caseInstanceEntity, isAutoComplete);
+
+        // update the completion state on the case and check, if it was changed
+        boolean previousCompletableState = caseInstanceEntity.isCompletable();
+        caseInstanceEntity.setCompletable(completionEvaluationResult.isCompletable());
+
+        // When the case entity changes, the plan items with an available condition can be become ready for creation
+        if (previousCompletableState != caseInstanceEntity.isCompletable()) {
+            boolean planItemInstancesChanged = evaluatePlanItemsWithAvailableCondition(caseInstanceEntity);
+            if (planItemInstancesChanged) {
+                // If new plan items have changed, this could lead to changing of the fact that the case instance entity completable state is changed again
+                completionEvaluationResult = PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(commandContext, caseInstanceEntity, isAutoComplete);
+                if (completionEvaluationResult.isCompletable() != caseInstanceEntity.isCompletable()) {
+                    caseInstanceEntity.setCompletable(completionEvaluationResult.isCompletable());
+                }
             }
-        } else {
-            return false;
         }
+
+        return completionEvaluationResult.shouldBeCompleted();
+    }
+
+    protected boolean evaluatePlanItemsWithAvailableCondition(PlanItemInstanceContainer planItemInstanceContainer) {
+        if (!planItemInstanceContainer.getPlanItems().isEmpty()) {
+
+            // Find event listeners with an available condition to become available
+            List<PlanItemInstanceEntity> planItemInstanceToInitiate = findChangedEventListenerInstances(planItemInstanceContainer,
+                PlanItemInstanceState.UNAVAILABLE, true);
+            if (!planItemInstanceToInitiate.isEmpty()) {
+                for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceToInitiate) {
+                    CommandContextUtil.getAgenda(commandContext).planInitiatePlanItemInstanceOperation(planItemInstanceEntity);
+                }
+                return true;
+            }
+
+            // Find event listeners with an available condition to become unavailable
+            List<PlanItemInstanceEntity> planItemInstanceToDismiss = findChangedEventListenerInstances(planItemInstanceContainer,
+                PlanItemInstanceState.AVAILABLE, false);
+            if (!planItemInstanceToDismiss.isEmpty()) {
+                for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceToDismiss) {
+                    CommandContextUtil.getAgenda(commandContext).planDismissPlanItemInstanceOperation(planItemInstanceEntity);
+                }
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+    protected List<PlanItemInstanceEntity> findChangedEventListenerInstances(PlanItemInstanceContainer planItemInstanceContainer, String state, boolean conditionValueToChange) {
+        return planItemInstanceContainer.getChildPlanItemInstances().stream()
+                    .filter(planItemInstance -> state.equals(planItemInstance.getState())
+                        && isEventListenerWithAvailableCondition(planItemInstance.getPlanItem())
+                        && conditionValueToChange == evaluateAvailableCondition(commandContext, planItemInstance))
+                    .collect(Collectors.toList());
+    }
+
+    protected boolean evaluateAvailableCondition(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        PlanItem planItem = planItemInstanceEntity.getPlanItem();
+        if (isEventListenerWithAvailableCondition(planItem)) {
+            EventListener eventListener = (EventListener) planItem.getPlanItemDefinition();
+            if (StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression())) {
+                Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(eventListener.getAvailableConditionExpression());
+                Object result = expression.getValue(planItemInstanceEntity);
+
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Evaluation of available condition {} results in '{}'", eventListener.getAvailableConditionExpression(), result);
+                }
+
+                if (result instanceof Boolean) {
+                    return (Boolean) result;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     protected void evaluateDependentPlanItems() {
@@ -483,10 +637,11 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
                 if (childPlanItemInstances.isEmpty() // runtime state
                         && (potentialTerminatedPlanItemInstances.isEmpty()
-                            || (hasRepetitionRule(entryDependentPlanItem) && evaluateRepetitionRule(caseInstanceEntity, entryDependentPlanItem.getItemControl().getRepetitionRule().getCondition())))) { // (terminated state) the plan item instance should not have been created anytime before
+                                // (terminated state) the plan item instance should not have been created anytime before
+                            || (ExpressionUtil.hasRepetitionRule(entryDependentPlanItem) && ExpressionUtil.evaluateRepetitionRule(commandContext, caseInstanceEntity, entryDependentPlanItem.getItemControl().getRepetitionRule().getCondition())))) {
 
                     // If the sentry satisfied, the plan item becomes active and all parent stages that are not yet activate are made active
-                    String satisfiedCriterion = evaluateDependentPlanItemEntryCriteria(entryDependentPlanItem);
+                    Criterion satisfiedCriterion = evaluateDependentPlanItemEntryCriteria(entryDependentPlanItem);
                     if (satisfiedCriterion != null) {
 
                         // Creating plan item instances for all parent stages that do not exist yet
@@ -508,6 +663,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                                     caseInstanceEntity.getId(),
                                     previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null,
                                     caseInstanceEntity.getTenantId(),
+                                    null,
                                     true);
                                 parentPlanItemInstancesToActivate.add(parentPlanItemInstance);
 
@@ -535,18 +691,19 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null,
                             // previous is closest parent stage plan item instance
                             caseInstanceEntity.getTenantId(),
+                            null,
                             true);
                         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(entryDependentPlanItemInstance);
 
                         // Special care needed in case the plan item instance is repeating
-                        if (!entryDependentPlanItem.getEntryCriteria().isEmpty() && hasRepetitionRule(entryDependentPlanItemInstance)) {
-                            if (evaluateRepetitionRule(entryDependentPlanItemInstance)) {
+                        if (!entryDependentPlanItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(entryDependentPlanItemInstance)) {
+                            if (ExpressionUtil.evaluateRepetitionRule(commandContext, entryDependentPlanItemInstance, (PlanItemInstanceContainer) null)) {
                                 createPlanItemInstanceDuplicateForRepetition(entryDependentPlanItemInstance);
                             }
                         }
 
                         // All plan item instances are created. Now activate them.
-                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion);
+                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion.getId());
                         for (int i = parentPlanItemInstancesToActivate.size() - 1; i >= 0; i--) {
                             PlanItemInstanceEntity parentPlanItemInstance = parentPlanItemInstancesToActivate.get(i);
                             if (parentPlanItemInstance == null) { // newly created one
@@ -561,35 +718,19 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
     }
 
-    protected String evaluateDependentPlanItemEntryCriteria(PlanItem entryDependentPlanItem) {
+    protected Criterion evaluateDependentPlanItemEntryCriteria(PlanItem entryDependentPlanItem) {
         List<Criterion> entryCriteria = entryDependentPlanItem.getEntryCriteria();
         if (!entryCriteria.isEmpty()) {
 
-            for (Criterion criterion : entryCriteria) {
+            // According to the spec, only the sentries that actually reference the planitem of which the event happens should be evaluated
+            List<Criterion> matchingCriteria = entryCriteria.stream()
+                .filter(criterion -> CriterionUtil
+                    .criterionHasOnPartDependingOnPlanItem(criterion, planItemLifeCycleEvent.getPlanItem(), planItemLifeCycleEvent.getTransition()))
+                .collect(Collectors.toList());
 
-                // According to the spec, only the sentries that actually reference the planitem of which the event happens should be evaluated
-                if (CriterionUtil.criterionHasOnPartDependingOnPlanItem(criterion, planItemLifeCycleEvent.getPlanItem(), planItemLifeCycleEvent.getTransition())) {
-                    boolean criterionSatisfied = true;
-
-                    List<SentryOnPart> onParts = criterion.getSentry().getOnParts();
-                    for (SentryOnPart onPart : onParts) {
-                        if (!sentryOnPartMatchesCurrentLifeCycleEvent(onPart)) {
-                            criterionSatisfied = false;
-                        }
-                    }
-
-                    if (criterion.getSentry().getSentryIfPart() != null) {
-                        if (!evaluateSentryIfPart(criterion.getSentry(), caseInstanceEntity)) { // Resolved against case entity as there's no plan item instance yet
-                            criterionSatisfied = false;
-                        }
-                    }
-
-                    if (criterionSatisfied) {
-                        return criterion.getId();
-                    }
-                }
+            if (!matchingCriteria.isEmpty()) {
+                return evaluateCriteria(caseInstanceEntity, matchingCriteria);// Resolved against case entity as there's no plan item instance yet
             }
-
         }
 
         return null;
@@ -605,6 +746,30 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
+        return childPlanItemInstanceEntity;
+    }
+
+    protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForCollectionRepetition(RepetitionRule repetitionRule,
+        PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Object item, int index) {
+
+        // check, if we need to set local variables as the item or item index
+        Map<String, Object> localVariables = new HashMap<>(2);
+        if (repetitionRule.hasElementVariable()) {
+            localVariables.put(repetitionRule.getElementVariableName(), item);
+        }
+        if (repetitionRule.hasElementIndexVariable()) {
+            localVariables.put(repetitionRule.getElementIndexVariableName(), index);
+        }
+
+        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false);
+
+        String oldState = childPlanItemInstanceEntity.getState();
+        String newState = PlanItemInstanceState.ACTIVE;
+        childPlanItemInstanceEntity.setState(newState);
+        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+
+        // createPlanItemInstance operations will also sync planItemInstance history
+        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(childPlanItemInstanceEntity, entryCriterionId);
         return childPlanItemInstanceEntity;
     }
 
@@ -642,10 +807,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         if (planItemLifeCycleEvent != null) {
             stringBuilder.append(" with transition '").append(planItemLifeCycleEvent.getTransition()).append("' having fired");
             if (planItemLifeCycleEvent.getPlanItem() != null) {
-                stringBuilder.append(" for plan item ").append(planItemLifeCycleEvent.getPlanItem().getId());
-                if (planItemLifeCycleEvent.getPlanItem().getName() != null) {
-                    stringBuilder.append(" (").append(planItemLifeCycleEvent.getPlanItem().getName()).append(")");
-                }
+                stringBuilder.append(" for ").append(planItemLifeCycleEvent.getPlanItem());
             }
         }
 

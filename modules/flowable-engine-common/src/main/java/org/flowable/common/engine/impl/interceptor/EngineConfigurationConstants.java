@@ -36,7 +36,11 @@ public interface EngineConfigurationConstants {
     
     String KEY_ENTITY_LINK_SERVICE_CONFIG = "cfg.entityLinkService";
     
+    String KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG = "cfg.eventSubscriptionService";
+    
     String KEY_JOB_SERVICE_CONFIG = "cfg.jobService";
+    
+    String KEY_BATCH_SERVICE_CONFIG = "cfg.batchService";
     
     int PRIORITY_ENGINE_PROCESS = 50000;
     

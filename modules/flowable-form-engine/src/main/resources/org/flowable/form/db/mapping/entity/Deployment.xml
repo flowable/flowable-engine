@@ -25,7 +25,7 @@
          #{formDeployment.name, jdbcType=VARCHAR}, 
          #{formDeployment.category, jdbcType=VARCHAR}, 
          #{formDeployment.tenantId, jdbcType=VARCHAR}, 
-         #{formDeploymentdeploymentTime, jdbcType=TIMESTAMP}, 
+         #{formDeployment.deploymentTime, jdbcType=TIMESTAMP}, 
          #{formDeployment.parentDeploymentId, jdbcType=VARCHAR})
     </foreach>         
   </insert>
@@ -38,7 +38,7 @@
           #{formDeployment.name, jdbcType=VARCHAR}, 
           #{formDeployment.category, jdbcType=VARCHAR}, 
           #{formDeployment.tenantId, jdbcType=VARCHAR}, 
-          #{formDeploymentdeploymentTime, jdbcType=TIMESTAMP}, 
+          #{formDeployment.deploymentTime, jdbcType=TIMESTAMP}, 
           #{formDeployment.parentDeploymentId, jdbcType=VARCHAR})
     </foreach>
     SELECT * FROM dual

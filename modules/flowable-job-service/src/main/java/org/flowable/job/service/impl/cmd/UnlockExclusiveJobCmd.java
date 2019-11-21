@@ -51,7 +51,7 @@ public class UnlockExclusiveJobCmd implements Command<Object>, Serializable {
         }
 
         if (job.isExclusive()) {
-            if (job.getProcessInstanceId() != null) {
+            if (job.getProcessInstanceId() != null || job.getScopeId() != null) {
                 InternalJobManager jobScopeInterface = CommandContextUtil.getJobServiceConfiguration().getInternalJobManager();
                 if (jobScopeInterface != null) {
                     jobScopeInterface.clearJobScopeLock(job);

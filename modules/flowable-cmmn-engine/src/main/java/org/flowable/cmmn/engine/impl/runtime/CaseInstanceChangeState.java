@@ -27,6 +27,9 @@ public class CaseInstanceChangeState {
     protected Map<String, Object> caseVariables = new HashMap<>();
     protected Map<String, List<PlanItemInstance>> currentStageInstances;
     protected List<MovePlanItemInstanceEntityContainer> movePlanItemInstanceEntityContainers;
+    protected List<String> activatePlanItemDefinitionIds;
+    protected List<String> changePlanItemToAvailableIdList;
+    protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
     protected HashMap<String, PlanItemInstanceEntity> createdStageInstances = new HashMap<>();
 
     public CaseInstanceChangeState() {
@@ -74,6 +77,33 @@ public class CaseInstanceChangeState {
 
     public CaseInstanceChangeState setMovePlanItemInstanceEntityContainers(List<MovePlanItemInstanceEntityContainer> movePlanItemInstanceEntityContainers) {
         this.movePlanItemInstanceEntityContainers = movePlanItemInstanceEntityContainers;
+        return this;
+    }
+
+    public List<String> getActivatePlanItemDefinitionIds() {
+        return activatePlanItemDefinitionIds;
+    }
+
+    public CaseInstanceChangeState setActivatePlanItemDefinitionIds(List<String> activatePlanItemDefinitionIds) {
+        this.activatePlanItemDefinitionIds = activatePlanItemDefinitionIds;
+        return this;
+    }
+    
+    public List<String> getChangePlanItemToAvailableIdList() {
+        return changePlanItemToAvailableIdList;
+    }
+
+    public CaseInstanceChangeState setChangePlanItemToAvailableIdList(List<String> changePlanItemToAvailableIdList) {
+        this.changePlanItemToAvailableIdList = changePlanItemToAvailableIdList;
+        return this;
+    }
+
+    public Map<String, Map<String, Object>> getChildInstanceTaskVariables() {
+        return childInstanceTaskVariables;
+    }
+
+    public CaseInstanceChangeState setChildInstanceTaskVariables(Map<String, Map<String, Object>> childInstanceTaskVariables) {
+        this.childInstanceTaskVariables = childInstanceTaskVariables;
         return this;
     }
 

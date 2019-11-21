@@ -26,6 +26,8 @@ public interface HistoricIdentityLinkEntityManager extends EntityManager<Histori
     List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId);
     
     List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 
     void deleteHistoricIdentityLinksByTaskId(String taskId);
 
@@ -34,5 +36,11 @@ public interface HistoricIdentityLinkEntityManager extends EntityManager<Histori
     void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
     void deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
+    
+    void deleteHistoricProcessIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricCaseIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricTaskIdentityLinksForNonExistingInstances();
 
 }

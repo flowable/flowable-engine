@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -99,16 +100,16 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
 
     @Override
-    public HistoricTaskInstanceEntity recordTaskEnd(TaskEntity task, String deleteReason) {
+    public HistoricTaskInstanceEntity recordTaskEnd(TaskEntity task, String deleteReason, Date endTime) {
         HistoricTaskInstanceEntity historicTaskInstanceEntity = getHistoricTaskInstanceEntityManager().findById(task.getId());
         if (historicTaskInstanceEntity != null) {
-            historicTaskInstanceEntity.markEnded(deleteReason);
+            historicTaskInstanceEntity.markEnded(deleteReason, endTime);
         }
         return historicTaskInstanceEntity;
     }
 
     @Override
-    public HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity) {
+    public HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
         HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskEntity.getId());
         if (historicTaskInstance != null) {
             historicTaskInstance.setName(taskEntity.getName());
@@ -121,7 +122,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
             historicTaskInstance.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
             historicTaskInstance.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
             historicTaskInstance.setClaimTime(taskEntity.getClaimTime());
-            historicTaskInstance.setLastUpdateTime(configuration.getClock().getCurrentTime());
+            historicTaskInstance.setLastUpdateTime(changeTime);
 
             if (!Objects.equals(historicTaskInstance.getAssignee(), taskEntity.getAssignee())) {
                 historicTaskInstance.setAssignee(taskEntity.getAssignee());
@@ -192,6 +193,35 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
         if (this.configuration.isEnableHistoricTaskLogging()) {
             getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntriesForTaskId(taskId);
         }
+    }
+    
+    @Override
+    public void deleteHistoricTaskLogEntriesForNonExistingProcessInstances() {
+        if (this.configuration.isEnableHistoricTaskLogging()) {
+            getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
+        }
+    }
+    
+    @Override
+    public void deleteHistoricTaskLogEntriesForNonExistingCaseInstances() {
+        if (this.configuration.isEnableHistoricTaskLogging()) {
+            getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
+        }
+    }
+    
+    @Override
+    public void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstances(historicTaskInstanceQuery);
+    }
+    
+    @Override
+    public void deleteHistoricTaskInstancesForNonExistingProcessInstances() {
+        getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstancesForNonExistingProcessInstances();
+    }
+    
+    @Override
+    public void deleteHistoricTaskInstancesForNonExistingCaseInstances() {
+        getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstancesForNonExistingCaseInstances();
     }
 
     @Override

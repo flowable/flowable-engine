@@ -35,8 +35,10 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
         addPlanItemDefinitionExport(new AbstractServiceTaskExport.ServiceTaskExport());
         addPlanItemDefinitionExport(new AbstractServiceTaskExport.HttpServiceTaskExport());
         addPlanItemDefinitionExport(new AbstractServiceTaskExport.ScriptServiceTaskExport());
+        addPlanItemDefinitionExport(new CasePageTaskExport());
         addPlanItemDefinitionExport(new MilestoneExport());
         addPlanItemDefinitionExport(new GenericEventListenerExport());
+        addPlanItemDefinitionExport(new SignalEventListenerExport());
         addPlanItemDefinitionExport(new TimerEventListenerExport());
         addPlanItemDefinitionExport(new UserEventListenerExport());
     }

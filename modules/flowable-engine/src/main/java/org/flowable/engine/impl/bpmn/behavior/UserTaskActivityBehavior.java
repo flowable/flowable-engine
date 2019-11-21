@@ -24,7 +24,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -32,14 +32,16 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.impl.bpmn.helper.DynamicPropertyUtil;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.EntityLinkUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.engine.interceptor.CreateUserTaskAfterContext;
+import org.flowable.engine.interceptor.CreateUserTaskBeforeContext;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
@@ -88,17 +90,17 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
 
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isEnableProcessDefinitionInfoCache()) {
+        if (processEngineConfiguration.isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(userTask.getId(), execution.getProcessDefinitionId());
-            activeTaskName = getActiveValue(userTask.getName(), DynamicBpmnConstants.USER_TASK_NAME, taskElementProperties);
-            activeTaskDescription = getActiveValue(userTask.getDocumentation(), DynamicBpmnConstants.USER_TASK_DESCRIPTION, taskElementProperties);
-            activeTaskDueDate = getActiveValue(userTask.getDueDate(), DynamicBpmnConstants.USER_TASK_DUEDATE, taskElementProperties);
-            activeTaskPriority = getActiveValue(userTask.getPriority(), DynamicBpmnConstants.USER_TASK_PRIORITY, taskElementProperties);
-            activeTaskCategory = getActiveValue(userTask.getCategory(), DynamicBpmnConstants.USER_TASK_CATEGORY, taskElementProperties);
-            activeTaskFormKey = getActiveValue(userTask.getFormKey(), DynamicBpmnConstants.USER_TASK_FORM_KEY, taskElementProperties);
-            activeTaskSkipExpression = getActiveValue(userTask.getSkipExpression(), DynamicBpmnConstants.TASK_SKIP_EXPRESSION, taskElementProperties);
-            activeTaskAssignee = getActiveValue(userTask.getAssignee(), DynamicBpmnConstants.USER_TASK_ASSIGNEE, taskElementProperties);
-            activeTaskOwner = getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
+            activeTaskName = DynamicPropertyUtil.getActiveValue(userTask.getName(), DynamicBpmnConstants.USER_TASK_NAME, taskElementProperties);
+            activeTaskDescription = DynamicPropertyUtil.getActiveValue(userTask.getDocumentation(), DynamicBpmnConstants.USER_TASK_DESCRIPTION, taskElementProperties);
+            activeTaskDueDate = DynamicPropertyUtil.getActiveValue(userTask.getDueDate(), DynamicBpmnConstants.USER_TASK_DUEDATE, taskElementProperties);
+            activeTaskPriority = DynamicPropertyUtil.getActiveValue(userTask.getPriority(), DynamicBpmnConstants.USER_TASK_PRIORITY, taskElementProperties);
+            activeTaskCategory = DynamicPropertyUtil.getActiveValue(userTask.getCategory(), DynamicBpmnConstants.USER_TASK_CATEGORY, taskElementProperties);
+            activeTaskFormKey = DynamicPropertyUtil.getActiveValue(userTask.getFormKey(), DynamicBpmnConstants.USER_TASK_FORM_KEY, taskElementProperties);
+            activeTaskSkipExpression = DynamicPropertyUtil.getActiveValue(userTask.getSkipExpression(), DynamicBpmnConstants.TASK_SKIP_EXPRESSION, taskElementProperties);
+            activeTaskAssignee = DynamicPropertyUtil.getActiveValue(userTask.getAssignee(), DynamicBpmnConstants.USER_TASK_ASSIGNEE, taskElementProperties);
+            activeTaskOwner = DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
             activeTaskCandidateUsers = getActiveValueList(userTask.getCandidateUsers(), DynamicBpmnConstants.USER_TASK_CANDIDATE_USERS, taskElementProperties);
             activeTaskCandidateGroups = getActiveValueList(userTask.getCandidateGroups(), DynamicBpmnConstants.USER_TASK_CANDIDATE_GROUPS, taskElementProperties);
 
@@ -115,37 +117,45 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             activeTaskCandidateUsers = userTask.getCandidateUsers();
             activeTaskCandidateGroups = userTask.getCandidateGroups();
         }
+        
+        CreateUserTaskBeforeContext beforeContext = new CreateUserTaskBeforeContext(userTask, execution, activeTaskName, activeTaskDescription, activeTaskDueDate, 
+                        activeTaskPriority, activeTaskCategory, activeTaskFormKey, activeTaskSkipExpression, activeTaskAssignee, activeTaskOwner, 
+                        activeTaskCandidateUsers, activeTaskCandidateGroups);
+        
+        if (processEngineConfiguration.getCreateUserTaskInterceptor() != null) {
+            processEngineConfiguration.getCreateUserTaskInterceptor().beforeCreateUserTask(beforeContext);
+        }
 
-        if (StringUtils.isNotEmpty(activeTaskName)) {
+        if (StringUtils.isNotEmpty(beforeContext.getName())) {
             String name = null;
             try {
-                Object nameValue = expressionManager.createExpression(activeTaskName).getValue(execution);
+                Object nameValue = expressionManager.createExpression(beforeContext.getName()).getValue(execution);
                 if (nameValue != null) {
                     name = nameValue.toString();
                 }
             } catch (FlowableException e) {
-                name = activeTaskName;
+                name = beforeContext.getName();
                 LOGGER.warn("property not found in task name expression {}", e.getMessage());
             }
             task.setName(name);
         }
 
-        if (StringUtils.isNotEmpty(activeTaskDescription)) {
+        if (StringUtils.isNotEmpty(beforeContext.getDescription())) {
             String description = null;
             try {
-                Object descriptionValue = expressionManager.createExpression(activeTaskDescription).getValue(execution);
+                Object descriptionValue = expressionManager.createExpression(beforeContext.getDescription()).getValue(execution);
                 if (descriptionValue != null) {
                     description = descriptionValue.toString();
                 }
             } catch (FlowableException e) {
-                description = activeTaskDescription;
+                description = beforeContext.getDescription();
                 LOGGER.warn("property not found in task description expression {}", e.getMessage());
             }
             task.setDescription(description);
         }
 
-        if (StringUtils.isNotEmpty(activeTaskDueDate)) {
-            Object dueDate = expressionManager.createExpression(activeTaskDueDate).getValue(execution);
+        if (StringUtils.isNotEmpty(beforeContext.getDueDate())) {
+            Object dueDate = expressionManager.createExpression(beforeContext.getDueDate()).getValue(execution);
             if (dueDate != null) {
                 if (dueDate instanceof Date) {
                     task.setDueDate((Date) dueDate);
@@ -167,8 +177,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
         }
 
-        if (StringUtils.isNotEmpty(activeTaskPriority)) {
-            final Object priority = expressionManager.createExpression(activeTaskPriority).getValue(execution);
+        if (StringUtils.isNotEmpty(beforeContext.getPriority())) {
+            final Object priority = expressionManager.createExpression(beforeContext.getPriority()).getValue(execution);
             if (priority != null) {
                 if (priority instanceof String) {
                     try {
@@ -184,58 +194,54 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
         }
 
-        if (StringUtils.isNotEmpty(activeTaskCategory)) {
+        if (StringUtils.isNotEmpty(beforeContext.getCategory())) {
             String category = null;
             try {
-                Object categoryValue = expressionManager.createExpression(activeTaskCategory).getValue(execution);
+                Object categoryValue = expressionManager.createExpression(beforeContext.getCategory()).getValue(execution);
                 if (categoryValue != null) {
                     category = categoryValue.toString();
                 }
             }  catch (FlowableException e) {
-                category = activeTaskCategory;
+                category = beforeContext.getCategory();
                 LOGGER.warn("property not found in task category expression {}", e.getMessage());
             }
-            task.setCategory(category.toString());
+            task.setCategory(category);
         }
 
-        if (StringUtils.isNotEmpty(activeTaskFormKey)) {
+        if (StringUtils.isNotEmpty(beforeContext.getFormKey())) {
             String formKey = null;
             try {
-                Object formKeyValue = expressionManager.createExpression(activeTaskFormKey).getValue(execution);
+                Object formKeyValue = expressionManager.createExpression(beforeContext.getFormKey()).getValue(execution);
                 if (formKeyValue != null) {
                     formKey = formKeyValue.toString();
                 }
             } catch (FlowableException e) {
-                formKey = activeTaskFormKey;
+                formKey = beforeContext.getFormKey();
                 LOGGER.warn("property not found in task formKey expression {}", e.getMessage());
             }
-            task.setFormKey(formKey.toString());
-        }
-
-        boolean skipUserTask = false;
-        if (StringUtils.isNotEmpty(activeTaskSkipExpression)) {
-            Expression skipExpression = expressionManager.createExpression(activeTaskSkipExpression);
-            skipUserTask = SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpression)
-                    && SkipExpressionUtil.shouldSkipFlowElement(execution, skipExpression);
+            task.setFormKey(formKey);
         }
         
-        TaskHelper.insertTask(task, (ExecutionEntity) execution, !skipUserTask);
+        boolean skipUserTask = SkipExpressionUtil.isSkipExpressionEnabled(beforeContext.getSkipExpression(), userTask.getId(), execution, commandContext)
+                    && SkipExpressionUtil.shouldSkipFlowElement(beforeContext.getSkipExpression(), userTask.getId(), execution, commandContext);
+
+        TaskHelper.insertTask(task, (ExecutionEntity) execution, !skipUserTask, (!skipUserTask && processEngineConfiguration.isEnableEntityLinks()));
 
         // Handling assignments need to be done after the task is inserted, to have an id
         if (!skipUserTask) {
-            handleAssignments(taskService, activeTaskAssignee, activeTaskOwner,
-                    activeTaskCandidateUsers, activeTaskCandidateGroups, task, expressionManager, execution);
-            
-            if (processEngineConfiguration.isEnableEntityLinks()) {
-                EntityLinkUtil.copyExistingEntityLinks(execution.getProcessInstanceId(), task.getId(), ScopeTypes.TASK);
-                EntityLinkUtil.createNewEntityLink(execution.getProcessInstanceId(), task.getId(), ScopeTypes.TASK);
+            handleAssignments(taskService, beforeContext.getAssignee(), beforeContext.getOwner(),
+                            beforeContext.getCandidateUsers(), beforeContext.getCandidateGroups(), task, expressionManager, execution);
+
+            if (processEngineConfiguration.getCreateUserTaskInterceptor() != null) {
+                CreateUserTaskAfterContext afterContext = new CreateUserTaskAfterContext(userTask, task, execution);
+                processEngineConfiguration.getCreateUserTaskInterceptor().afterCreateUserTask(afterContext);
             }
-            
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
-            if (CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().dispatchEvent(
+            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher();
+            if (eventDispatcher != null  && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(
                         FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
             
@@ -243,6 +249,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             TaskHelper.deleteTask(task, null, false, false, false); // false: no events fired for skipped user task
             leave(execution);
         }
+
     }
 
     @Override
@@ -322,7 +329,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
                             IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         }
-                        
+
                     }
                 }
             }
@@ -348,7 +355,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
                             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
-                        
+
                     }
 
                 }
@@ -378,7 +385,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                                             task.getId(), null, groupId, customGroupIdentityLinkType);
                             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
-                        
+
                     }
 
                 }
@@ -390,7 +397,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     /**
      * Extract a candidate list from a string.
-     * 
+     *
      * @param str
      * @return
      */

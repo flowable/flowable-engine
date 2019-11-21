@@ -88,4 +88,5 @@ public class FlowableAppProperties {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
 }

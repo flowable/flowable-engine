@@ -27,7 +27,8 @@ public class TenantAwareAcquireAsyncJobsDueRunnable extends AcquireAsyncJobsDueR
     protected String tenantId;
 
     public TenantAwareAcquireAsyncJobsDueRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId) {
-        super("flowable-tenant-" + tenantId + "-acquire-jobs", asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobEntityManager());
+        super("flowable-tenant-" + tenantId + "-" + asyncExecutor.getJobServiceConfiguration().getEngineName() + "-acquire-jobs",
+                asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobEntityManager());
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }

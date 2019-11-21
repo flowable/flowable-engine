@@ -21,8 +21,8 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableLowerThanOrEqualsExpressionFunction extends AbstractVariableComparatorExpressionFunction {
 
-    public VariableLowerThanOrEqualsExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("lowerThanOrEquals", "lessThanOrEquals", "lte"), "lowerThanOrEquals");
+    public VariableLowerThanOrEqualsExpressionFunction() {
+        super(Arrays.asList("lowerThanOrEquals", "lessThanOrEquals", "lte"), "lowerThanOrEquals");
     }
     
     public static boolean lowerThanOrEquals(VariableScope variableScope, String variableName, Object comparedValue) {

@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.4.1</version>
+    <version>6.5.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -180,6 +180,7 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -224,6 +225,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>net.javacrumbs.json-unit</groupId>
+      <artifactId>json-unit-assertj</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>io.swagger</groupId>
       <artifactId>swagger-annotations</artifactId>
     </dependency>
@@ -241,7 +247,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.1.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>

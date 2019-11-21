@@ -19,11 +19,12 @@ import java.util.Map;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
+@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
 public class ManagementServiceTest extends PluggableFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManagementServiceTest.class);
@@ -56,16 +58,16 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             
         });
 
-        assertEquals(new Long(11), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_GROUP"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_MEMBERSHIP"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_USER"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_PROCDEF"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_TASK"));
-        assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_IDENTITYLINK"));
+        assertEquals(Long.valueOf(13), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_ID_GROUP"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_ID_MEMBERSHIP"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_ID_USER"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RE_PROCDEF"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RU_TASK"));
+        assertEquals(Long.valueOf(0), tableCount.get(tablePrefix + "ACT_RU_IDENTITYLINK"));
     }
 
     @Test

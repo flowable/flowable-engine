@@ -50,6 +50,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
         if (task.getRevision() == 0) {
             TaskHelper.insertTask(task, true);
+            CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(task);
 
             if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
                 CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
@@ -67,15 +68,13 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             
             String originalAssignee = originalTaskEntity.getAssignee();
             
-            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task);
+            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
             CommandContextUtil.getTaskService().updateTask(task, true);
             
             if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
 
-                if (originalTaskEntity instanceof TaskEntity) {
-                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-                        .executeTaskListeners((TaskEntity) originalTaskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
-                }
+                CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+                    .executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
 
                 if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
                     CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));

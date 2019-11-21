@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test"
+             design:palette="flowable-process-palette">
+    <signal id="myExternalSignal" name="myExternalSignal" flowable:scope="global"/>
+    <process id="terminateBySignalTestCase" name="Terminate by signal test case" isExecutable="true"
+             flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false"/>
+        <serviceTask id="caseTask1" name="Case task" flowable:type="case" flowable:caseDefinitionKey="myCase"
+                     flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true"/>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="caseTask1"/>
+        <endEvent id="endNoneEvent1"/>
+        <sequenceFlow id="sequenceFlow2" sourceRef="caseTask1" targetRef="endNoneEvent1"/>
+        <endEvent id="endNoneEvent2"/>
+        <sequenceFlow id="sequenceFlow3" sourceRef="intermediateSignalEventBoundary1" targetRef="endNoneEvent2"/>
+        <boundaryEvent id="intermediateSignalEventBoundary1" attachedToRef="caseTask1" cancelActivity="true">
+            <signalEventDefinition signalRef="myExternalSignal"/>
+        </boundaryEvent>
+    </process>
+</definitions>

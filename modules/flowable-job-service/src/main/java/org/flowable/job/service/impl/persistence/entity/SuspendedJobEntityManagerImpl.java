@@ -25,45 +25,46 @@ import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataMan
 /**
  * @author Tijs Rademakers
  */
-public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<SuspendedJobEntity> implements SuspendedJobEntityManager {
-
-    protected SuspendedJobDataManager jobDataManager;
+public class SuspendedJobEntityManagerImpl
+    extends AbstractJobServiceEngineEntityManager<SuspendedJobEntity, SuspendedJobDataManager>
+    implements SuspendedJobEntityManager {
 
     public SuspendedJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, SuspendedJobDataManager jobDataManager) {
-        super(jobServiceConfiguration);
-        this.jobDataManager = jobDataManager;
+        super(jobServiceConfiguration, jobDataManager);
     }
 
     @Override
     public List<SuspendedJobEntity> findJobsByExecutionId(String id) {
-        return jobDataManager.findJobsByExecutionId(id);
+        return dataManager.findJobsByExecutionId(id);
     }
 
     @Override
     public List<SuspendedJobEntity> findJobsByProcessInstanceId(String id) {
-        return jobDataManager.findJobsByProcessInstanceId(id);
+        return dataManager.findJobsByProcessInstanceId(id);
     }
 
     @Override
     public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery);
+        return dataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override
     public long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
-        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+        return dataManager.findJobCountByQueryCriteria(jobQuery);
     }
 
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
     @Override
     public void insert(SuspendedJobEntity jobEntity, boolean fireCreateEvent) {
-        getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            serviceConfiguration.getInternalJobManager().handleJobInsert(jobEntity);
+        }
 
-        jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
+        jobEntity.setCreateTime(getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
     }
 
@@ -74,19 +75,21 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
 
     @Override
     public void delete(SuspendedJobEntity jobEntity) {
-        super.delete(jobEntity);
+        super.delete(jobEntity, false);
 
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
-        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            serviceConfiguration.getInternalJobManager().handleJobDelete(jobEntity);
+        }
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
         }
     }
-    
+
     protected SuspendedJobEntity createSuspendedJob(AbstractRuntimeJobEntity job) {
         SuspendedJobEntity newSuspendedJobEntity = create();
         newSuspendedJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
@@ -110,12 +113,4 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         return newSuspendedJobEntity;
     }
 
-    @Override
-    protected SuspendedJobDataManager getDataManager() {
-        return jobDataManager;
-    }
-
-    public void setJobDataManager(SuspendedJobDataManager jobDataManager) {
-        this.jobDataManager = jobDataManager;
-    }
 }

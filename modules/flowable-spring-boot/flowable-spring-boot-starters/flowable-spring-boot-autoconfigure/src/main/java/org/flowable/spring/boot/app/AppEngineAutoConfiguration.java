@@ -13,16 +13,24 @@
 package org.flowable.spring.boot.app;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.app.engine.AppEngine;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
+import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.FlowableAutoDeploymentProperties;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +47,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ConditionalOnAppEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableAutoDeploymentProperties.class,
     FlowableAppProperties.class,
     FlowableIdmProperties.class
 })
@@ -46,17 +55,20 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
     protected final FlowableAppProperties appProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public AppEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableAppProperties appProperties,
-        FlowableIdmProperties idmProperties) {
+        FlowableIdmProperties idmProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
         super(flowableProperties);
         this.appProperties = appProperties;
         this.idmProperties = idmProperties;
+        this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public SpringAppEngineConfiguration springAppEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager) throws IOException {
+    public SpringAppEngineConfiguration springAppEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<List<AutoDeploymentStrategy<AppEngine>>> appAutoDeploymentStrategies) throws IOException {
 
         SpringAppEngineConfiguration conf = new SpringAppEngineConfiguration();
 
@@ -74,6 +86,16 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
         configureEngine(conf, dataSource);
 
         conf.setIdGenerator(new StrongUuidGenerator());
+
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = appAutoDeploymentStrategies.getIfAvailable();
+        if (deploymentStrategies == null) {
+            deploymentStrategies = new ArrayList<>();
+        }
+        CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.APP);
+        // Always add the out of the box auto deployment strategies as last
+        deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));
+        conf.setDeploymentStrategies(deploymentStrategies);
 
         return conf;
     }

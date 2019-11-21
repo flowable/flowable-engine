@@ -76,6 +76,14 @@
     delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
   
+  <delete id="bulkDeleteHistoricProcessEntityLinks" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_TYPE_ = 'bpmn' and NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where SCOPE_ID_ = PROCINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricCaseEntityLinks" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_TYPE_ = 'cmmn' and NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where SCOPE_ID_ = CASEINST.ID_)
+  </delete>
+  
   <!-- HISTORIC ENTITY LINK RESULTMAP -->
 
   <resultMap id="historicEntityLinkResultMap" type="org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl">

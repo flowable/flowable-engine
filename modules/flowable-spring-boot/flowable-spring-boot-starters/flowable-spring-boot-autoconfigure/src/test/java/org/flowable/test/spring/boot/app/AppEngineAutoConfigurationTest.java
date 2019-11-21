@@ -18,6 +18,8 @@ import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDep
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +30,9 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.db.DbIdGenerator;
@@ -53,6 +57,8 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Tijs Rademakers
@@ -82,6 +88,17 @@ public class AppEngineAutoConfigurationTest {
                 assertAllServicesPresent(context, appEngine);
                 assertAutoDeployment(context);
 
+                SpringAppEngineConfiguration engineConfiguration = (SpringAppEngineConfiguration) appEngine.getAppEngineConfiguration();
+                Collection<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                        assertThat(strategy.getLockName()).isNull();
+                    });
+
                 deleteDeployments(appEngine);
 
                 assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
@@ -95,6 +112,86 @@ public class AppEngineAutoConfigurationTest {
                     });
             });
     }
+
+    @Test
+    public void standaloneAppEngineWithBasicDatasourceAndAutoDeploymentWithLocking() {
+        contextRunner
+            .withPropertyValues(
+                "flowable.auto-deployment.engine.app.use-lock=true",
+                "flowable.auto-deployment.engine.app.lock-wait-time=10m",
+                "flowable.auto-deployment.engine.app.throw-exception-on-deployment-failure=false",
+                "flowable.auto-deployment.engine.app.lock-name=testLock"
+            )
+            .run(context -> {
+                AppEngine appEngine = context.getBean(AppEngine.class);
+                assertThat(appEngine).as("App engine").isNotNull();
+
+                assertAllServicesPresent(context, appEngine);
+                assertAutoDeployment(context);
+
+                SpringAppEngineConfiguration engineConfiguration = (SpringAppEngineConfiguration) appEngine.getAppEngineConfiguration();
+                Collection<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
+                    });
+
+                deleteDeployments(appEngine);
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactly(
+                                SpringIdmEngineConfiguration.class,
+                                SpringAppEngineConfiguration.class
+                            );
+                    });
+            });
+    }
+
+    @Test
+    public void standaloneAppEngineWithBasicDatasourceAndCustomAutoDeploymentStrategies() {
+        contextRunner
+            .withUserConfiguration(CustomAutoDeploymentStrategyConfiguration.class)
+            .run(context -> {
+                AppEngine appEngine = context.getBean(AppEngine.class);
+                assertThat(appEngine).as("App engine").isNotNull();
+
+                assertAllServicesPresent(context, appEngine);
+                assertAutoDeployment(context);
+
+                SpringAppEngineConfiguration engineConfiguration = (SpringAppEngineConfiguration) appEngine.getAppEngineConfiguration();
+                Collection<AutoDeploymentStrategy<AppEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOf(TestAppEngineAutoDeploymentStrategy.class);
+
+                assertThat(deploymentStrategies).element(1)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isFalse();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    });
+
+                deleteDeployments(appEngine);
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactly(
+                                SpringIdmEngineConfiguration.class,
+                                SpringAppEngineConfiguration.class
+                            );
+                    });
+            });
+    }
+
+
     
     @Test
     public void appEngineWithBasicDataSourceAndProcessEngine() {
@@ -175,9 +272,9 @@ public class AppEngineAutoConfigurationTest {
         List<AppDeployment> deployments = appRepositoryService.createDeploymentQuery().orderByDeploymentName().asc().list();
 
         assertThat(deployments)
-            .hasSize(2)
+            .hasSize(3)
             .first()
-            .satisfies(deployment -> assertThat(deployment.getName()).isEqualTo("simple.bar"));
+            .satisfies(deployment -> assertThat(deployment.getName()).isEqualTo("processTask.bar"));
     }
     
     private static ProcessEngineConfiguration processEngine(AppEngine appEngine) {
@@ -191,6 +288,29 @@ public class AppEngineAutoConfigurationTest {
         @Bean
         public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> customIdGeneratorConfigurer() {
             return engineConfiguration -> engineConfiguration.setIdGenerator(new DbIdGenerator());
+        }
+    }
+
+    @Configuration
+    static class CustomAutoDeploymentStrategyConfiguration {
+
+        @Bean
+        @Order(10)
+        public TestAppEngineAutoDeploymentStrategy testAppEngineAutoDeploymentStrategy() {
+            return new TestAppEngineAutoDeploymentStrategy();
+        }
+    }
+
+    static class TestAppEngineAutoDeploymentStrategy implements AutoDeploymentStrategy<AppEngine> {
+
+        @Override
+        public boolean handlesMode(String mode) {
+            return false;
+        }
+
+        @Override
+        public void deployResources(String deploymentNameHint, Resource[] resources, AppEngine engine) {
+
         }
     }
 

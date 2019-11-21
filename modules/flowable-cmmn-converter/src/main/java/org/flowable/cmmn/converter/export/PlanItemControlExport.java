@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.ManualActivationRule;
+import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.RequiredRule;
@@ -26,6 +27,7 @@ import org.flowable.cmmn.model.RequiredRule;
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Micha Kiener
  */
 public class PlanItemControlExport implements CmmnXmlConstants {
 
@@ -42,7 +44,12 @@ public class PlanItemControlExport implements CmmnXmlConstants {
     }
 
     protected static void writeItemControlContent(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
-        writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
+        boolean hasWrittenExtensionElements = writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
+        hasWrittenExtensionElements = writeParentCompletionRule(planItemControl.getParentCompletionRule(), hasWrittenExtensionElements, xtw);
+        if (hasWrittenExtensionElements) {
+            xtw.writeEndElement();
+        }
+        
         writeRepetitionRule(planItemControl.getRepetitionRule(), xtw);
         writeRequiredRule(planItemControl.getRequiredRule(), xtw);
         writeManualActivationRule(planItemControl.getManualActivationRule(), xtw);
@@ -67,6 +74,27 @@ public class PlanItemControlExport implements CmmnXmlConstants {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
                         ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
             }
+            if (repetitionRule.getMaxInstanceCount() != null) {
+                if (repetitionRule.getMaxInstanceCount() == -1) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                        ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME, RepetitionRule.MAX_INSTANCE_COUNT_UNLIMITED_VALUE);
+                } else {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                        ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME, Integer.toString(repetitionRule.getMaxInstanceCount()));
+                }
+            }
+            if (StringUtils.isNotEmpty(repetitionRule.getCollectionVariableName())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_REPETITION_COLLECTION_VARIABLE_NAME, repetitionRule.getCollectionVariableName());
+            }
+            if (StringUtils.isNotEmpty(repetitionRule.getElementVariableName())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_REPETITION_ELEMENT_VARIABLE_NAME, repetitionRule.getElementVariableName());
+            }
+            if (StringUtils.isNotEmpty(repetitionRule.getElementIndexVariableName())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME, repetitionRule.getElementIndexVariableName());
+            }
             if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
                 xtw.writeStartElement(ELEMENT_CONDITION);
                 xtw.writeCData(repetitionRule.getCondition());
@@ -88,7 +116,8 @@ public class PlanItemControlExport implements CmmnXmlConstants {
         }
     }
 
-    public static void writeCompletionNeutralRule(CompletionNeutralRule completionNeutralRule, XMLStreamWriter xtw) throws XMLStreamException {
+    public static boolean writeCompletionNeutralRule(CompletionNeutralRule completionNeutralRule, XMLStreamWriter xtw) throws XMLStreamException {
+        boolean hasWrittenExtensionElements = false;
         if (completionNeutralRule != null) {
             xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
             xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_COMPLETION_NEUTRAL_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
@@ -99,7 +128,29 @@ public class PlanItemControlExport implements CmmnXmlConstants {
                 xtw.writeEndElement();
             }
             xtw.writeEndElement();
-            xtw.writeEndElement();
+            
+            hasWrittenExtensionElements = true;
         }
+        
+        return hasWrittenExtensionElements;
     }
+    
+    public static boolean writeParentCompletionRule(ParentCompletionRule parentCompletionRule, boolean hasWrittenExtensionElements, XMLStreamWriter xtw) throws XMLStreamException {
+        if (parentCompletionRule != null) {
+            if (!hasWrittenExtensionElements) {
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
+            }
+            
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_PARENT_COMPLETION_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
+            if (StringUtils.isNotEmpty(parentCompletionRule.getType())) {
+                xtw.writeAttribute(ATTRIBUTE_TYPE, parentCompletionRule.getType());
+            }
+            xtw.writeEndElement();
+            
+            hasWrittenExtensionElements = true;
+        }
+        
+        return hasWrittenExtensionElements;
+    }
+    
 }

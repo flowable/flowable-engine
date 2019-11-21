@@ -24,23 +24,12 @@ import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskLogEnt
 /**
  * @author martin.grofcik
  */
-public class HistoricTaskLogEntryEntityManagerImpl extends AbstractEntityManager<HistoricTaskLogEntryEntity> implements HistoricTaskLogEntryEntityManager {
-
-    private final HistoricTaskLogEntryDataManager taskLogDataManager;
+public class HistoricTaskLogEntryEntityManagerImpl
+    extends AbstractTaskServiceEntityManager<HistoricTaskLogEntryEntity, HistoricTaskLogEntryDataManager>
+    implements HistoricTaskLogEntryEntityManager {
 
     public HistoricTaskLogEntryEntityManagerImpl(TaskServiceConfiguration taskServiceConfiguration, HistoricTaskLogEntryDataManager taskLogDataManager) {
-        super(taskServiceConfiguration);
-        this.taskLogDataManager = taskLogDataManager;
-    }
-
-    @Override
-    public void insert(HistoricTaskLogEntryEntity entity, boolean fireEvents) {
-        super.insert(entity, fireEvents);
-    }
-
-    @Override
-    protected HistoricTaskLogEntryDataManager getDataManager() {
-        return taskLogDataManager;
+        super(taskServiceConfiguration, taskLogDataManager);
     }
 
     @Override
@@ -80,6 +69,16 @@ public class HistoricTaskLogEntryEntityManagerImpl extends AbstractEntityManager
     @Override
     public void deleteHistoricTaskLogEntriesForTaskId(String taskId) {
         getDataManager().deleteHistoricTaskLogEntriesByTaskId(taskId);
+    }
+    
+    @Override
+    public void deleteHistoricTaskLogEntriesForNonExistingProcessInstances() {
+        getDataManager().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
+    }
+    
+    @Override
+    public void deleteHistoricTaskLogEntriesForNonExistingCaseInstances() {
+        getDataManager().deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
     }
 
     @Override

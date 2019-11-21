@@ -12,12 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
-
-import java.util.List;
 
 /**
  * @author Dennis Federico
@@ -32,4 +32,5 @@ public interface HistoricPlanItemInstanceDataManager extends DataManager<Histori
 
     void deleteByCaseDefinitionId(String caseDefinitionId);
 
+    void deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
 }

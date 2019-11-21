@@ -19,9 +19,12 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -52,8 +55,10 @@ public abstract class AbstractProcessEngineIntegrationTest {
     protected ManagementService processEngineManagementService;
     protected RepositoryService processEngineRepositoryService;
     protected RuntimeService processEngineRuntimeService;
+    protected HistoryService processEngineHistoryService;
     protected TaskService processEngineTaskService;
     protected ProcessEngineConfiguration processEngineConfiguration;
+    protected DynamicBpmnService processEngineDynamicBpmnService;
 
     @BeforeClass
     public static void bootProcessEngine() {
@@ -77,13 +82,19 @@ public abstract class AbstractProcessEngineIntegrationTest {
         this.processEngineRepositoryService = processEngine.getRepositoryService();
         this.processEngineRuntimeService = processEngine.getRuntimeService();
         this.processEngineTaskService = processEngine.getTaskService();
+        this.processEngineHistoryService = processEngine.getHistoryService();
         this.processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+        this.processEngineDynamicBpmnService = processEngine.getDynamicBpmnService();
     }
 
     @After
     public void cleanup() {
         for (Deployment deployment : processEngineRepositoryService.createDeploymentQuery().list()) {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+
+        for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
+            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
     

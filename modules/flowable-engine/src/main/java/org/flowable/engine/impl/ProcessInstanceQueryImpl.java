@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -31,6 +32,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryValue;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +46,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Falko Menge
  * @author Daniel Meyer
  */
-public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessInstanceQuery, ProcessInstance> implements ProcessInstanceQuery, Serializable {
+public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessInstanceQuery, ProcessInstance> implements 
+        ProcessInstanceQuery, QueryCacheValues, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String executionId;
@@ -75,6 +78,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String nameLikeIgnoreCase;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String locale;
     protected boolean withLocalizationFallback;
 
@@ -490,6 +495,26 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     @Override
+    public ProcessInstanceQuery processInstanceReferenceId(String referenceId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceQuery processInstanceReferenceType(String referenceType) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
+        }
+        return this;
+    }
+
+    @Override
     public ProcessInstanceQuery or() {
         if (inOrStatement) {
             throw new FlowableException("the query is already in an or statement");
@@ -727,7 +752,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -740,7 +764,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     @Override
     public List<ProcessInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
         List<ProcessInstance> processInstances = null;
         
@@ -808,6 +831,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     public String getProcessInstanceId() {
+        return executionId;
+    }
+    
+    @Override
+    public String getId() {
         return executionId;
     }
 
@@ -957,6 +985,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public List<ProcessInstanceQueryImpl> getOrQueryObjects() {

@@ -17,9 +17,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.api.TokenQueryProperty;
@@ -28,7 +29,7 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
 /**
  * @author Tijs Rademakers
  */
-public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements TokenQuery {
+public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements TokenQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
     protected String id;
@@ -199,13 +200,11 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokenCountByQueryCriteria(this);
     }
 
     @Override
     public List<Token> executeList(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokenByQueryCriteria(this);
     }
 

@@ -262,6 +262,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.put("taskDefinitionKeyLike", "process%");
             assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
 
+            // Task definition keys filtering
+            requestNode.removeAll();
+            requestNode.putArray("taskDefinitionKeys").add("processTask").add("invalidTask");
+            assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+
             // Duedate filtering
             requestNode.removeAll();
             requestNode.put("dueDate", getISODateString(adhocTaskCreate.getTime()));
@@ -579,6 +584,14 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.put("name", "stringVar");
         variableNode.put("value", "Azert%");
         variableNode.put("operation", "like");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+
+        // LikeIgnore Case
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("value", "AzErT%");
+        variableNode.put("operation", "likeIgnoreCase");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
     }
 
     /**
@@ -633,10 +646,9 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment(resources = "org/flowable/rest/service/api/runtime/TaskQueryResourceTest.testQueryTasks.bpmn20.xml", tenantId = "testTenant")
     public void testQueryTasksWithTenant() throws Exception {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", "myBusinessKey",
+        runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", "myBusinessKey",
             Collections.singletonMap("var1", "var1Value"),
             "testTenant");
-        Task processTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         // Check filter-less to fetch all tasks
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_QUERY);

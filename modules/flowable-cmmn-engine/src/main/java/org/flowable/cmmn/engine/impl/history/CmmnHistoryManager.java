@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Date;
+
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -28,13 +30,15 @@ public interface CmmnHistoryManager {
 
     void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity);
 
-    void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state);
+    void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state, Date endTime);
     
     void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name);
 
+    void recordUpdateBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey);
+
     void recordMilestoneReached(MilestoneInstanceEntity milestoneInstanceEntity);
 
-    void recordHistoricCaseInstanceDeleted(String caseInstanceId);
+    void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId);
 
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
 
@@ -44,19 +48,21 @@ public interface CmmnHistoryManager {
 
     void recordEntityLinkDeleted(EntityLinkEntity entityLink);
 
-    void recordVariableCreate(VariableInstanceEntity variable);
+    void recordVariableCreate(VariableInstanceEntity variable, Date createTime);
 
-    void recordVariableUpdate(VariableInstanceEntity variable);
+    void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime);
 
     void recordVariableRemoved(VariableInstanceEntity variable);
 
     void recordTaskCreated(TaskEntity task);
 
-    void recordTaskEnd(TaskEntity task, String deleteReason);
+    void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime);
 
-    void recordTaskInfoChange(TaskEntity taskEntity);
+    void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
 
     void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity);
 
     void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity);
 

@@ -21,7 +21,7 @@
    <!-- INSERT HISTORIC IDENTITY LINK -->
   
   <insert id="insertHistoricIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
-    insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
+    insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
     values (#{id, jdbcType=VARCHAR},
             #{type, jdbcType=VARCHAR},
             #{userId, jdbcType=VARCHAR},
@@ -29,13 +29,14 @@
             #{taskId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
             #{createTime, jdbcType=TIMESTAMP})
   </insert>
   
   <insert id="bulkInsertHistoricIdentityLink" parameterType="java.util.List">
-    insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
+    insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
     values 
       <foreach collection="list" item="historicIdentityLink" index="index" separator=",">
         (#{historicIdentityLink.id, jdbcType=VARCHAR},
@@ -45,6 +46,7 @@
          #{historicIdentityLink.taskId, jdbcType=VARCHAR},
          #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR},
          #{historicIdentityLink.scopeId, jdbcType=VARCHAR},
+         #{historicIdentityLink.subScopeId, jdbcType=VARCHAR},
          #{historicIdentityLink.scopeType, jdbcType=VARCHAR},
          #{historicIdentityLink.scopeDefinitionId, jdbcType=VARCHAR},
          #{historicIdentityLink.createTime, jdbcType=TIMESTAMP})
@@ -54,7 +56,7 @@
   <insert id="bulkInsertHistoricIdentityLink" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="historicIdentityLink" index="index">
-        INTO ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_) VALUES 
+        INTO ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_) VALUES 
           (#{historicIdentityLink.id, jdbcType=VARCHAR},
            #{historicIdentityLink.type, jdbcType=VARCHAR},
            #{historicIdentityLink.userId, jdbcType=VARCHAR},
@@ -62,6 +64,7 @@
            #{historicIdentityLink.taskId, jdbcType=VARCHAR},
            #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR},
            #{historicIdentityLink.scopeId, jdbcType=VARCHAR},
+           #{historicIdentityLink.subScopeId, jdbcType=VARCHAR},
            #{historicIdentityLink.scopeType, jdbcType=VARCHAR},
            #{historicIdentityLink.scopeDefinitionId, jdbcType=VARCHAR},
            #{historicIdentityLink.createTime, jdbcType=TIMESTAMP})
@@ -90,6 +93,51 @@
     delete from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
   
+  <delete id="bulkDeleteHistoricProcessIdentityLinks" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ is not null and LINK.PROC_INST_ID_ != '' and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where LINK.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricProcessIdentityLinks" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ is not null and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where LINK.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricProcessIdentityLinks" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricCaseIdentityLinks" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.SCOPE_ID_ is not null and LINK.SCOPE_ID_ != '' and LINK.SCOPE_TYPE_ = 'cmmn' and
+    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where LINK.SCOPE_ID_ = CASEINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricCaseIdentityLinks" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.SCOPE_ID_ is not null and LINK.SCOPE_TYPE_ = 'cmmn' and
+    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where LINK.SCOPE_ID_ = CASEINST.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricCaseIdentityLinks" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
+    SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricTaskIdentityLinks" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> LINK </if> from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ is not null and LINK.TASK_ID_ != '' and
+    NOT EXISTS (select TASK.ID_ from ${prefix}ACT_HI_TASKINST TASK where LINK.TASK_ID_ = TASK.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricTaskIdentityLinks" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ is not null and
+    NOT EXISTS (select TASK.ID_ from ${prefix}ACT_HI_TASKINST TASK where LINK.TASK_ID_ = TASK.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricTaskIdentityLinks" databaseId="h2"  parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ is not null and TASK_ID_ != '' and 
+    TASK_ID_ NOT IN (select TASK.ID_ from ${prefix}ACT_HI_TASKINST TASK)
+  </delete>
+  
   <!-- HISTORIC IDENTITY LINK RESULTMAP -->
 
   <resultMap id="historicIdentityLinkResultMap" type="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
@@ -100,6 +148,7 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />       
@@ -121,6 +170,10 @@
   
   <select id="selectHistoricIdentityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
     select * from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+  </select>
+  
+  <select id="selectHistoricIdentityLinksBySubScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
+    select * from ${prefix}ACT_HI_IDENTITYLINK where SUB_SCOPE_ID_ = #{parameter.subScopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
   </select>
   
  <select id="selectIdentityLinks" resultMap="historicIdentityLinkResultMap">

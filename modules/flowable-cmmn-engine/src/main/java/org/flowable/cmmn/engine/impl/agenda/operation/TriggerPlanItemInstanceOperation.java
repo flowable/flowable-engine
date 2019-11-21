@@ -60,14 +60,7 @@ public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOp
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[Trigger PlanItem] ");
-        if (planItem.getName() != null) {
-            stringBuilder.append(planItem.getName());
-            stringBuilder.append(" (");
-            stringBuilder.append(planItem.getId());
-            stringBuilder.append(")");
-        } else {
-            stringBuilder.append(planItem.getId());
-        }
+        stringBuilder.append(planItem);
         return stringBuilder.toString();
     }
 

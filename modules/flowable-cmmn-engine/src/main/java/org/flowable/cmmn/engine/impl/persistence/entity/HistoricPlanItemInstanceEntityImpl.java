@@ -49,6 +49,8 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String referenceType;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String extraValue;
+    protected boolean showInOverview;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
     @Override
@@ -80,6 +82,8 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         persistentState.put("planItemDefinitionType", planItemDefinitionType);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
+        persistentState.put("extraValue", extraValue);
+        persistentState.put("showInOverview", showInOverview);
         persistentState.put("tenantId", tenantId);
         return persistentState;
     }
@@ -342,6 +346,36 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setExitCriterionId(String exitCriterionId) {
         this.exitCriterionId = exitCriterionId;
+    }
+    
+    @Override
+    public String getFormKey() {
+        return extraValue;
+    }
+
+    @Override
+    public void setFormKey(String formKey) {
+        this.extraValue = formKey;
+    }
+
+    @Override
+    public String getExtraValue() {
+        return extraValue;
+    }
+
+    @Override
+    public void setExtraValue(String extraValue) {
+        this.extraValue = extraValue;
+    }
+
+    @Override
+    public boolean isShowInOverview() {
+        return showInOverview;
+    }
+
+    @Override
+    public void setShowInOverview(boolean showInOverview) {
+        this.showInOverview = showInOverview;
     }
 
     @Override

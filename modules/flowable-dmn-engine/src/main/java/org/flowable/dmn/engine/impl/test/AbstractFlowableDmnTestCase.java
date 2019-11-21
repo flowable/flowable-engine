@@ -37,6 +37,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOG");
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOGLOCK");
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_GE_PROPERTY");
     }
 
     protected DmnEngine dmnEngine;
