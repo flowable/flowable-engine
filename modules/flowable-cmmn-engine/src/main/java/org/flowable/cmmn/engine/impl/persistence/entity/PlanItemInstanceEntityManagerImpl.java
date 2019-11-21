@@ -30,6 +30,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDat
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
@@ -185,11 +186,20 @@ public class PlanItemInstanceEntityManagerImpl
 
 
     protected List<PlanItem> gatherEventListenerDependencies(CommandContext commandContext, PlanItem planItem, PlanItemInstanceEntity planItemInstanceEntity) {
+        // first collect the event listeners
+        List<PlanItem> eventListenerDependencies;
 
-        List<PlanItem> eventListenerDependencies = Stream.concat(
-            planItem.getEntryDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener),
-            planItem.getExitDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener))
-            .collect(Collectors.toList());
+        // if the plan item has repetition, we don't remove any event listeners for entry dependencies, as they might trigger in the future and re-create
+        // the plan item as it has repetition and therefore, we also don't remove any exit sentry dependant event listeners, as if in the future, the plan
+        // item becomes active again, those event listeners might trigger again to terminate it, so we need them to stay in place
+        if (ExpressionUtil.hasRepetitionRule(planItem)) {
+            eventListenerDependencies = new ArrayList<>();
+        } else {
+            eventListenerDependencies = Stream.concat(
+                planItem.getEntryDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener),
+                planItem.getExitDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener))
+                .collect(Collectors.toList());
+        }
 
         // Special case: if the current plan item is a stage, we need to also verify all event listeners
         // that reference a child plan item of this stage. Normally this will happen automatically, unless
