@@ -24,15 +24,12 @@ import org.flowable.eventregistry.impl.runtime.EventCorrelationParameterInstance
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
 public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtractor<JsonNode> {
-
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventDefinition eventDefinition, JsonNode event) {
