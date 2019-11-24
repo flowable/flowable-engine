@@ -28,8 +28,6 @@ import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * Simple {@link EventInstance} serialization that maps all {@link EventPayloadInstance}'s
  * to an XML Document which gets transformed to a String.
@@ -39,8 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class EventPayloadToXmlStringSerializer implements OutboundEventSerializer {
 
     public static String TYPE = "payloadToXmlString";
-
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public String getType() {
