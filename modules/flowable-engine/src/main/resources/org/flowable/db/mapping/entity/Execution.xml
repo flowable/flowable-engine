@@ -760,6 +760,12 @@
       <if test="businessKey != null and includeChildExecutionsWithBusinessKeyQuery">
         and INST.BUSINESS_KEY_ = #{businessKey}
       </if>
+      <if test="businessKeyLike != null and !includeChildExecutionsWithBusinessKeyQuery">
+        and RES.BUSINESS_KEY_ like #{businessKeyLike}${wildcardEscapeClause}
+      </if>
+      <if test="businessKeyLike != null and includeChildExecutionsWithBusinessKeyQuery">
+        and INST.BUSINESS_KEY_ like #{businessKeyLike}${wildcardEscapeClause}
+      </if>
       <if test="activityId != null">
         and RES.ACT_ID_ = #{activityId} and RES.IS_ACTIVE_ = #{isActive}
       </if>

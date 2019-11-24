@@ -77,6 +77,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected boolean excludeSubprocesses;
     protected SuspensionState suspensionState;
     protected String businessKey;
+    protected String businessKeyLike;
     protected boolean includeChildExecutionsWithBusinessKeyQuery;
     protected boolean isActive;
     protected String involvedUser;
@@ -946,6 +947,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public String getBusinessKey() {
         return businessKey;
+    }
+    
+    public String getBusinessKeyLike() {
+        return businessKeyLike;
     }
 
     public String getExecutionId() {
