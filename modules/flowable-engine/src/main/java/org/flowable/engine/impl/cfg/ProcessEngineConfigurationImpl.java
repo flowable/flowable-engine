@@ -268,6 +268,7 @@ import org.flowable.engine.impl.migration.ProcessInstanceMigrationManagerImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
@@ -531,7 +532,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache;
 
     protected int processDefinitionInfoCacheLimit = -1; // By default, no limit
-    protected ProcessDefinitionInfoCache processDefinitionInfoCache;
+    protected DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache;
 
     protected int knowledgeBaseCacheLimit = -1;
     protected DeploymentCache<Object> knowledgeBaseCache;
@@ -3475,6 +3476,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setProcessDefinitionCache(DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache) {
         this.processDefinitionCache = processDefinitionCache;
         return this;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessDefinitionInfoCache(DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache){
+        this.processDefinitionInfoCache = processDefinitionInfoCache;
+        return this;
+    }
+
+    public DeploymentCache<ProcessDefinitionInfoCacheObject> getProcessDefinitionInfoCache() {
+        return processDefinitionInfoCache;
     }
 
     public int getKnowledgeBaseCacheLimit() {
