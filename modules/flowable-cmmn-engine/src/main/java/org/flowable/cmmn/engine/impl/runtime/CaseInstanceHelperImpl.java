@@ -192,6 +192,13 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             }
         }
 
+        if (cmmnEngineConfiguration.getStartCaseInstanceInterceptor() != null) {
+            StartCaseInstanceAfterContext instanceAfterContext = new StartCaseInstanceAfterContext(caseInstanceEntity,
+                caseInstanceBuilder.getVariables(), caseInstanceBuilder.getTransientVariables(), caseModel, caseDefinition, cmmnModel);
+
+            cmmnEngineConfiguration.getStartCaseInstanceInterceptor().afterStartCaseInstance(instanceAfterContext);
+        }
+
         CaseLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
 
         callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
@@ -201,14 +208,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, "Started case instance with id " + 
                             caseInstanceEntity.getId(), caseInstanceEntity);
         }
-        
-        if (cmmnEngineConfiguration.getStartCaseInstanceInterceptor() != null) {
-            StartCaseInstanceAfterContext instanceAfterContext = new StartCaseInstanceAfterContext(caseInstanceEntity, 
-                            caseInstanceBuilder.getVariables(), caseInstanceBuilder.getTransientVariables(), caseModel, caseDefinition, cmmnModel);
-            
-            cmmnEngineConfiguration.getStartCaseInstanceInterceptor().afterStartCaseInstance(instanceAfterContext);
-        }
-        
+
         return caseInstanceEntity;
     }
 

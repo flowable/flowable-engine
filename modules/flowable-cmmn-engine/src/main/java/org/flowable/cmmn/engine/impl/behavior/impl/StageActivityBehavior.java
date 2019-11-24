@@ -72,10 +72,12 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (StateTransition.isPossible(childPlanItemInstance, transition)) {
+                    // we don't propagate the exit and exit event type to the child plan items as regardless of the parent termination type, children always
+                    // get treated the same way
                     if (PlanItemTransition.TERMINATE.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(childPlanItemInstance);
+                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(childPlanItemInstance, null, null);
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance, null);
+                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance, null, null, null);
                     }
                 }
             }

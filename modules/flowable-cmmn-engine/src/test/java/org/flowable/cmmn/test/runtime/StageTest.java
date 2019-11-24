@@ -271,7 +271,7 @@ public class StageTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Hidden", PlanItemInstanceState.TERMINATED);
         assertPlanItemInstanceState(planItemInstances, "Close", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Draft", PlanItemInstanceState.COMPLETED);
-        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.TERMINATED);
         assertPlanItemInstanceState(planItemInstances, "Service task 1", PlanItemInstanceState.TERMINATED);
         assertPlanItemInstanceState(planItemInstances, "Service task 2", PlanItemInstanceState.COMPLETED);
         assertPlanItemInstanceState(planItemInstances, "Reopen Task", PlanItemInstanceState.ACTIVE);
@@ -291,7 +291,7 @@ public class StageTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Hidden", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Close", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Draft", PlanItemInstanceState.COMPLETED);
-        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Close Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.TERMINATED, PlanItemInstanceState.AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Service task 1", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Service task 2", PlanItemInstanceState.COMPLETED);
         assertPlanItemInstanceState(planItemInstances, "Reopen Task", PlanItemInstanceState.COMPLETED, PlanItemInstanceState.TERMINATED);
@@ -506,7 +506,7 @@ public class StageTest extends FlowableCmmnTestCase {
 
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().caseInstanceId(caseInstance.getId()).list();
         assertPlanItemInstanceState(planItemInstances, "stage1", PlanItemInstanceState.TERMINATED);
-        assertPlanItemInstanceState(planItemInstances, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "stage2", PlanItemInstanceState.TERMINATED, PlanItemInstanceState.TERMINATED);
 
         List<UserEventListenerInstance> userEventListenerInstances = cmmnRuntimeService.createUserEventListenerInstanceQuery().
             caseInstanceId(caseInstance.getId()).list();

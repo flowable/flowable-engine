@@ -34,7 +34,7 @@ public class TerminatePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceC
 
     @Override
     protected void internalExecute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
     }
     
 }

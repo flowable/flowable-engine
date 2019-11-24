@@ -26,7 +26,6 @@ import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.cmd.DeleteHistoricActivityInstancesCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskLogEntryByLogNumberCmd;

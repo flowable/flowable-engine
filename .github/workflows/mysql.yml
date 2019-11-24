@@ -12,6 +12,7 @@ jobs:
     name: MySQL ${{ matrix.mysql }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mysql: [5.7, 8]
     services:
@@ -50,6 +51,7 @@ jobs:
     name: MySQL ${{ matrix.mysql }} DMN
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mysql: [5.7, 8]
     services:
@@ -89,6 +91,7 @@ jobs:
     name: MySQL ${{ matrix.mysql }} Content
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mysql: [5.7, 8]
     services:

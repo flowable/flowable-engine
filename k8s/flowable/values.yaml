@@ -34,11 +34,11 @@ idm:
   resources:
     requests:
       cpu: "100m"
-      memory: "1Gi"
+      memory: "512Mi"
     limits:
       cpu: "1"
-      memory: "1Gi"
-  javaOpts: "-Xmx1g -Xms1g"
+      memory: "512Mi"
+  javaOpts: "-Xms512m -Xmx512m"
 
 # Enable either Flowable Task or Flowable REST
 task:
@@ -96,11 +96,11 @@ modeler:
   resources:
     requests:
       cpu: "100m"
-      memory: "1Gi"
+      memory: "512Mi"
     limits:
       cpu: "1"
-      memory: "1Gi"
-  javaOpts: "-Xmx1g -Xms1g"
+      memory: "512Mi"
+  javaOpts: "-Xms512m -Xmx512m"
 
 admin:
   enabled: true
@@ -116,11 +116,11 @@ admin:
   resources:
     requests:
       cpu: "100m"
-      memory: "1Gi"
+      memory: "512Mi"
     limits:
       cpu: "1"
-      memory: "1Gi"
-  javaOpts: "-Xmx1g -Xms1g"
+      memory: "512Mi"
+  javaOpts: "-Xms512m -Xmx512m"
 
 # NGINX Ingress controller https://github.com/kubernetes/ingress-nginx
 nginx-ingress:

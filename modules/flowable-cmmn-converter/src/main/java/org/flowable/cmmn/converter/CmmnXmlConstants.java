@@ -172,6 +172,10 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_CATEGORY = "category";
 
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
+    String ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME = "maxInstanceCount";
+    String ATTRIBUTE_REPETITION_COLLECTION_VARIABLE_NAME = "collectionVariable";
+    String ATTRIBUTE_REPETITION_ELEMENT_VARIABLE_NAME = "elementVariable";
+    String ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME = "elementIndexVariable";
 
     String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
 

@@ -34,6 +34,14 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
     @Override
     public void run() {
+        String oldState = planItemInstanceEntity.getState();
+        String newState = getNewState();
+
+        // if the old and new state are the same, leave the operation as we don't execute any transition
+        if (oldState != null && oldState.equals(newState) && abortOperationIfNewStateEqualsOldState()) {
+            return;
+        }
+
         if (planItemInstanceEntity.getPlanItem() != null) { // can be null for the plan model
             Object behavior = planItemInstanceEntity.getPlanItem().getBehavior();
             if (behavior instanceof PlanItemActivityBehavior
@@ -42,8 +50,6 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
             }
         }
 
-        String oldState = planItemInstanceEntity.getState();
-        String newState = getNewState();
         planItemInstanceEntity.setState(newState);
         PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, getNewState());
 
@@ -77,6 +83,16 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
     protected abstract String getNewState();
 
     protected abstract String getLifeCycleTransition();
+
+    /**
+     * Overwrite this default implemented hook, if the operation should be aborted on a void transition which might be the case, if the old and new state
+     * will be the same.
+     *
+     * @return true, if this operation should be aborted, if the new plan item state is the same as the old one, false, if the operation is to be executed in any case
+     */
+    protected boolean abortOperationIfNewStateEqualsOldState() {
+        return false;
+    }
 
     @Override
     public String toString() {

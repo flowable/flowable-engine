@@ -75,13 +75,13 @@ public class CasePageTaskActivityBehaviour extends TaskActivityBehavior implemen
                                 getExpressionValue(candidateGroup, planItemInstanceEntity, expressionManager), IdentityLinkType.CANDIDATE);
             }
         }
-        
-        cmmnEngineConfiguration.getCmmnHistoryManager().recordPlanItemInstanceUpdated(planItemInstanceEntity);
-        
+
         if (cmmnEngineConfiguration.getCreateCasePageTaskInterceptor() != null) {
             CreateCasePageTaskAfterContext afterContext = new CreateCasePageTaskAfterContext(casePageTask, planItemInstanceEntity);
             cmmnEngineConfiguration.getCreateCasePageTaskInterceptor().afterCreateCasePageTask(afterContext);
         }
+        
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordPlanItemInstanceUpdated(planItemInstanceEntity);
     }
 
     @Override

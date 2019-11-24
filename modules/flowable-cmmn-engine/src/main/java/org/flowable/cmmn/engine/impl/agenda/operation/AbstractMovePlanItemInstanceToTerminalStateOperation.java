@@ -44,11 +44,13 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         String originalState = planItemInstanceEntity.getState();
 
         super.run();
+
+        String plannedNewState = getNewState();
         
-        if (isRepeatingOnDelete(originalState) && !isWaitingForRepetitionPlanItemInstanceExists(planItemInstanceEntity)) {
+        if (isRepeatingOnDelete(originalState, plannedNewState) && !isWaitingForRepetitionPlanItemInstanceExists(planItemInstanceEntity)) {
 
             // Create new repeating instance
-            PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true);
+            PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true, false);
 
             if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener) {
                 CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
@@ -80,7 +82,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     @Override
     protected abstract void internalExecute();
 
-    protected boolean isRepeatingOnDelete(String originalState) {
+    protected boolean isRepeatingOnDelete(String originalState, String newState) {
         
         // If there are no entry criteria and the repetition rule evaluates to true: a new instance needs to be created.
 
@@ -91,16 +93,18 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         if (isEvaluateRepetitionRule() && hasRepetitionRuleAndNoEntryCriteria(planItem)) {
-            return ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity);
+            return ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceEntity.getStagePlanItemInstanceEntity());
         }
 
-        // If the plan item instance is in AVAILABLE, and it's repeatable and it gets terminated
+        // If the plan item instance is in AVAILABLE (and the new state is terminated), and it's repeatable and it gets terminated
         // this means it has never moved away from available.
         // This means there never was a wait_for_repetition instance created (because the plan item instance
         // never goes back to available but to wait_for_repetition).
         // In this specific case, we need to create the wait_for_repetition for future repetitions
         if (PlanItemInstanceState.AVAILABLE.equals(originalState)
+                && PlanItemInstanceState.TERMINATED.equals(newState)
                 && hasRepetitionRuleEntryCriteria(planItem)
+                && !hasRepetitionOnCollection(planItem)
                 && isWithoutStageOrParentIsNotTerminated(planItemInstanceEntity)) { // only when the parent is not yet terminated, a new instance should be created
             return true; // the repetition rule doesn't matter, as it can happen on any entry condition that becomes true
         }
@@ -113,11 +117,26 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                 || !PlanItemInstanceState.isInTerminalState(planItemInstanceEntity.getStagePlanItemInstanceEntity());
     }
 
+    /**
+     * Returns true, if the given plan item has a repetition rule, but no entry criteria to be satisfied and no collection based repetition. A collection
+     * based repetition is similar to entry criteria as it needs to be available in order to repeat the plan item.
+     *
+     * @param planItem the plan item to test
+     * @return true, if the plan item has a repetition rule without any conditions like entry criteria or a collection to be based on for repetition
+     */
     protected boolean hasRepetitionRuleAndNoEntryCriteria(PlanItem planItem) {
         return planItem != null
             && planItem.getEntryCriteria().isEmpty()
             && planItem.getItemControl() != null
-            && planItem.getItemControl().getRepetitionRule() != null;
+            && planItem.getItemControl().getRepetitionRule() != null
+            && !planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
+    }
+
+    protected boolean hasRepetitionOnCollection(PlanItem planItem) {
+        return planItem != null
+            && planItem.getItemControl() != null
+            && planItem.getItemControl().getRepetitionRule() != null
+            && planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
     }
 
     protected boolean hasRepetitionRuleEntryCriteria(PlanItem planItem) {
@@ -159,7 +178,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     protected void exitChildPlanItemInstances(String exitCriterionId) {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
             if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId);
+                // don't propagate the exit event type and exit type to child plan items, it only has an impact where it was set using the exit sentry
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId, null, null);
             }
         }
     }

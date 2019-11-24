@@ -241,6 +241,11 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             handleAssignments(taskService, beforeContext.getAssignee(), beforeContext.getOwner(), beforeContext.getCandidateUsers(), 
                             beforeContext.getCandidateGroups(), task, expressionManager, execution, processEngineConfiguration);
             
+            if (processEngineConfiguration.getCreateUserTaskInterceptor() != null) {
+                CreateUserTaskAfterContext afterContext = new CreateUserTaskAfterContext(userTask, task, execution);
+                processEngineConfiguration.getCreateUserTaskInterceptor().afterCreateUserTask(afterContext);
+            }
+
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
@@ -254,11 +259,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             TaskHelper.deleteTask(task, null, false, false, false); // false: no events fired for skipped user task
             leave(execution);
         }
-        
-        if (processEngineConfiguration.getCreateUserTaskInterceptor() != null) {
-            CreateUserTaskAfterContext afterContext = new CreateUserTaskAfterContext(userTask, task, execution);
-            processEngineConfiguration.getCreateUserTaskInterceptor().afterCreateUserTask(afterContext);
-        }
+
     }
 
     @Override
@@ -460,6 +461,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     /**
      * Extract a candidate list from a string.
+     *
+     * @param str
+     * @return
      */
     protected List<String> extractCandidates(String str) {
         return Arrays.asList(str.split("[\\s]*,[\\s]*"));

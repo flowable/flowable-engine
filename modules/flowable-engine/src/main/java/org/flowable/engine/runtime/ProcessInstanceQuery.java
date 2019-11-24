@@ -301,6 +301,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery processInstanceCallbackType(String callbackType);
 
     /**
+     * Only select process instances with the given reference id.
+     */
+    ProcessInstanceQuery processInstanceReferenceId(String referenceId);
+
+    /**
+     * Only select process instances with the given callback type.
+     */
+    ProcessInstanceQuery processInstanceReferenceType(String referenceType);
+
+    /**
      * Localize process name and description to specified locale.
      */
     ProcessInstanceQuery locale(String locale);

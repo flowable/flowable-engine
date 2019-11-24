@@ -13,12 +13,14 @@
 package org.flowable.cmmn.engine.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.time.Instant;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -155,9 +157,161 @@ public abstract class AbstractFlowableCmmnTestCase {
         }
 
         assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
+        List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
-            assertTrue("State '" + state + "' not found in plan item instances states '" + planItemInstanceStates + "'", planItemInstanceStates.contains(state));
+            assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
         }
+    }
+
+    protected void assertNoPlanItemInstance(List<PlanItemInstance> planItemInstances, String name) {
+        List<String> planItemInstanceStates = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .map(PlanItemInstance::getState)
+            .collect(Collectors.toList());
+
+        if (!planItemInstanceStates.isEmpty()) {
+            fail(planItemInstanceStates.size() + " plan item instance(s) found with name " + name + ", but should be 0");
+        }
+    }
+
+    protected void assertPlanItemLocalVariables(String caseInstanceId, String planItemName, List<?> itemVariableValues, List<Integer> itemIndexVariableValues) {
+        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceName(planItemName)
+            .planItemInstanceStateActive()
+            .orderByCreateTime().asc()
+            .list();
+
+        assertEquals(itemVariableValues.size(), tasks.size());
+
+        List<Object> itemValues = new ArrayList<>(tasks.size());
+        List<Object> itemIndexValues = new ArrayList<>(tasks.size());
+
+        for (PlanItemInstance task : tasks) {
+            itemValues.add(cmmnRuntimeService.getLocalVariable(task.getId(), "item"));
+            itemIndexValues.add(cmmnRuntimeService.getLocalVariable(task.getId(), "itemIndex"));
+        }
+
+        for (int ii = 0; ii < itemVariableValues.size(); ii++) {
+            int index = searchForMatch(itemVariableValues.get(ii), itemIndexVariableValues.get(ii), itemValues, itemIndexValues);
+            if (index == -1) {
+              fail("Could not find local variable value '" + itemVariableValues.get(ii) + "' with index value '" + itemIndexVariableValues.get(ii) + "'.");
+            }
+            itemValues.remove(index);
+            itemIndexValues.remove(index);
+        }
+    }
+
+    protected int searchForMatch(Object itemValue, Integer index, List<Object> itemValues, List<Object> itemIndexValues) {
+        for (int ii = 0; ii < itemValues.size(); ii++) {
+            if (itemValues.get(ii).equals(itemValue) && itemIndexValues.get(ii).equals(index)) {
+                return ii;
+            }
+        }
+        return -1;
+    }
+
+    protected void completePlanItemsWithItemValues(String caseInstanceId, String planItemName, int expectedTotalCount, Object... itemValues) {
+        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceName(planItemName)
+            .planItemInstanceStateActive()
+            .orderByCreateTime().asc()
+            .list();
+
+        assertEquals(expectedTotalCount, tasks.size());
+        assertNotNull(itemValues);
+        assertTrue(itemValues.length <= expectedTotalCount);
+
+        for (Object itemValue : itemValues) {
+            if (!completePlanItemWithItemValue(tasks, itemValue)) {
+                fail("Could not find plan item instance with 'item' value of '" + itemValue + "'");
+            }
+        }
+    }
+
+    protected boolean completePlanItemWithItemValue(List<PlanItemInstance> planItemInstances, Object itemValue) {
+        for (PlanItemInstance planItemInstance : planItemInstances) {
+            Object itemValueVar = cmmnRuntimeService.getLocalVariable(planItemInstance.getId(), "item");
+            if (itemValue.equals(itemValueVar)) {
+                cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void completeAllPlanItems(String caseInstanceId, String planItemName, int expectedCount) {
+        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceName(planItemName)
+            .planItemInstanceStateActive()
+            .orderByCreateTime().asc()
+            .list();
+
+        assertEquals(expectedCount, tasks.size());
+        for (PlanItemInstance task : tasks) {
+            cmmnRuntimeService.triggerPlanItemInstance(task.getId());
+        }
+    }
+
+    protected List<PlanItemInstance> getAllPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .orderByEndTime().asc()
+            .includeEnded()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getCompletedPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceStateCompleted()
+            .includeEnded()
+            .orderByName().asc()
+            .list();
+    }
+
+    protected List<PlanItemInstance> getTerminatedPlanItemInstances(String caseInstanceId) {
+        return cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .orderByName().asc()
+            .planItemInstanceStateTerminated()
+            .includeEnded()
+            .list();
+    }
+
+    protected String getPlanItemInstanceIdByName(List<PlanItemInstance> planItemInstances, String name) {
+        return getPlanItemInstanceByName(planItemInstances, name, null).getId();
+    }
+
+    protected String getPlanItemInstanceIdByNameAndState(List<PlanItemInstance> planItemInstances, String name, String state) {
+        return getPlanItemInstanceByName(planItemInstances, name, state).getId();
+    }
+
+    protected PlanItemInstance getPlanItemInstanceByName(List<PlanItemInstance> planItemInstances, String name, String state) {
+        List<PlanItemInstance> matchingPlanItemInstances = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .filter(planItemInstance -> state != null ? Objects.equals(state, planItemInstance.getState()) : true)
+            .collect(Collectors.toList());
+
+        if (matchingPlanItemInstances.isEmpty()) {
+            fail("No plan item instances found with name " + name);
+        }
+
+        if (matchingPlanItemInstances.size() > 1) {
+            fail("Found " + matchingPlanItemInstances.size() + " plan item instances with name " + name);
+        }
+
+        return matchingPlanItemInstances.get(0);
     }
 
     protected void waitForJobExecutorToProcessAllJobs() {

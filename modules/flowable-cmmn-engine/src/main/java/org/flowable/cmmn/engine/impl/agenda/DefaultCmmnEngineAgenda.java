@@ -188,13 +188,13 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
 
     @Override
-    public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId) {
-        addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitCriterionId), planItemInstanceEntity.getCaseInstanceId());
+    public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType) {
+        addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitCriterionId, exitType, exitEventType), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
+    public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
+        addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitType, exitEventType), planItemInstanceEntity.getCaseInstanceId());
     }
     
     @Override
@@ -214,12 +214,12 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
 
     @Override
     public void planManualTerminateCaseInstanceOperation(String caseInstanceEntityId) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, true, null), caseInstanceEntityId);
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, true, null, null, null), caseInstanceEntityId);
     }
 
     @Override
-    public void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, false, exitCriterionId), caseInstanceEntityId);
+    public void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId, String exitType, String exitEventType) {
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, false, exitCriterionId, exitType, exitEventType), caseInstanceEntityId);
     }
 
 }
