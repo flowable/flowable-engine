@@ -13,34 +13,17 @@
 
 package org.flowable.content.engine.impl.storage.db.entity;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.content.engine.impl.persistence.entity.AbstractEntityManager;
 import org.flowable.content.engine.impl.storage.db.StorageItemDataManager;
 
 /**
  * @author Jorge Moraleda
  */
-public class StorageItemEntityManagerImpl extends AbstractEntityManager<StorageItemEntity> implements StorageItemEntityManager {
-
-    protected StorageItemDataManager storageDataManager;
-
+public class StorageItemEntityManagerImpl 
+extends AbstractEngineEntityManager<ContentEngineConfiguration, StorageItemEntity, StorageItemDataManager> 
+implements StorageItemEntityManager {
     public StorageItemEntityManagerImpl(ContentEngineConfiguration contentEngineConfiguration, StorageItemDataManager storageDataManager) {
-        super(contentEngineConfiguration);
-        this.storageDataManager = storageDataManager;
+        super(contentEngineConfiguration, storageDataManager);
     }
-
-    @Override
-    protected DataManager<StorageItemEntity> getDataManager() {
-        return storageDataManager;
-    }
-
-    public StorageItemDataManager getstorageDataManager() {
-        return storageDataManager;
-    }
-
-    public void setstorageDataManager(StorageItemDataManager storageDataManager) {
-        this.storageDataManager = storageDataManager;
-    }
-
 }
