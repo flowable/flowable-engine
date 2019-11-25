@@ -32,6 +32,7 @@
         SUB_SCOPE_ID_,
         SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
+        STAGE_INSTANCE_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -60,6 +61,7 @@
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
         #{scopeDefinitionId, jdbcType=VARCHAR},
+        #{stageInstanceId, jdbcType=VARCHAR},
         #{name ,jdbcType=VARCHAR},
         #{parentTaskId ,jdbcType=VARCHAR},
         #{description ,jdbcType=VARCHAR},
@@ -92,6 +94,7 @@
         SUB_SCOPE_ID_,
         SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
+        STAGE_INSTANCE_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -121,6 +124,7 @@
            #{historicTask.subScopeId, jdbcType=VARCHAR},
            #{historicTask.scopeType, jdbcType=VARCHAR},
            #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
+           #{historicTask.stageInstanceId, jdbcType=VARCHAR},
            #{historicTask.name ,jdbcType=VARCHAR},
            #{historicTask.parentTaskId ,jdbcType=VARCHAR},
            #{historicTask.description ,jdbcType=VARCHAR},
@@ -155,6 +159,7 @@
             SUB_SCOPE_ID_,
             SCOPE_TYPE_,
             SCOPE_DEFINITION_ID_,
+            STAGE_INSTANCE_ID_,
             NAME_,
             PARENT_TASK_ID_,
             DESCRIPTION_,
@@ -183,6 +188,7 @@
              #{historicTask.subScopeId, jdbcType=VARCHAR},
              #{historicTask.scopeType, jdbcType=VARCHAR},
              #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
+             #{historicTask.stageInstanceId, jdbcType=VARCHAR},
              #{historicTask.name ,jdbcType=VARCHAR},
              #{historicTask.parentTaskId ,jdbcType=VARCHAR},
              #{historicTask.description ,jdbcType=VARCHAR},
@@ -220,16 +226,19 @@
 	      	EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
 	      </if>
           <if test="originalPersistentState.scopeId != scopeId">
-            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.subScopeId != subScopeId">
-            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.scopeType != scopeType">
-            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
+            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.stageInstanceId != stageInstanceId">
+            STAGE_INSTANCE_ID_ = #{stageInstanceId, jdbcType=VARCHAR},
           </if>
 	      <if test="originalPersistentState.name != name">
 	      	NAME_ = #{name, jdbcType=VARCHAR},
@@ -337,6 +346,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="stageInstanceId" column="STAGE_INSTANCE_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -367,6 +377,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="stageInstanceId" column="STAGE_INSTANCE_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />

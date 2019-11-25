@@ -65,6 +65,7 @@ create table ACT_RU_EXECUTION (
     CALLBACK_TYPE_ nvarchar(255),
     REFERENCE_ID_ nvarchar(255),
     REFERENCE_TYPE_ nvarchar(255),
+    STAGE_INSTANCE_ID_ nvarchar(255),
     primary key (ID_)
 );
 

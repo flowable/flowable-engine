@@ -58,7 +58,7 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
         String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey) {
         
-        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, stageInstanceId, tenantId, fallbackToDefaultTenant, inParametersMap, businessKey);
+        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, stageInstanceId, tenantId, fallbackToDefaultTenant, inParametersMap, businessKey);
     }
 
     @Override
