@@ -1923,6 +1923,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     }
 
+    @Override
+    public String getStageInstanceId() {
+        return null;
+    }
+
     protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity, ProcessEngineConfigurationImpl processEngineConfiguration) {
         JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
         for (JobProcessor jobProcessor : processEngineConfiguration.getJobProcessors()) {

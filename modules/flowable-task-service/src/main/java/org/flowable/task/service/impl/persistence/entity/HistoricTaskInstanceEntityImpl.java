@@ -43,6 +43,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String stageInstanceId;
     protected Date createTime;
     protected Date endTime;
     protected Long durationInMillis;
@@ -81,6 +82,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         this.subScopeId = task.getSubScopeId();
         this.scopeType = task.getScopeType();
         this.scopeDefinitionId = task.getScopeDefinitionId();
+        this.stageInstanceId = task.getStageInstanceId();
         this.name = task.getName();
         this.parentTaskId = task.getParentTaskId();
         this.description = task.getDescription();
@@ -210,6 +212,11 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @Override
+    public String getStageInstanceId() {
+        return stageInstanceId;
     }
 
     @Override

@@ -231,7 +231,7 @@ public class ExecutionEntityManagerImpl
 
     @Override
     public ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId, 
-                    String businessKey, String processInstanceName, String callbackId, String callbackType,
+                    String businessKey, String processInstanceName, String callbackId, String callbackType, String stageInstanceId,
                     String tenantId, String initiatorVariableName, String startActivityId) {
 
         ExecutionEntity processInstanceExecution = dataManager.create();
@@ -258,7 +258,10 @@ public class ExecutionEntityManagerImpl
         }
         if (callbackType != null) {
             processInstanceExecution.setCallbackType(callbackType);
-        }   
+        }
+        if (stageInstanceId != null) {
+            processInstanceExecution.setStageInstanceId(stageInstanceId);
+        }
         
         processInstanceExecution.setScope(true); // process instance is always a scope for all child executions
 
@@ -381,6 +384,9 @@ public class ExecutionEntityManagerImpl
             CountingExecutionEntity countingParentExecutionEntity = (CountingExecutionEntity) parentExecutionEntity;
             ((CountingExecutionEntity) childExecution).setCountEnabled(countingParentExecutionEntity.isCountEnabled());
         }
+
+        // inherit the stage instance id, if present
+        childExecution.setStageInstanceId(parentExecutionEntity.getStageInstanceId());
 
         childExecution.setRootProcessInstanceId(parentExecutionEntity.getRootProcessInstanceId());
         childExecution.setActive(true);

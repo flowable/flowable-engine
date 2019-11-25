@@ -69,6 +69,9 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             taskEntity.setScopeType(ScopeTypes.CMMN);
             taskEntity.setTenantId(planItemInstanceEntity.getTenantId());
 
+            // set the stage instance id, if this plan item (task) belongs to a stage
+            taskEntity.setStageInstanceId(planItemInstanceEntity.getStageInstanceId());
+
             taskEntity.setTaskDefinitionKey(humanTask.getId());
             
             CreateHumanTaskBeforeContext beforeContext = new CreateHumanTaskBeforeContext(humanTask, planItemInstanceEntity, humanTask.getName(), 

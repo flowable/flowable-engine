@@ -55,6 +55,8 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     
     void setScopeDefinitionId(String scopeDefinitionId);
 
+    void setStageInstanceId(String stageInstanceId);
+
     int getSuspensionState();
 
     void setSuspensionState(int suspensionState);

@@ -59,7 +59,7 @@ public interface Execution {
     /**
      * Id of the root of the execution tree representing the process instance that has no super execution.
      */
-    public String getRootProcessInstanceId();
+    String getRootProcessInstanceId();
 
     /**
      * The tenant identifier of this process instance
@@ -76,7 +76,25 @@ public interface Execution {
      */
     String getDescription();
 
+    /**
+     * If this execution has created a case (through a case task), this will return the referenced case instance id.
+     *
+     * @return the id of the optionally referenced case instance, if this execution created a case
+     */
     String getReferenceId();
 
+    /**
+     * If this execution has created a case (through a case task), this will return the referenced case type (e.g. bpmn-x-to-cmmn-y type).
+     *
+     * @return the type of the optionally referenced case instance, if this execution created a case
+     */
     String getReferenceType();
+
+    /**
+     * If this execution runs in the context of a case and stage, this method returns it's closest parent stage instance id (the stage plan item instance id to be
+     * precise).
+     *
+     * @return the stage instance id this execution belongs to or null, if this execution is not part of a case at all or is not a child element of a stage
+     */
+    String getStageInstanceId();
 }
