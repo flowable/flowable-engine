@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -178,22 +179,69 @@ public abstract class AbstractFlowableCmmnTestCase {
             .caseInstanceId(caseInstanceId)
             .planItemInstanceName(planItemName)
             .planItemInstanceStateActive()
-            .orderByName().asc()
             .orderByCreateTime().asc()
             .list();
 
         assertEquals(itemVariableValues.size(), tasks.size());
-        for (int ii = 0; ii < tasks.size(); ii++) {
-            PlanItemInstance task = tasks.get(ii);
 
-            Object itemValue = cmmnRuntimeService.getLocalVariable(task.getId(), "item");
-            Object itemIndexValue = cmmnRuntimeService.getLocalVariable(task.getId(), "itemIndex");
-            assertEquals(itemVariableValues.get(ii), itemValue);
-            assertEquals(itemIndexVariableValues.get(ii), itemIndexValue);
+        List<Object> itemValues = new ArrayList<>(tasks.size());
+        List<Object> itemIndexValues = new ArrayList<>(tasks.size());
+
+        for (PlanItemInstance task : tasks) {
+            itemValues.add(cmmnRuntimeService.getLocalVariable(task.getId(), "item"));
+            itemIndexValues.add(cmmnRuntimeService.getLocalVariable(task.getId(), "itemIndex"));
+        }
+
+        for (int ii = 0; ii < itemVariableValues.size(); ii++) {
+            int index = searchForMatch(itemVariableValues.get(ii), itemIndexVariableValues.get(ii), itemValues, itemIndexValues);
+            if (index == -1) {
+              fail("Could not find local variable value '" + itemVariableValues.get(ii) + "' with index value '" + itemIndexVariableValues.get(ii) + "'.");
+            }
+            itemValues.remove(index);
+            itemIndexValues.remove(index);
         }
     }
 
-    protected void completePlanItems(String caseInstanceId, String planItemName, int expectedCount, int numberToComplete) {
+    protected int searchForMatch(Object itemValue, Integer index, List<Object> itemValues, List<Object> itemIndexValues) {
+        for (int ii = 0; ii < itemValues.size(); ii++) {
+            if (itemValues.get(ii).equals(itemValue) && itemIndexValues.get(ii).equals(index)) {
+                return ii;
+            }
+        }
+        return -1;
+    }
+
+    protected void completePlanItemsWithItemValues(String caseInstanceId, String planItemName, int expectedTotalCount, Object... itemValues) {
+        List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .planItemInstanceName(planItemName)
+            .planItemInstanceStateActive()
+            .orderByCreateTime().asc()
+            .list();
+
+        assertEquals(expectedTotalCount, tasks.size());
+        assertNotNull(itemValues);
+        assertTrue(itemValues.length <= expectedTotalCount);
+
+        for (Object itemValue : itemValues) {
+            if (!completePlanItemWithItemValue(tasks, itemValue)) {
+                fail("Could not find plan item instance with 'item' value of '" + itemValue + "'");
+            }
+        }
+    }
+
+    protected boolean completePlanItemWithItemValue(List<PlanItemInstance> planItemInstances, Object itemValue) {
+        for (PlanItemInstance planItemInstance : planItemInstances) {
+            Object itemValueVar = cmmnRuntimeService.getLocalVariable(planItemInstance.getId(), "item");
+            if (itemValue.equals(itemValueVar)) {
+                cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void completeAllPlanItems(String caseInstanceId, String planItemName, int expectedCount) {
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(caseInstanceId)
             .planItemInstanceName(planItemName)
@@ -202,10 +250,8 @@ public abstract class AbstractFlowableCmmnTestCase {
             .list();
 
         assertEquals(expectedCount, tasks.size());
-        assertTrue(numberToComplete <= expectedCount);
-        int completedCount = 0;
-        while (completedCount < numberToComplete) {
-            cmmnRuntimeService.triggerPlanItemInstance(tasks.get(completedCount++).getId());
+        for (PlanItemInstance task : tasks) {
+            cmmnRuntimeService.triggerPlanItemInstance(task.getId());
         }
     }
 

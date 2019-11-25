@@ -538,6 +538,16 @@ function _drawBoundaryEvent(element)
 
 function _drawStringDataObject(element) {
 }
+function _drawBooleanDataObject(element) {
+}
+function _drawDoubleDataObject(element) {
+}
+function _drawLongDataObject(element) {
+}
+function _drawIntegerDataObject(element) {
+}
+function _drawDateDataObject(element) {
+}
 
 function _drawIntermediateCatchEvent(element)
 {

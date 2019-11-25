@@ -14,6 +14,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDat
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
@@ -57,21 +59,24 @@ public class PlanItemInstanceEntityManagerImpl
     public PlanItemInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceDataManager planItemInstanceDataManager) {
         super(cmmnEngineConfiguration, planItemInstanceDataManager);
     }
-    
+
     @Override
-    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItem planItem, String caseDefinitionId, String caseInstanceId, 
-            String stagePlanItemInstanceId, String tenantId, Map<String, Object> localVariables, boolean addToParent) {
+    public PlanItemInstanceBuilder createPlanItemInstanceBuilder() {
+        return new PlanItemInstanceBuilderImpl(this);
+    }
+
+    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItemInstanceBuilderImpl builder) {
         
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
 
         PlanItemInstanceEntity planItemInstanceEntity = create();
-        planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
-        planItemInstanceEntity.setCaseInstanceId(caseInstanceId);
+        planItemInstanceEntity.setCaseDefinitionId(builder.getCaseDefinitionId());
+        planItemInstanceEntity.setCaseInstanceId(builder.getCaseInstanceId());
 
         planItemInstanceEntity.setCreateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
-        planItemInstanceEntity.setElementId(planItem.getId());
-        PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+        planItemInstanceEntity.setElementId(builder.getPlanItem().getId());
+        PlanItemDefinition planItemDefinition = builder.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition != null) {
             planItemInstanceEntity.setPlanItemDefinitionId(planItemDefinition.getId());
 
@@ -81,24 +86,36 @@ public class PlanItemInstanceEntityManagerImpl
         } else {
             planItemInstanceEntity.setStage(false);
         }
-        planItemInstanceEntity.setStageInstanceId(stagePlanItemInstanceId);
-        planItemInstanceEntity.setTenantId(tenantId);
+        planItemInstanceEntity.setStageInstanceId(builder.getStagePlanItemInstanceId());
+        planItemInstanceEntity.setTenantId(builder.getTenantId());
        
         insert(planItemInstanceEntity);
 
 
         // adding variables must be done after the entity was inserted, before it does not yet have an id for the variables to be referenced
-        if (localVariables != null && localVariables.size() > 0) {
-            planItemInstanceEntity.setVariablesLocal(localVariables);
+        if (builder.hasLocalVariables()) {
+            planItemInstanceEntity.setVariablesLocal(builder.getLocalVariables());
         }
 
         // the name might have an expression being based on local variables, so we can only set the name after insertion
-        if (planItem.getName() != null) {
-            Expression nameExpression = expressionManager.createExpression(planItem.getName());
-            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
+        if (builder.getPlanItem().getName() != null) {
+            Expression nameExpression = expressionManager.createExpression(builder.getPlanItem().getName());
+            String name;
+            if (builder.isSilentNameExpressionEvaluation()) {
+                try {
+                    name = nameExpression.getValue(planItemInstanceEntity).toString();
+                } catch (Exception e) {
+                    // we silently catch this exception as it is expected to a possible failure due to the state of the name evaluation
+                    // we use the expression itself as a fallback in this case
+                    name = builder.getPlanItem().getName();
+                }
+            } else {
+                name = nameExpression.getValue(planItemInstanceEntity).toString();
+            }
+            planItemInstanceEntity.setName(name);
         }
         
-        if (addToParent) {
+        if (builder.addToParent) {
             addPlanItemInstanceToParent(commandContext, planItemInstanceEntity);
         }
 
@@ -185,11 +202,21 @@ public class PlanItemInstanceEntityManagerImpl
 
 
     protected List<PlanItem> gatherEventListenerDependencies(CommandContext commandContext, PlanItem planItem, PlanItemInstanceEntity planItemInstanceEntity) {
+        // first collect the event listeners
+        List<PlanItem> eventListenerDependencies;
 
-        List<PlanItem> eventListenerDependencies = Stream.concat(
-            planItem.getEntryDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener),
-            planItem.getExitDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener))
-            .collect(Collectors.toList());
+        // if the plan item has repetition, we don't remove any event listeners for entry dependencies, as they might trigger in the future and re-create
+        // the plan item as it has repetition and therefore, we also don't remove any exit sentry dependant event listeners, as if in the future, the plan
+        // item becomes active again, those event listeners might trigger again to terminate it, so we need them to stay in place
+        // furthermore, don't investigate into not-yet-created child plan items having event listeners as they might become active at a later state
+        if (ExpressionUtil.hasRepetitionRule(planItem)) {
+            return Collections.emptyList();
+        } else {
+            eventListenerDependencies = Stream.concat(
+                planItem.getEntryDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener),
+                planItem.getExitDependencies().stream().filter(p -> p.getPlanItemDefinition() instanceof EventListener))
+                .collect(Collectors.toList());
+        }
 
         // Special case: if the current plan item is a stage, we need to also verify all event listeners
         // that reference a child plan item of this stage. Normally this will happen automatically, unless

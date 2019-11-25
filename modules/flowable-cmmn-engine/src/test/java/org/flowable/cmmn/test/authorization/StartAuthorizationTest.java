@@ -13,11 +13,13 @@
 
 package org.flowable.cmmn.test.authorization;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -251,6 +253,37 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             caseDefinitions = cmmnRepositoryService.createCaseDefinitionQuery().startableByUser("userInGroup2").list();
             assertEquals(1, caseDefinitions.size());
             assertEquals("case3", caseDefinitions.get(0).getKey());
+
+            // when groups are defined they should be used instead
+
+            // "group1" can start case3
+            assertThat(identityService.createGroupQuery().groupMember("user4").list()).isEmpty();
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups("user4", Collections.singletonList("group1")).list())
+                .extracting(CaseDefinition::getKey)
+                .containsExactlyInAnyOrder("case3");
+
+            // "userInGroup3" can only start case3 via group authorization, "unknownGroup" cannot start any process
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups("userInGroup3", Collections.singletonList("unknownGroup")).list())
+                .extracting(CaseDefinition::getKey)
+                .isEmpty();
+
+            // "group3" can only start case3, query should work if no user is defined
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups(null, Collections.singletonList("group3")).list())
+                .extracting(CaseDefinition::getKey)
+                .containsExactlyInAnyOrder("case3");
+
+            // "userInGroup3" can only start case3 via group authorization, passed empty or null groups should still be used
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups("userInGroup3", Collections.emptyList()).list())
+                .extracting(CaseDefinition::getKey)
+                .isEmpty();
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups("userInGroup3", null).list())
+                .extracting(CaseDefinition::getKey)
+                .isEmpty();
+
+            // "group3" can only start case3, and user1 can start case2
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups("user1", Collections.singletonList("group3")).list())
+                .extracting(CaseDefinition::getKey)
+                .containsExactlyInAnyOrder("case2", "case3");
 
         } finally {
             tearDownUsersAndGroups();

@@ -107,7 +107,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
         // complete all active tasks
-        completePlanItems(caseInstance.getId(), "Task B", 4, 4);
+        completeAllPlanItems(caseInstance.getId(), "Task B", 4);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(3, planItemInstances.size());
 
@@ -127,7 +127,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1));
 
         // now let's complete all Tasks B -> nothing must happen additionally
-        completePlanItems(caseInstance.getId(), "Task B", 2, 2);
+        completeAllPlanItems(caseInstance.getId(), "Task B", 2);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(3, planItemInstances.size());
@@ -164,7 +164,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
         // only complete two active Task B
-        completePlanItems(caseInstance.getId(), "Task B", 4, 2);
+        completePlanItemsWithItemValues(caseInstance.getId(), "Task B", 4, "A", "B");
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(5, planItemInstances.size());
 
@@ -184,7 +184,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", Arrays.asList("C", "D", "E", "F"), Arrays.asList(2, 3, 0, 1));
 
         // now let's complete all Tasks B -> nothing must happen additionally
-        completePlanItems(caseInstance.getId(), "Task B", 4, 4);
+        completeAllPlanItems(caseInstance.getId(), "Task B", 4);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(3, planItemInstances.size());

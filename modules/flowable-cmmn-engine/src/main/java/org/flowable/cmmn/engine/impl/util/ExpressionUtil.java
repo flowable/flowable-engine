@@ -119,6 +119,23 @@ public class ExpressionUtil {
     }
 
     /**
+     * Returns true, if the given plan item instance has a repetition rule which is based on a collection variable, false, if there is no repetition rule at
+     * all or if it is not based on a collection variable.
+     *
+     * @param planItem the plan item to check for a repetition rule based on a collection
+     * @return true, if the plan item has a repetition rule based on a collection variable
+     */
+    public static boolean hasRepetitionOnCollection(PlanItem planItem) {
+        if (planItem.getItemControl() == null) {
+            return false;
+        }
+        if (planItem.getItemControl().getRepetitionRule() == null) {
+            return false;
+        }
+        return planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
+    }
+
+    /**
      * Evaluates the collection variable name or expression given by the plan items repetition rule and returns its evaluated collection as a list.
      *
      * @param commandContext the command context to be used for evaluating the expression

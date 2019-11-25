@@ -83,13 +83,18 @@ public abstract class CmmnOperation implements Runnable {
                 }
 
                 PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                    .createChildPlanItemInstance(planItem,
-                        caseDefinitionId,
-                        caseInstanceId,
-                        stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
-                        tenantId,
-                        null,
-                        true);
+                    .createPlanItemInstanceBuilder()
+                    .planItem(planItem)
+                    .caseDefinitionId(caseDefinitionId)
+                    .caseInstanceId(caseInstanceId)
+                    .stagePlanItemInstanceId(stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null)
+                    .tenantId(tenantId)
+                    .addToParent(true)
+                    // we silently ignore any exceptions evaluating the name for the new plan item, if it has repetition on a collection, as the item / itemIndex
+                    // local variables might not yet be available
+                    .silentNameExpressionEvaluation(ExpressionUtil.hasRepetitionOnCollection(planItem))
+                    .create();
+
                 planItemInstances.add(childPlanItemInstance);
                 CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
 
@@ -118,12 +123,13 @@ public abstract class CmmnOperation implements Runnable {
         return false;
     }
 
-    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
-        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntityToCopy, null, addToParent);
+    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
+        boolean addToParent, boolean silentNameExpressionEvaluation) {
+        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntityToCopy, null, addToParent, silentNameExpressionEvaluation);
     }
 
     protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
-        Map<String, Object> localVariables, boolean addToParent) {
+        Map<String, Object> localVariables, boolean addToParent, boolean silentNameExpressionEvaluation) {
 
         if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntityToCopy)) {
             int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
@@ -133,14 +139,17 @@ public abstract class CmmnOperation implements Runnable {
             localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
         }
 
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance(
-                planItemInstanceEntityToCopy.getPlanItem(),
-                planItemInstanceEntityToCopy.getCaseDefinitionId(),
-                planItemInstanceEntityToCopy.getCaseInstanceId(),
-                planItemInstanceEntityToCopy.getStageInstanceId(),
-                planItemInstanceEntityToCopy.getTenantId(),
-                localVariables,
-                addToParent);
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+            .createPlanItemInstanceBuilder()
+            .planItem(planItemInstanceEntityToCopy.getPlanItem())
+            .caseDefinitionId(planItemInstanceEntityToCopy.getCaseDefinitionId())
+            .caseInstanceId(planItemInstanceEntityToCopy.getCaseInstanceId())
+            .stagePlanItemInstanceId(planItemInstanceEntityToCopy.getStageInstanceId())
+            .tenantId(planItemInstanceEntityToCopy.getTenantId())
+            .localVariables(localVariables)
+            .addToParent(addToParent)
+            .silentNameExpressionEvaluation(silentNameExpressionEvaluation)
+            .create();
 
         return planItemInstanceEntity;
     }

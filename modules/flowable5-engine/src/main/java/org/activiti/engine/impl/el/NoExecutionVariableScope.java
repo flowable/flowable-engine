@@ -312,4 +312,9 @@ public class NoExecutionVariableScope implements VariableScope {
     public void removeTransientVariables() {
         throw new UnsupportedOperationException("No execution active, no variables can be removed");
     }
+
+    @Override
+    public String getTenantId() {
+        return null;
+    }
 }
