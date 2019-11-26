@@ -1924,7 +1924,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     @Override
-    public String getStageInstanceId() {
+    public String getPropagatedStageInstanceId() {
         return null;
     }
 

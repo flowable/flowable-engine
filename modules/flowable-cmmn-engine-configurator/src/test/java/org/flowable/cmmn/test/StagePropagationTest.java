@@ -71,7 +71,7 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
         // test the various query options
         tasks = cmmnTaskService.createTaskQuery()
             .active()
-            .stageInstanceId(stages.get(0).getId())
+            .propagatedStageInstanceId(stages.get(0).getId())
             .list();
 
         assertNotNull(tasks);
@@ -83,7 +83,7 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
 
         tasks = cmmnTaskService.createTaskQuery()
             .active()
-            .stageInstanceId(stages.get(1).getId())
+            .propagatedStageInstanceId(stages.get(1).getId())
             .list();
 
         assertNotNull(tasks);
@@ -125,7 +125,7 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
         assertStageInstanceId(historicTasks, "Task E", null);
 
         historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
-            .stageInstanceId(stages.get(0).getId())
+            .propagatedStageInstanceId(stages.get(0).getId())
             .list();
 
         assertNotNull(historicTasks);
@@ -136,7 +136,7 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
         assertStageInstanceId(historicTasks, "Task C", stages.get(0).getId());
 
         historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
-            .stageInstanceId(stages.get(1).getId())
+            .propagatedStageInstanceId(stages.get(1).getId())
             .list();
 
         assertNotNull(historicTasks);
@@ -154,6 +154,6 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
             }
         }
         assertNotNull(taskToAssert);
-        assertEquals(stageInstanceId, taskToAssert.getStageInstanceId());
+        assertEquals(stageInstanceId, taskToAssert.getPropagatedStageInstanceId());
     }
 }

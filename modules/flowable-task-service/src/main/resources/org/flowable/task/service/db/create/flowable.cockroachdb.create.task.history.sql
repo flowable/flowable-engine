@@ -10,7 +10,7 @@ CREATE TABLE ACT_HI_TASKINST (
     SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
     SCOPE_DEFINITION_ID_ varchar(255),
-    STAGE_INSTANCE_ID_ varchar(255),
+    PROPAGATED_STAGE_INST_ID_ varchar(255),
     NAME_ varchar(255),
     PARENT_TASK_ID_ varchar(64),
     DESCRIPTION_ varchar(4000),

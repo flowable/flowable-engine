@@ -98,7 +98,7 @@ public interface TaskInfo {
      *
      * @return the stage instance id this task belongs to or null, if this task is not part of a case at all or is not a child element of a stage
      */
-    String getStageInstanceId();
+    String getPropagatedStageInstanceId();
 
     /** The date/time when this task was created */
     Date getCreateTime();

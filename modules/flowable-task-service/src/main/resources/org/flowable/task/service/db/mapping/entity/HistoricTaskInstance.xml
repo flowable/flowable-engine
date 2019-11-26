@@ -32,7 +32,7 @@
         SUB_SCOPE_ID_,
         SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
-        STAGE_INSTANCE_ID_,
+        PROPAGATED_STAGE_INST_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -61,7 +61,7 @@
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
         #{scopeDefinitionId, jdbcType=VARCHAR},
-        #{stageInstanceId, jdbcType=VARCHAR},
+        #{propagatedStageInstanceId, jdbcType=VARCHAR},
         #{name ,jdbcType=VARCHAR},
         #{parentTaskId ,jdbcType=VARCHAR},
         #{description ,jdbcType=VARCHAR},
@@ -94,7 +94,7 @@
         SUB_SCOPE_ID_,
         SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
-        STAGE_INSTANCE_ID_,
+        PROPAGATED_STAGE_INST_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -124,7 +124,7 @@
            #{historicTask.subScopeId, jdbcType=VARCHAR},
            #{historicTask.scopeType, jdbcType=VARCHAR},
            #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
-           #{historicTask.stageInstanceId, jdbcType=VARCHAR},
+           #{historicTask.propagatedStageInstanceId, jdbcType=VARCHAR},
            #{historicTask.name ,jdbcType=VARCHAR},
            #{historicTask.parentTaskId ,jdbcType=VARCHAR},
            #{historicTask.description ,jdbcType=VARCHAR},
@@ -159,7 +159,7 @@
             SUB_SCOPE_ID_,
             SCOPE_TYPE_,
             SCOPE_DEFINITION_ID_,
-            STAGE_INSTANCE_ID_,
+            PROPAGATED_STAGE_INST_ID_,
             NAME_,
             PARENT_TASK_ID_,
             DESCRIPTION_,
@@ -188,7 +188,7 @@
              #{historicTask.subScopeId, jdbcType=VARCHAR},
              #{historicTask.scopeType, jdbcType=VARCHAR},
              #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
-             #{historicTask.stageInstanceId, jdbcType=VARCHAR},
+             #{historicTask.propagatedStageInstanceId, jdbcType=VARCHAR},
              #{historicTask.name ,jdbcType=VARCHAR},
              #{historicTask.parentTaskId ,jdbcType=VARCHAR},
              #{historicTask.description ,jdbcType=VARCHAR},
@@ -237,8 +237,8 @@
           <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
             SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
           </if>
-          <if test="originalPersistentState.stageInstanceId != stageInstanceId">
-            STAGE_INSTANCE_ID_ = #{stageInstanceId, jdbcType=VARCHAR},
+          <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
+            PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
           </if>
 	      <if test="originalPersistentState.name != name">
 	      	NAME_ = #{name, jdbcType=VARCHAR},
@@ -346,7 +346,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="stageInstanceId" column="STAGE_INSTANCE_ID_" jdbcType="VARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -377,7 +377,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="stageInstanceId" column="STAGE_INSTANCE_ID_" jdbcType="VARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -1023,8 +1023,8 @@
       <if test="scopeDefinitionId != null">
         and ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
       </if>
-      <if test="stageInstanceId != null">
-        and ${queryTablePrefix}STAGE_INSTANCE_ID_ = #{stageInstanceId}
+      <if test="propagatedStageInstanceId != null">
+        and ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId}
       </if>
       <if test="processInstanceIdWithChildren != null">
         and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
@@ -1255,8 +1255,8 @@
       <if test="orQueryObject.scopeDefinitionId != null">
         or ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
       </if>
-      <if test="orQueryObject.stageInstanceId != null">
-        or ${queryTablePrefix}STAGE_INSTANCE_ID_ = #{orQueryObject.stageInstanceId}
+      <if test="orQueryObject.propagatedStageInstanceId != null">
+        or ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{orQueryObject.propagatedStageInstanceId}
       </if>
       <if test="orQueryObject.processInstanceIdWithChildren != null">
         or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and

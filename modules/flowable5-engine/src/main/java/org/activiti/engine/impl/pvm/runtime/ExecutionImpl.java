@@ -1194,7 +1194,7 @@ public class ExecutionImpl implements
     }
 
     @Override
-    public String getStageInstanceId() {
+    public String getPropagatedStageInstanceId() {
         return null;
     }
 

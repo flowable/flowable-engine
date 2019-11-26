@@ -219,7 +219,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     /**
      * The optional stage instance id, if this execution runs in the context of a CMMN case and has a parent stage it belongs to.
      */
-    protected String stageInstanceId;
+    protected String propagatedStageInstanceId;
 
     public ExecutionEntityImpl() {
 
@@ -1277,13 +1277,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
-    public void setStageInstanceId(String stageInstanceId) {
-        this.stageInstanceId = stageInstanceId;
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     @Override
-    public String getStageInstanceId() {
-        return stageInstanceId;
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
     }
 
     protected String getRelatedActivityInstanceId(ExecutionEntity sourceExecution) {

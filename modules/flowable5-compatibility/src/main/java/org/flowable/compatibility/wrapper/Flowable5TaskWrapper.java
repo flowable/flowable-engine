@@ -105,7 +105,7 @@ public class Flowable5TaskWrapper implements Task {
     }
 
     @Override
-    public String getStageInstanceId() {
+    public String getPropagatedStageInstanceId() {
         return null;
     }
 

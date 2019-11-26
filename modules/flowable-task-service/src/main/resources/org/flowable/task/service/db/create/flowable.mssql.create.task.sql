@@ -9,7 +9,7 @@ create table ACT_RU_TASK (
     SUB_SCOPE_ID_ nvarchar(255),
     SCOPE_TYPE_ nvarchar(255),
     SCOPE_DEFINITION_ID_ nvarchar(255),
-    STAGE_INSTANCE_ID_ nvarchar(255),
+    PROPAGATED_STAGE_INST_ID_ nvarchar(255),
     NAME_ nvarchar(255),
     PARENT_TASK_ID_ nvarchar(64),
     DESCRIPTION_ nvarchar(4000),

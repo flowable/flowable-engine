@@ -145,7 +145,7 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
 
     void setReferenceType(String referenceType);
 
-    void setStageInstanceId(String stageInstanceId);
+    void setPropagatedStageInstanceId(String propagatedStageInstanceId);
     
     Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
 

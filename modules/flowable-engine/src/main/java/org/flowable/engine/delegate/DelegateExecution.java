@@ -66,7 +66,7 @@ public interface DelegateExecution extends VariableScope {
      *
      * @return the stage instance id this execution belongs to or null, if this execution is not part of a case at all or is not a child element of a stage
      */
-    String getStageInstanceId();
+    String getPropagatedStageInstanceId();
 
     /**
      * Gets the id of the parent of this execution. If null, the execution represents a process-instance.

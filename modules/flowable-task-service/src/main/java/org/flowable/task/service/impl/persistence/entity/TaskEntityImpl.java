@@ -85,7 +85,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
-    protected String stageInstanceId;
+    protected String propagatedStageInstanceId;
 
     protected String taskDefinitionKey;
     protected String formKey;
@@ -532,13 +532,13 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     }
 
     @Override
-    public void setStageInstanceId(String stageInstanceId) {
-        this.stageInstanceId = stageInstanceId;
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     @Override
-    public String getStageInstanceId() {
-        return stageInstanceId;
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
     }
 
     @Override

@@ -96,5 +96,5 @@ public interface Execution {
      *
      * @return the stage instance id this execution belongs to or null, if this execution is not part of a case at all or is not a child element of a stage
      */
-    String getStageInstanceId();
+    String getPropagatedStageInstanceId();
 }

@@ -24,7 +24,7 @@
   <insert id="insertTask" parameterType="org.flowable.task.service.impl.persistence.entity.TaskEntityImpl">
     insert into ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_,
                       EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
-                      STAGE_INSTANCE_ID_, TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_,
+                      PROPAGATED_STAGE_INST_ID_, TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_,
                       IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_)
     values (#{id, jdbcType=VARCHAR},
             1,
@@ -44,7 +44,7 @@
             #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
-            #{stageInstanceId, jdbcType=VARCHAR},
+            #{propagatedStageInstanceId, jdbcType=VARCHAR},
             #{taskDefinitionKey, jdbcType=VARCHAR},
             #{dueDate, jdbcType=TIMESTAMP},
             #{category, jdbcType=VARCHAR},
@@ -61,7 +61,7 @@
 
   <insert id="bulkInsertTask" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_,
-        EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, STAGE_INSTANCE_ID_,
+        EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, PROPAGATED_STAGE_INST_ID_,
         TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_,
         IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_)
     VALUES
@@ -84,7 +84,7 @@
          #{task.subScopeId, jdbcType=VARCHAR},
          #{task.scopeType, jdbcType=VARCHAR},
          #{task.scopeDefinitionId, jdbcType=VARCHAR},
-         #{task.stageInstanceId, jdbcType=VARCHAR},
+         #{task.propagatedStageInstanceId, jdbcType=VARCHAR},
          #{task.taskDefinitionKey, jdbcType=VARCHAR},
          #{task.dueDate, jdbcType=TIMESTAMP},
          #{task.category, jdbcType=VARCHAR},
@@ -104,7 +104,7 @@
     INSERT ALL
       <foreach collection="list" item="task" index="index">
         INTO ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_,
-              EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, STAGE_INSTANCE_ID_, TASK_DEF_KEY_,
+              EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, PROPAGATED_STAGE_INST_ID_, TASK_DEF_KEY_,
               DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_,
               IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_) VALUES
         (#{task.id, jdbcType=VARCHAR},
@@ -125,7 +125,7 @@
          #{task.subScopeId, jdbcType=VARCHAR},
          #{task.scopeType, jdbcType=VARCHAR},
          #{task.scopeDefinitionId, jdbcType=VARCHAR},
-         #{task.stageInstanceId, jdbcType=VARCHAR},
+         #{task.propagatedStageInstanceId, jdbcType=VARCHAR},
          #{task.taskDefinitionKey, jdbcType=VARCHAR},
          #{task.dueDate, jdbcType=TIMESTAMP},
          #{task.category, jdbcType=VARCHAR},
@@ -193,8 +193,8 @@
       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
       </if>
-      <if test="originalPersistentState.stageInstanceId != stageInstanceId">
-          STAGE_INSTANCE_ID_ = ${stageInstanceId, jdbcType=VARCHAR}
+      <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
+          PROPAGATED_STAGE_INST_ID_ = ${propagatedStageInstanceId, jdbcType=VARCHAR}
       </if>
       <if test="originalPersistentState.description != description">
           DESCRIPTION_ = #{description, jdbcType=VARCHAR},
@@ -307,7 +307,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="stageInstanceId" column="STAGE_INSTANCE_ID_" jdbcType="VARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR"/>
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP"/>
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
@@ -340,7 +340,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="stageInstanceId" column="STAGE_INSTANCE_ID_" jdbcType="VARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR"/>
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP"/>
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
@@ -695,8 +695,8 @@
       <if test="scopeDefinitionId != null">
         and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
       </if>
-      <if test="stageInstanceId != null">
-        and RES.STAGE_INSTANCE_ID_ = #{stageInstanceId}
+      <if test="propagatedStageInstanceId != null">
+        and RES.PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId}
       </if>
       <if test="processInstanceIdWithChildren != null">
         and exists(select ELINK.ID_ from ${prefix}ACT_RU_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
@@ -1134,8 +1134,8 @@
             <if test="orQueryObject.scopeDefinitionId != null">
               or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
             </if>
-            <if test="orQueryObject.stageInstanceId != null">
-              or RES.STAGE_INSTANCE_ID_ = #{orQueryObject.stageInstanceId}
+            <if test="orQueryObject.propagatedStageInstanceId != null">
+              or RES.PROPAGATED_STAGE_INST_ID_ = #{orQueryObject.propagatedStageInstanceId}
             </if>
             <if test="orQueryObject.processInstanceIdWithChildren != null">
               or exists(select ELINK.ID_ from ${prefix}ACT_RU_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and

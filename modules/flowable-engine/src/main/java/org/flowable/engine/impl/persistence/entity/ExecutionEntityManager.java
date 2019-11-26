@@ -30,7 +30,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId,
-                    String businessKey, String processInstanceName, String callbackId, String callbackType, String stageInstanceId, String tenantId,
+                    String businessKey, String processInstanceName, String callbackId, String callbackType, String propagatedStageInstanceId, String tenantId,
                     String initiatorVariableName, String startActivityId);
 
     ExecutionEntity createChildExecution(ExecutionEntity parentExecutionEntity);
