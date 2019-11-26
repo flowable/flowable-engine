@@ -89,6 +89,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String stageInstanceId;
     protected String processInstanceIdWithChildren;
     protected String caseInstanceIdWithChildren;
     protected Date createTime;
@@ -820,6 +821,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
         } else {
             this.scopeDefinitionId = scopeDefinitionId;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery stageInstanceId(String stageInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.stageInstanceId = stageInstanceId;
+        } else {
+            this.stageInstanceId = stageInstanceId;
         }
         return this;
     }
@@ -1789,6 +1800,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getStageInstanceId() {
+        return stageInstanceId;
     }
 
     public String getTaskId() {

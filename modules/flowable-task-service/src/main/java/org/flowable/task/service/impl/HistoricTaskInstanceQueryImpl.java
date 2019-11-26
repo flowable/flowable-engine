@@ -71,6 +71,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String stageInstanceId;
     protected String processInstanceIdWithChildren;
     protected String caseInstanceIdWithChildren;
     protected String taskId;
@@ -385,6 +386,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
         } else {
             this.scopeDefinitionId = scopeDefinitionId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery stageInstanceId(String stageInstanceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.stageInstanceId = stageInstanceId;
+        } else {
+            this.stageInstanceId = stageInstanceId;
         }
         return this;
     }
@@ -1741,6 +1752,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getStageInstanceId() {
+        return stageInstanceId;
     }
 
     public String getTaskDefinitionId() {

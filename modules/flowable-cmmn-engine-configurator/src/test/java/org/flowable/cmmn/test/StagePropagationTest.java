@@ -21,6 +21,8 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -65,11 +67,87 @@ public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
         assertStageInstanceId(tasks, "Task C", stages.get(0).getId());
         assertStageInstanceId(tasks, "Task D", stages.get(1).getId());
         assertStageInstanceId(tasks, "Task E", null);
+
+        // test the various query options
+        tasks = cmmnTaskService.createTaskQuery()
+            .active()
+            .stageInstanceId(stages.get(0).getId())
+            .list();
+
+        assertNotNull(tasks);
+        assertEquals(3, tasks.size());
+
+        assertStageInstanceId(tasks, "Task A", stages.get(0).getId());
+        assertStageInstanceId(tasks, "Task B", stages.get(0).getId());
+        assertStageInstanceId(tasks, "Task C", stages.get(0).getId());
+
+        tasks = cmmnTaskService.createTaskQuery()
+            .active()
+            .stageInstanceId(stages.get(1).getId())
+            .list();
+
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
+
+        assertStageInstanceId(tasks, "Task D", stages.get(1).getId());
+
+        // now complete the tasks to move the to the history
+        tasks = cmmnTaskService.createTaskQuery().active().caseInstanceId(caseInstance.getId()).list();
+        assertNotNull(tasks);
+        assertEquals(3, tasks.size());
+
+        for (Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+
+        tasks = processEngineTaskService.createTaskQuery().active().list();
+        assertNotNull(tasks);
+        assertEquals(2, tasks.size());
+
+        for (Task task : tasks) {
+            processEngineTaskService.complete(task.getId());
+        }
+
+        // case must now be completed
+        assertCaseInstanceEnded(caseInstance);
+
+        // so query the completed tasks through the history
+        List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
+            .list();
+
+        assertNotNull(historicTasks);
+        assertEquals(5, historicTasks.size());
+
+        assertStageInstanceId(historicTasks, "Task A", stages.get(0).getId());
+        assertStageInstanceId(historicTasks, "Task B", stages.get(0).getId());
+        assertStageInstanceId(historicTasks, "Task C", stages.get(0).getId());
+        assertStageInstanceId(historicTasks, "Task D", stages.get(1).getId());
+        assertStageInstanceId(historicTasks, "Task E", null);
+
+        historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
+            .stageInstanceId(stages.get(0).getId())
+            .list();
+
+        assertNotNull(historicTasks);
+        assertEquals(3, historicTasks.size());
+
+        assertStageInstanceId(historicTasks, "Task A", stages.get(0).getId());
+        assertStageInstanceId(historicTasks, "Task B", stages.get(0).getId());
+        assertStageInstanceId(historicTasks, "Task C", stages.get(0).getId());
+
+        historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
+            .stageInstanceId(stages.get(1).getId())
+            .list();
+
+        assertNotNull(historicTasks);
+        assertEquals(1, historicTasks.size());
+
+        assertStageInstanceId(historicTasks, "Task D", stages.get(1).getId());
     }
 
-    protected void assertStageInstanceId(List<Task> tasks, String taskName, String stageInstanceId) {
-        Task taskToAssert = null;
-        for (Task task : tasks) {
+    protected void assertStageInstanceId(List<? extends TaskInfo> tasks, String taskName, String stageInstanceId) {
+        TaskInfo taskToAssert = null;
+        for (TaskInfo task : tasks) {
             if (taskName.equals(task.getName())) {
                 taskToAssert = task;
                 break;

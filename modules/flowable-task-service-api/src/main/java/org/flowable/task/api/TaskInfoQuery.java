@@ -242,6 +242,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for the given scope definition identifier. 
      */
     T scopeDefinitionId(String scopeDefinitionId);
+
+    /**
+     * Only select tasks for the given stage, defined through its stage instance id.
+     */
+    T stageInstanceId(String stageInstanceId);
     
     /**
      * Select all tasks for the given process instance id and its children.

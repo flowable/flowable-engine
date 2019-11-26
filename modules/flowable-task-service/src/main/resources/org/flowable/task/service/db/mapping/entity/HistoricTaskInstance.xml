@@ -1023,6 +1023,9 @@
       <if test="scopeDefinitionId != null">
         and ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
       </if>
+      <if test="stageInstanceId != null">
+        and ${queryTablePrefix}STAGE_INSTANCE_ID_ = #{stageInstanceId}
+      </if>
       <if test="processInstanceIdWithChildren != null">
         and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
             ELINK.SCOPE_ID_ = #{processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and
@@ -1251,6 +1254,9 @@
       </if>
       <if test="orQueryObject.scopeDefinitionId != null">
         or ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+      </if>
+      <if test="orQueryObject.stageInstanceId != null">
+        or ${queryTablePrefix}STAGE_INSTANCE_ID_ = #{orQueryObject.stageInstanceId}
       </if>
       <if test="orQueryObject.processInstanceIdWithChildren != null">
         or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
