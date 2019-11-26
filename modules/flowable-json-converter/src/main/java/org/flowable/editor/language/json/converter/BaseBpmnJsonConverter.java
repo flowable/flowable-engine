@@ -537,7 +537,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
             } else if (eventDefinition instanceof TimerEventDefinition) {
                 TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;
-                if(StringUtils.isNotEmpty(timerDefinition.getCalendarName())) {
+                if (StringUtils.isNotEmpty(timerDefinition.getCalendarName())) {
                     propertiesNode.put(PROPERTY_CALENDAR_NAME, timerDefinition.getCalendarName());
                 }
                 if (StringUtils.isNotEmpty(timerDefinition.getTimeDuration())) {
