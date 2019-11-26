@@ -125,6 +125,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         persistentState.put("subScopeId", subScopeId);
         persistentState.put("scopeType", scopeType);
         persistentState.put("scopeDefinitionId", scopeDefinitionId);
+        persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         persistentState.put("parentTaskId", parentTaskId);
         persistentState.put("dueDate", dueDate);
         persistentState.put("claimTime", claimTime);

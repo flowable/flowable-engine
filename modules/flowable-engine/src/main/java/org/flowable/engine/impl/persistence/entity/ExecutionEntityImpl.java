@@ -280,6 +280,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("callbackType", callbackType);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
+        persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         return persistentState;
     }
 
