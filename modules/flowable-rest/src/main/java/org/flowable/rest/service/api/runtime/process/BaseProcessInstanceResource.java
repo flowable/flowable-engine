@@ -117,6 +117,9 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessBusinessKey() != null) {
             query.processInstanceBusinessKey(queryRequest.getProcessBusinessKey());
         }
+        if (queryRequest.getProcessBusinessKeyLike() != null) {
+            query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
+        }
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
         }

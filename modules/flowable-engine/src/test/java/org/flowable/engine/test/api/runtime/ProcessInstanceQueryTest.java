@@ -285,6 +285,19 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testQueryByBusinessKeyLike() {
+        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, "1A").getId());
+        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, "A1").getId());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%0").count());
+        assertEquals(3, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("1%").count());
+        assertEquals(3, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%1").count());
+        assertEquals(4, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%1%").count());
+        assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%A%").count());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%B%").count());
+    }
+    
+
+    @Test
     public void testQueryByInvalidBusinessKey() {
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("invalid").count());
 
