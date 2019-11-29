@@ -59,12 +59,12 @@ The following properties are available on the process engine configuration throu
 </tr>
 <tr class="even">
 <td><p>asyncExecutorCorePoolSize</p></td>
-<td><p>2</p></td>
+<td><p>8</p></td>
 <td><p>The minimal number of threads that are kept alive in the thread pool for job execution.</p></td>
 </tr>
 <tr class="odd">
 <td><p>asyncExecutorMaxPoolSize</p></td>
-<td><p>10</p></td>
+<td><p>8</p></td>
 <td><p>The maximum number of threads that are created in the thread pool for job execution.</p></td>
 </tr>
 <tr class="even">
