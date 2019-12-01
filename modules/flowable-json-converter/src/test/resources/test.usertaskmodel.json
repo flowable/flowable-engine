@@ -66,6 +66,18 @@
             	{"event": "complete", "className": "", "expression": "", "delegateExpression": "${someDelegateExpression}", "fields": "undefined"}]},
             "usertaskassignment" : { "assignment" : { "assignee" : "kermit", "owner": "gonzo",
             		"candidateUsers": [{"value":"kermit"},{"value":"fozzie"}], "candidateGroups": [{"value":"management"},{"value":"sales"}] }
+            },
+            "localization": {
+              "name": {
+                "es": "registro",
+                "fa": "ثبت نام",
+                "en": "registration"
+              },
+              "description": {
+                "es": "descripción de registro",
+                "fa": "توضیحات ثبت نام",
+                "en": "registration description"
+              }
             }
           },
         "resourceId" : "usertask",

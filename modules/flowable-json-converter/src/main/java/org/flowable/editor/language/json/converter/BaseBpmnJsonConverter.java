@@ -17,42 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.Activity;
-import org.flowable.bpmn.model.Artifact;
-import org.flowable.bpmn.model.Association;
-import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.BoundaryEvent;
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ConditionalEventDefinition;
-import org.flowable.bpmn.model.DataAssociation;
-import org.flowable.bpmn.model.DataStoreReference;
-import org.flowable.bpmn.model.ErrorEventDefinition;
-import org.flowable.bpmn.model.EscalationEventDefinition;
-import org.flowable.bpmn.model.Event;
-import org.flowable.bpmn.model.EventDefinition;
-import org.flowable.bpmn.model.ExtensionElement;
-import org.flowable.bpmn.model.FieldExtension;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.FlowElementsContainer;
-import org.flowable.bpmn.model.FlowNode;
-import org.flowable.bpmn.model.FormProperty;
-import org.flowable.bpmn.model.FormValue;
-import org.flowable.bpmn.model.Gateway;
-import org.flowable.bpmn.model.GraphicInfo;
-import org.flowable.bpmn.model.Lane;
-import org.flowable.bpmn.model.MapExceptionEntry;
-import org.flowable.bpmn.model.MessageEventDefinition;
-import org.flowable.bpmn.model.MessageFlow;
-import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
+import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
-import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.bpmn.model.SignalEventDefinition;
-import org.flowable.bpmn.model.StartEvent;
-import org.flowable.bpmn.model.SubProcess;
-import org.flowable.bpmn.model.TerminateEventDefinition;
-import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.editor.constants.EditorJsonConstants;
 import org.flowable.editor.constants.StencilConstants;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
@@ -61,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +39,10 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BaseBpmnJsonConverter.class);
 
+    public static final String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/bpmn";
     public static final String NAMESPACE = "http://flowable.org/modeler";
+    public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
+    public static final String ACTIVITI_EXTENSIONS_PREFIX = "activiti";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
     protected ActivityProcessor processor;
@@ -557,6 +527,63 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         }
     }
 
+    protected void addLocalizationProperties(UserTask userTask, ObjectNode propertiesNode) {
+        List<ExtensionElement> localizationElements = userTask.getExtensionElements().get("localization");
+        if (localizationElements != null) {
+            ObjectNode localizationNode = objectMapper.createObjectNode();
+            ObjectNode nameNode = localizationNode.putObject("name");
+            ObjectNode descriptionNode = localizationNode.putObject("description");
+            for (ExtensionElement localizationElement : localizationElements) {
+                if (FLOWABLE_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix()) ||
+                        ACTIVITI_EXTENSIONS_PREFIX.equals(localizationElement.getNamespacePrefix())) {
+                    String locale = localizationElement.getAttributeValue(null, "locale");
+                    String name = localizationElement.getAttributeValue(null, "name");
+                    String documentation = null;
+                    List<ExtensionElement> documentationElements = localizationElement.getChildElements().get("documentation");
+                    if (documentationElements != null) {
+                        for (ExtensionElement documentationElement : documentationElements) {
+                            documentation = StringUtils.trimToNull(documentationElement.getElementText());
+                            break;
+                        }
+                    }
+                    if (name != null && !name.trim().isEmpty()) {
+                        nameNode.put(locale, name);
+                    }
+                    if (documentation != null && !documentation.trim().isEmpty()) {
+                        descriptionNode.put(locale, documentation);
+                    }
+                }
+            }
+            if (nameNode.fieldNames().hasNext() || descriptionNode.fieldNames().hasNext()) {
+                propertiesNode.set(PROPERTY_LOCALIZATION, localizationNode);
+            }
+        }
+    }
+
+    protected void addLocalizationExtensionElement(JsonNode objectNode, BaseElement element) {
+        JsonNode localizationNode = getProperty(PROPERTY_LOCALIZATION, objectNode);
+        if (localizationNode != null) {
+            localizationNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(localizationNode);
+            final JsonNode nameNode = localizationNode.get("name");
+            Iterator<Map.Entry<String, JsonNode>> fields;
+            if (nameNode != null) {
+                fields = nameNode.fields();
+                while (fields.hasNext()) {
+                    final Map.Entry<String, JsonNode> entry = fields.next();
+                    setLocalizedName(entry.getKey(), entry.getValue().textValue(), element);
+                }
+            }
+            final JsonNode descriptionNode = localizationNode.get("description");
+            if (descriptionNode != null) {
+                fields = descriptionNode.fields();
+                while (fields.hasNext()) {
+                    final Map.Entry<String, JsonNode> entry = fields.next();
+                    setLocalizedDescription(entry.getKey(), entry.getValue().textValue(), element);
+                }
+            }
+        }
+    }
+
     protected void convertJsonToFormProperties(JsonNode objectNode, BaseElement element) {
 
         JsonNode formPropertiesNode = getProperty(PROPERTY_FORM_PROPERTIES, objectNode);
@@ -778,5 +805,68 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             resultString = expressionBuilder.toString();
         }
         return resultString;
+    }
+
+    protected void setLocalizedName(String locale, String name, BaseElement element) {
+        upsertLocalizationExtensionElement(locale, name, null, element);
+    }
+
+    protected void setLocalizedDescription(String locale, String description, BaseElement element) {
+        upsertLocalizationExtensionElement(locale, null, description, element);
+    }
+
+    protected void upsertLocalizationExtensionElement(String locale, String name, String description, BaseElement element) {
+        final List<ExtensionElement> localizations = element.getExtensionElements().get("localization");
+        ExtensionElement localization = null;
+        ExtensionAttribute localeAttr = null;
+        ExtensionAttribute nameAttr = null;
+        if (localizations != null) {
+            for (ExtensionElement extensionElement : localizations) {
+                if (locale.equals(extensionElement.getAttributeValue(null, "locale")) &&
+                        extensionElement.getAttributeValue(null, "name") != null) {
+                    localization = extensionElement;
+                    localeAttr = extensionElement.getAttributes().get("locale").get(0);
+                    nameAttr = extensionElement.getAttributes().get("name").get(0);
+                    break;
+                }
+            }
+        }
+        if (localization == null) {
+            localization = new ExtensionElement();
+            localization.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+            localization.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+            localization.setName("localization");
+            element.addExtensionElement(localization);
+            localeAttr = new ExtensionAttribute("locale");
+            nameAttr = new ExtensionAttribute("name");
+            localization.addAttribute(localeAttr);
+            localization.addAttribute(nameAttr);
+        }
+        if (name == null) {
+            name = localization.getAttributeValue(null, "name");
+        }
+        ExtensionElement documentationElement = null;
+        if (description == null) {
+            List<ExtensionElement> documentationElements = localization.getChildElements().get("documentation");
+            if (documentationElements != null) {
+                for (ExtensionElement docElement : documentationElements) {
+                    documentationElement = docElement;
+                    description = StringUtils.trimToNull(docElement.getElementText());
+                    break;
+                }
+            }
+        }
+        if (description != null && !description.trim().isEmpty()) {
+            if (documentationElement == null) {
+                documentationElement = new ExtensionElement();
+                documentationElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+                documentationElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+                documentationElement.setName("documentation");
+                documentationElement.setElementText(description);
+                localization.addChildElement(documentationElement);
+            }
+        }
+        localeAttr.setValue(locale);
+        nameAttr.setValue(name);
     }
 }

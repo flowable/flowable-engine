@@ -183,6 +183,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
         setPropertyValue(PROPERTY_USERTASK_CATEGORY, userTask.getCategory(), propertiesNode);
 
         addFormProperties(userTask.getFormProperties(), propertiesNode);
+        addLocalizationProperties(userTask, propertiesNode);
     }
 
     protected int getExtensionElementValueAsInt(String name, UserTask userTask) {
@@ -281,6 +282,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
         task.setSkipExpression(getPropertyValueAsString(PROPERTY_SKIP_EXPRESSION, elementNode));
 
         convertJsonToFormProperties(elementNode, task);
+        addLocalizationExtensionElement(elementNode, task);
         return task;
     }
 

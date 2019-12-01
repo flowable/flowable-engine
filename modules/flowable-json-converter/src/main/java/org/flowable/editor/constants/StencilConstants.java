@@ -152,6 +152,7 @@ public interface StencilConstants {
     final String PROPERTY_LISTENER_EXPRESSION = "expression";
     final String PROPERTY_LISTENER_DELEGATE_EXPRESSION = "delegateExpression";
     final String PROPERTY_LISTENER_FIELDS = "fields";
+    final String PROPERTY_LOCALIZATION = "localization";
 
     final String PROPERTY_EVENT_LISTENERS = "eventlisteners";
     final String PROPERTY_EVENTLISTENER_VALUE = "eventListeners";
