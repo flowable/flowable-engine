@@ -105,6 +105,11 @@ public class Flowable5TaskWrapper implements Task {
     }
 
     @Override
+    public String getPropagatedStageInstanceId() {
+        return null;
+    }
+
+    @Override
     public Date getCreateTime() {
         return activiti5Task.getCreateTime();
     }
