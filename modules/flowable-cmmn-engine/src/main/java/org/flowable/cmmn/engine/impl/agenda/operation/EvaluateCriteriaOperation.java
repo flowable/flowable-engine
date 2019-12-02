@@ -101,9 +101,10 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
             if (evaluateCaseInstanceCompleted
+                    && evaluatePlanModelComplete()
                     && !criteriaChangeOrActiveChildren
                     && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
-                    && evaluatePlanModelComplete()){
+                    ){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
