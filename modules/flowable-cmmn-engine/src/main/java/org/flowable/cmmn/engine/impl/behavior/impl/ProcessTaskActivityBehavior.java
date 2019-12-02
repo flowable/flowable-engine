@@ -107,10 +107,10 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
         boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
         if (blocking) {
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(),
+            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
                     planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
         } else {
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId,
+            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
                     planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
         }
 

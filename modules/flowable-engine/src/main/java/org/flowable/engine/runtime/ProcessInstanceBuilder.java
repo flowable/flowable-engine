@@ -66,6 +66,11 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder callbackType(String callbackType);
 
     /**
+     * Set the optional instance id of the stage this process instance belongs to, if it runns in the context of a CMMN case.
+     */
+    ProcessInstanceBuilder stageInstanceId(String stageInstanceId);
+
+    /**
      * Set the tenantId of to lookup the process definition
      **/
     ProcessInstanceBuilder tenantId(String tenantId);

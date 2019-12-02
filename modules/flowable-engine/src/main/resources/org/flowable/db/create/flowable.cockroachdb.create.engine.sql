@@ -65,6 +65,7 @@ CREATE TABLE ACT_RU_EXECUTION (
     CALLBACK_TYPE_ varchar(255),
     REFERENCE_ID_ varchar(255),
     REFERENCE_TYPE_ varchar(255),
+    PROPAGATED_STAGE_INST_ID_ varchar(255),
     primary key (ID_)
 );
 
