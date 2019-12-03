@@ -62,4 +62,9 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
         return PlanItemTransition.CREATE;
     }
 
+    @Override
+    protected String getOperationName() {
+        return "[Create plan item]";
+    }
+
 }

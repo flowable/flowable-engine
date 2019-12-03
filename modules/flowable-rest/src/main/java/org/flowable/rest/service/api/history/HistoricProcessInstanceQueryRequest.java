@@ -33,6 +33,7 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private String processInstanceNameLike;
     private String processInstanceNameLikeIgnoreCase;
     private String processBusinessKey;
+    private String processBusinessKeyLike;
     private String processDefinitionId;
     private String processDefinitionKey;
     private List<String> processDefinitionKeyIn;
@@ -105,6 +106,14 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessBusinessKey(String processBusinessKey) {
         this.processBusinessKey = processBusinessKey;
+    }
+    
+    public String getProcessBusinessKeyLike() {
+        return processBusinessKeyLike;
+    }
+
+    public void setProcessBusinessKeyLike(String processBusinessKeyLike) {
+        this.processBusinessKeyLike = processBusinessKeyLike;
     }
 
     public String getProcessDefinitionId() {

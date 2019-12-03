@@ -37,7 +37,12 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
     public void setPlanItemInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity) {
         this.planItemInstanceEntity = planItemInstanceEntity;
     }
-    
+
+    @Override
+    public String getCaseInstanceId() {
+        return planItemInstanceEntity.getCaseInstanceId();
+    }
+
     protected void removeSentryRelatedData() {
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteSentryRelatedData(planItemInstanceEntity.getId());
     }

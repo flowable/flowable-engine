@@ -216,9 +216,15 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String referenceId;
     protected String referenceType;
 
+    /**
+     * The optional stage instance id, if this execution runs in the context of a CMMN case and has a parent stage it belongs to.
+     */
+    protected String propagatedStageInstanceId;
+
     public ExecutionEntityImpl() {
 
     }
+
 
     /**
      * Static factory method: to be used when a new execution is created for the very first time/ Calling this will make sure no extra db fetches are needed later on, as all collections will be
@@ -274,6 +280,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("callbackType", callbackType);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
+        persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         return persistentState;
     }
 
@@ -1268,6 +1275,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setReferenceType(String referenceType) {
         this.referenceType = referenceType;
+    }
+
+    @Override
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
     }
 
     protected String getRelatedActivityInstanceId(ExecutionEntity sourceExecution) {

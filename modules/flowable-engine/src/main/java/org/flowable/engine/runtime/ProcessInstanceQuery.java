@@ -45,6 +45,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey, String processDefinitionKey);
 
     /**
+     * Select process instances with a business key like the given value.
+     */
+    ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike);
+
+    /**
      * Only select process instances that have the given tenant id.
      */
     ProcessInstanceQuery processInstanceTenantId(String tenantId);

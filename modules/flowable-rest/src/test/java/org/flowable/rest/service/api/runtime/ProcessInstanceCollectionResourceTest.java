@@ -139,6 +139,9 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?businessKey=anotherBusinessKey";
         assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?businessKeyLike=" + encode("%BusinessKey");
+        assertResultsPresentInDataResponse(url, id);
 
         // Process definition key
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?processDefinitionKey=processOne";

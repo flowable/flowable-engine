@@ -198,6 +198,6 @@ alter table ACT_RU_DEADLETTER_JOB
     references ACT_GE_BYTEARRAY (ID_);
 
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.4', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.5', 1);
 
 -- force-commit

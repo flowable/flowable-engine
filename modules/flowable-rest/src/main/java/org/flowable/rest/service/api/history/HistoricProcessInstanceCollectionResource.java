@@ -52,6 +52,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             @ApiImplicitParam(name = "processDefinitionVersion", dataType = "string", value = "The process definition version of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "The deployment id of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic process instance.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return instances with a businessKey like this key.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic process instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "superProcessInstanceId", dataType = "string", value = "An optional parent process id of the historic process instance.", paramType = "query"),
@@ -118,6 +119,10 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
 
         if (allRequestParams.get("businessKey") != null) {
             queryRequest.setProcessBusinessKey(allRequestParams.get("businessKey"));
+        }
+        
+        if (allRequestParams.get("businessKeyLike") != null) {
+            queryRequest.setProcessBusinessKeyLike(allRequestParams.get("businessKeyLike"));
         }
 
         if (allRequestParams.get("involvedUser") != null) {

@@ -83,4 +83,9 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
         return stringBuilder.toString();
     }
 
+    @Override
+    protected String getOperationName() {
+        return "[Async activate plan item]";
+    }
+
 }

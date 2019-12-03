@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Objects;
+
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
@@ -35,8 +37,8 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         String oldState = planItemInstanceEntity.getState();
         String newState = getNewState();
 
-        // if the old and new state are the same, leave the operation as we don't execute any transition
-        if (oldState != null && oldState.equals(newState) && abortOperationIfNewStateEqualsOldState()) {
+        if (isStateNotChanged(oldState, newState)) {
+            markAsNoop();
             return;
         }
 
@@ -53,6 +55,11 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
         internalExecute();
+    }
+
+    protected boolean isStateNotChanged(String oldState, String newState) {
+        // if the old and new state are the same, leave the operation as we don't execute any transition
+        return oldState != null && oldState.equals(newState) && abortOperationIfNewStateEqualsOldState();
     }
 
     protected abstract void internalExecute();
@@ -75,23 +82,41 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         return false;
     }
 
+    protected abstract String getOperationName();
+
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        stringBuilder.append("[Change PlanItem state] ");
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String operationName = getOperationName();
+        stringBuilder.append(operationName != null ? operationName : "[Change plan item state]").append(" ");
 
         if (planItem != null) {
             stringBuilder.append(planItem);
         } else {
-             stringBuilder.append(planItemInstanceEntity);
+            stringBuilder.append(planItemInstanceEntity);
         }
 
         stringBuilder.append(", ");
-        stringBuilder.append("new state: [").append(getNewState()).append("]");
-        stringBuilder.append(" with transition [");
-        stringBuilder.append(getLifeCycleTransition());
-        stringBuilder.append("]");
+
+        String currentState = planItemInstanceEntity.getState();
+        String newState = getNewState();
+
+        if (!Objects.equals(currentState, newState)) {
+
+            stringBuilder.append("new state: [").append(getNewState()).append("]");
+            stringBuilder.append(" with transition [");
+            stringBuilder.append(getLifeCycleTransition());
+            stringBuilder.append("]");
+
+        } else {
+            stringBuilder.append("will remain in state [").append(newState).append("]");
+
+        }
+
+
         return stringBuilder.toString();
     }
 

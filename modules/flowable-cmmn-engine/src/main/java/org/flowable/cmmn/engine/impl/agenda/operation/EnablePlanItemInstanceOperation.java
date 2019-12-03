@@ -51,4 +51,9 @@ public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInsta
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceEnabled(planItemInstanceEntity);
     }
 
+    @Override
+    protected String getOperationName() {
+        return "[Enable plan item]";
+    }
+
 }

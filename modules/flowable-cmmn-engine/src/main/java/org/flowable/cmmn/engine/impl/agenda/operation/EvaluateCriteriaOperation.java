@@ -87,6 +87,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         super.run();
 
         if (caseInstanceEntity.isDeleted()) {
+            markAsNoop();
             return;
         }
 
@@ -102,11 +103,15 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             if (evaluateCaseInstanceCompleted
                     && evaluatePlanModelComplete()
                     && !criteriaChangeOrActiveChildren
-                    && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())){
+                    && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
+                    ){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
                 CommandContextUtil.getAgenda(commandContext).planCompleteCaseInstanceOperation(caseInstanceEntity);
+
+            } else {
+                markAsNoop();
             }
 
         }
@@ -381,7 +386,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 }
 
             } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) { // Only an if part: simply evaluate the if part
-                if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
+                if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
 
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("{}: single ifPart has evaluated to true", criterion);
@@ -434,7 +439,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied
                         && (isDefaultTriggerMode || (sentry.isOnEventTriggerMode() && allOnPartsSatisfied) )) {
 
-                    if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
+                    if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
 
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("{}: ifPart evaluates to true", criterion);
@@ -504,12 +509,12 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return sentryPartInstanceEntity;
     }
     
-    protected boolean evaluateSentryIfPart(Sentry sentry, VariableContainer variableContainer) {
+    protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
         Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
         Object result = conditionExpression.getValue(variableContainer);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Evaluation of sentry if condition {} results in '{}'", sentry.getSentryIfPart().getCondition(), result);
+            LOGGER.debug("Evaluation of sentry if condition {} for {} results in '{}'", sentry.getSentryIfPart().getCondition(), entityWithSentryPartInstances, result);
         }
 
         if (result instanceof Boolean) {

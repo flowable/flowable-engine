@@ -76,5 +76,10 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
             activityBehavior.execute(planItemInstanceEntity);
         }
     }
+
+    @Override
+    protected String getOperationName() {
+        return "[Start plan item]";
+    }
     
 }

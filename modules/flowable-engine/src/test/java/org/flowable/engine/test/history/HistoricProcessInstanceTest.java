@@ -279,7 +279,8 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().or().processDefinitionId("undefined").processDefinitionKeyIn(Arrays.asList("undefined1", "undefined2")).endOr().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").processDefinitionId("undefined").endOr().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKey("businessKey123").processDefinitionId("undefined").endOr().count());
-
+        assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKeyLike("b%123").processDefinitionId("undefined").endOr().count());
+        
         List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");
 
