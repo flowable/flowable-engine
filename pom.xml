@@ -14,7 +14,7 @@
 	</parent>
 
 	<packaging>pom</packaging>
-	<version>6.4.3.26</version>
+	<version>6.4.3.27</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
