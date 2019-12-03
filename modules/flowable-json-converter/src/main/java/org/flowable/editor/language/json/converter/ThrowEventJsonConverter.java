@@ -15,7 +15,14 @@ package org.flowable.editor.language.json.converter;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.EscalationEventDefinition;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.ThrowEvent;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
