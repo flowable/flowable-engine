@@ -13,10 +13,15 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +41,8 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a single task variable.
@@ -69,6 +76,30 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         // Unexisting variable
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE,
                         caseInstance.getId(), "unexistingVariable")), HttpStatus.SC_NOT_FOUND));
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testGetInstanceCaseInstanceVariable() throws Exception {
+
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        Instant now = Instant.now();
+        Instant nowWithoutNanos = now.truncatedTo(ChronoUnit.MILLIS);
+        runtimeService.setVariable(caseInstance.getId(), "variable", now);
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE,
+                        caseInstance.getId(), "variable")), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  name: 'variable',"
+                + "  type: 'instant',"
+                + "  value: '" + nowWithoutNanos.toString() + "'"
+                + "}");
     }
 
     /**
@@ -185,6 +216,37 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "unexistingVariable"));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testUpdateInstanceProcessVariable() throws Exception {
+
+        Instant initial = Instant.parse("2019-12-03T12:32:45.583345Z");
+        Instant tenDaysLater = initial.plus(10, ChronoUnit.DAYS);
+        Instant tenDaysLaterWithoutNanos = tenDaysLater.truncatedTo(ChronoUnit.MILLIS);
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(Collections.singletonMap("overlappingVariable", (Object) "processValue")).start();
+        runtimeService.setVariable(caseInstance.getId(), "myVar", initial);
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "2019-12-13T12:32:45.583345Z");
+        requestNode.put("type", "instant");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThatJson(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(tenDaysLaterWithoutNanos);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  value: '2019-12-13T12:32:45.583345Z'"
+                + "}");
     }
 
     /**
