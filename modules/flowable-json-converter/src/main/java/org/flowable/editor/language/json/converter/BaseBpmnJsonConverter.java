@@ -581,11 +581,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                             break;
                         }
                     }
-                    if (name != null && !name.trim().isEmpty()) {
-                        nameNode.put(locale, name);
+                    if (StringUtils.isNotBlank(name)) {
+                        nameNode.put(locale, name.trim());
                     }
-                    if (documentation != null && !documentation.trim().isEmpty()) {
-                        descriptionNode.put(locale, documentation);
+                    if (StringUtils.isNotBlank(documentation)) {
+                        descriptionNode.put(locale, documentation.trim());
                     }
                 }
             }
@@ -891,13 +891,13 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 }
             }
         }
-        if (description != null && !description.trim().isEmpty()) {
+        if (StringUtils.isNotBlank(description)) {
             if (documentationElement == null) {
                 documentationElement = new ExtensionElement();
                 documentationElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
                 documentationElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
                 documentationElement.setName("documentation");
-                documentationElement.setElementText(description);
+                documentationElement.setElementText(description.trim());
                 localization.addChildElement(documentationElement);
             }
         }
