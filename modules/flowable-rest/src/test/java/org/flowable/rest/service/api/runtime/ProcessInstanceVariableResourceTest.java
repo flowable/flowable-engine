@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -21,6 +23,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +36,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
@@ -41,6 +46,9 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a single task variable.
@@ -79,6 +87,32 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         // Unexisting variable
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "unexistingVariable")),
                 HttpStatus.SC_NOT_FOUND));
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testGetProcessInstanceInstantVariable() throws Exception {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Instant now = Instant.now();
+        Instant nowWithoutNanos = now.truncatedTo(ChronoUnit.MILLIS);
+        runtimeService.setVariable(processInstance.getId(), "variable", now);
+
+        CloseableHttpResponse response = executeRequest(
+            new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "variable")),
+            HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  name: 'variable',"
+                + "  type: 'instant',"
+                + "  value: '" + nowWithoutNanos.toString() + "'"
+                + "}");
     }
 
     /**
@@ -202,6 +236,37 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "unexistingVariable"));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_NOT_FOUND));
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testUpdateInstantProcessVariable() throws Exception {
+        Instant initial = Instant.parse("2019-12-03T12:32:45.583345Z");
+        Instant tenDaysLater = initial.plus(10, ChronoUnit.DAYS);
+        Instant tenDaysLaterWithoutNanos = tenDaysLater.truncatedTo(ChronoUnit.MILLIS);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
+        runtimeService.setVariable(processInstance.getId(), "myVar", initial);
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "2019-12-13T12:32:45.583345Z");
+        requestNode.put("type", "instant");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo(tenDaysLaterWithoutNanos);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  value: '2019-12-13T12:32:45.583345Z'"
+                + "}");
     }
 
     /**

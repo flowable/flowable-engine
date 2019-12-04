@@ -30,7 +30,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database
@@ -80,7 +80,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database
@@ -131,7 +131,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database

@@ -8,16 +8,21 @@ on:
 
 jobs:
   test_jdk14:
-    name: Linux (OpenJDK 14 EA)
+    name: Linux (OpenJDK EA)
     runs-on: ubuntu-latest
-    container: openjdk:14
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Install
+        # If installing the JDK is in a different step then wrong java would be used
         # Need to do install first in order for the OSGi tests to work
-        run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+        run: |
+          . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
+          ./mvnw install -V -B --no-transfer-progress -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: Test
-        run: ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false
+        # If installing the JDK is in a different step then wrong java would be used
+        run: |
+          . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
+          ./mvnw verify -Pdistro,errorLogging -B -V -Dmaven.test.redirectTestOutputToFile=false
         continue-on-error: true
