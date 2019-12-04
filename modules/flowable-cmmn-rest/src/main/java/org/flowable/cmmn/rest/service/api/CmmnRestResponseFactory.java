@@ -567,6 +567,7 @@ public class CmmnRestResponseFactory {
             }
         }
         result.setTenantId(caseInstance.getTenantId());
+        result.setState(caseInstance.getState());
         return result;
     }
 
