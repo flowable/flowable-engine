@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot-starters</artifactId>
-        <version>6.4.3.27</version>
+        <version>6.4.3.28</version>
     </parent>
 
     <artifactId>flowable-spring-boot-starter-dmn-rest</artifactId>
