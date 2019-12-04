@@ -3045,7 +3045,7 @@ It is possible to throw BPMN Errors from user code inside Service Tasks or Scrip
 ----
 public class ThrowBpmnErrorDelegate implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
     try {
       executeBusinessLogic();
     } catch (BusinessException e) {
@@ -3164,7 +3164,7 @@ For some use cases, it might be necessary to use the Flowable services from with
 ----
 public class StartProcessInstanceTestDelegate implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
     RuntimeService runtimeService = Context.getProcessEngineConfiguration().getRuntimeService();
     runtimeService.startProcessInstanceByKey("myProcess");
   }
@@ -4340,7 +4340,7 @@ The first execution listener is notified when the process starts. The listener i
 ----
 public class ExampleExecutionListenerOne implements ExecutionListener {
 
-  public void notify(ExecutionListenerExecution execution) throws Exception {
+  public void notify(ExecutionListenerExecution execution) {
     execution.setVariable("variableSetInExecutionListener", "firstValue");
     execution.setVariable("eventReceived", execution.getEventName());
   }
@@ -4431,7 +4431,7 @@ public class ExampleFieldInjectedExecutionListener implements ExecutionListener 
 
   private Expression dynamicValue;
 
-  public void notify(ExecutionListenerExecution execution) throws Exception {
+  public void notify(ExecutionListenerExecution execution) {
     execution.setVariable("var", fixedValue.getValue(execution).toString() +
         dynamicValue.getValue(execution).toString());
   }
