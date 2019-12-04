@@ -40,7 +40,7 @@ jobs:
           ./mvnw clean install
           -Dmaven.javadoc.skip=true -B -V
           -PcleanDb,postgresql
-          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.url=jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/flowable
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver
@@ -78,7 +78,7 @@ jobs:
           ./mvnw clean install
           -Dmaven.javadoc.skip=true -B -V
           -Pdmn,postgresql
-          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.url=jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/flowable
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver
@@ -117,7 +117,7 @@ jobs:
           ./mvnw clean install
           -Dmaven.javadoc.skip=true -B -V
           -Pcontent,postgresql
-          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.url=jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/flowable
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver

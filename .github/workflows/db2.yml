@@ -48,7 +48,7 @@ jobs:
           ./mvnw clean install
           -Dmaven.javadoc.skip=true -B -V
           -PcleanDb,db2
-          -Djdbc.url=jdbc:db2://db2:${{ job.services.db2.ports[50000] }}/flowable
+          -Djdbc.url=jdbc:db2://localhost:${{ job.services.db2.ports[50000] }}/flowable
           -Djdbc.username=db2inst1
           -Djdbc.password=flowable
           -Djdbc.driver=com.ibm.db2.jcc.DB2Driver
@@ -94,7 +94,7 @@ jobs:
           ./mvnw clean install
           -Dmaven.javadoc.skip=true -B -V
           -Pdmn,db2
-          -Djdbc.url=jdbc:db2://db2:${{ job.services.db2.ports[50000] }}/flowable
+          -Djdbc.url=jdbc:db2://localhost:${{ job.services.db2.ports[50000] }}/flowable
           -Djdbc.username=db2inst1
           -Djdbc.password=flowable
           -Djdbc.driver=com.ibm.db2.jcc.DB2Driver
@@ -141,7 +141,7 @@ jobs:
           ./mvnw clean install
           -Dmaven.javadoc.skip=true -B -V
           -Pcontent,db2
-          -Djdbc.url=jdbc:db2://db2:${{ job.services.db2.ports[50000] }}/flowable
+          -Djdbc.url=jdbc:db2://localhost:${{ job.services.db2.ports[50000] }}/flowable
           -Djdbc.username=db2inst1
           -Djdbc.password=flowable
           -Djdbc.driver=com.ibm.db2.jcc.DB2Driver
