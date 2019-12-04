@@ -1056,14 +1056,14 @@ The *required rule* works in conjunction with the *autoComplete* attribute on th
 
 -   If *autoComplete* resolves to *true* for the stage, all child plan item instances for **which the required rule evaluates to true** need to be in an end state. If there are also no other active child plan item instances, the stage completes automatically
 
-A *stage plan item instance* has a **completeable** property that can be used to see whether or not the conditions for completion are satisfied.
+A *stage plan item instance* has a **completable** property that can be used to see whether or not the conditions for completion are satisfied.
 Take, for example, the following simple stage and assume that the sentry for the *required task* evaluates to true and the other one to false. This means that the left plan item instance will be active while the right one will be in the *available* state.
 
 ![cmmn.completeable stage](assets/cmmn/cmmn.completeable-stage.png)
 
 Calling *cmmnRuntimeService.completeStagePlanItemInstance(String stagePlanItemInstanceId)* will not be possible for the stage (an exception will be thrown) as it has one active child plan item instance. When this user task on the left is completed, the *completeStagePlanItemInstance* can now be called, as no child plan item instances are currently active. However, by itself, the stage will not automatically complete as the right user task is in the available state.
 
-If the previous stage is changed to be **autoCompleteable** (this is visualised by a black rectangle at the bottom of the stage) and the plan item on the left is changed to be required (this is visualised using an exclamation mark), the behavior will be different:
+If the previous stage is changed to be **autocompletable** (this is visualised by a black rectangle at the bottom of the stage) and the plan item on the left is changed to be required (this is visualised using an exclamation mark), the behavior will be different:
 
 ![cmmn.completeable stage02](assets/cmmn/cmmn.completeable-stage02.png)
 
