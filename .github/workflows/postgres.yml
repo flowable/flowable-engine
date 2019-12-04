@@ -10,7 +10,6 @@ jobs:
   test_postgres:
     name: Postgres ${{ matrix.postgres }}
     runs-on: ubuntu-latest
-    container: openjdk:8
     strategy:
       fail-fast: false
       matrix:
@@ -26,9 +25,12 @@ jobs:
         # needed because the postgres container does not provide a health check
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
       - name: Test
         # use postgres for the host here because we have specified a container for the job.
         # If we were running the job on the VM this would be localhost
@@ -46,7 +48,6 @@ jobs:
   test_postgres_dmn:
     name: Postgres ${{ matrix.postgres }} DMN
     runs-on: ubuntu-latest
-    container: openjdk:8
     strategy:
       fail-fast: false
       matrix:
@@ -62,9 +63,12 @@ jobs:
         # needed because the postgres container does not provide a health check
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
       - name: Test
         # use postgres for the host here because we have specified a container for the job.
         # If we were running the job on the VM this would be localhost
@@ -83,7 +87,6 @@ jobs:
   test_postgres_content:
     name: Postgres ${{ matrix.postgres }} Content
     runs-on: ubuntu-latest
-    container: openjdk:8
     strategy:
       fail-fast: false
       matrix:
@@ -99,9 +102,12 @@ jobs:
         # needed because the postgres container does not provide a health check
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
       - name: Test
         # use postgres for the host here because we have specified a container for the job.
         # If we were running the job on the VM this would be localhost
