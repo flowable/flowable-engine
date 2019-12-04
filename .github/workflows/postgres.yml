@@ -38,9 +38,9 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -PcleanDb,postgresql
-          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.url=jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/flowable
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver
@@ -76,9 +76,9 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pdmn,postgresql
-          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.url=jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/flowable
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver
@@ -115,9 +115,9 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pcontent,postgresql
-          -Djdbc.url=jdbc:postgresql://postgres:${{ job.services.postgres.ports[5432] }}/flowable
+          -Djdbc.url=jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/flowable
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=org.postgresql.Driver

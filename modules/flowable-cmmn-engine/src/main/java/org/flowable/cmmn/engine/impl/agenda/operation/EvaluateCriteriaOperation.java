@@ -428,7 +428,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     }
                 }
 
-                boolean allOnPartsSatisfied = (satisfiedSentryOnPartIds.size() == sentry.getOnParts().size());
+                boolean allOnPartsSatisfied = allOnPartsSatisfied(satisfiedSentryOnPartIds, sentry.getOnParts());
 
                 if (allOnPartsSatisfied && LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{}: all onParts have been satisfied", criterion);
@@ -463,6 +463,26 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
 
         return null;
+    }
+
+    /**
+     * Evaluate, if the sentries on-parts are all satisfied.
+     *
+     * @param satisfiedSentryOnPartIds the set of satisfied sentry on parts, which might also contain on-parts from other sentries on the same plan item.
+     * @param sentryOnParts the list of on-parts of the currently evaluated sentry
+     * @return true, if all on parts of the sentry are satisfied, false otherwise
+     */
+    protected boolean allOnPartsSatisfied(Set<String> satisfiedSentryOnPartIds, List<SentryOnPart> sentryOnParts) {
+        if (satisfiedSentryOnPartIds.size() == 0 && sentryOnParts.size() > 0) {
+            return false;
+        }
+
+        for (SentryOnPart sentryOnPart : sentryOnParts) {
+            if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean sentryOnPartMatchesCurrentLifeCycleEvent(SentryOnPart sentryOnPart) {
