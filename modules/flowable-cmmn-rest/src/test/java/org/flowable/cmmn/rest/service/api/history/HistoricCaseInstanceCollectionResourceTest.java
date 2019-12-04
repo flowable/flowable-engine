@@ -131,7 +131,10 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
         Iterator<JsonNode> it = dataNode.iterator();
         while (it.hasNext()) {
-            String id = it.next().get("id").textValue();
+            JsonNode jsonNodeEntry = it.next();
+            String id = jsonNodeEntry.get("id").textValue();
+            String state = jsonNodeEntry.get("state").textValue();
+            assertTrue("state is missing on the historic case instance", StringUtils.isNotEmpty(state));
             toBeFound.remove(id);
         }
         assertTrue("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());

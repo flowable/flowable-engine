@@ -45,6 +45,7 @@ public class HistoricCaseInstanceResponse {
     protected String superProcessInstanceId;
     protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
+    protected String state;
 
     @ApiModelProperty(example = "5")
     public String getId() {
@@ -173,5 +174,14 @@ public class HistoricCaseInstanceResponse {
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    @ApiModelProperty(example = "active")
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }
