@@ -40,7 +40,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -PcleanDb,mysql
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
@@ -79,7 +79,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pdmn,mysql
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
@@ -119,7 +119,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pcontent,mysql
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
