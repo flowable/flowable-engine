@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples2">
+
+  <process id="localizedProcess" name="A localized process">
+    <documentation>This a process that can be localized</documentation>
+    <extensionElements>
+      <activiti:localization locale="es" name="Nombre del proceso">
+        <activiti:documentation>Descripción del proceso</activiti:documentation>
+      </activiti:localization>
+    </extensionElements>
+
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />
+    <endEvent id="end" />
+    
+  </process>
+
+</definitions>

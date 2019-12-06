@@ -29,7 +29,11 @@ public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasR
 
     void setName(String name);
 
+    void setLocalizedName(String name);
+
     void setDescription(String description);
+
+    void setLocalizedDescription(String description);
 
     void setDeploymentId(String deploymentId);
 

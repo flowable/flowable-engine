@@ -104,6 +104,7 @@ import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryCleaningManager;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
+import org.flowable.engine.InternalProcessLocalizationManager;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -119,6 +120,7 @@ import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
 import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.DefaultProcessJobParentStateResolver;
+import org.flowable.engine.impl.DefaultProcessLocalizationManager;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
 import org.flowable.engine.impl.FormServiceImpl;
 import org.flowable.engine.impl.HistoryServiceImpl;
@@ -327,6 +329,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisModelDataMan
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
+import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
@@ -337,6 +340,7 @@ import org.flowable.engine.interceptor.ProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.StartProcessInstanceInterceptor;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
+import org.flowable.engine.repository.InternalProcessDefinitionLocalizationManager;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
@@ -805,6 +809,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected InternalTaskAssignmentManager internalTaskAssignmentManager;
     protected IdentityLinkEventHandler identityLinkEventHandler;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
+    protected InternalProcessLocalizationManager internalProcessLocalizationManager;
+    protected InternalProcessDefinitionLocalizationManager internalProcessDefinitionLocalizationManager;
     protected InternalJobManager internalJobManager;
     protected InternalJobCompatibilityManager internalJobCompatibilityManager;
 
@@ -1054,6 +1060,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         afterInitTaskServiceConfiguration();
         
         initHistoryCleaningManager();
+        initLocalizationManagers();
     }
 
     // failedJobCommandFactory
@@ -2599,6 +2606,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public void initLocalizationManagers() {
+        if (this.internalProcessLocalizationManager == null) {
+            this.setInternalProcessLocalizationManager(new DefaultProcessLocalizationManager(this));
+        }
+
+        if(this.internalProcessDefinitionLocalizationManager == null) {
+            this.setInternalProcessDefinitionLocalizationManager(new DefaultProcessDefinitionLocalizationManager(this));
+        }
+
+    }
+
     // getters and setters
     // //////////////////////////////////////////////////////
 
@@ -2989,6 +3007,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setInternalTaskLocalizationManager(InternalTaskLocalizationManager internalTaskLocalizationManager) {
         this.internalTaskLocalizationManager = internalTaskLocalizationManager;
+        return this;
+    }
+
+    public InternalProcessLocalizationManager getInternalProcessLocalizationManager() {
+        return internalProcessLocalizationManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalProcessLocalizationManager(InternalProcessLocalizationManager internalProcessLocalizationManager) {
+        this.internalProcessLocalizationManager = internalProcessLocalizationManager;
+        return this;
+    }
+
+    public InternalProcessDefinitionLocalizationManager getInternalProcessDefinitionLocalizationManager() {
+        return internalProcessDefinitionLocalizationManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalProcessDefinitionLocalizationManager(InternalProcessDefinitionLocalizationManager internalProcessDefinitionLocalizationManager) {
+        this.internalProcessDefinitionLocalizationManager = internalProcessDefinitionLocalizationManager;
         return this;
     }
 

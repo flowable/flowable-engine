@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,19 +13,20 @@
 
 package org.flowable.engine.impl;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Tom Baeyens
@@ -64,6 +65,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected String engineVersion;
+    protected String locale;
+    protected boolean withLocalizationFallback;
 
     protected String eventSubscriptionName;
     protected String eventSubscriptionType;
@@ -290,6 +293,18 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         return eventSubscription("message", messageName);
     }
 
+    @Override
+    public ProcessDefinitionQuery locale(String locale) {
+        this.locale = locale;
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionQuery withLocalizationFallback() {
+        this.withLocalizationFallback = true;
+        return this;
+    }
+
     public ProcessDefinitionQuery processDefinitionStarter(String procDefId) {
         this.procDefId = procDefId;
         return this;
@@ -317,7 +332,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         }
         return CommandContextUtil.getProcessEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(authorizationUserId);
     }
-    
+
     @Override
     public ProcessDefinitionQueryImpl startableByUser(String userId) {
         if (userId == null) {
@@ -384,7 +399,17 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     @Override
     public List<ProcessDefinition> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionsByQueryCriteria(this);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+
+        List<ProcessDefinition> processDefinitions = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionsByQueryCriteria(this);
+
+        if (processDefinitions != null && processEngineConfiguration.getPerformanceSettings().isEnableLocalization() && processEngineConfiguration.getInternalProcessDefinitionLocalizationManager() != null) {
+            for (ProcessDefinition processDefinition : processDefinitions) {
+                processEngineConfiguration.getInternalProcessDefinitionLocalizationManager().localize(processDefinition, locale, withLocalizationFallback);
+            }
+        }
+
+        return processDefinitions;
     }
 
     // getters ////////////////////////////////////////////
