@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
@@ -40,6 +41,7 @@ public class ThrowEventJsonConverter extends BaseBpmnJsonConverter {
         convertersToBpmnMap.put(STENCIL_EVENT_THROW_NONE, ThrowEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_THROW_SIGNAL, ThrowEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_THROW_ESCALATION, ThrowEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_THROW_COMPENSATION, ThrowEventJsonConverter.class);
     }
 
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
@@ -60,7 +62,9 @@ public class ThrowEventJsonConverter extends BaseBpmnJsonConverter {
             return STENCIL_EVENT_THROW_SIGNAL;
         } else if (eventDefinition instanceof EscalationEventDefinition) {
             return STENCIL_EVENT_THROW_ESCALATION;
-        } else {
+        } else if (eventDefinition instanceof CompensateEventDefinition) {
+            return STENCIL_EVENT_THROW_COMPENSATION;
+        }else {
             return STENCIL_EVENT_THROW_NONE;
         }
     }
@@ -87,6 +91,8 @@ public class ThrowEventJsonConverter extends BaseBpmnJsonConverter {
             convertJsonToSignalDefinition(elementNode, throwEvent);
         } else if (STENCIL_EVENT_THROW_ESCALATION.equals(stencilId)) {
             convertJsonToEscalationDefinition(elementNode, throwEvent);
+        } else if (STENCIL_EVENT_THROW_COMPENSATION.equals(stencilId)) {
+            convertJsonToCompensationDefinition(elementNode, throwEvent);
         }
         return throwEvent;
     }

@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.DataStoreReference;
@@ -561,6 +562,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 TerminateEventDefinition terminateEventDefinition = (TerminateEventDefinition) eventDefinition;
                 propertiesNode.put(PROPERTY_TERMINATE_ALL, terminateEventDefinition.isTerminateAll());
                 propertiesNode.put(PROPERTY_TERMINATE_MULTI_INSTANCE, terminateEventDefinition.isTerminateMultiInstance());
+            } else if (eventDefinition instanceof CompensateEventDefinition) {
+                CompensateEventDefinition compensateEventDefinition = (CompensateEventDefinition) eventDefinition;
+                if (StringUtils.isNotEmpty(compensateEventDefinition.getActivityRef())) {
+                    propertiesNode.put(PROPERTY_COMPENSATION_ACTIVITY_REF, compensateEventDefinition.getActivityRef());
+                }
             }
         }
     }
@@ -662,6 +668,13 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         if (isAsync) {
             eventDefinition.setAsync(isAsync);
         }
+        event.getEventDefinitions().add(eventDefinition);
+    }
+
+    protected void convertJsonToCompensationDefinition(JsonNode objectNode, Event event) {
+        CompensateEventDefinition eventDefinition = new CompensateEventDefinition();
+        String activityRef = getPropertyValueAsString(PROPERTY_COMPENSATION_ACTIVITY_REF, objectNode);
+        eventDefinition.setActivityRef(activityRef);
         event.getEventDefinitions().add(eventDefinition);
     }
 

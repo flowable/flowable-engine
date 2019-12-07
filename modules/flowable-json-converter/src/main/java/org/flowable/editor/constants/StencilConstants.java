@@ -78,6 +78,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_THROW_SIGNAL = "ThrowSignalEvent";
     final String STENCIL_EVENT_THROW_ESCALATION = "ThrowEscalationEvent";
     final String STENCIL_EVENT_THROW_NONE = "ThrowNoneEvent";
+    final String STENCIL_EVENT_THROW_COMPENSATION = "ThrowCompensationEvent";
 
     final String STENCIL_SEQUENCE_FLOW = "SequenceFlow";
     final String STENCIL_MESSAGE_FLOW = "MessageFlow";
@@ -327,4 +328,5 @@ public interface StencilConstants {
     final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
 
     final String PROPERTY_FOR_COMPENSATION = "isforcompensation";
+    final String PROPERTY_COMPENSATION_ACTIVITY_REF = "compensationactivityref";
 }
