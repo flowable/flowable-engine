@@ -593,6 +593,13 @@
       "value" : "",
       "description" : "BPMN.PROPERTYPACKAGES.MAILTASKTEXTPACKAGE.MAILTASKTEXT.DESCRIPTION",
       "popular" : true
+    }, {
+      "id" : "mailtasktextvar",
+      "type" : "String",
+      "title" : "BPMN.PROPERTYPACKAGES.MAILTASKTEXTPACKAGE.MAILTASKTEXTVAR.TITLE",
+      "value" : "",
+      "description" : "BPMN.PROPERTYPACKAGES.MAILTASKTEXTPACKAGE.MAILTASKTEXTVAR.DESCRIPTION",
+      "popular" : true
     } ]
   }, {
     "name" : "mailtaskhtmlpackage",

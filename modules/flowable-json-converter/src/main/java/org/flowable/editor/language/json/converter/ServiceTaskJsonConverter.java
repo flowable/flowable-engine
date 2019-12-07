@@ -71,6 +71,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_MAILTASK_TEXT, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_HTML, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_HTML_VAR, serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_MAILTASK_TEXT_VAR, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_CHARSET, serviceTask, propertiesNode);
 
         } else if ("camel".equalsIgnoreCase(serviceTask.getType())) {
