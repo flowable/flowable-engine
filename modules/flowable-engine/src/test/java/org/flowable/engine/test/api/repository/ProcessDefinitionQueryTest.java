@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -346,4 +347,40 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+
+    @Test
+    public void testLocalizeProcessDefinition() {
+        Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/repository/LocalizedProcess.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/repository/LocalizedProcess.bpmn20.xml").deploy();
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("localizedProcess")
+                .singleResult();
+
+        assertEquals("A localized process", processDefinition.getName());
+        assertEquals("This a process that can be localized", processDefinition.getDescription());
+
+        processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("localizedProcess")
+                .locale("es")
+                .singleResult();
+
+        assertEquals("Nombre del proceso", processDefinition.getName());
+        assertEquals("Descripción del proceso", processDefinition.getDescription());
+
+        ObjectNode infoNode = dynamicBpmnService.getProcessDefinitionInfo(processDefinition.getId());
+        dynamicBpmnService.changeLocalizationName("en-GB", "localizedProcess", "The process name in 'en-GB'", infoNode);
+        dynamicBpmnService.changeLocalizationDescription("en-GB", "localizedProcess", "The process description in 'en-GB'", infoNode);
+        dynamicBpmnService.saveProcessDefinitionInfo(processDefinition.getId(), infoNode);
+
+        processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("localizedProcess")
+                .locale("en-GB")
+                .singleResult();
+
+        assertEquals("The process name in 'en-GB'", processDefinition.getName());
+        assertEquals("The process description in 'en-GB'", processDefinition.getDescription());
+
+        repositoryService.deleteDeployment(deployment.getId());
+    }
 }

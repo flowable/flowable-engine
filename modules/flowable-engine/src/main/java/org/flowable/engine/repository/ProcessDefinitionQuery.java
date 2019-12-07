@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
 
 /**
  * Allows programmatic querying of {@link ProcessDefinition}s.
@@ -165,6 +166,16 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
      * Selects the single process definition which has a start message event with the messageName.
      */
     ProcessDefinitionQuery messageEventSubscriptionName(String messageName);
+
+    /**
+     * Localize process definition name and description to specified locale.
+     */
+    ProcessDefinitionQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    ProcessDefinitionQuery withLocalizationFallback();
 
     // ordering ////////////////////////////////////////////////////////////
 
