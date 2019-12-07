@@ -180,6 +180,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
 
         setPropertyValue(PROPERTY_FORM_FIELD_VALIDATION, userTask.getValidateFormFields(), propertiesNode);
         setPropertyValue(PROPERTY_USERTASK_DUEDATE, userTask.getDueDate(), propertiesNode);
+        setPropertyValue(PROPERTY_CALENDAR_NAME, userTask.getBusinessCalendarName(), propertiesNode);
         setPropertyValue(PROPERTY_USERTASK_CATEGORY, userTask.getCategory(), propertiesNode);
 
         addFormProperties(userTask.getFormProperties(), propertiesNode);
@@ -223,6 +224,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
 
         task.setValidateFormFields(getPropertyValueAsString(PROPERTY_FORM_FIELD_VALIDATION, elementNode));
         task.setDueDate(getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
+        task.setBusinessCalendarName(getPropertyValueAsString(PROPERTY_CALENDAR_NAME, elementNode));
         task.setCategory(getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
 
         JsonNode assignmentNode = getProperty(PROPERTY_USERTASK_ASSIGNMENT, elementNode);

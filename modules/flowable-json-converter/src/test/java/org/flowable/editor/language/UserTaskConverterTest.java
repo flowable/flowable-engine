@@ -61,6 +61,7 @@ public class UserTaskConverterTest extends AbstractConverterTest {
         assertEquals("formFieldValidationValue", userTask.getValidateFormFields());
         assertEquals("40", userTask.getPriority());
         assertEquals("2012-11-01", userTask.getDueDate());
+        assertEquals("myCalendarName", userTask.getBusinessCalendarName());
         assertEquals("defaultCategory", userTask.getCategory());
         assertEquals("${skipExpression}", userTask.getSkipExpression());
 
