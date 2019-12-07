@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.engine.runtime.ProcessInstanceQuery;
 
 /**
  * Allows programmatic querying of {@link ProcessDefinition}s.
