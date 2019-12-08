@@ -40,12 +40,11 @@ public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSuppor
         return new SessionLocaleResolver();
     }
 
-    @Bean
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+    @Override
+    protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         requestMappingHandlerMapping.setRemoveSemicolonContent(false);
-        requestMappingHandlerMapping.setInterceptors(getInterceptors());
         return requestMappingHandlerMapping;
     }
 

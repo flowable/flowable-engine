@@ -45,6 +45,7 @@ public class AppDispatcherServletConfiguration implements WebMvcRegistrations {
         return localeChangeInterceptor;
     }
 
+    @Override
     public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
