@@ -22,6 +22,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.executor.jms.JobMessageListener;
 import org.flowable.spring.executor.jms.MessageBasedJobManager;
@@ -63,38 +64,39 @@ public class SpringJmsConfig {
     }
 
     @Bean(name = "transactionManager")
-    public PlatformTransactionManager transactionManager() {
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
+        transactionManager.setDataSource(dataSource);
         return transactionManager;
     }
 
     @Bean
-    public SpringProcessEngineConfiguration processEngineConfiguration() {
+    public SpringProcessEngineConfiguration processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+        JobManager jobManager) {
         SpringProcessEngineConfiguration configuration = new SpringProcessEngineConfiguration();
-        configuration.setDataSource(dataSource());
-        configuration.setTransactionManager(transactionManager());
+        configuration.setDataSource(dataSource);
+        configuration.setTransactionManager(transactionManager);
         configuration.setDatabaseSchemaUpdate(SpringProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         configuration.setAsyncExecutorMessageQueueMode(true);
         configuration.setAsyncExecutorActivate(true);
-        configuration.setJobManager(jobManager());
+        configuration.setJobManager(jobManager);
         return configuration;
     }
 
     @Bean
-    public ProcessEngine processEngine() {
-        return processEngineConfiguration().buildProcessEngine();
+    public ProcessEngine processEngine(ProcessEngineConfiguration processEngineConfiguration) {
+        return processEngineConfiguration.buildProcessEngine();
     }
 
     @Bean
-    public RepositoryService repositoryService() {
-        return processEngine().getRepositoryService();
+    public RepositoryService repositoryService(ProcessEngine processEngine) {
+        return processEngine.getRepositoryService();
     }
 
     @Bean
-    public MessageBasedJobManager jobManager() {
+    public MessageBasedJobManager jobManager(JmsTemplate jmsTemplate) {
         MessageBasedJobManager jobManager = new MessageBasedJobManager();
-        jobManager.setJmsTemplate(jmsTemplate());
+        jobManager.setJmsTemplate(jmsTemplate);
         return jobManager;
     }
 
@@ -108,28 +110,28 @@ public class SpringJmsConfig {
     }
 
     @Bean
-    public JmsTemplate jmsTemplate() {
+    public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
         JmsTemplate jmsTemplate = new JmsTemplate();
         jmsTemplate.setDefaultDestination(new ActiveMQQueue("flowable-jobs"));
-        jmsTemplate.setConnectionFactory(connectionFactory());
+        jmsTemplate.setConnectionFactory(connectionFactory);
         return jmsTemplate;
     }
 
     @Bean
-    public MessageListenerContainer messageListenerContainer() {
+    public MessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory, JobMessageListener jobMessageListener) {
         DefaultMessageListenerContainer messageListenerContainer = new DefaultMessageListenerContainer();
-        messageListenerContainer.setConnectionFactory(connectionFactory());
+        messageListenerContainer.setConnectionFactory(connectionFactory);
         messageListenerContainer.setDestinationName("flowable-jobs");
-        messageListenerContainer.setMessageListener(jobMessageListener());
+        messageListenerContainer.setMessageListener(jobMessageListener);
         messageListenerContainer.setConcurrentConsumers(2);
         messageListenerContainer.start();
         return messageListenerContainer;
     }
 
     @Bean
-    public JobMessageListener jobMessageListener() {
+    public JobMessageListener jobMessageListener(ProcessEngine processEngine) {
         JobMessageListener jobMessageListener = new JobMessageListener();
-        ProcessEngineConfiguration processEngineConfiguration = processEngineConfiguration();
+        ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
         JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
         jobMessageListener.setJobServiceConfiguration(jobServiceConfiguration);
         return jobMessageListener;

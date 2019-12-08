@@ -20,9 +20,8 @@ import org.springframework.context.annotation.Configuration;
 public class EngineConfigurationWithTaskLogging extends EngineConfiguration {
 
     @Override
-    public ProcessEngineConfigurationImpl processEngineConfiguration() {
-        ProcessEngineConfigurationImpl configuration = super.processEngineConfiguration();
-        configuration.setEnableHistoricTaskLogging(true);
-        return configuration;
+    protected void configureProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super.configureProcessEngine(processEngineConfiguration);
+        processEngineConfiguration.setEnableHistoricTaskLogging(true);
     }
 }

@@ -30,7 +30,10 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.engine.FormEngines;
+import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
@@ -54,28 +57,15 @@ public class JPAFlowableEngineConfiguration {
     @Autowired
     protected EntityManagerFactory entityManagerFactory;
 
-    @Bean(name = "processEngineFactoryBean")
-    public ProcessEngineFactoryBean processEngineFactoryBean() {
+    @Bean(name = "processEngine")
+    public ProcessEngineFactoryBean processEngineFactoryBean(ProcessEngineConfigurationImpl processEngineConfiguration) {
         ProcessEngineFactoryBean factoryBean = new ProcessEngineFactoryBean();
-        factoryBean.setProcessEngineConfiguration(processEngineConfiguration());
+        factoryBean.setProcessEngineConfiguration(processEngineConfiguration);
         return factoryBean;
     }
 
-    @Bean(name = "processEngine")
-    public ProcessEngine processEngine() {
-        // Safe to call the getObject() on the @Bean annotated
-        // processEngineFactoryBean(), will be
-        // the fully initialized object instanced from the factory and will NOT
-        // be created more than once
-        try {
-            return processEngineFactoryBean().getObject();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Bean(name = "processEngineConfiguration")
-    public ProcessEngineConfigurationImpl processEngineConfiguration() {
+    public ProcessEngineConfigurationImpl processEngineConfiguration(FormEngineConfigurator formEngineConfigurator) {
         SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
         processEngineConfiguration.setDataSource(dataSource);
         processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
@@ -85,13 +75,14 @@ public class JPAFlowableEngineConfiguration {
         processEngineConfiguration.setJpaHandleTransaction(false);
         processEngineConfiguration.setJpaHandleTransaction(false);
         processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+        processEngineConfiguration.addConfigurator(formEngineConfigurator);
         return processEngineConfiguration;
     }
     
     @Bean
-    public SpringFormEngineConfigurator formEngineConfigurator() {
+    public SpringFormEngineConfigurator formEngineConfigurator(FormEngineConfiguration formEngineConfiguration) {
         SpringFormEngineConfigurator formEngineConfigurator =  new SpringFormEngineConfigurator();
-        formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration());
+        formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration);
         return formEngineConfigurator;
     }
     
@@ -105,63 +96,73 @@ public class JPAFlowableEngineConfiguration {
     }
 
     @Bean
-    public RepositoryService repositoryService() {
-        return processEngine().getRepositoryService();
+    public FormEngine formEngine(@SuppressWarnings("unused") ProcessEngine processEngine) {
+        // The process engine needs to be injected, as otherwise it won't be initialized, which means that the FormEngine is not initialized yet
+        if (!FormEngines.isInitialized()) {
+            throw new IllegalStateException("form engine has not been initialized");
+        }
+        return FormEngines.getDefaultFormEngine();
+    }
+
+
+    @Bean
+    public RepositoryService repositoryService(ProcessEngine processEngine) {
+        return processEngine.getRepositoryService();
     }
 
     @Bean
-    public RuntimeService runtimeService() {
-        return processEngine().getRuntimeService();
+    public RuntimeService runtimeService(ProcessEngine processEngine) {
+        return processEngine.getRuntimeService();
     }
 
     @Bean
-    public TaskService taskService() {
-        return processEngine().getTaskService();
+    public TaskService taskService(ProcessEngine processEngine) {
+        return processEngine.getTaskService();
     }
 
     @Bean
-    public HistoryService historyService() {
-        return processEngine().getHistoryService();
+    public HistoryService historyService(ProcessEngine processEngine) {
+        return processEngine.getHistoryService();
     }
 
     @Bean
-    public FormService formService() {
-        return processEngine().getFormService();
+    public FormService formService(ProcessEngine processEngine) {
+        return processEngine.getFormService();
     }
 
     @Bean
-    public IdentityService identityService() {
-        return processEngine().getIdentityService();
+    public IdentityService identityService(ProcessEngine processEngine) {
+        return processEngine.getIdentityService();
     }
 
     @Bean
-    public IdmIdentityService idmIdentityService() {
-        return ((IdmEngineConfigurationApi) processEngine().getProcessEngineConfiguration().getEngineConfigurations()
+    public IdmIdentityService idmIdentityService(ProcessEngine processEngine) {
+        return ((IdmEngineConfigurationApi) processEngine.getProcessEngineConfiguration().getEngineConfigurations()
                 .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
     @Bean
-    public ManagementService managementService() {
-        return processEngine().getManagementService();
+    public ManagementService managementService(ProcessEngine processEngine) {
+        return processEngine.getManagementService();
     }
 
     @Bean
-    public DynamicBpmnService dynamicBpmnService() {
-        return processEngine().getDynamicBpmnService();
+    public DynamicBpmnService dynamicBpmnService(ProcessEngine processEngine) {
+        return processEngine.getDynamicBpmnService();
     }
     
     @Bean
-    public FormRepositoryService formRepositoryService(ProcessEngine processEngine) {
-        return formEngineConfiguration().getFormRepositoryService();
+    public FormRepositoryService formRepositoryService(FormEngine formEngine) {
+        return formEngine.getFormRepositoryService();
     }
     
     @Bean
-    public org.flowable.form.api.FormService formEngineFormService(ProcessEngine processEngine) {
-        return formEngineConfiguration().getFormService();
+    public org.flowable.form.api.FormService formEngineFormService(FormEngine formEngine) {
+        return formEngine.getFormService();
     }
 
     @Bean
-    public ProcessMigrationService processInstanceMigrationService() {
-        return processEngine().getProcessMigrationService();
+    public ProcessMigrationService processInstanceMigrationService(ProcessEngine processEngine) {
+        return processEngine.getProcessMigrationService();
     }
 }

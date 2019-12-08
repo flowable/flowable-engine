@@ -58,46 +58,35 @@ public class EngineConfiguration {
     }
 
     @Bean(name = "transactionManager")
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
+    public PlatformTransactionManager annotationDrivenTransactionManager(DataSource dataSource) {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
+        transactionManager.setDataSource(dataSource);
         return transactionManager;
     }
 
-    @Bean(name = "appEngineFactoryBean")
-    public AppEngineFactoryBean appEngineFactoryBean() {
+    @Bean(name = "appEngine")
+    public AppEngineFactoryBean appEngineFactoryBean(AppEngineConfiguration appEngineConfiguration) {
         AppEngineFactoryBean factoryBean = new AppEngineFactoryBean();
-        factoryBean.setAppEngineConfiguration(appEngineConfiguration());
+        factoryBean.setAppEngineConfiguration(appEngineConfiguration);
         return factoryBean;
     }
 
-    @Bean(name = "appEngine")
-    public AppEngine appEngine() {
-        // Safe to call the getObject() on the @Bean annotated appEngineFactoryBean(), will be
-        // the fully initialized object instanced from the factory and will NOT be created more than once
-        try {
-            return appEngineFactoryBean().getObject();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Bean(name = "appEngineConfiguration")
-    public AppEngineConfiguration appEngineConfiguration() {
+    public AppEngineConfiguration appEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
         SpringAppEngineConfiguration appEngineConfiguration = new SpringAppEngineConfiguration();
-        appEngineConfiguration.setDataSource(dataSource());
+        appEngineConfiguration.setDataSource(dataSource);
         appEngineConfiguration.setDatabaseSchemaUpdate(AppEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-        appEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
+        appEngineConfiguration.setTransactionManager(transactionManager);
         return appEngineConfiguration;
     }
 
     @Bean
-    public AppRepositoryService appRepositoryService() {
-        return appEngine().getAppRepositoryService();
+    public AppRepositoryService appRepositoryService(AppEngine appEngine) {
+        return appEngine.getAppRepositoryService();
     }
 
     @Bean
-    public AppManagementService managementService() {
-        return appEngine().getAppManagementService();
+    public AppManagementService managementService(AppEngine appEngine) {
+        return appEngine.getAppManagementService();
     }
 }
