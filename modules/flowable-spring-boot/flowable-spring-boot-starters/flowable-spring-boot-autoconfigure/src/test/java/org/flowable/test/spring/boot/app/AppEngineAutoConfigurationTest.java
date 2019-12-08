@@ -282,7 +282,7 @@ public class AppEngineAutoConfigurationTest {
         return (ProcessEngineConfiguration) appEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomIdGeneratorConfiguration {
 
         @Bean
@@ -291,7 +291,7 @@ public class AppEngineAutoConfigurationTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomAutoDeploymentStrategyConfiguration {
 
         @Bean

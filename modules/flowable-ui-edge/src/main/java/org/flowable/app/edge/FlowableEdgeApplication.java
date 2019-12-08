@@ -18,7 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author Filip Hrisafov
  */
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class FlowableEdgeApplication {
 
     public static void main(String[] args) {

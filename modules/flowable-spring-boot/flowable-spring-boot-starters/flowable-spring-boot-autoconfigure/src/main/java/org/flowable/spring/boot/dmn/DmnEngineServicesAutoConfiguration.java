@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnDmnEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -56,7 +56,7 @@ public class DmnEngineServicesAutoConfiguration {
      * If a process engine is present that means that the DmnEngine was created as part of it.
      * Therefore extract it from the DmnEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.dmn.engine.DmnEngine",
         "org.flowable.app.engine.AppEngine"
@@ -79,7 +79,7 @@ public class DmnEngineServicesAutoConfiguration {
      * If an app engine is present that means that the DmnEngine was created as part of the app engine.
      * Therefore extract it from the DmnEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.dmn.engine.DmnEngine"
     })
@@ -101,7 +101,7 @@ public class DmnEngineServicesAutoConfiguration {
     /**
      * If there is no process engine configuration, then trigger a creation of the dmn engine.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.dmn.engine.DmnEngine",
         "org.flowable.engine.ProcessEngine",

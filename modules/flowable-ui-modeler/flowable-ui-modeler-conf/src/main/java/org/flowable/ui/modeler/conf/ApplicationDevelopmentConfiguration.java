@@ -25,7 +25,7 @@ import javax.annotation.PostConstruct;
  * @author Yvo Swillens
  */
 @Profile({"dev"})
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class ApplicationDevelopmentConfiguration {
 
     protected static final boolean FLOWABLE_MODELER_REST_ENABLED = true;

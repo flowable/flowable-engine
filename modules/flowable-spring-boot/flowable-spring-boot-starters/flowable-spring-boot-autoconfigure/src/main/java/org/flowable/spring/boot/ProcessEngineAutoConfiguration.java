@@ -67,7 +67,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Javier Casal
  * @author Joram Barrez
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnProcessEngine
 @EnableConfigurationProperties({
     FlowableAutoDeploymentProperties.class,
@@ -242,7 +242,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         return conf;
     }
     
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })

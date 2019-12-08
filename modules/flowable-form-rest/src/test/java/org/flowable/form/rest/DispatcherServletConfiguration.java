@@ -32,7 +32,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.util.List;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan({ "org.flowable.form.rest.service.api" })
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 

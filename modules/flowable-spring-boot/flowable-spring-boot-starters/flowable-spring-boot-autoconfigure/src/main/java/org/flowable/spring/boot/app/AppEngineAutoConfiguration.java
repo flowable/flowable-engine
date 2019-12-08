@@ -43,7 +43,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author Tijs Rademakers
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnAppEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,

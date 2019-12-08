@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnIdmEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -54,7 +54,7 @@ public class IdmEngineServicesAutoConfiguration {
      * If a process engine is present that means that the IdmEngine was created as part of it.
      * Therefore extract it from the IdmEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.idm.engine.IdmEngine",
         "org.flowable.app.engine.AppEngine"
@@ -78,7 +78,7 @@ public class IdmEngineServicesAutoConfiguration {
      * If an app engine is present that means that the IdmEngine was created as part of it.
      * Therefore extract it from the IdmEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.idm.engine.IdmEngine",
     })
@@ -100,7 +100,7 @@ public class IdmEngineServicesAutoConfiguration {
     /**
      * If there is no process engine configuration, then trigger a creation of the idm engine.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.idm.engine.IdmEngine",
         "org.flowable.engine.ProcessEngine",

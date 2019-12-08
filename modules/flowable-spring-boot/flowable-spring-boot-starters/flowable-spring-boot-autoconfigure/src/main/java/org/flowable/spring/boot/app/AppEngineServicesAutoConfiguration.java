@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Tijs Rademakers
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnAppEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,

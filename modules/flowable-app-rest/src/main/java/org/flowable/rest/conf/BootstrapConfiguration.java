@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class BootstrapConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BootstrapConfiguration.class);

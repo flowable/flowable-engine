@@ -37,7 +37,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class SpringJmsConfig {
 
     @Value("${jdbc.url:jdbc:h2:mem:flowable-spring-jms-test;DB_CLOSE_DELAY=1000;MVCC=TRUE}")

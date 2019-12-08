@@ -15,7 +15,7 @@ package org.flowable.cmmn.rest.conf;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = { "org.flowable.cmmn.rest.conf.common", "org.flowable.cmmn.rest.conf.engine" })
 public class ApplicationConfiguration {
 

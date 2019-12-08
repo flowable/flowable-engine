@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Bean;
 /**
  *
  */
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class Application {
 
     // establish that it's detected the processes and that we can deploy one.

@@ -26,7 +26,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableJpaRepositories({ "org.flowable.rest.api.jpa.repository" })
 @EnableTransactionManagement
 public class DatabaseConfiguration {
