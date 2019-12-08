@@ -30,7 +30,7 @@ import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class Application {
 
     public static void main(String[] args) {

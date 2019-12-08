@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class TestConfiguration {
 
     @Bean

@@ -49,7 +49,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * @author Tijs Rademakers
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class SecurityConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfiguration.class);

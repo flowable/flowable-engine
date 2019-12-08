@@ -66,7 +66,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Vedran Pavic
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ContentTypeResolver.class)
 @ConditionalOnWebApplication
 @AutoConfigureAfter({
@@ -83,7 +83,7 @@ import org.springframework.context.annotation.Configuration;
 })
 public class RestApiAutoConfiguration {
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(RestUrls.class)
     @ConditionalOnBean(ProcessEngine.class)
     @EnableConfigurationProperties(FlowableProcessProperties.class)
@@ -101,7 +101,7 @@ public class RestApiAutoConfiguration {
         return resolver;
     }
     
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(AppRestUrls.class)
     @ConditionalOnBean(AppEngine.class)
     public static class AppEngineRestApiConfiguration extends BaseRestApiConfiguration {
@@ -112,7 +112,7 @@ public class RestApiAutoConfiguration {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(CmmnRestUrls.class)
     @ConditionalOnBean(CmmnEngine.class)
     public static class CmmnEngineRestApiConfiguration extends BaseRestApiConfiguration {
@@ -123,7 +123,7 @@ public class RestApiAutoConfiguration {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(ContentRestUrls.class)
     @ConditionalOnBean(ContentEngine.class)
     public static class ContentEngineRestApiConfiguration extends BaseRestApiConfiguration {
@@ -134,7 +134,7 @@ public class RestApiAutoConfiguration {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(DmnRestUrls.class)
     @ConditionalOnBean(DmnEngine.class)
     public static class DmnEngineRestApiConfiguration extends BaseRestApiConfiguration {
@@ -145,7 +145,7 @@ public class RestApiAutoConfiguration {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(FormRestUrls.class)
     @ConditionalOnBean(FormEngine.class)
     public static class FormEngineRestApiConfiguration extends BaseRestApiConfiguration {
@@ -156,7 +156,7 @@ public class RestApiAutoConfiguration {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(IdmRestResponseFactory.class)
     @ConditionalOnBean(IdmEngine.class)
     public static class IdmEngineRestApiConfiguration extends BaseRestApiConfiguration {

@@ -524,7 +524,7 @@ public class CmmnEngineAutoConfigurationTest {
         return EngineServiceUtil.getCmmnEngineConfiguration(appEngineConfiguration);
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomAutoDeploymentStrategyConfiguration {
 
         @Bean
@@ -533,7 +533,7 @@ public class CmmnEngineAutoConfigurationTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomProcessAutoDeploymentStrategyConfiguration {
 
         @Bean

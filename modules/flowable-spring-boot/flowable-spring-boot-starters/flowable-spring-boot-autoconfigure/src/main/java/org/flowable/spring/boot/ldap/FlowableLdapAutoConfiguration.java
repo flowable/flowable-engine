@@ -47,7 +47,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @EnableConfigurationProperties({
     FlowableLdapProperties.class
 })
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class FlowableLdapAutoConfiguration {
 
     protected final FlowableLdapProperties properties;

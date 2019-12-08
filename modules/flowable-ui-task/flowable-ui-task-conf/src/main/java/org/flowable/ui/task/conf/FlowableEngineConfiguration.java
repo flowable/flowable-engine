@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = {
         "org.flowable.ui.task.extension.conf", // For custom configuration classes
         "org.flowable.ui.task.extension.bean" // For custom beans (delegates etc.)

@@ -24,7 +24,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author Filip Hrisafov
  * @author Joram Barrez
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class FlowableJobConfiguration {
 
     @Bean

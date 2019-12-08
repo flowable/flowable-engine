@@ -182,33 +182,34 @@ Some things to note:
       }
 
       @Bean(name = "transactionManager")
-      public PlatformTransactionManager transactionManager() {
+      public PlatformTransactionManager transactionManager(DataSource dataSource) {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
+        transactionManager.setDataSource(dataSource);
         return transactionManager;
       }
 
       @Bean
-      public SpringProcessEngineConfiguration processEngineConfiguration() {
+      public SpringProcessEngineConfiguration processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+        JobManager jobManager) {
         SpringProcessEngineConfiguration configuration = new SpringProcessEngineConfiguration();
-        configuration.setDataSource(dataSource());
-        configuration.setTransactionManager(transactionManager());
+        configuration.setDataSource(dataSource);
+        configuration.setTransactionManager(transactionManager);
         configuration.setDatabaseSchemaUpdate(SpringProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         configuration.setAsyncExecutorMessageQueueMode(true);
         configuration.setAsyncExecutorActivate(true);
-        configuration.setJobManager(jobManager());
+        configuration.setJobManager(jobManager);
         return configuration;
       }
 
       @Bean
-      public ProcessEngine processEngine() {
-        return processEngineConfiguration().buildProcessEngine();
+      public ProcessEngine processEngine(ProcessEngineConfiguration processEngineConfiguration) {
+        return processEngineConfiguration.buildProcessEngine();
       }
 
       @Bean
-      public MessageBasedJobManager jobManager() {
+      public MessageBasedJobManager jobManager(JmsTemplate jmsTemplate) {
         MessageBasedJobManager jobManager = new MessageBasedJobManager();
-        jobManager.setJmsTemplate(jmsTemplate());
+        jobManager.setJmsTemplate(jmsTemplate);
         return jobManager;
       }
 
@@ -221,28 +222,28 @@ Some things to note:
       }
 
       @Bean
-      public JmsTemplate jmsTemplate() {
+      public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
           JmsTemplate jmsTemplate = new JmsTemplate();
           jmsTemplate.setDefaultDestination(new ActiveMQQueue("flowable-jobs"));
-          jmsTemplate.setConnectionFactory(connectionFactory());
+          jmsTemplate.setConnectionFactory(connectionFactory);
           return jmsTemplate;
       }
 
       @Bean
-      public MessageListenerContainer messageListenerContainer() {
+      public MessageListenerContainer messageListenerContainer(JobMessageListener jobMessageListener) {
           DefaultMessageListenerContainer messageListenerContainer = new DefaultMessageListenerContainer();
           messageListenerContainer.setConnectionFactory(connectionFactory());
           messageListenerContainer.setDestinationName("flowable-jobs");
-          messageListenerContainer.setMessageListener(jobMessageListener());
+          messageListenerContainer.setMessageListener(jobMessageListener);
           messageListenerContainer.setConcurrentConsumers(2);
           messageListenerContainer.start();
           return messageListenerContainer;
       }
 
       @Bean
-      public JobMessageListener jobMessageListener() {
+      public JobMessageListener jobMessageListener(ProcessEngineConfiguration processEngineConfiguration) {
         JobMessageListener jobMessageListener = new JobMessageListener();
-        jobMessageListener.setProcessEngineConfiguration(processEngineConfiguration());
+        jobMessageListener.setProcessEngineConfiguration(processEngineConfiguration);
         return jobMessageListener;
       }
 

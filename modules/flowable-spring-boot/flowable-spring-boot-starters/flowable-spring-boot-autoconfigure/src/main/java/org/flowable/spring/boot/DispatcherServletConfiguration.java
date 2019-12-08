@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Base dispatcher configuration that can be used to configure context for the REST API.
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackageClasses = BaseExceptionHandlerAdvice.class)
 @ConditionalOnClass(WebMvcConfigurationSupport.class)
 @EnableAsync

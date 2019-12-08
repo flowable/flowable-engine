@@ -33,7 +33,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan({ "org.flowable.content.rest.exception", "org.flowable.content.rest.service.api" })
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 

@@ -428,7 +428,7 @@ public class FormEngineAutoConfigurationTest {
         return EngineServiceUtil.getFormEngineConfiguration(appEngineConfiguration);
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomAutoDeploymentStrategyConfiguration {
 
         @Bean

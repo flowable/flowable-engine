@@ -30,7 +30,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
     ApplicationConfiguration.class,
     AppDispatcherServletConfiguration.class
 })
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class FlowableTaskApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

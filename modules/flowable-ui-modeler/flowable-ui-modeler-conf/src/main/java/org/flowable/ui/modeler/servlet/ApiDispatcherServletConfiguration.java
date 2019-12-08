@@ -27,7 +27,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan(value = { "org.flowable.ui.modeler.rest.api", "org.flowable.ui.common.rest.exception" })
 @EnableAsync
 public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSupport {

@@ -16,7 +16,7 @@ package org.flowable.rest.conf.engine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class EngineConfigurationWithTaskLogging extends EngineConfiguration {
 
     @Override

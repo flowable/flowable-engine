@@ -25,7 +25,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableIdmAppProperties.class)
 @ComponentScan(basePackages = {
     "org.flowable.ui.common.conf",
