@@ -75,6 +75,22 @@ public interface ProcessInstanceMigrationBuilder {
     ProcessInstanceMigrationBuilder preUpgradeScript(Script script);
 
     /**
+     * The java delegate class name executed before process instance migration
+     *
+     * @param javaDelegateClassName the java delegate to execute
+     * @return process instance migration builder
+     */
+    ProcessInstanceMigrationBuilder preUpgradeJavaDelegate(String javaDelegateClassName);
+
+    /**
+     * The javadelegate expression executed before process instance migration
+     *
+     * @param expressionString string which resolves into java delagate instance
+     * @return process instance migration builder
+     */
+    ProcessInstanceMigrationBuilder preUpgradeExpression(String expressionString);
+
+    /**
      * Adds an activity mapping to the process instance migration plan. Addition order is relevant and "auto-mapping" has priority. There can only be one mapping for a given "from" activity.
      *
      * @param mapping

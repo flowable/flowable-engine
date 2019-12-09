@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
@@ -41,6 +42,8 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     protected Map<String, Map<String, Object>> activitiesLocalVariables;
     protected Map<String, Object> processInstanceVariables;
     protected Script preUpgradeScript;
+    protected String preUpgradeJavaDelegate;
+    protected String preUpgradeExpression;
 
     public static ProcessInstanceMigrationDocument fromJson(String processInstanceMigrationDocumentJson) {
         return ProcessInstanceMigrationDocumentConverter.convertFromJson(processInstanceMigrationDocumentJson);
@@ -62,7 +65,39 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     public void setPreUpgradeScript(Script script) {
-        this.preUpgradeScript = script;
+        if (this.preUpgradeJavaDelegate == null && this.preUpgradeExpression == null) {
+            if (script != null) {
+                this.preUpgradeScript = script;
+            } else {
+                throw new IllegalArgumentException("Pre upgrade script can't be null.");
+            }
+        } else {
+            throw new IllegalArgumentException("Pre upgrade script can't be set when another pre-upgrade task was already specified.");
+        }
+    }
+
+    public void setPreUpgradeJavaDelegate(String javaDelegateClassName) {
+        if (this.preUpgradeScript == null && this.preUpgradeExpression == null) {
+            if (StringUtils.isNotEmpty(javaDelegateClassName)) {
+                this.preUpgradeJavaDelegate = javaDelegateClassName;
+            } else {
+                throw new IllegalArgumentException("Pre upgrade java delegate can't be empty or null.");
+            }
+        } else {
+            throw new IllegalArgumentException("Pre upgrade java delegate can't be set when another pre-upgrade task was already specified.");
+        }
+    }
+
+    public void setPreUpgradeExpression(String expression) {
+        if (this.preUpgradeScript == null && this.preUpgradeJavaDelegate == null) {
+            if (StringUtils.isNotEmpty(expression)) {
+                this.preUpgradeExpression = expression;
+            } else {
+                throw new IllegalArgumentException("Pre upgrade expression can't be empty or null.");
+            }
+        } else {
+            throw new IllegalArgumentException("Pre upgrade expression can't be set when another pre-upgrade task was already specified.");
+        }
     }
 
     @Override
@@ -88,6 +123,16 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     @Override
     public Script getPreUpgradeScript() {
         return preUpgradeScript;
+    }
+
+    @Override
+    public String getPreUpgradeJavaDelegate() {
+        return preUpgradeJavaDelegate;
+    }
+
+    @Override
+    public String getPreUpgradeExpression() {
+        return preUpgradeExpression;
     }
 
     public void setActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings) {

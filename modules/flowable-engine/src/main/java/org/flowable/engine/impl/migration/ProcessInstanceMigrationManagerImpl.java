@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.migration;
 
+import static org.flowable.engine.impl.bpmn.helper.AbstractClassDelegate.defaultInstantiateDelegate;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,16 +38,23 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
+import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.delegate.ActivityBehaviorInvocation;
+import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
 import org.flowable.engine.impl.dynamic.AbstractDynamicStateManager;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.dynamic.ProcessInstanceChangeState;
@@ -386,8 +395,20 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
-        LOGGER.debug("Execute pre upgrade process instance script");
-        executeScript(processInstance, procDefToMigrateTo, document.getPreUpgradeScript(), commandContext);
+        if (document.getPreUpgradeScript() != null) {
+            LOGGER.debug("Execute pre upgrade process instance script");
+            executeScript(processInstance, procDefToMigrateTo, document.getPreUpgradeScript(), commandContext);
+        }
+
+        if (document.getPreUpgradeJavaDelegate() != null) {
+            LOGGER.debug("Execute pre upgrade process instance script");
+            executeJavaDelegate(processInstance, procDefToMigrateTo, document.getPreUpgradeJavaDelegate(), commandContext);
+        }
+
+        if (document.getPreUpgradeExpression() != null) {
+            LOGGER.debug("Execute pre upgrade process instance script");
+            executeExpression(processInstance, procDefToMigrateTo, document.getPreUpgradeExpression(), commandContext);
+        }
 
         List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders((ExecutionEntity) processInstance, procDefToMigrateTo, document, commandContext);
 
@@ -438,17 +459,34 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     protected void executeScript(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, Script script, CommandContext commandContext) {
-        if (script == null) {
-            LOGGER.debug("Script execution is empty.");
-        } else {
-            ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration(commandContext).getScriptingEngines();
 
-            try {
-                scriptingEngines.evaluate(script.getScript(), script.getLanguage(), (ExecutionEntityImpl) processInstance);
-            } catch (FlowableException e) {
-                LOGGER.warn("Exception while executing upgrade of process instance {} : {}", processInstance.getId(), e.getMessage());
-                throw e;
-            }
+        try {
+            scriptingEngines.evaluate(script.getScript(), script.getLanguage(), (ExecutionEntityImpl) processInstance);
+        } catch (FlowableException e) {
+            LOGGER.warn("Exception while executing upgrade of process instance {} : {}", processInstance.getId(), e.getMessage());
+            throw e;
+        }
+    }
+
+    protected void executeJavaDelegate(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, String preUpgradeJavaDelegate,
+        CommandContext commandContext) {
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getDelegateInterceptor()
+            .handleInvocation(new JavaDelegateInvocation((JavaDelegate) defaultInstantiateDelegate(preUpgradeJavaDelegate, Collections.emptyList()),
+                (ExecutionEntityImpl) processInstance));
+    }
+
+    protected void executeExpression(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, String preUpgradeExpression,
+        CommandContext commandContext) {
+        Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(preUpgradeExpression);
+
+        Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, (VariableContainer) processInstance, Collections.emptyList());
+        if (delegate instanceof ActivityBehavior) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getDelegateInterceptor().handleInvocation(new ActivityBehaviorInvocation((ActivityBehavior) delegate, (ExecutionEntityImpl) processInstance));
+        } else if (delegate instanceof JavaDelegate) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getDelegateInterceptor().handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, (ExecutionEntityImpl) processInstance));
+        } else {
+            throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of " + ActivityBehavior.class + " nor " + JavaDelegate.class);
         }
     }
 

@@ -40,6 +40,8 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
         migrationDocumentBuilder.setTenantId(document.getMigrateToProcessDefinitionTenantId());
         migrationDocumentBuilder.addActivityMigrationMappings(document.getActivityMigrationMappings());
         migrationDocumentBuilder.setPreUpgradeScript(document.getPreUpgradeScript());
+        migrationDocumentBuilder.setPreUpgradeJavaDelegate(document.getPreUpgradeJavaDelegate());
+        migrationDocumentBuilder.setPreUpgradeExpression(document.getPreUpgradeExpression());
         return this;
     }
 
@@ -71,6 +73,18 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     @Override
     public ProcessInstanceMigrationBuilder preUpgradeScript(Script script) {
         this.migrationDocumentBuilder.setPreUpgradeScript(script);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder preUpgradeJavaDelegate(String javaDelegateClassName) {
+        this.migrationDocumentBuilder.setPreUpgradeJavaDelegate(javaDelegateClassName);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder preUpgradeExpression(String expression) {
+        this.migrationDocumentBuilder.setPreUpgradeExpression(expression);
         return this;
     }
 

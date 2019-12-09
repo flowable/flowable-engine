@@ -32,9 +32,12 @@ public interface ProcessInstanceMigrationDocumentConstants {
     String CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY = "callActivityProcessDefinitionVersion";
     String IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY = "inParentProcessOfCallActivityId";
 
+    String PRE_UPGRADE_JAVA_DELEGATE = "preUpgradeJavaDelegate";
+    String PRE_UPGRADE_EXPRESSION = "preUpgradeExpression";
     String PRE_UPGRADE_SCRIPT = "preUpgradeScript";
     String LANGUAGE = "language";
     String SCRIPT = "script";
+
     String ACTIVITY_MAPPINGS_JSON_SECTION = "activityMappings";
     String LOCAL_VARIABLES_JSON_SECTION = "localVariables";
     String PROCESS_INSTANCE_VARIABLES_JSON_SECTION = "processInstanceVariables";

@@ -18,6 +18,7 @@ import java.util.Map;
 
 /**
  * @author Dennis Federico
+ * @author martin.grofcik
  */
 public interface ProcessInstanceMigrationDocument {
 
@@ -30,6 +31,10 @@ public interface ProcessInstanceMigrationDocument {
     String getMigrateToProcessDefinitionTenantId();
 
     Script getPreUpgradeScript();
+
+    String getPreUpgradeJavaDelegate();
+
+    String getPreUpgradeExpression();
 
     List<ActivityMigrationMapping> getActivityMigrationMappings();
 

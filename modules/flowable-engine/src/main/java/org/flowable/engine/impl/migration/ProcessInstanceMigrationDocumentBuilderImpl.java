@@ -36,6 +36,8 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     protected List<ActivityMigrationMapping> activityMigrationMappings = new ArrayList<>();
     protected Map<String, Object> processInstanceVariables = new HashMap<>();
     protected Script preUpgradeScript;
+    private String preUpgradeJavaDelegate;
+    private String preUpgradeExpression;
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId) {
@@ -59,6 +61,18 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     @Override
     public ProcessInstanceMigrationDocumentBuilder setPreUpgradeScript(Script script) {
         this.preUpgradeScript = script;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPreUpgradeJavaDelegate(String preUpgradeJavaDelegate) {
+        this.preUpgradeJavaDelegate = preUpgradeJavaDelegate;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPreUpgradeExpression(String expression) {
+        this.preUpgradeExpression = expression;
         return this;
     }
 
@@ -101,7 +115,15 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
         ProcessInstanceMigrationDocumentImpl document = new ProcessInstanceMigrationDocumentImpl();
         document.setMigrateToProcessDefinitionId(migrateToProcessDefinitionId);
         document.setMigrateToProcessDefinition(migrateToProcessDefinitionKey, migrateToProcessDefinitionVersion, migrateToProcessDefinitionTenantId);
-        document.setPreUpgradeScript(preUpgradeScript);
+        if (preUpgradeScript != null) {
+            document.setPreUpgradeScript(preUpgradeScript);
+        }
+        if (preUpgradeJavaDelegate != null) {
+            document.setPreUpgradeJavaDelegate(preUpgradeJavaDelegate);
+        }
+        if (preUpgradeExpression != null) {
+            document.setPreUpgradeExpression(preUpgradeExpression);
+        }
         document.setActivityMigrationMappings(activityMigrationMappings);
         document.setProcessInstanceVariables(processInstanceVariables);
 

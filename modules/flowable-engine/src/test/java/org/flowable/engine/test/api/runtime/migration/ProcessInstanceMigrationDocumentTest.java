@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.runtime.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -198,6 +199,68 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
         assertThat(migrationDocument.getPreUpgradeScript().getLanguage()).isEqualTo("groovy");
         assertThat(migrationDocument.getPreUpgradeScript().getScript()).isEqualTo("1+1");
+    }
+
+    @Test
+    public void preUpgradeJavaDelegateSerialization() {
+        String definitionId = "someProcessId";
+
+        ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
+            .migrateToProcessDefinition(definitionId)
+            .preUpgradeJavaDelegate("new javadelegate")
+            .getProcessInstanceMigrationDocument();
+
+        //Serialize the document as Json
+        String serializedDocument = document.asJsonString();
+
+        //DeSerialize the document
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(serializedDocument);
+
+        assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
+        assertThat(migrationDocument.getPreUpgradeJavaDelegate()).isEqualTo("new javadelegate");
+    }
+
+    @Test
+    public void preUpgradeExpressionSerialization() {
+        String definitionId = "someProcessId";
+
+        ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
+            .migrateToProcessDefinition(definitionId)
+            .preUpgradeExpression("new expression")
+            .getProcessInstanceMigrationDocument();
+
+        //Serialize the document as Json
+        String serializedDocument = document.asJsonString();
+
+        //DeSerialize the document
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(serializedDocument);
+
+        assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
+        assertThat(migrationDocument.getPreUpgradeExpression()).isEqualTo("new expression");
+    }
+
+    @Test
+    void preUpgradeAllowsOneTaskOnly_ScriptExpression() {
+        assertThatThrownBy(() -> new ProcessInstanceMigrationBuilderImpl(null)
+            .migrateToProcessDefinition("testProcessDefinition")
+            .preUpgradeScript(new Script("groovy", "1+1"))
+            .preUpgradeExpression("new Expression()")
+            .getProcessInstanceMigrationDocument()
+        ).
+            isInstanceOf(IllegalArgumentException.class).
+            hasMessage("Pre upgrade expression can't be set when another pre-upgrade task was already specified.");
+    }
+
+    @Test
+    void preUpgradeAllowsOneTaskOnly_ExpressionJavaDelegate() {
+        assertThatThrownBy(() -> new ProcessInstanceMigrationBuilderImpl(null)
+            .migrateToProcessDefinition("testProcessDefinition")
+            .preUpgradeScript(new Script("groovy", "1+1"))
+            .preUpgradeJavaDelegate("JavaDelegate")
+            .getProcessInstanceMigrationDocument()
+        ).
+            isInstanceOf(IllegalArgumentException.class).
+            hasMessage("Pre upgrade java delegate can't be set when another pre-upgrade task was already specified.");
     }
 
     @Test
