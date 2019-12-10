@@ -89,11 +89,9 @@ Quartz
 This software includes unchanged copies of the following libraries:
 
 aopalliance                     aopalliance                 1.0             Public Domain
-com.carrotsearch                hppc                        0.7.1           The Apache Software License, Version 2.0
 com.fasterxml.jackson.core      jackson-annotations         2.10.2          The Apache Software License, Version 2.0
 com.fasterxml.jackson.core      jackson-core                2.10.2          The Apache Software License, Version 2.0
 com.fasterxml.jackson.core      jackson-databind            2.10.2          The Apache Software License, Version 2.0
-com.fasterxml.jackson.datatype  jackson-datatype-hppc       2.10.2          The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-joda       2.10.2          The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-json-org   2.10.2          The Apache Software License, Version 2.0
 com.google.guava                guava                       28.2-jre        The Apache Software License, Version 2.0
