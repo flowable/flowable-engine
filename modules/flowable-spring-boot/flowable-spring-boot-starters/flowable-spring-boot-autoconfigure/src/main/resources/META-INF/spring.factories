@@ -26,3 +26,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.ldap.FlowableLdapAutoConfiguration,\
     org.flowable.spring.boot.FlowableSecurityAutoConfiguration
+
+# Failure analyzers
+org.springframework.boot.diagnostics.FailureAnalyzer=\
+  org.flowable.spring.boot.liquibase.LiquibaseXmlElementClassNotFoundFailureAnalyzer
