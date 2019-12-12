@@ -12,6 +12,8 @@
  */
 package org.flowable.content.rest.service.api.content;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Calendar;
@@ -19,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -110,7 +111,9 @@ public class ContentItemCollectionResourceTest extends BaseSpringContentRestTest
 
             urlContentItem = contentItems.get(0);
 
-            assertEquals("This is binary content", IOUtils.toString(contentService.getContentItemData(urlContentItem.getId())));
+            try (InputStream contentStream = contentService.getContentItemData(urlContentItem.getId())) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);

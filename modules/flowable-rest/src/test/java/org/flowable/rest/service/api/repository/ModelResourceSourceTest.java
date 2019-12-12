@@ -13,7 +13,6 @@
 
 package org.flowable.rest.service.api.repository;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -26,7 +25,9 @@ import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -51,7 +52,9 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
 
             // Check "OK" status
             assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
-            assertEquals("This is the editor source", IOUtils.toString(response.getEntity().getContent()));
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is the editor source");
+            }
             closeResponse(response);
 
         } finally {
@@ -101,7 +104,9 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
 
             // Check "OK" status
             assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
-            assertEquals("This is the extra editor source", IOUtils.toString(response.getEntity().getContent()));
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is the extra editor source");
+            }
             closeResponse(response);
 
         } finally {

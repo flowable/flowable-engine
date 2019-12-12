@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -125,7 +126,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "var")),
                 HttpStatus.SC_OK);
 
-        String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent());
+        String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertEquals("This is a binary piece of text", actualResponseBytesAsText);
         assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());

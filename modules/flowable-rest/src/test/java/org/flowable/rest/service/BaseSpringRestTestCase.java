@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -318,7 +319,7 @@ public class BaseSpringRestTestCase {
             if (expectedStatusCode != responseStatusCode) {
                 LOGGER.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
                 if (response.getEntity() != null && response.getEntity().getContent() != null) {
-                    LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+                    LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
                 }
             }
 

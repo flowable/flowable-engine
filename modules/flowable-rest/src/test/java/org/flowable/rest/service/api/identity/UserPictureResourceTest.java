@@ -13,14 +13,15 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -58,7 +59,9 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
 
             CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_PICTURE, newUser.getId())), HttpStatus.SC_OK);
 
-            assertEquals("this is the picture raw byte stream", IOUtils.toString(response.getEntity().getContent()));
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("this is the picture raw byte stream");
+            }
 
             // Check if media-type is correct
             assertEquals("image/png", response.getEntity().getContentType().getValue());
