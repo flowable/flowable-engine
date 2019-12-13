@@ -23,11 +23,11 @@ import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.EventRegistry;
-import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.eventregistry.model.EventModel;
 
 /**
  * @author Joram Barrez
@@ -46,23 +46,23 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
 
         String eventDefinitionKey = getEventKey();
 
-        EventRegistry eventRegistry = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getEventRegistry();
-        EventDefinition eventDefinition = eventRegistry.getEventDefinition(eventDefinitionKey);
+        EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
+        EventModel eventModel = eventRegistry.getEventModel(eventDefinitionKey);
 
-        if (eventDefinition == null) {
-            throw new FlowableException("No event definition found for event key " + eventDefinitionKey);
+        if (eventModel == null) {
+            throw new FlowableException("No event model found for event key " + eventDefinitionKey);
         }
 
         EventInstanceImpl eventInstance = new EventInstanceImpl();
-        eventInstance.setEventDefinition(eventDefinition);
+        eventInstance.setEventModel(eventModel);
 
         Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceCmmnUtil
-            .createEventPayloadInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventDefinition);
+            .createEventPayloadInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventModel);
         eventInstance.setPayloadInstances(eventPayloadInstances);
 
         // TODO: always async? Send event in post-commit? Triggerable?
 
-        eventRegistry.sendEvent(eventInstance);
+        eventRegistry.sendEventOutbound(eventInstance);
 
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }

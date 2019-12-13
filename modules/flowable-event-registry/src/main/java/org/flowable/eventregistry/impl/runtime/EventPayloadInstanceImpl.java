@@ -12,8 +12,8 @@
  */
 package org.flowable.eventregistry.impl.runtime;
 
-import org.flowable.eventregistry.api.definition.EventPayloadDefinition;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.model.EventPayloadDefinition;
 
 /**
  * @author Joram Barrez

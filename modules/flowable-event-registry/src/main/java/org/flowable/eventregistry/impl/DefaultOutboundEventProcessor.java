@@ -19,8 +19,8 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
-import org.flowable.eventregistry.api.definition.OutboundChannelDefinition;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.model.OutboundChannelDefinition;
 
 /**
  * @author Joram Barrez
@@ -35,7 +35,7 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
     
     @Override
     public void sendEvent(EventInstance eventInstance) {
-        Collection<String> outboundChannelKeys = eventInstance.getEventDefinition().getOutboundChannelKeys();
+        Collection<String> outboundChannelKeys = eventInstance.getEventModel().getOutboundChannelKeys();
         for (String outboundChannelKey : outboundChannelKeys) {
 
             OutboundChannelDefinition outboundChannelDefinition = eventRegistry.getOutboundChannelDefinition(outboundChannelKey);
@@ -43,10 +43,10 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
                 throw new FlowableException("Could not find outbound channel definition for " + outboundChannelKey);
             }
 
-            OutboundEventProcessingPipeline outboundEventProcessingPipeline = outboundChannelDefinition.getOutboundEventProcessingPipeline();
+            OutboundEventProcessingPipeline outboundEventProcessingPipeline = (OutboundEventProcessingPipeline) outboundChannelDefinition.getOutboundEventProcessingPipeline();
             String rawEvent = outboundEventProcessingPipeline.run(eventInstance);
 
-            OutboundEventChannelAdapter outboundEventChannelAdapter = outboundChannelDefinition.getOutboundEventChannelAdapter();
+            OutboundEventChannelAdapter outboundEventChannelAdapter = (OutboundEventChannelAdapter) outboundChannelDefinition.getOutboundEventChannelAdapter();
             if (outboundEventChannelAdapter == null) {
                 throw new FlowableException("Could not find an outbound channel adapter for channel " + outboundChannelKey);
             }

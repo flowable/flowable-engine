@@ -29,11 +29,11 @@ import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.eventregistry.api.definition.EventDefinition;
-import org.flowable.eventregistry.api.definition.EventPayloadDefinition;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.EventPayloadDefinition;
 import org.flowable.variable.api.delegate.VariableScope;
 
 public class EventInstanceBpmnUtil {
@@ -76,7 +76,7 @@ public class EventInstanceBpmnUtil {
      * Typically used when needing to create {@link EventInstance}'s and populate the payload.
      */
     public static Collection<EventPayloadInstance> createEventPayloadInstances(VariableScope variableScope, ExpressionManager expressionManager,
-            BaseElement baseElement, EventDefinition eventDefinition) {
+            BaseElement baseElement, EventModel eventDefinition) {
 
         List<EventPayloadInstance> eventPayloadInstances = new ArrayList<>();
         if (baseElement instanceof SendEventServiceTask) {
@@ -122,9 +122,9 @@ public class EventInstanceBpmnUtil {
     }
     
     protected static void addEventPayloadInstance(List<EventPayloadInstance> eventPayloadInstances, String source, String target, 
-                    VariableScope variableScope, ExpressionManager expressionManager, EventDefinition eventDefinition) {
+                    VariableScope variableScope, ExpressionManager expressionManager, EventModel eventDefinition) {
         
-        Optional<EventPayloadDefinition> matchingEventDefinition = eventDefinition.getEventPayloadDefinitions()
+        Optional<EventPayloadDefinition> matchingEventDefinition = eventDefinition.getPayload()
             .stream()
             .filter(e -> e.getName().equals(target))
             .findFirst();

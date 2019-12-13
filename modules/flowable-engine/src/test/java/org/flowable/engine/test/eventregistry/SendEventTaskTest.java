@@ -22,10 +22,12 @@ import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTestCase;
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
-import org.flowable.eventregistry.api.definition.EventPayloadTypes;
+import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
@@ -47,31 +49,34 @@ public class SendEventTaskTest extends FlowableTestCase {
         outboundEventChannelAdapter = setupTestChannel();
         inboundEventChannelAdapter = setupTestInboundChannel();
 
-        processEngineConfiguration.getEventRegistry().newEventDefinition()
+        getEventRepositoryService().createEventModelBuilder()
             .outboundChannelKey("out-channel")
             .key("myEvent")
+            .resourceName("myEvent.event")
             .payload("eventProperty", EventPayloadTypes.STRING)
-            .register();
+            .deploy();
         
-        processEngineConfiguration.getEventRegistry().newEventDefinition()
+        getEventRepositoryService().createEventModelBuilder()
             .outboundChannelKey("out-channel")
             .key("anotherEvent")
+            .resourceName("anotherEvent.event")
             .payload("nameProperty", EventPayloadTypes.STRING)
             .payload("numberProperty", EventPayloadTypes.INTEGER)
-            .register();
+            .deploy();
         
-        processEngineConfiguration.getEventRegistry().newEventDefinition()
+        getEventRepositoryService().createEventModelBuilder()
             .inboundChannelKey("test-channel")
             .key("myTriggerEvent")
+            .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
             .payload("customerId", EventPayloadTypes.STRING)
-            .register();
+            .deploy();
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
         TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
 
-        processEngineConfiguration.getEventRegistry().newOutboundChannelDefinition()
+        getEventRegistry().newOutboundChannelDefinition()
             .key("out-channel")
             .channelAdapter(outboundEventChannelAdapter)
             .jsonSerializer()
@@ -83,7 +88,7 @@ public class SendEventTaskTest extends FlowableTestCase {
     protected TestInboundEventChannelAdapter setupTestInboundChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        processEngineConfiguration.getEventRegistry().newInboundChannelDefinition()
+        getEventRegistry().newInboundChannelDefinition()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .jsonDeserializer()
@@ -96,11 +101,14 @@ public class SendEventTaskTest extends FlowableTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        processEngineConfiguration.getEventRegistry().removeChannelDefinition("out-channel");
-        processEngineConfiguration.getEventRegistry().removeChannelDefinition("test-channel");
-        processEngineConfiguration.getEventRegistry().removeEventDefinition("myEvent");
-        processEngineConfiguration.getEventRegistry().removeEventDefinition("anotherEvent");
-        processEngineConfiguration.getEventRegistry().removeEventDefinition("myTriggerEvent");
+        getEventRegistry().removeChannelDefinition("out-channel");
+        getEventRegistry().removeChannelDefinition("test-channel");
+        
+        EventRepositoryService eventRepositoryService = getEventRepositoryService();
+        List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
+        for (EventDeployment eventDeployment : deployments) {
+            eventRepositoryService.deleteDeployment(eventDeployment.getId());
+        }
     }
 
     @Test
@@ -227,7 +235,7 @@ public class SendEventTaskTest extends FlowableTestCase {
         ObjectNode json = objectMapper.createObjectNode();
         json.put("type", "myTriggerEvent");
         json.put("customerId", "testId");
-        processEngineConfiguration.getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
+        getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
         
         eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(eventSubscription).isNull();
@@ -270,7 +278,7 @@ public class SendEventTaskTest extends FlowableTestCase {
         ObjectNode json = objectMapper.createObjectNode();
         json.put("type", "myTriggerEvent");
         json.put("customerId", "testId");
-        processEngineConfiguration.getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
+        getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
 
         eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(eventSubscription).isNull();
@@ -322,7 +330,7 @@ public class SendEventTaskTest extends FlowableTestCase {
         ObjectNode json = objectMapper.createObjectNode();
         json.put("type", "myTriggerEvent");
         json.put("customerId", "testId");
-        processEngineConfiguration.getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
+        getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
         
         eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(eventSubscription).isNotNull();
@@ -332,7 +340,7 @@ public class SendEventTaskTest extends FlowableTestCase {
         json = objectMapper.createObjectNode();
         json.put("type", "myTriggerEvent");
         json.put("customerId", "someId");
-        processEngineConfiguration.getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
+        getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
         eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(eventSubscription).isNull();
         

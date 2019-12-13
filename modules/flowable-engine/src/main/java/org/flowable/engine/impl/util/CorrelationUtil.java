@@ -55,7 +55,7 @@ public class CorrelationUtil {
                     }
                 }
 
-                correlationKey = processEngineConfiguration.getEventRegistry().generateKey(correlationParameters);
+                correlationKey = CommandContextUtil.getEventRegistry().generateKey(correlationParameters);
             }
         }
         

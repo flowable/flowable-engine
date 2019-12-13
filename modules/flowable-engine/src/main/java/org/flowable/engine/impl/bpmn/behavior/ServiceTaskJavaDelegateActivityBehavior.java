@@ -24,8 +24,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
-import org.flowable.engine.impl.eventbus.FlowableBpmnEventBusItemBuilder;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -110,11 +108,6 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
                 }
                 
             } catch (RuntimeException e) {
-                if (processEngineConfiguration.isEventPublisherEnabled()) {
-                    processEngineConfiguration.getEventPublisher().publishEvent(
-                                    FlowableBpmnEventBusItemBuilder.createServiceTaskExceptionEvent((ExecutionEntity) execution));
-                }
-                
                 if (processEngineConfiguration.isLoggingSessionEnabled()) {
                     BpmnLoggingSessionUtil.addErrorLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXCEPTION, 
                                     "Service task with java class " + javaDelegate.getClass().getName() + " threw exception " + e.getMessage(), e, execution);

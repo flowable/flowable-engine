@@ -12,7 +12,7 @@
  */
 package org.flowable.eventregistry.api.runtime;
 
-import org.flowable.eventregistry.api.definition.EventCorrelationParameterDefinition;
+import org.flowable.eventregistry.model.EventCorrelationParameterDefinition;
 
 /**
  * @author Joram Barrez

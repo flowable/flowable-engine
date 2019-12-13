@@ -22,9 +22,9 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.EventRegistry;
-import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -52,21 +52,21 @@ public class AsyncSendEventJobHandler implements JobHandler {
         }
         SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) flowElement;
         
-        EventRegistry eventRegistry = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventRegistry();
-        EventDefinition eventDefinition = eventRegistry.getEventDefinition(sendEventServiceTask.getEventType());
+        EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
+        EventModel eventModel = eventRegistry.getEventModel(sendEventServiceTask.getEventType());
 
-        if (eventDefinition == null) {
-            throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType());
+        if (eventModel == null) {
+            throw new FlowableException("No event model found for event key " + sendEventServiceTask.getEventType());
         }
         
         EventInstanceImpl eventInstance = new EventInstanceImpl();
-        eventInstance.setEventDefinition(eventDefinition);
+        eventInstance.setEventModel(eventModel);
 
         Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceBpmnUtil.createEventPayloadInstances(executionEntity, 
-                        CommandContextUtil.getProcessEngineConfiguration().getExpressionManager(), sendEventServiceTask, eventDefinition);
+                        CommandContextUtil.getProcessEngineConfiguration().getExpressionManager(), sendEventServiceTask, eventModel);
         eventInstance.setPayloadInstances(eventPayloadInstances);
 
-        eventRegistry.sendEvent(eventInstance);
+        eventRegistry.sendEventOutbound(eventInstance);
         
         if (!sendEventServiceTask.isTriggerable()) {
             CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(executionEntity, true);

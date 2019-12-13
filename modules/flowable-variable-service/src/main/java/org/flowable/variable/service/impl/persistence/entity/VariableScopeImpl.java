@@ -36,7 +36,6 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
-import org.flowable.variable.service.impl.eventbus.FlowableVariableEventBusItemBuilder;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.util.VariableLoggingSessionUtil;
 
@@ -897,11 +896,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                                             variableInstance.getScopeId(), variableInstance.getScopeType()));
         }
         
-        if (variableServiceConfiguration.isEventPublisherEnabled()) {
-            variableServiceConfiguration.getEventPublisher().publishEvent(FlowableVariableEventBusItemBuilder.createVariableUpdatedEvent(
-                            variableInstance, oldVariableValue, oldVariableType));
-        }
-        
         if (variableServiceConfiguration.isLoggingSessionEnabled()) {
             ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + variableInstance.getName() + "' updated", variableInstance);
             addLoggingSessionInfo(loggingNode);
@@ -942,10 +936,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                                             variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
                                             variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
                                             variableInstance.getScopeId(), variableInstance.getScopeType()));
-        }
-        
-        if (variableServiceConfiguration.isEventPublisherEnabled()) {
-            variableServiceConfiguration.getEventPublisher().publishEvent(FlowableVariableEventBusItemBuilder.createVariableCreatedEvent(variableInstance));
         }
         
         if (variableServiceConfiguration.isLoggingSessionEnabled()) {

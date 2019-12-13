@@ -344,13 +344,9 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
-import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
-import org.flowable.eventregistry.api.InboundEventProcessor;
-import org.flowable.eventregistry.api.OutboundEventProcessor;
-import org.flowable.eventregistry.impl.DefaultEventRegistry;
-import org.flowable.eventregistry.impl.DefaultInboundEventProcessor;
-import org.flowable.eventregistry.impl.DefaultOutboundEventProcessor;
+import org.flowable.eventregistry.configurator.EventRegistryEngineConfigurator;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
@@ -450,6 +446,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // IDM ENGINE /////////////////////////////////////////////////////
     protected boolean disableIdmEngine;
+    
+    // EVENT REGISTRY /////////////////////////////////////////////////////
+    protected boolean disableEventRegistry;
 
     // DATA MANAGERS /////////////////////////////////////////////////////////////
 
@@ -523,11 +522,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BatchServiceConfiguration batchServiceConfiguration;
 
     protected boolean enableEntityLinks;
-    
-    // Event registry
-    protected EventRegistry eventRegistry;
-    protected InboundEventProcessor inboundEventProcessor;
-    protected OutboundEventProcessor outboundEventProcessor;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -1049,8 +1043,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEventHandlers();
         initFailedJobCommandFactory();
         initEventDispatcher();
-        initEventBusAndRelatedServices();
-        initEventRegistryAndRelatedServices();
         initProcessValidator();
         initFormFieldHandler();
         initDatabaseEventLogging();
@@ -1066,6 +1058,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initAsyncHistoryExecutor();
         configuratorsAfterInit();
         afterInitTaskServiceConfiguration();
+        afterInitEventRegistryEventBusConsumer();
         
         initHistoryCleaningManager();
     }
@@ -1455,7 +1448,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        this.variableServiceConfiguration.setEventPublisher(this.eventPublisher);
 
         this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
@@ -1713,6 +1705,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
             this.taskServiceConfiguration.setIdmIdentityService(idmEngineConfiguration.getIdmIdentityService());
         }
+    }
+    
+    public void afterInitEventRegistryEventBusConsumer() {
+        if (engineConfigurations.containsKey(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG)) {
+            EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
+            if (eventRegistryEventBusConsumer != null) {
+                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration)
+                                engineConfigurations.get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+                eventRegistryEngineConfiguration.getEventRegistry().registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
+            }
+        }
+    }
+    
+    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
+        return new BpmnEventRegistryEventConsumer(this);
     }
     
     public void initHistoryCleaningManager() {
@@ -2607,54 +2614,28 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         };
     }
-    
-    public void initEventRegistryAndRelatedServices() {
-        initEventRegistry();
-        initInboundEventProcessor();
-        initOutboundEventProcessor();
-        initEventRegistryEventBusConsumer();
-    }
-
-    public void initEventRegistry() {
-        if (this.eventRegistry == null) {
-            this.eventRegistry = new DefaultEventRegistry(eventBus);
-        }
-    }
-
-    public void initInboundEventProcessor() {
-        if (this.inboundEventProcessor == null) {
-            this.inboundEventProcessor = new DefaultInboundEventProcessor(eventRegistry, eventBus);
-        }
-        this.eventRegistry.setInboundEventProcessor(this.inboundEventProcessor);
-    }
-
-    public void initOutboundEventProcessor() {
-        if (this.outboundEventProcessor == null) {
-            this.outboundEventProcessor = new DefaultOutboundEventProcessor(eventRegistry);
-        }
-        this.eventRegistry.setOutboundEventProcessor(outboundEventProcessor);
-    }
-
-    public void initEventRegistryEventBusConsumer() {
-        EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
-        if (eventRegistryEventBusConsumer != null) {
-            this.eventRegistry.registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
-        }
-    }
-    
-    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
-        return new BpmnEventRegistryEventConsumer(this, eventRegistry);
-    }
 
     @Override
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
-        if (!disableIdmEngine) {
+        if (!disableIdmEngine || !disableEventRegistry) {
             List<EngineConfigurator> specificConfigurators = new ArrayList<>();
-            if (idmEngineConfigurator != null) {
-                specificConfigurators.add(idmEngineConfigurator);
-            } else {
-                specificConfigurators.add(new IdmEngineConfigurator());
+            
+            if (!disableIdmEngine) {
+                if (idmEngineConfigurator != null) {
+                    specificConfigurators.add(idmEngineConfigurator);
+                } else {
+                    specificConfigurators.add(new IdmEngineConfigurator());
+                }
             }
+            
+            if (!disableEventRegistry) {
+                if (eventRegistryConfigurator != null) {
+                    specificConfigurators.add(eventRegistryConfigurator);
+                } else {
+                    specificConfigurators.add(new EventRegistryEngineConfigurator());
+                }
+            }
+            
             return specificConfigurators;
         }
         return Collections.emptyList();
@@ -2829,6 +2810,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setDisableIdmEngine(boolean disableIdmEngine) {
         this.disableIdmEngine = disableIdmEngine;
+        return this;
+    }
+    
+    public boolean isDisableEventRegistry() {
+        return disableEventRegistry;
+    }
+
+    public ProcessEngineConfigurationImpl setDisableEventRegistry(boolean disableEventRegistry) {
+        this.disableEventRegistry = disableEventRegistry;
         return this;
     }
 
@@ -4292,33 +4282,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEnableEntityLinks(boolean enableEntityLinks) {
         this.enableEntityLinks = enableEntityLinks;
-        return this;
-    }
-    
-    public EventRegistry getEventRegistry() {
-        return eventRegistry;
-    }
-
-    public ProcessEngineConfigurationImpl setEventRegistry(EventRegistry eventRegistry) {
-        this.eventRegistry = eventRegistry;
-        return this;
-    }
-
-    public InboundEventProcessor getInboundEventProcessor() {
-        return inboundEventProcessor;
-    }
-
-    public ProcessEngineConfigurationImpl setInboundEventProcessor(InboundEventProcessor inboundEventProcessor) {
-        this.inboundEventProcessor = inboundEventProcessor;
-        return this;
-    }
-
-    public OutboundEventProcessor getOutboundEventProcessor() {
-        return outboundEventProcessor;
-    }
-
-    public ProcessEngineConfigurationImpl setOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor) {
-        this.outboundEventProcessor = outboundEventProcessor;
         return this;
     }
 

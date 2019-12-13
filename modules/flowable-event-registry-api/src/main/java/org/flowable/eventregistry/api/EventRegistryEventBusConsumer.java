@@ -12,11 +12,10 @@
  */
 package org.flowable.eventregistry.api;
 
-import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
-
 /**
  * @author Joram Barrez
  */
-public interface EventRegistryEventBusConsumer extends FlowableEventBusConsumer {
+public interface EventRegistryEventBusConsumer {
 
+    void eventReceived(EventRegistryEvent event);
 }

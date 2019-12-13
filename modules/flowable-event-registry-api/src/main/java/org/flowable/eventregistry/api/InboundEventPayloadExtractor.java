@@ -14,9 +14,9 @@ package org.flowable.eventregistry.api;
 
 import java.util.Collection;
 
-import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.model.EventModel;
 
 /**
  * @author Joram Barrez
@@ -24,8 +24,8 @@ import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
  */
 public interface InboundEventPayloadExtractor<T> {
 
-    Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventDefinition eventDefinition, T event);
+    Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, T event);
 
-    Collection<EventPayloadInstance> extractPayload(EventDefinition eventDefinition, T event);
+    Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, T event);
 
 }

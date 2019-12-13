@@ -14,18 +14,18 @@ package org.flowable.eventregistry.impl.pipeline;
 
 import java.util.Collection;
 
-import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTransformer;
-import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
 
 /**
  * @author Joram Barrez
@@ -52,11 +52,11 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     }
 
     @Override
-    public Collection<FlowableEventBusEvent> run(String channelKey, String rawEvent) {
+    public Collection<EventRegistryEvent> run(String channelKey, String rawEvent) {
         T event = deserialize(rawEvent);
         String eventKey = detectEventDefinitionKey(event);
 
-        EventDefinition eventDefinition = eventRegistry.getEventDefinition(eventKey);
+        EventModel eventDefinition = eventRegistry.getEventModel(eventKey);
 
         EventInstanceImpl eventInstance = new EventInstanceImpl(
             eventDefinition,
@@ -76,15 +76,15 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         return inboundEventKeyDetector.detectEventDefinitionKey(event);
     }
 
-    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventDefinition eventDefinition, T event) {
+    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, T event) {
         return inboundEventPayloadExtractor.extractCorrelationParameters(eventDefinition, event);
     }
 
-    public Collection<EventPayloadInstance> extractPayload(EventDefinition eventDefinition, T event) {
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, T event) {
         return inboundEventPayloadExtractor.extractPayload(eventDefinition, event);
     }
 
-    public Collection<FlowableEventBusEvent> transform(EventInstance eventInstance) {
+    public Collection<EventRegistryEvent> transform(EventInstance eventInstance) {
         return inboundEventTransformer.transform(eventInstance);
     }
 }

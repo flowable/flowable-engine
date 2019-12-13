@@ -17,7 +17,7 @@ import java.util.Collection;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
-import org.flowable.eventregistry.api.definition.EventPayloadTypes;
+import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 

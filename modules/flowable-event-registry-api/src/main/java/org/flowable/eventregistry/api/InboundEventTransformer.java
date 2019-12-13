@@ -14,7 +14,6 @@ package org.flowable.eventregistry.api;
 
 import java.util.Collection;
 
-import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 
 /**
@@ -23,6 +22,6 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
  */
 public interface InboundEventTransformer {
 
-    Collection<FlowableEventBusEvent> transform(EventInstance eventInstance);
+    Collection<EventRegistryEvent> transform(EventInstance eventInstance);
 
 }

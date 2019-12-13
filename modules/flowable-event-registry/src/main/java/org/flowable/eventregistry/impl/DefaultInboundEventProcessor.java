@@ -15,12 +15,11 @@ package org.flowable.eventregistry.impl;
 import java.util.Collection;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.eventbus.FlowableEventBus;
-import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventProcessor;
-import org.flowable.eventregistry.api.definition.InboundChannelDefinition;
+import org.flowable.eventregistry.model.InboundChannelDefinition;
 
 /**
  * @author Joram Barrez
@@ -29,11 +28,9 @@ import org.flowable.eventregistry.api.definition.InboundChannelDefinition;
 public class DefaultInboundEventProcessor implements InboundEventProcessor {
 
     protected EventRegistry eventRegistry;
-    protected FlowableEventBus flowableEventBus;
 
-    public DefaultInboundEventProcessor(EventRegistry eventRegistry, FlowableEventBus flowableEventBus) {
+    public DefaultInboundEventProcessor(EventRegistry eventRegistry) {
         this.eventRegistry = eventRegistry;
-        this.flowableEventBus = flowableEventBus;
     }
 
     @Override
@@ -44,11 +41,11 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
             throw new FlowableException("No channel definition found for key " + channelKey);
         }
 
-        InboundEventProcessingPipeline inboundEventProcessingPipeline = channelDefinition.getInboundEventProcessingPipeline();
-        Collection<FlowableEventBusEvent> eventBusEvents = inboundEventProcessingPipeline.run(channelKey, event);
+        InboundEventProcessingPipeline inboundEventProcessingPipeline = (InboundEventProcessingPipeline) channelDefinition.getInboundEventProcessingPipeline();
+        Collection<EventRegistryEvent> eventRegistryEvents = inboundEventProcessingPipeline.run(channelKey, event);
 
-        for (FlowableEventBusEvent flowableEventBusEvent : eventBusEvents) {
-            flowableEventBus.sendEvent(flowableEventBusEvent);
+        for (EventRegistryEvent eventRegistryEvent : eventRegistryEvents) {
+            eventRegistry.sendEventToConsumers(eventRegistryEvent);
         }
 
     }

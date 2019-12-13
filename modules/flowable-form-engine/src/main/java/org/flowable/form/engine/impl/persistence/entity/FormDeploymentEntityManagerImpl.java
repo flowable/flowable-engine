@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
-import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
@@ -59,16 +58,6 @@ public class FormDeploymentEntityManagerImpl
 
     protected void deleteFormDefinitionsForDeployment(String deploymentId) {
         getFormDefinitionEntityManager().deleteFormDefinitionsByDeploymentId(deploymentId);
-    }
-
-    protected FormDefinitionEntity findLatestFormDefinition(FormDefinition formDefinition) {
-        FormDefinitionEntity latestForm = null;
-        if (formDefinition.getTenantId() != null && !FormEngineConfiguration.NO_TENANT_ID.equals(formDefinition.getTenantId())) {
-            latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKeyAndTenantId(formDefinition.getKey(), formDefinition.getTenantId());
-        } else {
-            latestForm = getFormDefinitionEntityManager().findLatestFormDefinitionByKey(formDefinition.getKey());
-        }
-        return latestForm;
     }
 
     @Override

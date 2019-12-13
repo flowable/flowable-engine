@@ -15,10 +15,10 @@ package org.flowable.eventregistry.impl.transformer;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
-import org.flowable.eventregistry.impl.event.EventRegistryEvent;
+import org.flowable.eventregistry.impl.event.FlowableEventRegistryEvent;
 
 /**
  * @author Joram Barrez
@@ -27,7 +27,7 @@ import org.flowable.eventregistry.impl.event.EventRegistryEvent;
 public class DefaultInboundEventTransformer implements InboundEventTransformer {
 
     @Override
-    public Collection<FlowableEventBusEvent> transform(EventInstance eventInstance) {
-        return Collections.singletonList(new EventRegistryEvent(eventInstance));
+    public Collection<EventRegistryEvent> transform(EventInstance eventInstance) {
+        return Collections.singletonList(new FlowableEventRegistryEvent(eventInstance));
     }
 }

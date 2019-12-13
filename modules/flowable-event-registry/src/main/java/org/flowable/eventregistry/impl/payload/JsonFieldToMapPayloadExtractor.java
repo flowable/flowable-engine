@@ -16,12 +16,12 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
-import org.flowable.eventregistry.api.definition.EventDefinition;
-import org.flowable.eventregistry.api.definition.EventPayloadTypes;
+import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventCorrelationParameterInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -32,16 +32,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtractor<JsonNode> {
 
     @Override
-    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventDefinition eventDefinition, JsonNode event) {
-        return eventDefinition.getCorrelationParameterDefinitions().stream()
+    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, JsonNode event) {
+        return eventDefinition.getCorrelationParameters().stream()
             .filter(parameterDefinition -> event.has(parameterDefinition.getName()))
             .map(parameterDefinition -> new EventCorrelationParameterInstanceImpl(parameterDefinition, getPayloadValue(event, parameterDefinition.getName(), parameterDefinition.getType())))
             .collect(Collectors.toList());
     }
 
     @Override
-    public Collection<EventPayloadInstance> extractPayload(EventDefinition eventDefinition, JsonNode event) {
-        return eventDefinition.getEventPayloadDefinitions().stream()
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, JsonNode event) {
+        return eventDefinition.getPayload().stream()
             .filter(payloadDefinition -> event.has(payloadDefinition.getName()))
             .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(event, payloadDefinition.getName(), payloadDefinition.getType())))
             .collect(Collectors.toList());

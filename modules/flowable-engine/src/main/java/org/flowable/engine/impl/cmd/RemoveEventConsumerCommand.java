@@ -13,16 +13,16 @@
 package org.flowable.engine.impl.cmd;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
 
 public class RemoveEventConsumerCommand implements Command<Void> {
 
-    protected FlowableEventBusConsumer eventConsumer;
+    protected EventRegistryEventBusConsumer eventConsumer;
 
-    public RemoveEventConsumerCommand(FlowableEventBusConsumer eventConsumer) {
+    public RemoveEventConsumerCommand(EventRegistryEventBusConsumer eventConsumer) {
         this.eventConsumer = eventConsumer;
     }
 
@@ -32,7 +32,7 @@ public class RemoveEventConsumerCommand implements Command<Void> {
             throw new FlowableIllegalArgumentException("event consumer is null.");
         }
 
-        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventBus().removeFlowableEventConsumer(eventConsumer);
+        CommandContextUtil.getEventRegistry().removeFlowableEventConsumer(eventConsumer);
 
         return null;
     }

@@ -15,17 +15,17 @@ package org.flowable.eventregistry.impl.runtime;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.model.EventModel;
 
 /**
  * @author Joram Barrez
  */
 public class EventInstanceImpl implements EventInstance {
 
-    protected EventDefinition eventDefinition;
+    protected EventModel eventModel;
     protected Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
     protected Collection<EventCorrelationParameterInstance> correlationParameterInstances = new ArrayList<>();
 
@@ -33,21 +33,21 @@ public class EventInstanceImpl implements EventInstance {
 
     }
 
-    public EventInstanceImpl(EventDefinition eventDefinition,
+    public EventInstanceImpl(EventModel eventModel,
             Collection<EventCorrelationParameterInstance> correlationParameterInstances,
             Collection<EventPayloadInstance> payloadInstances) {
         
-        this.eventDefinition = eventDefinition;
+        this.eventModel = eventModel;
         this.correlationParameterInstances = correlationParameterInstances;
         this.payloadInstances = payloadInstances;
     }
 
     @Override
-    public EventDefinition getEventDefinition() {
-        return eventDefinition;
+    public EventModel getEventModel() {
+        return eventModel;
     }
-    public void setEventDefinition(EventDefinition eventDefinition) {
-        this.eventDefinition = eventDefinition;
+    public void setEventModel(EventModel eventModel) {
+        this.eventModel = eventModel;
     }
     public Collection<EventPayloadInstance> getPayloadInstances() {
         return payloadInstances;

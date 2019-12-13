@@ -51,8 +51,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
-import org.flowable.common.engine.api.eventbus.FlowableEventBus;
-import org.flowable.common.engine.api.eventbus.FlowableEventBusPublisher;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
@@ -65,8 +63,6 @@ import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
-import org.flowable.common.engine.impl.eventbus.BasicFlowableEventBus;
-import org.flowable.common.engine.impl.eventbus.FlowableEventPublisherImpl;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContextFactory;
@@ -222,9 +218,6 @@ public abstract class AbstractEngineConfiguration {
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
 
-    protected FlowableEventBus eventBus;
-    protected FlowableEventBusPublisher eventPublisher;
-
     protected LoggingListener loggingListener;
 
     protected boolean transactionsExternallyManaged;
@@ -329,6 +322,7 @@ public abstract class AbstractEngineConfiguration {
     protected List<EngineConfigurator> configurators; // The injected configurators
     protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
     protected EngineConfigurator idmEngineConfigurator;
+    protected EngineConfigurator eventRegistryConfigurator;
 
     public static final String PRODUCT_NAME_POSTGRES = "PostgreSQL";
     public static final String PRODUCT_NAME_CRDB = "CockroachDB";
@@ -1707,43 +1701,6 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
-    public void initEventBusAndRelatedServices() {
-        initEventBus();
-    }
-
-    public void initEventBus() {
-        if (this.eventBus == null) {
-            this.eventBus = new BasicFlowableEventBus();
-        }
-        
-        if (this.eventPublisher == null) {
-            this.eventPublisher = new FlowableEventPublisherImpl(this.eventBus);
-        }
-    }
-
-    public FlowableEventBus getEventBus() {
-        return eventBus;
-    }
-
-    public AbstractEngineConfiguration setEventBus(FlowableEventBus eventBus) {
-        this.eventBus = eventBus;
-        return this;
-    }
-
-
-    public boolean isEventPublisherEnabled() {
-        return eventPublisher != null && eventPublisher.isEnabled();
-    }
-
-    public FlowableEventBusPublisher getEventPublisher() {
-        return eventPublisher;
-    }
-
-    public AbstractEngineConfiguration setEventPublisher(FlowableEventBusPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-        return this;
-    }
-
     public boolean isLoggingSessionEnabled() {
         return loggingListener != null;
     }
@@ -1889,6 +1846,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setIdmEngineConfigurator(EngineConfigurator idmEngineConfigurator) {
         this.idmEngineConfigurator = idmEngineConfigurator;
+        return this;
+    }
+
+    public EngineConfigurator getEventRegistryConfigurator() {
+        return eventRegistryConfigurator;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryConfigurator(EngineConfigurator eventRegistryConfigurator) {
+        this.eventRegistryConfigurator = eventRegistryConfigurator;
         return this;
     }
 

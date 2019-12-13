@@ -20,8 +20,10 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.eventregistry.api.EventDeployment;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
-import org.flowable.eventregistry.api.definition.EventPayloadTypes;
+import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,17 +41,18 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
     public void registerEventDefinition() {
         outboundEventChannelAdapter = setupTestChannel();
 
-        cmmnEngineConfiguration.getEventRegistry().newEventDefinition()
+        getEventRepositoryService().createEventModelBuilder()
             .outboundChannelKey("out-channel")
             .key("testEvent")
+            .resourceName("testEvent.event")
             .payload("customerId", EventPayloadTypes.STRING)
-            .register();
+            .deploy();
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
         TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
 
-        cmmnEngineConfiguration.getEventRegistry().newOutboundChannelDefinition()
+        getEventRegistry().newOutboundChannelDefinition()
             .key("out-channel")
             .channelAdapter(outboundEventChannelAdapter)
             .jsonSerializer()
@@ -61,8 +64,12 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
 
     @After
     public void unregisterEventDefinition() {
-        cmmnEngineConfiguration.getEventRegistry().removeChannelDefinition("test-channel");
-        cmmnEngineConfiguration.getEventRegistry().removeEventDefinition("myEvent");
+        getEventRegistry().removeChannelDefinition("test-channel");
+        EventRepositoryService eventRepositoryService = getEventRepositoryService();
+        List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
+        for (EventDeployment eventDeployment : deployments) {
+            eventRepositoryService.deleteDeployment(eventDeployment.getId());
+        }
     }
 
     @Test
@@ -73,7 +80,7 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
             .variable("myVariable", "Hello World!")
             .start();
 
-         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
         JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);

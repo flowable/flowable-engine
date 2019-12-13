@@ -22,6 +22,10 @@
     <dependencies>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-engine-common-api</artifactId>
         </dependency>
     </dependencies>

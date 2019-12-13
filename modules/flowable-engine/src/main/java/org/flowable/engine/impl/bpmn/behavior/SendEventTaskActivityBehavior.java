@@ -26,7 +26,6 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -34,10 +33,10 @@ import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.EventRegistry;
-import org.flowable.eventregistry.api.definition.EventDefinition;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.service.JobService;
@@ -60,8 +59,9 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
 
     @Override
     public void execute(DelegateExecution execution) {
-        EventRegistry eventRegistry = CommandContextUtil.getProcessEngineConfiguration().getEventRegistry();
-        EventDefinition eventDefinition = eventRegistry.getEventDefinition(sendEventServiceTask.getEventType());
+        EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
+        
+        EventModel eventDefinition = eventRegistry.getEventModel(sendEventServiceTask.getEventType());
 
         if (eventDefinition == null) {
             throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType());
@@ -95,13 +95,13 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 execution.getCurrentFlowElement(),
                 eventDefinition);
             EventInstanceImpl eventInstance = new EventInstanceImpl(eventDefinition, Collections.emptyList(), eventPayloadInstances);
-            eventRegistry.sendEvent(eventInstance);
+            eventRegistry.sendEventOutbound(eventInstance);
         }
 
         if (sendEventServiceTask.isTriggerable()) {
-            EventDefinition triggerEventDefinition = null;
+            EventModel triggerEventDefinition = null;
             if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
-                triggerEventDefinition = eventRegistry.getEventDefinition(sendEventServiceTask.getTriggerEventType());
+                triggerEventDefinition = eventRegistry.getEventModel(sendEventServiceTask.getTriggerEventType());
             } else {
                 triggerEventDefinition = eventDefinition;
             }
@@ -129,7 +129,6 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         
         if (sendEventServiceTask.isTriggerable()) {
             Object eventInstance = execution.getTransientVariables().get("eventInstance");
@@ -147,10 +146,11 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             } else {
                 eventType = sendEventServiceTask.getEventType();
             }
-            EventRegistry eventRegistry = processEngineConfiguration.getEventRegistry();
-            EventDefinition eventDefinition = eventRegistry.getEventDefinition(eventType);
+            
+            EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
+            EventModel eventModel = eventRegistry.getEventModel(eventType);
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-                if (Objects.equals(eventDefinition.getKey(), eventSubscription.getEventType())) {
+                if (Objects.equals(eventModel.getKey(), eventSubscription.getEventType())) {
                     eventSubscriptionService.deleteEventSubscription(eventSubscription);
                 }
             }

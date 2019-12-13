@@ -17,16 +17,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.eventbus.FlowableEventBusEvent;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
-import org.flowable.eventregistry.impl.event.EventRegistryEvent;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 
 /**
  * @author Joram Barrez
@@ -34,34 +35,16 @@ import org.flowable.eventregistry.impl.event.EventRegistryEvent;
  */
 public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventBusConsumer {
 
-    protected Collection<String> supportedTypes = new LinkedHashSet<>();
-    protected EventRegistry eventRegistry;
+    protected AbstractEngineConfiguration engingeConfiguration;
 
-    public BaseEventRegistryEventConsumer(EventRegistry eventRegistry) {
-        this.eventRegistry = eventRegistry;
-    }
-
-    public void addSupportedType(String supportedType) {
-        if (!supportedTypes.contains(supportedType)) {
-            supportedTypes.add(supportedType);
-        }
+    public BaseEventRegistryEventConsumer(AbstractEngineConfiguration engingeConfiguration) {
+        this.engingeConfiguration = engingeConfiguration;
     }
 
     @Override
-    public Collection<String> getSupportedTypes() {
-        return supportedTypes;
-    }
-
-    @Override
-    public void eventReceived(FlowableEventBusEvent event) {
-        if (event instanceof EventRegistryEvent) {
-            EventRegistryEvent eventRegistryEvent = (EventRegistryEvent) event;
-            if (eventRegistryEvent.getEventInstance() != null) {
-                eventReceived(eventRegistryEvent.getEventInstance());
-            } else {
-                // TODO: what should happen in this case?
-            }
-            
+    public void eventReceived(EventRegistryEvent event) {
+        if (event.getEventObject() != null && event.getEventObject() instanceof EventInstance) {
+            eventReceived((EventInstance) event.getEventObject());
         } else {
             // TODO: what should happen in this case?
         }
@@ -94,7 +77,12 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
             data.put(correlationParameterInstance.getDefinitionName(), correlationParameterInstance.getValue());
         }
 
-        return eventRegistry.generateKey(data);
+        return getEventRegistry().generateKey(data);
     }
 
+    protected EventRegistry getEventRegistry() {
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) 
+                        engingeConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+        return eventRegistryEngineConfiguration.getEventRegistry();
+    }
 }

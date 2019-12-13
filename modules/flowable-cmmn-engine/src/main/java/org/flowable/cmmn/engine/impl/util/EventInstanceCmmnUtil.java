@@ -26,12 +26,12 @@ import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.eventregistry.api.definition.EventDefinition;
-import org.flowable.eventregistry.api.definition.EventPayloadDefinition;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.EventPayloadDefinition;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -75,7 +75,7 @@ public class EventInstanceCmmnUtil {
      * Typically used when needing to create {@link EventInstance}'s and populate the payload.
      */
     public static Collection<EventPayloadInstance> createEventPayloadInstances(VariableScope variableScope, ExpressionManager expressionManager,
-            BaseElement baseElement, EventDefinition eventDefinition) {
+            BaseElement baseElement, EventModel eventDefinition) {
 
         List<EventPayloadInstance> eventPayloadInstances = new ArrayList<>();
         List<ExtensionElement> inParameters = baseElement.getExtensionElements()
@@ -88,7 +88,7 @@ public class EventInstanceCmmnUtil {
                 String source = inParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
                 String target = inParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
 
-                Optional<EventPayloadDefinition> matchingEventDefinition = eventDefinition.getEventPayloadDefinitions()
+                Optional<EventPayloadDefinition> matchingEventDefinition = eventDefinition.getPayload()
                     .stream()
                     .filter(e -> e.getName().equals(target))
                     .findFirst();

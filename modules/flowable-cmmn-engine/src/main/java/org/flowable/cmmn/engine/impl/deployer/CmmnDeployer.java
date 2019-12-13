@@ -217,7 +217,7 @@ public class CmmnDeployer implements EngineDeployer {
                 correlationParameters.put(name, value);
             }
 
-            correlationKey = CommandContextUtil.getCmmnEngineConfiguration().getEventRegistry().generateKey(correlationParameters);
+            correlationKey = CommandContextUtil.getEventRegistry().generateKey(correlationParameters);
         }
         return correlationKey;
     }

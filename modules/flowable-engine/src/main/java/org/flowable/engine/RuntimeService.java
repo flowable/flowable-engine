@@ -25,7 +25,6 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
-import org.flowable.common.engine.api.eventbus.FlowableEventBusConsumer;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
@@ -40,6 +39,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
@@ -1286,9 +1286,9 @@ public interface RuntimeService {
      */
     void dispatchEvent(FlowableEvent event);
     
-    void addEventBusConsumer(FlowableEventBusConsumer eventConsumer);
+    void addEventBusConsumer(EventRegistryEventBusConsumer eventConsumer);
     
-    void removeEventBusConsumer(FlowableEventBusConsumer eventConsumer);
+    void removeEventBusConsumer(EventRegistryEventBusConsumer eventConsumer);
 
     /**
      * Sets the name for the process instance with the given id.

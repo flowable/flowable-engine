@@ -121,12 +121,6 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             // See the beforeInit
             ((CmmnEngineConfiguration) cmmnEngineConfiguration).setHistoryJobExecutionScope(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL);
         }
-
-        if (processEngineConfiguration.getEventRegistry() != null) {
-            cmmnEngineConfiguration.setEventRegistry(processEngineConfiguration.getEventRegistry());
-            cmmnEngineConfiguration.setInboundEventProcessor(processEngineConfiguration.getInboundEventProcessor());
-            cmmnEngineConfiguration.setOutboundEventProcessor(processEngineConfiguration.getOutboundEventProcessor());
-        }
     }
     
     protected ProcessEngineConfigurationImpl getProcessEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {

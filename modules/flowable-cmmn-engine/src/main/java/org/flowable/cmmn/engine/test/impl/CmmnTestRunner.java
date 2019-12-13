@@ -60,8 +60,11 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        super.runChild(method, notifier);
-        
+        try {
+            super.runChild(method, notifier);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

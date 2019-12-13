@@ -32,11 +32,11 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.eventregistry.api.definition.EventDefinition;
-import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
@@ -57,7 +57,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
 
     }
 
-    protected EventDefinition getEventDefinition(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected EventModel getEventDefinition(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
 
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
@@ -67,18 +67,18 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
             key = expression.getValue(planItemInstanceEntity).toString();
         }
 
-        EventDefinition eventDefinition = cmmnEngineConfiguration.getEventRegistry().getEventDefinition(key);
-        if (eventDefinition == null) {
-            throw new FlowableException("Could not find event definition for key " +key);
+        EventModel eventModel = CommandContextUtil.getEventRegistry().getEventModel(key);
+        if (eventModel == null) {
+            throw new FlowableException("Could not find event model for key " +key);
         }
-        return eventDefinition;
+        return eventModel;
     }
 
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
 
         EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
-        EventDefinition eventDefinition = getEventDefinition(commandContext, planItemInstanceEntity);
+        EventModel eventDefinition = getEventDefinition(commandContext, planItemInstanceEntity);
 
         List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntity.getId());
         for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
@@ -121,7 +121,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
     }
 
     protected void createEventSubscription(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        EventDefinition eventDefinition = getEventDefinition(commandContext, planItemInstanceEntity);
+        EventModel eventDefinition = getEventDefinition(commandContext, planItemInstanceEntity);
 
         String correlationKey = getCorrelationKey(commandContext, planItemInstanceEntity);
 
@@ -158,7 +158,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
                     }
                 }
 
-                correlationKey = cmmnEngineConfiguration.getEventRegistry().generateKey(correlationParameters);
+                correlationKey = CommandContextUtil.getEventRegistry().generateKey(correlationParameters);
             } else {
                 correlationKey = null;
             }

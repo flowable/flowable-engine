@@ -15,6 +15,7 @@ package org.flowable.cmmn.test.eventregistry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,10 +24,12 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.eventregistry.api.EventRegistry;
-import org.flowable.eventregistry.api.InboundEventChannelAdapter;
-import org.flowable.eventregistry.api.definition.EventPayloadTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.eventregistry.api.EventDeployment;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.api.InboundEventChannelAdapter;
+import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.junit.After;
 import org.junit.Before;
@@ -48,20 +51,21 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
     public void registerEventDefinition() {
         inboundEventChannelAdapter = setupTestChannel();
 
-        cmmnEngineConfiguration.getEventRegistry().newEventDefinition()
+        getEventRepositoryService().createEventModelBuilder()
             .inboundChannelKey("test-channel")
             .key("myEvent")
+            .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
             .correlationParameter("orderId", EventPayloadTypes.STRING)
             .payload("payload1", EventPayloadTypes.STRING)
             .payload("payload2", EventPayloadTypes.INTEGER)
-            .register();
+            .deploy();
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        cmmnEngineConfiguration.getEventRegistry().newInboundChannelDefinition()
+        getEventRegistry().newInboundChannelDefinition()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .jsonDeserializer()
@@ -75,8 +79,12 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
 
     @After
     public void unregisterEventDefinition() {
-        cmmnEngineConfiguration.getEventRegistry().removeChannelDefinition("test-channel");
-        cmmnEngineConfiguration.getEventRegistry().removeEventDefinition("myEvent");
+        getEventRegistry().removeChannelDefinition("test-channel");
+        EventRepositoryService eventRepositoryService = getEventRepositoryService();
+        List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
+        for (EventDeployment eventDeployment : deployments) {
+            eventRepositoryService.deleteDeployment(eventDeployment.getId());
+        }
     }
 
     @Test

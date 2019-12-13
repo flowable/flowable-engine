@@ -14,14 +14,14 @@ package org.flowable.eventregistry.api.runtime;
 
 import java.util.Collection;
 
-import org.flowable.eventregistry.api.definition.EventDefinition;
+import org.flowable.eventregistry.model.EventModel;
 
 /**
  * @author Joram Barrez
  */
 public interface EventInstance {
 
-    EventDefinition getEventDefinition();
+    EventModel getEventModel();
 
     Collection<EventPayloadInstance> getPayloadInstances();
 

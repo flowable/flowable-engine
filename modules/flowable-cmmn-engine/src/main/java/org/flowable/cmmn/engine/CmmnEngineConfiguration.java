@@ -239,13 +239,9 @@ import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
-import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
-import org.flowable.eventregistry.api.InboundEventProcessor;
-import org.flowable.eventregistry.api.OutboundEventProcessor;
-import org.flowable.eventregistry.impl.DefaultEventRegistry;
-import org.flowable.eventregistry.impl.DefaultInboundEventProcessor;
-import org.flowable.eventregistry.impl.DefaultOutboundEventProcessor;
+import org.flowable.eventregistry.configurator.EventRegistryEngineConfigurator;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
@@ -348,6 +344,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected boolean disableIdmEngine;
     
+    protected boolean disableEventRegistry;
+    
     protected CandidateManager candidateManager;
     
     protected DecisionTableVariableManager decisionTableVariableManager;
@@ -432,11 +430,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     // Entitylink support
     protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
     protected boolean enableEntityLinks;
-
-    // Event registry
-    protected EventRegistry eventRegistry;
-    protected InboundEventProcessor inboundEventProcessor;
-    protected OutboundEventProcessor outboundEventProcessor;
     
     // EventSubscription support
     protected EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration;
@@ -857,8 +850,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initIdentityLinkInterceptor();
         initClock();
         initEventDispatcher();
-        initEventBusAndRelatedServices();
-        initEventRegistryAndRelatedServices();
         initIdentityLinkServiceConfiguration();
         initEntityLinkServiceConfiguration();
         initEventSubscriptionServiceConfiguration();
@@ -873,6 +864,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initAsyncHistoryExecutor();
         initScriptingEngines();
         configuratorsAfterInit();
+        afterInitEventRegistryEventBusConsumer();
         
         initHistoryCleaningManager();
     }
@@ -1372,6 +1364,21 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
             scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
         }
+    }
+    
+    public void afterInitEventRegistryEventBusConsumer() {
+        if (engineConfigurations.containsKey(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG)) {
+            EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
+            if (eventRegistryEventBusConsumer != null) {
+                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration)
+                                engineConfigurations.get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+                eventRegistryEngineConfiguration.getEventRegistry().registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
+            }
+        }
+    }
+    
+    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
+        return new CmmnEventRegistryEventConsumer(this);
     }
     
     public void initHistoryCleaningManager() {
@@ -1882,53 +1889,27 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
-    public void initEventRegistryAndRelatedServices() {
-        initEventRegistry();
-        initInboundEventProcessor();
-        initOutboundEventProcessor();
-        initEventRegistryEventBusConsumer();
-    }
-
-    public void initEventRegistry() {
-        if (this.eventRegistry == null) {
-            this.eventRegistry = new DefaultEventRegistry(eventBus);
-        }
-    }
-
-    public void initInboundEventProcessor() {
-        if (this.inboundEventProcessor == null) {
-            this.inboundEventProcessor = new DefaultInboundEventProcessor(eventRegistry, eventBus);
-        }
-        this.eventRegistry.setInboundEventProcessor(this.inboundEventProcessor);
-    }
-
-    public void initOutboundEventProcessor() {
-        if (this.outboundEventProcessor == null) {
-            this.outboundEventProcessor = new DefaultOutboundEventProcessor(eventRegistry);
-        }
-        this.eventRegistry.setOutboundEventProcessor(outboundEventProcessor);
-    }
-
-    public void initEventRegistryEventBusConsumer() {
-        EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
-        if (eventRegistryEventBusConsumer != null) {
-            this.eventRegistry.registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
-        }
-    }
-
-    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
-        return new CmmnEventRegistryEventConsumer(this, eventRegistry);
-    }
-
     @Override
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
-        if (!disableIdmEngine) {
+        if (!disableIdmEngine || !disableEventRegistry) {
             List<EngineConfigurator> specificConfigurators = new ArrayList<>();
-            if (idmEngineConfigurator != null) {
-                specificConfigurators.add(idmEngineConfigurator);
-            } else {
-                specificConfigurators.add(new IdmEngineConfigurator());
+            
+            if (!disableIdmEngine) {
+                if (idmEngineConfigurator != null) {
+                    specificConfigurators.add(idmEngineConfigurator);
+                } else {
+                    specificConfigurators.add(new IdmEngineConfigurator());
+                }
             }
+            
+            if (!disableEventRegistry) {
+                if (eventRegistryConfigurator != null) {
+                    specificConfigurators.add(eventRegistryConfigurator);
+                } else {
+                    specificConfigurators.add(new EventRegistryEngineConfigurator());
+                }
+            }
+            
             return specificConfigurators;
         }
         return Collections.emptyList();
@@ -2815,6 +2796,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.disableIdmEngine = disableIdmEngine;
         return this;
     }
+    
+    public boolean isDisableEventRegistry() {
+        return disableEventRegistry;
+    }
+
+    public CmmnEngineConfiguration setDisableEventRegistry(boolean disableEventRegistry) {
+        this.disableEventRegistry = disableEventRegistry;
+        return this;
+    }
 
     public JobServiceConfiguration getJobServiceConfiguration() {
         return jobServiceConfiguration;
@@ -3418,33 +3408,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setEnableEntityLinks(boolean enableEntityLinks) {
         this.enableEntityLinks = enableEntityLinks;
-        return this;
-    }
-
-    public EventRegistry getEventRegistry() {
-        return eventRegistry;
-    }
-
-    public CmmnEngineConfiguration setEventRegistry(EventRegistry eventRegistry) {
-        this.eventRegistry = eventRegistry;
-        return this;
-    }
-
-    public InboundEventProcessor getInboundEventProcessor() {
-        return inboundEventProcessor;
-    }
-
-    public CmmnEngineConfiguration setInboundEventProcessor(InboundEventProcessor inboundEventProcessor) {
-        this.inboundEventProcessor = inboundEventProcessor;
-        return this;
-    }
-
-    public OutboundEventProcessor getOutboundEventProcessor() {
-        return outboundEventProcessor;
-    }
-
-    public CmmnEngineConfiguration setOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor) {
-        this.outboundEventProcessor = outboundEventProcessor;
         return this;
     }
 
