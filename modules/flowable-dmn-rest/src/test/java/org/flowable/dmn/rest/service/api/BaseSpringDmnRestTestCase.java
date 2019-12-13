@@ -15,6 +15,7 @@ package org.flowable.dmn.rest.service.api;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -184,7 +185,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
                 LOGGER.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
-                LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+                LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
             }
 
             Assert.assertEquals(expectedStatusCode, responseStatusCode);

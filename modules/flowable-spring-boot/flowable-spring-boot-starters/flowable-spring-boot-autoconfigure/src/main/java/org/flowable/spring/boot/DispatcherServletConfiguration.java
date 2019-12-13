@@ -28,6 +28,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -38,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Base dispatcher configuration that can be used to configure context for the REST API.
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackageClasses = BaseExceptionHandlerAdvice.class)
 @ConditionalOnClass(WebMvcConfigurationSupport.class)
 @EnableAsync
@@ -54,12 +55,12 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
         return new SessionLocaleResolver();
     }
 
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
+    @Override
+    protected void addInterceptors(InterceptorRegistry registry) {
         LOGGER.debug("Configuring localeChangeInterceptor");
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("language");
-        return localeChangeInterceptor;
+        registry.addInterceptor(localeChangeInterceptor);
     }
 
     @Bean
@@ -70,14 +71,11 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
         return multipartResolver;
     }
 
-    @Bean
     @Override
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+    protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
-        Object[] interceptors = { localeChangeInterceptor() };
-        requestMappingHandlerMapping.setInterceptors(interceptors);
         return requestMappingHandlerMapping;
     }
 

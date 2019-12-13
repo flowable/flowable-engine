@@ -36,7 +36,7 @@ You can now run your Spring Boot application:
     import org.springframework.boot.SpringApplication;
     import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-    @SpringBootApplication
+    @SpringBootApplication(proxyBeanMethods = false)
     public class MyApplication {
 
         public static void main(String[] args) {
@@ -167,7 +167,7 @@ The XML content of the process definition is shown below. Notice that, for the m
 
 Also, add following code lines to test if the deployment actually worked. The *CommandLineRunner* is a special kind of Spring bean that is executed when the application boots:
 
-    @SpringBootApplication
+    @SpringBootApplication(proxyBeanMethods = false)
     public class MyApplication {
 
         public static void main(String[] args) {

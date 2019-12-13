@@ -13,6 +13,7 @@
 package org.flowable.dmn.rest.service.api.history;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
-        String content = IOUtils.toString(response.getEntity().getContent());
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertNotNull(content);
         

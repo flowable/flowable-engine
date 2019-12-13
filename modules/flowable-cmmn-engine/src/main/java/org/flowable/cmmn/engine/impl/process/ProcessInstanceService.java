@@ -32,13 +32,13 @@ public interface ProcessInstanceService {
     /**
      * Starts a process instance without a reference to a plan item instance (i.e. non-blocking behavior).
      */
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String tenantId,
-                    Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey);
+    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
+                    String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey);
 
     /**
      * Starts a process instance with a reference to a plan item instance (i.e. blocking behavior).
      */
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId,
+    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
                     String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey);
 
     /**

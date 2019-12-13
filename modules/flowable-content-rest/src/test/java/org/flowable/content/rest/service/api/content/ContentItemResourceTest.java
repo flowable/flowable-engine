@@ -12,11 +12,12 @@
  */
 package org.flowable.content.rest.service.api.content;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -87,7 +88,9 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
             // Check response headers
             assertEquals("application/pdf", response.getEntity().getContentType().getValue());
-            assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
             closeResponse(response);
 
         } finally {
@@ -165,7 +168,9 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
             // Check response headers
             assertEquals("application/pdf", response.getEntity().getContentType().getValue());
-            assertEquals("This is binary content", IOUtils.toString(response.getEntity().getContent()));
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
             closeResponse(response);
 
             ContentItem changedContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();

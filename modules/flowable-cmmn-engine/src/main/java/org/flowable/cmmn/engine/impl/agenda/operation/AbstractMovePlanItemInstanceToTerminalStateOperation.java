@@ -41,38 +41,44 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
     @Override
     public void run() {
+
+        // Need to capture the original state before the super.run() will change it
         String originalState = planItemInstanceEntity.getState();
 
+        // Not overriding the internalExecute, as that's meant for subclasses of this operation.
         super.run();
 
-        String plannedNewState = getNewState();
-        
-        if (isRepeatingOnDelete(originalState, plannedNewState) && !isWaitingForRepetitionPlanItemInstanceExists(planItemInstanceEntity)) {
+        if (!isNoop) {  // The super.run() could have marked this as a no-op. No point in continuing.
 
-            // Create new repeating instance
-            PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true, false);
+            String plannedNewState = getNewState();
 
-            if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener) {
-                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
+            if (isRepeatingOnDelete(originalState, plannedNewState) && !isWaitingForRepetitionPlanItemInstanceExists(planItemInstanceEntity)) {
 
-            } else {
+                // Create new repeating instance
+                PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true, false);
 
-                String oldState = newPlanItemInstanceEntity.getState();
-                String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
-                newPlanItemInstanceEntity.setState(newState);
-                PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
+                if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener) {
+                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
 
-                // Plan item creation "for Repetition"
-                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
+                } else {
 
-                // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
-                if (hasRepetitionRuleAndNoEntryCriteria(planItemInstanceEntity.getPlanItem())) {
-                    CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
+                    String oldState = newPlanItemInstanceEntity.getState();
+                    String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
+                    newPlanItemInstanceEntity.setState(newState);
+                    PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
+
+                    // Plan item creation "for Repetition"
+                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
+
+                    // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
+                    if (hasRepetitionRuleAndNoEntryCriteria(planItemInstanceEntity.getPlanItem())) {
+                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
+                    }
                 }
             }
+
+            removeSentryRelatedData();
         }
-        
-        removeSentryRelatedData();
     }
 
     /**

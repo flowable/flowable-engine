@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 /**
  * @author Joram Barrez
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class JacksonConfiguration {
 
     @Bean()

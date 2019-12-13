@@ -52,7 +52,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnIdmEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -76,7 +76,7 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
     }
 
     @ConditionalOnClass(PasswordEncoder.class)
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "false", matchIfMissing = true)
     public static class PasswordEncoderConfiguration {
 
@@ -121,7 +121,7 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
         return configuration;
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.spring.SpringProcessEngineConfiguration"
     })
@@ -150,7 +150,7 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
         }
     }
     
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })

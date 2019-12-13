@@ -603,7 +603,14 @@
       "value" : "",
       "description" : "BPMN.PROPERTYPACKAGES.MAILTASKHTMLPACKAGE.MAILTASKHTML.DESCRIPTION",
       "popular" : true
-    } ]
+    }, {
+      "id" : "mailtaskhtmlVar",
+      "type" : "String",
+      "title" : "BPMN.PROPERTYPACKAGES.MAILTASKHTMLPACKAGE.MAILTASKHTMLVAR.TITLE",
+      "value" : "",
+      "description" : "BPMN.PROPERTYPACKAGES.MAILTASKHTMLPACKAGE.MAILTASKHTMLVAR.DESCRIPTION",
+      "popular" : true
+    }  ]
   }, {
     "name" : "mailtaskcharsetpackage",
     "properties" : [ {

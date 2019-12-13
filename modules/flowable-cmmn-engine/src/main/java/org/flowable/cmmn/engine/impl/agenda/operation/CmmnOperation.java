@@ -36,6 +36,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public abstract class CmmnOperation implements Runnable {
     
     protected CommandContext commandContext;
+    protected boolean isNoop = false; // flag indicating whether this operation did something. False by default, as all operation should typically do something.
     
     public CmmnOperation() {
     }
@@ -43,7 +44,12 @@ public abstract class CmmnOperation implements Runnable {
     public CmmnOperation(CommandContext commandContext) {
         this.commandContext = commandContext;
     }
-    
+
+    /**
+     * @return The id of the case instance related to this operation.
+     */
+    public abstract String getCaseInstanceId();
+
     protected Stage getStage(PlanItemInstanceEntity planItemInstanceEntity) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition instanceof Stage) {
@@ -171,4 +177,13 @@ public abstract class CmmnOperation implements Runnable {
         String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
         return repetitionCounterVariableName;
     }
+
+    public void markAsNoop() {
+        isNoop = true;
+    }
+
+    public boolean isNoop() {
+        return isNoop;
+    }
+
 }

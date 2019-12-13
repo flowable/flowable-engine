@@ -109,11 +109,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
         }
 
-        boolean forceNullUserId = false;
         if (assignedToNoOne) {
-            // ACT-1317: Special handling when assignee is set to NULL, a
-            // CommentEntity notifying of assignee-delete should be created
-            forceNullUserId = true;
             if (IdentityLinkType.ASSIGNEE.equals(identityType)) { 
                 identityId = oldAssigneeId;
             } else {

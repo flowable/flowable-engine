@@ -490,7 +490,7 @@
                   <if test="involvedUser != null">
                     I.USER_ID_ = #{involvedUser}
                   </if>
-                  <if test="involvedUser != null &amp;&amp; involvedGroups != null &amp;&amp; involvedGroups &gt; 0">
+                  <if test="involvedUser != null &amp;&amp; involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
                     or
                   </if>
                   <if test="involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">

@@ -405,6 +405,10 @@
           "MAILTASKHTML" : {
             "TITLE" : "Html",
             "DESCRIPTION" : "A piece of HTML that is the content of the e-mail."
+          },
+          "MAILTASKHTMLVAR" : {
+            "TITLE" : "HtmlVar",
+            "DESCRIPTION" : "The name of a process variable that holds the HTML that is the content of the e-mail."
           }
         },
         "MAILTASKCHARSETPACKAGE" : {

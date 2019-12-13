@@ -78,6 +78,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_THROW_SIGNAL = "ThrowSignalEvent";
     final String STENCIL_EVENT_THROW_ESCALATION = "ThrowEscalationEvent";
     final String STENCIL_EVENT_THROW_NONE = "ThrowNoneEvent";
+    final String STENCIL_EVENT_THROW_COMPENSATION = "ThrowCompensationEvent";
 
     final String STENCIL_SEQUENCE_FLOW = "SequenceFlow";
     final String STENCIL_MESSAGE_FLOW = "MessageFlow";
@@ -111,6 +112,7 @@ public interface StencilConstants {
     final String PROPERTY_TIMER_DATE = "timerdatedefinition";
     final String PROPERTY_TIMER_CYCLE = "timercycledefinition";
     final String PROPERTY_TIMER_CYCLE_END_DATE = "timerenddatedefinition";
+    final String PROPERTY_CALENDAR_NAME = "calendarname";
 
     final String PROPERTY_MESSAGES = "messages";
     final String PROPERTY_MESSAGE_ID = "message_id";
@@ -144,6 +146,7 @@ public interface StencilConstants {
     final String PROPERTY_MULTIINSTANCE_COLLECTION = "multiinstance_collection";
     final String PROPERTY_MULTIINSTANCE_VARIABLE = "multiinstance_variable";
     final String PROPERTY_MULTIINSTANCE_CONDITION = "multiinstance_condition";
+    final String PROPERTY_MULTIINSTANCE_INDEX_VARIABLE = "multiinstance_index_variable";
 
     final String PROPERTY_TASK_LISTENERS = "tasklisteners";
     final String PROPERTY_EXECUTION_LISTENERS = "executionlisteners";
@@ -238,6 +241,7 @@ public interface StencilConstants {
     final String PROPERTY_MAILTASK_BCC = "mailtaskbcc";
     final String PROPERTY_MAILTASK_TEXT = "mailtasktext";
     final String PROPERTY_MAILTASK_HTML = "mailtaskhtml";
+    final String PROPERTY_MAILTASK_HTML_VAR = "mailtaskhtmlvar";
     final String PROPERTY_MAILTASK_CHARSET = "mailtaskcharset";
 
     final String PROPERTY_CALLACTIVITY_CALLEDELEMENT = "callactivitycalledelement";
@@ -324,4 +328,5 @@ public interface StencilConstants {
     final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
 
     final String PROPERTY_FOR_COMPENSATION = "isforcompensation";
+    final String PROPERTY_COMPENSATION_ACTIVITY_REF = "compensationactivityref";
 }

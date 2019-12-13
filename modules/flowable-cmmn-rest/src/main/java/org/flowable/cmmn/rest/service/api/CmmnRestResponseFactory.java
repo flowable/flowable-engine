@@ -57,7 +57,9 @@ import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
+import org.flowable.common.rest.variable.InstantRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
+import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
 import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
@@ -565,6 +567,7 @@ public class CmmnRestResponseFactory {
             }
         }
         result.setTenantId(caseInstance.getTenantId());
+        result.setState(caseInstance.getState());
         return result;
     }
 
@@ -853,6 +856,8 @@ public class CmmnRestResponseFactory {
         variableConverters.add(new DoubleRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
+        variableConverters.add(new InstantRestVariableConverter());
+        variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 
     protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {

@@ -52,6 +52,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     private static final long serialVersionUID = 1L;
     protected String executionId;
     protected String businessKey;
+    protected String businessKeyLike;
     protected boolean includeChildExecutionsWithBusinessKeyQuery;
     protected String processDefinitionId;
     protected Set<String> processDefinitionIds;
@@ -168,6 +169,16 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
         this.businessKey = businessKey;
         this.processDefinitionKey = processDefinitionKey;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessKeyLike = businessKeyLike;
+        } else {
+            this.businessKeyLike = businessKeyLike;
+        }
         return this;
     }
 
@@ -778,9 +789,9 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             processInstances = CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceByQueryCriteria(this);
         }
 
-        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization()) {
+        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization() && processEngineConfiguration.getInternalProcessLocalizationManager() != null) {
             for (ProcessInstance processInstance : processInstances) {
-                localize(processInstance);
+                processEngineConfiguration.getInternalProcessLocalizationManager().localize(processInstance, locale, withLocalizationFallback);
             }
         }
         
@@ -797,30 +808,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
         for (ProcessInstanceQueryImpl orQueryObject : orQueryObjects) {
             orQueryObject.ensureVariablesInitialized();
-        }
-    }
-
-    protected void localize(ProcessInstance processInstance) {
-        ExecutionEntity processInstanceExecution = (ExecutionEntity) processInstance;
-        processInstanceExecution.setLocalizedName(null);
-        processInstanceExecution.setLocalizedDescription(null);
-
-        if (locale != null) {
-            String processDefinitionId = processInstanceExecution.getProcessDefinitionId();
-            if (processDefinitionId != null) {
-                ObjectNode languageNode = BpmnOverrideContext.getLocalizationElementProperties(locale, processInstanceExecution.getProcessDefinitionKey(), processDefinitionId, withLocalizationFallback);
-                if (languageNode != null) {
-                    JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
-                    if (languageNameNode != null && !languageNameNode.isNull()) {
-                        processInstanceExecution.setLocalizedName(languageNameNode.asText());
-                    }
-
-                    JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
-                    if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                        processInstanceExecution.setLocalizedDescription(languageDescriptionNode.asText());
-                    }
-                }
-            }
         }
     }
 
@@ -849,6 +836,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getBusinessKey() {
         return businessKey;
+    }
+
+    public String getBusinessKeyLike() {
+        return businessKeyLike;
     }
 
     public boolean isIncludeChildExecutionsWithBusinessKeyQuery() {

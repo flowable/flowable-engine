@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Bean;
 /**
  * Demonstrates the <A href="http://localhost:8080/">REST API</A>
  */
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class Application {
 
     @Bean

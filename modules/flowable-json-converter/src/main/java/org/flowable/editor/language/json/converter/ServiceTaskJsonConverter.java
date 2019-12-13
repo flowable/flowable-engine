@@ -12,9 +12,8 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FieldExtension;
@@ -25,7 +24,9 @@ import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.editor.language.json.model.ModelInfo;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -69,6 +70,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_MAILTASK_BCC, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_TEXT, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_HTML, serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_MAILTASK_HTML_VAR, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_CHARSET, serviceTask, propertiesNode);
 
         } else if ("camel".equalsIgnoreCase(serviceTask.getType())) {

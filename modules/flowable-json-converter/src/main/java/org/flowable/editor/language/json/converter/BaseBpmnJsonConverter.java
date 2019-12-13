@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.DataStoreReference;
@@ -190,6 +191,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     if (StringUtils.isNotEmpty(loopDef.getCompletionCondition())) {
                         propertiesNode.put(PROPERTY_MULTIINSTANCE_CONDITION, loopDef.getCompletionCondition());
                     }
+                    if (StringUtils.isNotEmpty(loopDef.getElementIndexVariable())) {
+                        propertiesNode.put(PROPERTY_MULTIINSTANCE_INDEX_VARIABLE, loopDef.getElementIndexVariable());
+                    }
                 }
             }
 
@@ -327,6 +331,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 String multiInstanceCardinality = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_CARDINALITY, elementNode);
                 String multiInstanceCollection = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_COLLECTION, elementNode);
                 String multiInstanceCondition = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_CONDITION, elementNode);
+                String multiInstanceIndexVariable = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_INDEX_VARIABLE, elementNode);
 
                 if (StringUtils.isNotEmpty(multiInstanceType) && !"none".equalsIgnoreCase(multiInstanceType)) {
 
@@ -342,6 +347,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     multiInstanceObject.setInputDataItem(multiInstanceCollection);
                     multiInstanceObject.setElementVariable(multiInstanceVariable);
                     multiInstanceObject.setCompletionCondition(multiInstanceCondition);
+                    multiInstanceObject.setElementIndexVariable(multiInstanceIndexVariable);
                     activity.setLoopCharacteristics(multiInstanceObject);
                 }
 
@@ -537,6 +543,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
             } else if (eventDefinition instanceof TimerEventDefinition) {
                 TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;
+                if (StringUtils.isNotEmpty(timerDefinition.getCalendarName())) {
+                    propertiesNode.put(PROPERTY_CALENDAR_NAME, timerDefinition.getCalendarName());
+                }
                 if (StringUtils.isNotEmpty(timerDefinition.getTimeDuration())) {
                     propertiesNode.put(PROPERTY_TIMER_DURATON, timerDefinition.getTimeDuration());
                 }
@@ -553,6 +562,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 TerminateEventDefinition terminateEventDefinition = (TerminateEventDefinition) eventDefinition;
                 propertiesNode.put(PROPERTY_TERMINATE_ALL, terminateEventDefinition.isTerminateAll());
                 propertiesNode.put(PROPERTY_TERMINATE_MULTI_INSTANCE, terminateEventDefinition.isTerminateMultiInstance());
+            } else if (eventDefinition instanceof CompensateEventDefinition) {
+                CompensateEventDefinition compensateEventDefinition = (CompensateEventDefinition) eventDefinition;
+                if (StringUtils.isNotEmpty(compensateEventDefinition.getActivityRef())) {
+                    propertiesNode.put(PROPERTY_COMPENSATION_ACTIVITY_REF, compensateEventDefinition.getActivityRef());
+                }
             }
         }
     }
@@ -623,8 +637,12 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         String timeCycle = getPropertyValueAsString(PROPERTY_TIMER_CYCLE, objectNode);
         String timeDuration = getPropertyValueAsString(PROPERTY_TIMER_DURATON, objectNode);
         String endDate = getPropertyValueAsString(PROPERTY_TIMER_CYCLE_END_DATE, objectNode);
+        String calendarName = getPropertyValueAsString(PROPERTY_CALENDAR_NAME, objectNode);
 
         TimerEventDefinition eventDefinition = new TimerEventDefinition();
+        if (StringUtils.isNotEmpty(calendarName)){
+            eventDefinition.setCalendarName(calendarName);
+        }
         if (StringUtils.isNotEmpty(timeDate)) {
             eventDefinition.setTimeDate(timeDate);
 
@@ -650,6 +668,13 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         if (isAsync) {
             eventDefinition.setAsync(isAsync);
         }
+        event.getEventDefinitions().add(eventDefinition);
+    }
+
+    protected void convertJsonToCompensationDefinition(JsonNode objectNode, Event event) {
+        CompensateEventDefinition eventDefinition = new CompensateEventDefinition();
+        String activityRef = getPropertyValueAsString(PROPERTY_COMPENSATION_ACTIVITY_REF, objectNode);
+        eventDefinition.setActivityRef(activityRef);
         event.getEventDefinitions().add(eventDefinition);
     }
 

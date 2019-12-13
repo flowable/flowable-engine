@@ -98,7 +98,7 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
         assertEquals("test", variable);
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @EnableTransactionManagement
     static class TestConfiguration {
 

@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Profile;
  * @author Yvo Swillens
  */
 @Profile({"dev"})
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class ApplicationDevelopmentConfiguration {
 
     protected static final Integer FLOWABLE_ADMIN_APP_SERVER_CONFIG_PROCESS_PORT = 9999;

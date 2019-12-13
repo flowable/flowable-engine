@@ -27,7 +27,10 @@ import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.engine.FormEngines;
+import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.idm.api.IdmIdentityService;
@@ -38,7 +41,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
 
     @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}")
@@ -67,95 +70,94 @@ public class EngineConfiguration {
     }
 
     @Bean(name = "transactionManager")
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
+    public PlatformTransactionManager annotationDrivenTransactionManager(DataSource dataSource) {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
+        transactionManager.setDataSource(dataSource);
         return transactionManager;
     }
 
-    @Bean(name = "cmmnEngineFactoryBean")
-    public CmmnEngineFactoryBean cmmnEngineFactoryBean() {
+    @Bean(name = "cmmnEngine")
+    public CmmnEngineFactoryBean cmmnEngineFactoryBean(CmmnEngineConfiguration cmmnEngineConfiguration) {
         CmmnEngineFactoryBean factoryBean = new CmmnEngineFactoryBean();
-        factoryBean.setCmmnEngineConfiguration(cmmnEngineConfiguration());
+        factoryBean.setCmmnEngineConfiguration(cmmnEngineConfiguration);
         return factoryBean;
     }
 
-    @Bean(name = "cmmnEngine")
-    public CmmnEngine cmmnEngine() {
-        // Safe to call the getObject() on the @Bean annotated cmmnEngineFactoryBean(), will be
-        // the fully initialized object instanced from the factory and will NOT be created more than once
-        try {
-            return cmmnEngineFactoryBean().getObject();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Bean(name = "cmmnEngineConfiguration")
-    public CmmnEngineConfiguration cmmnEngineConfiguration() {
+    public CmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+        FormEngineConfigurator formEngineConfigurator) {
         SpringCmmnEngineConfiguration cmmnEngineConfiguration = new SpringCmmnEngineConfiguration();
-        cmmnEngineConfiguration.setDataSource(dataSource());
+        cmmnEngineConfiguration.setDataSource(dataSource);
         cmmnEngineConfiguration.setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-        cmmnEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
+        cmmnEngineConfiguration.setTransactionManager(transactionManager);
         cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         cmmnEngineConfiguration.setEnableEntityLinks(true);
-        cmmnEngineConfiguration.addConfigurator(formEngineConfigurator());
+        cmmnEngineConfiguration.addConfigurator(formEngineConfigurator);
         return cmmnEngineConfiguration;
     }
     
     @Bean
-    public SpringFormEngineConfigurator formEngineConfigurator() {
+    public SpringFormEngineConfigurator formEngineConfigurator(FormEngineConfiguration formEngineConfiguration) {
         SpringFormEngineConfigurator formEngineConfigurator =  new SpringFormEngineConfigurator();
-        formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration());
+        formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration);
         return formEngineConfigurator;
     }
     
     @Bean(name = "formEngineConfiguration")
-    public FormEngineConfiguration formEngineConfiguration() {
+    public FormEngineConfiguration formEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
         SpringFormEngineConfiguration formEngineConfiguration = new SpringFormEngineConfiguration();
-        formEngineConfiguration.setDataSource(dataSource());
+        formEngineConfiguration.setDataSource(dataSource);
         formEngineConfiguration.setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-        formEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
+        formEngineConfiguration.setTransactionManager(transactionManager);
         return formEngineConfiguration;
     }
 
     @Bean
-    public CmmnRepositoryService cmmnRepositoryService() {
-        return cmmnEngine().getCmmnRepositoryService();
+    public FormEngine formEngine(@SuppressWarnings("unused") CmmnEngine cmmnEngine) {
+        // The cmmn engine needs to be injected, as otherwise it won't be initialized, which means that the FormEngine is not initialized yet
+        if (!FormEngines.isInitialized()) {
+            throw new IllegalStateException("form engine has not been initialized");
+        }
+        return FormEngines.getDefaultFormEngine();
     }
 
     @Bean
-    public CmmnRuntimeService cmmnRuntimeService() {
-        return cmmnEngine().getCmmnRuntimeService();
+    public CmmnRepositoryService cmmnRepositoryService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnRepositoryService();
     }
 
     @Bean
-    public CmmnTaskService taskService() {
-        return cmmnEngine().getCmmnTaskService();
+    public CmmnRuntimeService cmmnRuntimeService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnRuntimeService();
     }
 
     @Bean
-    public CmmnHistoryService historyService() {
-        return cmmnEngine().getCmmnHistoryService();
+    public CmmnTaskService taskService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnTaskService();
     }
 
     @Bean
-    public CmmnManagementService managementService() {
-        return cmmnEngine().getCmmnManagementService();
+    public CmmnHistoryService historyService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnHistoryService();
+    }
+
+    @Bean
+    public CmmnManagementService managementService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnManagementService();
     }
     
     @Bean
-    public IdmIdentityService idmIdentityService() {
-        return cmmnEngine().getCmmnEngineConfiguration().getIdmIdentityService();
+    public IdmIdentityService idmIdentityService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnEngineConfiguration().getIdmIdentityService();
     }
     
     @Bean
-    public FormRepositoryService formRepositoryService(CmmnEngine cmmnEngine) {
-        return formEngineConfiguration().getFormRepositoryService();
+    public FormRepositoryService formRepositoryService(FormEngine formEngine) {
+        return formEngine.getFormRepositoryService();
     }
     
     @Bean
-    public org.flowable.form.api.FormService formEngineFormService(CmmnEngine cmmnEngine) {
-        return formEngineConfiguration().getFormService();
+    public org.flowable.form.api.FormService formEngineFormService(FormEngine formEngine) {
+        return formEngine.getFormService();
     }
 }

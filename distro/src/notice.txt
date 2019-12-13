@@ -132,22 +132,22 @@ org.mvel                        mvel2                       2.2.6.Final     The 
 org.slf4j                       jcl-over-slf4j              1.7.29          MIT License
 org.slf4j                       slf4j-api                   1.7.29          MIT License
 org.slf4j                       slf4j-log4j12               1.7.29          MIT License
-org.springframework             spring-beans                5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-context              5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-context-support      5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-tx                   5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-web                  5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-aop                  5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-expression           5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework             spring-orm                  5.1.11.RELEASE  The Apache Software License, Version 2.0
-org.springframework.security    spring-security-config      5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework.security    spring-security-core        5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework.security    spring-security-crypto      5.1.7.RELEASE   The Apache Software License, Version 2.0
-org.springframework.security    spring-security-web         5.1.7.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-beans                5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-context              5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-context-support      5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-tx                   5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-web                  5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-aop                  5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-expression           5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework             spring-orm                  5.2.2.RELEASE  The Apache Software License, Version 2.0
+org.springframework.security    spring-security-config      5.2.1.RELEASE   The Apache Software License, Version 2.0
+org.springframework.security    spring-security-core        5.2.1.RELEASE   The Apache Software License, Version 2.0
+org.springframework.security    spring-security-crypto      5.2.1.RELEASE   The Apache Software License, Version 2.0
+org.springframework.security    spring-security-web         5.2.1.RELEASE   The Apache Software License, Version 2.0
 org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
 xerces                          xercesImpl                  2.12.0          The Apache Software License, Version 2.0

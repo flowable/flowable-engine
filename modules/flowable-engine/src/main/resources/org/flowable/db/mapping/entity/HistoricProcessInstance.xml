@@ -694,6 +694,9 @@
       <if test="businessKey != null">
         and ${queryTablePrefix}BUSINESS_KEY_ = #{businessKey}
       </if>
+      <if test="businessKeyLike != null">
+        and ${queryTablePrefix}BUSINESS_KEY_ like #{businessKeyLike}${wildcardEscapeClause}
+      </if>
       <if test="startedBefore != null">
         and ${queryTablePrefix}START_TIME_ &lt;= #{startedBefore}
       </if>
@@ -781,6 +784,9 @@
       </if>
       <if test="orQueryObject.businessKey != null">
         or ${queryTablePrefix}BUSINESS_KEY_ = #{orQueryObject.businessKey}
+      </if>
+      <if test="orQueryObject.businessKeyLike != null">
+        or ${queryTablePrefix}BUSINESS_KEY_ like #{orQueryObject.businessKeyLike}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.startedBefore != null">
         or ${queryTablePrefix}START_TIME_ &lt;= #{orQueryObject.startedBefore}

@@ -25,4 +25,6 @@ public interface VariableContainer {
     
     void setTransientVariable(String variableName, Object variableValue);
 
+    String getTenantId();
+
 }

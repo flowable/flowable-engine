@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Collections;
 
@@ -66,7 +67,7 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(new HttpGet(
                 SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_EXCEPTION_STRACKTRACE, timerJob.getId())), HttpStatus.SC_OK);
 
-        String stack = IOUtils.toString(response.getEntity().getContent());
+        String stack = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         assertNotNull(stack);
         assertEquals(managementService.getTimerJobExceptionStacktrace(timerJob.getId()), stack);
 

@@ -59,12 +59,12 @@ The following properties are available on the process engine configuration throu
 </tr>
 <tr class="even">
 <td><p>asyncExecutorCorePoolSize</p></td>
-<td><p>2</p></td>
+<td><p>8</p></td>
 <td><p>The minimal number of threads that are kept alive in the thread pool for job execution.</p></td>
 </tr>
 <tr class="odd">
 <td><p>asyncExecutorMaxPoolSize</p></td>
-<td><p>10</p></td>
+<td><p>8</p></td>
 <td><p>The maximum number of threads that are created in the thread pool for job execution.</p></td>
 </tr>
 <tr class="even">
@@ -181,33 +181,34 @@ Some things to note:
       }
 
       @Bean(name = "transactionManager")
-      public PlatformTransactionManager transactionManager() {
+      public PlatformTransactionManager transactionManager(DataSource dataSource) {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
+        transactionManager.setDataSource(dataSource);
         return transactionManager;
       }
 
       @Bean
-      public SpringProcessEngineConfiguration processEngineConfiguration() {
+      public SpringProcessEngineConfiguration processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+        JobManager jobManager) {
         SpringProcessEngineConfiguration configuration = new SpringProcessEngineConfiguration();
-        configuration.setDataSource(dataSource());
-        configuration.setTransactionManager(transactionManager());
+        configuration.setDataSource(dataSource);
+        configuration.setTransactionManager(transactionManager);
         configuration.setDatabaseSchemaUpdate(SpringProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         configuration.setAsyncExecutorMessageQueueMode(true);
         configuration.setAsyncExecutorActivate(true);
-        configuration.setJobManager(jobManager());
+        configuration.setJobManager(jobManager);
         return configuration;
       }
 
       @Bean
-      public ProcessEngine processEngine() {
-        return processEngineConfiguration().buildProcessEngine();
+      public ProcessEngine processEngine(ProcessEngineConfiguration processEngineConfiguration) {
+        return processEngineConfiguration.buildProcessEngine();
       }
 
       @Bean
-      public MessageBasedJobManager jobManager() {
+      public MessageBasedJobManager jobManager(JmsTemplate jmsTemplate) {
         MessageBasedJobManager jobManager = new MessageBasedJobManager();
-        jobManager.setJmsTemplate(jmsTemplate());
+        jobManager.setJmsTemplate(jmsTemplate);
         return jobManager;
       }
 
@@ -220,28 +221,28 @@ Some things to note:
       }
 
       @Bean
-      public JmsTemplate jmsTemplate() {
+      public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
           JmsTemplate jmsTemplate = new JmsTemplate();
           jmsTemplate.setDefaultDestination(new ActiveMQQueue("flowable-jobs"));
-          jmsTemplate.setConnectionFactory(connectionFactory());
+          jmsTemplate.setConnectionFactory(connectionFactory);
           return jmsTemplate;
       }
 
       @Bean
-      public MessageListenerContainer messageListenerContainer() {
+      public MessageListenerContainer messageListenerContainer(JobMessageListener jobMessageListener) {
           DefaultMessageListenerContainer messageListenerContainer = new DefaultMessageListenerContainer();
           messageListenerContainer.setConnectionFactory(connectionFactory());
           messageListenerContainer.setDestinationName("flowable-jobs");
-          messageListenerContainer.setMessageListener(jobMessageListener());
+          messageListenerContainer.setMessageListener(jobMessageListener);
           messageListenerContainer.setConcurrentConsumers(2);
           messageListenerContainer.start();
           return messageListenerContainer;
       }
 
       @Bean
-      public JobMessageListener jobMessageListener() {
+      public JobMessageListener jobMessageListener(ProcessEngineConfiguration processEngineConfiguration) {
         JobMessageListener jobMessageListener = new JobMessageListener();
-        jobMessageListener.setProcessEngineConfiguration(processEngineConfiguration());
+        jobMessageListener.setProcessEngineConfiguration(processEngineConfiguration);
         return jobMessageListener;
       }
 

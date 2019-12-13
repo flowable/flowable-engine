@@ -25,7 +25,7 @@ import javax.sql.DataSource;
  *
  * @author Yvo Swillens
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @Profile({"dev"})
 public class DevelopmentConfiguration {
 

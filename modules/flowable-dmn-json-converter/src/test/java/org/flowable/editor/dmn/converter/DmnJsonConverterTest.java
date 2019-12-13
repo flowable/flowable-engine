@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -599,7 +600,7 @@ public class DmnJsonConverterTest {
     /* Helper methods */
     protected String readJsonToString(String resource) {
         try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(resource)) {
-            return IOUtils.toString(is);
+            return IOUtils.toString(is, StandardCharsets.UTF_8);
         } catch (IOException e) {
             fail("Could not read " + resource + " : " + e.getMessage());
             return null;

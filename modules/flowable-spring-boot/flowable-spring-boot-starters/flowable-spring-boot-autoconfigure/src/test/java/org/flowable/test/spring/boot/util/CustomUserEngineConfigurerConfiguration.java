@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class CustomUserEngineConfigurerConfiguration {
 
     protected final List<Class<?>> invokedConfigurations = new ArrayList<>();

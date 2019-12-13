@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,7 +37,7 @@ public class DecisionTableResourceDataResourceTest extends BaseSpringDmnRestTest
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
-        String content = IOUtils.toString(response.getEntity().getContent());
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertNotNull(content);
         assertTrue(content.contains("Full Decision"));

@@ -291,7 +291,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class SpringDmnAutoDeployTestConfiguration {
 
         @Bean

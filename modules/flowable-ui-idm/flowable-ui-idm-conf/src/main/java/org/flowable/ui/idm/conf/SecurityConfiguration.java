@@ -53,7 +53,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * @author Tijs Rademakers
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
 
@@ -68,7 +68,7 @@ public class SecurityConfiguration {
     protected FlowableIdmAppProperties idmAppProperties;
     
     @Bean
-    public UserDetailsService userDetailsService() {
+    public org.flowable.ui.idm.security.UserDetailsService userDetailsService() {
         org.flowable.ui.idm.security.UserDetailsService userDetailsService = new org.flowable.ui.idm.security.UserDetailsService();
         userDetailsService.setUserValidityPeriod(idmAppProperties.getSecurity().getUserValidityPeriod());
         return userDetailsService;
@@ -77,18 +77,18 @@ public class SecurityConfiguration {
     @Bean(name = "dbAuthenticationProvider")
     @ConditionalOnMissingBean(AuthenticationProvider.class)
     @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "false", matchIfMissing = true)
-    public AuthenticationProvider dbAuthenticationProvider(PasswordEncoder passwordEncoder) {
+    public AuthenticationProvider dbAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
         CustomDaoAuthenticationProvider daoAuthenticationProvider = new CustomDaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         return daoAuthenticationProvider;
     }
 
     @Bean(name = "ldapAuthenticationProvider")
     @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "true")
-    public AuthenticationProvider ldapAuthenticationProvider() {
+    public AuthenticationProvider ldapAuthenticationProvider(UserDetailsService userDetailsService) {
         CustomLdapAuthenticationProvider ldapAuthenticationProvider = new CustomLdapAuthenticationProvider(
-                userDetailsService(), identityService);
+                userDetailsService, identityService);
         return ldapAuthenticationProvider;
     }
 
@@ -164,8 +164,8 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public CustomPersistentRememberMeServices rememberMeServices() {
-        return new CustomPersistentRememberMeServices(idmAppProperties, userDetailsService());
+    public CustomPersistentRememberMeServices rememberMeServices(UserDetailsService userDetailsService) {
+        return new CustomPersistentRememberMeServices(idmAppProperties, userDetailsService);
     }
 
     //

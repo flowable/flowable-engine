@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -116,7 +117,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
 
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "var")),
                 HttpStatus.SC_OK);
-        String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent());
+        String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertEquals("This is a binary piece of text in the child execution", actualResponseBytesAsText);
         assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
@@ -124,7 +125,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         // Test global scope
         response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "var") + "?scope=global"),
                 HttpStatus.SC_OK);
-        actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent());
+        actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertEquals("This is a binary piece of text", actualResponseBytesAsText);
         assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());

@@ -78,6 +78,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         TaskEntity task = taskService.createTask();
         task.setExecutionId(execution.getId());
         task.setTaskDefinitionKey(userTask.getId());
+        task.setPropagatedStageInstanceId(execution.getPropagatedStageInstanceId());
 
         String activeTaskName = null;
         String activeTaskDescription = null;

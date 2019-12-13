@@ -22,6 +22,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -36,7 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  * @author Tijs Rademakers
  */
-public class ProcessDefinitionInfoCache {
+public class ProcessDefinitionInfoCache implements DeploymentCache<ProcessDefinitionInfoCacheObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDefinitionInfoCache.class);
 
@@ -87,6 +88,11 @@ public class ProcessDefinitionInfoCache {
         }
 
         return infoCacheObject;
+    }
+
+    @Override
+    public boolean contains(String id) {
+        return cache.containsKey(id);
     }
 
     public void add(String id, ProcessDefinitionInfoCacheObject obj) {

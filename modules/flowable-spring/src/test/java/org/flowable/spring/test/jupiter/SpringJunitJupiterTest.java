@@ -100,7 +100,7 @@ public class SpringJunitJupiterTest {
             .isEqualTo(task.getProcessDefinitionId());
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @EnableTransactionManagement
     static class TestConfiguration {
 

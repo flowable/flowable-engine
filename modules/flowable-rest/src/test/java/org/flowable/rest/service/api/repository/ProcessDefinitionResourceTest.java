@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 
 import org.apache.commons.io.IOUtils;
@@ -329,7 +330,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
-        String content = IOUtils.toString(response.getEntity().getContent());
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertNotNull(content);
         assertTrue(content.contains("The One Task Process"));

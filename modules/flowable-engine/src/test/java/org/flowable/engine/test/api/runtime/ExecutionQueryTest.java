@@ -10,23 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -1029,6 +1019,106 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
         runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
         runtimeService.deleteProcessInstance(processInstance3.getId(), "test");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryInstantVariable() throws Exception {
+        Map<String, Object> vars = new HashMap<>();
+        Instant instant1 = Instant.now();
+        vars.put("instantVar", instant1);
+
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Instant instant2 = instant1.plusSeconds(1);
+        vars = new HashMap<>();
+        vars.put("instantVar", instant1);
+        vars.put("instantVar2", instant2);
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Instant nextYear = instant1.plus(365, ChronoUnit.DAYS);
+        vars = new HashMap<>();
+        vars.put("instantVar", nextYear);
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Instant nextMonth = instant1.plus(30, ChronoUnit.DAYS);
+
+        Instant twoYearsLater = instant1.plus(730, ChronoUnit.DAYS);
+
+        Instant oneYearAgo = instant1.minus(365, ChronoUnit.DAYS);
+
+        // Query on single instant variable, should result in 2 matches
+        ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("instantVar", instant1);
+        List<Execution> executions = query.list();
+        assertThat(executions).hasSize(2);
+
+        // Query on two instant variables, should result in single value
+        query = runtimeService.createExecutionQuery().variableValueEquals("instantVar", instant1).variableValueEquals("instantVar2", instant2);
+        Execution execution = query.singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance2.getId());
+
+        // Query with unexisting variable value
+        execution = runtimeService.createExecutionQuery().variableValueEquals("instantVar", instant1.minus(1, ChronoUnit.HOURS)).singleResult();
+        assertThat(execution).isNull();
+
+        // Test NOT_EQUALS
+        execution = runtimeService.createExecutionQuery().variableValueNotEquals("instantVar", instant1).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        // Test GREATER_THAN
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThan("instantVar", nextMonth).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThan("instantVar", nextYear).count()).isEqualTo(0);
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThan("instantVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test GREATER_THAN_OR_EQUAL
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("instantVar", nextMonth).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("instantVar", nextYear).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("instantVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test LESS_THAN
+        executions = runtimeService.createExecutionQuery().variableValueLessThan("instantVar", nextYear).list();
+        assertThat(executions)
+            .extracting(Execution::getId)
+            .containsExactlyInAnyOrder(
+                processInstance1.getId(),
+                processInstance2.getId()
+            );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThan("instantVar", instant1).count()).isEqualTo(0);
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThan("instantVar", twoYearsLater).count()).isEqualTo(3);
+
+        // Test LESS_THAN_OR_EQUAL
+        executions = runtimeService.createExecutionQuery().variableValueLessThanOrEqual("instantVar", nextYear).list();
+        assertThat(executions).hasSize(3);
+
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThanOrEqual("instantVar", oneYearAgo).count()).isEqualTo(0);
+
+        // Test value-only matching
+        execution = runtimeService.createExecutionQuery().variableValueEquals(nextYear).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        executions = runtimeService.createExecutionQuery().variableValueEquals(instant1).list();
+        assertThat(executions)
+            .extracting(Execution::getId)
+            .containsExactlyInAnyOrder(
+                processInstance1.getId(),
+                processInstance2.getId()
+            );
+
+        execution = runtimeService.createExecutionQuery().variableValueEquals(twoYearsLater).singleResult();
+        assertThat(execution).isNull();
     }
 
     @Test

@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Tijs Rademakers
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class FlowableContentEngineConfiguration {
 
     @Bean
@@ -34,7 +34,7 @@ public class FlowableContentEngineConfiguration {
     }
 
     @Bean
-    public ContentService contentService() {
-        return contentEngine().getContentService();
+    public ContentService contentService(ContentEngine contentEngine) {
+        return contentEngine.getContentService();
     }
 }
