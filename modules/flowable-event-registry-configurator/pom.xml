@@ -14,7 +14,7 @@
 
     <properties>
         <flowable.artifact>
-            org.flowable.eventregistry.configurator
+            org.flowable.eventregistry.impl.configurator
         </flowable.artifact>
     </properties>
 

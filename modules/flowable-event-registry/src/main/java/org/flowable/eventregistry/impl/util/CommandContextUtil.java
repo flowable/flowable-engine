@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityManager;
@@ -33,6 +34,10 @@ public class CommandContextUtil {
             return (EventRegistryEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         }
         return null;
+    }
+    
+    public static EventRepositoryService getEventRepositoryService() {
+        return getEventRegistryConfiguration().getEventRepositoryService();
     }
     
     public static DbSqlSession getDbSqlSession() {

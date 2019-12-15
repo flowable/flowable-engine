@@ -13,12 +13,12 @@
 package org.flowable.eventregistry.impl.deployer;
 
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
-import org.flowable.eventregistry.converter.EventJsonConverter;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
+import org.flowable.eventregistry.json.converter.EventJsonConverter;
 import org.flowable.eventregistry.model.EventModel;
 
 /**

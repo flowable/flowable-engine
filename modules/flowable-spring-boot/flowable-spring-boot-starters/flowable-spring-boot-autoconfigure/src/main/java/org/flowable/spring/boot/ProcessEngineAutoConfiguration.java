@@ -33,6 +33,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
+import org.flowable.spring.boot.eventregistry.FlowableEventProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.Process;
@@ -76,7 +77,8 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableHttpProperties.class,
     FlowableProcessProperties.class,
     FlowableAppProperties.class,
-    FlowableIdmProperties.class
+    FlowableIdmProperties.class,
+    FlowableEventProperties.class
 })
 @AutoConfigureAfter(value = {
     FlowableJpaAutoConfiguration.class,
@@ -95,18 +97,21 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     protected final FlowableProcessProperties processProperties;
     protected final FlowableAppProperties appProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableEventProperties eventProperties;
     protected final FlowableMailProperties mailProperties;
     protected final FlowableHttpProperties httpProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
-        FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties,
+        FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, 
+        FlowableEventProperties eventProperties, FlowableMailProperties mailProperties,
         FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
         
         super(flowableProperties);
         this.processProperties = processProperties;
         this.appProperties = appProperties;
         this.idmProperties = idmProperties;
+        this.eventProperties = eventProperties;
         this.mailProperties = mailProperties;
         this.httpProperties = httpProperties;
         this.autoDeploymentProperties = autoDeploymentProperties;
@@ -188,6 +193,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setDeploymentName(defaultText(flowableProperties.getDeploymentName(), conf.getDeploymentName()));
 
         conf.setDisableIdmEngine(!(flowableProperties.isDbIdentityUsed() && idmProperties.isEnabled()));
+        conf.setDisableEventRegistry(!eventProperties.isEnabled());
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
         conf.setAsyncHistoryExecutorActivate(flowableProperties.isAsyncHistoryExecutorActivate());
@@ -261,6 +267,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             processEngineConfigurator.setProcessEngineConfiguration(processEngineConfiguration);
             
             processEngineConfiguration.setDisableIdmEngine(true);
+            processEngineConfiguration.setDisableEventRegistry(true);
             
             invokeConfigurers(processEngineConfiguration);
             

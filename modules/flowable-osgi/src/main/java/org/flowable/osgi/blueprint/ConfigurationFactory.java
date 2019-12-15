@@ -18,15 +18,17 @@ import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
 public class ConfigurationFactory {
 
-    DataSource dataSource;
-    String databaseSchemaUpdate;
-    boolean jobExecutorActivate = true;
+    protected DataSource dataSource;
+    protected String databaseSchemaUpdate;
+    protected boolean jobExecutorActivate = true;
+    protected boolean disableEventRegistry;
 
     public StandaloneProcessEngineConfiguration getConfiguration() {
         StandaloneProcessEngineConfiguration conf = new StandaloneProcessEngineConfiguration();
         conf.setDataSource(dataSource);
         conf.setDatabaseSchemaUpdate(databaseSchemaUpdate);
         conf.setAsyncExecutorActivate(jobExecutorActivate);
+        conf.setDisableEventRegistry(disableEventRegistry);
         return conf;
     }
 
@@ -40,5 +42,9 @@ public class ConfigurationFactory {
 
     public void setJobExecutorActivate(boolean jobExecutorActivate) {
         this.jobExecutorActivate = jobExecutorActivate;
+    }
+
+    public void setDisableEventRegistry(boolean disableEventRegistry) {
+        this.disableEventRegistry = disableEventRegistry;
     }
 }

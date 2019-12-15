@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.impl;
 
+import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +26,14 @@ public class EventRegistryEngineImpl implements EventRegistryEngine {
 
     protected String name;
     protected EventRepositoryService repositoryService;
+    protected EventRegistry eventRegistry;
     protected EventRegistryEngineConfiguration engineConfiguration;
 
     public EventRegistryEngineImpl(EventRegistryEngineConfiguration engineConfiguration) {
         this.engineConfiguration = engineConfiguration;
         this.name = engineConfiguration.getEngineName();
         this.repositoryService = engineConfiguration.getEventRepositoryService();
+        this.eventRegistry = engineConfiguration.getEventRegistry();
         
         if (engineConfiguration.getSchemaManagementCmd() != null) {
             engineConfiguration.getCommandExecutor().execute(engineConfiguration.getSchemaCommandConfig(), engineConfiguration.getSchemaManagementCmd());
@@ -62,6 +65,11 @@ public class EventRegistryEngineImpl implements EventRegistryEngine {
     @Override
     public EventRepositoryService getEventRepositoryService() {
         return repositoryService;
+    }
+    
+    @Override
+    public EventRegistry getEventRegistry() {
+        return eventRegistry;
     }
 
     @Override

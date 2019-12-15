@@ -569,7 +569,17 @@
             </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
                 <artifactId>flowable-event-registry-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-spring-configurator</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1283,6 +1293,8 @@
                 <module>modules/flowable-spring-common</module>
                 <module>modules/flowable-engine-configurator</module>
                 <module>modules/flowable-spring-configurator</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
                 <module>modules/flowable-app-engine-spring</module>
                 <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
@@ -1404,6 +1416,8 @@
 				<module>modules/flowable-idm-spring</module>
 				<module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
                 <module>modules/flowable-ldap</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
@@ -1540,6 +1554,8 @@
                 <module>modules/flowable-idm-spring</module>
                 <module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
                 <module>modules/flowable-content-engine</module>
                 <module>modules/flowable-content-engine-configurator</module>
                 <module>modules/flowable-content-spring</module>
@@ -1731,6 +1747,9 @@
 				<module>modules/flowable-idm-engine-configurator</module>
 				<module>modules/flowable-idm-spring</module>
 				<module>modules/flowable-idm-spring-configurator</module>
+                <module>modules/flowable-event-registry-configurator</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>

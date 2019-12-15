@@ -10,17 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.configurator;
+package org.flowable.eventregistry.impl.configurator;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.configurator.deployer.EventDeployer;
 import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
 
 /**
@@ -38,7 +42,9 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
 
     @Override
     protected List<EngineDeployer> getCustomDeployers() {
-        return null;
+        List<EngineDeployer> deployers = new ArrayList<>();
+        deployers.add(new EventDeployer());
+        return deployers;
     }
 
     @Override
@@ -54,7 +60,7 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
 
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
 
-        eventEngineConfiguration.buildEventRegistryEngine();
+        initEventRegistryEngine();
 
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
     }
@@ -67,6 +73,14 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
     @Override
     protected List<Class<? extends Entity>> getEntityDeletionOrder() {
         return EntityDependencyOrder.DELETE_ORDER;
+    }
+    
+    protected synchronized EventRegistryEngine initEventRegistryEngine() {
+        if (eventEngineConfiguration == null) {
+            throw new FlowableException("EventRegistryEngineConfiguration is required");
+        }
+
+        return eventEngineConfiguration.buildEventRegistryEngine();
     }
 
     public EventRegistryEngineConfiguration getEventEngineConfiguration() {

@@ -350,8 +350,8 @@ import org.flowable.engine.repository.InternalProcessDefinitionLocalizationManag
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
-import org.flowable.eventregistry.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;

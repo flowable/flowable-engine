@@ -113,6 +113,25 @@
         <flowable.artifact>
             org.flowable.eventregistry.impl
         </flowable.artifact>
+        <flowable.osgi.export.additional>
+            org.flowable.eventregistry.db.liquibase,
+            org.flowable.eventregistry.db.mapping.entity,
+        </flowable.osgi.export.additional>
+        <flowable.osgi.import.additional>
+            junit*;resolution:=optional,
+            org.junit*;resolution:=optional,
+            org.junit.jupiter*;resolution:=optional,
+            com.sun*;resolution:=optional,
+            liquibase*;resolution:=optional,
+            javax.activation*;resolution:=optional,
+            javax.persistence*;resolution:=optional,
+            org.apache.commons.mail*;resolution:=optional,
+            org.apache.xerces*;resolution:=optional,
+            org.springframework*;resolution:=optional,
+            com.fasterxml*;resolution:=optional,
+            javax.transaction;resolution:=optional,
+            javax.enterprise.concurrent;resolution:=optional,
+        </flowable.osgi.import.additional>
     </properties>
     
     <build>

@@ -32,7 +32,6 @@ import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
-import org.flowable.eventregistry.converter.EventJsonConverter;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneInMemEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBuild;
@@ -60,6 +59,7 @@ import org.flowable.eventregistry.impl.persistence.entity.data.EventResourceData
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventResourceDataManager;
+import org.flowable.eventregistry.json.converter.EventJsonConverter;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;

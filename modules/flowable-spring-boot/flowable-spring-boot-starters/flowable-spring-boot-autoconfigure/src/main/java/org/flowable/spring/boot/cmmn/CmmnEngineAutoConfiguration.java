@@ -44,6 +44,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
+import org.flowable.spring.boot.eventregistry.FlowableEventProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
@@ -72,6 +73,7 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableProperties.class,
     FlowableAutoDeploymentProperties.class,
     FlowableIdmProperties.class,
+    FlowableEventProperties.class,
     FlowableCmmnProperties.class,
     FlowableAppProperties.class,
     FlowableHttpProperties.class
@@ -93,14 +95,17 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableEventProperties eventProperties;
     protected final FlowableHttpProperties httpProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties,
-        FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
+                    FlowableEventProperties eventProperties, FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
+        
         super(flowableProperties);
         this.cmmnProperties = cmmnProperties;
         this.idmProperties = idmProperties;
+        this.eventProperties = eventProperties;
         this.httpProperties = httpProperties;
         this.autoDeploymentProperties = autoDeploymentProperties;
     }
@@ -156,6 +161,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setDeploymentName(defaultText(cmmnProperties.getDeploymentName(), configuration.getDeploymentName()));
 
         configuration.setDisableIdmEngine(!idmProperties.isEnabled());
+        configuration.setDisableEventRegistry(!eventProperties.isEnabled());
 
         configuration.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
 
@@ -211,6 +217,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
 
             cmmnEngineConfiguration.setDisableIdmEngine(true);
+            cmmnEngineConfiguration.setDisableEventRegistry(true);
             
             invokeConfigurers(cmmnEngineConfiguration);
             
@@ -237,6 +244,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
 
             cmmnEngineConfiguration.setDisableIdmEngine(true);
+            cmmnEngineConfiguration.setDisableEventRegistry(true);
             
             invokeConfigurers(cmmnEngineConfiguration);
             

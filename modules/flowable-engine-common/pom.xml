@@ -50,6 +50,7 @@
             org.flowable.job.service.db;resolution:=optional,
             org.flowable.idm.db;resolution:=optional,
             org.flowable.idm.db.mapping;resolution:=optional,
+            org.flowable.eventregistry.impl.persistence;resolution:=optional,
             org.flowable.db;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>

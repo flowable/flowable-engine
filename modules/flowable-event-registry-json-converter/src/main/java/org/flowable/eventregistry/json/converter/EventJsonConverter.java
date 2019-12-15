@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.converter;
+package org.flowable.eventregistry.json.converter;
 
 import org.flowable.eventregistry.model.EventModel;
 

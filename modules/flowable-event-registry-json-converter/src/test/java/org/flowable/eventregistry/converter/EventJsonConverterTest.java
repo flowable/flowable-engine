@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
+import org.flowable.eventregistry.json.converter.EventJsonConverter;
 import org.flowable.eventregistry.model.EventCorrelationParameterDefinition;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayloadDefinition;
