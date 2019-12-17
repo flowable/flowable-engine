@@ -11,8 +11,32 @@
         <property name="jdbcPassword" value="@jdbc.password@" />
         <property name="databaseSchema" value="@jdbc.schema@" />
         <property name="databaseSchemaUpdate" value="drop-create" />
+        
+        <property name="asyncExecutor" ref="asyncExecutor" />
+        <property name="asyncExecutorActivate" value="false" />
+    
+        <property name="asyncFailedJobWaitTime" value="1" />
+        
         <property name="enableEntityLinks" value="true" />
         <property name="enableHistoricTaskLogging" value="true" />
+        
+        <property name="mailServerPort" value="5025" />
+
+        <property name="mailServers">
+            <map>
+                <entry key="myEmailTenant">
+                    <bean class="org.flowable.common.engine.impl.cfg.mail.MailServerInfo">
+                        <property name="mailServerHost" value="localhost" />
+                        <property name="mailServerPort" value="5025" />
+                        <property name="mailServerUseSSL" value="false" />
+                        <property name="mailServerUseTLS" value="false" />
+                        <property name="mailServerDefaultFrom" value="flowable@myTenant" />
+                        <property name="mailServerUsername" value="flowable@myTenant" />
+                        <property name="mailServerPassword" value="password" />
+                    </bean>
+                </entry>
+            </map>
+        </property>
     </bean>
 
     <bean id="testBean" class="org.flowable.cmmn.test.delegate.TestBean" />
@@ -22,5 +46,10 @@
     <bean id="testDelegateFieldsBean" class="org.flowable.cmmn.test.delegate.TestFieldsJavaDelegate" />
     
     <bean id="timerBean" class="org.flowable.cmmn.test.bean.TimerBean" />
+    
+    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
+        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
+        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
+    </bean>
 
 </beans>
