@@ -91,7 +91,7 @@ GEM
       activesupport (>= 3.1)
     parallel (1.10.0)
     public_suffix (3.0.0)
-    rack (2.0.1)
+    rack (2.0.8)
     rb-fsevent (0.10.2)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
