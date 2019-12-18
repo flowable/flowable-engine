@@ -4466,7 +4466,7 @@ __任务监听器__包含下列属性：
 ** **assignment（指派）**：当任务已经指派给某人时触发。请注意：当流程执行到达用户任务时，在触发__create__事件**之前**，会首先触发__assignment__事件。这顺序看起来不太自然，但是有实际原因的：当收到__create__事件时，我们通常希望能看到任务的所有参数，包括办理人。
 ** **complete（完成）**：当任务已经完成，从运行时数据中删除前触发。
 ** **delete（删除）**：在任务即将被删除前触发。请注意任务由completeTask正常完成时也会触发。
-* **class**：需要调用的委托类。这个类必须实现++org.flowable.engine.delegate.TaskListener++接口。
+* **class**：需要调用的委托类。这个类必须实现++org.flowable.task.service.delegate.TaskListener++接口。
 
 [source,java,linenums]
 ----

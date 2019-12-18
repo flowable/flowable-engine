@@ -4488,7 +4488,7 @@ A _task listener_ supports the following attributes:
 ** *assignment*: occurs when the task is assigned to somebody. Note: when process execution arrives in a userTask, first an _assignment_ event will be fired, *before* the _create_ event is fired. This might seem an unnatural order, but the reason is pragmatic: when receiving the _create_ event, we usually want to inspect all properties of the task including the assignee.
 ** *complete*: occurs when the task is completed and just before the task is deleted from the runtime data.
 ** *delete*: occurs just before the task is going to be deleted. Notice that it will also be executed when task is normally finished via completeTask.
-* *class*: the delegation class that must be called. This class must implement the +org.flowable.engine.delegate.TaskListener+ interface.
+* *class*: the delegation class that must be called. This class must implement the +org.flowable.task.service.delegate.TaskListener+ interface.
 
 [source,java,linenums]
 ----
