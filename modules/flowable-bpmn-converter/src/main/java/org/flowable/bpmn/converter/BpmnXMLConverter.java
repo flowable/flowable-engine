@@ -293,7 +293,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         model.setStartEventFormTypes(startEventFormTypes);
         model.setUserTaskFormTypes(userTaskFormTypes);
         try {
-            Process activeProcess = null;
+            Process activeProcess = new Process();
             List<SubProcess> activeSubProcessList = new ArrayList<>();
             while (xtr.hasNext()) {
                 try {
@@ -365,6 +365,10 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     Process process = processParser.parse(xtr, model);
                     if (process != null) {
                         activeProcess = process;
+                        // copy over anything already parsed
+                        process.setAttributes(activeProcess.getAttributes());
+                        process.setDocumentation(activeProcess.getDocumentation());
+                        process.setExtensionElements(activeProcess.getExtensionElements());
                     }
 
                 } else if (ELEMENT_POTENTIAL_STARTER.equals(xtr.getLocalName())) {
@@ -396,11 +400,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     model.getGlobalArtifacts().add(association);
 
                 } else if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
-                    if (activeProcess == null) {
-                        LOGGER.info("Extension elements before any process defined, ignoring as unneeded for execution");
-                    } else {
-                        extensionElementsParser.parse(xtr, activeSubProcessList, activeProcess, model);
-                    }
+                    extensionElementsParser.parse(xtr, activeSubProcessList, activeProcess, model);
 
                 } else if (ELEMENT_SUBPROCESS.equals(xtr.getLocalName()) || ELEMENT_TRANSACTION.equals(xtr.getLocalName()) || ELEMENT_ADHOC_SUBPROCESS.equals(xtr.getLocalName())) {
                     subProcessParser.parse(xtr, activeSubProcessList, activeProcess);
