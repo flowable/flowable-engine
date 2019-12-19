@@ -16,12 +16,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
+
+import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Lane;
 import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.junit.Test;
 
 public class PoolsConverterTest extends AbstractConverterTest {
@@ -30,6 +34,14 @@ public class PoolsConverterTest extends AbstractConverterTest {
     public void convertXMLToModel() throws Exception {
         BpmnModel bpmnModel = readXMLFile();
         validateModel(bpmnModel);
+    }
+
+    @Test
+    public void convertXMLToModel2() throws Exception {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("pool-with-extensions.bpmn")) {
+            new BpmnXMLConverter().convertToBpmnModel(
+                    new InputStreamSource(is), true, true, "UTF-8");
+        }
     }
 
     @Test

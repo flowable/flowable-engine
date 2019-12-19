@@ -396,7 +396,11 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     model.getGlobalArtifacts().add(association);
 
                 } else if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
-                    extensionElementsParser.parse(xtr, activeSubProcessList, activeProcess, model);
+                    if (activeProcess == null) {
+                        LOGGER.info("Extension elements before any process defined, ignoring as unneeded for execution");
+                    } else {
+                        extensionElementsParser.parse(xtr, activeSubProcessList, activeProcess, model);
+                    }
 
                 } else if (ELEMENT_SUBPROCESS.equals(xtr.getLocalName()) || ELEMENT_TRANSACTION.equals(xtr.getLocalName()) || ELEMENT_ADHOC_SUBPROCESS.equals(xtr.getLocalName())) {
                     subProcessParser.parse(xtr, activeSubProcessList, activeProcess);
