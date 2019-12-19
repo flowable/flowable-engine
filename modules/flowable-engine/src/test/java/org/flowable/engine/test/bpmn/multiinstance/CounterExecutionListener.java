@@ -37,7 +37,7 @@ public class CounterExecutionListener implements ExecutionListener {
         String nrOfCompletedInstances = null == nrOfCompletedInstancesObj ? null : nrOfCompletedInstancesObj.toString();
         LOGGER.debug("Invoke into executionEnd method and execution is {}", execution.getVariables());
         
-        if (nrOfCompletedInstances != null && nrOfInstances.equals(nrOfCompletedInstances)) {
+        if (nrOfInstances.equals(nrOfCompletedInstances)) {
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             
             if (processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
