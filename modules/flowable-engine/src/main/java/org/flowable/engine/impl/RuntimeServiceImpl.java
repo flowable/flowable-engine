@@ -30,6 +30,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.AddEventConsumerCommand;
 import org.flowable.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.AddMultiInstanceExecutionCmd;
@@ -61,6 +62,7 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
+import org.flowable.engine.impl.cmd.RemoveEventConsumerCommand;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
@@ -85,6 +87,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
@@ -662,6 +665,16 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void dispatchEvent(FlowableEvent event) {
         commandExecutor.execute(new DispatchEventCommand(event));
+    }
+    
+    @Override
+    public void addEventBusConsumer(EventRegistryEventBusConsumer eventConsumer) {
+        commandExecutor.execute(new AddEventConsumerCommand(eventConsumer));
+    }
+    
+    @Override
+    public void removeEventBusConsumer(EventRegistryEventBusConsumer eventConsumer) {
+        commandExecutor.execute(new RemoveEventConsumerCommand(eventConsumer));
     }
 
     @Override

@@ -68,8 +68,6 @@ import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDep
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormInstanceDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormResourceDataManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.exception.DatabaseException;
@@ -107,8 +105,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     protected ExpressionManager expressionManager;
 
     protected FormJsonConverter formJsonConverter = new FormJsonConverter();
-
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     // DEPLOYERS
     // ////////////////////////////////////////////////////////////////
@@ -613,15 +609,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     public FormEngineConfiguration setFormJsonConverter(FormJsonConverter formJsonConverter) {
         this.formJsonConverter = formJsonConverter;
-        return this;
-    }
-
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public FormEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
         return this;
     }
 }

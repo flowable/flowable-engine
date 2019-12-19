@@ -23,6 +23,7 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 
 /**
@@ -45,6 +46,10 @@ public class ServiceTaskParseHandler extends AbstractPlanItemParseHandler<Servic
 
             case ServiceTask.MAIL_TASK:
                 planItem.setBehavior(activityBehaviorFactory.createEmailActivityBehavior(planItem, serviceTask));
+                break;
+
+            case SendEventServiceTask.SEND_EVENT:
+                planItem.setBehavior(activityBehaviorFactory.createSendEventActivityBehavior(planItem, (SendEventServiceTask) serviceTask));
                 break;
 
             default:

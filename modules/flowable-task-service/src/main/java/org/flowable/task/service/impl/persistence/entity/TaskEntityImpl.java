@@ -42,6 +42,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInitializin
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -211,6 +213,11 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
             variableInstance.setProcessInstanceId(this.processInstanceId);
             variableInstance.setProcessDefinitionId(this.processDefinitionId);
         }
+    }
+    
+    @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        // TODO
     }
 
     @Override

@@ -63,19 +63,22 @@ import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
-import org.flowable.common.engine.impl.interceptor.CrDbRetryInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContextFactory;
 import org.flowable.common.engine.impl.interceptor.CommandContextInterceptor;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.CrDbRetryInterceptor;
 import org.flowable.common.engine.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.common.engine.impl.interceptor.LogInterceptor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
+import org.flowable.common.engine.impl.logging.LoggingListener;
+import org.flowable.common.engine.impl.logging.LoggingSession;
+import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -92,6 +95,8 @@ import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class AbstractEngineConfiguration {
 
@@ -213,6 +218,8 @@ public abstract class AbstractEngineConfiguration {
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
 
+    protected LoggingListener loggingListener;
+
     protected boolean transactionsExternallyManaged;
 
     /**
@@ -315,6 +322,7 @@ public abstract class AbstractEngineConfiguration {
     protected List<EngineConfigurator> configurators; // The injected configurators
     protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
     protected EngineConfigurator idmEngineConfigurator;
+    protected EngineConfigurator eventRegistryConfigurator;
 
     public static final String PRODUCT_NAME_POSTGRES = "PostgreSQL";
     public static final String PRODUCT_NAME_CRDB = "CockroachDB";
@@ -368,6 +376,7 @@ public abstract class AbstractEngineConfiguration {
     protected boolean usePrefixId;
 
     protected Clock clock;
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
     // Variables
 
@@ -678,6 +687,16 @@ public abstract class AbstractEngineConfiguration {
             }
 
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            
+            if (isLoggingSessionEnabled()) {
+                if (!sessionFactories.containsKey(LoggingSession.class)) {
+                    LoggingSessionFactory loggingSessionFactory = new LoggingSessionFactory();
+                    loggingSessionFactory.setLoggingListener(loggingListener);
+                    loggingSessionFactory.setObjectMapper(objectMapper);
+                    sessionFactories.put(LoggingSession.class, loggingSessionFactory);
+                }
+            }
+            
             commandContextFactory.setSessionFactories(sessionFactories);
         }
 
@@ -1682,12 +1701,33 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
+    public boolean isLoggingSessionEnabled() {
+        return loggingListener != null;
+    }
+    
+    public LoggingListener getLoggingListener() {
+        return loggingListener;
+    }
+
+    public void setLoggingListener(LoggingListener loggingListener) {
+        this.loggingListener = loggingListener;
+    }
+
     public Clock getClock() {
         return clock;
     }
 
     public AbstractEngineConfiguration setClock(Clock clock) {
         this.clock = clock;
+        return this;
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public AbstractEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         return this;
     }
 
@@ -1806,6 +1846,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setIdmEngineConfigurator(EngineConfigurator idmEngineConfigurator) {
         this.idmEngineConfigurator = idmEngineConfigurator;
+        return this;
+    }
+
+    public EngineConfigurator getEventRegistryConfigurator() {
+        return eventRegistryConfigurator;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryConfigurator(EngineConfigurator eventRegistryConfigurator) {
+        this.eventRegistryConfigurator = eventRegistryConfigurator;
         return this;
     }
 

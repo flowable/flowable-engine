@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.bpmn.model.Signal;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
@@ -54,6 +53,11 @@ public class EventSubscriptionEntityManagerImpl
         return dataManager.createSignalEventSubscription();
     }
 
+    @Override
+    public GenericEventSubscriptionEntity createGenericEventSubscription() {
+        return dataManager.createGenericEventSubscriptionEntity();
+    }
+
     public EventSubscription createEventSubscription(EventSubscriptionBuilder eventSubscriptionBuilder) {
         if (SignalEventSubscriptionEntity.EVENT_TYPE.equals(eventSubscriptionBuilder.getEventType())) {
             return insertSignalEvent(eventSubscriptionBuilder);
@@ -65,7 +69,7 @@ public class EventSubscriptionEntityManagerImpl
             return insertCompensationEvent(eventSubscriptionBuilder);
         
         } else {
-            throw new FlowableException("unknown event type " + eventSubscriptionBuilder.getEventType());
+            return insertGenericEvent(eventSubscriptionBuilder);
         }
     }
 
@@ -182,7 +186,7 @@ public class EventSubscriptionEntityManagerImpl
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
         dataManager.deleteEventSubscriptionsForProcessDefinition(processDefinitionId);
     }
-    
+
     @Override
     public void deleteEventSubscriptionsByExecutionId(String executionId) {
         dataManager.deleteEventSubscriptionsByExecutionId(executionId);
@@ -192,7 +196,12 @@ public class EventSubscriptionEntityManagerImpl
     public void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType) {
         dataManager.deleteEventSubscriptionsForScopeIdAndType(scopeId, scopeType);
     }
-    
+
+    @Override
+    public void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
+        dataManager.deleteEventSubscriptionsForScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
+    }
+
     protected SignalEventSubscriptionEntity insertSignalEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
         SignalEventSubscriptionEntity subscriptionEntity = createSignalEventSubscription();
         subscriptionEntity.setExecutionId(eventSubscriptionBuilder.getExecutionId());
@@ -235,6 +244,9 @@ public class EventSubscriptionEntityManagerImpl
         if (eventSubscriptionBuilder.getTenantId() != null) {
             subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
+
+        subscriptionEntity.setConfiguration(eventSubscriptionBuilder.getConfiguration());
+
         insert(subscriptionEntity);
         
         return subscriptionEntity;
@@ -249,7 +261,33 @@ public class EventSubscriptionEntityManagerImpl
         if (eventSubscriptionBuilder.getTenantId() != null) {
             eventSubscription.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
+
+        eventSubscription.setConfiguration(eventSubscriptionBuilder.getConfiguration());
+
         insert(eventSubscription);
+        return eventSubscription;
+    }
+
+    protected GenericEventSubscriptionEntity insertGenericEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
+        GenericEventSubscriptionEntity eventSubscription = createGenericEventSubscription();
+        eventSubscription.setEventType(eventSubscriptionBuilder.getEventType());
+        eventSubscription.setExecutionId(eventSubscriptionBuilder.getExecutionId());
+        eventSubscription.setProcessInstanceId(eventSubscriptionBuilder.getProcessInstanceId());
+        eventSubscription.setActivityId(eventSubscriptionBuilder.getActivityId());
+        eventSubscription.setProcessDefinitionId(eventSubscriptionBuilder.getProcessDefinitionId());
+        eventSubscription.setSubScopeId(eventSubscriptionBuilder.getSubScopeId());
+        eventSubscription.setScopeId(eventSubscriptionBuilder.getScopeId());
+        eventSubscription.setScopeDefinitionId(eventSubscriptionBuilder.getScopeDefinitionId());
+        eventSubscription.setScopeType(eventSubscriptionBuilder.getScopeType());
+
+        if (eventSubscriptionBuilder.getTenantId() != null) {
+            eventSubscription.setTenantId(eventSubscriptionBuilder.getTenantId());
+        }
+
+        eventSubscription.setConfiguration(eventSubscriptionBuilder.getConfiguration());
+
+        insert(eventSubscription);
+
         return eventSubscription;
     }
 

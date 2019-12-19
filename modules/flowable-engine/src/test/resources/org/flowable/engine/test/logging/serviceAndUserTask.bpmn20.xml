@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="serviceAndUserTask" name="Service and User task">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
+    <serviceTask id="task" name="Test task" flowable:class="org.flowable.engine.test.logging.ServiceTaskLoggingTest$VariableServiceTaskDelegate" />
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="userTask" />
+    <userTask id="userTask" name="Some user task" flowable:assignee="johndoe" flowable:owner="janedoe" flowable:formKey="someKey"
+            flowable:candidateUsers="johndoe,janedoe" flowable:candidateGroups="group1,group2">
+        <extensionElements>
+            <flowable:customResource flowable:name="businessAdministrator">
+                <resourceAssignmentExpression>
+                    <formalExpression>user(johndoe), group(group3)</formalExpression>
+                </resourceAssignmentExpression>
+            </flowable:customResource>
+            <flowable:customResource flowable:name="someAdmin">
+                <resourceAssignmentExpression>
+                    <formalExpression>user(janedoe), group(group4)</formalExpression>
+                </resourceAssignmentExpression>
+            </flowable:customResource>
+        </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="userTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

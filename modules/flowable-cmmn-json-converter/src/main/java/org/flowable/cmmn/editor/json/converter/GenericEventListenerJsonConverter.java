@@ -14,10 +14,12 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.GenericEventListener;
+import org.flowable.cmmn.model.PlanItem;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -45,6 +47,11 @@ public class GenericEventListenerJsonConverter extends AbstractEventListenerJson
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
         convertCommonElementToJson(elementNode, propertiesNode, baseElement);
+
+        GenericEventListener genericEventListener = (GenericEventListener) ((PlanItem) baseElement).getPlanItemDefinition();
+        if (StringUtils.isNotEmpty(genericEventListener.getEventType())) {
+            propertiesNode.put(PROPERTY_EVENT_TYPE, genericEventListener.getEventType());
+        }
     }
 
     @Override
@@ -52,6 +59,12 @@ public class GenericEventListenerJsonConverter extends AbstractEventListenerJson
             BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverter.CmmnModelIdHelper cmmnModelIdHelper) {
         GenericEventListener genericEventListener = new GenericEventListener();
         convertCommonJsonToElement(elementNode, genericEventListener);
+
+        String eventType = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_TYPE, modelNode);
+        if (StringUtils.isNotEmpty(eventType)) {
+            genericEventListener.setEventType(eventType);
+        }
+
         return genericEventListener;
     }
 

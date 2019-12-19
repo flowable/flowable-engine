@@ -74,6 +74,10 @@ public abstract class AbstractServiceConfiguration {
     public void setEngineName(String engineName) {
         this.engineName = engineName;
     }
+    
+    public boolean isEventDispatcherEnabled() {
+        return getEventDispatcher() != null && getEventDispatcher().isEnabled();
+    }
 
     public boolean isEnableEventDispatcher() {
         return enableEventDispatcher;
@@ -119,7 +123,7 @@ public abstract class AbstractServiceConfiguration {
         this.additionalEventDispatchActions = additionalEventDispatchActions;
         return this;
     }
-    
+
     public HistoryLevel getHistoryLevel() {
         return historyLevel;
     }

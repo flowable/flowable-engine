@@ -50,6 +50,7 @@
             org.flowable.job.service.db;resolution:=optional,
             org.flowable.idm.db;resolution:=optional,
             org.flowable.idm.db.mapping;resolution:=optional,
+            org.flowable.eventregistry.impl.persistence;resolution:=optional,
             org.flowable.db;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>
@@ -152,6 +153,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-variable-service-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>

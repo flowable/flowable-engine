@@ -49,6 +49,8 @@ import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
@@ -335,6 +337,26 @@ public class CommandContextUtil {
         }
 
         return identityService;
+    }
+    
+    // EVENT REGISTRY
+    
+    public static EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return getEventRegistryEngineConfiguration(getCommandContext());
+    }
+    
+    public static EventRegistryEngineConfiguration getEventRegistryEngineConfiguration(CommandContext commandContext) {
+        return (EventRegistryEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+    }
+    
+    public static EventRegistry getEventRegistry() {
+        EventRegistry eventRegistry = null;
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration();
+        if (eventRegistryEngineConfiguration != null) {
+            eventRegistry = eventRegistryEngineConfiguration.getEventRegistry();
+        }
+
+        return eventRegistry;
     }
     
     // IDENTITY LINK SERVICE

@@ -183,6 +183,14 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";
     String ATTRIBUTE_EVENT_LISTENER_SIGNAL_REF = "signalRef";
 
+    String ATTRIBUTE_CASE_START_EVENT_TYPE = "startEventType";
+    String ATTRIBUTE_EVENT_LISTENER_EVENT_TYPE = "eventType";
+
+    String ELEMENT_EVENT_TYPE = "eventType";
+    String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
+    String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
+    String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
+
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";
     String ELEMENT_DI_SHAPE = "CMMNShape";

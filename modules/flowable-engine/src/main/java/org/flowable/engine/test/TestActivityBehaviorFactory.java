@@ -42,6 +42,7 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.ParallelGateway;
 import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.ScriptTask;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.SendTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.Signal;
@@ -61,6 +62,7 @@ import org.flowable.engine.impl.bpmn.behavior.BoundaryCompensateEventActivityBeh
 import org.flowable.engine.impl.bpmn.behavior.BoundaryConditionalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundarySignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryTimerEventActivityBehavior;
@@ -96,6 +98,7 @@ import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SendEventTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
@@ -273,6 +276,11 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public ScriptTaskActivityBehavior createScriptTaskActivityBehavior(ScriptTask scriptTask) {
         return wrappedActivityBehaviorFactory.createScriptTaskActivityBehavior(scriptTask);
+    }
+    
+    @Override
+    public SendEventTaskActivityBehavior createSendEventTaskBehavior(SendEventServiceTask sendEventServiceTask) {
+        return wrappedActivityBehaviorFactory.createSendEventTaskBehavior(sendEventServiceTask);
     }
 
     @Override
@@ -488,6 +496,11 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public BoundaryCompensateEventActivityBehavior createBoundaryCompensateEventActivityBehavior(BoundaryEvent boundaryEvent, CompensateEventDefinition compensateEventDefinition, boolean interrupting) {
         return wrappedActivityBehaviorFactory.createBoundaryCompensateEventActivityBehavior(boundaryEvent, compensateEventDefinition, interrupting);
+    }
+    
+    @Override
+    public BoundaryEventRegistryEventActivityBehavior createBoundaryEventRegistryEventActivityBehavior(BoundaryEvent boundaryEvent, String eventDefinitionKey, boolean interrupting) {
+        return wrappedActivityBehaviorFactory.createBoundaryEventRegistryEventActivityBehavior(boundaryEvent, eventDefinitionKey, interrupting);
     }
 
     // Mock support //////////////////////////////////////////////////////

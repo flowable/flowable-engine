@@ -62,6 +62,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-spring-configurator</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-ldap</artifactId>
             <optional>true</optional>
         </dependency>

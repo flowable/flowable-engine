@@ -39,6 +39,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
@@ -1284,6 +1285,10 @@ public interface RuntimeService {
      *     when the given event is not suitable for dispatching.
      */
     void dispatchEvent(FlowableEvent event);
+    
+    void addEventBusConsumer(EventRegistryEventBusConsumer eventConsumer);
+    
+    void removeEventBusConsumer(EventRegistryEventBusConsumer eventConsumer);
 
     /**
      * Sets the name for the process instance with the given id.

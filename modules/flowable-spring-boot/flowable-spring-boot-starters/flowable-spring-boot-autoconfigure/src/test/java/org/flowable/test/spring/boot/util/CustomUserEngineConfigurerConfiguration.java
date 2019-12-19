@@ -20,6 +20,7 @@ import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
+import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
@@ -63,6 +64,11 @@ public class CustomUserEngineConfigurerConfiguration {
 
     @Bean
     public EngineConfigurationConfigurer<SpringIdmEngineConfiguration> customUserSpringIdmEngineConfigurer() {
+        return this::configurationInvoked;
+    }
+    
+    @Bean
+    public EngineConfigurationConfigurer<SpringEventRegistryEngineConfiguration> customUserSpringEventRegistryEngineConfigurer() {
         return this::configurationInvoked;
     }
 

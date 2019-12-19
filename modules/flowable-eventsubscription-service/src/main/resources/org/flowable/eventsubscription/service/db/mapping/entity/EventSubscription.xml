@@ -6,7 +6,13 @@
 
   <!-- RESULTMAP -->
 
-  <resultMap id="eventSubscriptionResultMap" type="org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl">
+  <!--
+    Note that the type here is the generic event subscription and not the EventSubScriptionEntityImpl.
+    The reason is that a generic event subscription can have any value for the eventType, which doesn't
+    work with the discriminator below. By putting the type as it is, it will instantiate the generic event subscription
+    when none of the values in the discriminator match.
+  -->
+  <resultMap id="eventSubscriptionResultMap" type="org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="eventType" column="EVENT_TYPE_" jdbcType="VARCHAR" />
@@ -31,7 +37,7 @@
 
   <resultMap id="messageResultMap" type="org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntityImpl" extends="eventSubscriptionResultMap"/>
   <resultMap id="signalResultMap" type="org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntityImpl" extends="eventSubscriptionResultMap"/>   
-  <resultMap id="compensateResultMap" type="org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntityImpl" extends="eventSubscriptionResultMap"/>   
+  <resultMap id="compensateResultMap" type="org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntityImpl" extends="eventSubscriptionResultMap"/>
 
   <!-- SELECT -->  
 
@@ -100,6 +106,18 @@
       <if test="tenantId == null">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>        
+      <if test="configuration != null">
+          and RES.CONFIGURATION_ = #{configuration}
+      </if>
+      <if test="configurations != null and !configurations.isEmpty()">
+          and RES.CONFIGURATION_ in
+          <foreach item="item" index="index" collection="configurations" open="(" separator="," close=")">
+              #{item}
+          </foreach>
+      </if>
+      <if test="withoutConfiguration">
+          and RES.CONFIGURATION_ is null
+      </if>
     </where>
   </sql>
   
@@ -725,6 +743,169 @@
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
+
+    <!-- Generic INSERT -->
+
+    <insert id="insertGenericEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntityImpl">
+    insert into ${prefix}ACT_RU_EVENT_SUBSCR (
+            ID_,
+            REV_,
+            EVENT_TYPE_,
+           	EVENT_NAME_,
+           	EXECUTION_ID_,
+           	PROC_INST_ID_,
+           	ACTIVITY_ID_,
+           	CONFIGURATION_,
+           	CREATED_,
+           	PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
+           	TENANT_ID_
+    )
+    values (#{id, jdbcType=VARCHAR},
+            1,
+            #{eventType, jdbcType=VARCHAR},
+            #{eventName, jdbcType=VARCHAR},
+            #{executionId, jdbcType=VARCHAR},
+            #{processInstanceId, jdbcType=VARCHAR},
+            #{activityId, jdbcType=VARCHAR},
+            #{configuration, jdbcType=VARCHAR},
+            #{created, jdbcType=TIMESTAMP},
+            #{processDefinitionId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR}
+    )
+  </insert>
+
+    <insert id="bulkInsertGenericEventSubscription" parameterType="java.util.List">
+        insert into ${prefix}ACT_RU_EVENT_SUBSCR (
+        ID_,
+        REV_,
+        EVENT_TYPE_,
+        EVENT_NAME_,
+        EXECUTION_ID_,
+        PROC_INST_ID_,
+        ACTIVITY_ID_,
+        CONFIGURATION_,
+        CREATED_,
+        PROC_DEF_ID_,
+        SUB_SCOPE_ID_,
+        SCOPE_ID_,
+        SCOPE_DEFINITION_ID_,
+        SCOPE_TYPE_,
+        TENANT_ID_
+        )
+        values
+        <foreach collection="list" item="eventSubscription" index="index" separator=",">
+            (#{eventSubscription.id, jdbcType=VARCHAR},
+            1,
+            #{eventSubscription.eventType, jdbcType=VARCHAR},
+            #{eventSubscription.eventName, jdbcType=VARCHAR},
+            #{eventSubscription.executionId, jdbcType=VARCHAR},
+            #{eventSubscription.processInstanceId, jdbcType=VARCHAR},
+            #{eventSubscription.activityId, jdbcType=VARCHAR},
+            #{eventSubscription.configuration, jdbcType=VARCHAR},
+            #{eventSubscription.created, jdbcType=TIMESTAMP},
+            #{eventSubscription.processDefinitionId, jdbcType=VARCHAR},
+            #{eventSubscription.subScopeId, jdbcType=VARCHAR},
+            #{eventSubscription.scopeId, jdbcType=VARCHAR},
+            #{eventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+            #{eventSubscription.scopeType, jdbcType=VARCHAR},
+            #{eventSubscription.tenantId, jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertGenericEventSubscription" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="eventSubscription" index="index">
+            into ${prefix}ACT_RU_EVENT_SUBSCR (
+            ID_,
+            REV_,
+            EVENT_TYPE_,
+            EVENT_NAME_,
+            EXECUTION_ID_,
+            PROC_INST_ID_,
+            ACTIVITY_ID_,
+            CONFIGURATION_,
+            CREATED_,
+            PROC_DEF_ID_,
+            SUB_SCOPE_ID_,
+            SCOPE_ID_,
+            SCOPE_DEFINITION_ID_,
+            SCOPE_TYPE_,
+            TENANT_ID_
+            )
+            VALUES
+            (#{eventSubscription.id, jdbcType=VARCHAR},
+            1,
+            #{eventSubscription.eventType, jdbcType=VARCHAR},
+            #{eventSubscription.eventName, jdbcType=VARCHAR},
+            #{eventSubscription.executionId, jdbcType=VARCHAR},
+            #{eventSubscription.processInstanceId, jdbcType=VARCHAR},
+            #{eventSubscription.activityId, jdbcType=VARCHAR},
+            #{eventSubscription.configuration, jdbcType=VARCHAR},
+            #{eventSubscription.created, jdbcType=TIMESTAMP},
+            #{eventSubscription.processDefinitionId, jdbcType=VARCHAR},
+            #{eventSubscription.subScopeId, jdbcType=VARCHAR},
+            #{eventSubscription.scopeId, jdbcType=VARCHAR},
+            #{eventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+            #{eventSubscription.scopeType, jdbcType=VARCHAR},
+            #{eventSubscription.tenantId, jdbcType=VARCHAR})
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <!-- Compensate UPDATE -->
+
+    <update id="updateGenericEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntityImpl">
+        update ${prefix}ACT_RU_EVENT_SUBSCR
+        <set>
+            REV_ =  #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.eventName != eventName">
+                EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.eventType != eventType">
+                EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.executionId != executionId">
+                EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.processInstanceId != processInstanceId">
+                PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.activityId != activityId">
+                ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.configuration != configuration">
+                CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.subScopeId != subScopeId">
+                SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.scopeId != scopeId">
+                SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
+                SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.scopeType != scopeType">
+                SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.created != created">
+                CREATED_ = #{created, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.tenantId != tenantId">
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+            </if>
+        </set>
+        where ID_= #{id, jdbcType=VARCHAR}
+        and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
   
   <!--  tenantId update -->
    <update id="updateTenantIdOfEventSubscriptions" parameterType="map">
@@ -748,6 +929,10 @@
   <delete id="deleteMessageEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl">
     delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
   </delete>
+
+  <delete id="deleteGenericEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntityImpl">
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
+  </delete>
   
   <delete id="deleteEventSubscriptionsForProcessDefinition" parameterType="string">
     delete from ${prefix}ACT_RU_EVENT_SUBSCR 
@@ -762,6 +947,10 @@
   
   <delete id="deleteEventSubscriptionsForScopeIdAndType" parameterType="map">
      delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
+  </delete>
+
+  <delete id="deleteEventSubscriptionsForScopeDefinitionIdAndType" parameterType="map">
+     delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
 
 </mapper>

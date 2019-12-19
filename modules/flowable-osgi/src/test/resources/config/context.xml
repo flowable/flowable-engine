@@ -9,6 +9,7 @@
   <bean id="configurationFactory" class="org.flowable.osgi.blueprint.ConfigurationFactory">
     <property name="dataSource" ref="dataSource" />
     <property name="databaseSchemaUpdate" value="true" />
+    <property name="disableEventRegistry" value="true" />
   </bean>
 
   <bean id="configuration" factory-ref="configurationFactory" factory-method="getConfiguration" />

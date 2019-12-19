@@ -13,6 +13,7 @@
 
 package org.flowable.eventsubscription.service.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -46,6 +47,9 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     protected Date createdBefore;
     protected Date createdAfter;
     protected String tenantId;
+    protected String configuration;
+    protected Collection<String> configurations;
+    protected boolean withoutConfiguration;
 
     public EventSubscriptionQueryImpl(CommandContext commandContext) {
         super(commandContext);
@@ -184,6 +188,30 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     }
 
     @Override
+    public EventSubscriptionQueryImpl configuration(String configuration) {
+        if (configuration == null) {
+            throw new FlowableIllegalArgumentException("configuration is null");
+        }
+        this.configuration = configuration;
+        return this;
+    }
+
+    @Override
+    public EventSubscriptionQueryImpl configurations(Collection<String> configurations) {
+        if (configurations == null) {
+            throw new FlowableIllegalArgumentException("configurations are null");
+        }
+        this.configurations = configurations;
+        return this;
+    }
+
+    @Override
+    public EventSubscriptionQueryImpl withoutConfiguration() {
+        this.withoutConfiguration = true;
+        return this;
+    }
+
+    @Override
     public EventSubscriptionQuery orderById() {
         return orderBy(EventSubscriptionQueryProperty.ID);
     }
@@ -283,4 +311,15 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return tenantId;
     }
 
+    public String getConfiguration() {
+        return configuration;
+    }
+
+    public Collection<String> getConfigurations() {
+        return configurations;
+    }
+
+    public boolean isWithoutConfiguration() {
+        return withoutConfiguration;
+    }
 }

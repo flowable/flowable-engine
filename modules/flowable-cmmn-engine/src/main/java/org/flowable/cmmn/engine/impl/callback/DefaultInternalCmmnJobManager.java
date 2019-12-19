@@ -17,8 +17,10 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -59,12 +61,28 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
     public void lockJobScope(Job job) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         caseInstanceEntityManager.updateLockTime(job.getScopeId());
+        
+        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+            PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());
+            if (planItemInstanceEntity != null) {
+                CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Locking job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),
+                                CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, (JobEntity) job, planItemInstanceEntity.getPlanItemDefinition(), planItemInstanceEntity);
+            }
+        }
     }
 
     @Override
     public void clearJobScopeLock(Job job) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         caseInstanceEntityManager.clearLockTime(job.getScopeId());
+        
+        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+            PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());
+            if (planItemInstanceEntity != null) {
+                CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Unlocking job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),
+                                CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_UNLOCK_JOB, (JobEntity) job, planItemInstanceEntity.getPlanItemDefinition(), planItemInstanceEntity);
+            }
+        }
     }
 
     @Override

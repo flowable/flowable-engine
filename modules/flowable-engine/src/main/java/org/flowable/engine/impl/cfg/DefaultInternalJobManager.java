@@ -26,12 +26,14 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -140,19 +142,32 @@ public class DefaultInternalJobManager implements InternalJobManager {
 
     @Override
     public void lockJobScope(Job job) {
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getExecutionId());
         if (execution != null) {
             executionEntityManager.updateProcessInstanceLockTime(execution.getProcessInstanceId());
+        }
+        
+        if (processEngineConfiguration.isLoggingSessionEnabled()) {
+            FlowElement flowElement = execution.getCurrentFlowElement();
+            BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Locking job for " + flowElement.getId() + ", with job id " + job.getId(),
+                            LoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, (JobEntity) job, flowElement, execution);
         }
     }
 
     @Override
     public void clearJobScopeLock(Job job) {
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getProcessInstanceId());
         if (execution != null) {
             executionEntityManager.clearProcessInstanceLockTime(execution.getId());
+        }
+        
+        if (processEngineConfiguration.isLoggingSessionEnabled()) {
+            ExecutionEntity localExecution = executionEntityManager.findById(job.getExecutionId());
+            FlowElement flowElement = localExecution.getCurrentFlowElement();
+            BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Unlocking job for " + flowElement.getId() + ", with job id " + job.getId(),
+                            LoggingSessionConstants.TYPE_SERVICE_TASK_UNLOCK_JOB, (JobEntity) job, flowElement, localExecution);
         }
     }
 

@@ -30,6 +30,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
+import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -41,6 +42,8 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -58,6 +61,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     protected FlowElement currentFlowElement;
     protected FlowableListener currentListener; // Only set when executing an execution listener
+    
+    protected FlowElement originatingCurrentFlowElement;
 
     /**
      * the process instance. this is the root of the execution tree. the processInstance of a process instance is a self reference.
@@ -318,6 +323,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setCurrentFlowableListener(FlowableListener currentListener) {
         this.currentListener = currentListener;
+    }
+    
+    @Override
+    public FlowElement getOriginatingCurrentFlowElement() {
+        return originatingCurrentFlowElement;
+    }
+    
+    @Override
+    public void setOriginatingCurrentFlowElement(FlowElement flowElement) {
+        this.originatingCurrentFlowElement = flowElement;
     }
 
     // executions ///////////////////////////////////////////////////////////////
@@ -585,6 +600,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        BpmnLoggingSessionUtil.fillLoggingData(loggingNode, this);
+    }
+
+    @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
         return CommandContextUtil.getVariableService().findVariableInstancesByExecutionId(id);
     }
@@ -618,6 +638,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
             // Otherwise, go up the hierarchy (we're trying to put it as high as possible)
             VariableScopeImpl parentVariableScope = getParentVariableScope();
             if (parentVariableScope != null) {
+                FlowElement localFlowElement = getCurrentFlowElement();
+                if (localFlowElement != null) {
+                    ((ExecutionEntity) parentVariableScope).setOriginatingCurrentFlowElement(localFlowElement);
+                }
+                
                 if (sourceExecution == null) {
                     parentVariableScope.setVariable(variableName, value);
                 } else {

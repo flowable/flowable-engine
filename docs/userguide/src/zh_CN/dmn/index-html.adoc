@@ -1,4 +1,4 @@
-= Flowable DMN 用户手册 (v 6.5.0-SNAPSHOT)
+= Flowable DMN 用户手册 (v 6.5.0.event-SNAPSHOT)
 :doctype: book
 :docinfodir: ../base
 :docinfo1: header

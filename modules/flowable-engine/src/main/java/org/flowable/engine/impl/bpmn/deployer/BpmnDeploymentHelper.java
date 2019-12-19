@@ -29,8 +29,8 @@ import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
@@ -166,10 +166,9 @@ public class BpmnDeploymentHelper {
         BpmnModel bpmnModel = parsedDeployment.getBpmnModelForProcessDefinition(processDefinition);
 
         eventSubscriptionManager.removeObsoleteMessageEventSubscriptions(previousProcessDefinition);
-        eventSubscriptionManager.addMessageEventSubscriptions(processDefinition, process, bpmnModel);
-
         eventSubscriptionManager.removeObsoleteSignalEventSubScription(previousProcessDefinition);
-        eventSubscriptionManager.addSignalEventSubscriptions(Context.getCommandContext(), processDefinition, process, bpmnModel);
+        eventSubscriptionManager.removeObsoleteEventRegistryEventSubScription(previousProcessDefinition);
+        eventSubscriptionManager.addEventSubscriptions(Context.getCommandContext(), processDefinition, process, bpmnModel);
 
         timerManager.removeObsoleteTimers(processDefinition);
         timerManager.scheduleTimers(processDefinition, process);

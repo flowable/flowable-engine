@@ -230,9 +230,16 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET = "target";
+    public static final String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
     
     public static final String ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY = "caseDefinitionKey";
     public static final String ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME = "caseInstanceName";
+    
+    public static final String ATTRIBUTE_EVENT_TYPE = "eventType";
+    public static final String ATTRIBUTE_TRIGGERABLE = "triggerable";
+    public static final String ATTRIBUTE_TRIGGER_EVENT_TYPE = "triggerEventType";
+    public static final String ATTRIBUTE_SEND_SYNCHRONOUSLY = "sendSynchronously";
+    public static final String ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER = "triggerEventCorrelationParameter";
 
     public static final String ELEMENT_SEQUENCE_FLOW = "sequenceFlow";
     public static final String ELEMENT_FLOW_CONDITION = "conditionExpression";
@@ -295,6 +302,10 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_EVENT_COMPENSATEDEFINITION = "compensateEventDefinition";
     public static final String ATTRIBUTE_COMPENSATE_ACTIVITYREF = "activityRef";
     public static final String ATTRIBUTE_COMPENSATE_WAITFORCOMPLETION = "waitForCompletion";
+    
+    public static final String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
+    public static final String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
+    public static final String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
 
     public static final String ELEMENT_FORMPROPERTY = "formProperty";
     public static final String ATTRIBUTE_FORM_ID = "id";
@@ -335,6 +346,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_DATA_ID = "id";
     public static final String ATTRIBUTE_DATA_NAME = "name";
     public static final String ATTRIBUTE_DATA_ITEM_REF = "itemSubjectRef";
+    
     // only used by valued data objects
     public static final String ELEMENT_DATA_VALUE = "value";
 

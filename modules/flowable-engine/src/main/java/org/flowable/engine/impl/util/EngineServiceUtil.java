@@ -26,6 +26,8 @@ import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -49,6 +51,22 @@ public class EngineServiceUtil {
         }
         
         return idmIdentityService;
+    }
+    
+    // EVENT REGISTRY ENGINE
+    
+    public static EventRegistryEngineConfiguration getEventRegistryEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (EventRegistryEngineConfiguration) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+    }
+    
+    public static EventRegistry getEventRegistry(AbstractEngineConfiguration engineConfiguration) {
+        EventRegistry eventRegistry = null;
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration(engineConfiguration);
+        if (eventRegistryEngineConfiguration != null) {
+            eventRegistry = eventRegistryEngineConfiguration.getEventRegistry();
+        }
+        
+        return eventRegistry;
     }
     
     // CMMN ENGINE

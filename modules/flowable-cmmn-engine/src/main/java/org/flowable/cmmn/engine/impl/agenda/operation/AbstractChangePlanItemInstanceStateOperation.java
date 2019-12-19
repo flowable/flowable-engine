@@ -19,9 +19,11 @@ import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 
 /**
  * @author Joram Barrez
@@ -55,6 +57,23 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
         internalExecute();
+        
+        if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+            String loggingType = null;
+            String message = null;
+            if (oldState == null) {
+                loggingType = CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_CREATED;
+                message = "Plan item instance created with type " + planItemInstanceEntity.getPlanItemDefinitionType() + 
+                                ", new state " + planItemInstanceEntity.getState();
+                
+            } else {
+                loggingType = CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_NEW_STATE;
+                message = "Plan item instance state change with type " + planItemInstanceEntity.getPlanItemDefinitionType() + 
+                                ", old state " + oldState + ", new state " + newState;
+            }
+            
+            CmmnLoggingSessionUtil.addLoggingData(loggingType, message, oldState, newState, planItemInstanceEntity);
+        }
     }
 
     protected boolean isStateNotChanged(String oldState, String newState) {

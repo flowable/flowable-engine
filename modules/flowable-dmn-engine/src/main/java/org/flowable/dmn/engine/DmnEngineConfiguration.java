@@ -158,7 +158,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     protected int decisionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<DecisionTableCacheEntry> decisionCache;
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper dmnEngineObjectMapper = new ObjectMapper();
 
     // HIT POLICIES
     protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
@@ -238,7 +238,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
             initSchemaManagementCommand();
         }
 
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        dmnEngineObjectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         initBeans();
         initTransactionFactory();
@@ -537,7 +537,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     /////////////////////////////////////////////////////////////
     public void initRuleEngineExecutor() {
     	if (ruleEngineExecutor == null) {
-	        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, objectMapper);
+	        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, dmnEngineObjectMapper);
 	        
     	} else {
     	    if (ruleEngineExecutor.getExpressionManager() == null) {
@@ -549,7 +549,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     	    }
     	    
     	    if (ruleEngineExecutor.getObjectMapper() == null) {
-    	        ruleEngineExecutor.setObjectMapper(objectMapper);
+    	        ruleEngineExecutor.setObjectMapper(dmnEngineObjectMapper);
     	    }
     	}
     }
@@ -983,6 +983,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     }
 
     public ObjectMapper getObjectMapper() {
-        return objectMapper;
+        return dmnEngineObjectMapper;
     }
 }

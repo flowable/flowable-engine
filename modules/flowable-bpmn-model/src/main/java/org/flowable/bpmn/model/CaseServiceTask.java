@@ -112,8 +112,7 @@ public class CaseServiceTask extends ServiceTask {
 
     public void setValues(CaseServiceTask otherElement) {
         super.setValues(otherElement);
-        
-        super.setValues(otherElement);
+
         setCaseDefinitionKey(otherElement.getCaseDefinitionKey());
         setCaseInstanceName(otherElement.getCaseInstanceName());
         setBusinessKey(otherElement.getBusinessKey());

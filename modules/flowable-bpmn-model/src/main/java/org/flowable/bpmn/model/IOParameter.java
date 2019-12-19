@@ -21,6 +21,7 @@ public class IOParameter extends BaseElement {
     protected String sourceExpression;
     protected String target;
     protected String targetExpression;
+    protected boolean isTransient;
 
     public String getSource() {
         return source;
@@ -54,6 +55,14 @@ public class IOParameter extends BaseElement {
         this.targetExpression = targetExpression;
     }
 
+    public boolean isTransient() {
+        return isTransient;
+    }
+
+    public void setTransient(boolean isTransient) {
+        this.isTransient = isTransient;
+    }
+
     @Override
     public IOParameter clone() {
         IOParameter clone = new IOParameter();
@@ -67,5 +76,6 @@ public class IOParameter extends BaseElement {
         setSourceExpression(otherElement.getSourceExpression());
         setTarget(otherElement.getTarget());
         setTargetExpression(otherElement.getTargetExpression());
+        setTransient(otherElement.isTransient());
     }
 }

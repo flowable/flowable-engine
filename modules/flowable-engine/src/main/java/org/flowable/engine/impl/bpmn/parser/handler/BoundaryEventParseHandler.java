@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
@@ -20,6 +23,7 @@ import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.TimerEventDefinition;
@@ -58,12 +62,23 @@ public class BoundaryEventParseHandler extends AbstractFlowNodeBpmnParseHandler<
                 || eventDefinition instanceof EscalationEventDefinition || eventDefinition instanceof CompensateEventDefinition) {
 
             bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
+            return;
+            
+        } else if (!boundaryEvent.getExtensionElements().isEmpty()) {
+            List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get("eventType");
+            if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
+                String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(eventTypeValue)) {
+                    boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryEventRegistryEventActivityBehavior(
+                                    boundaryEvent, eventTypeValue, boundaryEvent.isCancelActivity()));
+                    return;
+                }
+            }
 
-        } else {
-            // Should already be picked up by process validator on deploy, so this is just to be sure
-            LOGGER.warn("Unsupported boundary event type for boundary event {}", boundaryEvent.getId());
-        }
-
+        } 
+        
+        // Should already be picked up by process validator on deploy, so this is just to be sure
+        LOGGER.warn("Unsupported boundary event type for boundary event {}", boundaryEvent.getId());
     }
 
 }

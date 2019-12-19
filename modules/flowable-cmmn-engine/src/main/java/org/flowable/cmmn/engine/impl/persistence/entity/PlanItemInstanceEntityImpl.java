@@ -30,6 +30,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Joram Barrez
  */
@@ -436,6 +438,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         variableInstance.setScopeId(caseInstanceId);
         variableInstance.setSubScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
+    }
+    
+    @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        // TODO
     }
 
     @Override

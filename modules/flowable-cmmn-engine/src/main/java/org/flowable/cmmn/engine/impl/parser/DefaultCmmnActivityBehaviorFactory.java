@@ -17,6 +17,7 @@ import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.CasePageTaskActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.DecisionTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MailActivityBehavior;
@@ -25,6 +26,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionAct
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ScriptTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.SendEventActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.SignalEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
@@ -42,6 +44,7 @@ import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ScriptServiceTask;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Stage;
@@ -134,6 +137,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
+    public EventRegistryEventListenerActivityBehaviour createEventRegistryEventListenerActivityBehaviour(PlanItem planItem, GenericEventListener genericEventListener) {
+        return new EventRegistryEventListenerActivityBehaviour(genericEventListener.getEventType());
+    }
+
+    @Override
     public DecisionTaskActivityBehavior createDecisionTaskActivityBehavior(PlanItem planItem, DecisionTask decisionTask) {
         return new DecisionTaskActivityBehavior(createExpression(decisionTask.getDecisionRefExpression()), decisionTask);
     }
@@ -170,6 +178,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     @Override
     public MailActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task) {
         return (MailActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(MailActivityBehavior.class, task, true); // MailActivityBehavior only has expression fields
+    }
+
+    @Override
+    public SendEventActivityBehavior createSendEventActivityBehavior(PlanItem planItem, SendEventServiceTask sendEventServiceTask) {
+        return new SendEventActivityBehavior(sendEventServiceTask);
     }
 
     @Override

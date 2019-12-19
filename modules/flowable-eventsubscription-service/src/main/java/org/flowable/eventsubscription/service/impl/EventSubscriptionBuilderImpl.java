@@ -32,6 +32,7 @@ public class EventSubscriptionBuilderImpl implements EventSubscriptionBuilder {
     protected String scopeDefinitionId;
     protected String scopeType;
     protected String tenantId;
+    protected String configuration;
 
     public EventSubscriptionBuilderImpl() {
         
@@ -114,6 +115,12 @@ public class EventSubscriptionBuilderImpl implements EventSubscriptionBuilder {
     }
 
     @Override
+    public EventSubscriptionBuilder configuration(String configuration) {
+        this.configuration = configuration;
+        return this;
+    }
+
+    @Override
     public EventSubscription create() {
         return eventSubscriptionService.createEventSubscription(this);
     }
@@ -176,5 +183,10 @@ public class EventSubscriptionBuilderImpl implements EventSubscriptionBuilder {
     @Override
     public String getTenantId() {
         return tenantId;
+    }
+
+    @Override
+    public String getConfiguration() {
+        return configuration;
     }
 }

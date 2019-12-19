@@ -43,6 +43,12 @@ public class GenericEventListenerExport extends AbstractPlanItemDefinitionExport
                 CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION,
                 genericEventListener.getAvailableConditionExpression());
         }
+
+        if (StringUtils.isNotEmpty(genericEventListener.getEventType())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_EVENT_TYPE,
+                genericEventListener.getEventType());
+        }
     }
 
 }

@@ -62,6 +62,7 @@ import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventRegistryEventConsumer;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
@@ -126,6 +127,7 @@ import org.flowable.cmmn.engine.impl.parser.handler.MilestoneParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.PlanFragmentParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ProcessTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ScriptTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.SendEventServiceTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ServiceTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.SignalEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.StageParseHandler;
@@ -237,6 +239,9 @@ import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
+import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
@@ -299,8 +304,6 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
         ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
@@ -341,6 +344,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager;
 
     protected boolean disableIdmEngine;
+    
+    protected boolean disableEventRegistry;
     
     protected CandidateManager candidateManager;
     
@@ -450,7 +455,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
@@ -861,6 +865,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initAsyncHistoryExecutor();
         initScriptingEngines();
         configuratorsAfterInit();
+        afterInitEventRegistryEventBusConsumer();
         
         initHistoryCleaningManager();
     }
@@ -1247,6 +1252,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnParseHandlers.add(new ProcessTaskParseHandler());
         cmmnParseHandlers.add(new ScriptTaskParseHandler());
         cmmnParseHandlers.add(new ServiceTaskParseHandler());
+        cmmnParseHandlers.add(new SendEventServiceTaskParseHandler());
         cmmnParseHandlers.add(new StageParseHandler());
         cmmnParseHandlers.add(new HttpTaskParseHandler());
         cmmnParseHandlers.add(new CasePageTaskParseHandler());
@@ -1359,6 +1365,21 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
             scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
         }
+    }
+    
+    public void afterInitEventRegistryEventBusConsumer() {
+        if (engineConfigurations.containsKey(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG)) {
+            EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
+            if (eventRegistryEventBusConsumer != null) {
+                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration)
+                                engineConfigurations.get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+                eventRegistryEngineConfiguration.getEventRegistry().registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
+            }
+        }
+    }
+    
+    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
+        return new CmmnEventRegistryEventConsumer(this);
     }
     
     public void initHistoryCleaningManager() {
@@ -1869,16 +1890,28 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
         }
     }
-    
+
     @Override
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
-        if (!disableIdmEngine) {
+        if (!disableIdmEngine || !disableEventRegistry) {
             List<EngineConfigurator> specificConfigurators = new ArrayList<>();
-            if (idmEngineConfigurator != null) {
-                specificConfigurators.add(idmEngineConfigurator);
-            } else {
-                specificConfigurators.add(new IdmEngineConfigurator());
+            
+            if (!disableIdmEngine) {
+                if (idmEngineConfigurator != null) {
+                    specificConfigurators.add(idmEngineConfigurator);
+                } else {
+                    specificConfigurators.add(new IdmEngineConfigurator());
+                }
             }
+            
+            if (!disableEventRegistry) {
+                if (eventRegistryConfigurator != null) {
+                    specificConfigurators.add(eventRegistryConfigurator);
+                } else {
+                    specificConfigurators.add(new EventRegistryEngineConfigurator());
+                }
+            }
+            
             return specificConfigurators;
         }
         return Collections.emptyList();
@@ -2757,21 +2790,21 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public CmmnEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-        return this;
-    }
-
     public boolean isDisableIdmEngine() {
         return disableIdmEngine;
     }
 
     public CmmnEngineConfiguration setDisableIdmEngine(boolean disableIdmEngine) {
         this.disableIdmEngine = disableIdmEngine;
+        return this;
+    }
+    
+    public boolean isDisableEventRegistry() {
+        return disableEventRegistry;
+    }
+
+    public CmmnEngineConfiguration setDisableEventRegistry(boolean disableEventRegistry) {
+        this.disableEventRegistry = disableEventRegistry;
         return this;
     }
 
@@ -3380,6 +3413,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
+        return eventSubscriptionServiceConfiguration;
+    }
+
+    public CmmnEngineConfiguration setEventSubscriptionServiceConfiguration(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
+        this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
+        return this;
+    }
+
     public Map<String, HistoryJobHandler> getHistoryJobHandlers() {
         return historyJobHandlers;
     }
@@ -3641,4 +3683,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void setHandleCmmnEngineExecutorsAfterEngineCreate(boolean handleCmmnEngineExecutorsAfterEngineCreate) {
         this.handleCmmnEngineExecutorsAfterEngineCreate = handleCmmnEngineExecutorsAfterEngineCreate;
     }
+
+
 }
