@@ -12,11 +12,16 @@
  */
 package org.flowable.examples.bpmn.tasklistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.service.delegate.DelegateTask;
+import org.flowable.task.service.delegate.TaskListener;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -252,5 +257,21 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         assertEquals("Delete Task Listener executed.", TaskDeleteListener.getCurrentMessages().get(0));
 
         assertEquals(0, TaskSimpleCompleteListener.getCurrentMessages().size());
+    }
+
+    @Test
+    @Deployment
+    public void testTaskServiceTaskListeners() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("taskServiceListeners")
+            .transientVariable("taskServiceTaskDelegateTaskListener",
+                (TaskListener) delegateTask -> delegateTask.setVariable("variableFromDelegateExpression", "From delegate expression"))
+            .start();
+
+        assertThat(processInstance.getProcessVariables())
+            .containsOnly(
+                entry("variableFromClassDelegate", "From class delegate"),
+                entry("variableFromDelegateExpression", "From delegate expression")
+            );
     }
 }

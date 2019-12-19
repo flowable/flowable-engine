@@ -72,7 +72,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()).size()).isGreaterThan(0);
             assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
-            assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            }
             
             HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
             Calendar cal = new GregorianCalendar();
@@ -95,7 +97,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()).size()).isGreaterThan(0);
             assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
-            assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            }
                     
             historyService.deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();
 
@@ -106,7 +110,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()).size()).isGreaterThan(0);
             assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
-            assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isGreaterThan(0);
+            }
             
             historyService.deleteRelatedDataOfRemovedHistoricProcessInstances();
             
@@ -116,7 +122,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertEquals(0, historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()).size());
             assertEquals(0, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count());
             assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
-            assertEquals(0, historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                assertEquals(0, historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count());
+            }
         }
     }
     
@@ -187,13 +195,17 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                     assertEquals(0, historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i)).size());
                     assertEquals(0, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count());
                     assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count());
-                    assertEquals(0, historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count());
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertEquals(0, historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count());
+                    }
                     
                 } else {
                     assertEquals(1, historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i)).size());
                     assertEquals(1, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count());
                     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count());
-                    assertEquals(2, historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count());
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertEquals(2, historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count());
+                    }
                 }
             }
         }
@@ -245,13 +257,17 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                         assertEquals(0, historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i)).size());
                         assertEquals(0, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count());
                         assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count());
-                        assertEquals(0, historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count());
+                        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                            assertEquals(0, historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count());
+                        }
                         
                     } else {
                         assertEquals(1, historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i)).size());
                         assertEquals(1, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count());
                         assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count());
-                        assertEquals(2, historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count());
+                        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                            assertEquals(2, historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count());
+                        }
                     }
                 }
                 

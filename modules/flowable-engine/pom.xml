@@ -302,7 +302,7 @@
                         <exclude>${exclude.tests2}</exclude>
                         <exclude>${exclude.tests3}</exclude>
                     </excludes>
-                    <argLine>${argLine} -Xmx3g</argLine>
+                    <argLine>${argLine} -Xmx4g</argLine>
                 </configuration>
             </plugin>
             <plugin>

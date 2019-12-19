@@ -772,7 +772,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("oneTaskCase")
             .variables(vars)
-            .start();;
+            .start();
 
         Instant nextMonth = instant1.plus(30, ChronoUnit.DAYS);
 

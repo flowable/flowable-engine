@@ -24,6 +24,7 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
 
@@ -223,6 +224,7 @@ public class JsonTest extends PluggableFlowableTestCase {
             assertEquals("myThirdValue", value.get(2).get("var").asText());
         }
     }
+    
     @Test
     @Deployment
     public void testJsonArrayAccessByIndex() {
@@ -253,6 +255,44 @@ public class JsonTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskSuccess");
+    }
+    
+    @Test
+    @Deployment
+    public void testJsonNumber() {
+        Map<String, Object> vars = new HashMap<>();
+
+        ObjectNode varNode = objectMapper.createObjectNode();
+        varNode.put("numVar", 10);
+        vars.put(MY_JSON_OBJ, varNode);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testJsonAvailableProcess", vars);
+
+        // Check JSON has been parsed as expected
+        ObjectNode value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ);
+        assertEquals(10, value.get("numVar").asInt());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId(), vars);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
+        
+        vars = new HashMap<>();
+
+        varNode = objectMapper.createObjectNode();
+        varNode.put("numVar", 40);
+        vars.put(MY_JSON_OBJ, varNode);
+        processInstance = runtimeService.startProcessInstanceByKey("testJsonAvailableProcess", vars);
+
+        // Check JSON has been parsed as expected
+        value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), MY_JSON_OBJ);
+        assertEquals(40, value.get("numVar").asInt());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId(), vars);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("userTaskFailure", task.getTaskDefinitionKey());
     }
 
     protected ObjectNode createBigJsonObject() {

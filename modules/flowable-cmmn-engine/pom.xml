@@ -211,7 +211,7 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>${argLine} -Xmx3g</argLine>
+                    <argLine>${argLine} -Xmx4g</argLine>
                 </configuration>
             </plugin>
             <plugin>

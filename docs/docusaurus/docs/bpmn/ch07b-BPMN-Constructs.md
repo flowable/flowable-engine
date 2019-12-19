@@ -3608,7 +3608,7 @@ A *task listener* supports the following attributes:
 
     -   **delete**: occurs just before the task is going to be deleted. Notice that it will also be executed when task is normally finished via completeTask.
 
--   **class**: the delegation class that must be called. This class must implement the org.flowable.engine.delegate.TaskListener interface.
+-   **class**: the delegation class that must be called. This class must implement the org.flowable.task.service.delegate.TaskListener interface.
 
 <!-- -->
 
