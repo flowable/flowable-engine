@@ -767,11 +767,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected String asyncExecutorTenantId = AbstractEngineConfiguration.NO_TENANT_ID;
     
     protected String batchStatusTimeCycleConfig = "30 * * * * ?";
-    
-    protected boolean enableHistoryCleaning = false;
-    protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
-    protected int cleanInstancesEndedAfterNumberOfDays = 365;
-    protected HistoryCleaningManager historyCleaningManager;
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
@@ -4886,35 +4881,4 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.batchStatusTimeCycleConfig = batchStatusTimeCycleConfig;
     }
 
-    public boolean isEnableHistoryCleaning() {
-        return enableHistoryCleaning;
-    }
-
-    public void setEnableHistoryCleaning(boolean enableHistoryCleaning) {
-        this.enableHistoryCleaning = enableHistoryCleaning;
-    }
-
-    public String getHistoryCleaningTimeCycleConfig() {
-        return historyCleaningTimeCycleConfig;
-    }
-
-    public void setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
-        this.historyCleaningTimeCycleConfig = historyCleaningTimeCycleConfig;
-    }
-
-    public int getCleanInstancesEndedAfterNumberOfDays() {
-        return cleanInstancesEndedAfterNumberOfDays;
-    }
-
-    public void setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
-        this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
-    }
-
-    public HistoryCleaningManager getHistoryCleaningManager() {
-        return historyCleaningManager;
-    }
-
-    public void setHistoryCleaningManager(HistoryCleaningManager historyCleaningManager) {
-        this.historyCleaningManager = historyCleaningManager;
-    }
 }
