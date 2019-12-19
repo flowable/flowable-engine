@@ -30,7 +30,20 @@ public interface InboundChannelDefinitionBuilder {
 
     InboundEventProcessingPipelineBuilder channelAdapter(InboundEventChannelAdapter inboundEventChannelAdapter);
 
+    InboundJmsChannelBuilder jmsChannelAdapter(String destinationName);
+
     InboundChannelDefinition register();
+
+    interface InboundJmsChannelBuilder {
+
+        InboundJmsChannelBuilder selector(String selector);
+
+        InboundJmsChannelBuilder subscription(String subscription);
+
+        InboundJmsChannelBuilder concurrency(String concurrency);
+
+        InboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
 
     interface InboundEventProcessingPipelineBuilder {
 

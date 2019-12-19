@@ -17,8 +17,18 @@ package org.flowable.eventregistry.model;
  */
 public class InboundChannelDefinition extends ChannelDefinition {
 
+    protected String type;
+
     protected Object inboundEventChannelAdapter;
     protected Object inboundEventProcessingPipeline;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public Object getInboundEventProcessingPipeline() {
         return inboundEventProcessingPipeline;

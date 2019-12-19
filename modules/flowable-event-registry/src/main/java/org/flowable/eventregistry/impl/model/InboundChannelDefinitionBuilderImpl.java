@@ -31,6 +31,7 @@ import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
 import org.flowable.eventregistry.model.InboundChannelDefinition;
+import org.flowable.eventregistry.model.JmsInboundChannelDefinition;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,6 +44,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
 
     protected EventRegistry eventRegistry;
 
+    protected InboundChannelDefinition channelDefinition;
     protected String key;
     protected InboundEventChannelAdapter inboundEventChannelAdapter;
     protected InboundEventProcessingPipelineBuilder inboundEventProcessingPipelineBuilder;
@@ -65,8 +67,20 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
     }
 
     @Override
+    public InboundJmsChannelBuilder jmsChannelAdapter(String destinationName) {
+        JmsInboundChannelDefinition channelDefinition = new JmsInboundChannelDefinition();
+        channelDefinition.setDestination(destinationName);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new InboundJmsChannelBuilderImpl(channelDefinition, eventRegistry, this);
+    }
+
+    @Override
     public InboundChannelDefinition register() {
-        InboundChannelDefinition channelDefinition = new InboundChannelDefinition();
+        if (this.channelDefinition == null) {
+            channelDefinition = new InboundChannelDefinition();
+        }
+
         channelDefinition.setKey(key);
         channelDefinition.setInboundEventChannelAdapter(inboundEventChannelAdapter);
 
@@ -76,6 +90,44 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         eventRegistry.registerChannelDefinition(channelDefinition);
 
         return channelDefinition;
+    }
+
+    public static class InboundJmsChannelBuilderImpl implements InboundJmsChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final InboundChannelDefinitionBuilderImpl channelDefinitionBuilder;
+
+        protected JmsInboundChannelDefinition jmsChannel;
+
+        public InboundJmsChannelBuilderImpl(JmsInboundChannelDefinition jmsChannel, EventRegistry eventRegistry, InboundChannelDefinitionBuilderImpl channelDefinitionBuilder) {
+            this.jmsChannel = jmsChannel;
+            this.eventRegistry = eventRegistry;
+            this.channelDefinitionBuilder = channelDefinitionBuilder;
+        }
+
+        @Override
+        public InboundJmsChannelBuilder selector(String selector) {
+            jmsChannel.setSelector(selector);
+            return this;
+        }
+
+        @Override
+        public InboundJmsChannelBuilder subscription(String subscription) {
+            jmsChannel.setSubscription(subscription);
+            return this;
+        }
+
+        @Override
+        public InboundJmsChannelBuilder concurrency(String concurrency) {
+            jmsChannel.setConcurrency(concurrency);
+            return this;
+        }
+
+        @Override
+        public InboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry, channelDefinitionBuilder);
+            return channelDefinitionBuilder.inboundEventProcessingPipelineBuilder;
+        }
     }
 
     public static class InboundEventProcessingPipelineBuilderImpl<T> implements InboundEventProcessingPipelineBuilder {

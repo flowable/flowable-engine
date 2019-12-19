@@ -38,6 +38,7 @@ import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBu
 import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
 import org.flowable.eventregistry.impl.db.EventDbSchemaManager;
 import org.flowable.eventregistry.impl.deployer.CachingAndArtifactsManager;
+import org.flowable.eventregistry.impl.deployer.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeployer;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeploymentHelper;
 import org.flowable.eventregistry.impl.deployer.ParsedDeploymentBuilderFactory;
@@ -111,6 +112,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected int eventDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache;
     
+    protected Collection<ChannelDefinitionProcessor> channelDefinitionProcessors = new ArrayList<>();
+
     // Event registry
     protected EventRegistry eventRegistry;
     protected InboundEventProcessor inboundEventProcessor;
@@ -524,6 +527,21 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     public EventRegistryEngineConfiguration setEventDefinitionCache(DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache) {
         this.eventDefinitionCache = eventDefinitionCache;
         return this;
+    }
+
+    public Collection<ChannelDefinitionProcessor> getChannelDefinitionProcessors() {
+        return channelDefinitionProcessors;
+    }
+
+    public void addChannelDefinitionProcessor(ChannelDefinitionProcessor channelDefinitionProcessor) {
+        if (this.channelDefinitionProcessors == null) {
+            this.channelDefinitionProcessors = new ArrayList<>();
+        }
+        this.channelDefinitionProcessors.add(channelDefinitionProcessor);
+    }
+
+    public void setChannelDefinitionProcessors(Collection<ChannelDefinitionProcessor> channelDefinitionProcessors) {
+        this.channelDefinitionProcessors = channelDefinitionProcessors;
     }
 
     public EventDeploymentDataManager getDeploymentDataManager() {

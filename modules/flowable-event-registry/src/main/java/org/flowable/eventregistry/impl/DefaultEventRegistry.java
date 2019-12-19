@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.CorrelationKeyGenerator;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -32,6 +31,7 @@ import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.model.InboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.api.model.OutboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.deployer.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.impl.model.InboundChannelDefinitionBuilderImpl;
 import org.flowable.eventregistry.impl.model.OutboundChannelDefinitionBuilderImpl;
 import org.flowable.eventregistry.model.ChannelDefinition;
@@ -44,7 +44,7 @@ import org.flowable.eventregistry.model.OutboundChannelDefinition;
  */
 public class DefaultEventRegistry implements EventRegistry {
 
-    protected AbstractEngineConfiguration engineConfiguration;
+    protected EventRegistryEngineConfiguration engineConfiguration;
     
     protected Map<String, InboundChannelDefinition> inboundChannelDefinitions = new HashMap<>();
     protected Map<String, OutboundChannelDefinition> outboundChannelDefinitions = new HashMap<>();
@@ -55,7 +55,7 @@ public class DefaultEventRegistry implements EventRegistry {
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
 
-    public DefaultEventRegistry(AbstractEngineConfiguration engineConfiguration) {
+    public DefaultEventRegistry(EventRegistryEngineConfiguration engineConfiguration) {
         this.engineConfiguration = engineConfiguration;
         this.correlationKeyGenerator = new DefaultCorrelationKeyGenerator();
     }
@@ -102,13 +102,34 @@ public class DefaultEventRegistry implements EventRegistry {
 
         }
 
+        for (ChannelDefinitionProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
+            if (channelDefinitionProcessor.canProcess(channelDefinition)) {
+                channelDefinitionProcessor.registerChannelDefinition(channelDefinition, engineConfiguration.getEventRegistry());
+            }
+        }
+
     }
 
     @Override
     public void removeChannelDefinition(String channelDefinitionKey) {
         // keys are unique over the two maps
-        inboundChannelDefinitions.remove(channelDefinitionKey);
-        outboundChannelDefinitions.remove(channelDefinitionKey);
+        InboundChannelDefinition inboundChannelDefinition = inboundChannelDefinitions.remove(channelDefinitionKey);
+        if (inboundChannelDefinition != null) {
+            for (ChannelDefinitionProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
+                if (channelDefinitionProcessor.canProcess(inboundChannelDefinition)) {
+                    channelDefinitionProcessor.unregisterChannelDefinition(inboundChannelDefinition, engineConfiguration.getEventRegistry());
+                }
+            }
+        }
+        OutboundChannelDefinition outboundChannelDefinition = outboundChannelDefinitions.remove(channelDefinitionKey);
+        if (outboundChannelDefinition != null) {
+            for (ChannelDefinitionProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
+                if (channelDefinitionProcessor.canProcess(outboundChannelDefinition)) {
+                    channelDefinitionProcessor.unregisterChannelDefinition(outboundChannelDefinition, engineConfiguration.getEventRegistry());
+                }
+            }
+        }
+
     }
 
     @Override
