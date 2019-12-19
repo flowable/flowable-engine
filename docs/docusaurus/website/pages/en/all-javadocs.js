@@ -64,11 +64,11 @@ class HomeSplash extends React.Component {
           <ProjectTitle />
 <p>For the tightest integration to your applications, you can use the Java API.  From high-level to the deepest customization, this is the definitive reference document.</p>
           <PromoSection>
-            <Button href={'https://flowable.org/docs/javadocs/index.html'} target="_blank">BPMN</Button>
-            <Button href={'https://flowable.org/docs/cmmn-javadocs/index.html'} target="_blank">CMMN</Button>
-            <Button href={'https://flowable.org/docs/task-javadocs/index.html'} target="_blank">Task</Button>
-            <Button href={'https://flowable.org/docs/variable-javadocs/index.html'} target="_blank">Variable</Button>
-            <Button href={'https://flowable.org/docs/job-javadocs/index.html'} target="_blank">Job</Button>
+            <Button href={'https://flowable.com/open-source/docs/javadocs/index.html'} target="_blank">BPMN</Button>
+            <Button href={'https://flowable.com/open-source/docs/cmmn-javadocs/index.html'} target="_blank">CMMN</Button>
+            <Button href={'https://flowable.com/open-source/docs/task-javadocs/index.html'} target="_blank">Task</Button>
+            <Button href={'https://flowable.com/open-source/docs/variable-javadocs/index.html'} target="_blank">Variable</Button>
+            <Button href={'https://flowable.com/open-source/docs/job-javadocs/index.html'} target="_blank">Job</Button>
           </PromoSection>
         </div>
       </SplashContainer>

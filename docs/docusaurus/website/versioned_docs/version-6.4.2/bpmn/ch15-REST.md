@@ -2644,7 +2644,7 @@ Response body contains the model’s raw editor source. The response’s content
        "variables": [
           {
             "name":"myVar",
-            "value":"This is a variable",
+            "value":"This is a variable"
           }
        ]
     }
@@ -2659,7 +2659,7 @@ Response body contains the model’s raw editor source. The response’s content
        "variables": [
           {
             "name":"myVar",
-            "value":"This is a variable",
+            "value":"This is a variable"
           }
        ]
     }
@@ -2673,7 +2673,7 @@ Response body contains the model’s raw editor source. The response’s content
        "variables": [
           {
             "name":"myVar",
-            "value":"This is a variable",
+            "value":"This is a variable"
           }
        ]
     }
@@ -10470,7 +10470,7 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 **Body JSON:**
 
     {
-      "action" : "execute"
+      "action" : "move"
     }
 
 <table>

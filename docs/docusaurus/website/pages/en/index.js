@@ -58,21 +58,22 @@ class Index extends React.Component {
         <h2>Talks and tutorials</h2>
 <div className="productShowcaseSection">
 <p>If you just want to download Flowable and have a quick play, this is a good article to follow:</p>
-<a href="https://paulhh.wordpress.com/2017/01/31/flowable-6-instant-gratification/">Instant Gratification with Flowable 6</a>
+<a className="normal-link" href="https://paulhh.wordpress.com/2017/01/31/flowable-6-instant-gratification/">Instant Gratification with Flowable 6</a>
 
-<p>Here are some talks we’ve given:</p>
-<a href="https://www.youtube.com/watch?v=uSQVtm8O7SA">bpmNEXT 2019: The Case of the Intentional Process</a><br/>
-<a href="https://www.youtube.com/watch?v=fyxRHZaCSSA">bpmNEXT 2018: Making Process Personal</a><br/>
-<a href="https://www.youtube.com/watch?v=vzgU1lZ1h3U">Jax London 2018: Using transactional BPM for service orchestration on NoSQL</a><br/>
-<a href="https://www.youtube.com/watch?v=i8dYR0LdpHg">Devoxx 2017: Introducing AI to the Flowable Process Engines</a><br/>
-<a href="https://www.youtube.com/watch?v=5qIw3JTw-mI">bpmNEXT 2017: Making Business Processes Dance to the User’s Tune</a><br/>
-<a href="https://www.youtube.com/watch?v=HaZQTrfNAgo">Codemotion 2017: Introducing AI to the Flowable Process Engines</a><br/>
+<h3>Here are some talks we’ve given:</h3>
+<a  className="normal-link" href="https://www.youtube.com/watch?v=uSQVtm8O7SA">bpmNEXT 2019: The Case of the Intentional Process</a><br/>
+<a  className="normal-link" href="https://www.youtube.com/watch?v=nX0dRiPqOmk">Devoxx 2019: Flowable business processing from Kafka events</a><br/>
+<a  className="normal-link" href="https://www.youtube.com/watch?v=fyxRHZaCSSA">bpmNEXT 2018: Making Process Personal</a><br/>
+<a  className="normal-link" href="https://www.youtube.com/watch?v=vzgU1lZ1h3U">Jax London 2018: Using transactional BPM for service orchestration on NoSQL</a><br/>
+<a  className="normal-link" href="https://www.youtube.com/watch?v=i8dYR0LdpHg">Devoxx 2017: Introducing AI to the Flowable Process Engines</a><br/>
+<a  className="normal-link" href="https://www.youtube.com/watch?v=5qIw3JTw-mI">bpmNEXT 2017: Making Business Processes Dance to the User’s Tune</a><br/>
+<a  className="normal-link" href="https://www.youtube.com/watch?v=HaZQTrfNAgo">Codemotion 2017: Introducing AI to the Flowable Process Engines</a><br/>
 
-<p>FlowFest Community Event tasks:</p>
-<a href="https://flowable.com/flowfest2018">FlowFest 2018: All talks</a>
+<h3>FlowFest Community Event tasks:</h3>
+<a  className="normal-link" href="https://flowable.com/flowfest2018">FlowFest 2018: All talks</a>
 
-<p>And links to some others:</p>
-<a href="https://www.youtube.com/watch?v=43_OLrxU3so">Josh Long: Spring Tips: Business Process Management with Flowable</a>
+<h3>And links to some others:</h3>
+<a  className="normal-link" href="https://www.youtube.com/watch?v=43_OLrxU3so">Josh Long: Spring Tips: Business Process Management with Flowable</a>
 </div>
       </Container>
     );
@@ -158,10 +159,10 @@ In addition we’ve added Swagger in Flowable v6. Boot up the Flowable REST app 
         <h2>Flowable 5 Documentation</h2>
         <MarkdownBlock>The Flowable 5 version of the documentation items above can be found on these pages.</MarkdownBlock>
           <PromoSection>
-            <Button href="https://flowable.org/docs/userguide-5/index.html">Getting Started v5</Button>
-            <Button href="https://flowable.org/docs/userguide-5/index.html">User Guide v5</Button>
-            <Button href="https://flowable.org/docs/userguide-5/index.html">REST API v5</Button>
-            <Button href="https://flowable.org/docs/userguide-5/index.html">Javadocs v5</Button>
+            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html">Getting Started v5</Button>
+            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html">User Guide v5</Button>
+            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html">REST API v5</Button>
+            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html">Javadocs v5</Button>
           </PromoSection>
       </Container>
     );

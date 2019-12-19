@@ -14,8 +14,8 @@ const users = [];
 const siteConfig = {
   title: 'Flowable Open Source Documentation', // Title for your website.
   tagline: 'Reference and User Guides',
-  url: 'http://lowable.com/open-source/docs', // Your website URL
-  baseUrl: '/', // Base URL for your project */
+  url: 'https://flowable.com', // Your website URL
+  baseUrl: '/open-source/docs/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
@@ -30,7 +30,7 @@ const siteConfig = {
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
     {doc: 'oss-introduction', label: 'Guides'},
-    {page: 'Javadocs', label: 'Javadocs'},
+    {page: 'all-javadocs', label: 'Javadocs'},
   ],
 
   // If you have users set above, you add it here:
@@ -95,7 +95,7 @@ const siteConfig = {
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  //   repoUrl: 'https://github.com/facebook/test-site',
+  repoUrl: 'https://github.com/flowable/flowable-engine',
 };
 
 module.exports = siteConfig;

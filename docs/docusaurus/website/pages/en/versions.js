@@ -18,9 +18,7 @@ const versions = require(`${CWD}/versions.json`);
 function Versions(props) {
   const {config: siteConfig} = props;
   const latestVersion = versions[0];
-  const repoUrl = `https://github.com/${siteConfig.organizationName}/${
-    siteConfig.projectName
-  }`;
+  const repoUrl = `https://github.com/flowable/flowable-engine`;
   return (
     <div className="docMainWrapper wrapper">
       <Container className="mainContainer versionsContainer">
@@ -50,10 +48,7 @@ function Versions(props) {
               </tr>
             </tbody>
           </table>
-          <p>
-            This is the version that is configured automatically when you first
-            install this project.
-          </p>
+         
           <h3 id="rc">Pre-release versions</h3>
           <table className="versions">
             <tbody>
@@ -75,7 +70,6 @@ function Versions(props) {
               </tr>
             </tbody>
           </table>
-          <p>Other text describing this section.</p>
           <h3 id="archive">Past Versions</h3>
           <p>Here you can find previous versions of the documentation.</p>
           <table className="versions">
