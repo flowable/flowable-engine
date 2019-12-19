@@ -12,16 +12,7 @@
  */
 package org.flowable.bpmn.converter;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamWriter;
-
-import org.flowable.bpmn.converter.child.BaseChildElementParser;
-import org.flowable.bpmn.converter.child.EventInParameterParser;
-import org.flowable.bpmn.converter.child.EventOutParameterParser;
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.SendEventServiceTask;
 
 /**
