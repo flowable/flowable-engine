@@ -446,9 +446,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
                         DmnXMLUtil.writeExtensionElements(container.getInputEntry(), xtw);
 
-                        xtw.writeStartElement(ELEMENT_TEXT);
-                        xtw.writeCData(container.getInputEntry().getText());
-                        xtw.writeEndElement();
+                        if (StringUtils.isNotEmpty(container.getInputEntry().getText())) {
+                            xtw.writeStartElement(ELEMENT_TEXT);
+                            xtw.writeCData(container.getInputEntry().getText());
+                            xtw.writeEndElement();
+                        }
 
                         xtw.writeEndElement();
                     }
@@ -457,9 +459,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeStartElement(ELEMENT_OUTPUT_ENTRY);
                         xtw.writeAttribute(ATTRIBUTE_ID, container.getOutputEntry().getId());
 
-                        xtw.writeStartElement(ELEMENT_TEXT);
-                        xtw.writeCData(container.getOutputEntry().getText());
-                        xtw.writeEndElement();
+                        if (StringUtils.isNotEmpty(container.getOutputEntry().getText())) {
+                            xtw.writeStartElement(ELEMENT_TEXT);
+                            xtw.writeCData(container.getOutputEntry().getText());
+                            xtw.writeEndElement();
+                        }
 
                         xtw.writeEndElement();
                     }
