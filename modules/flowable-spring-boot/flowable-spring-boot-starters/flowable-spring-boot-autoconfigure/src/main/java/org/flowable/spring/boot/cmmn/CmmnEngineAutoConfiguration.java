@@ -191,6 +191,10 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         configuration.setDeploymentStrategies(deploymentStrategies);
 
+        configuration.setEnableHistoryCleaning(flowableProperties.isEnableHistoryCleaning());
+        configuration.setHistoryCleaningTimeCycleConfig(flowableProperties.getHistoryCleaningCycle());
+        configuration.setCleanInstancesEndedAfterNumberOfDays(flowableProperties.getHistoryCleaningAfterDays());
+
         return configuration;
     }
 

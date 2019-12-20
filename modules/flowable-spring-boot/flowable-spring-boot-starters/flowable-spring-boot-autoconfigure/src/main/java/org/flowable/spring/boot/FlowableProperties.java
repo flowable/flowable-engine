@@ -123,6 +123,10 @@ public class FlowableProperties {
      */
     private Duration schemaLockWaitTime = Duration.ofMinutes(5);
 
+    private boolean enableHistoryCleaning = false;
+    private String historyCleaningCycle = "0 0 1 * * ?";
+    private int historyCleaningAfterDays = 365;
+
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
     }
@@ -345,4 +349,22 @@ public class FlowableProperties {
         this.schemaLockWaitTime = schemaLockWaitTime;
     }
 
+    public boolean isEnableHistoryCleaning() {
+        return enableHistoryCleaning;
+    }
+    public void setEnableHistoryCleaning(boolean enableHistoryCleaning) {
+        this.enableHistoryCleaning = enableHistoryCleaning;
+    }
+    public String getHistoryCleaningCycle() {
+        return historyCleaningCycle;
+    }
+    public void setHistoryCleaningCycle(String historyCleaningCycle) {
+        this.historyCleaningCycle = historyCleaningCycle;
+    }
+    public int getHistoryCleaningAfterDays() {
+        return historyCleaningAfterDays;
+    }
+    public void setHistoryCleaningAfterDays(int historyCleaningAfterDays) {
+        this.historyCleaningAfterDays = historyCleaningAfterDays;
+    }
 }
