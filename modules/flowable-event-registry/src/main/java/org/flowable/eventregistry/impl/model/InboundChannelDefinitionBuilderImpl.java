@@ -12,6 +12,9 @@
  */
 package org.flowable.eventregistry.impl.model;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
@@ -32,6 +35,7 @@ import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserial
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
 import org.flowable.eventregistry.model.InboundChannelDefinition;
 import org.flowable.eventregistry.model.JmsInboundChannelDefinition;
+import org.flowable.eventregistry.model.RabbitInboundChannelDefinition;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -73,6 +77,17 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         this.channelDefinition = channelDefinition;
         this.channelDefinition.setKey(key);
         return new InboundJmsChannelBuilderImpl(channelDefinition, eventRegistry, this);
+    }
+
+    @Override
+    public InboundRabbitChannelBuilder rabbitChannelAdapter(String queueName) {
+        RabbitInboundChannelDefinition channelDefinition = new RabbitInboundChannelDefinition();
+        Set<String> queues = new LinkedHashSet<>();
+        queues.add(queueName);
+        channelDefinition.setQueues(queues);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new InboundRabbitChannelBuilderImpl(channelDefinition, eventRegistry, this);
     }
 
     @Override
@@ -120,6 +135,62 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         @Override
         public InboundJmsChannelBuilder concurrency(String concurrency) {
             jmsChannel.setConcurrency(concurrency);
+            return this;
+        }
+
+        @Override
+        public InboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry, channelDefinitionBuilder);
+            return channelDefinitionBuilder.inboundEventProcessingPipelineBuilder;
+        }
+    }
+
+    public static class InboundRabbitChannelBuilderImpl implements InboundRabbitChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final InboundChannelDefinitionBuilderImpl channelDefinitionBuilder;
+
+        protected RabbitInboundChannelDefinition rabbitChannel;
+
+        public InboundRabbitChannelBuilderImpl(RabbitInboundChannelDefinition rabbitChannel, EventRegistry eventRegistry, InboundChannelDefinitionBuilderImpl channelDefinitionBuilder) {
+            this.rabbitChannel = rabbitChannel;
+            this.eventRegistry = eventRegistry;
+            this.channelDefinitionBuilder = channelDefinitionBuilder;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder exclusive(boolean exclusive) {
+            this.rabbitChannel.setExclusive(exclusive);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder priority(String priority) {
+            this.rabbitChannel.setPriority(priority);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder admin(String admin) {
+            this.rabbitChannel.setAdmin(admin);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder concurrency(String concurrency) {
+            rabbitChannel.setConcurrency(concurrency);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder executor(String executor) {
+            this.rabbitChannel.setExecutor(executor);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder ackMode(String ackMode) {
+            this.rabbitChannel.setAckMode(ackMode);
             return this;
         }
 

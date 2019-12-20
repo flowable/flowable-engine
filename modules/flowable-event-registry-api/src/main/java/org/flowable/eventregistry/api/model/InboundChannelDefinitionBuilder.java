@@ -32,6 +32,8 @@ public interface InboundChannelDefinitionBuilder {
 
     InboundJmsChannelBuilder jmsChannelAdapter(String destinationName);
 
+    InboundRabbitChannelBuilder rabbitChannelAdapter(String queue);
+
     InboundChannelDefinition register();
 
     interface InboundJmsChannelBuilder {
@@ -41,6 +43,23 @@ public interface InboundChannelDefinitionBuilder {
         InboundJmsChannelBuilder subscription(String subscription);
 
         InboundJmsChannelBuilder concurrency(String concurrency);
+
+        InboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
+
+    interface InboundRabbitChannelBuilder {
+
+        InboundRabbitChannelBuilder exclusive(boolean exclusive);
+
+        InboundRabbitChannelBuilder priority(String priority);
+
+        InboundRabbitChannelBuilder admin(String admin);
+
+        InboundRabbitChannelBuilder concurrency(String concurrency);
+
+        InboundRabbitChannelBuilder executor(String executor);
+
+        InboundRabbitChannelBuilder ackMode(String ackMode);
 
         InboundEventProcessingPipelineBuilder eventProcessingPipeline();
     }
