@@ -13,9 +13,6 @@
 package org.flowable.job.service.impl.history.async;
 
 import org.flowable.common.engine.impl.cfg.TransactionListener;
-import org.flowable.common.engine.impl.cfg.TransactionPropagation;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
@@ -47,13 +44,7 @@ public class TriggerAsyncHistoryExecutorTransactionListener implements Transacti
     
     @Override
     public void execute(CommandContext commandContext) {
-        jobServiceConfiguration.getCommandExecutor().execute(new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), new Command<Void>() {
-            @Override
-            public Void execute(CommandContext commandContext) {
-                jobServiceConfiguration.getAsyncHistoryExecutor().executeAsyncJob(historyJobEntity);
-                return null;
-            }
-        });
+        jobServiceConfiguration.getAsyncHistoryExecutor().executeAsyncJob(historyJobEntity);
     }
 
 }

@@ -12,6 +12,8 @@
  */
 package org.flowable.spring.test.transaction;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -24,6 +26,10 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.AbstractAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
@@ -38,6 +44,7 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Joram Barrez
@@ -97,6 +104,68 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
         String variable = (String) runtimeService.getVariable(processInstance.getId(), "theVariable");
         assertEquals("test", variable);
     }
+
+    @Autowired
+    private ExceptionThrowingAfterFlowableLogicBean exceptionThrowingAfterFlowableLogicBean;
+
+    @Test
+    @Deployment
+    public void testExceptionInTransactionRollsbackFlowable() {
+        // This will start a process instance, but throw an exception after the call,
+        // which should rollback the whole transaction
+        try {
+            exceptionThrowingAfterFlowableLogicBean.execute();
+            fail();
+        } catch (Exception e) {
+        }
+
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertEquals(0, taskService.createTaskQuery().count());
+    }
+
+    static class TestExecuteAsyncRunnableFactory implements ExecuteAsyncRunnableFactory {
+
+        public static AtomicInteger counter = new AtomicInteger(0);
+
+        @Override
+        public Runnable createExecuteAsyncRunnable(JobInfo job, JobServiceConfiguration jobServiceConfiguration) {
+            counter.incrementAndGet();
+
+            throw new RuntimeException("This line should never be reached, because the hint should happen in the post-commit, "
+                + "and the whole transaction should rollback (no post commit should have happened)");
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testExceptionInTransactionRollsbackAsyncJob() {
+        // This will start a process instance with an async job,
+        // but throw an exception after the call, which should rollback the whole transaction.
+        // This test specifically tests if the hinting of the async executor (which is done in the post-commit) works properly,
+        // hence why the async executor needs to be started specifically in this test
+        try {
+            ((AbstractAsyncExecutor) processEngineConfiguration.getAsyncExecutor()).setExecuteAsyncRunnableFactory(new TestExecuteAsyncRunnableFactory());
+
+            processEngineConfiguration.getAsyncExecutor().start();
+            exceptionThrowingAfterFlowableLogicBean.execute();
+            fail();
+        } catch (Exception e) {
+
+        } finally {
+            processEngineConfiguration.getAsyncExecutor().shutdown();
+
+            ((AbstractAsyncExecutor) processEngineConfiguration.getAsyncExecutor()).setExecuteAsyncRunnableFactory(null);
+        }
+
+        assertEquals(0, TestExecuteAsyncRunnableFactory.counter.get());
+
+        assertEquals(0, managementService.createJobQuery().count());
+        assertEquals(0, managementService.createDeadLetterJobQuery().count());
+        assertEquals(0, managementService.createTimerJobQuery().count());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertEquals(0, taskService.createTaskQuery().count());
+    }
+
 
     @Configuration(proxyBeanMethods = false)
     @EnableTransactionManagement
@@ -163,6 +232,11 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
             return new TestServiceTaskBean(managementService, exceptionThrowingBean);
         }
 
+        @Bean
+        public ExceptionThrowingAfterFlowableLogicBean exceptionThrowingAfterFlowableLogicBean(RuntimeService runtimeService) {
+            return new ExceptionThrowingAfterFlowableLogicBean(runtimeService);
+        }
+
         static class TestServiceTaskBean implements JavaDelegate {
 
             private ManagementService managementService;
@@ -219,6 +293,22 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
     static class ExceptionThrowingBean {
 
         public void throwException() {
+            throw new RuntimeException("from the exception throwing bean");
+        }
+
+    }
+
+    static class ExceptionThrowingAfterFlowableLogicBean {
+
+        private RuntimeService runtimeService;
+
+        public ExceptionThrowingAfterFlowableLogicBean(RuntimeService runtimeService) {
+            this.runtimeService = runtimeService;
+        }
+
+        @Transactional
+        public void execute() {
+            runtimeService.startProcessInstanceByKey("testProcess");
             throw new RuntimeException("from the exception throwing bean");
         }
 
