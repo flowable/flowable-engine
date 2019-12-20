@@ -15,7 +15,6 @@
             <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}" />
             <property name="username"  value="${jdbc.username:sa}" />
             <property name="password" value="${jdbc.password:}" />
-            <property name="maximumPoolSize" value="${jdbc.max-pool-size:25}" />
           </bean>
         </constructor-arg>
       </bean>
