@@ -7,10 +7,19 @@
     <bean id="processEngineConfiguration"
           class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
-        <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
-        <property name="jdbcUsername" value="${jdbc.username:sa}" />
-        <property name="jdbcPassword" value="${jdbc.password:}" />
+        <property name="dataSource">
+            <bean class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+                <constructor-arg>
+                    <bean class="com.zaxxer.hikari.HikariConfig">
+                        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+                        <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}" />
+                        <property name="username"  value="${jdbc.username:sa}" />
+                        <property name="password" value="${jdbc.password:}" />
+                        <property name="maximumPoolSize" value="${jdbc.max-pool-size:25}" />
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </property>
 
         <!-- Database configurations -->
         <property name="databaseSchemaUpdate" value="drop-create"/>

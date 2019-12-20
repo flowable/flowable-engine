@@ -136,6 +136,11 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
