@@ -130,8 +130,8 @@ public abstract class AbstractEngineConfiguration {
     protected String jdbcUsername = "sa";
     protected String jdbcPassword = "";
     protected String dataSourceJndiName;
-    protected int jdbcMaxActiveConnections;
-    protected int jdbcMaxIdleConnections;
+    protected int jdbcMaxActiveConnections = 16;
+    protected int jdbcMaxIdleConnections = 8;
     protected int jdbcMaxCheckoutTime;
     protected int jdbcMaxWaitTime;
     protected boolean jdbcPingEnabled;
