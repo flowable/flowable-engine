@@ -1,0 +1,18 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_DMN_MODEL-9b634e7a-b4dc-4fbd-b76c-56ca01079a04" name="Empty Outcome 2" namespace="http://www.flowable.org/dmn">
+  <decision id="EmptyOutcome" name="Empty Outcome">
+    <decisionTable id="decisionTable_DMN_MODEL-9b634e7a-b4dc-4fbd-b76c-56ca01079a04" hitPolicy="FIRST">
+      <input label="Input 1">
+        <inputExpression id="inputExpression_1" typeRef="string">
+          <text>input1</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" label="Output 1" name="outcome1" typeRef="number"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[== "TEST"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1"></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
