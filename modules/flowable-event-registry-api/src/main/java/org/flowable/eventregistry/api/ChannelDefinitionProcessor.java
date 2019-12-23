@@ -10,9 +10,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.impl.deployer;
+package org.flowable.eventregistry.api;
 
-import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.model.ChannelDefinition;
 
 /**

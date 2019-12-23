@@ -19,8 +19,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.eventregistry.api.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
-import org.flowable.eventregistry.impl.deployer.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.model.ChannelDefinition;
 import org.flowable.eventregistry.model.RabbitInboundChannelDefinition;
 import org.springframework.amqp.core.AcknowledgeMode;

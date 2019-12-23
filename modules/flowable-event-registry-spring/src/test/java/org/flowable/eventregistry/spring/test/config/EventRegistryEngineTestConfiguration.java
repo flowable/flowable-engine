@@ -16,10 +16,10 @@ import java.sql.Driver;
 
 import javax.sql.DataSource;
 
+import org.flowable.eventregistry.api.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
-import org.flowable.eventregistry.impl.deployer.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.spring.EventRegistryFactoryBean;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.springframework.beans.factory.ObjectProvider;

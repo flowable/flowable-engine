@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.eventregistry.api.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -38,7 +39,6 @@ import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBu
 import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
 import org.flowable.eventregistry.impl.db.EventDbSchemaManager;
 import org.flowable.eventregistry.impl.deployer.CachingAndArtifactsManager;
-import org.flowable.eventregistry.impl.deployer.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeployer;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeploymentHelper;
 import org.flowable.eventregistry.impl.deployer.ParsedDeploymentBuilderFactory;

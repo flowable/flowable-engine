@@ -17,8 +17,8 @@ import java.util.Map;
 
 import javax.jms.MessageListener;
 
+import org.flowable.eventregistry.api.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
-import org.flowable.eventregistry.impl.deployer.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.model.ChannelDefinition;
 import org.flowable.eventregistry.model.JmsInboundChannelDefinition;
 import org.springframework.beans.BeansException;
