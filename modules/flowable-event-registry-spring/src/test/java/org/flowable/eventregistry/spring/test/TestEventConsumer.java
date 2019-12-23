@@ -14,9 +14,11 @@ package org.flowable.eventregistry.spring.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
+import org.opentest4j.AssertionFailedError;
 
 /**
  * @author Filip Hrisafov
@@ -32,6 +34,13 @@ public class TestEventConsumer implements EventRegistryEventBusConsumer {
 
     public List<EventRegistryEvent> getEvents() {
         return events;
+    }
+
+    public EventRegistryEvent getEvent(String eventType) {
+        return events.stream()
+            .filter(event -> Objects.equals(event.getType(), eventType))
+            .findAny()
+            .orElseThrow(() -> new AssertionFailedError(events + " does not container an event with type " + eventType));
     }
 
     public void clear() {

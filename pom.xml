@@ -21,6 +21,7 @@
 		<spring.framework.version>5.2.2.RELEASE</spring.framework.version>
 		<spring.security.version>5.2.1.RELEASE</spring.security.version>
 		<spring.amqp.version>2.2.2.RELEASE</spring.amqp.version>
+		<spring.kafka.version>2.3.4.RELEASE</spring.kafka.version>
 		<jackson.version>2.10.1</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
@@ -917,6 +918,11 @@
 				<groupId>org.springframework.amqp</groupId>
 				<artifactId>spring-rabbit</artifactId>
 				<version>${spring.amqp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.kafka</groupId>
+				<artifactId>spring-kafka</artifactId>
+				<version>${spring.kafka.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>

@@ -34,6 +34,8 @@ public interface InboundChannelDefinitionBuilder {
 
     InboundRabbitChannelBuilder rabbitChannelAdapter(String queue);
 
+    InboundKafkaChannelBuilder kafkaChannelAdapter(String topic);
+
     InboundChannelDefinition register();
 
     interface InboundJmsChannelBuilder {
@@ -60,6 +62,19 @@ public interface InboundChannelDefinitionBuilder {
         InboundRabbitChannelBuilder executor(String executor);
 
         InboundRabbitChannelBuilder ackMode(String ackMode);
+
+        InboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
+
+    interface InboundKafkaChannelBuilder {
+
+        InboundKafkaChannelBuilder groupId(String groupId);
+
+        InboundKafkaChannelBuilder clientIdPrefix(String clientIdPrefix);
+
+        InboundKafkaChannelBuilder concurrency(String concurrency);
+
+        InboundKafkaChannelBuilder property(String name, String value);
 
         InboundEventProcessingPipelineBuilder eventProcessingPipeline();
     }
