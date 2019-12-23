@@ -5,7 +5,7 @@ title: The Flowable Form API
 
 ## The Form Engine API and services
 
-The Form engine API is the most common way of interacting with Flowable Form. The central starting point is the FormEngine, which can be created in several ways as described in the [configuration section](#configuration). From the FormEngine, you can obtain the various other services.
+The Form engine API is the most common way of interacting with Flowable Form. The central starting point is the FormEngine, which can be created in several ways as described in the [configuration section](form/ch02-Configuration.md#creating-a-form-engine). From the FormEngine, you can obtain the various other services.
 FormEngine and the services objects are thread safe, so you can keep a reference to one of those for a whole server.
 
 ![api.services](assets/form/api.services.png)
@@ -164,6 +164,6 @@ or
     FormEngines.getFormEngine("myName");
 
 Of course, it’s also possible to use any of the variants of creating a Form engine,
-as described in the [configuration section](#configuration).
+as described in the [configuration section](form/ch02-Configuration.md#creating-a-form-engine).
 
 The contextDestroyed method of the context-listener delegates to FormEngines.destroy(). This will properly close all initialized Form engines.

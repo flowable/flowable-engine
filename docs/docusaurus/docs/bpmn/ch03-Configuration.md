@@ -5,7 +5,7 @@ title: Configuration
 
 ## Creating a ProcessEngine
 
-The Flowable process engine is configured through an XML file called flowable.cfg.xml. Note that this is **not** applicable if you’re using [the Spring style of building a process engine](#springintegration).
+The Flowable process engine is configured through an XML file called flowable.cfg.xml. Note that this is **not** applicable if you’re using [the Spring style of building a process engine](bpmn/ch05-Spring.md#spring-integration).
 
 The easiest way to obtain a ProcessEngine is to use the org.flowable.engine.ProcessEngines class:
 
@@ -58,20 +58,21 @@ All these ProcessEngineConfiguration.createXXX() methods return a ProcessEngineC
       .setJdbcUrl("jdbc:h2:mem:my-own-db;DB_CLOSE_DELAY=1000")
       .setAsyncExecutorActivate(false)
       .buildProcessEngine();
-
+      
 ## ProcessEngineConfiguration bean
 
 The flowable.cfg.xml must contain a bean that has the id 'processEngineConfiguration'.
 
      <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
+<a name="configurationClasses"/>
 This bean is then used to construct the ProcessEngine. There are multiple classes available that can be used to define the processEngineConfiguration. These classes represent different environments, and set defaults accordingly. It’s best practice to select the class that best matches your environment, to minimize the number of properties needed to configure the engine. The following classes are currently available:
 
 -   **org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration**: the process engine is used in a standalone way. Flowable will take care of all transactions. By default, the database will only be checked when the engine boots (and an exception is thrown if there is no Flowable schema or the schema version is incorrect).
 
 -   **org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration**: this is a convenience class for unit testing purposes. Flowable will take care of all transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, no additional configuration is probably needed (except when using, for example, the job executor or mail capabilities).
 
--   **org.flowable.spring.SpringProcessEngineConfiguration**: To be used when the process engine is used in a Spring environment. See [the Spring integration section](#springintegration) for more information.
+-   **org.flowable.spring.SpringProcessEngineConfiguration**: To be used when the process engine is used in a Spring environment. See [the Spring integration section](bpmn/ch05-Spring.md#spring-integration) for more information.
 
 -   **org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration**: To be used when the engine runs in standalone mode, with JTA transactions.
 
@@ -123,7 +124,7 @@ Note that Flowable does not ship with a library that allows you to define such a
 
 The following properties can be set, regardless of whether you are using the JDBC or data source approach:
 
--   **databaseType**: it’s normally not necessary to specify this property, as it is automatically detected from the database connection metadata. Should only be specified when automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See [the 'supported databases' section](#supporteddatabases) for an overview of which types are supported.
+-   **databaseType**: it’s normally not necessary to specify this property, as it is automatically detected from the database connection metadata. Should only be specified when automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See [the 'supported databases' section](bpmn/ch03-Configuration.md#supported-databases) for an overview of which types are supported.
 
 -   **databaseSchemaUpdate**: sets the strategy to handle the database schema on process engine boot and shutdown.
 
@@ -273,7 +274,7 @@ The easiest way to create the database tables for your database is to:
 
 -   Add a suitable database driver
 
--   Add a Flowable configuration file (*flowable.cfg.xml*) to your classpath, pointing to your database (see [database configuration section](#databaseConfiguration))
+-   Add a Flowable configuration file (*flowable.cfg.xml*) to your classpath, pointing to your database (see [database configuration section](bpmn/ch03-Configuration.md#database-configuration))
 
 -   Execute the main method of the *DbSchemaCreate* class
 
@@ -281,7 +282,7 @@ However, often only database administrators can execute DDL statements on a data
 
     flowable.{db}.{create|drop}.{type}.sql
 
-Where *db* is any of the [supported databases](#supporteddatabases) and *type* is:
+Where *db* is any of the [supported databases](bpmn/ch03-Configuration.md#supported-databases) and *type* is:
 
 -   **engine:** the tables needed for engine execution. Required.
 
@@ -365,18 +366,18 @@ The property asyncExecutorActivate instructs the Flowable engine to start the As
 
 ## Mail server configuration
 
-Configuring a mail server is optional. Flowable supports sending e-mails in business processes. To actually send an e-mail, a valid SMTP mail server configuration is required. See the [e-mail task](#bpmnEmailTaskServerConfiguration) for the configuration options.
+Configuring a mail server is optional. Flowable supports sending e-mails in business processes. To actually send an e-mail, a valid SMTP mail server configuration is required. See the [e-mail task](bpmn/ch07b-BPMN-Constructs.md#mail-server-configuration) for the configuration options.
 
 ## History configuration
 
-Customizing the configuration of history storage is optional. This allows you to tweak settings that influence the [history capabilities](#history) of the engine. See [history configuration](#historyConfig) for more details.
+Customizing the configuration of history storage is optional. This allows you to tweak settings that influence the [history capabilities](bpmn/ch11-History.md#history) of the engine. See [history configuration](bpmn/ch11-History.md#history-configuration) for more details.
 
     <property name="history" value="audit" />
 
 ## Async history configuration
 
 \[Experimental\] Since Flowable 6.1.0 the async history feature has been added. When async history is enabled, the historic data will be persisted by a history job executor, instead of synchronous persistence as part of the runtime execution persistence.
-See [async history configuration](#asyncHistoryConfig) for more details.
+See [async history configuration](bpmn/ch11-History.md#async-history-configuration) for more details.
 
     <property name="asyncHistoryEnabled" value="true" />
 
@@ -444,11 +445,11 @@ This is useful when the logs contain information that needs to checked in real t
 
 ## Event handlers
 
-The event mechanism in the Flowable engine allows you to get notified when various events occur within the engine. Take a look at [all supported event types](#eventDispatcherEventTypes) for an overview of the events available.
+The event mechanism in the Flowable engine allows you to get notified when various events occur within the engine. Take a look at [all supported event types](bpmn/ch03-Configuration.md#supported-event-types) for an overview of the events available.
 
-It’s possible to register a listener for certain types of events as opposed to getting notified when any type of event is dispatched. You can either add engine-wide event listeners [through the configuration](#eventDispatcherConfiguration), add engine-wide event listeners [at runtime using the API](#eventDispatcherConfigurationRuntime) or add event-listeners to [specific process definitions in the BPMN XML](#eventDispatcherConfigurationProcessDefinition).
+It’s possible to register a listener for certain types of events as opposed to getting notified when any type of event is dispatched. You can either add engine-wide event listeners [through the configuration](bpmn/ch03-Configuration.md#configuration-and-setup), add engine-wide event listeners [at runtime using the API](bpmn/ch03-Configuration.md#adding-listeners-at-runtime) or add event-listeners to [specific process definitions in the BPMN XML](bpmn/ch03-Configuration.md#adding-listeners-to-process-definitions).
 
-All events dispatched are a subtype of org.flowable.engine.common.api.delegate.event.FlowableEvent. The event exposes (if available) the type, executionId, processInstanceId and processDefinitionId. Certain events contain additional context related to the event that occurred, more information about additional payloads can be found in the list of [all supported event types](#eventDispatcherEventTypes).
+All events dispatched are a subtype of org.flowable.engine.common.api.delegate.event.FlowableEvent. The event exposes (if available) the type, executionId, processInstanceId and processDefinitionId. Certain events contain additional context related to the event that occurred, more information about additional payloads can be found in the list of [all supported event types](bpmn/ch03-Configuration.md#supported-event-types).
 
 ### Event listener implementation
 

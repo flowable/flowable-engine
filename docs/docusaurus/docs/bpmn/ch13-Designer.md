@@ -33,7 +33,7 @@ Make sure the **"Contact all updates sites.."** checkbox is **checked**, because
 
 ![designer.open.importedfile](assets/bpmn/designer.open.importedfile.png)
 
--   For deployment, a BAR file and optionally a JAR file is created by the Flowable Designer by right-clicking on a Flowable project in the package explorer and choosing the *Create deployment artifacts* option at the bottom of the popup menu. For more information about the deployment functionality of the Designer look at the [deployment](#eclipseDesignerDeployment) section.
+-   For deployment, a BAR file and optionally a JAR file is created by the Flowable Designer by right-clicking on a Flowable project in the package explorer and choosing the *Create deployment artifacts* option at the bottom of the popup menu. For more information about the deployment functionality of the Designer look at the [deployment](bpmn/ch13-Designer.md#flowable-designer-deployment-features) section.
 
 ![designer.create.deployment](assets/bpmn/designer.create.deployment.png)
 
@@ -125,7 +125,7 @@ You can customize the palette that is offered to users when modeling processes. 
 
 -   Disabling any or all of the default BPMN 2.0 shapes offered by Flowable Designer, with the exception of the connection and selection tools
 
-In order to customize the palette, you create a JAR file that is needs to be added to every installation of Flowable Designer (more on [how to do that](#eclipseDesignerApplyingExtension) later). Such a JAR file is called an *extension*. By writing classes that are included in your extension, Flowable Designer understands which customizations you wish to make. In order for this to work, your classes should implement certain interfaces. There is an integration library available with those interfaces and base classes to extend, which you should add to your project’s classpath.
+In order to customize the palette, you create a JAR file that is needs to be added to every installation of Flowable Designer (more on [how to do that](bpmn/ch13-Designer.md#applying-your-extension-to-flowable-designer) later). Such a JAR file is called an *extension*. By writing classes that are included in your extension, Flowable Designer understands which customizations you wish to make. In order for this to work, your classes should implement certain interfaces. There is an integration library available with those interfaces and base classes to extend, which you should add to your project’s classpath.
 
 You can find the code examples listed below in source control with Flowable Designer. Take a look in the examples/money-tasks directory in the flowable-designer repository of Flowable’s [source code](https://github.com/flowable/flowable-designer/tree/master/examples).
 
@@ -245,7 +245,7 @@ Diagrams you open will now have the shapes from the new extension in their palet
 
 #### Adding shapes to the palette
 
-With your project set up, you can now easily add shapes to the palette. Each shape you wish to add is represented by a class in your JAR. Take note that these classes are not the classes that will be used by the Flowable engine during runtime. In your extension you describe the properties that can be set in Flowable Designer for each shape. From these shapes, you can also define the runtime characteristics that should be used by the engine when a process instance reaches the node in the process. The runtime characteristics can use any of the options that Flowable supports for regular ServiceTasks. See [this section](#eclipseDesignerConfiguringRuntime) for more details.
+With your project set up, you can now easily add shapes to the palette. Each shape you wish to add is represented by a class in your JAR. Take note that these classes are not the classes that will be used by the Flowable engine during runtime. In your extension you describe the properties that can be set in Flowable Designer for each shape. From these shapes, you can also define the runtime characteristics that should be used by the engine when a process instance reaches the node in the process. The runtime characteristics can use any of the options that Flowable supports for regular ServiceTasks. See [this section](bpmn/ch13-Designer.md#configuring-runtime-execution-of-custom-service-tasks) for more details.
 
 A shape’s class is a simple Java class, to which a number of annotations are added. The class should implement the CustomServiceTask interface, but you shouldn’t implement this interface yourself. Extend the AbstractCustomServiceTask base class instead (at the moment you MUST extend this class directly, so no abstract classes in between). In the Javadoc for that class you can find instructions on the defaults it provides and when you should override any of the methods it already implements. Overrides allow you to do things such as providing icons for the palette and in the shape on the canvas (these can be different) and specifying the base shape you want the node to have (activity, event, gateway).
 
@@ -266,7 +266,7 @@ You can add properties to the shape by adding members to the class and annotatin
     @Help(displayHelpShort = "Provide an account number", displayHelpLong = HELP_ACCOUNT_NUMBER_LONG)
     private String accountNumber;
 
-There are several PropertyType values you can use, which are described in more detail in [this section](#eclipseDesignerPropertyTypes). You can make a field required by setting the required attribute to true. A message and red background will appear if the user doesn’t fill in the field.
+There are several PropertyType values you can use, which are described in more detail in [this section](bpmn/ch13-Designer.md#property-types). You can make a field required by setting the required attribute to true. A message and red background will appear if the user doesn’t fill in the field.
 
 If you want to fix the order of the various properties in your class as they appear in the property screen, you should specify the order attribute of the @Property annotation.
 
@@ -320,7 +320,7 @@ The properties screen for the money task is shown below. Note the required messa
 
 ![designer.palette.add.money.properties.required](assets/bpmn/designer.palette.add.money.properties.required.png)
 
-Users can enter static text or use expressions that use process variables in the property fields when creating diagrams (for example, "This little piggy went to ${piggyLocation}"). Generally, this applies to text fields where users are free to enter any text. If you expect users to want to use expressions and you apply runtime behavior to your CustomServiceTask (using @Runtime), make sure to use Expression fields in the delegate class so the expressions are correctly resolved at runtime. More information on runtime behavior can be found in [this section](#eclipseDesignerConfiguringRuntime).
+Users can enter static text or use expressions that use process variables in the property fields when creating diagrams (for example, "This little piggy went to ${piggyLocation}"). Generally, this applies to text fields where users are free to enter any text. If you expect users to want to use expressions and you apply runtime behavior to your CustomServiceTask (using @Runtime), make sure to use Expression fields in the delegate class so the expressions are correctly resolved at runtime. More information on runtime behavior can be found in [this section](bpmn/ch13-Designer.md#configuring-runtime-execution-of-custom-service-tasks).
 
 The help for fields is offered by the buttons to the right of each property. Clicking on the button shows a popup as displayed below.
 
@@ -334,7 +334,7 @@ There is a special annotation for specifying the runtime characteristics of your
 
     @Runtime(javaDelegateClass = "org.acme.runtime.AcmeMoneyJavaDelegation")
 
-Your CustomServiceTask will result in a normal ServiceTask in the BPMN output of processes modeled with it. Flowable enables [several ways](#bpmnJavaServiceTask) to define the runtime characteristics of ServiceTasks. Therefore, the @Runtime annotation can take one of three attributes, which match directly to the options Flowable provides, like this:
+Your CustomServiceTask will result in a normal ServiceTask in the BPMN output of processes modeled with it. Flowable enables [several ways](bpmn/ch07b-BPMN-Constructs.md#java-service-task) to define the runtime characteristics of ServiceTasks. Therefore, the @Runtime annotation can take one of three attributes, which match directly to the options Flowable provides, like this:
 
 -   javaDelegateClass maps to flowable:class in the BPMN output. Specify the fully qualified classname of a class that implements JavaDelegate.
 
@@ -342,7 +342,7 @@ Your CustomServiceTask will result in a normal ServiceTask in the BPMN output of
 
 -   javaDelegateExpression maps to flowable:delegateExpression in the BPMN output. Specify an expression to a class that implements JavaDelegate.
 
-The user’s property values will be injected into the runtime class if you provide members in the class for Flowable to inject into. The names should match the names of the members in your CustomServiceTask. For more information, consult [this part](#serviceTaskFieldInjection) of the userguide. Note that from version 5.11.0 of the Designer, you can use the Expression interface for dynamic field values. This means that the value of the property in the Flowable Designer must contain an expression, and this expression will then be injected into an Expression property in the JavaDelegate implementation class.
+The user’s property values will be injected into the runtime class if you provide members in the class for Flowable to inject into. The names should match the names of the members in your CustomServiceTask. For more information, consult [this part](bpmn/ch07b-BPMN-Constructs.md#field-injection) of the userguide. Note that from version 5.11.0 of the Designer, you can use the Expression interface for dynamic field values. This means that the value of the property in the Flowable Designer must contain an expression, and this expression will then be injected into an Expression property in the JavaDelegate implementation class.
 
 > **Note**
 >

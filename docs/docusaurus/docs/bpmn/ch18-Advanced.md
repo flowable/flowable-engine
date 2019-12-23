@@ -132,7 +132,7 @@ The following properties are available on the process engine configuration throu
 
 ### Message Queue based Async Executor
 
-When reading the [async executor design section](#async_executor_design), it becomes clear that the architecture is inspired by message queues. The async executor is designed in such a way that a message queue can easily be used to take over the job of the thread pool and the handling of async jobs.
+When reading the [async executor design section](bpmn/ch18-Advanced.md#async-executor-design), it becomes clear that the architecture is inspired by message queues. The async executor is designed in such a way that a message queue can easily be used to take over the job of the thread pool and the handling of async jobs.
 
 Benchmarks have shown that using a message queue is superior, throughput-wise, to the thread pool-backed async executor. However, it does come with an extra architectural component, which of course makes setup, maintenance and monitoring more complex. For many users, the performance of the thread pool-backed async executor is more than sufficient. It is nice to know however, that there is an alternative if the required performance grows.
 
@@ -635,7 +635,7 @@ An advanced way of hooking into the process engine configuration is through the 
 
 There are two methods required to implement this interface. The *configure* method, which gets a *ProcessEngineConfiguration* instance as parameter. The custom configuration can be added this way, and this method will guaranteed be called **before the process engine is created, but after all default configuration has been done**. The other method is the *getPriority* method, which allows for ordering the configurators in the case where some configurators are dependent on each other.
 
-An example of such a configurator is the [LDAP integration](#chapter_ldap), where the configurator is used to replace the default user and group manager classes with one that is capable of handling an LDAP user store. So basically a configurator allows to change or tweak the process engine quite heavily and is meant for very advanced use cases. Another example is to swap the process definition cache with a customized version:
+An example of such a configurator is the [LDAP integration](bpmn/ch17-Ldap.md#ldap-integration), where the configurator is used to replace the default user and group manager classes with one that is capable of handling an LDAP user store. So basically a configurator allows to change or tweak the process engine quite heavily and is meant for very advanced use cases. Another example is to swap the process definition cache with a customized version:
 
     public class ProcessDefinitionCacheConfigurator extends AbstractProcessEngineConfigurator {
 
@@ -679,7 +679,7 @@ Ugh, Right. To 'solve' this, a *org.flowable.engine.task.TaskInfoQueryWrapper* c
 
 ## Custom identity management by overriding standard SessionFactory
 
-If you do not want to use a full *ProcessEngineConfigurator* implementation like in the [LDAP integration](#chapter_ldap), but still want to plug in your custom identity management framework, then you can also override the *IdmIdentityServiceImpl* class or implement the *IdmIdentityService* interface directly and use the implemented class for the *idmIdentityService* property in the *ProcessEngineConfiguration*. In Spring this can be easily done by adding the following to the *ProcessEngineConfiguration* bean definition:
+If you do not want to use a full *ProcessEngineConfigurator* implementation like in the [LDAP integration](bpmn/ch17-Ldap.md#ldap-integration), but still want to plug in your custom identity management framework, then you can also override the *IdmIdentityServiceImpl* class or implement the *IdmIdentityService* interface directly and use the implemented class for the *idmIdentityService* property in the *ProcessEngineConfiguration*. In Spring this can be easily done by adding the following to the *ProcessEngineConfiguration* bean definition:
 
     <bean id="processEngineConfiguration" class="...SomeProcessEngineConfigurationClass">
 
@@ -702,7 +702,7 @@ leads to a call on the following member of the *IdmIdentityService* interface:
 
     UserQuery createUserQuery();
 
-The code for the [LDAP integration](#chapter_ldap) contains full examples of how to implement this. Check out the code on Github: [LDAPIdentityServiceImpl](https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ldap/src/main/java/org/flowable/ldap/LDAPIdentityServiceImpl.java).
+The code for the [LDAP integration](bpmn/ch17-Ldap.md#ldap-integration) contains full examples of how to implement this. Check out the code on Github: [LDAPIdentityServiceImpl](https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ldap/src/main/java/org/flowable/ldap/LDAPIdentityServiceImpl.java).
 
 ## Enable safe BPMN 2.0 xml
 
@@ -718,7 +718,7 @@ If the platform on which Flowable runs does support it, do enable this feature.
 
 ## Event logging
 
-An event logging mechanism has been introduced. The logging mechanism builds upon the general-purpose [event mechanism of the Flowable engine](#eventDispatcher) and is disabled by default. The idea is that the events originating from the engine are caught, and a map containing all the event data (and some more) is created and provided to an *org.flowable.engine.impl.event.logger.EventFlusher* which will flush this data to somewhere else. By default, simple database-backed event handlers/flusher is used, which serializes the said map to JSON using Jackson and stores it in the database as an *EventLogEntryEntity* instance. The table required for this database logging is created by default (called *ACT\_EVT\_LOG*). This table can be deleted if the event logging is not used.
+An event logging mechanism has been introduced. The logging mechanism builds upon the general-purpose [event mechanism of the Flowable engine](bpmn/ch03-Configuration.md#event-handlers) and is disabled by default. The idea is that the events originating from the engine are caught, and a map containing all the event data (and some more) is created and provided to an *org.flowable.engine.impl.event.logger.EventFlusher* which will flush this data to somewhere else. By default, simple database-backed event handlers/flusher is used, which serializes the said map to JSON using Jackson and stores it in the database as an *EventLogEntryEntity* instance. The table required for this database logging is created by default (called *ACT\_EVT\_LOG*). This table can be deleted if the event logging is not used.
 
 To enable the database logger:
 
@@ -747,7 +747,7 @@ However, it could be a specific version of a supported and tested database does 
 
 ## Secure Scripting
 
-By default, when using a [script task](#bpmnScriptTask), the script that is executed has similar capabilities as a Java delegate. It has full access to the JVM, can run forever (due to infinite loops) or use up a lot of memory. However, Java delegates need to be written and put on the classpath in a jar and they have a different life cycle from a process definitions. End-users generally will not write Java delegates, as this is a typical the job of a developer.
+By default, when using a [script task](bpmn/ch07b-BPMN-Constructs.md#script-Task), the script that is executed has similar capabilities as a Java delegate. It has full access to the JVM, can run forever (due to infinite loops) or use up a lot of memory. However, Java delegates need to be written and put on the classpath in a jar and they have a different life cycle from a process definitions. End-users generally will not write Java delegates, as this is a typical the job of a developer.
 
 Scripts on the other hand are part of the process definition and its lifecycle is the same. Script tasks don’t need the extra step of a jar deployment, but can be executed from the moment the process definition is deployed. Sometimes, scripts for script tasks are not written by developers. Yet, this poses a problem as stated above: a script has full access to the JVM and it is possible to block many system resources when executing the script. Allowing scripts from just about anyone is thus not a good idea.
 

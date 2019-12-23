@@ -5,7 +5,7 @@ title: The Flowable API
 
 ## The Process Engine API and services
 
-The engine API is the most common way of interacting with Flowable. The main starting point is the ProcessEngine, which can be created in several ways as described in the [configuration section](#configuration). From the ProcessEngine, you can obtain the various services that contain the workflow/BPM methods. ProcessEngine and the services objects are thread safe, so you can keep a reference to one of those for a whole server.
+The engine API is the most common way of interacting with Flowable. The main starting point is the ProcessEngine, which can be created in several ways as described in the [configuration section](bpmn/ch03-Configuration.md#creating-a-processengine). From the ProcessEngine, you can obtain the various services that contain the workflow/BPM methods. ProcessEngine and the services objects are thread safe, so you can keep a reference to one of those for a whole server.
 
 ![api.services](assets/bpmn/api.services.png)
 
@@ -140,7 +140,7 @@ Variables can also be retrieved, as shown below. Note that similar methods exist
     Object getVariable(String executionId, String variableName);
     <T> T getVariable(String executionId, String variableName, Class<T> variableClass);
 
-Variables are often used in [Java delegates](#bpmnJavaServiceTask), [expressions](#apiExpressions), execution- or tasklisteners, scripts, and so on. In those constructs, the current *execution* or *task* object is available and it can be used for variable setting and/or retrieval. The simplest methods are these:
+Variables are often used in [Java delegates](bpmn/ch07b-BPMN-Constructs.md#java-service-task), [expressions](bpmn/ch04-API.md#expressions), execution- or tasklisteners, scripts, and so on. In those constructs, the current *execution* or *task* object is available and it can be used for variable setting and/or retrieval. The simplest methods are these:
 
     execution.getVariables();
     execution.getVariables(Collection<String> variableNames);
@@ -247,7 +247,7 @@ The condition on the sequence flow leaving the exclusive gateway are oblivious t
 
 Flowable uses UEL for expression-resolving. UEL stands for *Unified Expression Language* and is part of the EE6 specification (see [the EE6 specification](http://docs.oracle.com/javaee/6/tutorial/doc/gjddd.html) for detailed information).
 
-Expressions can be used in, for example, [Java Service tasks](#bpmnJavaServiceTaskXML), [Execution Listeners](#executionListeners), [Task Listeners](#taskListeners) and [Conditional sequence flows](#conditionalSequenceFlowXml). Although there are two types of expressions, value-expression and method-expression, Flowable abstracts this so they can both be used where an expression is expected.
+Expressions can be used in, for example, [Java Service tasks](bpmn/ch07b-BPMN-Constructs.md#xml-representation), [Execution Listeners](bpmn/ch07b-BPMN-Constructs.md#execution-listener), [Task Listeners](bpmn/ch07b-BPMN-Constructs.md#task-listener) and [Conditional sequence flows](bpmn/ch07b-BPMN-Constructs.md#xml-representation). Although there are two types of expressions, value-expression and method-expression, Flowable abstracts this so they can both be used where an expression is expected.
 
 -   **Value expression**: resolves to a value. By default, all process variables are available to use. Also, all spring-beans (if using Spring) are available to use in expressions. Some examples:
 
@@ -276,7 +276,7 @@ On top of all process variables, there are a few default objects available that 
 
 -   variableContainer: The VariableContainer for which the expression is being resolved for.
 
-For more concrete usage and examples, check out [Expressions in Spring](#springExpressions), [Java Service tasks](#bpmnJavaServiceTaskXML), [Execution Listeners](#executionListeners), [Task Listeners](#taskListeners) or [Conditional sequence flows](#conditionalSequenceFlowXml).
+For more concrete usage and examples, check out [Expressions in Spring](bpmn/ch05-Spring.md#expressions), [Java Service tasks](bpmn/ch07b-BPMN-Constructs.md#xml-representation), [Execution Listeners](bpmn/ch07b-BPMN-Constructs.md#execution-listener), [Task Listeners](bpmn/ch07b-BPMN-Constructs.md#task-listener) or [Conditional sequence flows](bpmn/ch07b-BPMN-Constructs.md#xml-representation).
 
 ## Expression functions
 
@@ -524,6 +524,6 @@ or
     ProcessEngines.getProcessEngine("myName");
 
 Of course, it is also possible to use any of the variants of creating a process engine,
-as described in the [configuration section](#configuration).
+as described in the [configuration section](bpmn/ch03-Configuration.md#creating-a-processengine).
 
 The contextDestroyed method of the context-listener delegates to ProcessEngines.destroy(). That will properly close all initialized process engines.

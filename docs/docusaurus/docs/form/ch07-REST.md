@@ -463,7 +463,7 @@ It’s possible to support additional variable-types with a custom JSON represen
 
 ## Deployment
 
-**When using tomcat, please read [Usage in Tomcat](#restUsageInTomcat).**
+**When using tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
 
 ### List of Deployments
 
@@ -1214,7 +1214,7 @@ The response body is a JSON representation of the org.flowable.form.model.FormMo
        }
     }
 
-Only one of formDefinitionId or formDefinitionKey can be used in the request body. Parameters variables and tenantId are optional. If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in [the REST variables section](#restVariables).
+Only one of formDefinitionId or formDefinitionKey can be used in the request body. Parameters variables and tenantId are optional. If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in [the REST variables section](#variable-representation).
 
 <table>
 <caption>Store a form instance - Response codes</caption>
@@ -1427,9 +1427,9 @@ Only one of formDefinitionId or formDefinitionKey can be used in the request bod
       "formDefinitionId":"818e4703-f1d2-11e6-8549-acde48001122"
     }
 
-The request body can contain all possible filters that can be used in the [List process instances](#restFormInstancesGet) URL query.
+The request body can contain all possible filters that can be used in the [List process instances](#list-of-form-instances) URL query.
 
-The general [paging and sorting query-parameters](#restPagingAndSort) can be used for this URL.
+The general [paging and sorting query-parameters](#paging-and-sorting) can be used for this URL.
 
 <table>
 <caption>Query form instances - Response codes</caption>

@@ -54,7 +54,7 @@ In this section we will cover a very simple business process that we will use to
 
 ### Prerequisites
 
-This tutorial assumes that you have the [Flowable demo setup running](#demo.setup.one.minute.version), and that you are using a standalone H2 server. Edit db.properties and set the jdbc.url=jdbc:h2:tcp://localhost/flowable, and then run the standalone server according to [H2’s documentation](http://www.h2database.com/html/tutorial.html#using_server).
+This tutorial assumes that you have the [Flowable demo setup running](demo.setup.one.minute.version), and that you are using a standalone H2 server. Edit db.properties and set the jdbc.url=jdbc:h2:tcp://localhost/flowable, and then run the standalone server according to [H2’s documentation](http://www.h2database.com/html/tutorial.html#using_server).
 
 ### Goal
 
@@ -66,23 +66,23 @@ The use case is straightforward: we have a company, let’s call it BPMCorp. In 
 
 ### Process diagram
 
-The business process as described above can be defined graphically using the [Flowable Designer](#flowableDesigner). However, for this tutorial, we’ll type the XML ourselves, as we’ll learn the most this way at this stage. The graphical BPMN 2.0 notation of our process looks like this:
+The business process as described above can be defined graphically using the [Flowable Designer](bpmn/ch13-Designer.md#eclipse-designer). However, for this tutorial, we’ll type the XML ourselves, as we’ll learn the most this way at this stage. The graphical BPMN 2.0 notation of our process looks like this:
 
 ![financial.report.example.diagram](assets/bpmn/financial.report.example.diagram.png)
 
-What we see is a [none Start Event](#bpmnNoneStartEvent) (circle on the left), followed by two [User Tasks](#bpmnUserTask): *'Write monthly financial report'* and *'Verify monthly financial report'*, ending in a [none end event](#bpmnNoneEndEvent) (circle with thick border on the right).
+What we see is a [none Start Event](bpmn/ch07b-BPMN-Constructs.md#None-start-event) (circle on the left), followed by two [User Tasks](bpmn/ch07b-BPMN-Constructs.md#user-task): *'Write monthly financial report'* and *'Verify monthly financial report'*, ending in a [none end event](bpmn/ch07b-BPMN-Constructs.md#None-end-event) (circle with thick border on the right).
 
 ### XML representation
 
 The XML version of this business process (*FinancialReportProcess.bpmn20.xml*) looks like that shown below. It’s easy to recognize the main elements of our process (click on the link to go to the detailed section of that BPMN 2.0 construct):
 
--   The [(none) start event](#bpmnNoneStartEvent) tells us what the *entry point* is to the process.
+-   The [(none) start event](bpmn/ch07b-BPMN-Constructs.md#None-start-event) tells us what the *entry point* is to the process.
 
--   The [User Tasks](#bpmnUserTask) declarations are the representation of the human tasks of our process. Note that the first task is assigned to the *accountancy* group, while the second task is assigned to the *management* group. See [the section on user task assignment](#bpmnUserTaskAssignment) for more information on how users and groups can be assigned to user tasks.
+-   The [User Tasks](bpmn/ch07b-BPMN-Constructs.md#user-task) declarations are the representation of the human tasks of our process. Note that the first task is assigned to the *accountancy* group, while the second task is assigned to the *management* group. See [the section on user task assignment](bpmn/ch07b-BPMN-Constructs.md#user-assignment) for more information on how users and groups can be assigned to user tasks.
 
--   The process ends when the [none end event](#bpmnNoneEndEvent) is reached.
+-   The process ends when the [none end event](bpmn/ch07b-BPMN-Constructs.md#None-end-event) is reached.
 
--   The elements are connected to each other by [sequence flows](#bpmnSequenceFlow). These sequence flows have a source and target, defining the *direction* of the sequence flow.
+-   The elements are connected to each other by [sequence flows](bpmn/ch07b-BPMN-Constructs.md#sequence-flow). These sequence flows have a source and target, defining the *direction* of the sequence flow.
 
 <!-- -->
 
@@ -140,7 +140,7 @@ To be able to create process instances from a given process definition, we must 
 
 -   The BPMN 2.0 process XML will be parsed to an in-memory object model that can be manipulated through the Flowable API.
 
-More information on deployment can be found [in the dedicated section on deployment](#chDeployment).
+More information on deployment can be found [in the dedicated section on deployment](bpmn/ch06-Deployment.md#deployment).
 
 As described in that section, deployment can happen in several ways. One way is through the API as follows. Note that all interaction with the Flowable engine happens through its *services*.
 
@@ -158,7 +158,7 @@ After the task is created, the startProcessInstanceByKey method will return beca
 
 We can now throw this all together and create a simple Java program. Create a new Eclipse project and add the Flowable JARs and dependencies to its classpath (these can be found in the *libs* folder of the Flowable distribution). Before we can call the Flowable services, we must first construct a ProcessEngine that gives us access to the services. Here we use the *'standalone'* configuration, which constructs a ProcessEngine that uses the database also used in the demo setup.
 
-You can download the process definition XML [here](assets/bpmn/FinancialReportProcess.bpmn20.xml). This file contains the XML shown above, but also contains the necessary BPMN [diagram interchange information](#generatingProcessDiagram) to visualize the process in the Flowable tools.
+You can download the process definition XML [here](assets/bpmn/FinancialReportProcess.bpmn20.xml). This file contains the XML shown above, but also contains the necessary BPMN [diagram interchange information](bpmn/ch06-Deployment.md#generating-a-process-diagram) to visualize the process in the Flowable tools.
 
     public static void main(String[] args) {
 

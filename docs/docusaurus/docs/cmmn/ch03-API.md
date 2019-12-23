@@ -5,7 +5,7 @@ title: The Flowable CMMN API
 
 ## The Process CMMN Engine API and services
 
-The engine API is the most common way of interacting with Flowable. The main starting point is the CmmnEngine, which can be created in several ways as described in the [configuration section](#configuration). From the CmmnEngine, you can obtain the various services that contain the case/CMMN methods. CmmnEngine and the services objects are thread safe, so you can keep a reference to one of those for a whole server.
+The engine API is the most common way of interacting with Flowable. The main starting point is the CmmnEngine, which can be created in several ways as described in the [configuration section](cmmn/ch02-Configuration.md#creating-a-cmmnengine). From the CmmnEngine, you can obtain the various services that contain the case/CMMN methods. CmmnEngine and the services objects are thread safe, so you can keep a reference to one of those for a whole server.
 
     CmmnEngine cmmnEngine = CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration();
 

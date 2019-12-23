@@ -16,11 +16,11 @@ Alternatively, you can use the Flowable REST API to communicate over HTTP. There
 Common to all the ways of setting up Flowable is the core engine, which can be seen as a collection of services that expose APIs to manage and execute business processes.
 The various tutorials below start by introducing how to set up and use this core engine. The sections afterwards build upon the knowledge acquired in the previous sections.
 
--   The [first section](#getting.started.command.line) shows how to run Flowable in the simplest way possible: a regular Java main using only Java SE. Many core concepts and APIs will be explained here.
+-   The [first section](building-a-command-line-application) shows how to run Flowable in the simplest way possible: a regular Java main using only Java SE. Many core concepts and APIs will be explained here.
 
--   The [section on the Flowable REST API](#getting.started.rest) shows how to run and use the same API through REST.
+-   The [section on the Flowable REST API](getting-started-with-the-flowable-rest-api) shows how to run and use the same API through REST.
 
--   The [section on the Flowable App](#getting.started.flowable.app), will guide you through the basics of using the out-of-the-box example Flowable user interfaces.
+-   The [section on the Flowable App](ch14-Applications.md#flowable-ui-applications-configurations), will guide you through the basics of using the out-of-the-box example Flowable user interfaces.yyy
 
 ## Flowable and Activiti
 
@@ -442,11 +442,11 @@ Of course, this is just the start of the journey. The following sections will di
 
 ## Getting started with the Flowable REST API
 
-This section shows the same example as the [previous section](#getting.started.command.line): deploying a process definition, starting a process instance, getting a task list and completing a task. If you haven’t read that section, it might be good to skim through it to get an idea of what is done there.
+This section shows the same example as the [previous section](building-a-command-line-application): deploying a process definition, starting a process instance, getting a task list and completing a task. If you haven’t read that section, it might be good to skim through it to get an idea of what is done there.
 
 This time, the Flowable REST API is used rather than the Java API. You’ll soon notice that the REST API closely matches the Java API, and knowing one automatically means that you can find your way around the other.
 
-To get a full, detailed overview of the Flowable REST API, check out the [REST API chapter](#restApiChapter).
+To get a full, detailed overview of the Flowable REST API, check out the [REST API chapter](bpmn/ch15-REST.md#rest-api).
 
 ### Setting up the REST application
 
@@ -510,4 +510,4 @@ However, you most likely will get an error like:
 
     {"message":"Internal server error","exception":"couldn't instantiate class org.flowable.CallExternalSystemDelegate"}
 
-This means that the engine couldn’t find the *CallExternalSystemDelegate* class that is referenced in the service task. To solve this, the class needs to be put on the classpath of the application (which will require a restart). Create the class as described in [this section](#getting.started.delegate), package it up as a JAR and put it in the *WEB-INF/lib* folder of the flowable-rest folder under the *webapps* folder of Tomcat.
+This means that the engine couldn’t find the *CallExternalSystemDelegate* class that is referenced in the service task. To solve this, the class needs to be put on the classpath of the application (which will require a restart). Create the class as described in [this section](bpmn/ch02-GettingStarted.md#writing-a-javadelegate), package it up as a JAR and put it in the *WEB-INF/lib* folder of the flowable-rest folder under the *webapps* folder of Tomcat.

@@ -107,7 +107,7 @@ Note that the above configuration requires the "spring-context" module:
         <version>4.2.5.RELEASE</version>
     </dependency>
 
-The configuration in a Java SE environment looks exactly like the examples provided in section [Creating a ProcessEngine](#configuration), substitute CdiStandaloneProcessEngineConfiguration for StandaloneProcessEngineConfiguration.
+The configuration in a Java SE environment looks exactly like the examples provided in section [Creating a ProcessEngine](bpmn/ch03-Configuration.md#creating-a-processengine), substitute CdiStandaloneProcessEngineConfiguration for StandaloneProcessEngineConfiguration.
 
 ### Deploying Processes
 

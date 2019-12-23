@@ -7,7 +7,7 @@ While you can definitely use Flowable DMN without Spring, we’ve provided some 
 
 ## DmnEngineFactoryBean
 
-The DmnEngine can be configured as a regular Spring bean. The starting point of the integration is the class org.flowable.dmn.spring.DmnEngineFactoryBean. This bean takes a DMN engine configuration and creates the DMN engine. This means that the creation and configuration of properties for Spring is the same as documented in the [configuration section](#configuration). For Spring integration, the configuration and engine beans will look like this:
+The DmnEngine can be configured as a regular Spring bean. The starting point of the integration is the class org.flowable.dmn.spring.DmnEngineFactoryBean. This bean takes a DMN engine configuration and creates the DMN engine. This means that the creation and configuration of properties for Spring is the same as documented in the [configuration section](dmn/ch02-Configuration.md#creating-a-dmn-engine). For Spring integration, the configuration and engine beans will look like this:
 
     <bean id="dmnEngineConfiguration" class="org.flowable.dmn.spring.SpringDmnEngineConfiguration">
         ...
@@ -59,7 +59,7 @@ In addition to using the values listed above for deploymentMode, you may want cu
 
 ## Unit testing
 
-When integrating with Spring, decisions can be tested very easily using the standard [Flowable testing facilities](#apiUnitTesting).
+When integrating with Spring, decisions can be tested very easily using the standard [Flowable testing facilities](dmn/ch03-API.md#unit-testing).
 The following examples show how a decision is tested in typical Spring-based JUnit 4 and 5 tests:
 
 **JUnit 5 test.**

@@ -31,6 +31,7 @@ const siteConfig = {
   headerLinks: [
     {doc: 'oss-introduction', label: 'Guides'},
     {page: 'all-javadocs', label: 'Javadocs'},
+    {href: 'https://flowable.com/open-source/', label: 'Open source home'},
   ],
 
   // If you have users set above, you add it here:

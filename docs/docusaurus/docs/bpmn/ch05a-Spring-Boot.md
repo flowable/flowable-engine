@@ -21,7 +21,7 @@ To get started, you would need to create a Spring Boot project.
 The easiest way to do this would be to create a project via [start.spring.io](https://start.spring.io/).
 For example create a project with web and h2 dependencies.
 Then in the created project simply add the *flowable-spring-boot-starter* or *flowable-spring-boot-starter-rest* dependency.
-In case you don’t need all the engines see the other [Flowable starters](#springBootFlowableStarter).
+In case you don’t need all the engines see the other [Flowable starters](bpmn/ch05a-Spring-Boot.md#flowable-starters).
 For example for Maven:
 
     <dependency>

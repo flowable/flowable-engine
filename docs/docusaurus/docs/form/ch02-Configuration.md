@@ -7,7 +7,7 @@ title: Configuration
 
 *The Flowable Form engine is structured in a very similar way to the Flowable process engine. As a result parts of the documentation have a resemblance with their process engine counterpart.*
 
-The Flowable Form engine is configured through an XML file named flowable.form.cfg.xml. Note that this is **not** applicable if you’re using [the Spring style of building a Form engine](#springintegration).
+The Flowable Form engine is configured through an XML file named flowable.form.cfg.xml. Note that this is **not** applicable if you’re using [the Spring style of building a Form engine](form/ch04-Spring.md#spring-integration).
 
 The easiest way to obtain a FormEngine, is to use the org.flowable.form.engine.FormEngines class:
 
@@ -44,7 +44,7 @@ The FormEngineConfiguration object can also be created programmatically using th
       createFormEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
 
 It is also possible not to use a configuration file, and create a configuration based on
-defaults (see [the different supported classes](#configurationClasses) for more information).
+defaults (see [the different supported classes](form/ch02-Configuration.md#plug-into-process-engine) for more information).
 
     FormEngineConfiguration.createStandaloneFormEngineConfiguration();
     FormEngineConfiguration.createStandaloneInMemFormEngineConfiguration();
@@ -68,7 +68,7 @@ This bean is then used to construct the FormEngine. There are multiple classes a
 
 -   **org.flowable.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration**: this is a convenience class for unit testing purposes. Flowable Form will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed).
 
--   **org.flowable.form.spring.SpringFormEngineConfiguration**: To be used when the Form engine is used in a Spring environment. See [the Spring integration section](#springintegration) for more information.
+-   **org.flowable.form.spring.SpringFormEngineConfiguration**: To be used when the Form engine is used in a Spring environment. See [the Spring integration section](form/ch04-Spring.md#spring-integration) for more information.
 
 ## Plug into Process Engine
 
@@ -145,7 +145,7 @@ Note that Flowable Form does not ship with a library that allows you to define s
 
 The following properties can be set, regardless of whether you are using the JDBC or data source approach:
 
--   **databaseType**: it’s normally not necessary to specify this property as it’s automatically identified from the database connection metadata. Should only be specified in case automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See [the 'supported databases' section](#supporteddatabases) for an overview of which types are supported.
+-   **databaseType**: it’s normally not necessary to specify this property as it’s automatically identified from the database connection metadata. Should only be specified in case automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See [the 'supported databases' section](form/ch02-Configuration.md#supported-databases) for an overview of which types are supported.
 
 -   **databaseSchemaUpdate**: allows you to set the strategy to handle the database schema on form engine boot and shutdown.
 
@@ -293,7 +293,7 @@ The easiest way to create the database tables for your database is to:
 
 -   Add a suitable database driver
 
--   Add a Flowable configuration file (*flowable.form.cfg.xml*) to your classpath, pointing to your database (see [database configuration section](#databaseConfiguration))
+-   Add a Flowable configuration file (*flowable.form.cfg.xml*) to your classpath, pointing to your database (see [database configuration section](form/ch02-Configuration.md#database-configuration))
 
 -   Execute the main method of the *DbSchemaCreate* class
 

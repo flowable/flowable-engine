@@ -67,7 +67,7 @@ The next example, gets all variable-updates that have been done in process with 
       .orderByVariableName().asc()
       .list()
 
-This example gets all [form-properties](#formProperties) that were submitted in any task or when starting the process with id "123". Only HistoricFormProperties will be returned by this query.
+This example gets all [form-properties](bpmn/ch08-Forms.md#form-properties) that were submitted in any task or when starting the process with id "123". Only HistoricFormProperties will be returned by this query.
 
     historyService.createHistoricDetailQuery()
       .formProperties()
@@ -164,7 +164,7 @@ See [the Flowable Async History Examples](https://github.com/flowable/flowable-e
 
 ## History for audit purposes
 
-When [configuring](#historyConfig) at least audit level for configuration. Then all properties submitted through methods FormService.submitStartFormData(String processDefinitionId, Map&lt;String, String&gt; properties) and FormService.submitTaskFormData(String taskId, Map&lt;String, String&gt; properties) are recorded.
+When [configuring](bpmn/ch11-History.md#history-configuration) at least audit level for configuration. Then all properties submitted through methods FormService.submitStartFormData(String processDefinitionId, Map&lt;String, String&gt; properties) and FormService.submitTaskFormData(String taskId, Map&lt;String, String&gt; properties) are recorded.
 
 Form properties can be retrieved with the query API like this:
 

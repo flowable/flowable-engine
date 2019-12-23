@@ -17,7 +17,7 @@ When you are using the demo setup and you want to add your custom classes, you s
 
 ### Using Spring beans from a case instance
 
-When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the case definition. If you are building your own webapp and you configure your CMMN engine in your context as described in [the spring integration section](#springintegration), that is straightforward. But bear in mind that you also should update the Flowable task and rest webapps with that context if you use it.
+When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the case definition. If you are building your own webapp and you configure your CMMN engine in your context as described in [the spring integration section](cmmn/ch04-Spring.md#spring-integration), that is straightforward. But bear in mind that you also should update the Flowable task and rest webapps with that context if you use it.
 
 ## Versioning of case definitions
 

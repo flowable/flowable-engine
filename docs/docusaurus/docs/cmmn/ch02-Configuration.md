@@ -5,7 +5,7 @@ title: Configuration
 
 ## Creating a CmmnEngine
 
-The Flowable CMMN engine is configured through an XML file called flowable.cmmn.cfg.xml. Note that this is **not** applicable if you’re using [the Spring style of building a process engine](#springintegration).
+The Flowable CMMN engine is configured through an XML file called flowable.cmmn.cfg.xml. Note that this is **not** applicable if you’re using [the Spring style of building a process engine](cmmn/ch04-Spring.md#spring-integration).
 
 The easiest way to obtain a CmmnEngine is to use the org.flowable.cmmn.engine.CmmnEngineConfiguration class:
 
@@ -60,10 +60,11 @@ The flowable.cmmn.cfg.xml must contain a bean that has the id 'cmmnEngineConfigu
      <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
 
 This bean is then used to construct the CmmnEngine. There are multiple classes available that can be used to define the cmmnEngineConfiguration. These classes represent different environments, and set defaults accordingly. It is a best practice to select the class that best matches your environment, to minimize the number of properties needed to configure the engine. The following classes are currently available:
+<a name="configurationClasses"></a>
 
 -   **org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration**: this is a convenience class for unit testing purposes. Flowable will take care of all transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, no additional configuration is probably needed.
 
--   **org.flowable.cmmn.spring.SpringCmmnEngineConfiguration**: To be used when the CMMN engine is used in a Spring environment. See [the Spring integration section](#springintegration) for more information.
+-   **org.flowable.cmmn.spring.SpringCmmnEngineConfiguration**: To be used when the CMMN engine is used in a Spring environment. See [the Spring integration section](cmmn/ch04-Spring.md#spring-integration) for more information.
 
 ## Database configuration
 
@@ -113,7 +114,7 @@ Note that Flowable does not ship with a library that allows you to define such a
 
 The following properties can be set, regardless of whether you are using the JDBC or data source approach:
 
--   **databaseType**: it’s normally not necessary to specify this property, as it is automatically detected from the database connection metadata. Should only be specified when automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See [the 'supported databases' section](#supporteddatabases) for an overview of which types are supported.
+-   **databaseType**: it’s normally not necessary to specify this property, as it is automatically detected from the database connection metadata. Should only be specified when automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See [the 'supported databases' section](cmmn/ch02-Configuration.md#supported-databases) for an overview of which types are supported.
 
 -   **databaseSchemaUpdate**: sets the strategy to handle the database schema on process engine boot and shutdown.
 
@@ -258,7 +259,7 @@ The easiest way to create the database tables for your database is to:
 
 -   Add a suitable database driver
 
--   Add a Flowable configuration file (*flowable.cmmn.cfg.xml*) to your classpath, pointing to your database (see [database configuration section](#databaseConfiguration))
+-   Add a Flowable configuration file (*flowable.cmmn.cfg.xml*) to your classpath, pointing to your database (see [database configuration section](cmmn/ch02-Configuration.md#database-configuration))
 
 -   Execute the main method of the *DbSchemaCreate* class
 
@@ -266,7 +267,7 @@ However, often only database administrators can execute DDL statements on a data
 
     flowable.{db}.cmmn.create.sql
 
-Where *db* is any of the [supported databases](#supporteddatabases).
+Where *db* is any of the [supported databases](cmmn/ch02-Configuration.md#supported-databases).
 
 ## Database table names explained
 

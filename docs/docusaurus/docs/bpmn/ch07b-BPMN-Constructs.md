@@ -33,7 +33,7 @@ Event definitions define the semantics of an event. Without an event definition,
 
 ### Timer Event Definitions
 
-Timer events are events that are triggered by a defined timer. They can be used as [start event](#bpmnTimerStartEvent), [intermediate event](#bpmnIntermediateCatchingEvent) or [boundary event](#bpmnTimerBoundaryEvent). The behavior of the time event depends on the business calendar used. Every timer event has a default business calendar, but the business calendar can also be given as part of the timer event definition.
+Timer events are events that are triggered by a defined timer. They can be used as [start event](bpmn/ch07b-BPMN-Constructs.md#timer-start-event), [intermediate event](bpmn/ch07b-BPMN-Constructs.md#intermediate-catching-events) or [boundary event](bpmn/ch07b-BPMN-Constructs.md#timer-boundary-event). The behavior of the time event depends on the business calendar used. Every timer event has a default business calendar, but the business calendar can also be given as part of the timer event definition.
 
     <timerEventDefinition flowable:businessCalendarName="custom">
         ...
@@ -85,7 +85,7 @@ Please see [this tutorial](http://www.quartz-scheduler.org/documentation/quartz-
 
 **Note:** The first symbol denotes seconds, not minutes as in normal Unix cron.
 
-The recurring time duration is better suited for handling relative timers, which are calculated with respect to some particular point in time (for example, the time when a user task was started), while cron expressions can handle absolute timers, which is particularly useful for [timer start events](#timerStartEventDescription).
+The recurring time duration is better suited for handling relative timers, which are calculated with respect to some particular point in time (for example, the time when a user task was started), while cron expressions can handle absolute timers, which is particularly useful for [timer start events](bpmn/ch07b-BPMN-Constructs.md#description).
 
 You can use expressions for timer event definitions, and by doing so, you can influence the timer definition
 based on process variables. The process variables must contain the ISO 8601 (or cron for cycle type) string for appropriate timer type.
@@ -101,7 +101,7 @@ Additionally, for durations variables of type or expressions that return `java.t
 
 ### Error Event Definitions
 
-**Important note:** a BPMN error is NOT the same as a Java exception. In fact, the two have nothing in common. BPMN error events are a way of modeling *business exceptions*. Java exceptions are handled in [their own specific way](#serviceTaskExceptionHandling).
+**Important note:** a BPMN error is NOT the same as a Java exception. In fact, the two have nothing in common. BPMN error events are a way of modeling *business exceptions*. Java exceptions are handled in [their own specific way](bpmn/ch07b-BPMN-Constructs.md#handling-exceptions).
 
     <endEvent id="myErrorEndEvent">
       <errorEventDefinition errorRef="myError" />
@@ -184,7 +184,7 @@ This event can now be caught by all process instances that are interested. The f
 
 The pattern described in the process above is not supported by BPMN. The idea is that the error thrown while performing the "do something" task is caught by the boundary error event, propagated to the parallel path of execution using the signal throw event and then interrupt the "do something in parallel" task. So far, Flowable would perform as expected. The signal would be propagated to the catching boundary event and interrupt the task. **However, due to the broadcast semantics of the signal, it would also be propagated to all other process instances that have subscribed to the signal event.** In this case, this might not be what we want.
 
-**Note:** the signal event does not perform any kind of correlation to a specific process instance. On the contrary, it is broadcast to all process instances. If you need to deliver a signal to a specific process instance only, perform the correlation manually and use signalEventReceived(String signalName, String executionId) along with the appropriate [query mechanisms](#bpmnSignalEventDefinitionQuery).
+**Note:** the signal event does not perform any kind of correlation to a specific process instance. On the contrary, it is broadcast to all process instances. If you need to deliver a signal to a specific process instance only, perform the correlation manually and use signalEventReceived(String signalName, String executionId) along with the appropriate [query mechanisms](bpmn/ch07b-BPMN-Constructs.md#querying-for-signal-event-subscriptions).
 
 Flowable does have a way to fix this by adding the *scope* attribute to the signal event set to *processInstance*.
 
@@ -291,7 +291,7 @@ The authenticated user must be set with the method IdentityService.setAuthentica
       identityService.setAuthenticatedUserId(null);
     }
 
-This code is baked into the Flowable application, so it works in combination with [???](#forms).
+This code is baked into the Flowable application, so it works in combination with [???](bpmn/ch08-Forms.md#forms).
 
 ### None Start Event
 
@@ -317,7 +317,7 @@ The XML representation of a none start event is the normal start event declarati
 
 #### Custom extensions for the none start event
 
-**formKey**: references a form definition that users have to fill in when starting a new process instance. More information can be found in [the forms section](#forms) Example:
+**formKey**: references a form definition that users have to fill in when starting a new process instance. More information can be found in [the forms section](bpmn/ch08-Forms.md#forms) Example:
 
     <startEvent id="request" flowable:formKey="request" />
 
@@ -341,7 +341,7 @@ A timer start event is visualized as a circle with clock inner icon.
 
 #### XML representation
 
-The XML representation of a timer start event is the normal start event declaration, with timer definition sub-element. Please refer to [timer definitions](#timerEventDefinitions) for configuration details.
+The XML representation of a timer start event is the normal start event declaration, with timer definition sub-element. Please refer to [timer definitions](bpmn/ch07b-BPMN-Constructs.md#timer-event-definitions) for configuration details.
 
 Example: process will start 4 times, in 5 minute intervals, starting on 11th march 2011, 12:13
 
@@ -363,7 +363,7 @@ Example: process will start once, on selected date
 
 #### Description
 
-A [message](#bpmnMessageEventDefinition) start event can be used to start a process instance using a named message. This effectively allows us to *select* the right start event from a set of alternative start events using the message name.
+A [message](bpmn/ch07b-BPMN-Constructs.md#message-event-definitions) start event can be used to start a process instance using a named message. This effectively allows us to *select* the right start event from a set of alternative start events using the message name.
 
 When **deploying** a process definition with one or more message start events, the following considerations apply:
 
@@ -430,7 +430,7 @@ The XML representation of a message start event is the normal start event declar
 
 #### Description
 
-A [signal](#bpmnSignalEventDefinition) start event can be used to start a process instance using a named signal. The signal can be 'fired' from within a process instance using the intermediary signal throw event or through the API (*runtimeService.signalEventReceivedXXX* methods). In both cases, all process definitions that have a signal start event with the same name will be started.
+A [signal](bpmn/ch07b-BPMN-Constructs.md#signal-event-definitions) start event can be used to start a process instance using a named signal. The signal can be 'fired' from within a process instance using the intermediary signal throw event or through the API (*runtimeService.signalEventReceivedXXX* methods). In both cases, all process definitions that have a signal start event with the same name will be started.
 
 Note that in both cases, it is also possible to choose between a synchronous and asynchronous starting of the process instances.
 
@@ -462,7 +462,7 @@ The XML representation of a signal start event is the normal start event declara
 
 #### Description
 
-An [error](#bpmnErrorEventDefinition) start event can be used to trigger an Event Sub-Process. **An error start event cannot be used for starting a process instance**.
+An [error](bpmn/ch07b-BPMN-Constructs.md#error-event-definitions) start event can be used to trigger an Event Sub-Process. **An error start event cannot be used for starting a process instance**.
 
 An error start event is always interrupting.
 
@@ -506,7 +506,7 @@ The XML representation of a none end event is the normal end event declaration, 
 
 #### Description
 
-When process execution arrives at an **error end event**, the current path of execution ends and an error is thrown. This error can [caught by a matching intermediate boundary error event](#bpmnBoundaryErrorEvent). If no matching boundary error event is found, an exception will be thrown.
+When process execution arrives at an **error end event**, the current path of execution ends and an error is thrown. This error can [caught by a matching intermediate boundary error event](bpmn/ch07b-BPMN-Constructs.md#error-boundary-event). If no matching boundary error event is found, an exception will be thrown.
 
 #### Graphical notation
 
@@ -625,7 +625,7 @@ A timer boundary event is visualized as a typical boundary event (circle on the 
 
 #### XML Representation
 
-A timer boundary event is defined as a [regular boundary event](#bpmnBoundaryEvent). The specific type sub-element in this case is a **timerEventDefinition** element.
+A timer boundary event is defined as a [regular boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events). The specific type sub-element in this case is a **timerEventDefinition** element.
 
     <boundaryEvent id="escalationTimer" cancelActivity="true" attachedToRef="firstLineSupport">
       <timerEventDefinition>
@@ -633,7 +633,7 @@ A timer boundary event is defined as a [regular boundary event](#bpmnBoundaryEve
       </timerEventDefinition>
     </boundaryEvent>
 
-Please refer to [timer event definition](#timerEventDefinitions) for details on timer configuration.
+Please refer to [timer event definition](bpmn/ch07b-BPMN-Constructs.md#timer-event-definitions) for details on timer configuration.
 
 In the graphical representation, the line of the circle is dotted as you can see in the example above:
 
@@ -659,7 +659,7 @@ There is a known issue regarding concurrency when using boundary events of any t
 
 An intermediate *catching* error on the boundary of an activity, or **boundary error event** for short, catches errors that are thrown within the scope of the activity on which it is defined.
 
-Defining a boundary error event makes most sense on an [embedded sub-process](#bpmnSubProcess), or a [call activity](#bpmnCallActivity), as a sub-process creates a scope for all activities inside the sub-process. Errors are thrown by [error end events](#bpmnErrorEndEvent). Such an error will propagate its parent scopes upwards until a scope is found on which a boundary error event is defined that matches the error event definition.
+Defining a boundary error event makes most sense on an [embedded sub-process](bpmn/ch07b-BPMN-Constructs.md#aocess), or a [call activity](bpmn/ch07b-BPMN-Constructs.md#call-activity-(sub-process)), as a sub-process creates a scope for all activities inside the sub-process. Errors are thrown by [error end events](bpmn/ch07b-BPMN-Constructs.md#error-end-event). Such an error will propagate its parent scopes upwards until a scope is found on which a boundary error event is defined that matches the error event definition.
 
 When an error event is caught, the activity on which the boundary event is defined is destroyed, also destroying all current executions within (concurrent activities, nested sub-processes, and so on). Process execution continues following the outgoing sequence flow of the boundary event.
 
@@ -671,13 +671,13 @@ A boundary error event is visualized as a typical intermediate event (circle wit
 
 #### XML representation
 
-A boundary error event is defined as a typical [boundary event](#bpmnBoundaryEvent):
+A boundary error event is defined as a typical [boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events):
 
     <boundaryEvent id="catchError" attachedToRef="mySubProcess">
       <errorEventDefinition errorRef="myError"/>
     </boundaryEvent>
 
-As with the [error end event](#bpmnErrorEndEvent), the *errorRef* references an error defined outside the process element:
+As with the [error end event](bpmn/ch07b-BPMN-Constructs.md#error-end-event), the *errorRef* references an error defined outside the process element:
 
     <error id="myError" errorCode="123" />
     ...
@@ -704,7 +704,7 @@ This process is shipped as example in the demo setup. The process XML and unit t
 
 #### Description
 
-An attached intermediate *catching* [signal](#bpmnSignalEventDefinition) on the boundary of an activity, or **boundary signal event** for short, catches signals with the same signal name as the referenced signal definition.
+An attached intermediate *catching* [signal](bpmn/ch07b-BPMN-Constructs.md#signal-event-definitions) on the boundary of an activity, or **boundary signal event** for short, catches signals with the same signal name as the referenced signal definition.
 
 **Note:** contrary to other events, such as the boundary error event, a boundary signal event doesn’t only catch signal events thrown from the scope to which it is attached. On the contrary, a signal event has global scope (broadcast semantics), meaning that the signal can be thrown from any place, even from a different process instance.
 
@@ -718,7 +718,7 @@ A boundary signal event is visualized as a typical intermediate event (circle wi
 
 #### XML representation
 
-A boundary signal event is defined as a typical [boundary event](#bpmnBoundaryEvent):
+A boundary signal event is defined as a typical [boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events):
 
     <boundaryEvent id="boundary" attachedToRef="task" cancelActivity="true">
         <signalEventDefinition signalRef="alertSignal"/>
@@ -726,13 +726,13 @@ A boundary signal event is defined as a typical [boundary event](#bpmnBoundaryEv
 
 #### Example
 
-See the section on [signal event definitions](#bpmnSignalEventDefinition).
+See the section on [signal event definitions](bpmn/ch07b-BPMN-Constructs.md#signal-event-definitions).
 
 ### Message Boundary Event
 
 #### Description
 
-An attached intermediate *catching* [message](#bpmnMessageEventDefinition) on the boundary of an activity, or **boundary message event** for short, catches messages with the same message name as the referenced message definition.
+An attached intermediate *catching* [message](bpmn/ch07b-BPMN-Constructs.md#message-event-definitions) on the boundary of an activity, or **boundary message event** for short, catches messages with the same message name as the referenced message definition.
 
 #### Graphical notation
 
@@ -744,7 +744,7 @@ Note that boundary message event can be both interrupting (right-hand side) and 
 
 #### XML representation
 
-A boundary message event is defined as a typical [boundary event](#bpmnBoundaryEvent):
+A boundary message event is defined as a typical [boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events):
 
     <boundaryEvent id="boundary" attachedToRef="task" cancelActivity="true">
         <messageEventDefinition messageRef="newCustomerMessage"/>
@@ -752,7 +752,7 @@ A boundary message event is defined as a typical [boundary event](#bpmnBoundaryE
 
 #### Example
 
-See the section on [message event definitions](#bpmnMessageEventDefinition).
+See the section on [message event definitions](bpmn/ch07b-BPMN-Constructs.md#message-event-definitions).
 
 ### Cancel Boundary Event
 
@@ -774,7 +774,7 @@ A cancel boundary event is visualized as a typical intermediate event (circle wi
 
 #### XML representation
 
-A cancel boundary event is defined as a typical [boundary event](#bpmnBoundaryEvent):
+A cancel boundary event is defined as a typical [boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events):
 
     <boundaryEvent id="boundary" attachedToRef="transaction" >
               <cancelEventDefinition />
@@ -810,7 +810,7 @@ A compensation boundary event is visualized as a typical intermediate event (cir
 
 #### XML representation
 
-A compensation boundary event is defined as a typical [boundary event](#bpmnBoundaryEvent):
+A compensation boundary event is defined as a typical [boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events):
 
     <boundaryEvent id="compensateBookHotelEvt" attachedToRef="bookHotel" >
         <compensateEventDefinition />
@@ -851,7 +851,7 @@ A timer intermediate event is visualized as an intermediate catching event, with
 
 #### XML Representation
 
-A timer intermediate event is defined as an [intermediate catching event](#bpmnIntermediateCatchingEvent). The specific type sub-element is, in this case, a **timerEventDefinition** element.
+A timer intermediate event is defined as an [intermediate catching event](bpmn/ch07b-BPMN-Constructs.md#intermediate-catching-events). The specific type sub-element is, in this case, a **timerEventDefinition** element.
 
     <intermediateCatchEvent id="timer">
       <timerEventDefinition>
@@ -859,13 +859,13 @@ A timer intermediate event is defined as an [intermediate catching event](#bpmnI
       </timerEventDefinition>
     </intermediateCatchEvent>
 
-See [timer event definitions](#timerEventDefinitions) for configuration details.
+See [timer event definitions](bpmn/ch07b-BPMN-Constructs.md#timer-event-definitions) for configuration details.
 
 ### Signal Intermediate Catching Event
 
 #### Description
 
-An intermediate *catching* [signal](#bpmnSignalEventDefinition) event catches signals with the same signal name as the referenced signal definition.
+An intermediate *catching* [signal](bpmn/ch07b-BPMN-Constructs.md#signal-event-definitions) event catches signals with the same signal name as the referenced signal definition.
 
 **Note:** contrary to other events, such as an error event, a signal is not consumed if it is caught. If you have two active signal boundary events catching the same signal event, both boundary events are triggered, even if they are part of different process instances.
 
@@ -877,7 +877,7 @@ An intermediate signal catch event is visualized as a typical intermediate event
 
 #### XML representation
 
-A signal intermediate event is defined as an [intermediate catching event](#bpmnIntermediateCatchingEvent). The specific type sub-element is in this case a **signalEventDefinition** element.
+A signal intermediate event is defined as an [intermediate catching event](bpmn/ch07b-BPMN-Constructs.md#intermediate-catching-events). The specific type sub-element is in this case a **signalEventDefinition** element.
 
     <intermediateCatchEvent id="signal">
       <signalEventDefinition signalRef="newCustomerSignal" />
@@ -885,13 +885,13 @@ A signal intermediate event is defined as an [intermediate catching event](#bpmn
 
 #### Example
 
-See the section on [signal event definitions](#bpmnSignalEventDefinition).
+See the section on [signal event definitions](bpmn/ch07b-BPMN-Constructs.md#signal-event-definitions).
 
 ### Message Intermediate Catching Event
 
 #### Description
 
-An intermediate *catching* [message](#bpmnMessageEventDefinition) event catches messages with a specified name.
+An intermediate *catching* [message](bpmn/ch07b-BPMN-Constructs.md#message-event-definitions) event catches messages with a specified name.
 
 #### Graphical notation
 
@@ -901,7 +901,7 @@ An intermediate catching message event is visualized as a typical intermediate e
 
 #### XML representation
 
-A message intermediate event is defined as an [intermediate catching event](#bpmnIntermediateCatchingEvent). The specific type sub-element is in this case a **messageEventDefinition** element.
+A message intermediate event is defined as an [intermediate catching event](bpmn/ch07b-BPMN-Constructs.md#intermediate-catching-events). The specific type sub-element is in this case a **messageEventDefinition** element.
 
     <intermediateCatchEvent id="message">
       <messageEventDefinition signalRef="newCustomerMessage" />
@@ -909,7 +909,7 @@ A message intermediate event is defined as an [intermediate catching event](#bpm
 
 #### Example
 
-See the section on [message event definitions](#bpmnMessageEventDefinition).
+See the section on [message event definitions](bpmn/ch07b-BPMN-Constructs.md#message-event-definitions).
 
 ### Intermediate Throwing Event
 
@@ -931,7 +931,7 @@ The following process diagram shows a simple example of an intermediate none eve
 
 ![bpmn.intermediate.none.event](assets/bpmn/bpmn.intermediate.none.event.png)
 
-This can be a good hook to monitor some KPIs, by adding an [execution listener](#executionListeners).
+This can be a good hook to monitor some KPIs, by adding an [execution listener](bpmn/ch07b-BPMN-Constructs.md#execution-listener).
 
     <intermediateThrowEvent id="noneEvent">
       <extensionElements>
@@ -945,7 +945,7 @@ Here you can add some of your own code to maybe send some event to your BAM tool
 
 #### Description
 
-An intermediate *throwing* [signal](#bpmnSignalEventDefinition) event throws a signal event for a defined signal.
+An intermediate *throwing* [signal](bpmn/ch07b-BPMN-Constructs.md#signal-event-definitions) event throws a signal event for a defined signal.
 
 In Flowable, the signal is broadcast to all active handlers (in other words, all catching signal events). Signals can be published synchronously or asynchronously.
 
@@ -961,7 +961,7 @@ An intermediate signal throw event is visualized as a typical intermediate event
 
 #### XML representation
 
-A signal intermediate event is defined as an [intermediate throwing event](#bpmnIntermediateThrowEvent). The specific type sub-element is in this case a **signalEventDefinition** element.
+A signal intermediate event is defined as an [intermediate throwing event](bpmn/ch07b-BPMN-Constructs.md#intermediate-throwing-event). The specific type sub-element is in this case a **signalEventDefinition** element.
 
     <intermediateThrowEvent id="signal">
       <signalEventDefinition signalRef="newCustomerSignal" />
@@ -975,7 +975,7 @@ An asynchronous signal event would look like this:
 
 #### Example
 
-See the section on [signal event definitions](#bpmnSignalEventDefinition).
+See the section on [signal event definitions](bpmn/ch07b-BPMN-Constructs.md#signal-event-definitions).
 
 ### Compensation Intermediate Throwing Event
 
@@ -1025,7 +1025,7 @@ An intermediate compensation throw event is visualized as a typical intermediate
 
 #### XML representation
 
-A compensation intermediate event is defined as an [intermediate throwing event](#bpmnIntermediateThrowEvent). The specific type sub-element is in this case a **compensateEventDefinition** element.
+A compensation intermediate event is defined as an [intermediate throwing event](bpmn/ch07b-BPMN-Constructs.md#intermediate-throwing-event). The specific type sub-element is in this case a **compensateEventDefinition** element.
 
     <intermediateThrowEvent id="throwCompensation">
         <compensateEventDefinition />
@@ -1079,7 +1079,7 @@ A conditional sequence flow is represented in XML as a regular sequence flow, co
       </conditionExpression>
     </sequenceFlow>
 
-Currently, conditionalExpressions can **only be used with UEL**. Detailed information about these can be found in the section on [Expressions](#apiExpressions). The expression used should resolve to a boolean value, otherwise an exception is thrown while evaluating the condition.
+Currently, conditionalExpressions can **only be used with UEL**. Detailed information about these can be found in the section on [Expressions](bpmn/ch04-API.md#expressions). The expression used should resolve to a boolean value, otherwise an exception is thrown while evaluating the condition.
 
 -   The example below references the data of a process variable, in the typical JavaBean style through getters.
 
@@ -1155,7 +1155,7 @@ An exclusive gateway is visualized as a typical gateway (a diamond shape) with a
 
 #### XML representation
 
-The XML representation of an exclusive gateway is straight-forward: one line defining the gateway and condition expressions defined on the outgoing sequence flows. See the section on [conditional sequence flow](#bpmnConditionalSequenceFlow) to see which options are available for such expressions.
+The XML representation of an exclusive gateway is straight-forward: one line defining the gateway and condition expressions defined on the outgoing sequence flows. See the section on [conditional sequence flow](bpmn/ch07b-BPMN-Constructs.md#conditional-sequence-flow) to see which options are available for such expressions.
 
 Take, for example, the following model:
 
@@ -1483,7 +1483,7 @@ Tasks defined with the *potential owner* construct can be retrieved as follows (
 
      List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit");
 
-This will retrieve all tasks where kermit is a **candidate user**, in other words, the formal expression contains *user(kermit)*. This will also retrieve all tasks that are **assigned to a group of which kermit is a member** (for example, *group(management)*, if kermit is a member of that group and the Flowable identity component is used). The user’s groups are resolved at runtime and these can be managed through the [IdentityService](#apiEngine).
+This will retrieve all tasks where kermit is a **candidate user**, in other words, the formal expression contains *user(kermit)*. This will also retrieve all tasks that are **assigned to a group of which kermit is a member** (for example, *group(management)*, if kermit is a member of that group and the Flowable identity component is used). The user’s groups are resolved at runtime and these can be managed through the [IdentityService](bpmn/ch04-API.md#the-process-engine-api-and-services).
 
 If no specifics are given as to whether the given text string is a user or group, the engine defaults to group. The following would be the same as when *group(accountancy) was declared*.
 
@@ -1491,7 +1491,7 @@ If no specifics are given as to whether the given text string is a user or group
 
 #### Flowable extensions for task assignment
 
-It is clear that user and group assignments are quite cumbersome for use cases where the assignment is not complex. To avoid these complexities, [custom extensions](#bpmnCustomExtensions) on the user task are possible.
+It is clear that user and group assignments are quite cumbersome for use cases where the assignment is not complex. To avoid these complexities, [custom extensions](bpmn/ch07b-BPMN-Constructs.md#custom-extensions) on the user task are possible.
 
 -   **assignee attribute**: this custom extension allows direct assignment of a given user to a task.
 
@@ -1499,7 +1499,7 @@ It is clear that user and group assignments are quite cumbersome for use cases w
 
     <userTask id="theTask" name="my task" flowable:assignee="kermit" />
 
-This is exactly the same as using a **humanPerformer** construct as defined [above](#bpmnUserTaskAssignment).
+This is exactly the same as using a **humanPerformer** construct as defined [above](bpmn/ch07b-BPMN-Constructs.md#user-assignment).
 
 -   **candidateUsers attribute**: this custom extension makes a given user a candidate for a task.
 
@@ -1507,7 +1507,7 @@ This is exactly the same as using a **humanPerformer** construct as defined [abo
 
     <userTask id="theTask" name="my task" flowable:candidateUsers="kermit, gonzo" />
 
-This is exactly the same as using the **potentialOwner** construct as defined [above](#bpmnUserTaskAssignment). Note that it is not necessary to use the *user(kermit)* declaration, as with the case of the *potential owner* construct, since the attribute can only be used for users.
+This is exactly the same as using the **potentialOwner** construct as defined [above](bpmn/ch07b-BPMN-Constructs.md#user-assignment). Note that it is not necessary to use the *user(kermit)* declaration, as with the case of the *potential owner* construct, since the attribute can only be used for users.
 
 -   **candidateGroups attribute**: this custom extension makes a given group a candidate for a task.
 
@@ -1515,15 +1515,15 @@ This is exactly the same as using the **potentialOwner** construct as defined [a
 
     <userTask id="theTask" name="my task" flowable:candidateGroups="management, accountancy" />
 
-This is exactly the same as using a **potentialOwner** construct as defined [above](#bpmnUserTaskAssignment). Note that it is not necessary to use the *group(management)* declaration, as with the case of the *potential owner* construct, since the attribute can only be used for groups.
+This is exactly the same as using a **potentialOwner** construct as defined [above](bpmn/ch07b-BPMN-Constructs.md#user-assignment). Note that it is not necessary to use the *group(management)* declaration, as with the case of the *potential owner* construct, since the attribute can only be used for groups.
 
 -   *candidateUsers* and *candidateGroups* can both be defined on the same user task.
 
-Note: Although Flowable provides an identity management component, which is exposed through the [IdentityService](#apiEngine), no check is made whether a provided user is known by the identity component. This is to allow Flowable to integrate with existing identity management solutions when it is embedded in an application.
+Note: Although Flowable provides an identity management component, which is exposed through the [IdentityService](bpmn/ch04-API.md#the-process-engine-api-and-services), no check is made whether a provided user is known by the identity component. This is to allow Flowable to integrate with existing identity management solutions when it is embedded in an application.
 
 #### Custom identity link types
 
-The BPMN standard supports a single assigned user or **humanPerformer** or a set of users that form a potential pool of **potentialOwners**, as defined in [User assignment](#bpmnUserTaskAssignment). In addition, Flowable defines [extension attribute elements](#bpmnUserTaskUserAssignmentExtension) for the User Task that can represent the task **assignee** or **candidate owner**.
+The BPMN standard supports a single assigned user or **humanPerformer** or a set of users that form a potential pool of **potentialOwners**, as defined in [User assignment](bpmn/ch07b-BPMN-Constructs.md#user-assignment). In addition, Flowable defines [extension attribute elements](bpmn/ch07b-BPMN-Constructs.md#flowable-extensions-for-task-assignment) for the User Task that can represent the task **assignee** or **candidate owner**.
 
 The supported Flowable identity link types are:
 
@@ -1592,7 +1592,7 @@ Finally, the *IdentityLinkType* class must be extended to support the custom ide
 
 #### Custom Assignment via task listeners
 
-If the previous approaches are not sufficient, it is possible to delegate to custom assignment logic using a [task listener](#taskListeners) on the create event:
+If the previous approaches are not sufficient, it is possible to delegate to custom assignment logic using a [task listener](bpmn/ch07b-BPMN-Constructs.md#task-listener) on the create event:
 
     <userTask id="task1" name="My task" >
       <extensionElements>
@@ -1616,7 +1616,7 @@ The DelegateTask that is passed to the TaskListener implementation can set the a
 
     }
 
-When using Spring, it is possible to use the custom assignment attributes as described in the section above, and delegate to a Spring bean using a [task listener](#taskListeners) with an [expression](#springExpressions) that listens to task *create* events. In the following example, the assignee will be set by calling the findManagerOfEmployee on the ldapService Spring bean. The *emp* parameter that is passed, is a process variable&gt;.
+When using Spring, it is possible to use the custom assignment attributes as described in the section above, and delegate to a Spring bean using a [task listener](bpmn/ch07b-BPMN-Constructs.md#task-listener) with an [expression](bpmn/ch05-Spring.md#expressions) that listens to task *create* events. In the following example, the assignee will be set by calling the findManagerOfEmployee on the ldapService Spring bean. The *emp* parameter that is passed, is a process variable&gt;.
 
     <userTask id="task" name="My Task" flowable:assignee="${ldapService.findManagerForEmployee(emp)}"/>
 
@@ -1725,7 +1725,7 @@ In the above example, the result of the script execution (the value of the resol
 
 #### Security
 
-It is also possible when using *javascript* as the scripting language to use '*secure scripting*'. See the [secure scripting section](#advancedSecureScripting).
+It is also possible when using *javascript* as the scripting language to use '*secure scripting*'. See the [secure scripting section](bpmn/ch18-Advanced.md#secure-scripting).
 
 ### Java Service Task
 
@@ -1757,9 +1757,9 @@ To specify a class that is called during process execution, the fully qualified 
                  name="My Java Service Task"
                  flowable:class="org.flowable.MyJavaDelegate" />
 
-See [the implementation section](#bpmnJavaServiceTaskImplementation) for more details on how to use such a class.
+See [the implementation section](bpmn/ch07b-BPMN-Constructs.md#implementation) for more details on how to use such a class.
 
-It’s also possible to use an expression that resolves to an object. This object must follow the same rules as objects that are created when the flowable:class attribute is used (see [further](#bpmnJavaServiceTaskImplementation)).
+It’s also possible to use an expression that resolves to an object. This object must follow the same rules as objects that are created when the flowable:class attribute is used (see [further](bpmn/ch07b-BPMN-Constructs.md#implementation)).
 
     <serviceTask id="serviceTask" flowable:delegateExpression="${delegateExpressionBean}" />
 
@@ -1805,11 +1805,11 @@ Let’s create, for example, a Java class that can be used to change a process v
 
     }
 
-Note: there will be **only one instance of the Java class created for the serviceTask on which it is defined**. All process instances share the same class instance that will be used to call *execute(DelegateExecution)*. This means that the class must not use any member variables and must be thread-safe, as it can be executed simultaneously from different threads. This also influences the way [Field injection](#serviceTaskFieldInjection) is handled.
+Note: there will be **only one instance of the Java class created for the serviceTask on which it is defined**. All process instances share the same class instance that will be used to call *execute(DelegateExecution)*. This means that the class must not use any member variables and must be thread-safe, as it can be executed simultaneously from different threads. This also influences the way [Field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection) is handled.
 
 The classes that are referenced in the process definition (by using flowable:class) are **NOT instantiated during deployment**. Only when a process execution arrives for the first time at the point in the process where the class is used, an instance of that class will be created. If the class cannot be found, an FlowableException will be thrown. The reasoning for this is that the environment (and more specifically, the *classpath*) when you are deploying is often different from the actual runtime environment. For example, when using *ant* or the business archive upload in the Flowable app to deploy processes, the classpath will not automatically contain the referenced classes.
 
-[\[INTERNAL: non-public implementation classes\]](#internal) It is also possible to provide a class that implements the *org.flowable.engine.impl.delegate.ActivityBehavior* interface. Implementations then have access to more powerful engine functionality, for example, to influence the control flow of the process. Note however that this is not a very good practice and should be avoided as much as possible. So, it is advisable to use the *ActivityBehavior* interface only for advanced use cases and if you know exactly what you’re doing.
+[\[INTERNAL: non-public implementation classes\]](internal) It is also possible to provide a class that implements the *org.flowable.engine.impl.delegate.ActivityBehavior* interface. Implementations then have access to more powerful engine functionality, for example, to influence the control flow of the process. Note however that this is not a very good practice and should be avoided as much as possible. So, it is advisable to use the *ActivityBehavior* interface only for advanced use cases and if you know exactly what you’re doing.
 
 #### Field Injection
 
@@ -1861,7 +1861,7 @@ Alternatively, for long texts (for example, an inline e-mail) the *'flowable:str
       </extensionElements>
     </serviceTask>
 
-To inject values that are dynamically resolved at runtime, expressions can be used. Those expressions can use process variables or Spring defined beans (if Spring is used). As noted in [Service Task Implementation](#bpmnJavaServiceTaskImplementation), an instance of the Java class is shared among all process-instances in a service task when using the *flowable:class* attribute. To have dynamic injection of values in fields, you can inject value and method expressions in a org.flowable.engine.delegate.Expression that can be evaluated/invoked using the DelegateExecution passed in the execute method.
+To inject values that are dynamically resolved at runtime, expressions can be used. Those expressions can use process variables or Spring defined beans (if Spring is used). As noted in [Service Task Implementation](bpmn/ch07b-BPMN-Constructs.md#implementation), an instance of the Java class is shared among all process-instances in a service task when using the *flowable:class* attribute. To have dynamic injection of values in fields, you can inject value and method expressions in a org.flowable.engine.delegate.Expression that can be evaluated/invoked using the DelegateExecution passed in the execute method.
 
 The example class below uses the injected expressions and resolves them using the current DelegateExecution. A *genderBean* method call is used while passing the *gender* variable. Full code and test can be found in org.flowable.examples.bpmn.servicetask.JavaServiceTaskTest.testExpressionFieldInjection
 
@@ -2132,7 +2132,7 @@ It is possible to throw BPMN Errors from user code inside Service Tasks or Scrip
 
     }
 
-The constructor argument is an error code, which will be used to determine the error handler that is responsible for the error. See [Boundary Error Event](#bpmnBoundaryErrorEvent) for information on how to catch a BPMN Error.
+The constructor argument is an error code, which will be used to determine the error handler that is responsible for the error. See [Boundary Error Event](bpmn/ch07b-BPMN-Constructs.md#error-boundary-event) for information on how to catch a BPMN Error.
 
 This mechanism should be used **only for business faults** that will be handled by a Boundary Error Event or Error Event Sub-Process modeled in the process definition. Technical errors should be represented by other exception types and are not usually handled inside a process.
 
@@ -2175,7 +2175,7 @@ Only the first map with no class will be considered as a default map. includeChi
 
 ##### Exception Sequence Flow
 
-[\[INTERNAL: non-public implementation classes\]](#internal)
+[\[INTERNAL: non-public implementation classes\]](internal)
 
 Another option is to route process execution through a different path when some exception occurs. The following example shows how this is done.
 
@@ -2359,7 +2359,7 @@ Alternatively, we can use the simplistic approach that is much more straightforw
 
 A Business Rule task is used to synchronously execute one or more rules. Flowable uses Drools Expert, the Drools rule engine to execute business rules. Currently, the .drl files containing the business rules have to be deployed together with the process definition that defines a business rule task to execute those rules. This means that all .drl files that are used in a process have to be packaged in the process BAR file, as for task forms and so on. For more information about creating business rules for Drools Expert, please refer to the Drools documentation at [JBoss Drools](http://www.jboss.org/drools/documentation)
 
-If you want to plug in your own implementation of the rule task, for example, because you want to use Drools differently or you want to use a completely different rule engine, then you can use the class or expression attribute on the BusinessRuleTask and it will behave exactly like a [ServiceTask](#bpmnJavaServiceTask)
+If you want to plug in your own implementation of the rule task, for example, because you want to use Drools differently or you want to use a completely different rule engine, then you can use the class or expression attribute on the BusinessRuleTask and it will behave exactly like a [ServiceTask](bpmn/ch07b-BPMN-Constructs.md#java-service-task)
 
 #### Graphical Notation
 
@@ -2474,11 +2474,11 @@ The Flowable engine sends e-mails trough an external mail server with SMTP capab
 
 #### Defining an Email Task
 
-The Email task is implemented as a dedicated [Service Task](#bpmnJavaServiceTask) and is defined by setting *'mail'* for the *type* of the service task.
+The Email task is implemented as a dedicated [Service Task](bpmn/ch07b-BPMN-Constructs.md#java-service-task) and is defined by setting *'mail'* for the *type* of the service task.
 
     <serviceTask id="sendMail" flowable:type="mail">
 
-The Email task is configured by [field injection](#serviceTaskFieldInjection). All the values for these properties can contain EL expression, which are resolved at runtime during process execution. The following properties can be set:
+The Email task is configured by [field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection). All the values for these properties can contain EL expression, which are resolved at runtime during process execution. The following properties can be set:
 
 <table>
 <colgroup>
@@ -2661,7 +2661,7 @@ By default set to false.</p></td>
 
 #### Defining Http Task
 
-The Http task is implemented as a dedicated [Service Task](#bpmnJavaServiceTask) and is defined by setting *'http'* for the *type* of the service task.
+The Http task is implemented as a dedicated [Service Task](bpmn/ch07b-BPMN-Constructs.md#java-service-task) and is defined by setting *'http'* for the *type* of the service task.
 
     <serviceTask id="httpGet" flowable:type="http">
 
@@ -2686,7 +2686,7 @@ To create a custom client refer to [Http Client builder](http://hc.apache.org/ht
 
 #### Http Task configuration
 
-The Http task is configured by [field injection](#serviceTaskFieldInjection). All the values for these properties can contain EL expression, which are resolved at runtime during execution. The following properties can be set:
+The Http task is configured by [field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection). All the values for these properties can contain EL expression, which are resolved at runtime during execution. The following properties can be set:
 
 <table>
 <colgroup>
@@ -2896,7 +2896,7 @@ The following XML snippet shows an example of using the Http Task.
 By default Http Task throws a FlowableException when Connection, IO or any unhandled exceptions occur.
 By default any redirect/client/server error http status codes are not handled.
 
-The Http task can be configured to handle the exceptions and http status by setting 'failStatusCodes' and/or 'handleStatusCodes' fields. Refer [Http Task configuration](#bpmnHttpTaskConfiguration).
+The Http task can be configured to handle the exceptions and http status by setting 'failStatusCodes' and/or 'handleStatusCodes' fields. Refer [Http Task configuration](bpmn/ch07b-BPMN-Constructs.md#-http-task-configuration).
 
 The BpmnError thrown by 'handleStatusCodes' should be handled exactly like a normal BPMN exception, by having a corresponding boundary error event.
 Below are few examples for exception handling and retry for http task.
@@ -2955,7 +2955,7 @@ Below are few examples for exception handling and retry for http task.
 
 ##### Exception mapping
 
-Refer [Exception mapping](#exceptionMapping)
+Refer [Exception mapping](bpmn/ch07b-BPMN-Constructs.md#exception-mapping)
 
 ### Mule Task
 
@@ -2963,11 +2963,11 @@ The mule task allows you to send messages to Mule, enhancing the integration fea
 
 #### Defining an Mule Task
 
-The Mule task is implemented as a dedicated [Service Task](#bpmnJavaServiceTask) and is defined by setting *'mule'* for the *type* of the service task.
+The Mule task is implemented as a dedicated [Service Task](bpmn/ch07b-BPMN-Constructs.md#java-service-task) and is defined by setting *'mule'* for the *type* of the service task.
 
     <serviceTask id="sendMule" flowable:type="mule">
 
-The Mule task is configured by [field injection](#serviceTaskFieldInjection). All the values for these properties can contain EL expression, which are resolved at runtime during process execution. Following properties can be set:
+The Mule task is configured by [field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection). All the values for these properties can contain EL expression, which are resolved at runtime during process execution. Following properties can be set:
 
 <table>
 <colgroup>
@@ -3031,7 +3031,7 @@ The Camel task allows you to send messages to and receive messages from Camel, a
 
 #### Defining a Camel Task
 
-The Camel task is implemented as a dedicated [Service Task](#bpmnJavaServiceTask) and is defined by setting *'camel'* for the *type* of the service task.
+The Camel task is implemented as a dedicated [Service Task](bpmn/ch07b-BPMN-Constructs.md#java-service-task) and is defined by setting *'camel'* for the *type* of the service task.
 
     <serviceTask id="sendCamel" flowable:type="camel">
 
@@ -3331,11 +3331,11 @@ The Shell task allows you to run shell scripts and commands. Note that the Shell
 
 #### Defining a Shell task
 
-The Shell task is implemented as a dedicated [Service Task](#bpmnJavaServiceTask) and is defined by setting *'shell'* for the *type* of the service task.
+The Shell task is implemented as a dedicated [Service Task](bpmn/ch07b-BPMN-Constructs.md#java-service-task) and is defined by setting *'shell'* for the *type* of the service task.
 
     <serviceTask id="shellEcho" flowable:type="shell">
 
-The Shell task is configured by [field injection](#serviceTaskFieldInjection). All the values for these properties can contain EL expression, which are resolved at runtime during process execution. The following properties can be set:
+The Shell task is configured by [field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection). All the values for these properties can contain EL expression, which are resolved at runtime during process execution. The following properties can be set:
 
 <table>
 <colgroup>
@@ -3502,7 +3502,7 @@ The last execution listener is called when the activity secondTask ends. Instead
 
 As with other expressions, execution variables are resolved and can be used. Because the execution implementation object has a property that exposes the event name, it’s possible to pass the event-name to your methods using execution.eventName.
 
-Execution listeners also support using a delegateExpression, [similar to a service task](#bpmnJavaServiceTaskXML).
+Execution listeners also support using a delegateExpression, [similar to a service task](bpmn/ch07b-BPMN-Constructs.md#xml-representation).
 
     <flowable:executionListener event="start" delegateExpression="${myExecutionListenerBean}" />
 
@@ -3526,7 +3526,7 @@ A while back, we also introduced a new type of execution listener, the org.flowa
 
 #### Field injection on execution listeners
 
-When using an execution listener that is configured with the class attribute, field injection can be applied. This is exactly the same mechanism as used in [Service task field injection](#serviceTaskFieldInjection), which contains an overview of the possibilities provided by field injection.
+When using an execution listener that is configured with the class attribute, field injection can be applied. This is exactly the same mechanism as used in [Service task field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection), which contains an overview of the possibilities provided by field injection.
 
 The fragment below shows a simple example process with an execution listener with fields injected.
 
@@ -3582,13 +3582,13 @@ The class ExampleFieldInjectedExecutionListener concatenates the two injected fi
       assertEquals("Yes, I am listening!", varSetByListener);
     }
 
-Note that the same rules with regards to thread-safety apply to service tasks. Please read the [relevant section](#serviceTaskFieldInjectionThreadSafety) for more information.
+Note that the same rules with regards to thread-safety apply to service tasks. Please read the [relevant section](bpmn/ch07b-BPMN-Constructs.md#field-injection-and-thread-safety) for more information.
 
 ### Task listener
 
 A *task listener* is used to execute custom Java logic or an expression on the occurrence of a certain task-related event.
 
-A task listener can only be added in the process definition as a child element of a [user task](#bpmnUserTask). Note that this also must happen as a child of the *BPMN 2.0 extensionElements* and in the *flowable* namespace, since a task listener is a Flowable-specific construct.
+A task listener can only be added in the process definition as a child element of a [user task](bpmn/ch07b-BPMN-Constructs.md#user-task). Note that this also must happen as a child of the *BPMN 2.0 extensionElements* and in the *flowable* namespace, since a task listener is a Flowable-specific construct.
 
     <userTask id="myTask" name="My Task" >
       <extensionElements>
@@ -3619,7 +3619,7 @@ A *task listener* supports the following attributes:
       }
     }
 
-It is also possible to use [field injection](#serviceTaskFieldInjection) to pass process variables or the execution to the delegation class. Note that an instance of the delegation class is created on process deployment (as is the case with any class delegation in Flowable), which means that the instance is shared between all process instance executions.
+It is also possible to use [field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection) to pass process variables or the execution to the delegation class. Note that an instance of the delegation class is created on process deployment (as is the case with any class delegation in Flowable), which means that the instance is shared between all process instance executions.
 
 -   **expression**: (cannot be used together with the *class* attribute): specifies an expression that will be executed when the event happens. It is possible to pass the DelegateTask object and the name of the event (using task.eventName) as parameter to the called object.
 
@@ -3627,7 +3627,7 @@ It is also possible to use [field injection](#serviceTaskFieldInjection) to pass
 
     <flowable:taskListener event="create" expression="${myObject.callMethod(task, task.eventName)}" />
 
--   **delegateExpression** allows you to specify an expression that resolves to an object implementing the TaskListener interface, [similar to a service task](#bpmnJavaServiceTaskXML).
+-   **delegateExpression** allows you to specify an expression that resolves to an object implementing the TaskListener interface, [similar to a service task](bpmn/ch07b-BPMN-Constructs.md#xml-representation).
 
 <!-- -->
 
@@ -3658,27 +3658,27 @@ A *multi-instance activity* is a way of defining repetition for a certain step i
 
 A *multi-instance* is a regular activity that has extra properties defined (named *'multi-instance* characteristics'*) that will cause the activity to be executed multiple times at runtime. The following activities can become a \_multi-instance activity:*
 
--   [User Task](#bpmnUserTask)
+-   [User Task](bpmn/ch07b-BPMN-Constructs.md#user-task)
 
--   [Script Task](#bpmnScriptTask)
+-   [Script Task](bpmn/ch07b-BPMN-Constructs.md#script-Task)
 
--   [Java Service Task](#bpmnJavaServiceTask)
+-   [Java Service Task](bpmn/ch07b-BPMN-Constructs.md#java-service-task)
 
--   [Web Service Task](#bpmnWebserviceTask)
+-   [Web Service Task](bpmn/ch07b-BPMN-Constructs.md#web-service-task)
 
--   [Business Rule Task](#bpmnBusinessRuleTask)
+-   [Business Rule Task](bpmn/ch07b-BPMN-Constructs.md#business-rule-task)
 
--   [Email Task](#bpmnEmailTask)
+-   [Email Task](bpmn/ch07b-BPMN-Constructs.md#email-task)
 
--   [Manual Task](#bpmnManualTask)
+-   [Manual Task](bpmn/ch07b-BPMN-Constructs.md#manual-task)
 
--   [Receive Task](#bpmnReceiveTask)
+-   [Receive Task](bpmn/ch07b-BPMN-Constructs.md#java-receive-task)
 
--   [(Embedded) Sub-Process](#bpmnSubProcess)
+-   [(Embedded) Sub-Process](bpmn/ch07b-BPMN-Constructs.md#aocess)
 
--   [Call Activity](#bpmnCallActivity)
+-   [Call Activity](bpmn/ch07b-BPMN-Constructs.md#call-activity-(sub-process))
 
-A [Gateway](#bpmnGateways) or [Event](#bpmnEvents) **cannot** become multi-instance.
+A [Gateway](bpmn/ch07b-BPMN-Constructs.md#gateways) or [Event](bpmn/ch07b-BPMN-Constructs.md#events) **cannot** become multi-instance.
 
 As required by the BPMN 2.0 specification, each parent execution of the created executions for each instance will have following variables:
 
@@ -3772,7 +3772,7 @@ In this example, there will be parallel instances created for each element of th
 
 #### Boundary events and multi-instance
 
-Since a multi-instance is a regular activity, it is possible to define a [boundary event](#bpmnBoundaryEvent) on its boundary. In the case of an interrupting boundary event, when the event is caught, **all instances** that are still active will be destroyed. Take, for example, the following multi-instance sub-process:
+Since a multi-instance is a regular activity, it is possible to define a [boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events) on its boundary. In the case of an interrupting boundary event, when the event is caught, **all instances** that are still active will be destroyed. Take, for example, the following multi-instance sub-process:
 
 ![bpmn.multi.instance.boundary.event](assets/bpmn/bpmn.multi.instance.boundary.event.png)
 
@@ -3862,7 +3862,7 @@ Sub-Processes have two major use cases:
 
 -   Sub-Processes allow **hierarchical modeling**. Many modeling tools allow Sub-Processes to be *collapsed*, hiding all the details of the Sub-Process, resulting in a high-level, end-to-end overview of the business process.
 
--   A Sub-Process creates a new **scope for events**. Events that are thrown during execution of the Sub-Process can be caught by [a boundary event](#bpmnBoundaryEvent) on the boundary of the Sub-Process, creating a scope for that event limited to the Sub-Process.
+-   A Sub-Process creates a new **scope for events**. Events that are thrown during execution of the Sub-Process can be caught by [a boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events) on the boundary of the Sub-Process, creating a scope for that event limited to the Sub-Process.
 
 Using a Sub-Process does impose some constraints:
 
@@ -3914,7 +3914,7 @@ An Event Sub-Process must not have any incoming or outgoing sequence flows. As a
 
 #### Graphical Notation
 
-An Event Sub-Process can be visualized as an [embedded sub-process](#bpmnSubProcessGraphicalNotation) with a dotted outline.
+An Event Sub-Process can be visualized as an [embedded sub-process](bpmn/ch07b-BPMN-Constructs.md#graphical-notation) with a dotted outline.
 
 ![bpmn.subprocess.eventSubprocess](assets/bpmn/bpmn.subprocess.eventSubprocess.png)
 
@@ -3976,7 +3976,7 @@ The following diagram illustrates the three different outcomes:
 
 ![bpmn.transaction.subprocess.example.1](assets/bpmn/bpmn.transaction.subprocess.example.1.png)
 
-**Relation to ACID transactions:** it is important not to confuse the BPMN transaction sub-process with technical (ACID) transactions. The BPMN transaction sub-process is not a way to scope technical transactions. In order to understand transaction management in Flowable, read the section on [concurrency and transactions](#bpmnConcurrencyAndTransactions). A BPMN transaction is different from a technical transaction in the following ways:
+**Relation to ACID transactions:** it is important not to confuse the BPMN transaction sub-process with technical (ACID) transactions. The BPMN transaction sub-process is not a way to scope technical transactions. In order to understand transaction management in Flowable, read the section on [concurrency and transactions](bpmn/ch07b-BPMN-Constructs.md#transactions-and-concurrency). A BPMN transaction is different from a technical transaction in the following ways:
 
 -   While an ACID transaction is typically short-lived, a BPMN transaction may take hours, days or even months to complete. Consider the case where one of the activities grouped by a transaction is a user task: typically people have longer response times than applications. Or, in another situation, a BPMN transaction might wait for some business event to occur, like the fact that a particular order has been fulfilled. Such operations usually take considerably longer to complete than updating a record in a database, or storing a message using a transactional queue.
 
@@ -4004,7 +4004,7 @@ To sum it up: while ACID transactions offer a generic solution to such problems 
 
 #### Graphical Notation
 
-A transaction sub-process is visualized as a an [embedded sub-process](#bpmnSubProcessGraphicalNotation) with a double outline.
+A transaction sub-process is visualized as a an [embedded sub-process](bpmn/ch07b-BPMN-Constructs.md#graphical-notation) with a double outline.
 
 ![bpmn.transaction.subprocess](assets/bpmn/bpmn.transaction.subprocess.png)
 
@@ -4026,15 +4026,15 @@ The following is an example of a transaction sub-process:
 
 #### Description
 
-BPMN 2.0 makes a distinction between a regular *[sub-process](#bpmnSubProcess)*, often also called *embedded sub-process*, and the call activity, which looks very similar. From a conceptual point of view, both will call a sub-process when the process execution arrives at the activity.
+BPMN 2.0 makes a distinction between a regular *[sub-process](bpmn/ch07b-BPMN-Constructs.md#aocess)*, often also called *embedded sub-process*, and the call activity, which looks very similar. From a conceptual point of view, both will call a sub-process when the process execution arrives at the activity.
 
-The difference is that the call activity references a process that is external to the process definition, whereas the *[sub-process](#bpmnSubProcess)* is embedded within the original process definition. The main use case for the call activity is to have a reusable process definition that can be called from multiple other process definitions.
+The difference is that the call activity references a process that is external to the process definition, whereas the *[sub-process](bpmn/ch07b-BPMN-Constructs.md#aocess)* is embedded within the original process definition. The main use case for the call activity is to have a reusable process definition that can be called from multiple other process definitions.
 
 When process execution arrives at the *call activity*, a new execution is created that is a sub-execution of the execution that arrived at the call activity. This sub-execution is then used to execute the sub-process, potentially creating parallel child executions, as within a regular process. The super-execution waits until the sub-process has completely ended, and continues with the original process afterwards.
 
 #### Graphical Notation
 
-A call activity is visualized in the same way as a [sub-process](#bpmnSubProcessGraphicalNotation), but with a thick border (collapsed and expanded). Depending on the modeling tool, a call activity can also be expanded, but the default visualization is the collapsed sub-process representation.
+A call activity is visualized in the same way as a [sub-process](bpmn/ch07b-BPMN-Constructs.md#graphical-notation), but with a thick border (collapsed and expanded). Depending on the modeling tool, a call activity can also be expanded, but the default visualization is the collapsed sub-process representation.
 
 ![bpmn.collapsed.call.activity](assets/bpmn/bpmn.collapsed.call.activity.png)
 
