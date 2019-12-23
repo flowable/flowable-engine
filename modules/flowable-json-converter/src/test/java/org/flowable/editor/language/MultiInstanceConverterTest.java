@@ -39,12 +39,12 @@ public class MultiInstanceConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         Activity activity = (Activity) model.getFlowElement("multi-instance");
-        assertEquals(activity.getLoopCharacteristics().isSequential(), true);
-        assertEquals(activity.getLoopCharacteristics().getLoopCardinality(), "3");
-        assertEquals(activity.getLoopCharacteristics().getElementVariable(), "instanceVar");
-        assertEquals(activity.getLoopCharacteristics().getInputDataItem(), "collection");
-        assertEquals(activity.getLoopCharacteristics().getElementIndexVariable(), "index");
-        assertEquals(activity.getLoopCharacteristics().getCompletionCondition(), "completionCondition");
+        assertEquals(true, activity.getLoopCharacteristics().isSequential());
+        assertEquals("3", activity.getLoopCharacteristics().getLoopCardinality());
+        assertEquals("instanceVar", activity.getLoopCharacteristics().getElementVariable());
+        assertEquals("collection", activity.getLoopCharacteristics().getInputDataItem());
+        assertEquals("index", activity.getLoopCharacteristics().getElementIndexVariable());
+        assertEquals("completionCondition", activity.getLoopCharacteristics().getCompletionCondition());
     }
 
 }

@@ -50,8 +50,8 @@ public class ThrowCompensationEventTest extends AbstractConverterTest {
 
         final List<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
         assertNotNull(eventDefinitions);
-        assertEquals(eventDefinitions.size(), 1);
+        assertEquals(1, eventDefinitions.size());
         assertThat(eventDefinitions.get(0), instanceOf(CompensateEventDefinition.class));
-        assertEquals(((CompensateEventDefinition)eventDefinitions.get(0)).getActivityRef(), "activity_ref");
+        assertEquals("activity_ref", ((CompensateEventDefinition)eventDefinitions.get(0)).getActivityRef());
     }
 }
