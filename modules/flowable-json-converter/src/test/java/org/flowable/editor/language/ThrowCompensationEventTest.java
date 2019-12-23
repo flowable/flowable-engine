@@ -12,15 +12,19 @@
  */
 package org.flowable.editor.language;
 
-import org.flowable.bpmn.model.*;
-import org.junit.Test;
-
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
+import java.util.List;
+
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.ThrowEvent;
+import org.junit.Test;
 
 /**
  * Created by alireza on 06/11/2016.

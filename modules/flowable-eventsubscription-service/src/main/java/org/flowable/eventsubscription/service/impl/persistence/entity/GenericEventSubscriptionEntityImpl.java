@@ -13,10 +13,6 @@
 
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
-import java.text.MessageFormat;
-
-import org.flowable.bpmn.model.Signal;
-
 /**
  * @author Joram Barrez
  */

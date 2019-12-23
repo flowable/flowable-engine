@@ -13,7 +13,6 @@
 package org.flowable.eventregistry.test;
 
 import static org.assertj.core.api.Assertions.tuple;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.io.IOException;
