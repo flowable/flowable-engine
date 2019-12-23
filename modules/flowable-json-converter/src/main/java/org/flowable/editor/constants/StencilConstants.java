@@ -242,6 +242,7 @@ public interface StencilConstants {
     final String PROPERTY_MAILTASK_TEXT = "mailtasktext";
     final String PROPERTY_MAILTASK_HTML = "mailtaskhtml";
     final String PROPERTY_MAILTASK_HTML_VAR = "mailtaskhtmlvar";
+    final String PROPERTY_MAILTASK_TEXT_VAR = "mailtasktextvar";
     final String PROPERTY_MAILTASK_CHARSET = "mailtaskcharset";
 
     final String PROPERTY_CALLACTIVITY_CALLEDELEMENT = "callactivitycalledelement";

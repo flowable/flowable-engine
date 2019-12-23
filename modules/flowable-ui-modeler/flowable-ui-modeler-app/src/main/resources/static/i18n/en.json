@@ -399,6 +399,10 @@
           "MAILTASKTEXT" : {
             "TITLE" : "Text",
             "DESCRIPTION" : "The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
+          },
+          "MAILTASKTEXTVAR" : {
+            "TITLE" : "TextVar",
+            "DESCRIPTION" : "The name of a process variable that holds the text that is the content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
           }
         },
         "MAILTASKHTMLPACKAGE" : {
