@@ -402,11 +402,23 @@ public class CommandContextUtil {
     }
 
     public static EntityLinkService getEntityLinkService(CommandContext commandContext) {
-        return getEntityLinkServiceConfiguration(commandContext).getEntityLinkService();
+        EntityLinkService entityLinkService = null;
+        EntityLinkServiceConfiguration entityLinkServiceConfiguration = getEntityLinkServiceConfiguration(commandContext);
+        if (entityLinkServiceConfiguration != null) {
+            entityLinkService = entityLinkServiceConfiguration.getEntityLinkService();
+        }
+
+        return entityLinkService;
     }
     
     public static HistoricEntityLinkService getHistoricEntityLinkService() {
-        return getHistoricEntityLinkService(getCommandContext());
+        HistoricEntityLinkService historicEntityLinkService = null;
+        EntityLinkServiceConfiguration entityLinkServiceConfiguration = getEntityLinkServiceConfiguration();
+        if (entityLinkServiceConfiguration != null) {
+            historicEntityLinkService = entityLinkServiceConfiguration.getHistoricEntityLinkService();
+        }
+
+        return historicEntityLinkService;
     }
 
     public static HistoricEntityLinkService getHistoricEntityLinkService(CommandContext commandContext) {

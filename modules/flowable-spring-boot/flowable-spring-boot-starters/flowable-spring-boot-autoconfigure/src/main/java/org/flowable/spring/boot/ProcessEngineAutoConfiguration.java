@@ -226,6 +226,10 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
 
+        conf.setEnableHistoryCleaning(flowableProperties.isEnableHistoryCleaning());
+        conf.setHistoryCleaningTimeCycleConfig(flowableProperties.getHistoryCleaningCycle());
+        conf.setCleanInstancesEndedAfterNumberOfDays(flowableProperties.getHistoryCleaningAfterDays());
+
         IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
         if (idGenerator == null) {
             idGenerator = new StrongUuidGenerator();

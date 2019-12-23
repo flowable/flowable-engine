@@ -350,6 +350,69 @@ The function implementations take into account the nullability of the variable (
 
 Additionally, it's possible to register custom functions that can be used in expressions. See the +org.flowable.common.engine.api.delegate.FlowableFunctionDelegate+ interface for more information.
 
+=== History Cleaning
+
+By default history data is stored forever, this can cause the history tables to grow very large and impact the performance of the HistoryService.  History Cleaning has been introduced with 6.5.0 and allows the deletion of HistoricProcessInstances and their associated data.  Once process data no longer needs to be retained it can be deleted to reduce the history database's size.
+
+==== Automatic History Cleaning Configuration
+
+Automatic cleanup of HistoricCaseInstances is disabled by default but can be enabled and configured programmatically.  Once enabled the default is to run a cleanup job at 1 AM to delete all HistoricCaseInstances and associated data that have ended 365 days prior or older.
+
+[source,java,linenums]
+----
+CmmnEngine cmmnEngine = CmmnEngineConfiguration.
+    .createProcessEngineConfigurationFromResourceDefault()
+    .setEnableHistoryCleaning(true)
+    .setHistoryCleaningTimeCycleConfig("0 0 1 * * ?")
+    .setCleanInstancesEndedAfterNumberOfDays(365)
+    .buildCmmnEngine();
+----
+
+Spring properties set in an application.properties or externalized configuration are also available:
+
+[source]
+----
+ flowable.enable-history-cleaning=true
+ flowable.history-cleaning-after-days=365
+ flowable.history-cleaning-cycle=0 0 1 * * ?
+----
+
+==== Manually Deleting History
+
+Manually cleaning history can accomplished by executing methods on the CmmnHistoryService query builders.
+
+Delete all HistoricCaseInstances and their related data that are older than one year.
+
+[source,java,linenums]
+----
+     Calendar cal = new GregorianCalendar();
+     cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+     cmmnHistoryService.createHistoricCaseInstanceQuery()
+       .finishedBefore(cal.getTime())
+       .deleteWithRelatedData();
+----
+
+Delete just HistoricCaseInstances older than one year.
+
+[source,java,linenums]
+----
+    Calendar cal = new GregorianCalendar();
+    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+    cmmnHistoryService.createHistoricCaseInstanceQuery()
+      .finishedBefore(cal.getTime())
+      .delete();
+----
+
+Delete just HistoricTaskInstances older than one year.
+
+[source,java,linenums]
+----
+Calendar cal = new GregorianCalendar();
+    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+    cmmnHistoryService.createHistoricTaskInstanceQuery()
+      .finishedBefore(cal.getTime())
+      .delete();
+----
 
 [[apiUnitTesting]]
 

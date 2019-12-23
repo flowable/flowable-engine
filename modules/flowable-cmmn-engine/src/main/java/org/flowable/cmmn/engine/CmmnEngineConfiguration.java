@@ -3648,40 +3648,45 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return enableHistoryCleaning;
     }
 
-    public void setEnableHistoryCleaning(boolean enableHistoryCleaning) {
+    public CmmnEngineConfiguration setEnableHistoryCleaning(boolean enableHistoryCleaning) {
         this.enableHistoryCleaning = enableHistoryCleaning;
+        return this;
     }
 
     public String getHistoryCleaningTimeCycleConfig() {
         return historyCleaningTimeCycleConfig;
     }
 
-    public void setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
+    public CmmnEngineConfiguration setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
         this.historyCleaningTimeCycleConfig = historyCleaningTimeCycleConfig;
+        return this;
     }
 
     public int getCleanInstancesEndedAfterNumberOfDays() {
         return cleanInstancesEndedAfterNumberOfDays;
     }
 
-    public void setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
+    public CmmnEngineConfiguration setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
         this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+        return this;
     }
 
     public CmmnHistoryCleaningManager getCmmnHistoryCleaningManager() {
         return cmmnHistoryCleaningManager;
     }
 
-    public void setCmmnHistoryCleaningManager(CmmnHistoryCleaningManager cmmnHistoryCleaningManager) {
+    public CmmnEngineConfiguration setCmmnHistoryCleaningManager(CmmnHistoryCleaningManager cmmnHistoryCleaningManager) {
         this.cmmnHistoryCleaningManager = cmmnHistoryCleaningManager;
+        return this;
     }
 
     public boolean isHandleCmmnEngineExecutorsAfterEngineCreate() {
         return handleCmmnEngineExecutorsAfterEngineCreate;
     }
 
-    public void setHandleCmmnEngineExecutorsAfterEngineCreate(boolean handleCmmnEngineExecutorsAfterEngineCreate) {
+    public CmmnEngineConfiguration setHandleCmmnEngineExecutorsAfterEngineCreate(boolean handleCmmnEngineExecutorsAfterEngineCreate) {
         this.handleCmmnEngineExecutorsAfterEngineCreate = handleCmmnEngineExecutorsAfterEngineCreate;
+        return this;
     }
 
 
