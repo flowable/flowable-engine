@@ -294,7 +294,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         model.setStartEventFormTypes(startEventFormTypes);
         model.setUserTaskFormTypes(userTaskFormTypes);
         try {
-            Process activeProcess = null;
+            Process activeProcess = new Process();
             List<SubProcess> activeSubProcessList = new ArrayList<>();
             while (xtr.hasNext()) {
                 try {
@@ -366,6 +366,10 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     Process process = processParser.parse(xtr, model);
                     if (process != null) {
                         activeProcess = process;
+                        // copy over anything already parsed
+                        process.setAttributes(activeProcess.getAttributes());
+                        process.setDocumentation(activeProcess.getDocumentation());
+                        process.setExtensionElements(activeProcess.getExtensionElements());
                     }
 
                 } else if (ELEMENT_POTENTIAL_STARTER.equals(xtr.getLocalName())) {
