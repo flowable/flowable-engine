@@ -22,6 +22,7 @@ import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
+import org.flowable.eventregistry.api.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
@@ -29,6 +30,9 @@ import org.flowable.eventregistry.spring.autodeployment.DefaultAutoDeploymentStr
 import org.flowable.eventregistry.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
+import org.flowable.eventregistry.spring.jms.JmsChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.rabbit.RabbitChannelDefinitionProcessor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
@@ -40,15 +44,24 @@ import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnEventRegistry;
+import org.springframework.amqp.rabbit.core.RabbitOperations;
+import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
+import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.jms.config.JmsListenerEndpointRegistry;
+import org.springframework.jms.core.JmsOperations;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.core.KafkaOperations;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -64,6 +77,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 @AutoConfigureAfter({
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
+    KafkaAutoConfiguration.class,
+    JmsAutoConfiguration.class,
+    RabbitAutoConfiguration.class,
 })
 @AutoConfigureBefore({
     AppEngineServicesAutoConfiguration.class,
@@ -87,6 +103,7 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
     public SpringEventRegistryEngineConfiguration eventEngineConfiguration(
         DataSource dataSource,
         PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<ChannelDefinitionProcessor> channelDefinitionProcessors,
         ObjectProvider<List<AutoDeploymentStrategy<EventRegistryEngine>>> eventAutoDeploymentStrategies
     ) throws IOException {
         
@@ -118,6 +135,9 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(deploymentProperties));
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         configuration.setDeploymentStrategies(deploymentStrategies);
+
+        channelDefinitionProcessors.orderedStream()
+            .forEach(configuration::addChannelDefinitionProcessor);
 
         return configuration;
     }
@@ -173,6 +193,52 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
             invokeConfigurers(configuration);
             
             return eventEngineConfigurator;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnBean(JmsOperations.class)
+    public static class EventRegistryJmsConfiguration {
+
+        @Bean("jmsChannelDefinitionProcessor")
+        @ConditionalOnMissingBean(name = "jmsChannelDefinitionProcessor")
+        public JmsChannelDefinitionProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, JmsOperations jmsOperations) {
+            JmsChannelDefinitionProcessor jmsChannelDefinitionProcessor = new JmsChannelDefinitionProcessor();
+            jmsChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
+            jmsChannelDefinitionProcessor.setJmsOperations(jmsOperations);
+
+            return jmsChannelDefinitionProcessor;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnBean(RabbitOperations.class)
+    public static class EventRegistryRabbitConfiguration {
+
+        @Bean("rabbitChannelDefinitionProcessor")
+        @ConditionalOnMissingBean(name = "rabbitChannelDefinitionProcessor")
+        public RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor(RabbitListenerEndpointRegistry endpointRegistry, RabbitOperations rabbitOperations) {
+            RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor = new RabbitChannelDefinitionProcessor();
+            rabbitChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
+            rabbitChannelDefinitionProcessor.setRabbitOperations(rabbitOperations);
+
+            return rabbitChannelDefinitionProcessor;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnBean(KafkaOperations.class)
+    public static class EventRegistryKafkaConfiguration {
+
+        @Bean("kafkaChannelDefinitionProcessor")
+        @ConditionalOnMissingBean(name = "kafkaChannelDefinitionProcessor")
+        public KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor(KafkaListenerEndpointRegistry endpointRegistry,
+            KafkaOperations<Object, Object> kafkaOperations) {
+            KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor = new KafkaChannelDefinitionProcessor();
+            kafkaChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
+            kafkaChannelDefinitionProcessor.setKafkaOperations(kafkaOperations);
+
+            return kafkaChannelDefinitionProcessor;
         }
     }
 }
