@@ -14,6 +14,7 @@ package org.flowable.eventregistry.impl.parser;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -67,14 +68,7 @@ public class EventDefinitionParse {
         String encoding = eventEngineConfig.getXmlEncoding();
         EventJsonConverter converter = new EventJsonConverter();
 
-        try {
-            InputStreamReader in = null;
-            if (encoding != null) {
-                in = new InputStreamReader(streamSource.getInputStream(), encoding);
-            } else {
-                in = new InputStreamReader(streamSource.getInputStream());
-            }
-
+        try (InputStreamReader in = newInputStreamReaderForSource(encoding)) {
             String eventJson = IOUtils.toString(in);
             eventModel = converter.convertToEventModel(eventJson);
 
@@ -90,6 +84,14 @@ public class EventDefinitionParse {
             throw new FlowableException("Error parsing event definition JSON", e);
         }
         return this;
+    }
+
+    private InputStreamReader newInputStreamReaderForSource(String encoding) throws UnsupportedEncodingException {
+        if (encoding != null) {
+            return new InputStreamReader(streamSource.getInputStream(), encoding);
+        } else {
+            return new InputStreamReader(streamSource.getInputStream());
+        }
     }
 
     public EventDefinitionParse name(String name) {
