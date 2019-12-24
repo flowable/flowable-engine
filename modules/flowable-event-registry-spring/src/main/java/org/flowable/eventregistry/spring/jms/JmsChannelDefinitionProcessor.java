@@ -21,6 +21,7 @@ import org.flowable.eventregistry.api.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.model.ChannelDefinition;
 import org.flowable.eventregistry.model.JmsInboundChannelDefinition;
+import org.flowable.eventregistry.model.JmsOutboundChannelDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -31,6 +32,7 @@ import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerEndpoint;
 import org.springframework.jms.config.JmsListenerEndpointRegistry;
 import org.springframework.jms.config.SimpleJmsListenerEndpoint;
+import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.listener.MessageListenerContainer;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -47,6 +49,8 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelD
      */
     static final String DEFAULT_JMS_LISTENER_CONTAINER_FACTORY_BEAN_NAME = "jmsListenerContainerFactory";
 
+    protected JmsOperations jmsOperations;
+
     protected JmsListenerEndpointRegistry endpointRegistry;
 
     protected String containerFactoryBeanName = DEFAULT_JMS_LISTENER_CONTAINER_FACTORY_BEAN_NAME;
@@ -59,15 +63,19 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelD
 
     @Override
     public boolean canProcess(ChannelDefinition channelDefinition) {
-        return channelDefinition instanceof JmsInboundChannelDefinition;
+        return channelDefinition instanceof JmsInboundChannelDefinition || channelDefinition instanceof JmsOutboundChannelDefinition;
     }
 
     @Override
     public void registerChannelDefinition(ChannelDefinition channelDefinition, EventRegistry eventRegistry) {
-        JmsInboundChannelDefinition jmsChannelDefinition = (JmsInboundChannelDefinition) channelDefinition;
+        if (channelDefinition instanceof JmsInboundChannelDefinition) {
+            JmsInboundChannelDefinition jmsChannelDefinition = (JmsInboundChannelDefinition) channelDefinition;
 
-        JmsListenerEndpoint endpoint = createJmsListenerEndpoint(channelDefinition, eventRegistry, jmsChannelDefinition);
-        registerEndpoint(endpoint, null);
+            JmsListenerEndpoint endpoint = createJmsListenerEndpoint(channelDefinition, eventRegistry, jmsChannelDefinition);
+            registerEndpoint(endpoint, null);
+        } else if (channelDefinition instanceof JmsOutboundChannelDefinition) {
+            processOutboundDefinition((JmsOutboundChannelDefinition) channelDefinition);
+        }
     }
 
     protected JmsListenerEndpoint createJmsListenerEndpoint(ChannelDefinition channelDefinition, EventRegistry eventRegistry,
@@ -101,6 +109,13 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelD
 
     protected MessageListener createMessageListener(EventRegistry eventRegistry, String channelKey) {
         return new JmsChannelMessageListenerAdapter(eventRegistry, channelKey);
+    }
+
+    protected void processOutboundDefinition(JmsOutboundChannelDefinition channelDefinition) {
+        String destination = channelDefinition.getDestination();
+        if (channelDefinition.getOutboundEventChannelAdapter() == null && StringUtils.hasText(destination)) {
+            channelDefinition.setOutboundEventChannelAdapter(new JmsOperationsOutboundEventChannelAdapter(jmsOperations, destination));
+        }
     }
 
     @Override
@@ -186,6 +201,14 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelD
         if (beanFactory instanceof ConfigurableBeanFactory) {
             this.embeddedValueResolver = new EmbeddedValueResolver((ConfigurableBeanFactory) beanFactory);
         }
+    }
+
+    public JmsOperations getJmsOperations() {
+        return jmsOperations;
+    }
+
+    public void setJmsOperations(JmsOperations jmsOperations) {
+        this.jmsOperations = jmsOperations;
     }
 
     public JmsListenerEndpointRegistry getEndpointRegistry() {

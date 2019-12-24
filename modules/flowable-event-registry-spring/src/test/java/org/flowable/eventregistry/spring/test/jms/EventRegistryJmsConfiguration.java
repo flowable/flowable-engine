@@ -26,6 +26,7 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerEndpointRegistry;
 import org.springframework.jms.connection.CachingConnectionFactory;
+import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 
 /**
@@ -76,9 +77,10 @@ public class EventRegistryJmsConfiguration {
     }
 
     @Bean
-    public JmsChannelDefinitionProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry) {
+    public JmsChannelDefinitionProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, JmsOperations jmsOperations) {
         JmsChannelDefinitionProcessor jmsChannelDeployer = new JmsChannelDefinitionProcessor();
         jmsChannelDeployer.setEndpointRegistry(endpointRegistry);
+        jmsChannelDeployer.setJmsOperations(jmsOperations);
 
         return jmsChannelDeployer;
     }

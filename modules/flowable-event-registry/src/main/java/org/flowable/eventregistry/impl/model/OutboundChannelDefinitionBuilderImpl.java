@@ -20,6 +20,7 @@ import org.flowable.eventregistry.api.model.OutboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.impl.pipeline.DefaultOutboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToJsonStringSerializer;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToXmlStringSerializer;
+import org.flowable.eventregistry.model.JmsOutboundChannelDefinition;
 import org.flowable.eventregistry.model.OutboundChannelDefinition;
 
 /**
@@ -30,6 +31,7 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
 
     protected EventRegistry eventRegistry;
 
+    protected OutboundChannelDefinition channelDefinition;
     protected String key;
     protected OutboundEventChannelAdapter outboundEventChannelAdapter;
     protected OutboundEventProcessingPipelineBuilder outboundEventProcessingPipelineBuilder;
@@ -51,8 +53,23 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
     }
 
     @Override
+    public OutboundJmsChannelBuilder jmsChannelAdapter(String destination) {
+        JmsOutboundChannelDefinition channelDefinition = new JmsOutboundChannelDefinition();
+        channelDefinition.setDestination(destination);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new OutboundJmsChannelBuilderImpl(eventRegistry, this, channelDefinition);
+    }
+
+    @Override
     public OutboundChannelDefinition register() {
-        OutboundChannelDefinition outboundChannelDefinition = new OutboundChannelDefinition();
+        OutboundChannelDefinition outboundChannelDefinition;
+        if (this.channelDefinition == null) {
+            outboundChannelDefinition = new OutboundChannelDefinition();
+        } else {
+            outboundChannelDefinition = this.channelDefinition;
+        }
+
         outboundChannelDefinition.setKey(key);
         outboundChannelDefinition.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
 
@@ -62,6 +79,27 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
         eventRegistry.registerChannelDefinition(outboundChannelDefinition);
 
         return outboundChannelDefinition;
+    }
+
+    public static class OutboundJmsChannelBuilderImpl implements OutboundJmsChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder;
+
+        protected JmsOutboundChannelDefinition jmsChannel;
+
+        public OutboundJmsChannelBuilderImpl(EventRegistry eventRegistry, OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder,
+            JmsOutboundChannelDefinition jmsChannel) {
+            this.eventRegistry = eventRegistry;
+            this.outboundChannelDefinitionBuilder = outboundChannelDefinitionBuilder;
+            this.jmsChannel = jmsChannel;
+        }
+
+        @Override
+        public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRegistry, outboundChannelDefinitionBuilder);
+            return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
+        }
     }
 
     public static class OutboundEventProcessingPipelineBuilderImpl implements OutboundEventProcessingPipelineBuilder {

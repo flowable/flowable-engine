@@ -26,7 +26,14 @@ public interface OutboundChannelDefinitionBuilder {
 
     OutboundEventProcessingPipelineBuilder channelAdapter(OutboundEventChannelAdapter outboundEventChannelAdapter);
 
+    OutboundJmsChannelBuilder jmsChannelAdapter(String destination);
+
     OutboundChannelDefinition register();
+
+    interface OutboundJmsChannelBuilder {
+
+        OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
 
     interface OutboundEventProcessingPipelineBuilder {
 

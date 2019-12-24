@@ -12,11 +12,15 @@
  */
 package org.flowable.eventregistry.spring.test.jms;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
@@ -25,6 +29,10 @@ import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.EventPayloadDefinition;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -179,5 +187,42 @@ class JmsChannelDefinitionProcessorTest {
             );
 
         eventRegistry.removeChannelDefinition("testChannel");
+    }
+
+    @Test
+    void eventShouldBeSendAfterOutboundChannelDefinitionIsRegistered() {
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("customer")
+            .outboundChannelKey("outboundCustomer")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        eventRegistry.newOutboundChannelDefinition()
+            .key("outboundCustomer")
+            .jmsChannelAdapter("outbound-customer")
+            .eventProcessingPipeline()
+            .jsonSerializer()
+            .register();
+
+        EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayloadDefinition("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayloadDefinition("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+
+        eventRegistry.sendEventOutbound(kermitEvent);
+
+        Object message = jmsTemplate.receiveAndConvert("outbound-customer");
+        assertThat(message).isNotNull();
+        assertThatJson(message)
+            .isEqualTo("{"
+                + "  customer: 'kermit',"
+                + "  name: 'Kermit the Frog'"
+                + "}");
+
+        eventRegistry.removeChannelDefinition("outboundCustomer");
     }
 }
