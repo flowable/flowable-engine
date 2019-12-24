@@ -201,7 +201,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                                         + "Running subProcess activities '%s' should also be mapped for migration (or the call activity itself)", executionActivityId, childSubProcessExecutionActivityIds));
                                 }
                             } else {
-                                validationResult.addValidationMessage(String.format("Incomplete migration mapping for call activity. Activity '%s' is not a Call Activity in the new model."
+                                validationResult.addValidationMessage(String.format("Incomplete migration mapping for call activity. Activity '%s' is not a Call Activity in the new model. "
                                                 + "Running subProcess activities '%s' should also be mapped for migration (or the call activity itself)", 
                                                 executionActivityId, childSubProcessExecutionActivityIds));
                             }
