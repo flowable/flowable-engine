@@ -28,9 +28,18 @@ public interface OutboundChannelDefinitionBuilder {
 
     OutboundJmsChannelBuilder jmsChannelAdapter(String destination);
 
+    OutboundRabbitChannelBuilder rabbitChannelAdapter(String routingKey);
+
     OutboundChannelDefinition register();
 
     interface OutboundJmsChannelBuilder {
+
+        OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
+
+    interface OutboundRabbitChannelBuilder {
+
+        OutboundRabbitChannelBuilder exchange(String exchange);
 
         OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
     }

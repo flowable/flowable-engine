@@ -12,12 +12,15 @@
  */
 package org.flowable.eventregistry.spring.test.rabbit;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 import org.flowable.eventregistry.api.EventRegistry;
@@ -27,11 +30,18 @@ import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.EventPayloadDefinition;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,5 +205,92 @@ class RabbitChannelDefinitionProcessorTest {
             );
 
         eventRegistry.removeChannelDefinition("testChannel");
+    }
+
+    @Test
+    void eventShouldBeSendAfterOutboundChannelDefinitionIsRegisteredWithDefinedExchange() {
+        TopicExchange exchange = new TopicExchange("flowable-test");
+        rabbitAdmin.declareExchange(exchange);
+        Queue queue = new Queue("outbound-customer", false);
+        rabbitAdmin.declareQueue(queue);
+        Binding binding = BindingBuilder.bind(queue).to(exchange).with("customer");
+        rabbitAdmin.declareBinding(binding);
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("customer")
+            .outboundChannelKey("outboundCustomer")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        eventRegistry.newOutboundChannelDefinition()
+            .key("outboundCustomer")
+            .rabbitChannelAdapter("customer")
+            .exchange("flowable-test")
+            .eventProcessingPipeline()
+            .jsonSerializer()
+            .register();
+
+        EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayloadDefinition("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayloadDefinition("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+
+        eventRegistry.sendEventOutbound(kermitEvent);
+
+        Object message = rabbitTemplate.receiveAndConvert("outbound-customer");
+        assertThat(message).isNotNull();
+        assertThatJson(message)
+            .isEqualTo("{"
+                + "  customer: 'kermit',"
+                + "  name: 'Kermit the Frog'"
+                + "}");
+
+        eventRegistry.removeChannelDefinition("outboundCustomer");
+        rabbitAdmin.removeBinding(binding);
+        rabbitAdmin.deleteExchange(exchange.getName());
+    }
+
+    @Test
+    void eventShouldBeSendAfterOutboundChannelDefinitionIsRegisteredWithUndefinedExchange() {
+        rabbitAdmin.declareQueue(new Queue("outbound-customer"));
+        queuesToDelete.add("outbound-customer");
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("customer")
+            .outboundChannelKey("outboundCustomer")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        eventRegistry.newOutboundChannelDefinition()
+            .key("outboundCustomer")
+            .rabbitChannelAdapter("outbound-customer")
+            .eventProcessingPipeline()
+            .jsonSerializer()
+            .register();
+
+        EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayloadDefinition("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayloadDefinition("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+
+        eventRegistry.sendEventOutbound(kermitEvent);
+
+        Object message = rabbitTemplate.receiveAndConvert("outbound-customer");
+        assertThat(message).isNotNull();
+        assertThatJson(message)
+            .isEqualTo("{"
+                + "  customer: 'kermit',"
+                + "  name: 'Kermit the Frog'"
+                + "}");
+
+        eventRegistry.removeChannelDefinition("outboundCustomer");
     }
 }

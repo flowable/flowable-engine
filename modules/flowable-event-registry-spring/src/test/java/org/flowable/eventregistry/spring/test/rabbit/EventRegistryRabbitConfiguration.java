@@ -20,6 +20,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitOperations;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.context.annotation.Bean;
@@ -60,9 +61,10 @@ public class EventRegistryRabbitConfiguration {
     }
 
     @Bean
-    public RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor(RabbitListenerEndpointRegistry endpointRegistry) {
+    public RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor(RabbitListenerEndpointRegistry endpointRegistry, RabbitOperations rabbitOperations) {
         RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor = new RabbitChannelDefinitionProcessor();
         rabbitChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
+        rabbitChannelDefinitionProcessor.setRabbitOperations(rabbitOperations);
         return rabbitChannelDefinitionProcessor;
     }
 

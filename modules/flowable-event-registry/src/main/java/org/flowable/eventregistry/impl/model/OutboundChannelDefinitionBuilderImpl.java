@@ -22,6 +22,7 @@ import org.flowable.eventregistry.impl.serialization.EventPayloadToJsonStringSer
 import org.flowable.eventregistry.impl.serialization.EventPayloadToXmlStringSerializer;
 import org.flowable.eventregistry.model.JmsOutboundChannelDefinition;
 import org.flowable.eventregistry.model.OutboundChannelDefinition;
+import org.flowable.eventregistry.model.RabbitOutboundChannelDefinition;
 
 /**
  * @author Joram Barrez
@@ -62,6 +63,15 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
     }
 
     @Override
+    public OutboundRabbitChannelBuilder rabbitChannelAdapter(String routingKey) {
+        RabbitOutboundChannelDefinition channelDefinition = new RabbitOutboundChannelDefinition();
+        channelDefinition.setRoutingKey(routingKey);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new OutboundRabbitChannelBuilderImpl(eventRegistry, this, channelDefinition);
+    }
+
+    @Override
     public OutboundChannelDefinition register() {
         OutboundChannelDefinition outboundChannelDefinition;
         if (this.channelDefinition == null) {
@@ -98,6 +108,34 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
         @Override
         public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
             outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRegistry, outboundChannelDefinitionBuilder);
+            return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
+        }
+    }
+
+    public static class OutboundRabbitChannelBuilderImpl implements OutboundRabbitChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder;
+
+        protected RabbitOutboundChannelDefinition rabbitChannel;
+
+        public OutboundRabbitChannelBuilderImpl(EventRegistry eventRegistry, OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder,
+            RabbitOutboundChannelDefinition rabbitChannel) {
+            this.eventRegistry = eventRegistry;
+            this.outboundChannelDefinitionBuilder = outboundChannelDefinitionBuilder;
+            this.rabbitChannel = rabbitChannel;
+        }
+
+        @Override
+        public OutboundRabbitChannelBuilder exchange(String exchange) {
+            rabbitChannel.setExchange(exchange);
+            return this;
+        }
+
+        @Override
+        public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRegistry,
+                outboundChannelDefinitionBuilder);
             return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
         }
     }

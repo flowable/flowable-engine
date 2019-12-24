@@ -23,12 +23,14 @@ import org.flowable.eventregistry.api.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.model.ChannelDefinition;
 import org.flowable.eventregistry.model.RabbitInboundChannelDefinition;
+import org.flowable.eventregistry.model.RabbitOutboundChannelDefinition;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerAnnotationBeanPostProcessor;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitOperations;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint;
@@ -59,6 +61,8 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
 
     protected String containerFactoryBeanName = RabbitListenerAnnotationBeanPostProcessor.DEFAULT_RABBIT_LISTENER_CONTAINER_FACTORY_BEAN_NAME;
 
+    protected RabbitOperations rabbitOperations;
+
     protected RabbitListenerContainerFactory<?> containerFactory;
 
     protected BeanFactory beanFactory;
@@ -70,15 +74,19 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
 
     @Override
     public boolean canProcess(ChannelDefinition channelDefinition) {
-        return channelDefinition instanceof RabbitInboundChannelDefinition;
+        return channelDefinition instanceof RabbitInboundChannelDefinition || channelDefinition instanceof RabbitOutboundChannelDefinition;
     }
 
     @Override
     public void registerChannelDefinition(ChannelDefinition channelDefinition, EventRegistry eventRegistry) {
-        RabbitInboundChannelDefinition rabbitChannelDefinition = (RabbitInboundChannelDefinition) channelDefinition;
+        if (channelDefinition instanceof RabbitInboundChannelDefinition) {
+            RabbitInboundChannelDefinition rabbitChannelDefinition = (RabbitInboundChannelDefinition) channelDefinition;
 
-        RabbitListenerEndpoint endpoint = createRabbitListenerEndpoint(rabbitChannelDefinition, eventRegistry);
-        registerEndpoint(endpoint, null);
+            RabbitListenerEndpoint endpoint = createRabbitListenerEndpoint(rabbitChannelDefinition, eventRegistry);
+            registerEndpoint(endpoint, null);
+        } else if (channelDefinition instanceof RabbitOutboundChannelDefinition) {
+            processOutboundDefinition((RabbitOutboundChannelDefinition) channelDefinition);
+        }
     }
 
     protected RabbitListenerEndpoint createRabbitListenerEndpoint(RabbitInboundChannelDefinition channelDefinition, EventRegistry eventRegistry) {
@@ -102,6 +110,14 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
         String channelKey = channelDefinition.getKey();
         endpoint.setMessageListener(createMessageListener(eventRegistry, channelKey));
         return endpoint;
+    }
+
+    protected void processOutboundDefinition(RabbitOutboundChannelDefinition channelDefinition) {
+        String routingKey = channelDefinition.getRoutingKey();
+        if (channelDefinition.getOutboundEventChannelAdapter() == null && StringUtils.hasText(routingKey)) {
+            channelDefinition
+                .setOutboundEventChannelAdapter(new RabbitOperationsOutboundEventChannelAdapter(rabbitOperations, channelDefinition.getExchange(), routingKey));
+        }
     }
 
     protected String resolveExpressionAsStringOrInteger(String value, String attribute) {
@@ -314,6 +330,14 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
             this.resolver = ((ConfigurableListableBeanFactory) beanFactory).getBeanExpressionResolver();
             this.expressionContext = new BeanExpressionContext((ConfigurableListableBeanFactory) beanFactory, null);
         }
+    }
+
+    public RabbitOperations getRabbitOperations() {
+        return rabbitOperations;
+    }
+
+    public void setRabbitOperations(RabbitOperations rabbitOperations) {
+        this.rabbitOperations = rabbitOperations;
     }
 
     public RabbitListenerEndpointRegistry getEndpointRegistry() {
