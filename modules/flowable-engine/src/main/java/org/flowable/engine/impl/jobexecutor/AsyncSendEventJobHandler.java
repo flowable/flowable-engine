@@ -48,7 +48,7 @@ public class AsyncSendEventJobHandler implements JobHandler {
         FlowElement flowElement = executionEntity.getCurrentFlowElement();
         
         if (!(flowElement instanceof SendEventServiceTask)) {
-            throw new FlowableException(String.format("unexpected activity type found for job {}, at activity {}", job.getId(), flowElement.getId()));
+            throw new FlowableException(String.format("unexpected activity type found for job %s, at activity %s", job.getId(), flowElement.getId()));
         }
         SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) flowElement;
         
