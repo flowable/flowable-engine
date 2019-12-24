@@ -461,17 +461,17 @@ public abstract class AbstractEngineConfiguration {
 
             // CRDB does not expose the version through the jdbc driver, so we need to fetch it through version().
             if (PRODUCT_NAME_POSTGRES.equalsIgnoreCase(databaseProductName)) {
-                PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
-                ResultSet resultSet = preparedStatement.executeQuery();
-                String version = null;
-                if (resultSet.next()) {
-                    version = resultSet.getString("version");
-                }
-                resultSet.close();
+                try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
+                        ResultSet resultSet = preparedStatement.executeQuery()) {
+                    String version = null;
+                    if (resultSet.next()) {
+                        version = resultSet.getString("version");
+                    }
 
-                if (StringUtils.isNotEmpty(version) && version.toLowerCase().startsWith(PRODUCT_NAME_CRDB.toLowerCase())) {
-                    databaseProductName = PRODUCT_NAME_CRDB;
-                    logger.info("CockroachDB version '{}' detected", version);
+                    if (StringUtils.isNotEmpty(version) && version.toLowerCase().startsWith(PRODUCT_NAME_CRDB.toLowerCase())) {
+                        databaseProductName = PRODUCT_NAME_CRDB;
+                        logger.info("CockroachDB version '{}' detected", version);
+                    }
                 }
             }
 
