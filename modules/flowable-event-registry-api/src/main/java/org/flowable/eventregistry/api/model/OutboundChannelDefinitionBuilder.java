@@ -30,6 +30,8 @@ public interface OutboundChannelDefinitionBuilder {
 
     OutboundRabbitChannelBuilder rabbitChannelAdapter(String routingKey);
 
+    OutboundKafkaChannelBuilder kafkaChannelAdapter(String topic);
+
     OutboundChannelDefinition register();
 
     interface OutboundJmsChannelBuilder {
@@ -40,6 +42,13 @@ public interface OutboundChannelDefinitionBuilder {
     interface OutboundRabbitChannelBuilder {
 
         OutboundRabbitChannelBuilder exchange(String exchange);
+
+        OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
+
+    interface OutboundKafkaChannelBuilder {
+
+        OutboundKafkaChannelBuilder recordKey(String key);
 
         OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
     }

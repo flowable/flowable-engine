@@ -12,11 +12,13 @@
  */
 package org.flowable.eventregistry.spring.test.kafka;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,7 +30,10 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.clients.admin.DeleteTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.common.TopicPartition;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -36,11 +41,16 @@ import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.EventPayloadDefinition;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
 /**
@@ -60,6 +70,9 @@ class KafkaChannelDefinitionProcessorTest {
 
     @Autowired
     protected AdminClient adminClient;
+
+    @Autowired
+    protected ConsumerFactory<Object, Object> consumerFactory;
 
     protected TestEventConsumer testEventConsumer;
 
@@ -297,6 +310,63 @@ class KafkaChannelDefinitionProcessorTest {
             );
 
         eventRegistry.removeChannelDefinition("testChannel");
+    }
+
+    @Test
+    void eventShouldBeSendAfterOutboundChannelDefinitionIsRegistered() throws Exception {
+        createTopic("outbound-customer");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            consumer.subscribe(Collections.singleton("outbound-customer"));
+
+            eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("customer")
+                .outboundChannelKey("outboundCustomer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+            eventRegistry.newOutboundChannelDefinition()
+                .key("outboundCustomer")
+                .kafkaChannelAdapter("outbound-customer")
+                .recordKey("customer")
+                .eventProcessingPipeline()
+                .jsonSerializer()
+                .register();
+
+            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayloadDefinition("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayloadDefinition("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent);
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                .hasSize(1)
+                .first()
+                .isNotNull()
+                .satisfies(record -> {
+                    assertThat(record.key()).isEqualTo("customer");
+                    assertThatJson(record.value())
+                        .isEqualTo("{"
+                            + "  customer: 'kermit',"
+                            + "  name: 'Kermit the Frog'"
+                            + "}");
+                });
+        } finally {
+            eventRegistry.removeChannelDefinition("outboundCustomer");
+        }
+
     }
 
     protected void createTopic(String topicName) {

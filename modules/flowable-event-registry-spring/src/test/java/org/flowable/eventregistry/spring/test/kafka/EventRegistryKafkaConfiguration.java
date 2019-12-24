@@ -32,6 +32,7 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaOperations;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
@@ -87,9 +88,10 @@ public class EventRegistryKafkaConfiguration {
     }
 
     @Bean
-    public KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor(KafkaListenerEndpointRegistry endpointRegistry) {
+    public KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor(KafkaListenerEndpointRegistry endpointRegistry, KafkaOperations<Object, Object> kafkaOperations) {
         KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor = new KafkaChannelDefinitionProcessor();
         kafkaChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
+        kafkaChannelDefinitionProcessor.setKafkaOperations(kafkaOperations);
         return kafkaChannelDefinitionProcessor;
     }
 

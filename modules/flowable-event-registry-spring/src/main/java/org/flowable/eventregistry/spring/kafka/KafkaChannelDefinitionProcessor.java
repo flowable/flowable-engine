@@ -25,6 +25,7 @@ import org.flowable.eventregistry.api.ChannelDefinitionProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.model.ChannelDefinition;
 import org.flowable.eventregistry.model.KafkaInboundChannelDefinition;
+import org.flowable.eventregistry.model.KafkaOutboundChannelDefinition;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -39,6 +40,7 @@ import org.springframework.kafka.annotation.KafkaListenerAnnotationBeanPostProce
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerEndpoint;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.core.KafkaOperations;
 import org.springframework.kafka.listener.GenericMessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.util.Assert;
@@ -50,6 +52,8 @@ import org.springframework.util.StringValueResolver;
  * @author Filip Hrisafov
  */
 public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, ChannelDefinitionProcessor {
+
+    protected KafkaOperations<Object, Object> kafkaOperations;
 
     protected KafkaListenerEndpointRegistry endpointRegistry;
 
@@ -66,15 +70,19 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
 
     @Override
     public boolean canProcess(ChannelDefinition channelDefinition) {
-        return channelDefinition instanceof KafkaInboundChannelDefinition;
+        return channelDefinition instanceof KafkaInboundChannelDefinition || channelDefinition instanceof KafkaOutboundChannelDefinition;
     }
 
     @Override
     public void registerChannelDefinition(ChannelDefinition channelDefinition, EventRegistry eventRegistry) {
-        KafkaInboundChannelDefinition kafkaChannelDefinition = (KafkaInboundChannelDefinition) channelDefinition;
+        if (channelDefinition instanceof KafkaInboundChannelDefinition) {
+            KafkaInboundChannelDefinition kafkaChannelDefinition = (KafkaInboundChannelDefinition) channelDefinition;
 
-        KafkaListenerEndpoint endpoint = createKafkaListenerEndpoint(kafkaChannelDefinition, eventRegistry);
-        registerEndpoint(endpoint, null);
+            KafkaListenerEndpoint endpoint = createKafkaListenerEndpoint(kafkaChannelDefinition, eventRegistry);
+            registerEndpoint(endpoint, null);
+        } else if (channelDefinition instanceof KafkaOutboundChannelDefinition) {
+            processOutboundDefinition((KafkaOutboundChannelDefinition) channelDefinition);
+        }
     }
 
     protected KafkaListenerEndpoint createKafkaListenerEndpoint(KafkaInboundChannelDefinition channelDefinition, EventRegistry eventRegistry) {
@@ -94,6 +102,14 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         String channelKey = channelDefinition.getKey();
         endpoint.setMessageListener(createMessageListener(eventRegistry, channelKey));
         return endpoint;
+    }
+
+    protected void processOutboundDefinition(KafkaOutboundChannelDefinition channelDefinition) {
+        String topic = channelDefinition.getTopic();
+        if (channelDefinition.getOutboundEventChannelAdapter() == null && StringUtils.hasText(topic)) {
+            channelDefinition
+                .setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(kafkaOperations, topic, channelDefinition.getRecordKey()));
+        }
     }
 
     protected Integer resolveExpressionAsInteger(String value, String attribute) {
@@ -295,6 +311,14 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
             this.resolver = ((ConfigurableListableBeanFactory) beanFactory).getBeanExpressionResolver();
             this.expressionContext = new BeanExpressionContext((ConfigurableListableBeanFactory) beanFactory, null);
         }
+    }
+
+    public KafkaOperations<Object, Object> getKafkaOperations() {
+        return kafkaOperations;
+    }
+
+    public void setKafkaOperations(KafkaOperations<Object, Object> kafkaOperations) {
+        this.kafkaOperations = kafkaOperations;
     }
 
     public KafkaListenerEndpointRegistry getEndpointRegistry() {
