@@ -12,8 +12,13 @@
  */
 package org.flowable.standalone.event;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.test.api.event.TestFlowableEventListener;
 import org.junit.jupiter.api.Test;
 
@@ -21,15 +26,16 @@ import org.junit.jupiter.api.Test;
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
  * 
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
-public class EngineEventsTest extends ResourceFlowableTestCase {
-
-    public EngineEventsTest() {
-        super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
-    }
+public class EngineEventsTest {
 
     @Test
     public void testEngineEventsTest() {
+        ProcessEngineConfiguration processEngineConfiguration = StandaloneProcessEngineConfiguration
+            .createProcessEngineConfigurationFromResource("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
+        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+
         // Fetch the listener to check received events
         TestFlowableEventListener listener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("eventListener");
         assertNotNull(listener);

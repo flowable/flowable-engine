@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.impl;
 
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.slf4j.Logger;
@@ -46,12 +47,24 @@ public class EventRegistryEngineImpl implements EventRegistryEngine {
         }
 
         EventRegistryEngines.registerEventRegistryEngine(this);
+
+        if (engineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : engineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
+        }
     }
 
     @Override
     public void close() {
         EventRegistryEngines.unregister(this);
         engineConfiguration.close();
+
+        if (engineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : engineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
+        }
     }
 
     // getters and setters

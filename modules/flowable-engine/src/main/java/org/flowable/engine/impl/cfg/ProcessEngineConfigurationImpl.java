@@ -103,7 +103,6 @@ import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.FormService;
-import org.flowable.engine.HistoryCleaningManager;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.InternalProcessLocalizationManager;
@@ -956,7 +955,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
 
         if (handleProcessEngineExecutorsAfterEngineCreate) {
-            processEngine.handleExecutors();
+            processEngine.startExecutors();
         }
 
         // trigger build of Flowable 5 Engine

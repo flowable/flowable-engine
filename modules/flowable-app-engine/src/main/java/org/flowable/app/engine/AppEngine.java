@@ -14,6 +14,7 @@ package org.flowable.app.engine;
 
 import org.flowable.app.api.AppManagementService;
 import org.flowable.app.api.AppRepositoryService;
+import org.flowable.common.engine.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 
 /**
@@ -21,15 +22,11 @@ import org.flowable.common.engine.impl.FlowableVersions;
  * 
  * @author Tijs Rademakers
  */
-public interface AppEngine {
+public interface AppEngine extends Engine {
     
     /** the version of the flowable CMMN library */
     public static String VERSION = FlowableVersions.CURRENT_VERSION;
 
-    String getName();
-
-    void close();
-    
     AppManagementService getAppManagementService();
     
     AppRepositoryService getAppRepositoryService();

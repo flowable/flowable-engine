@@ -212,7 +212,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
             if (!isRunning()) {
                 enginesBuild.forEach(name -> {
                     ProcessEngine processEngine = ProcessEngines.getProcessEngine(name);
-                    processEngine.handleExecutors();
+                    processEngine.startExecutors();
                     autoDeployResources(processEngine);
                 });
                 running = true;

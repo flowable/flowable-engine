@@ -12,23 +12,17 @@
  */
 package org.flowable.eventregistry.impl;
 
+import org.flowable.common.engine.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 
-public interface EventRegistryEngine {
+public interface EventRegistryEngine extends Engine {
 
     /**
      * the version of the flowable event registry library
      */
     public static String VERSION = FlowableVersions.CURRENT_VERSION;
-
-    /**
-     * The name as specified in 'event-registry-engine-name' in the flowable.registry.cfg.xml configuration file. The default name for a event registry engine is 'default
-     */
-    String getName();
-
-    void close();
 
     EventRepositoryService getEventRepositoryService();
     

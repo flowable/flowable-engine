@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -55,12 +56,24 @@ public class DmnEngineImpl implements DmnEngine {
         }
 
         DmnEngines.registerDmnEngine(this);
+
+        if (dmnEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : dmnEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
+        }
     }
 
     @Override
     public void close() {
         DmnEngines.unregister(this);
         dmnEngineConfiguration.close();
+
+        if (dmnEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : dmnEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
+        }
     }
 
     // getters and setters

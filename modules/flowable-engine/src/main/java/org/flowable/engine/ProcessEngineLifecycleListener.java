@@ -13,12 +13,25 @@
 
 package org.flowable.engine;
 
+import org.flowable.common.engine.Engine;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+
 /**
  * Interface describing a listener that gets notified when certain event occurs, related to the process-engine lifecycle it is attached to.
  * 
  * @author Frederik Heremans
  */
-public interface ProcessEngineLifecycleListener {
+public interface ProcessEngineLifecycleListener extends EngineLifecycleListener {
+
+    @Override
+    default void onEngineBuilt(Engine engine) {
+        onProcessEngineBuilt((ProcessEngine) engine);
+    }
+
+    @Override
+    default void onEngineClosed(Engine engine) {
+        onProcessEngineClosed((ProcessEngine) engine);
+    }
 
     /**
      * Called right after the process-engine has been built.
@@ -35,4 +48,5 @@ public interface ProcessEngineLifecycleListener {
      *            engine that was closed
      */
     void onProcessEngineClosed(ProcessEngine processEngine);
+
 }

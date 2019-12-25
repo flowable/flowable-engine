@@ -12,6 +12,7 @@
  */
 package org.flowable.engine;
 
+import org.flowable.common.engine.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 
 /**
@@ -33,19 +34,15 @@ import org.flowable.common.engine.impl.FlowableVersions;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface ProcessEngine {
+public interface ProcessEngine extends Engine {
 
     /** the version of the flowable library */
     public static String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
-     * The name as specified in 'process-engine-name' in the flowable.cfg.xml configuration file. The default name for a process engine is 'default
+     * Starts the execuctors (async and async history), if they are configured to be auto-actived.
      */
-    String getName();
-
-    void handleExecutors();
-
-    void close();
+    void startExecutors();
 
     RepositoryService getRepositoryService();
 
