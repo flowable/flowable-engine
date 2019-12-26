@@ -61,6 +61,35 @@
             <column name="VERSION_" />
             <column name="TENANT_ID_" />
         </createIndex>
+        
+        <createTable tableName="FLW_CHANNEL_DEFINITION">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="VERSION_" type="int" />
+            <column name="KEY_" type="varchar(255)" />
+            <column name="CATEGORY_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="CREATE_TIME_" type="datetime(3)">
+                <constraints nullable="true" />
+            </column>
+            <column name="TENANT_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="RESOURCE_NAME_" type="varchar(255)" />
+            <column name="DESCRIPTION_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        
+        <createIndex tableName="FLW_CHANNEL_DEFINITION" indexName="ACT_IDX_CHANNEL_DEF_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
 
     </changeSet>
 

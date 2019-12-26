@@ -15,7 +15,7 @@ package org.flowable.eventregistry.model;
 /**
  * @author Joram Barrez
  */
-public class InboundChannelDefinition extends ChannelDefinition {
+public class InboundChannelDefinition extends ChannelModel {
 
     protected Object inboundEventChannelAdapter;
     protected Object inboundEventProcessingPipeline;

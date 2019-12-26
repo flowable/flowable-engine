@@ -15,10 +15,13 @@ package org.flowable.eventregistry.impl.deployer;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.eventregistry.impl.parser.ChannelDefinitionParse;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParse;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntity;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -32,17 +35,26 @@ public class ParsedDeployment {
     protected EventDeploymentEntity deploymentEntity;
 
     protected List<EventDefinitionEntity> eventDefinitions;
+    protected List<ChannelDefinitionEntity> channelDefinitions;
     protected Map<EventDefinitionEntity, EventDefinitionParse> mapEventDefinitionsToParses;
     protected Map<EventDefinitionEntity, EventResourceEntity> mapEventDefinitionsToResources;
+    protected Map<ChannelDefinitionEntity, ChannelDefinitionParse> mapChannelDefinitionsToParses;
+    protected Map<ChannelDefinitionEntity, EventResourceEntity> mapChannelDefinitionsToResources;
 
     public ParsedDeployment(EventDeploymentEntity entity, List<EventDefinitionEntity> eventDefinitions,
+            List<ChannelDefinitionEntity> channelDefinitions,
             Map<EventDefinitionEntity, EventDefinitionParse> mapEventDefinitionsToParses,
-            Map<EventDefinitionEntity, EventResourceEntity> mapEventDefinitionsToResources) {
+            Map<EventDefinitionEntity, EventResourceEntity> mapEventDefinitionsToResources,
+            Map<ChannelDefinitionEntity, ChannelDefinitionParse> mapChannelDefinitionsToParses,
+            Map<ChannelDefinitionEntity, EventResourceEntity> mapChannelDefinitionsToResources) {
 
         this.deploymentEntity = entity;
         this.eventDefinitions = eventDefinitions;
+        this.channelDefinitions = channelDefinitions;
         this.mapEventDefinitionsToParses = mapEventDefinitionsToParses;
         this.mapEventDefinitionsToResources = mapEventDefinitionsToResources;
+        this.mapChannelDefinitionsToParses = mapChannelDefinitionsToParses;
+        this.mapChannelDefinitionsToResources = mapChannelDefinitionsToResources;
     }
 
     public EventDeploymentEntity getDeployment() {
@@ -51,6 +63,10 @@ public class ParsedDeployment {
 
     public List<EventDefinitionEntity> getAllEventDefinitions() {
         return eventDefinitions;
+    }
+    
+    public List<ChannelDefinitionEntity> getAllChannelDefinitions() {
+        return channelDefinitions;
     }
 
     public EventResourceEntity getResourceForEventDefinition(EventDefinitionEntity eventDefinition) {
@@ -65,5 +81,19 @@ public class ParsedDeployment {
         EventDefinitionParse parse = getEventDefinitionParseForEventDefinition(eventDefinition);
 
         return (parse == null ? null : parse.getEventModel());
+    }
+    
+    public EventResourceEntity getResourceForChannelDefinition(ChannelDefinitionEntity channelDefinition) {
+        return mapChannelDefinitionsToResources.get(channelDefinition);
+    }
+
+    public ChannelDefinitionParse getChannelDefinitionParseForChannelDefinition(ChannelDefinitionEntity channelDefinition) {
+        return mapChannelDefinitionsToParses.get(channelDefinition);
+    }
+
+    public ChannelModel getChannelModelForChannelDefinition(ChannelDefinitionEntity channelDefinition) {
+        ChannelDefinitionParse parse = getChannelDefinitionParseForChannelDefinition(channelDefinition);
+
+        return (parse == null ? null : parse.getChannelModel());
     }
 }

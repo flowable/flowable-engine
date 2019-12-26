@@ -14,22 +14,27 @@ package org.flowable.eventregistry.impl.deployer;
 
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDefinitionCacheEntry;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
+import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
- * Updates caches and artifacts for a deployment and its forms
+ * Updates caches and artifacts for a deployment and its event and channel definitions
  */
 public class CachingAndArtifactsManager {
 
     protected EventJsonConverter eventJsonConverter = new EventJsonConverter();
+    protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter();
 
     /**
-     * Ensures that the decision table is cached in the appropriate places, including the deployment's collection of deployed artifacts and the deployment manager's cache.
+     * Ensures that the event and channel definitions are cached in the appropriate places, including the deployment's collection of deployed artifacts and the deployment manager's cache.
      */
     public void updateCachingAndArtifacts(ParsedDeployment parsedDeployment) {
         final EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryConfiguration();
@@ -43,6 +48,17 @@ public class CachingAndArtifactsManager {
 
             // Add to deployment for further usage
             deployment.addDeployedArtifact(eventDefinition);
+        }
+        
+        DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache = eventRegistryEngineConfiguration.getDeploymentManager().getChannelDefinitionCache();
+
+        for (ChannelDefinitionEntity channelDefinition : parsedDeployment.getAllChannelDefinitions()) {
+            ChannelModel channelModel = parsedDeployment.getChannelModelForChannelDefinition(channelDefinition);
+            ChannelDefinitionCacheEntry cacheEntry = new ChannelDefinitionCacheEntry(channelDefinition, channelJsonConverter.convertToJson(channelModel));
+            channelDefinitionCache.add(channelDefinition.getId(), cacheEntry);
+
+            // Add to deployment for further usage
+            deployment.addDeployedArtifact(channelDefinition);
         }
     }
 }

@@ -17,10 +17,9 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.eventregistry.model.EventModel;
 
 /**
- * Allows programmatic querying of {@link EventModel}s.
+ * Allows programmatic querying of {@link EventDefinition}s.
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez

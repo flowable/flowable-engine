@@ -167,7 +167,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
         repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
 
-        List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().orderByDeploymenTime().desc().list();
+        List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().orderByDeploymentTime().desc().list();
         assertEquals(2, deploymentList.size());
         List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentList.get(0).getId());
 

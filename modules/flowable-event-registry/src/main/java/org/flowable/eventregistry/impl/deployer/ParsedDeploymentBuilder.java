@@ -18,8 +18,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.eventregistry.impl.parser.ChannelDefinitionParse;
+import org.flowable.eventregistry.impl.parser.ChannelDefinitionParseFactory;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParse;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParseFactory;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntity;
@@ -32,19 +35,27 @@ public class ParsedDeploymentBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
 
     public static final String[] EVENT_RESOURCE_SUFFIXES = new String[] { "event" };
+    public static final String[] CHANNEL_RESOURCE_SUFFIXES = new String[] { "channel" };
 
     protected EventDeploymentEntity deployment;
     protected EventDefinitionParseFactory eventDefinitionParseFactory;
+    protected ChannelDefinitionParseFactory channelDefinitionParseFactory;
 
-    public ParsedDeploymentBuilder(EventDeploymentEntity deployment, EventDefinitionParseFactory eventDefinitionParseFactory) {
+    public ParsedDeploymentBuilder(EventDeploymentEntity deployment, EventDefinitionParseFactory eventDefinitionParseFactory,
+                    ChannelDefinitionParseFactory channelDefinitionParseFactory) {
+        
         this.deployment = deployment;
         this.eventDefinitionParseFactory = eventDefinitionParseFactory;
+        this.channelDefinitionParseFactory = channelDefinitionParseFactory;
     }
 
     public ParsedDeployment build() {
         List<EventDefinitionEntity> eventDefinitions = new ArrayList<>();
+        List<ChannelDefinitionEntity> channelDefinitions = new ArrayList<>();
         Map<EventDefinitionEntity, EventDefinitionParse> eventDefinitionToParseMap = new LinkedHashMap<>();
         Map<EventDefinitionEntity, EventResourceEntity> eventDefinitionToResourceMap = new LinkedHashMap<>();
+        Map<ChannelDefinitionEntity, ChannelDefinitionParse> channelDefinitionToParseMap = new LinkedHashMap<>();
+        Map<ChannelDefinitionEntity, EventResourceEntity> channelDefinitionToResourceMap = new LinkedHashMap<>();
 
         for (EventResourceEntity resource : deployment.getResources().values()) {
             if (isEventResource(resource.getName())) {
@@ -55,10 +66,20 @@ public class ParsedDeploymentBuilder {
                     eventDefinitionToParseMap.put(eventDefinition, parse);
                     eventDefinitionToResourceMap.put(eventDefinition, resource);
                 }
+                
+            } else if (isChannelResource(resource.getName())) {
+                LOGGER.debug("Processing Channel definition resource {}", resource.getName());
+                ChannelDefinitionParse parse = createChannelParseFromResource(resource);
+                for (ChannelDefinitionEntity channelDefinition : parse.getChannelDefinitions()) {
+                    channelDefinitions.add(channelDefinition);
+                    channelDefinitionToParseMap.put(channelDefinition, parse);
+                    channelDefinitionToResourceMap.put(channelDefinition, resource);
+                }
             }
         }
 
-        return new ParsedDeployment(deployment, eventDefinitions, eventDefinitionToParseMap, eventDefinitionToResourceMap);
+        return new ParsedDeployment(deployment, eventDefinitions, channelDefinitions, eventDefinitionToParseMap, eventDefinitionToResourceMap,
+                        channelDefinitionToParseMap, channelDefinitionToResourceMap);
     }
 
     protected EventDefinitionParse createEventParseFromResource(EventResourceEntity resource) {
@@ -74,9 +95,33 @@ public class ParsedDeploymentBuilder {
         eventParse.execute(CommandContextUtil.getEventRegistryConfiguration());
         return eventParse;
     }
+    
+    protected ChannelDefinitionParse createChannelParseFromResource(EventResourceEntity resource) {
+        String resourceName = resource.getName();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
+
+        ChannelDefinitionParse eventParse = channelDefinitionParseFactory.createParse()
+                .sourceInputStream(inputStream)
+                .setSourceSystemId(resourceName)
+                .deployment(deployment)
+                .name(resourceName);
+
+        eventParse.execute(CommandContextUtil.getEventRegistryConfiguration());
+        return eventParse;
+    }
 
     protected boolean isEventResource(String resourceName) {
         for (String suffix : EVENT_RESOURCE_SUFFIXES) {
+            if (resourceName.endsWith(suffix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    protected boolean isChannelResource(String resourceName) {
+        for (String suffix : CHANNEL_RESOURCE_SUFFIXES) {
             if (resourceName.endsWith(suffix)) {
                 return true;
             }

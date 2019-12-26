@@ -17,7 +17,7 @@ import java.util.Map;
 import org.flowable.eventregistry.api.model.InboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.api.model.OutboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.api.runtime.EventInstance;
-import org.flowable.eventregistry.model.ChannelDefinition;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.InboundChannelDefinition;
 import org.flowable.eventregistry.model.OutboundChannelDefinition;
@@ -56,12 +56,12 @@ public interface EventRegistry {
     OutboundChannelDefinition getOutboundChannelDefinition(String channelKey);
 
     /**
-     * Low-level (vs the {@link InboundChannelDefinitionBuilder}) way of registering a new {@link ChannelDefinition}.
+     * Low-level (vs the {@link InboundChannelDefinitionBuilder}) way of registering a new {@link ChannelModel}.
      */
-    void registerChannelDefinition(ChannelDefinition channelDefinition);
+    void registerChannelDefinition(ChannelModel channelDefinition);
 
     /**
-     * Removes a previously registered {@link ChannelDefinition}.
+     * Removes a previously registered {@link ChannelModel}.
      */
     void removeChannelDefinition(String channelDefinitionKey);
 

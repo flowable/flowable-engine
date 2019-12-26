@@ -197,7 +197,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
 
         assertEquals(2, repositoryService.createDeploymentQuery().orderByDeploymentId().asc().list().size());
 
-        assertEquals(2, repositoryService.createDeploymentQuery().orderByDeploymenTime().asc().list().size());
+        assertEquals(2, repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list().size());
 
     }
 

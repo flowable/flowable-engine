@@ -131,7 +131,7 @@ public class FlowableAppDefinitionService {
     
     public String migrateAppDefinitions() {
         List<Deployment> deployments = new ArrayList<>();
-        List<Deployment> processDeployments = repositoryService.createDeploymentQuery().orderByDeploymenTime().asc().list();
+        List<Deployment> processDeployments = repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list();
         for (Deployment deployment : processDeployments) {
             if (deployment.getKey() != null && deployment.getParentDeploymentId() == null) {
                 deployments.add(deployment);

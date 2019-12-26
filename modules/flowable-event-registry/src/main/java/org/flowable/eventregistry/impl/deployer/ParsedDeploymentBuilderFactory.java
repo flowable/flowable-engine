@@ -12,15 +12,17 @@
  */
 package org.flowable.eventregistry.impl.deployer;
 
+import org.flowable.eventregistry.impl.parser.ChannelDefinitionParseFactory;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParseFactory;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 
 public class ParsedDeploymentBuilderFactory {
 
     protected EventDefinitionParseFactory eventParseFactory;
+    protected ChannelDefinitionParseFactory channelParseFactory;
 
     public ParsedDeploymentBuilder getBuilderForDeployment(EventDeploymentEntity deployment) {
-        return new ParsedDeploymentBuilder(deployment, eventParseFactory);
+        return new ParsedDeploymentBuilder(deployment, eventParseFactory, channelParseFactory);
     }
 
     public EventDefinitionParseFactory getEventParseFactory() {
@@ -29,6 +31,14 @@ public class ParsedDeploymentBuilderFactory {
 
     public void setEventParseFactory(EventDefinitionParseFactory eventParseFactory) {
         this.eventParseFactory = eventParseFactory;
+    }
+
+    public ChannelDefinitionParseFactory getChannelParseFactory() {
+        return channelParseFactory;
+    }
+
+    public void setChannelParseFactory(ChannelDefinitionParseFactory channelParseFactory) {
+        this.channelParseFactory = channelParseFactory;
     }
 
 }

@@ -18,6 +18,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityManager;
@@ -70,6 +71,14 @@ public class CommandContextUtil {
     
     public static EventDefinitionEntityManager getEventDefinitionEntityManager(CommandContext commandContext) {
         return getEventRegistryConfiguration(commandContext).getEventDefinitionEntityManager();
+    }
+    
+    public static ChannelDefinitionEntityManager getChannelDefinitionEntityManager() {
+        return getChannelDefinitionEntityManager(getCommandContext());
+    }
+    
+    public static ChannelDefinitionEntityManager getChannelDefinitionEntityManager(CommandContext commandContext) {
+        return getEventRegistryConfiguration(commandContext).getChannelDefinitionEntityManager();
     }
     
     public static TableDataManager getTableDataManager(CommandContext commandContext) {

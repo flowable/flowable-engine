@@ -38,13 +38,18 @@ import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBu
 import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
 import org.flowable.eventregistry.impl.db.EventDbSchemaManager;
 import org.flowable.eventregistry.impl.deployer.CachingAndArtifactsManager;
+import org.flowable.eventregistry.impl.deployer.ChannelDefinitionDeploymentHelper;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeployer;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeploymentHelper;
 import org.flowable.eventregistry.impl.deployer.ParsedDeploymentBuilderFactory;
+import org.flowable.eventregistry.impl.parser.ChannelDefinitionParseFactory;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParseFactory;
+import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.deploy.Deployer;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDeploymentManager;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityManager;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityManagerImpl;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityManagerImpl;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityManager;
@@ -53,12 +58,15 @@ import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityMan
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityManagerImpl;
 import org.flowable.eventregistry.impl.persistence.entity.TableDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.TableDataManagerImpl;
+import org.flowable.eventregistry.impl.persistence.entity.data.ChannelDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.EventDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.EventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.EventResourceDataManager;
+import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisChannelDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventResourceDataManager;
+import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 
 import liquibase.Liquibase;
@@ -83,25 +91,30 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     protected EventDeploymentDataManager deploymentDataManager;
     protected EventDefinitionDataManager eventDefinitionDataManager;
+    protected ChannelDefinitionDataManager channelDefinitionDataManager;
     protected EventResourceDataManager resourceDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected EventDeploymentEntityManager deploymentEntityManager;
     protected EventDefinitionEntityManager eventDefinitionEntityManager;
+    protected ChannelDefinitionEntityManager channelDefinitionEntityManager;
     protected EventResourceEntityManager resourceEntityManager;
     protected TableDataManager tableDataManager;
 
     protected ExpressionManager expressionManager;
 
     protected EventJsonConverter eventJsonConverter = new EventJsonConverter();
+    protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter();
 
     // DEPLOYERS
     // ////////////////////////////////////////////////////////////////
 
     protected EventDefinitionDeployer eventDeployer;
     protected EventDefinitionParseFactory eventParseFactory;
+    protected ChannelDefinitionParseFactory channelParseFactory;
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
     protected EventDefinitionDeploymentHelper eventDeploymentHelper;
+    protected ChannelDefinitionDeploymentHelper channelDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
     protected List<Deployer> customPreDeployers;
     protected List<Deployer> customPostDeployers;
@@ -110,6 +123,9 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     protected int eventDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache;
+    
+    protected int channelDefinitionCacheLimit = -1; // By default, no limit
+    protected DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache;
     
     // Event registry
     protected EventRegistry eventRegistry;
@@ -218,6 +234,9 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         if (eventDefinitionDataManager == null) {
             eventDefinitionDataManager = new MybatisEventDefinitionDataManager(this);
         }
+        if (channelDefinitionDataManager == null) {
+            channelDefinitionDataManager = new MybatisChannelDefinitionDataManager(this);
+        }
         if (resourceDataManager == null) {
             resourceDataManager = new MybatisEventResourceDataManager(this);
         }
@@ -231,6 +250,9 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         }
         if (eventDefinitionEntityManager == null) {
             eventDefinitionEntityManager = new EventDefinitionEntityManagerImpl(this, eventDefinitionDataManager);
+        }
+        if (channelDefinitionEntityManager == null) {
+            channelDefinitionEntityManager = new ChannelDefinitionEntityManagerImpl(this, channelDefinitionDataManager);
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new EventResourceEntityManagerImpl(this, resourceDataManager);
@@ -342,6 +364,10 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         if (eventParseFactory == null) {
             eventParseFactory = new EventDefinitionParseFactory();
         }
+        
+        if (channelParseFactory == null) {
+            channelParseFactory = new ChannelDefinitionParseFactory();
+        }
 
         if (this.eventDeployer == null) {
             this.deployers = new ArrayList<>();
@@ -361,11 +387,20 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
                 eventDefinitionCache = new DefaultDeploymentCache<>(eventDefinitionCacheLimit);
             }
         }
+        
+        if (channelDefinitionCache == null) {
+            if (channelDefinitionCacheLimit <= 0) {
+                channelDefinitionCache = new DefaultDeploymentCache<>();
+            } else {
+                channelDefinitionCache = new DefaultDeploymentCache<>(channelDefinitionCacheLimit);
+            }
+        }
 
-        deploymentManager = new EventDeploymentManager(eventDefinitionCache, this);
+        deploymentManager = new EventDeploymentManager(eventDefinitionCache, channelDefinitionCache, this);
         deploymentManager.setDeployers(deployers);
         deploymentManager.setDeploymentEntityManager(deploymentEntityManager);
         deploymentManager.setEventDefinitionEntityManager(eventDefinitionEntityManager);
+        deploymentManager.setChannelDefinitionEntityManager(channelDefinitionEntityManager);
     }
 
     public Collection<? extends Deployer> getDefaultDeployers() {
@@ -391,12 +426,21 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         if (parsedDeploymentBuilderFactory == null) {
             parsedDeploymentBuilderFactory = new ParsedDeploymentBuilderFactory();
         }
+        
         if (parsedDeploymentBuilderFactory.getEventParseFactory() == null) {
             parsedDeploymentBuilderFactory.setEventParseFactory(eventParseFactory);
+        }
+        
+        if (parsedDeploymentBuilderFactory.getChannelParseFactory() == null) {
+            parsedDeploymentBuilderFactory.setChannelParseFactory(channelParseFactory);
         }
 
         if (eventDeploymentHelper == null) {
             eventDeploymentHelper = new EventDefinitionDeploymentHelper();
+        }
+        
+        if (channelDeploymentHelper == null) {
+            channelDeploymentHelper = new ChannelDefinitionDeploymentHelper();
         }
 
         if (cachingAndArtifactsManager == null) {
@@ -526,6 +570,24 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
 
+    public int getChannelDefinitionCacheLimit() {
+        return channelDefinitionCacheLimit;
+    }
+
+    public EventRegistryEngineConfiguration setChannelDefinitionCacheLimit(int channelDefinitionCacheLimit) {
+        this.channelDefinitionCacheLimit = channelDefinitionCacheLimit;
+        return this;
+    }
+
+    public DeploymentCache<ChannelDefinitionCacheEntry> getChannelDefinitionCache() {
+        return channelDefinitionCache;
+    }
+
+    public EventRegistryEngineConfiguration setChannelDefinitionCache(DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache) {
+        this.channelDefinitionCache = channelDefinitionCache;
+        return this;
+    }
+
     public EventDeploymentDataManager getDeploymentDataManager() {
         return deploymentDataManager;
     }
@@ -570,6 +632,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.eventDefinitionEntityManager = eventDefinitionEntityManager;
         return this;
     }
+    
+    public ChannelDefinitionEntityManager getChannelDefinitionEntityManager() {
+        return channelDefinitionEntityManager;
+    }
+
+    public EventRegistryEngineConfiguration setChannelDefinitionEntityManager(ChannelDefinitionEntityManager channelDefinitionEntityManager) {
+        this.channelDefinitionEntityManager = channelDefinitionEntityManager;
+        return this;
+    }
 
     public EventResourceEntityManager getResourceEntityManager() {
         return resourceEntityManager;
@@ -608,4 +679,14 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.eventJsonConverter = eventJsonConverter;
         return this;
     }
+
+    public ChannelJsonConverter getChannelJsonConverter() {
+        return channelJsonConverter;
+    }
+
+    public EventRegistryEngineConfiguration setChannelJsonConverter(ChannelJsonConverter channelJsonConverter) {
+        this.channelJsonConverter = channelJsonConverter;
+        return this;
+    }
+    
 }

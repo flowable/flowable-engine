@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.impl.EventDefinitionQueryImpl;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
@@ -34,13 +35,18 @@ public class EventDeploymentManager {
 
     protected EventRegistryEngineConfiguration engineConfig;
     protected DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache;
+    protected DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache;
 
     protected List<Deployer> deployers;
     protected EventDefinitionEntityManager eventDefinitionEntityManager;
+    protected ChannelDefinitionEntityManager channelDefinitionEntityManager;
     protected EventDeploymentEntityManager deploymentEntityManager;
 
-    public EventDeploymentManager(DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache, EventRegistryEngineConfiguration engineConfig) {
+    public EventDeploymentManager(DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache, 
+                    DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache, EventRegistryEngineConfiguration engineConfig) {
+        
         this.eventDefinitionCache = eventDefinitionCache;
+        this.channelDefinitionCache = channelDefinitionCache;
         this.engineConfig = engineConfig;
     }
 
@@ -181,6 +187,14 @@ public class EventDeploymentManager {
     public void setEventDefinitionCache(DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache) {
         this.eventDefinitionCache = eventDefinitionCache;
     }
+    
+    public DeploymentCache<ChannelDefinitionCacheEntry> getChannelDefinitionCache() {
+        return channelDefinitionCache;
+    }
+
+    public void setChannelDefinitionCache(DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache) {
+        this.channelDefinitionCache = channelDefinitionCache;
+    }
 
     public EventDefinitionEntityManager getEventDefinitionEntityManager() {
         return eventDefinitionEntityManager;
@@ -188,6 +202,14 @@ public class EventDeploymentManager {
 
     public void setEventDefinitionEntityManager(EventDefinitionEntityManager eventDefinitionEntityManager) {
         this.eventDefinitionEntityManager = eventDefinitionEntityManager;
+    }
+    
+    public ChannelDefinitionEntityManager getChannelDefinitionEntityManager() {
+        return channelDefinitionEntityManager;
+    }
+
+    public void setChannelDefinitionEntityManager(ChannelDefinitionEntityManager channelDefinitionEntityManager) {
+        this.channelDefinitionEntityManager = channelDefinitionEntityManager;
     }
 
     public EventDeploymentEntityManager getDeploymentEntityManager() {

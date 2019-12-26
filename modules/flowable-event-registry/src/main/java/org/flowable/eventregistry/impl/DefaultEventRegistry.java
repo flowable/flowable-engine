@@ -34,7 +34,7 @@ import org.flowable.eventregistry.api.model.OutboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.model.InboundChannelDefinitionBuilderImpl;
 import org.flowable.eventregistry.impl.model.OutboundChannelDefinitionBuilderImpl;
-import org.flowable.eventregistry.model.ChannelDefinition;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.InboundChannelDefinition;
 import org.flowable.eventregistry.model.OutboundChannelDefinition;
@@ -71,7 +71,7 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void registerChannelDefinition(ChannelDefinition channelDefinition) {
+    public void registerChannelDefinition(ChannelModel channelDefinition) {
         String channelDefinitionKey = channelDefinition.getKey();
         if (StringUtils.isEmpty(channelDefinitionKey)) {
             throw new FlowableIllegalArgumentException("No key set for channel definition");
