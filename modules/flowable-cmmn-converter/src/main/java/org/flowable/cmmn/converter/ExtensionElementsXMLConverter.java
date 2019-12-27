@@ -27,6 +27,7 @@ import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.converter.util.ListenerXmlConverterUtil;
 import org.flowable.cmmn.model.AbstractFlowableHttpHandler;
 import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.ChildTask;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CompletionNeutralRule;
@@ -36,12 +37,14 @@ import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.FlowableHttpRequestHandler;
 import org.flowable.cmmn.model.FlowableHttpResponseHandler;
 import org.flowable.cmmn.model.FlowableListener;
+import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HasLifecycleListeners;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.slf4j.Logger;
@@ -100,12 +103,15 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
                     } else if (CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equals(xtr.getLocalName()) ||
                                     CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER.equals(xtr.getLocalName())) {
-                        
                         readLifecycleListener(xtr, conversionHelper);
+
+                    } else if (CmmnXmlConstants.ELEMENT_EVENT_TYPE.equals(xtr.getLocalName())) {
+                        readEventType(xtr, conversionHelper);
 
                     } else {
                         ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
                         conversionHelper.getCurrentCmmnElement().addExtensionElement(extensionElement);
+
                     }
 
                 } else if (xtr.isEndElement()) {
@@ -327,6 +333,38 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_DELEGATE_EXPRESSION))) {
             handler.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_DELEGATE_EXPRESSION));
             handler.setImplementationType(IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+        }
+    }
+
+    protected void readEventType(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+
+        String eventType = null;
+        try {
+
+            // Parsing and storing as an extension element, which means the export will work automatically
+            ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
+            conversionHelper.getCurrentCmmnElement().addExtensionElement(extensionElement);
+            eventType = extensionElement.getElementText();
+        } catch (Exception e) {
+            throw new FlowableException("Error while reading eventType element", e);
+        }
+
+        if (currentCmmnElement instanceof Case) {
+            Case caze = (Case) currentCmmnElement;
+            caze.setStartEventType(eventType);
+
+        } else if (currentCmmnElement instanceof SendEventServiceTask) {
+            SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) currentCmmnElement;
+            sendEventServiceTask.setEventType(eventType);
+
+        } else if (currentCmmnElement instanceof GenericEventListener) {
+            GenericEventListener genericEventListener = (GenericEventListener) currentCmmnElement;
+            genericEventListener.setEventType(eventType);
+
+        } else {
+            LOGGER.warn("Unsupported eventType detected for element " + currentCmmnElement);
+
         }
     }
 

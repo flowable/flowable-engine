@@ -147,12 +147,10 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
             }
 
         } else {
-            throw new FlowableObjectNotFoundException("formDefinitionKey and formDefinitionId are null");
+            throw new FlowableObjectNotFoundException("eventDefinitionKey and evebtDefinitionId are null");
         }
 
         EventDefinitionCacheEntry eventDefinitionCacheEntry = deploymentManager.resolveEventDefinition(eventDefinitionEntity);
-        EventModel eventModel = eventEngineConfiguration.getEventJsonConverter().convertToEventModel(eventDefinitionCacheEntry.getEventDefinitionJson());
-
-        return eventModel;
+        return eventEngineConfiguration.getEventJsonConverter().convertToEventModel(eventDefinitionCacheEntry.getEventDefinitionJson());
     }
 }

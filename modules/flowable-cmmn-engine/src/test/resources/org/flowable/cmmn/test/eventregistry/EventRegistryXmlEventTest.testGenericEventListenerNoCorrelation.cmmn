@@ -22,8 +22,11 @@
                 </planItemOnPart>
             </sentry>
             <humanTask id="taskA" name="A"/>
-            <eventListener id="eventListener" name="myEventListener" flowable:eventType="myEvent">
+            <eventListener id="eventListener" name="myEventListener">
                 <documentation>EventListener documentation</documentation>
+                <extensionElements>
+                    <flowable:eventType>myEvent</flowable:eventType>
+                </extensionElements>
             </eventListener>
             <humanTask id="taskB" name="B"/>
         </casePlanModel>

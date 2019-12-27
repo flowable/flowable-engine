@@ -4,9 +4,10 @@
     targetNamespace="http://www.flowable.org/test">
     
   <process id="process" name="process1" isExecutable="true">
-    <serviceTask id="sendEventServiceTask" flowable:type="send-event" name="Send event task" 
-            flowable:eventType="myEvent" flowable:triggerable="true" flowable:triggerEventType="triggerMyEvent">
+    <serviceTask id="sendEventServiceTask" flowable:type="send-event" name="Send event task" flowable:triggerable="true">
       <extensionElements>
+        <flowable:eventType>myEvent</flowable:eventType>
+        <flowable:triggerEventType>triggerMyEvent</flowable:triggerEventType>
         <flowable:eventInParameter source="${myVariable}" target="customerId" />
         <flowable:eventInParameter source="anotherProperty" target="anotherCustomerId" />
         <flowable:eventOutParameter source="eventProperty" target="newVariable" />

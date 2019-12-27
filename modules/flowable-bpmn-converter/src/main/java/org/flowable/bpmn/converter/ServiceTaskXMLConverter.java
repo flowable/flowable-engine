@@ -13,12 +13,14 @@
 package org.flowable.bpmn.converter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.EventInParameterParser;
 import org.flowable.bpmn.converter.child.EventOutParameterParser;
@@ -32,6 +34,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.CustomProperty;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.SendEventServiceTask;
@@ -184,20 +187,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, sendEventServiceTask.getSkipExpression(), xtw);
         }
 
-        if (StringUtils.isNotEmpty(sendEventServiceTask.getEventType())) {
-            writeQualifiedAttribute(ATTRIBUTE_EVENT_TYPE, sendEventServiceTask.getEventType(), xtw);
-        }
-
         if (sendEventServiceTask.isTriggerable()) {
             writeQualifiedAttribute(ATTRIBUTE_TRIGGERABLE, "true", xtw);
-        }
-
-        if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
-            writeQualifiedAttribute(ATTRIBUTE_TRIGGER_EVENT_TYPE, sendEventServiceTask.getTriggerEventType(), xtw);
-        }
-
-        if (sendEventServiceTask.isSendSynchronously()) {
-            writeQualifiedAttribute(ATTRIBUTE_SEND_SYNCHRONOUSLY, "true", xtw);
         }
     }
 
@@ -305,27 +296,42 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
     }
     
     protected void convertSendEventServiceTaskXMLProperties(SendEventServiceTask sendEventServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) throws Exception {
-        String eventType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_EVENT_TYPE, xtr);
-        if (StringUtils.isNotEmpty(eventType)) {
-            sendEventServiceTask.setEventType(eventType);
-        }
-
         String triggerable = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TRIGGERABLE, xtr);
         if ("true".equalsIgnoreCase(triggerable)) {
             sendEventServiceTask.setTriggerable(true);
         }
 
-        String triggerEventType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TRIGGER_EVENT_TYPE, xtr);
-        if (StringUtils.isNotEmpty(triggerEventType)) {
-            sendEventServiceTask.setTriggerEventType(triggerEventType);
-        }
-
-        String sendSynchronously = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SEND_SYNCHRONOUSLY, xtr);
-        if ("true".equalsIgnoreCase(sendSynchronously)) {
-            sendEventServiceTask.setSendSynchronously(true);
-        }
-
         parseChildElements(getXMLElementName(), sendEventServiceTask, sendEventServiceChildParserMap, bpmnModel, xtr);
+
+        // event related properties are parsed and stored as extension elements (makes export work automatically)
+
+        if (sendEventServiceTask.getExtensionElements() != null) {
+
+            List<ExtensionElement> eventTypeExtensionElements = sendEventServiceTask.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
+            if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
+                String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(eventTypeValue)) {
+                    sendEventServiceTask.setEventType(eventTypeValue);
+                }
+            }
+
+            List<ExtensionElement> triggerEventTypeExtensionElements = sendEventServiceTask.getExtensionElements().get(BpmnXMLConstants.ELEMENT_TRIGGER_EVENT_TYPE);
+            if (triggerEventTypeExtensionElements != null && !triggerEventTypeExtensionElements.isEmpty()) {
+                String triggerEventType = triggerEventTypeExtensionElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(triggerEventType)) {
+                    sendEventServiceTask.setTriggerEventType(triggerEventType);
+                }
+            }
+
+            List<ExtensionElement> sendSyncExtensionElements = sendEventServiceTask.getExtensionElements().get(BpmnXMLConstants.ELEMENT_SEND_SYNCHRONOUSLY);
+            if (sendSyncExtensionElements != null && !sendSyncExtensionElements.isEmpty()) {
+                String sendSyncValue = sendSyncExtensionElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(sendSyncValue) && "true".equalsIgnoreCase(sendSyncValue)) {
+                    sendEventServiceTask.setSendSynchronously(true);
+                }
+            }
+
+        }
     }
     
     protected boolean writeCustomProperties(ServiceTask serviceTask, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {

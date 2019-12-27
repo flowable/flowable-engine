@@ -15,9 +15,11 @@
 
         <sequenceFlow sourceRef="task" targetRef="sendEventTask"/>
 
-        <serviceTask id="sendEventTask" flowable:type="send-event" flowable:eventType="myEvent" flowable:triggerable="true"
-                     flowable:triggerEventType="myTriggerEvent" flowable:sendSynchronously="true">
+        <serviceTask id="sendEventTask" flowable:type="send-event" flowable:triggerable="true">
             <extensionElements>
+                <flowable:eventType>myEvent</flowable:eventType>
+                <flowable:triggerEventType>myTriggerEvent</flowable:triggerEventType>
+                <flowable:sendSynchronously>true</flowable:sendSynchronously>
                 <flowable:eventInParameter source="test" target="eventProperty"/>
                 <flowable:eventOutParameter source="customerId" target="anotherVariable"/>
             </extensionElements>
