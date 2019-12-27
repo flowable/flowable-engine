@@ -86,7 +86,7 @@ class RabbitChannelDefinitionProcessorTest {
         rabbitAdmin.declareQueue(new Queue("test-customer"));
         queuesToDelete.add("test-customer");
 
-        eventRegistry.newInboundChannelDefinition()
+        eventRegistry.newInboundChannelModel()
             .key("testChannel")
             .rabbitChannelAdapter("test-customer")
             .eventProcessingPipeline()
@@ -131,7 +131,7 @@ class RabbitChannelDefinitionProcessorTest {
                 tuple("customer", "kermit")
             );
 
-        eventRegistry.removeChannelDefinition("testChannel");
+        eventRegistry.removeChannelModel("testChannel");
     }
 
     @Test
@@ -152,7 +152,7 @@ class RabbitChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newInboundChannelDefinition()
+        eventRegistry.newInboundChannelModel()
             .key("testChannel")
             .rabbitChannelAdapter("test-customer")
             .eventProcessingPipeline()
@@ -204,7 +204,7 @@ class RabbitChannelDefinitionProcessorTest {
                 tuple("customer", "fozzie")
             );
 
-        eventRegistry.removeChannelDefinition("testChannel");
+        eventRegistry.removeChannelModel("testChannel");
     }
 
     @Test
@@ -224,7 +224,7 @@ class RabbitChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newOutboundChannelDefinition()
+        eventRegistry.newOutboundChannelModel()
             .key("outboundCustomer")
             .rabbitChannelAdapter("customer")
             .exchange("flowable-test")
@@ -249,7 +249,7 @@ class RabbitChannelDefinitionProcessorTest {
                 + "  name: 'Kermit the Frog'"
                 + "}");
 
-        eventRegistry.removeChannelDefinition("outboundCustomer");
+        eventRegistry.removeChannelModel("outboundCustomer");
         rabbitAdmin.removeBinding(binding);
         rabbitAdmin.deleteExchange(exchange.getName());
     }
@@ -267,7 +267,7 @@ class RabbitChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newOutboundChannelDefinition()
+        eventRegistry.newOutboundChannelModel()
             .key("outboundCustomer")
             .rabbitChannelAdapter("outbound-customer")
             .eventProcessingPipeline()
@@ -291,6 +291,6 @@ class RabbitChannelDefinitionProcessorTest {
                 + "  name: 'Kermit the Frog'"
                 + "}");
 
-        eventRegistry.removeChannelDefinition("outboundCustomer");
+        eventRegistry.removeChannelModel("outboundCustomer");
     }
 }

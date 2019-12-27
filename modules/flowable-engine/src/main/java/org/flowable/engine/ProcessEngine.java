@@ -12,7 +12,7 @@
  */
 package org.flowable.engine;
 
-import org.flowable.common.engine.Engine;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 
 /**

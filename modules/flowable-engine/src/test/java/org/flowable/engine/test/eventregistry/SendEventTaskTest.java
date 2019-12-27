@@ -76,7 +76,7 @@ public class SendEventTaskTest extends FlowableTestCase {
     protected TestOutboundEventChannelAdapter setupTestChannel() {
         TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
 
-        getEventRegistry().newOutboundChannelDefinition()
+        getEventRegistry().newOutboundChannelModel()
             .key("out-channel")
             .channelAdapter(outboundEventChannelAdapter)
             .jsonSerializer()
@@ -88,7 +88,7 @@ public class SendEventTaskTest extends FlowableTestCase {
     protected TestInboundEventChannelAdapter setupTestInboundChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        getEventRegistry().newInboundChannelDefinition()
+        getEventRegistry().newInboundChannelModel()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .jsonDeserializer()
@@ -101,8 +101,8 @@ public class SendEventTaskTest extends FlowableTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        getEventRegistry().removeChannelDefinition("out-channel");
-        getEventRegistry().removeChannelDefinition("test-channel");
+        getEventRegistry().removeChannelModel("out-channel");
+        getEventRegistry().removeChannelModel("test-channel");
         
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();

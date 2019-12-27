@@ -39,6 +39,19 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
             "}\n" + 
             "";
     
+    private String channelModel = "{\n" + 
+            "    \"key\": \"$changeme$\",\n" + 
+            "    \"name\": \"My first event\",\n" + 
+            "    \"channelType\": \"inbound\",\n" + 
+            "    \"type\": \"jms\",\n" + 
+            "    \"destination\": \"$changemedestination$\",\n" + 
+            "    \"deserializerType\": \"json\",\n" + 
+            "    \"channelEventKeyDetection\": {\n" + 
+            "       \"fixedValue\": \"$changemefixedvalue$\"\n" + 
+            "    }\n" + 
+            "}\n" + 
+            "";
+    
     @BeforeEach
     public void deploy() {
         deploymentId1 = repositoryService.createDeployment()
@@ -59,6 +72,7 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
                 .name("test3.event")
                 .category("testCategoryC")
                 .addString("event3.event", eventModel.replace("$changeme$", "event3").replace("$changemechannel$", "channel3"))
+                .addString("channel1.channel", channelModel.replace("$changeme$", "channel1").replace("$changemedestination$", "testQueue").replace("$changemefixedvalue$", "myEvent"))
                 .tenantId("tenantB")
                 .deploy().getId();
     }
@@ -141,7 +155,7 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
     }
     
     @Test
-    public void testQueryByDecisionTableKey() {
+    public void testQueryByEventDefinitionKey() {
         assertEquals(1, repositoryService.createDeploymentQuery().eventDefinitionKey("event2").list().size());
         assertEquals(1, repositoryService.createDeploymentQuery().eventDefinitionKey("event2").count());
         
@@ -150,7 +164,7 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
     }
     
     @Test
-    public void testQueryByDecisionTableKeyLike() {
+    public void testQueryByEventDefinitionKeyLike() {
         assertEquals(3, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").list().size());
         assertEquals(3, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").count());
         assertEquals(1, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("event%").listPage(0, 1).size());
@@ -159,6 +173,27 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
         
         assertEquals(0, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("inva%").list().size());
         assertEquals(0, repositoryService.createDeploymentQuery().eventDefinitionKeyLike("inva%").count());
+    }
+    
+    @Test
+    public void testQueryByChannelDefinitionKey() {
+        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKey("channel1").list().size());
+        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKey("channel1").count());
+        
+        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKey("invalid").list().size());
+        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKey("invalid").count());
+    }
+    
+    @Test
+    public void testQueryByChannelDefinitionKeyLike() {
+        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").list().size());
+        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").count());
+        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(0, 1).size());
+        assertEquals(1, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(0, 2).size());
+        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("channel%").listPage(1, 2).size());
+        
+        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("inva%").list().size());
+        assertEquals(0, repositoryService.createDeploymentQuery().channelDefinitionKeyLike("inva%").count());
     }
     
 }

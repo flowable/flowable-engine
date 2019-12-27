@@ -106,6 +106,16 @@ public class EventDeploymentManager {
         eventDefinition = resolveEventDefinition(eventDefinition).getEventDefinitionEntity();
         return eventDefinition;
     }
+    
+    public ChannelDefinitionEntity findDeployedLatestChannelDefinitionByKey(String channelDefinitionKey) {
+        ChannelDefinitionEntity channelDefinition = channelDefinitionEntityManager.findLatestChannelDefinitionByKey(channelDefinitionKey);
+
+        if (channelDefinition == null) {
+            throw new FlowableObjectNotFoundException("no channel definitions deployed with key '" + channelDefinitionKey + "'");
+        }
+        channelDefinition = resolveChannelDefinition(channelDefinition).getChannelDefinitionEntity();
+        return channelDefinition;
+    }
 
     public EventDefinitionEntity findDeployedLatestEventDefinitionByKeyAndTenantId(String eventDefinitionKey, String tenantId) {
         EventDefinitionEntity eventDefinition = eventDefinitionEntityManager.findLatestEventDefinitionByKeyAndTenantId(eventDefinitionKey, tenantId);
@@ -223,6 +233,7 @@ public class EventDeploymentManager {
         
         for (ChannelDefinition channelDefinition : channelDefinitions) {
             channelDefinitionCache.remove(channelDefinition.getId());
+            engineConfig.getEventRegistry().removeChannelModel(channelDefinition.getKey());
         }
     }
 

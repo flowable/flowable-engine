@@ -65,7 +65,7 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        getEventRegistry().newInboundChannelDefinition()
+        getEventRegistry().newInboundChannelModel()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .jsonDeserializer()
@@ -79,7 +79,7 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
 
     @After
     public void unregisterEventDefinition() {
-        getEventRegistry().removeChannelDefinition("test-channel");
+        getEventRegistry().removeChannelModel("test-channel");
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {

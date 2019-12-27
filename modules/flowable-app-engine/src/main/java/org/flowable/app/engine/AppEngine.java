@@ -14,7 +14,7 @@ package org.flowable.app.engine;
 
 import org.flowable.app.api.AppManagementService;
 import org.flowable.app.api.AppRepositoryService;
-import org.flowable.common.engine.Engine;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 
 /**

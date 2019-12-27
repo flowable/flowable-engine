@@ -38,7 +38,7 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
         Collection<String> outboundChannelKeys = eventInstance.getEventModel().getOutboundChannelKeys();
         for (String outboundChannelKey : outboundChannelKeys) {
 
-            OutboundChannelModel outboundChannelDefinition = eventRegistry.getOutboundChannelDefinition(outboundChannelKey);
+            OutboundChannelModel outboundChannelDefinition = eventRegistry.getOutboundChannelModel(outboundChannelKey);
             if (outboundChannelDefinition == null) {
                 throw new FlowableException("Could not find outbound channel definition for " + outboundChannelKey);
             }

@@ -147,7 +147,7 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
             }
 
         } else {
-            throw new FlowableObjectNotFoundException("eventDefinitionKey and evebtDefinitionId are null");
+            throw new FlowableObjectNotFoundException("eventDefinitionKey and eventDefinitionId are null");
         }
 
         EventDefinitionCacheEntry eventDefinitionCacheEntry = deploymentManager.resolveEventDefinition(eventDefinitionEntity);

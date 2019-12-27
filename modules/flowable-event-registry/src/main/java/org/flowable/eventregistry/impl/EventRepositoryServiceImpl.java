@@ -28,6 +28,7 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.model.EventModelBuilder;
 import org.flowable.eventregistry.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.eventregistry.impl.cmd.DeployCmd;
+import org.flowable.eventregistry.impl.cmd.GetChannelModelCmd;
 import org.flowable.eventregistry.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.eventregistry.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.flowable.eventregistry.impl.cmd.GetEventDefinitionCmd;
@@ -152,31 +153,27 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
     
     @Override
     public ChannelModel getChannelModelById(String channelDefinitionId) {
-        return commandExecutor.execute(new GetEventModelCmd(null, eventDefinitionId));
+        return commandExecutor.execute(new GetChannelModelCmd(null, channelDefinitionId));
     }
 
     @Override
     public ChannelModel getChannelModelByKey(String channelDefinitionKey) {
-        // TODO Auto-generated method stub
-        return null;
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null));
     }
 
     @Override
     public ChannelModel getChannelModelByKey(String channelDefinitionKey, String tenantId, boolean fallbackToDefaultTenant) {
-        // TODO Auto-generated method stub
-        return null;
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, tenantId, fallbackToDefaultTenant));
     }
 
     @Override
     public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId) {
-        // TODO Auto-generated method stub
-        return null;
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, null, parentDeploymentId, false));
     }
 
     @Override
     public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant) {
-        // TODO Auto-generated method stub
-        return null;
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, tenantId, parentDeploymentId, fallbackToDefaultTenant));
     }
 
     @Override

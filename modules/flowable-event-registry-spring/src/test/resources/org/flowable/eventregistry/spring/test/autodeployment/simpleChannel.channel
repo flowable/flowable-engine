@@ -1,0 +1,12 @@
+{
+    "key": "testChannel",
+    "category": "channel",
+    "name": "Test channel",
+    "channelType": "inbound",
+    "type": "jms",
+    "destination": "test-customer",
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    }
+}

@@ -22,7 +22,7 @@ import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTransformer;
-import org.flowable.eventregistry.api.model.InboundChannelDefinitionBuilder;
+import org.flowable.eventregistry.api.model.InboundChannelModelBuilder;
 import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.StaticKeyDetector;
@@ -45,11 +45,11 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefinitionBuilder {
+public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelBuilder {
 
     protected EventRegistry eventRegistry;
 
-    protected InboundChannelModel channelDefinition;
+    protected InboundChannelModel channelModel;
     protected String key;
     protected InboundEventChannelAdapter inboundEventChannelAdapter;
     protected InboundEventProcessingPipelineBuilder inboundEventProcessingPipelineBuilder;
@@ -59,7 +59,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
     }
 
     @Override
-    public InboundChannelDefinitionBuilder key(String key) {
+    public InboundChannelModelBuilder key(String key) {
         this.key = key;
         return this;
     }
@@ -73,50 +73,50 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
 
     @Override
     public InboundJmsChannelBuilder jmsChannelAdapter(String destinationName) {
-        JmsInboundChannelModel channelDefinition = new JmsInboundChannelModel();
-        channelDefinition.setDestination(destinationName);
-        this.channelDefinition = channelDefinition;
-        this.channelDefinition.setKey(key);
-        return new InboundJmsChannelBuilderImpl(channelDefinition, eventRegistry, this);
+        JmsInboundChannelModel channelModel = new JmsInboundChannelModel();
+        channelModel.setDestination(destinationName);
+        this.channelModel = channelModel;
+        this.channelModel.setKey(key);
+        return new InboundJmsChannelBuilderImpl(channelModel, eventRegistry, this);
     }
 
     @Override
     public InboundRabbitChannelBuilder rabbitChannelAdapter(String queueName) {
-        RabbitInboundChannelModel channelDefinition = new RabbitInboundChannelModel();
+        RabbitInboundChannelModel channelModel = new RabbitInboundChannelModel();
         Set<String> queues = new LinkedHashSet<>();
         queues.add(queueName);
-        channelDefinition.setQueues(queues);
-        this.channelDefinition = channelDefinition;
-        this.channelDefinition.setKey(key);
-        return new InboundRabbitChannelBuilderImpl(channelDefinition, eventRegistry, this);
+        channelModel.setQueues(queues);
+        this.channelModel = channelModel;
+        this.channelModel.setKey(key);
+        return new InboundRabbitChannelBuilderImpl(channelModel, eventRegistry, this);
     }
 
     @Override
     public InboundKafkaChannelBuilder kafkaChannelAdapter(String topic) {
-        KafkaInboundChannelModel channelDefinition = new KafkaInboundChannelModel();
+        KafkaInboundChannelModel channelModel = new KafkaInboundChannelModel();
         Set<String> topics = new LinkedHashSet<>();
         topics.add(topic);
-        channelDefinition.setTopics(topics);
-        this.channelDefinition = channelDefinition;
-        this.channelDefinition.setKey(key);
-        return new InboundKafkaChannelBuilderImpl(channelDefinition, eventRegistry, this);
+        channelModel.setTopics(topics);
+        this.channelModel = channelModel;
+        this.channelModel.setKey(key);
+        return new InboundKafkaChannelBuilderImpl(channelModel, eventRegistry, this);
     }
 
     @Override
     public InboundChannelModel register() {
-        if (this.channelDefinition == null) {
-            channelDefinition = new InboundChannelModel();
+        if (this.channelModel == null) {
+            channelModel = new InboundChannelModel();
         }
 
-        channelDefinition.setKey(key);
-        channelDefinition.setInboundEventChannelAdapter(inboundEventChannelAdapter);
+        channelModel.setKey(key);
+        channelModel.setInboundEventChannelAdapter(inboundEventChannelAdapter);
 
         InboundEventProcessingPipeline inboundEventProcessingPipeline = inboundEventProcessingPipelineBuilder.build();
-        channelDefinition.setInboundEventProcessingPipeline(inboundEventProcessingPipeline);
+        channelModel.setInboundEventProcessingPipeline(inboundEventProcessingPipeline);
 
-        eventRegistry.registerChannelDefinition(channelDefinition);
+        eventRegistry.registerChannelModel(channelModel);
 
-        return channelDefinition;
+        return channelModel;
     }
 
     public static class InboundJmsChannelBuilderImpl implements InboundJmsChannelBuilder {
@@ -303,7 +303,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         }
 
         @Override
-        public InboundChannelDefinitionBuilder eventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline) {
+        public InboundChannelModelBuilder eventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline) {
             this.customInboundEventProcessingPipeline = inboundEventProcessingPipeline;
             return channelDefinitionBuilder;
         }
@@ -441,7 +441,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         }
 
         @Override
-        public InboundChannelDefinitionBuilder transformer(InboundEventTransformer inboundEventTransformer) {
+        public InboundChannelModelBuilder transformer(InboundEventTransformer inboundEventTransformer) {
             this.inboundEventProcessingPipelineBuilder.inboundEventTransformer = inboundEventTransformer;
             return this.inboundEventProcessingPipelineBuilder.channelDefinitionBuilder;
         }

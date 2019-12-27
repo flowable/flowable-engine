@@ -69,9 +69,9 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     
     @AfterEach
     public void tearDown() {
-        Map<String, InboundChannelModel> inboundChannelDefinitionMap = eventEngineConfiguration.getEventRegistry().getInboundChannelDefinitions();
+        Map<String, InboundChannelModel> inboundChannelDefinitionMap = eventEngineConfiguration.getEventRegistry().getInboundChannelModels();
         for (String key : inboundChannelDefinitionMap.keySet()) {
-            eventEngineConfiguration.getEventRegistry().removeChannelDefinition(key);
+            eventEngineConfiguration.getEventRegistry().removeChannelModel(key);
         }
         
         List<EventDeployment> eventDeployments = repositoryService.createDeploymentQuery().list();
@@ -154,7 +154,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        eventEngineConfiguration.getEventRegistry().newInboundChannelDefinition()
+        eventEngineConfiguration.getEventRegistry().newInboundChannelModel()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .jsonDeserializer()
@@ -168,7 +168,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     protected TestInboundEventChannelAdapter setupTestChannelWithCustomDeserializer() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
 
-        eventEngineConfiguration.getEventRegistry().newInboundChannelDefinition()
+        eventEngineConfiguration.getEventRegistry().newInboundChannelModel()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .deserializer(new InboundEventDeserializer<Customer>() {

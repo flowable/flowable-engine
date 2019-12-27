@@ -20,9 +20,9 @@ import org.flowable.eventregistry.model.OutboundChannelModel;
 /**
  * @author Joram Barrez
  */
-public interface OutboundChannelDefinitionBuilder {
+public interface OutboundChannelModelBuilder {
 
-    OutboundChannelDefinitionBuilder key(String key);
+    OutboundChannelModelBuilder key(String key);
 
     OutboundEventProcessingPipelineBuilder channelAdapter(OutboundEventChannelAdapter outboundEventChannelAdapter);
 
@@ -55,13 +55,13 @@ public interface OutboundChannelDefinitionBuilder {
 
     interface OutboundEventProcessingPipelineBuilder {
 
-        OutboundChannelDefinitionBuilder jsonSerializer();
+        OutboundChannelModelBuilder jsonSerializer();
 
-        OutboundChannelDefinitionBuilder xmlSerializer();
+        OutboundChannelModelBuilder xmlSerializer();
 
-        OutboundChannelDefinitionBuilder serializer(OutboundEventSerializer serializer);
+        OutboundChannelModelBuilder serializer(OutboundEventSerializer serializer);
 
-        OutboundChannelDefinitionBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline);
+        OutboundChannelModelBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline);
 
         OutboundEventProcessingPipeline build();
 

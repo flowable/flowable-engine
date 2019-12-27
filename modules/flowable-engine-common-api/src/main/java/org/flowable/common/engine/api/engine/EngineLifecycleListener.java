@@ -12,7 +12,7 @@
  */
 package org.flowable.common.engine.api.engine;
 
-import org.flowable.common.engine.Engine;
+import org.flowable.common.engine.api.Engine;
 
 /**
  * Interface describing a listener that gets notified when certain event occurs, related to the engine lifecycle it is attached to.

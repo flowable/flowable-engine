@@ -79,6 +79,14 @@ public interface EventDeploymentQuery extends Query<EventDeploymentQuery, EventD
      * Only select deployments with an event definition key like the given string.
      */
     EventDeploymentQuery eventDefinitionKeyLike(String keyLike);
+    
+    /** Only select deployments with the given channel definition key. */
+    EventDeploymentQuery channelDefinitionKey(String key);
+
+    /**
+     * Only select deployments with a channel definition key like the given string.
+     */
+    EventDeploymentQuery channelDefinitionKeyLike(String keyLike);
 
     /**
      * Only select deployment that have the given deployment parent id.

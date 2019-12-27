@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.flowable.common.engine.Engine;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.slf4j.LoggerFactory;
 

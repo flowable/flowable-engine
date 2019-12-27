@@ -52,7 +52,7 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
     protected TestOutboundEventChannelAdapter setupTestChannel() {
         TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
 
-        getEventRegistry().newOutboundChannelDefinition()
+        getEventRegistry().newOutboundChannelModel()
             .key("out-channel")
             .channelAdapter(outboundEventChannelAdapter)
             .jsonSerializer()
@@ -64,7 +64,7 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
 
     @After
     public void unregisterEventDefinition() {
-        getEventRegistry().removeChannelDefinition("test-channel");
+        getEventRegistry().removeChannelModel("test-channel");
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {

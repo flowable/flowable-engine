@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.engine;
 
-import org.flowable.common.engine.Engine;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -71,7 +72,7 @@ class JmsChannelDefinitionProcessorTest {
 
     @Test
     void eventShouldBeReceivedWhenChannelDefinitionIsRegistered() {
-        eventRegistry.newInboundChannelDefinition()
+        eventRegistry.newInboundChannelModel()
             .key("testChannel")
             .jmsChannelAdapter("test-customer")
             .eventProcessingPipeline()
@@ -116,7 +117,48 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("customer", "kermit")
             );
 
-        eventRegistry.removeChannelDefinition("testChannel");
+        eventRegistry.removeChannelModel("testChannel");
+    }
+    
+    @Test
+    void eventShouldBeReceivedWhenChannelModelIsDeployed() {
+        EventDeployment deployment = eventRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/jmsEvent.event")
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/jmsChannel.channel")
+            .deploy();
+
+        try {
+            jmsTemplate.convertAndSend("test-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"customer\": \"kermit\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}");
+    
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                    .extracting(EventRegistryEvent::getType)
+                    .containsExactlyInAnyOrder("test"));
+    
+            EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+    
+            assertThat(eventInstance).isNotNull();
+            assertThat(eventInstance.getPayloadInstances())
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("customer", "kermit"),
+                    tuple("name", "Kermit the Frog")
+                );
+            assertThat(eventInstance.getCorrelationParameterInstances())
+                .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("customer", "kermit")
+                );
+            
+        } finally {
+            eventRepositoryService.deleteDeployment(deployment.getId());
+        }
     }
 
     @Test
@@ -126,6 +168,7 @@ class JmsChannelDefinitionProcessorTest {
             + "    \"customer\": \"kermit\","
             + "    \"name\": \"Kermit the Frog\""
             + "}");
+        
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("test")
@@ -134,7 +177,7 @@ class JmsChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newInboundChannelDefinition()
+        eventRegistry.newInboundChannelModel()
             .key("testChannel")
             .jmsChannelAdapter("test-customer")
             .eventProcessingPipeline()
@@ -186,7 +229,7 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("customer", "fozzie")
             );
 
-        eventRegistry.removeChannelDefinition("testChannel");
+        eventRegistry.removeChannelModel("testChannel");
     }
 
     @Test
@@ -199,7 +242,7 @@ class JmsChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newOutboundChannelDefinition()
+        eventRegistry.newOutboundChannelModel()
             .key("outboundCustomer")
             .jmsChannelAdapter("outbound-customer")
             .eventProcessingPipeline()
@@ -223,6 +266,6 @@ class JmsChannelDefinitionProcessorTest {
                 + "  name: 'Kermit the Frog'"
                 + "}");
 
-        eventRegistry.removeChannelDefinition("outboundCustomer");
+        eventRegistry.removeChannelModel("outboundCustomer");
     }
 }

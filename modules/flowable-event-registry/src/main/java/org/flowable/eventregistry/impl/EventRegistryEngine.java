@@ -12,7 +12,7 @@
  */
 package org.flowable.eventregistry.impl;
 
-import org.flowable.common.engine.Engine;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;

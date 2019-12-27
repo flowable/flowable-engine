@@ -43,6 +43,8 @@ public class EventDeploymentQueryImpl extends AbstractQuery<EventDeploymentQuery
     protected String parentDeploymentIdLike;
     protected String eventDefinitionKey;
     protected String eventDefinitionKeyLike;
+    protected String channelDefinitionKey;
+    protected String channelDefinitionKeyLike;
 
     public EventDeploymentQueryImpl() {
     }
@@ -159,6 +161,24 @@ public class EventDeploymentQueryImpl extends AbstractQuery<EventDeploymentQuery
         this.eventDefinitionKeyLike = keyLike;
         return this;
     }
+    
+    @Override
+    public EventDeploymentQueryImpl channelDefinitionKey(String key) {
+        if (key == null) {
+            throw new FlowableIllegalArgumentException("key is null");
+        }
+        this.channelDefinitionKey = key;
+        return this;
+    }
+
+    @Override
+    public EventDeploymentQueryImpl channelDefinitionKeyLike(String keyLike) {
+        if (keyLike == null) {
+            throw new FlowableIllegalArgumentException("keyLike is null");
+        }
+        this.channelDefinitionKeyLike = keyLike;
+        return this;
+    }
 
     // sorting ////////////////////////////////////////////////////////
 
@@ -234,5 +254,21 @@ public class EventDeploymentQueryImpl extends AbstractQuery<EventDeploymentQuery
 
     public String getEventDefinitionKeyLike() {
         return eventDefinitionKeyLike;
+    }
+
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    public String getParentDeploymentIdLike() {
+        return parentDeploymentIdLike;
+    }
+
+    public String getChannelDefinitionKey() {
+        return channelDefinitionKey;
+    }
+
+    public String getChannelDefinitionKeyLike() {
+        return channelDefinitionKeyLike;
     }
 }

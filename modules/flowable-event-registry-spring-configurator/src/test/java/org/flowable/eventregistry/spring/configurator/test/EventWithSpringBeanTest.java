@@ -50,7 +50,7 @@ public class EventWithSpringBeanTest extends SpringEventFlowableTestCase {
     protected void tearDown() {
         EventRegistryEngineConfiguration eventEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
                         .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-        eventEngineConfiguration.getEventRegistry().removeChannelDefinition("test-channel");
+        eventEngineConfiguration.getEventRegistry().removeChannelModel("test-channel");
     }
     
     protected TestInboundEventChannelAdapter setupTestChannel() {
@@ -59,7 +59,7 @@ public class EventWithSpringBeanTest extends SpringEventFlowableTestCase {
         EventRegistryEngineConfiguration eventEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
                         .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         
-        eventEngineConfiguration.getEventRegistry().newInboundChannelDefinition()
+        eventEngineConfiguration.getEventRegistry().newInboundChannelModel()
             .key("test-channel")
             .channelAdapter(inboundEventChannelAdapter)
             .jsonDeserializer()

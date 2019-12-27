@@ -21,6 +21,7 @@ import java.util.List;
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDeployment;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
@@ -155,59 +156,32 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         assertEquals("myChannel", channelDefinition.getKey());
         assertEquals(1, channelDefinition.getVersion());
 
-        EventModel eventModel = repositoryService.getEventModelById(eventDefinition.getId());
-        assertEquals("myEvent", eventModel.getKey());
+        ChannelModel channelModel = repositoryService.getChannelModelById(channelDefinition.getId());
+        assertEquals("myChannel", channelModel.getKey());
+        assertEquals("inbound", channelModel.getChannelType());
+        assertEquals("jms", channelModel.getType());
+        assertEquals("testQueue", channelModel.getDestination());
+        assertEquals("json", channelModel.getDeserializerType());
+        assertEquals("myEvent", channelModel.getChannelEventKeyDetection().getFixedValue());
         
-        assertEquals(1, eventModel.getInboundChannelKeys().size());
-        assertEquals("test-channel", eventModel.getInboundChannelKeys().iterator().next());
-        
-        assertEquals(1, eventModel.getCorrelationParameters().size());
-        EventCorrelationParameter correlationParameter = eventModel.getCorrelationParameters().iterator().next();
-        assertEquals("customerId", correlationParameter.getName());
-        assertEquals("string", correlationParameter.getType());
-        
-        assertEquals(2, eventModel.getPayload().size());
-        Iterator<EventPayload> itPayload = eventModel.getPayload().iterator();
-        EventPayload payloadDefinition = itPayload.next();
-        assertEquals("payload1", payloadDefinition.getName());
-        assertEquals("string", payloadDefinition.getType());
-        
-        payloadDefinition = itPayload.next();
-        assertEquals("payload2", payloadDefinition.getName());
-        assertEquals("integer", payloadDefinition.getType());
-
         EventDeployment redeployment = repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleEvent2.event")
+                .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel")
                 .deploy();
 
-        eventDefinition = repositoryService.createEventDefinitionQuery()
-                .eventDefinitionKey("myEvent")
+        channelDefinition = repositoryService.createChannelDefinitionQuery()
+                .channelDefinitionKey("myChannel")
                 .latestVersion()
                 .singleResult();
-        assertNotNull(eventDefinition);
-        assertEquals("myEvent", eventDefinition.getKey());
-        assertEquals(2, eventDefinition.getVersion());
+        assertNotNull(channelDefinition);
+        assertEquals("myChannel", channelDefinition.getKey());
+        assertEquals(2, channelDefinition.getVersion());
 
-        eventModel = repositoryService.getEventModelById(eventDefinition.getId());
-        assertEquals("myEvent", eventModel.getKey());
-        
-        assertEquals(1, eventModel.getInboundChannelKeys().size());
-        assertEquals("test-channel2", eventModel.getInboundChannelKeys().iterator().next());
-        
-        assertEquals(1, eventModel.getCorrelationParameters().size());
-        correlationParameter = eventModel.getCorrelationParameters().iterator().next();
-        assertEquals("customerId2", correlationParameter.getName());
-        assertEquals("string", correlationParameter.getType());
-        
-        assertEquals(2, eventModel.getPayload().size());
-        itPayload = eventModel.getPayload().iterator();
-        payloadDefinition = itPayload.next();
-        assertEquals("payload3", payloadDefinition.getName());
-        assertEquals("string", payloadDefinition.getType());
-        
-        payloadDefinition = itPayload.next();
-        assertEquals("payload4", payloadDefinition.getName());
-        assertEquals("integer", payloadDefinition.getType());
+        channelModel = repositoryService.getChannelModelById(channelDefinition.getId());
+        assertEquals("inbound", channelModel.getChannelType());
+        assertEquals("jms", channelModel.getType());
+        assertEquals("testQueue2", channelModel.getDestination());
+        assertEquals("json", channelModel.getDeserializerType());
+        assertEquals("myEvent2", channelModel.getChannelEventKeyDetection().getFixedValue());
 
         repositoryService.deleteDeployment(redeployment.getId());
     }
@@ -221,6 +195,17 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         assertEquals("My event", eventDefinitions.get(0).getName());
         assertEquals("My order event", eventDefinitions.get(1).getName());
+    }
+    
+    @Test
+    @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/test/deployment/simpleChannel.channel",
+            "org/flowable/eventregistry/test/deployment/orderChannel.channel" })
+    public void deploy2ChannelDefinitions() {
+        List<ChannelDefinition> channelDefinitions = repositoryService.createChannelDefinitionQuery().orderByChannelDefinitionName().asc().list();
+        assertEquals(2, channelDefinitions.size());
+
+        assertEquals("My channel", channelDefinitions.get(0).getName());
+        assertEquals("Order channel", channelDefinitions.get(1).getName());
     }
     
     @Test
@@ -253,6 +238,44 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             eventModel = repositoryService.getEventModelByKeyAndParentDeploymentId("myEvent", "someDeploymentId");
             assertEquals("myEvent", eventModel.getKey());
             assertEquals("My event2", eventModel.getName());
+        
+        } finally {
+            eventEngineConfiguration.setAlwaysLookupLatestDefinitionVersion(false);
+            repositoryService.deleteDeployment(deployment.getId());
+            repositoryService.deleteDeployment(newDeployment.getId());
+        }
+    }
+    
+    @Test
+    public void deploySingleChannelDefinitionWithParentDeploymentId() {
+        EventDeployment deployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel.channel")
+                .parentDeploymentId("someDeploymentId")
+                .deploy();
+        
+        EventDeployment newDeployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel")
+                .deploy();
+        
+        try {
+            ChannelDefinition definition = repositoryService.createChannelDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+            assertNotNull(definition);
+            assertEquals("myChannel", definition.getKey());
+            assertEquals(1, definition.getVersion());
+            
+            ChannelDefinition newDefinition = repositoryService.createChannelDefinitionQuery().deploymentId(newDeployment.getId()).singleResult();
+            assertNotNull(newDefinition);
+            assertEquals("myChannel", newDefinition.getKey());
+            assertEquals(2, newDefinition.getVersion());
+            
+            ChannelModel channelModel = repositoryService.getChannelModelByKeyAndParentDeploymentId("myChannel", "someDeploymentId");
+            assertEquals("myChannel", channelModel.getKey());
+            assertEquals("My channel", channelModel.getName());
+            
+            eventEngineConfiguration.setAlwaysLookupLatestDefinitionVersion(true);
+            channelModel = repositoryService.getChannelModelByKeyAndParentDeploymentId("myChannel", "someDeploymentId");
+            assertEquals("myChannel", channelModel.getKey());
+            assertEquals("My channel2", channelModel.getName());
         
         } finally {
             eventEngineConfiguration.setAlwaysLookupLatestDefinitionVersion(false);

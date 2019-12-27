@@ -43,6 +43,8 @@ import org.springframework.util.StringValueResolver;
  * @author Filip Hrisafov
  */
 public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelModelProcessor {
+    
+    public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.jms.ChannelJmsListenerEndpointContainer#";
 
     /**
      * The bean name of the default {@link JmsListenerContainerFactory}.
@@ -79,7 +81,8 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelM
     }
 
     protected JmsListenerEndpoint createJmsListenerEndpoint(ChannelModel channelDefinition, EventRegistry eventRegistry,
-        JmsInboundChannelModel jmsChannelDefinition) {
+                    JmsInboundChannelModel jmsChannelDefinition) {
+        
         String endpointId = getEndpointId(jmsChannelDefinition);
 
         SimpleJmsListenerEndpoint endpoint = new SimpleJmsListenerEndpoint();
@@ -184,7 +187,7 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelM
     protected String getEndpointId(ChannelModel channelModel) {
         String channelDefinitionKey = channelModel.getKey();
         //TODO multi tenant
-        return "org.flowable.eventregistry.jms.ChannelJmsListenerEndpointContainer#" + channelDefinitionKey;
+        return CHANNEL_ID_PREFIX + channelDefinitionKey;
     }
 
     protected String resolve(String value) {

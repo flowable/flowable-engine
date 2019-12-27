@@ -16,7 +16,7 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
-import org.flowable.eventregistry.api.model.OutboundChannelDefinitionBuilder;
+import org.flowable.eventregistry.api.model.OutboundChannelModelBuilder;
 import org.flowable.eventregistry.impl.pipeline.DefaultOutboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToJsonStringSerializer;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToXmlStringSerializer;
@@ -29,7 +29,7 @@ import org.flowable.eventregistry.model.RabbitOutboundChannelModel;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefinitionBuilder {
+public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelModelBuilder {
 
     protected EventRegistry eventRegistry;
 
@@ -96,7 +96,7 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
         OutboundEventProcessingPipeline outboundEventProcessingPipeline = this.outboundEventProcessingPipelineBuilder.build();
         outboundChannelDefinition.setOutboundEventProcessingPipeline(outboundEventProcessingPipeline);
 
-        eventRegistry.registerChannelDefinition(outboundChannelDefinition);
+        eventRegistry.registerChannelModel(outboundChannelDefinition);
 
         return outboundChannelDefinition;
     }
@@ -193,25 +193,25 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
         }
 
         @Override
-        public OutboundChannelDefinitionBuilder jsonSerializer() {
+        public OutboundChannelModelBuilder jsonSerializer() {
             this.outboundEventSerializer = new EventPayloadToJsonStringSerializer();
             return outboundChannelDefinitionBuilder;
         }
 
         @Override
-        public OutboundChannelDefinitionBuilder xmlSerializer() {
+        public OutboundChannelModelBuilder xmlSerializer() {
             this.outboundEventSerializer = new EventPayloadToXmlStringSerializer();
             return outboundChannelDefinitionBuilder;
         }
 
         @Override
-        public OutboundChannelDefinitionBuilder serializer(OutboundEventSerializer serializer) {
+        public OutboundChannelModelBuilder serializer(OutboundEventSerializer serializer) {
             this.outboundEventSerializer = serializer;
             return outboundChannelDefinitionBuilder;
         }
 
         @Override
-        public OutboundChannelDefinitionBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline) {
+        public OutboundChannelModelBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline) {
             this.customOutboundEventProcessingPipeline = outboundEventProcessingPipeline;
             return outboundChannelDefinitionBuilder;
         }

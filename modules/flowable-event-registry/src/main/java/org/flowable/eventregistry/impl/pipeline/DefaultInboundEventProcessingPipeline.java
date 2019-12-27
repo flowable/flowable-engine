@@ -64,7 +64,6 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
             extractPayload(eventDefinition, event)
         );
 
-        // TODO: change transform() to EventInstance instead of eventBusEvent
         return transform(eventInstance);
     }
 

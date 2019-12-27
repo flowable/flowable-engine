@@ -12,7 +12,7 @@
  */
 package org.flowable.form.engine;
 
-import org.flowable.common.engine.Engine;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;

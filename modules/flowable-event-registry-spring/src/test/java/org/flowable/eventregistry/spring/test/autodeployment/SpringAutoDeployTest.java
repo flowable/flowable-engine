@@ -54,7 +54,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ExtendWith(LoggingExtension.class)
 public class SpringAutoDeployTest {
 
-    protected static final String DEFAULT_VALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/eventregistry/spring/test/autodeployment/simple*.event";
+    protected static final String DEFAULT_VALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/eventregistry/spring/test/autodeployment/simple*.*";
 
     protected static final String DEFAULT_INVALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/eventregistry/spring/test/autodeployment/*simple*.event";
 
@@ -84,7 +84,7 @@ public class SpringAutoDeployTest {
         createAppContext(properties);
     }
 
-    protected void createAppContextWithResourceParenFolderDeploymentMode() {
+    protected void createAppContextWithResourceParentFolderDeploymentMode() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("deploymentMode", "resource-parent-folder");
         properties.put("deploymentResources", DEFAULT_VALID_DIRECTORY_DEPLOYMENT_RESOURCES);
@@ -178,6 +178,7 @@ public class SpringAutoDeployTest {
         createAppContextWithDefaultDeploymentMode();
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createEventDefinitionQuery().count());
+        assertEquals(1, repositoryService.createChannelDefinitionQuery().count());
     }
 
     @Test
@@ -197,8 +198,9 @@ public class SpringAutoDeployTest {
     @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContextWithSingleResourceDeploymentMode();
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
+        assertEquals(3, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createEventDefinitionQuery().count());
+        assertEquals(1, repositoryService.createChannelDefinitionQuery().count());
     }
 
     @Test
@@ -217,7 +219,7 @@ public class SpringAutoDeployTest {
 
     @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
-        createAppContextWithResourceParenFolderDeploymentMode();
+        createAppContextWithResourceParentFolderDeploymentMode();
         assertEquals(2, repositoryService.createDeploymentQuery().count());
         assertEquals(3, repositoryService.createEventDefinitionQuery().count());
     }

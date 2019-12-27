@@ -36,7 +36,7 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
     @Override
     public void eventReceived(String channelKey, String event) {
 
-        InboundChannelModel channelDefinition = eventRegistry.getInboundChannelDefinition(channelKey);
+        InboundChannelModel channelDefinition = eventRegistry.getInboundChannelModel(channelKey);
         if (channelDefinition == null) {
             throw new FlowableException("No channel definition found for key " + channelKey);
         }

@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.common.engine;
+package org.flowable.common.engine.api;
 
 /**
  * @author Joram Barrez

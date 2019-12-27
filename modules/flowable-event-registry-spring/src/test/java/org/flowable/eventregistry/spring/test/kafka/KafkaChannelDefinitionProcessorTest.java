@@ -34,6 +34,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.TopicPartition;
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -96,7 +97,7 @@ class KafkaChannelDefinitionProcessorTest {
     void eventShouldBeReceivedWhenChannelDefinitionIsRegistered() throws Exception {
         createTopic("test-new-customer");
 
-        eventRegistry.newInboundChannelDefinition()
+        eventRegistry.newInboundChannelModel()
             .key("newCustomerChannel")
             .kafkaChannelAdapter("test-new-customer")
             .eventProcessingPipeline()
@@ -145,15 +146,79 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("customer", "kermit")
             );
 
-        eventRegistry.removeChannelDefinition("newCustomerChannel");
+        eventRegistry.removeChannelModel("newCustomerChannel");
     }
 
+    @Test
+    void eventShouldBeReceivedWhenChannelModelIsDeployed() throws Exception {
+        createTopic("test-new-customer");
+        
+        EventDeployment deployment = eventRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaEvent.event")
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaChannel.channel")
+            .deploy();
+    
+        try {
+
+            eventRegistry.newInboundChannelModel()
+                .key("newCustomerChannel")
+                .kafkaChannelAdapter("test-new-customer")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .register();
+    
+            // Give time for the consumers to register properly in the groups
+            // This is linked to the session timeout property for the consumers
+            Thread.sleep(600);
+    
+            eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+    
+            kafkaTemplate.send("test-new-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"customer\": \"kermit\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}")
+                .get(5, TimeUnit.SECONDS);
+    
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                    .extracting(EventRegistryEvent::getType)
+                    .containsExactlyInAnyOrder("test"));
+    
+            EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+    
+            assertThat(eventInstance).isNotNull();
+            assertThat(eventInstance.getPayloadInstances())
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("customer", "kermit"),
+                    tuple("name", "Kermit the Frog")
+                );
+            assertThat(eventInstance.getCorrelationParameterInstances())
+                .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("customer", "kermit")
+                );
+            
+        } finally {
+            eventRepositoryService.deleteDeployment(deployment.getId());
+        }
+    }
 
     @Test
     void eventShouldBeReceivedWhenMultipleChannelDefinitionsAreRegistered() throws Exception {
         createTopic("test-multi-customer");
 
-        eventRegistry.newInboundChannelDefinition()
+        eventRegistry.newInboundChannelModel()
             .key("customer")
             .kafkaChannelAdapter("test-multi-customer")
             .eventProcessingPipeline()
@@ -162,7 +227,7 @@ class KafkaChannelDefinitionProcessorTest {
             .jsonFieldsMapDirectlyToPayload()
             .register();
 
-        eventRegistry.newInboundChannelDefinition()
+        eventRegistry.newInboundChannelModel()
             .key("newCustomer")
             .kafkaChannelAdapter("test-multi-customer")
             .eventProcessingPipeline()
@@ -230,8 +295,8 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("customer", "kermit")
             );
 
-        eventRegistry.removeChannelDefinition("customer");
-        eventRegistry.removeChannelDefinition("newCustomer");
+        eventRegistry.removeChannelModel("customer");
+        eventRegistry.removeChannelModel("newCustomer");
     }
 
     @Test
@@ -251,7 +316,7 @@ class KafkaChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newInboundChannelDefinition()
+        eventRegistry.newInboundChannelModel()
             .key("testChannel")
             .kafkaChannelAdapter("test-customer")
             .property(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
@@ -309,7 +374,7 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("customer", "fozzie")
             );
 
-        eventRegistry.removeChannelDefinition("testChannel");
+        eventRegistry.removeChannelModel("testChannel");
     }
 
     @Test
@@ -327,7 +392,7 @@ class KafkaChannelDefinitionProcessorTest {
                 .payload("name", EventPayloadTypes.STRING)
                 .deploy();
 
-            eventRegistry.newOutboundChannelDefinition()
+            eventRegistry.newOutboundChannelModel()
                 .key("outboundCustomer")
                 .kafkaChannelAdapter("outbound-customer")
                 .recordKey("customer")
@@ -364,7 +429,7 @@ class KafkaChannelDefinitionProcessorTest {
                             + "}");
                 });
         } finally {
-            eventRegistry.removeChannelDefinition("outboundCustomer");
+            eventRegistry.removeChannelModel("outboundCustomer");
         }
 
     }

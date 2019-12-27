@@ -123,6 +123,16 @@
         </if>
         )
       </if>
+      <if test="channelDefinitionKey != null || channelDefinitionKeyLike != null">
+          and exists(select 1 from ${prefix}FLW_CHANNEL_DEFINITION CHANNEL where RES.ID_ = CHANNEL.DEPLOYMENT_ID_ 
+        <if test="channelDefinitionKey != null">
+          and CHANNEL.KEY_ = #{channelDefinitionKey}
+        </if>
+        <if test="channelDefinitionKeyLike != null">
+          and CHANNEL.KEY_ like #{channelDefinitionKeyLike}
+        </if>
+        )
+      </if>
       <if test="parentDeploymentId != null">
         and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
       </if>
