@@ -15,7 +15,7 @@ package org.flowable.eventregistry.api.model;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
-import org.flowable.eventregistry.model.OutboundChannelDefinition;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 
 /**
  * @author Joram Barrez
@@ -26,7 +26,32 @@ public interface OutboundChannelDefinitionBuilder {
 
     OutboundEventProcessingPipelineBuilder channelAdapter(OutboundEventChannelAdapter outboundEventChannelAdapter);
 
-    OutboundChannelDefinition register();
+    OutboundJmsChannelBuilder jmsChannelAdapter(String destination);
+
+    OutboundRabbitChannelBuilder rabbitChannelAdapter(String routingKey);
+
+    OutboundKafkaChannelBuilder kafkaChannelAdapter(String topic);
+
+    OutboundChannelModel register();
+
+    interface OutboundJmsChannelBuilder {
+
+        OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
+
+    interface OutboundRabbitChannelBuilder {
+
+        OutboundRabbitChannelBuilder exchange(String exchange);
+
+        OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
+
+    interface OutboundKafkaChannelBuilder {
+
+        OutboundKafkaChannelBuilder recordKey(String key);
+
+        OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
 
     interface OutboundEventProcessingPipelineBuilder {
 

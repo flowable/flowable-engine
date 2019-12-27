@@ -23,9 +23,9 @@ import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
-import org.flowable.eventregistry.model.EventCorrelationParameterDefinition;
+import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.EventPayloadDefinition;
+import org.flowable.eventregistry.model.EventPayload;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -54,13 +54,13 @@ public class EventJsonConverterTest {
         assertEquals("test-channel", eventModel.getInboundChannelKeys().iterator().next());
         
         assertEquals(1, eventModel.getCorrelationParameters().size());
-        EventCorrelationParameterDefinition correlationParameter = eventModel.getCorrelationParameters().iterator().next();
+        EventCorrelationParameter correlationParameter = eventModel.getCorrelationParameters().iterator().next();
         assertEquals("customerId", correlationParameter.getName());
         assertEquals("string", correlationParameter.getType());
         
         assertEquals(2, eventModel.getPayload().size());
-        Iterator<EventPayloadDefinition> itPayload = eventModel.getPayload().iterator();
-        EventPayloadDefinition payloadDefinition = itPayload.next();
+        Iterator<EventPayload> itPayload = eventModel.getPayload().iterator();
+        EventPayload payloadDefinition = itPayload.next();
         assertEquals("payload1", payloadDefinition.getName());
         assertEquals("string", payloadDefinition.getType());
         

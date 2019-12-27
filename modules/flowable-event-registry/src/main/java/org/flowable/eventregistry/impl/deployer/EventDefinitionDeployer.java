@@ -17,6 +17,8 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.eventregistry.impl.persistence.deploy.Deployer;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
@@ -35,6 +37,7 @@ public class EventDefinitionDeployer implements Deployer {
     protected IdGenerator idGenerator;
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
     protected EventDefinitionDeploymentHelper eventDeploymentHelper;
+    protected ChannelDefinitionDeploymentHelper channelDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
     protected boolean usePrefixId;
 
@@ -47,16 +50,26 @@ public class EventDefinitionDeployer implements Deployer {
         ParsedDeployment parsedDeployment = parsedDeploymentBuilderFactory.getBuilderForDeployment(deployment).build();
 
         eventDeploymentHelper.verifyEventDefinitionsDoNotShareKeys(parsedDeployment.getAllEventDefinitions());
+        channelDeploymentHelper.verifyChannelDefinitionsDoNotShareKeys(parsedDeployment.getAllChannelDefinitions());
 
         eventDeploymentHelper.copyDeploymentValuesToEventDefinitions(parsedDeployment.getDeployment(), parsedDeployment.getAllEventDefinitions());
         eventDeploymentHelper.setResourceNamesOnEventDefinitions(parsedDeployment);
+        
+        channelDeploymentHelper.copyDeploymentValuesToEventDefinitions(parsedDeployment.getDeployment(), parsedDeployment.getAllChannelDefinitions());
+        channelDeploymentHelper.setResourceNamesOnEventDefinitions(parsedDeployment);
 
         if (deployment.isNew()) {
             Map<EventDefinitionEntity, EventDefinitionEntity> mapOfNewEventDefinitionToPreviousVersion = getPreviousVersionsOfEventDefinitions(parsedDeployment);
             setEventDefinitionVersionsAndIds(parsedDeployment, mapOfNewEventDefinitionToPreviousVersion);
             persistEventDefinitions(parsedDeployment);
+            
+            Map<ChannelDefinitionEntity, ChannelDefinitionEntity> mapOfNewChannelDefinitionToPreviousVersion = getPreviousVersionsOfChannelDefinitions(parsedDeployment);
+            setChannelDefinitionVersionsAndIds(parsedDeployment, mapOfNewChannelDefinitionToPreviousVersion);
+            persistChannelDefinitions(parsedDeployment);
+            
         } else {
             makeEventDefinitionsConsistentWithPersistedVersions(parsedDeployment);
+            makeChannelDefinitionsConsistentWithPersistedVersions(parsedDeployment);
         }
 
         cachingAndArtifactsManager.updateCachingAndArtifacts(parsedDeployment);
@@ -74,6 +87,24 @@ public class EventDefinitionDeployer implements Deployer {
 
             if (existingEventDefinition != null) {
                 result.put(newDefinition, existingEventDefinition);
+            }
+        }
+
+        return result;
+    }
+    
+    /**
+     * Constructs a map from new channel definitions to the previous version by key and tenant. If no previous version exists, no map entry is created.
+     */
+    protected Map<ChannelDefinitionEntity, ChannelDefinitionEntity> getPreviousVersionsOfChannelDefinitions(ParsedDeployment parsedDeployment) {
+
+        Map<ChannelDefinitionEntity, ChannelDefinitionEntity> result = new LinkedHashMap<>();
+
+        for (ChannelDefinitionEntity newDefinition : parsedDeployment.getAllChannelDefinitions()) {
+            ChannelDefinitionEntity existingChannelDefinition = channelDeploymentHelper.getMostRecentVersionOfChannelDefinition(newDefinition);
+
+            if (existingChannelDefinition != null) {
+                result.put(newDefinition, existingChannelDefinition);
             }
         }
 
@@ -101,6 +132,28 @@ public class EventDefinitionDeployer implements Deployer {
             }
         }
     }
+    
+    /**
+     * If the map contains an existing version for a channel definition, then the channel definition is updated, otherwise a new channel definition is created.
+     */
+    protected void setChannelDefinitionVersionsAndIds(ParsedDeployment parsedDeployment, Map<ChannelDefinitionEntity, ChannelDefinitionEntity> mapOfNewChannelDefinitionToPreviousVersion) {
+        for (ChannelDefinitionEntity channelDefinition : parsedDeployment.getAllChannelDefinitions()) {
+            int version = 1;
+            
+            ChannelDefinitionEntity latest = mapOfNewChannelDefinitionToPreviousVersion.get(channelDefinition);
+            if (latest != null) {
+                version = latest.getVersion() + 1;
+            }
+
+            channelDefinition.setVersion(version);
+
+            if (usePrefixId) {
+                channelDefinition.setId(channelDefinition.getIdPrefix() + idGenerator.getNextId());
+            } else {
+                channelDefinition.setId(idGenerator.getNextId());
+            }
+        }
+    }
 
     /**
      * Saves each event definition. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
@@ -110,6 +163,17 @@ public class EventDefinitionDeployer implements Deployer {
 
         for (EventDefinitionEntity eventDefinition : parsedDeployment.getAllEventDefinitions()) {
             eventDefinitionEntityManager.insert(eventDefinition);
+        }
+    }
+    
+    /**
+     * Saves each channel definition. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
+     */
+    protected void persistChannelDefinitions(ParsedDeployment parsedDeployment) {
+        ChannelDefinitionEntityManager channelDefinitionEntityManager = CommandContextUtil.getChannelDefinitionEntityManager();
+
+        for (ChannelDefinitionEntity channelDefinition : parsedDeployment.getAllChannelDefinitions()) {
+            channelDefinitionEntityManager.insert(channelDefinition);
         }
     }
 
@@ -123,6 +187,20 @@ public class EventDefinitionDeployer implements Deployer {
             if (persistedEventDefinition != null) {
                 eventDefinition.setId(persistedEventDefinition.getId());
                 eventDefinition.setVersion(persistedEventDefinition.getVersion());
+            }
+        }
+    }
+    
+    /**
+     * Loads the persisted version of each channel definition and set values on the in-memory version to be consistent.
+     */
+    protected void makeChannelDefinitionsConsistentWithPersistedVersions(ParsedDeployment parsedDeployment) {
+        for (ChannelDefinitionEntity channelDefinition : parsedDeployment.getAllChannelDefinitions()) {
+            ChannelDefinitionEntity persistedChannelDefinition = channelDeploymentHelper.getPersistedInstanceOfChannelDefinition(channelDefinition);
+
+            if (persistedChannelDefinition != null) {
+                channelDefinition.setId(persistedChannelDefinition.getId());
+                channelDefinition.setVersion(persistedChannelDefinition.getVersion());
             }
         }
     }
@@ -149,6 +227,14 @@ public class EventDefinitionDeployer implements Deployer {
 
     public void setEventDeploymentHelper(EventDefinitionDeploymentHelper eventDeploymentHelper) {
         this.eventDeploymentHelper = eventDeploymentHelper;
+    }    
+
+    public ChannelDefinitionDeploymentHelper getChannelDeploymentHelper() {
+        return channelDeploymentHelper;
+    }
+
+    public void setChannelDeploymentHelper(ChannelDefinitionDeploymentHelper channelDeploymentHelper) {
+        this.channelDeploymentHelper = channelDeploymentHelper;
     }
 
     public CachingAndArtifactsManager getCachingAndArtifcatsManager() {

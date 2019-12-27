@@ -13,7 +13,7 @@
 package org.flowable.eventregistry.impl.runtime;
 
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
-import org.flowable.eventregistry.model.EventCorrelationParameterDefinition;
+import org.flowable.eventregistry.model.EventCorrelationParameter;
 
 /**
  * @author Joram Barrez
@@ -21,21 +21,21 @@ import org.flowable.eventregistry.model.EventCorrelationParameterDefinition;
  */
 public class EventCorrelationParameterInstanceImpl implements EventCorrelationParameterInstance {
 
-    protected EventCorrelationParameterDefinition eventCorrelationParameterDefinition;
+    protected EventCorrelationParameter eventCorrelationParameterDefinition;
     protected Object value;
 
     public EventCorrelationParameterInstanceImpl(
-        EventCorrelationParameterDefinition eventCorrelationParameterDefinition, Object value) {
+        EventCorrelationParameter eventCorrelationParameterDefinition, Object value) {
         this.eventCorrelationParameterDefinition = eventCorrelationParameterDefinition;
         this.value = value;
     }
 
     @Override
-    public EventCorrelationParameterDefinition getEventCorrelationParameterDefinition() {
+    public EventCorrelationParameter getEventCorrelationParameterDefinition() {
         return eventCorrelationParameterDefinition;
     }
 
-    public void setEventCorrelationParameterDefinition(EventCorrelationParameterDefinition eventCorrelationParameterDefinition) {
+    public void setEventCorrelationParameterDefinition(EventCorrelationParameter eventCorrelationParameterDefinition) {
         this.eventCorrelationParameterDefinition = eventCorrelationParameterDefinition;
     }
 

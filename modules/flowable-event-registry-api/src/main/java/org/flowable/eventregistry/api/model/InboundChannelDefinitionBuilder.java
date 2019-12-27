@@ -18,7 +18,7 @@ import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTransformer;
-import org.flowable.eventregistry.model.InboundChannelDefinition;
+import org.flowable.eventregistry.model.InboundChannelModel;
 
 /**
  * @author Joram Barrez
@@ -30,7 +30,54 @@ public interface InboundChannelDefinitionBuilder {
 
     InboundEventProcessingPipelineBuilder channelAdapter(InboundEventChannelAdapter inboundEventChannelAdapter);
 
-    InboundChannelDefinition register();
+    InboundJmsChannelBuilder jmsChannelAdapter(String destinationName);
+
+    InboundRabbitChannelBuilder rabbitChannelAdapter(String queue);
+
+    InboundKafkaChannelBuilder kafkaChannelAdapter(String topic);
+
+    InboundChannelModel register();
+
+    interface InboundJmsChannelBuilder {
+
+        InboundJmsChannelBuilder selector(String selector);
+
+        InboundJmsChannelBuilder subscription(String subscription);
+
+        InboundJmsChannelBuilder concurrency(String concurrency);
+
+        InboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
+
+    interface InboundRabbitChannelBuilder {
+
+        InboundRabbitChannelBuilder exclusive(boolean exclusive);
+
+        InboundRabbitChannelBuilder priority(String priority);
+
+        InboundRabbitChannelBuilder admin(String admin);
+
+        InboundRabbitChannelBuilder concurrency(String concurrency);
+
+        InboundRabbitChannelBuilder executor(String executor);
+
+        InboundRabbitChannelBuilder ackMode(String ackMode);
+
+        InboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
+
+    interface InboundKafkaChannelBuilder {
+
+        InboundKafkaChannelBuilder groupId(String groupId);
+
+        InboundKafkaChannelBuilder clientIdPrefix(String clientIdPrefix);
+
+        InboundKafkaChannelBuilder concurrency(String concurrency);
+
+        InboundKafkaChannelBuilder property(String name, String value);
+
+        InboundEventProcessingPipelineBuilder eventProcessingPipeline();
+    }
 
     interface InboundEventProcessingPipelineBuilder {
 
@@ -92,7 +139,7 @@ public interface InboundChannelDefinitionBuilder {
 
         InboundChannelDefinitionBuilder transformer(InboundEventTransformer inboundEventTransformer);
 
-        InboundChannelDefinition register();
+        InboundChannelModel register();
 
     }
 

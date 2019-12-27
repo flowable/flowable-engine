@@ -20,7 +20,10 @@ import org.flowable.eventregistry.api.model.OutboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.impl.pipeline.DefaultOutboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToJsonStringSerializer;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToXmlStringSerializer;
-import org.flowable.eventregistry.model.OutboundChannelDefinition;
+import org.flowable.eventregistry.model.JmsOutboundChannelModel;
+import org.flowable.eventregistry.model.KafkaOutboundChannelModel;
+import org.flowable.eventregistry.model.OutboundChannelModel;
+import org.flowable.eventregistry.model.RabbitOutboundChannelModel;
 
 /**
  * @author Joram Barrez
@@ -30,6 +33,7 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
 
     protected EventRegistry eventRegistry;
 
+    protected OutboundChannelModel channelDefinition;
     protected String key;
     protected OutboundEventChannelAdapter outboundEventChannelAdapter;
     protected OutboundEventProcessingPipelineBuilder outboundEventProcessingPipelineBuilder;
@@ -51,8 +55,41 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
     }
 
     @Override
-    public OutboundChannelDefinition register() {
-        OutboundChannelDefinition outboundChannelDefinition = new OutboundChannelDefinition();
+    public OutboundJmsChannelBuilder jmsChannelAdapter(String destination) {
+        JmsOutboundChannelModel channelDefinition = new JmsOutboundChannelModel();
+        channelDefinition.setDestination(destination);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new OutboundJmsChannelBuilderImpl(eventRegistry, this, channelDefinition);
+    }
+
+    @Override
+    public OutboundRabbitChannelBuilder rabbitChannelAdapter(String routingKey) {
+        RabbitOutboundChannelModel channelDefinition = new RabbitOutboundChannelModel();
+        channelDefinition.setRoutingKey(routingKey);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new OutboundRabbitChannelBuilderImpl(eventRegistry, this, channelDefinition);
+    }
+
+    @Override
+    public OutboundKafkaChannelBuilder kafkaChannelAdapter(String topic) {
+        KafkaOutboundChannelModel channelDefinition = new KafkaOutboundChannelModel();
+        channelDefinition.setTopic(topic);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new OutboundKafkaChannelBuilderImpl(eventRegistry, this, channelDefinition);
+    }
+
+    @Override
+    public OutboundChannelModel register() {
+        OutboundChannelModel outboundChannelDefinition;
+        if (this.channelDefinition == null) {
+            outboundChannelDefinition = new OutboundChannelModel();
+        } else {
+            outboundChannelDefinition = this.channelDefinition;
+        }
+
         outboundChannelDefinition.setKey(key);
         outboundChannelDefinition.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
 
@@ -62,6 +99,83 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelDefi
         eventRegistry.registerChannelDefinition(outboundChannelDefinition);
 
         return outboundChannelDefinition;
+    }
+
+    public static class OutboundJmsChannelBuilderImpl implements OutboundJmsChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder;
+
+        protected JmsOutboundChannelModel jmsChannel;
+
+        public OutboundJmsChannelBuilderImpl(EventRegistry eventRegistry, OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder,
+            JmsOutboundChannelModel jmsChannel) {
+            this.eventRegistry = eventRegistry;
+            this.outboundChannelDefinitionBuilder = outboundChannelDefinitionBuilder;
+            this.jmsChannel = jmsChannel;
+        }
+
+        @Override
+        public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRegistry, outboundChannelDefinitionBuilder);
+            return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
+        }
+    }
+
+    public static class OutboundRabbitChannelBuilderImpl implements OutboundRabbitChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder;
+
+        protected RabbitOutboundChannelModel rabbitChannel;
+
+        public OutboundRabbitChannelBuilderImpl(EventRegistry eventRegistry, OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder,
+            RabbitOutboundChannelModel rabbitChannel) {
+            this.eventRegistry = eventRegistry;
+            this.outboundChannelDefinitionBuilder = outboundChannelDefinitionBuilder;
+            this.rabbitChannel = rabbitChannel;
+        }
+
+        @Override
+        public OutboundRabbitChannelBuilder exchange(String exchange) {
+            rabbitChannel.setExchange(exchange);
+            return this;
+        }
+
+        @Override
+        public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRegistry,
+                outboundChannelDefinitionBuilder);
+            return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
+        }
+    }
+
+    public static class OutboundKafkaChannelBuilderImpl implements OutboundKafkaChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder;
+
+        protected KafkaOutboundChannelModel kafkaChannel;
+
+        public OutboundKafkaChannelBuilderImpl(EventRegistry eventRegistry, OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder,
+            KafkaOutboundChannelModel kafkaChannel) {
+            this.eventRegistry = eventRegistry;
+            this.outboundChannelDefinitionBuilder = outboundChannelDefinitionBuilder;
+            this.kafkaChannel = kafkaChannel;
+        }
+
+        @Override
+        public OutboundKafkaChannelBuilder recordKey(String key) {
+            kafkaChannel.setRecordKey(key);
+            return this;
+        }
+
+        @Override
+        public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRegistry,
+                outboundChannelDefinitionBuilder);
+            return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
+        }
     }
 
     public static class OutboundEventProcessingPipelineBuilderImpl implements OutboundEventProcessingPipelineBuilder {

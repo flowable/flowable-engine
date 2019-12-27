@@ -12,7 +12,7 @@
  */
 package org.flowable.eventregistry.api.runtime;
 
-import org.flowable.eventregistry.model.EventPayloadDefinition;
+import org.flowable.eventregistry.model.EventPayload;
 
 /**
  * @author Joram Barrez
@@ -20,7 +20,7 @@ import org.flowable.eventregistry.model.EventPayloadDefinition;
  */
 public interface EventPayloadInstance {
 
-    EventPayloadDefinition getEventPayloadDefinition();
+    EventPayload getEventPayloadDefinition();
 
     String getDefinitionName();
 

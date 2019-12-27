@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
@@ -63,10 +64,16 @@ public class CmmnEngineImpl implements CmmnEngine {
         LOGGER.info("CmmnEngine {} created", name);
         
         CmmnEngines.registerCmmnEngine(this);
+
+        if (cmmnEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : cmmnEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
+        }
     }
     
     @Override
-    public void handleExecutors() {
+    public void startExecutors() {
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
         }
@@ -104,6 +111,11 @@ public class CmmnEngineImpl implements CmmnEngine {
         }
         cmmnEngineConfiguration.close();
 
+        if (cmmnEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : cmmnEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
+        }
     }
     
     @Override

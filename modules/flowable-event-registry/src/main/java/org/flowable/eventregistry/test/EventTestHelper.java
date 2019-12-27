@@ -14,6 +14,8 @@ package org.flowable.eventregistry.test;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,32 +53,59 @@ public abstract class EventTestHelper {
             LOGGER.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
             return null;
         }
-        EventDeploymentAnnotation deploymentAnnotation = method.getAnnotation(EventDeploymentAnnotation.class);
-        return annotationDeploymentSetUp(eventRegistryEngine, testClass, method, deploymentAnnotation);
+        
+        EventDeploymentAnnotation eventDeploymentAnnotation = method.getAnnotation(EventDeploymentAnnotation.class);
+        ChannelDeploymentAnnotation channelDeploymentAnnotation = method.getAnnotation(ChannelDeploymentAnnotation.class);
+        return annotationDeploymentSetUp(eventRegistryEngine, testClass, method, eventDeploymentAnnotation, channelDeploymentAnnotation);
     }
 
-    public static String annotationDeploymentSetUp(EventRegistryEngine eventRegistryEngine, Class<?> testClass, Method method, EventDeploymentAnnotation deploymentAnnotation) {
+    public static String annotationDeploymentSetUp(EventRegistryEngine eventRegistryEngine, Class<?> testClass, Method method, 
+                    EventDeploymentAnnotation eventDeploymentAnnotation, ChannelDeploymentAnnotation channelDeploymentAnnotation) {
+        
         String deploymentId = null;
-        if (deploymentAnnotation != null) {
+        String tenantId = null;
+        String[] resources = null;
+        if (eventDeploymentAnnotation != null) {
             String methodName = method.getName();
-            LOGGER.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
-            String[] resources = deploymentAnnotation.resources();
+            LOGGER.debug("annotation @EventDeployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
+            resources = eventDeploymentAnnotation.resources();
+            tenantId = eventDeploymentAnnotation.tenantId();
             if (resources.length == 0) {
-                String name = method.getName();
-                String resource = getFormResource(testClass, name);
+                String resource = getEventResource(testClass, methodName);
                 resources = new String[] { resource };
             }
-
-            EventDeploymentBuilder deploymentBuilder = eventRegistryEngine.getEventRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + methodName);
-
+        }
+        
+        if (channelDeploymentAnnotation != null) {
+            String methodName = method.getName();
+            LOGGER.debug("annotation @ChannelDeployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
+            String[] channelResources = channelDeploymentAnnotation.resources();
+            tenantId = channelDeploymentAnnotation.tenantId();
+            if (channelResources.length == 0) {
+                String resource = getChannelResource(testClass, methodName);
+                channelResources = new String[] { resource };
+            }
+            
+            if (resources != null) {
+                List<String> resourceList = new ArrayList<>(Arrays.asList(resources));
+                resourceList.addAll(new ArrayList<>(Arrays.asList(channelResources)));
+                resources = resourceList.toArray(new String[channelResources.length]);
+            } else {
+                resources = channelResources;
+            }
+        }
+        
+        if (resources != null && resources.length > 0) {
+            EventDeploymentBuilder deploymentBuilder = eventRegistryEngine.getEventRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + method.getName());
+    
             for (String resource : resources) {
                 deploymentBuilder.addClasspathResource(resource);
             }
             
-            if (StringUtils.isNotEmpty(deploymentAnnotation.tenantId())) {
-                deploymentBuilder.tenantId(deploymentAnnotation.tenantId());
+            if (StringUtils.isNotEmpty(tenantId)) {
+                deploymentBuilder.tenantId(tenantId);
             }
-
+    
             deploymentId = deploymentBuilder.deploy().getId();
         }
 
@@ -98,7 +127,7 @@ public abstract class EventTestHelper {
      * get a resource location by convention based on a class (type) and a relative resource name. The return value will be the full classpath location of the type, plus a suffix built from the name
      * parameter: <code>EventDeployer.EVENT_RESOURCE_SUFFIXES</code>. The first resource matching a suffix will be returned.
      */
-    public static String getFormResource(Class<?> type, String name) {
+    public static String getEventResource(Class<?> type, String name) {
         for (String suffix : ParsedDeploymentBuilder.EVENT_RESOURCE_SUFFIXES) {
             String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
             InputStream inputStream = EventTestHelper.class.getClassLoader().getResourceAsStream(resource);
@@ -109,6 +138,23 @@ public abstract class EventTestHelper {
             }
         }
         return type.getName().replace('.', '/') + "." + name + "." + ParsedDeploymentBuilder.EVENT_RESOURCE_SUFFIXES[0];
+    }
+    
+    /**
+     * get a resource location by convention based on a class (type) and a relative resource name. The return value will be the full classpath location of the type, plus a suffix built from the name
+     * parameter: <code>EventDeployer.CHANNEL_RESOURCE_SUFFIXES</code>. The first resource matching a suffix will be returned.
+     */
+    public static String getChannelResource(Class<?> type, String name) {
+        for (String suffix : ParsedDeploymentBuilder.CHANNEL_RESOURCE_SUFFIXES) {
+            String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
+            InputStream inputStream = EventTestHelper.class.getClassLoader().getResourceAsStream(resource);
+            if (inputStream == null) {
+                continue;
+            } else {
+                return resource;
+            }
+        }
+        return type.getName().replace('.', '/') + "." + name + "." + ParsedDeploymentBuilder.CHANNEL_RESOURCE_SUFFIXES[0];
     }
 
     // Engine startup and shutdown helpers
@@ -127,7 +173,7 @@ public abstract class EventTestHelper {
         return eventRegistryEngine;
     }
 
-    public static void closeFormEngines() {
+    public static void closeEventRegistryEngines() {
         for (EventRegistryEngine eventRegistryEngine : eventRegistryEngines.values()) {
             eventRegistryEngine.close();
         }

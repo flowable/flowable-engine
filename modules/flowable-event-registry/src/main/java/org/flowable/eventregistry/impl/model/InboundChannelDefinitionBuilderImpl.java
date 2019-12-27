@@ -12,6 +12,9 @@
  */
 package org.flowable.eventregistry.impl.model;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
@@ -30,7 +33,10 @@ import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPip
 import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
-import org.flowable.eventregistry.model.InboundChannelDefinition;
+import org.flowable.eventregistry.model.InboundChannelModel;
+import org.flowable.eventregistry.model.JmsInboundChannelModel;
+import org.flowable.eventregistry.model.KafkaInboundChannelModel;
+import org.flowable.eventregistry.model.RabbitInboundChannelModel;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,6 +49,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
 
     protected EventRegistry eventRegistry;
 
+    protected InboundChannelModel channelDefinition;
     protected String key;
     protected InboundEventChannelAdapter inboundEventChannelAdapter;
     protected InboundEventProcessingPipelineBuilder inboundEventProcessingPipelineBuilder;
@@ -65,8 +72,42 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
     }
 
     @Override
-    public InboundChannelDefinition register() {
-        InboundChannelDefinition channelDefinition = new InboundChannelDefinition();
+    public InboundJmsChannelBuilder jmsChannelAdapter(String destinationName) {
+        JmsInboundChannelModel channelDefinition = new JmsInboundChannelModel();
+        channelDefinition.setDestination(destinationName);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new InboundJmsChannelBuilderImpl(channelDefinition, eventRegistry, this);
+    }
+
+    @Override
+    public InboundRabbitChannelBuilder rabbitChannelAdapter(String queueName) {
+        RabbitInboundChannelModel channelDefinition = new RabbitInboundChannelModel();
+        Set<String> queues = new LinkedHashSet<>();
+        queues.add(queueName);
+        channelDefinition.setQueues(queues);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new InboundRabbitChannelBuilderImpl(channelDefinition, eventRegistry, this);
+    }
+
+    @Override
+    public InboundKafkaChannelBuilder kafkaChannelAdapter(String topic) {
+        KafkaInboundChannelModel channelDefinition = new KafkaInboundChannelModel();
+        Set<String> topics = new LinkedHashSet<>();
+        topics.add(topic);
+        channelDefinition.setTopics(topics);
+        this.channelDefinition = channelDefinition;
+        this.channelDefinition.setKey(key);
+        return new InboundKafkaChannelBuilderImpl(channelDefinition, eventRegistry, this);
+    }
+
+    @Override
+    public InboundChannelModel register() {
+        if (this.channelDefinition == null) {
+            channelDefinition = new InboundChannelModel();
+        }
+
         channelDefinition.setKey(key);
         channelDefinition.setInboundEventChannelAdapter(inboundEventChannelAdapter);
 
@@ -76,6 +117,144 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         eventRegistry.registerChannelDefinition(channelDefinition);
 
         return channelDefinition;
+    }
+
+    public static class InboundJmsChannelBuilderImpl implements InboundJmsChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final InboundChannelDefinitionBuilderImpl channelDefinitionBuilder;
+
+        protected JmsInboundChannelModel jmsChannel;
+
+        public InboundJmsChannelBuilderImpl(JmsInboundChannelModel jmsChannel, EventRegistry eventRegistry, InboundChannelDefinitionBuilderImpl channelDefinitionBuilder) {
+            this.jmsChannel = jmsChannel;
+            this.eventRegistry = eventRegistry;
+            this.channelDefinitionBuilder = channelDefinitionBuilder;
+        }
+
+        @Override
+        public InboundJmsChannelBuilder selector(String selector) {
+            jmsChannel.setSelector(selector);
+            return this;
+        }
+
+        @Override
+        public InboundJmsChannelBuilder subscription(String subscription) {
+            jmsChannel.setSubscription(subscription);
+            return this;
+        }
+
+        @Override
+        public InboundJmsChannelBuilder concurrency(String concurrency) {
+            jmsChannel.setConcurrency(concurrency);
+            return this;
+        }
+
+        @Override
+        public InboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry, channelDefinitionBuilder);
+            return channelDefinitionBuilder.inboundEventProcessingPipelineBuilder;
+        }
+    }
+
+    public static class InboundRabbitChannelBuilderImpl implements InboundRabbitChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final InboundChannelDefinitionBuilderImpl channelDefinitionBuilder;
+
+        protected RabbitInboundChannelModel rabbitChannel;
+
+        public InboundRabbitChannelBuilderImpl(RabbitInboundChannelModel rabbitChannel, EventRegistry eventRegistry, InboundChannelDefinitionBuilderImpl channelDefinitionBuilder) {
+            this.rabbitChannel = rabbitChannel;
+            this.eventRegistry = eventRegistry;
+            this.channelDefinitionBuilder = channelDefinitionBuilder;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder exclusive(boolean exclusive) {
+            this.rabbitChannel.setExclusive(exclusive);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder priority(String priority) {
+            this.rabbitChannel.setPriority(priority);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder admin(String admin) {
+            this.rabbitChannel.setAdmin(admin);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder concurrency(String concurrency) {
+            rabbitChannel.setConcurrency(concurrency);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder executor(String executor) {
+            this.rabbitChannel.setExecutor(executor);
+            return this;
+        }
+
+        @Override
+        public InboundRabbitChannelBuilder ackMode(String ackMode) {
+            this.rabbitChannel.setAckMode(ackMode);
+            return this;
+        }
+
+        @Override
+        public InboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry, channelDefinitionBuilder);
+            return channelDefinitionBuilder.inboundEventProcessingPipelineBuilder;
+        }
+    }
+
+    public static class InboundKafkaChannelBuilderImpl implements InboundKafkaChannelBuilder {
+
+        protected final EventRegistry eventRegistry;
+        protected final InboundChannelDefinitionBuilderImpl channelDefinitionBuilder;
+
+        protected KafkaInboundChannelModel kafkaChannel;
+
+        public InboundKafkaChannelBuilderImpl(KafkaInboundChannelModel kafkaChannel, EventRegistry eventRegistry, InboundChannelDefinitionBuilderImpl channelDefinitionBuilder) {
+            this.kafkaChannel = kafkaChannel;
+            this.eventRegistry = eventRegistry;
+            this.channelDefinitionBuilder = channelDefinitionBuilder;
+        }
+
+        @Override
+        public InboundKafkaChannelBuilder groupId(String groupId) {
+            kafkaChannel.setGroupId(groupId);
+            return this;
+        }
+
+        @Override
+        public InboundKafkaChannelBuilder clientIdPrefix(String clientIdPrefix) {
+            kafkaChannel.setClientIdPrefix(clientIdPrefix);
+            return this;
+        }
+
+        @Override
+        public InboundKafkaChannelBuilder concurrency(String concurrency) {
+            kafkaChannel.setConcurrency(concurrency);
+            return this;
+        }
+
+        @Override
+        public InboundKafkaChannelBuilder property(String name, String value) {
+            kafkaChannel.addProperty(name, value);
+            return this;
+        }
+
+        @Override
+        public InboundEventProcessingPipelineBuilder eventProcessingPipeline() {
+            channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(eventRegistry, channelDefinitionBuilder);
+            return channelDefinitionBuilder.inboundEventProcessingPipelineBuilder;
+        }
     }
 
     public static class InboundEventProcessingPipelineBuilderImpl<T> implements InboundEventProcessingPipelineBuilder {
@@ -268,7 +447,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelDefini
         }
 
         @Override
-        public InboundChannelDefinition register() {
+        public InboundChannelModel register() {
             this.inboundEventProcessingPipelineBuilder.inboundEventTransformer = new DefaultInboundEventTransformer();
             return this.inboundEventProcessingPipelineBuilder.channelDefinitionBuilder.register();
         }

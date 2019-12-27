@@ -13,7 +13,7 @@
 package org.flowable.eventregistry.impl.runtime;
 
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.model.EventPayloadDefinition;
+import org.flowable.eventregistry.model.EventPayload;
 
 /**
  * @author Joram Barrez
@@ -21,20 +21,20 @@ import org.flowable.eventregistry.model.EventPayloadDefinition;
  */
 public class EventPayloadInstanceImpl implements EventPayloadInstance {
 
-    protected EventPayloadDefinition eventPayloadDefinition;
+    protected EventPayload eventPayloadDefinition;
     protected Object value;
 
-    public EventPayloadInstanceImpl(EventPayloadDefinition eventPayloadDefinition, Object value) {
+    public EventPayloadInstanceImpl(EventPayload eventPayloadDefinition, Object value) {
         this.eventPayloadDefinition = eventPayloadDefinition;
         this.value = value;
     }
 
     @Override
-    public EventPayloadDefinition getEventPayloadDefinition() {
+    public EventPayload getEventPayloadDefinition() {
         return eventPayloadDefinition;
     }
 
-    public void setEventPayloadDefinition(EventPayloadDefinition eventPayloadDefinition) {
+    public void setEventPayloadDefinition(EventPayload eventPayloadDefinition) {
         this.eventPayloadDefinition = eventPayloadDefinition;
     }
 

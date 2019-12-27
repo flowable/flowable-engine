@@ -33,7 +33,7 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.EventPayloadDefinition;
+import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.variable.api.delegate.VariableScope;
 
 public class EventInstanceBpmnUtil {
@@ -124,12 +124,12 @@ public class EventInstanceBpmnUtil {
     protected static void addEventPayloadInstance(List<EventPayloadInstance> eventPayloadInstances, String source, String target, 
                     VariableScope variableScope, ExpressionManager expressionManager, EventModel eventDefinition) {
         
-        Optional<EventPayloadDefinition> matchingEventDefinition = eventDefinition.getPayload()
+        Optional<EventPayload> matchingEventDefinition = eventDefinition.getPayload()
             .stream()
             .filter(e -> e.getName().equals(target))
             .findFirst();
         if (matchingEventDefinition.isPresent()) {
-            EventPayloadDefinition eventPayloadDefinition = matchingEventDefinition.get();
+            EventPayload eventPayloadDefinition = matchingEventDefinition.get();
 
             Expression sourceExpression = expressionManager.createExpression(source);
             Object value = sourceExpression.getValue(variableScope);

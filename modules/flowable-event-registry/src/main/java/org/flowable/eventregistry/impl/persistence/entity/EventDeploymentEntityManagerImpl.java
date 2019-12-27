@@ -52,12 +52,17 @@ public class EventDeploymentEntityManagerImpl
     @Override
     public void deleteDeployment(String deploymentId) {
         deleteEventDefinitionsForDeployment(deploymentId);
+        deleteChannelDefinitionsForDeployment(deploymentId);
         getResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));
     }
 
     protected void deleteEventDefinitionsForDeployment(String deploymentId) {
         getEventDefinitionEntityManager().deleteEventDefinitionsByDeploymentId(deploymentId);
+    }
+    
+    protected void deleteChannelDefinitionsForDeployment(String deploymentId) {
+        getChannelDefinitionEntityManager().deleteChannelDefinitionsByDeploymentId(deploymentId);
     }
 
     @Override
@@ -93,4 +98,7 @@ public class EventDeploymentEntityManagerImpl
         return engineConfiguration.getEventDefinitionEntityManager();
     }
 
+    protected ChannelDefinitionEntityManager getChannelDefinitionEntityManager() {
+        return engineConfiguration.getChannelDefinitionEntityManager();
+    }
 }

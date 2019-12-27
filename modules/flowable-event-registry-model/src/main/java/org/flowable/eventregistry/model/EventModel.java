@@ -24,8 +24,8 @@ public class EventModel {
     protected String name;
     protected Collection<String> inboundChannelKeys = new ArrayList<>();
     protected Collection<String> outboundChannelKeys = new ArrayList<>();
-    protected Collection<EventCorrelationParameterDefinition> correlationParameters = new ArrayList<>();
-    protected Collection<EventPayloadDefinition> payload = new ArrayList<>();
+    protected Collection<EventCorrelationParameter> correlationParameters = new ArrayList<>();
+    protected Collection<EventPayload> payload = new ArrayList<>();
 
     public String getKey() {
         return key;
@@ -59,19 +59,19 @@ public class EventModel {
         this.outboundChannelKeys = outboundChannelKeys;
     }
 
-    public Collection<EventCorrelationParameterDefinition> getCorrelationParameters() {
+    public Collection<EventCorrelationParameter> getCorrelationParameters() {
         return correlationParameters;
     }
 
-    public void setCorrelationParameters(Collection<EventCorrelationParameterDefinition> correlationParameters) {
+    public void setCorrelationParameters(Collection<EventCorrelationParameter> correlationParameters) {
         this.correlationParameters = correlationParameters;
     }
 
-    public Collection<EventPayloadDefinition> getPayload() {
+    public Collection<EventPayload> getPayload() {
         return payload;
     }
 
-    public void setPayload(Collection<EventPayloadDefinition> payload) {
+    public void setPayload(Collection<EventPayload> payload) {
         this.payload = payload;
     }
 

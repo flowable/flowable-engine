@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.CorrelationKeyGenerator;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
@@ -36,18 +36,18 @@ import org.flowable.eventregistry.impl.model.InboundChannelDefinitionBuilderImpl
 import org.flowable.eventregistry.impl.model.OutboundChannelDefinitionBuilderImpl;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.InboundChannelDefinition;
-import org.flowable.eventregistry.model.OutboundChannelDefinition;
+import org.flowable.eventregistry.model.InboundChannelModel;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 
 /**
  * @author Joram Barrez
  */
 public class DefaultEventRegistry implements EventRegistry {
 
-    protected AbstractEngineConfiguration engineConfiguration;
+    protected EventRegistryEngineConfiguration engineConfiguration;
     
-    protected Map<String, InboundChannelDefinition> inboundChannelDefinitions = new HashMap<>();
-    protected Map<String, OutboundChannelDefinition> outboundChannelDefinitions = new HashMap<>();
+    protected Map<String, InboundChannelModel> inboundChannelDefinitions = new HashMap<>();
+    protected Map<String, OutboundChannelModel> outboundChannelDefinitions = new HashMap<>();
 
     protected List<EventRegistryEventBusConsumer> eventRegistryEventBusConsumers = new ArrayList<>();
     protected CorrelationKeyGenerator<Map<String, Object>> correlationKeyGenerator;
@@ -55,7 +55,7 @@ public class DefaultEventRegistry implements EventRegistry {
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
 
-    public DefaultEventRegistry(AbstractEngineConfiguration engineConfiguration) {
+    public DefaultEventRegistry(EventRegistryEngineConfiguration engineConfiguration) {
         this.engineConfiguration = engineConfiguration;
         this.correlationKeyGenerator = new DefaultCorrelationKeyGenerator();
     }
@@ -81,9 +81,9 @@ public class DefaultEventRegistry implements EventRegistry {
             throw new FlowableIllegalArgumentException("Channel key " + channelDefinitionKey + " is already registered");
         }
 
-        if (channelDefinition instanceof InboundChannelDefinition) {
+        if (channelDefinition instanceof InboundChannelModel) {
 
-            InboundChannelDefinition inboundChannelDefinition = (InboundChannelDefinition) channelDefinition;
+            InboundChannelModel inboundChannelDefinition = (InboundChannelModel) channelDefinition;
             inboundChannelDefinitions.put(inboundChannelDefinition.getKey(), inboundChannelDefinition);
 
             if (inboundChannelDefinition.getInboundEventChannelAdapter() != null) {
@@ -92,9 +92,9 @@ public class DefaultEventRegistry implements EventRegistry {
                 inboundEventChannelAdapter.setChannelKey(inboundChannelDefinition.getKey());
             }
 
-        } else if (channelDefinition instanceof OutboundChannelDefinition) {
+        } else if (channelDefinition instanceof OutboundChannelModel) {
 
-            OutboundChannelDefinition outboundChannelDefinition = (OutboundChannelDefinition) channelDefinition;
+            OutboundChannelModel outboundChannelDefinition = (OutboundChannelModel) channelDefinition;
             outboundChannelDefinitions.put(outboundChannelDefinition.getKey(), outboundChannelDefinition);
 
         } else {
@@ -102,27 +102,48 @@ public class DefaultEventRegistry implements EventRegistry {
 
         }
 
+        for (ChannelModelProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
+            if (channelDefinitionProcessor.canProcess(channelDefinition)) {
+                channelDefinitionProcessor.registerChannelModel(channelDefinition, engineConfiguration.getEventRegistry());
+            }
+        }
+
     }
 
     @Override
     public void removeChannelDefinition(String channelDefinitionKey) {
         // keys are unique over the two maps
-        inboundChannelDefinitions.remove(channelDefinitionKey);
-        outboundChannelDefinitions.remove(channelDefinitionKey);
+        InboundChannelModel inboundChannelDefinition = inboundChannelDefinitions.remove(channelDefinitionKey);
+        if (inboundChannelDefinition != null) {
+            for (ChannelModelProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
+                if (channelDefinitionProcessor.canProcess(inboundChannelDefinition)) {
+                    channelDefinitionProcessor.unregisterChannelModel(inboundChannelDefinition, engineConfiguration.getEventRegistry());
+                }
+            }
+        }
+        OutboundChannelModel outboundChannelDefinition = outboundChannelDefinitions.remove(channelDefinitionKey);
+        if (outboundChannelDefinition != null) {
+            for (ChannelModelProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
+                if (channelDefinitionProcessor.canProcess(outboundChannelDefinition)) {
+                    channelDefinitionProcessor.unregisterChannelModel(outboundChannelDefinition, engineConfiguration.getEventRegistry());
+                }
+            }
+        }
+
     }
 
     @Override
-    public InboundChannelDefinition getInboundChannelDefinition(String channelKey) {
+    public InboundChannelModel getInboundChannelDefinition(String channelKey) {
         return inboundChannelDefinitions.get(channelKey);
     }
     
     @Override
-    public Map<String, InboundChannelDefinition> getInboundChannelDefinitions() {
+    public Map<String, InboundChannelModel> getInboundChannelDefinitions() {
         return inboundChannelDefinitions;
     }
 
     @Override
-    public OutboundChannelDefinition getOutboundChannelDefinition(String channelKey) {
+    public OutboundChannelModel getOutboundChannelDefinition(String channelKey) {
         return outboundChannelDefinitions.get(channelKey);
     }
 

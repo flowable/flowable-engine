@@ -17,9 +17,12 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventDefinition;
+import org.flowable.eventregistry.impl.ChannelDefinitionQueryImpl;
 import org.flowable.eventregistry.impl.EventDefinitionQueryImpl;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityManager;
@@ -73,6 +76,25 @@ public class EventDeploymentManager {
             eventDefinition = resolveEventDefinition(eventDefinition).getEventDefinitionEntity();
         }
         return eventDefinition;
+    }
+    
+    public ChannelDefinitionEntity findDeployedChannelDefinitionById(String channelDefinitionId) {
+        if (channelDefinitionId == null) {
+            throw new FlowableException("Invalid channel definition id : null");
+        }
+
+        // first try the cache
+        ChannelDefinitionCacheEntry cacheEntry = channelDefinitionCache.get(channelDefinitionId);
+        ChannelDefinitionEntity channelDefinition = cacheEntry != null ? cacheEntry.getChannelDefinitionEntity() : null;
+
+        if (channelDefinition == null) {
+            channelDefinition = engineConfig.getChannelDefinitionEntityManager().findById(channelDefinitionId);
+            if (channelDefinition == null) {
+                throw new FlowableObjectNotFoundException("no deployed channel definition found with id '" + channelDefinitionId + "'");
+            }
+            channelDefinition = resolveChannelDefinition(channelDefinition).getChannelDefinitionEntity();
+        }
+        return channelDefinition;
     }
 
     public EventDefinitionEntity findDeployedLatestEventDefinitionByKey(String eventDefinitionKey) {
@@ -129,7 +151,7 @@ public class EventDeploymentManager {
     }
 
     /**
-     * Resolving the decision will fetch the event definition, parse it and store the {@link EventDefinition} in memory.
+     * Resolving the event will fetch the event definition, parse it and store the {@link EventDefinition} in memory.
      */
     public EventDefinitionCacheEntry resolveEventDefinition(EventDefinition eventDefinition) {
         String eventDefinitionId = eventDefinition.getId();
@@ -154,6 +176,33 @@ public class EventDeploymentManager {
         }
         return cachedEventDefinition;
     }
+    
+    /**
+     * Resolving the channel will fetch the channel definition, parse it and store the {@link ChannelDefinition} in memory.
+     */
+    public ChannelDefinitionCacheEntry resolveChannelDefinition(ChannelDefinition channelDefinition) {
+        String channelDefinitionId = channelDefinition.getId();
+        String deploymentId = channelDefinition.getDeploymentId();
+
+        ChannelDefinitionCacheEntry cachedChannelDefinition = channelDefinitionCache.get(channelDefinitionId);
+
+        if (cachedChannelDefinition == null) {
+            EventDeploymentEntity deployment = engineConfig.getDeploymentEntityManager().findById(deploymentId);
+            List<EventResourceEntity> resources = engineConfig.getResourceEntityManager().findResourcesByDeploymentId(deploymentId);
+            for (EventResourceEntity resource : resources) {
+                deployment.addResource(resource);
+            }
+
+            deployment.setNew(false);
+            deploy(deployment);
+            cachedChannelDefinition = channelDefinitionCache.get(channelDefinitionId);
+
+            if (cachedChannelDefinition == null) {
+                throw new FlowableException("deployment '" + deploymentId + "' didn't put channel definition '" + channelDefinitionId + "' in the cache");
+            }
+        }
+        return cachedChannelDefinition;
+    }
 
     public void removeDeployment(String deploymentId) {
         EventDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
@@ -161,14 +210,19 @@ public class EventDeploymentManager {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
         }
 
-        // Remove any form definition from the cache
+        // Remove any event and channel definition from the cache
         List<EventDefinition> eventDefinitions = new EventDefinitionQueryImpl().deploymentId(deploymentId).list();
+        List<ChannelDefinition> channelDefinitions = new ChannelDefinitionQueryImpl().deploymentId(deploymentId).list();
 
         // Delete data
         deploymentEntityManager.deleteDeployment(deploymentId);
 
         for (EventDefinition eventDefinition : eventDefinitions) {
             eventDefinitionCache.remove(eventDefinition.getId());
+        }
+        
+        for (ChannelDefinition channelDefinition : channelDefinitions) {
+            channelDefinitionCache.remove(channelDefinition.getId());
         }
     }
 

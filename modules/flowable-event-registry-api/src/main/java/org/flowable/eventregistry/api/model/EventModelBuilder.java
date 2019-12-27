@@ -15,7 +15,7 @@ package org.flowable.eventregistry.api.model;
 import java.util.Collection;
 
 import org.flowable.eventregistry.api.EventDeployment;
-import org.flowable.eventregistry.model.EventCorrelationParameterDefinition;
+import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -91,7 +91,7 @@ public interface EventModelBuilder {
      * Defines one parameters for correlation that can be used in models to map onto.
      * Each correlation parameter is automatically a {@link #payload(String, String)} element.
      *
-     * Will create a {@link EventCorrelationParameterDefinition} behind the scenes.
+     * Will create a {@link EventCorrelationParameter} behind the scenes.
      */
     EventModelBuilder correlationParameter(String name, String type);
     

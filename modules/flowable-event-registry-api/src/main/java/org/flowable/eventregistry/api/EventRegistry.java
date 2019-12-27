@@ -19,8 +19,8 @@ import org.flowable.eventregistry.api.model.OutboundChannelDefinitionBuilder;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.InboundChannelDefinition;
-import org.flowable.eventregistry.model.OutboundChannelDefinition;
+import org.flowable.eventregistry.model.InboundChannelModel;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 
 /**
  * Central registry for events that are received through external channels through a {@link InboundEventChannelAdapter}
@@ -31,29 +31,29 @@ import org.flowable.eventregistry.model.OutboundChannelDefinition;
 public interface EventRegistry {
 
     /**
-     * Programmatically build and register a new {@link InboundChannelDefinition}.
+     * Programmatically build and register a new {@link InboundChannelModel}.
      */
     InboundChannelDefinitionBuilder newInboundChannelDefinition();
 
     /**
-     * Returns the {@link InboundChannelDefinition} instance associated with the given key.
+     * Returns the {@link InboundChannelModel} instance associated with the given key.
      */
-    InboundChannelDefinition getInboundChannelDefinition(String channelKey);
+    InboundChannelModel getInboundChannelDefinition(String channelKey);
     
     /**
-     * Returns all the {@link InboundChannelDefinition} instances.
+     * Returns all the {@link InboundChannelModel} instances.
      */
-    Map<String, InboundChannelDefinition> getInboundChannelDefinitions();
+    Map<String, InboundChannelModel> getInboundChannelDefinitions();
 
     /**
-     * Programmatically build and register a new {@link OutboundChannelDefinition}.
+     * Programmatically build and register a new {@link OutboundChannelModel}.
      */
     OutboundChannelDefinitionBuilder newOutboundChannelDefinition();
 
     /**
-     * Returns the {@link OutboundChannelDefinition} instance associated with the given key.
+     * Returns the {@link OutboundChannelModel} instance associated with the given key.
      */
-    OutboundChannelDefinition getOutboundChannelDefinition(String channelKey);
+    OutboundChannelModel getOutboundChannelDefinition(String channelKey);
 
     /**
      * Low-level (vs the {@link InboundChannelDefinitionBuilder}) way of registering a new {@link ChannelModel}.

@@ -39,10 +39,10 @@ import org.flowable.eventregistry.impl.DefaultInboundEventProcessor;
 import org.flowable.eventregistry.impl.event.FlowableEventRegistryEvent;
 import org.flowable.eventregistry.impl.runtime.EventCorrelationParameterInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
-import org.flowable.eventregistry.model.EventCorrelationParameterDefinition;
+import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.EventPayloadDefinition;
-import org.flowable.eventregistry.model.InboundChannelDefinition;
+import org.flowable.eventregistry.model.EventPayload;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +69,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     
     @AfterEach
     public void tearDown() {
-        Map<String, InboundChannelDefinition> inboundChannelDefinitionMap = eventEngineConfiguration.getEventRegistry().getInboundChannelDefinitions();
+        Map<String, InboundChannelModel> inboundChannelDefinitionMap = eventEngineConfiguration.getEventRegistry().getInboundChannelDefinitions();
         for (String key : inboundChannelDefinitionMap.keySet()) {
             eventEngineConfiguration.getEventRegistry().removeChannelDefinition(key);
         }
@@ -192,7 +192,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
 
                 @Override
                 public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, Customer event) {
-                    EventCorrelationParameterDefinition correlationParameterDefinition = eventDefinition.getCorrelationParameters()
+                    EventCorrelationParameter correlationParameterDefinition = eventDefinition.getCorrelationParameters()
                         .stream()
                         .filter(parameterDefinition -> Objects.equals("customerId", parameterDefinition.getName()))
                         .findAny()
@@ -203,7 +203,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                 @Override
                 public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, Customer event) {
                     Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
-                    for (EventPayloadDefinition eventPayloadDefinition : eventDefinition.getPayload()) {
+                    for (EventPayload eventPayloadDefinition : eventDefinition.getPayload()) {
                         switch (eventPayloadDefinition.getName()) {
                             case "payload1":
                                 payloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, event.getPayload1()));

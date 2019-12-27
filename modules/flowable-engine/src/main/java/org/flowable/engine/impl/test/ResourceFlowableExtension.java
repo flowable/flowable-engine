@@ -30,9 +30,12 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 public class ResourceFlowableExtension extends InternalFlowableExtension {
 
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ResourceFlowableExtension.class);
+
     protected final String configurationResource;
     protected final String processEngineName;
     protected final Consumer<ProcessEngineConfiguration> configurationConsumer;
+
+    protected ExtensionContext currentExtensionContext;
 
     public ResourceFlowableExtension(String configurationResource, Consumer<ProcessEngineConfiguration> configurationConsumer) {
         this(configurationResource, null, configurationConsumer);
@@ -42,6 +45,12 @@ public class ResourceFlowableExtension extends InternalFlowableExtension {
         this.configurationResource = configurationResource;
         this.processEngineName = processEngineName;
         this.configurationConsumer = configurationConsumer;
+    }
+
+    @Override
+    public void beforeEach(ExtensionContext context) {
+        super.beforeEach(context);
+        currentExtensionContext = context;
     }
 
     @Override
@@ -78,6 +87,10 @@ public class ResourceFlowableExtension extends InternalFlowableExtension {
         String engineName = processEngineName != null ? processEngineName : ProcessEngines.NAME_DEFAULT;
         ProcessEngine processEngine = ProcessEngines.getProcessEngine(engineName);
         ProcessEngines.unregister(processEngine);
-        return initializeProcessEngine();
+        processEngine.close();
+
+        ProcessEngine rebootedProcessEngine = initializeProcessEngine();
+        getStore(currentExtensionContext).put(currentExtensionContext.getUniqueId(), rebootedProcessEngine);
+        return rebootedProcessEngine;
     }
 }

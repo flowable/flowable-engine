@@ -4,9 +4,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration">
-
-        <property name="dataSource">
+    <bean id="dataSource" class="org.flowable.common.engine.impl.test.ClosingDataSource">
+        <constructor-arg>
             <bean class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
                 <constructor-arg>
                     <bean class="com.zaxxer.hikari.HikariConfig">
@@ -17,14 +16,25 @@
                     </bean>
                 </constructor-arg>
             </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration">
+
+        <property name="dataSource" ref="dataSource"/>
+
+        <property name="engineLifecycleListeners">
+            <list>
+                <ref bean="dataSource"/>
+            </list>
         </property>
         <property name="databaseSchemaUpdate" value="true" />
-        
+
         <property name="asyncExecutor" ref="asyncExecutor" />
         <property name="asyncExecutorActivate" value="false" />
-    
+
         <property name="asyncFailedJobWaitTime" value="1" />
-        
+
         <property name="enableEntityLinks" value="true" />
 
         <property name="enableHistoricTaskLogging" value="true" />

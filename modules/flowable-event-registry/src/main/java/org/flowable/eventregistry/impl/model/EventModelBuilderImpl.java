@@ -23,9 +23,9 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.model.EventModelBuilder;
 import org.flowable.eventregistry.impl.EventRepositoryServiceImpl;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
-import org.flowable.eventregistry.model.EventCorrelationParameterDefinition;
+import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.EventPayloadDefinition;
+import org.flowable.eventregistry.model.EventPayload;
 
 /**
  * @author Joram Barrez
@@ -43,8 +43,8 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     protected String key;
     protected Collection<String> inboundChannelKeys;
     protected Collection<String> outboundChannelKeys;
-    protected Map<String, EventCorrelationParameterDefinition> correlationParameterDefinitions = new LinkedHashMap<>();
-    protected Map<String, EventPayloadDefinition> eventPayloadDefinitions = new LinkedHashMap<>();
+    protected Map<String, EventCorrelationParameter> correlationParameterDefinitions = new LinkedHashMap<>();
+    protected Map<String, EventPayload> eventPayloadDefinitions = new LinkedHashMap<>();
 
     public EventModelBuilderImpl(EventRepositoryServiceImpl eventRepository) {
         this.eventRepository = eventRepository;
@@ -118,14 +118,14 @@ public class EventModelBuilderImpl implements EventModelBuilder {
 
     @Override
     public EventModelBuilder correlationParameter(String name, String type) {
-        correlationParameterDefinitions.put(name, new EventCorrelationParameterDefinition(name, type));
+        correlationParameterDefinitions.put(name, new EventCorrelationParameter(name, type));
         payload(name, type);
         return this;
     }
 
     @Override
     public EventModelBuilder payload(String name, String type) {
-        eventPayloadDefinitions.put(name, new EventPayloadDefinition(name, type));
+        eventPayloadDefinitions.put(name, new EventPayload(name, type));
         return this;
     }
     @Override

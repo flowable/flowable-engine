@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -126,7 +127,9 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     
     protected int channelDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache;
-    
+
+    protected Collection<ChannelModelProcessor> channelDefinitionProcessors = new ArrayList<>();
+
     // Event registry
     protected EventRegistry eventRegistry;
     protected InboundEventProcessor inboundEventProcessor;
@@ -415,6 +418,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         eventDeployer.setIdGenerator(idGenerator);
         eventDeployer.setParsedDeploymentBuilderFactory(parsedDeploymentBuilderFactory);
         eventDeployer.setEventDeploymentHelper(eventDeploymentHelper);
+        eventDeployer.setChannelDeploymentHelper(channelDeploymentHelper);
         eventDeployer.setCachingAndArtifactsManager(cachingAndArtifactsManager);
         eventDeployer.setUsePrefixId(usePrefixId);
 
@@ -586,6 +590,21 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     public EventRegistryEngineConfiguration setChannelDefinitionCache(DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache) {
         this.channelDefinitionCache = channelDefinitionCache;
         return this;
+    }
+    
+    public Collection<ChannelModelProcessor> getChannelDefinitionProcessors() {
+        return channelDefinitionProcessors;
+    }
+
+    public void addChannelDefinitionProcessor(ChannelModelProcessor channelDefinitionProcessor) {
+        if (this.channelDefinitionProcessors == null) {
+            this.channelDefinitionProcessors = new ArrayList<>();
+        }
+        this.channelDefinitionProcessors.add(channelDefinitionProcessor);
+    }
+
+    public void setChannelDefinitionProcessors(Collection<ChannelModelProcessor> channelDefinitionProcessors) {
+        this.channelDefinitionProcessors = channelDefinitionProcessors;
     }
 
     public EventDeploymentDataManager getDeploymentDataManager() {

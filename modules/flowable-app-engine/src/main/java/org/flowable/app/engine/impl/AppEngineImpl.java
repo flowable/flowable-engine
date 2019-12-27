@@ -17,6 +17,7 @@ import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.AppEngines;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,12 @@ public class AppEngineImpl implements AppEngine {
         LOGGER.info("AppEngine {} created", name);
         
         AppEngines.registerAppEngine(this);
+
+        if (appEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : appEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
+        }
     }
     
     @Override
@@ -63,6 +70,11 @@ public class AppEngineImpl implements AppEngine {
         AppEngines.unregister(this);
         appEngineConfiguration.close();
 
+        if (appEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : appEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
+        }
     }
     
     @Override

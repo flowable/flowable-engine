@@ -19,7 +19,7 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventProcessor;
-import org.flowable.eventregistry.model.InboundChannelDefinition;
+import org.flowable.eventregistry.model.InboundChannelModel;
 
 /**
  * @author Joram Barrez
@@ -36,7 +36,7 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
     @Override
     public void eventReceived(String channelKey, String event) {
 
-        InboundChannelDefinition channelDefinition = eventRegistry.getInboundChannelDefinition(channelKey);
+        InboundChannelModel channelDefinition = eventRegistry.getInboundChannelDefinition(channelKey);
         if (channelDefinition == null) {
             throw new FlowableException("No channel definition found for key " + channelKey);
         }

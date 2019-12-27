@@ -793,7 +793,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         CmmnEngineImpl cmmnEngine = new CmmnEngineImpl(this);
 
         if (handleCmmnEngineExecutorsAfterEngineCreate) {
-            cmmnEngine.handleExecutors();
+            cmmnEngine.startExecutors();
         }
 
         return cmmnEngine;

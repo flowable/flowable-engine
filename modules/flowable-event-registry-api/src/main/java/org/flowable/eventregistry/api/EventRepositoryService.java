@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.flowable.eventregistry.api.model.EventModelBuilder;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -30,6 +31,8 @@ public interface EventRepositoryService {
     void deleteDeployment(String deploymentId);
 
     EventDefinitionQuery createEventDefinitionQuery();
+    
+    ChannelDefinitionQuery createChannelDefinitionQuery();
 
     /**
      * Changes the category of a deployment.
@@ -77,11 +80,21 @@ public interface EventRepositoryService {
 
     EventModel getEventModelByKey(String eventDefinitionKey);
     
-    EventModel getEventModelByKey(String formDefinitionKey, String tenantId, boolean fallbackToDefaultTenant);
+    EventModel getEventModelByKey(String eventDefinitionKey, String tenantId, boolean fallbackToDefaultTenant);
 
     EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId);
 
     EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant);
+    
+    ChannelModel getChannelModelById(String channelDefinitionId);
+
+    ChannelModel getChannelModelByKey(String channelDefinitionKey);
+    
+    ChannelModel getChannelModelByKey(String channelDefinitionKey, String tenantId, boolean fallbackToDefaultTenant);
+
+    ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId);
+
+    ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant);
     
     /**
      * Programmatically build and register a new {@link EventModel}.

@@ -200,7 +200,7 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
             if (!isRunning()) {
                 enginesBuild.forEach(name -> {
                     CmmnEngine cmmnEngine = CmmnEngines.getCmmnEngine(name);
-                    cmmnEngine.handleExecutors();
+                    cmmnEngine.startExecutors();
                     autoDeployResources(cmmnEngine);
                 });
                 running = true;

@@ -51,6 +51,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
@@ -174,6 +175,8 @@ public abstract class AbstractEngineConfiguration {
      */
     protected boolean useClassForNameClassLoading = true;
 
+    protected List<EngineLifecycleListener> engineLifecycleListeners;
+
     // MYBATIS SQL SESSION FACTORY /////////////////////////////////////
 
     protected boolean isDbHistoryUsed = true;
@@ -202,7 +205,6 @@ public abstract class AbstractEngineConfiguration {
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
     protected List<Interceptor> customMybatisInterceptors;
-
 
     protected Set<String> dependentEngineMyBatisXmlMappers;
     protected List<MybatisTypeAliasConfigurator> dependentEngineMybatisTypeAliasConfigs;
@@ -461,17 +463,17 @@ public abstract class AbstractEngineConfiguration {
 
             // CRDB does not expose the version through the jdbc driver, so we need to fetch it through version().
             if (PRODUCT_NAME_POSTGRES.equalsIgnoreCase(databaseProductName)) {
-                PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
-                ResultSet resultSet = preparedStatement.executeQuery();
-                String version = null;
-                if (resultSet.next()) {
-                    version = resultSet.getString("version");
-                }
-                resultSet.close();
+                try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
+                        ResultSet resultSet = preparedStatement.executeQuery()) {
+                    String version = null;
+                    if (resultSet.next()) {
+                        version = resultSet.getString("version");
+                    }
 
-                if (StringUtils.isNotEmpty(version) && version.toLowerCase().startsWith(PRODUCT_NAME_CRDB.toLowerCase())) {
-                    databaseProductName = PRODUCT_NAME_CRDB;
-                    logger.info("CockroachDB version '{}' detected", version);
+                    if (StringUtils.isNotEmpty(version) && version.toLowerCase().startsWith(PRODUCT_NAME_CRDB.toLowerCase())) {
+                        databaseProductName = PRODUCT_NAME_CRDB;
+                        logger.info("CockroachDB version '{}' detected", version);
+                    }
                 }
             }
 
@@ -1025,6 +1027,22 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setUseClassForNameClassLoading(boolean useClassForNameClassLoading) {
         this.useClassForNameClassLoading = useClassForNameClassLoading;
+        return this;
+    }
+
+    public void addEngineLifecycleListener(EngineLifecycleListener engineLifecycleListener) {
+        if (this.engineLifecycleListeners == null) {
+            this.engineLifecycleListeners = new ArrayList<>();
+        }
+        this.engineLifecycleListeners.add(engineLifecycleListener);
+    }
+
+    public List<EngineLifecycleListener> getEngineLifecycleListeners() {
+        return engineLifecycleListeners;
+    }
+
+    public AbstractEngineConfiguration setEngineLifecycleListeners(List<EngineLifecycleListener> engineLifecycleListeners) {
+        this.engineLifecycleListeners = engineLifecycleListeners;
         return this;
     }
 

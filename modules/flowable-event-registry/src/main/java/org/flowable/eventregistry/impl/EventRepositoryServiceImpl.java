@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.eventregistry.api.ChannelDefinitionQuery;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDefinitionQuery;
 import org.flowable.eventregistry.api.EventDeployment;
@@ -38,6 +39,7 @@ import org.flowable.eventregistry.impl.cmd.SetDeploymentTenantIdCmd;
 import org.flowable.eventregistry.impl.cmd.SetEventDefinitionCategoryCmd;
 import org.flowable.eventregistry.impl.model.EventModelBuilderImpl;
 import org.flowable.eventregistry.impl.repository.EventDeploymentBuilderImpl;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -71,6 +73,11 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
     @Override
     public EventDefinitionQuery createEventDefinitionQuery() {
         return new EventDefinitionQueryImpl(commandExecutor);
+    }
+    
+    @Override
+    public ChannelDefinitionQuery createChannelDefinitionQuery() {
+        return new ChannelDefinitionQueryImpl(commandExecutor);
     }
 
     @Override
@@ -143,6 +150,35 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
         return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, tenantId, parentDeploymentId, fallbackToDefaultTenant));
     }
     
+    @Override
+    public ChannelModel getChannelModelById(String channelDefinitionId) {
+        return commandExecutor.execute(new GetEventModelCmd(null, eventDefinitionId));
+    }
+
+    @Override
+    public ChannelModel getChannelModelByKey(String channelDefinitionKey) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ChannelModel getChannelModelByKey(String channelDefinitionKey, String tenantId, boolean fallbackToDefaultTenant) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     @Override
     public EventModelBuilder createEventModelBuilder() {
         return new EventModelBuilderImpl(this);

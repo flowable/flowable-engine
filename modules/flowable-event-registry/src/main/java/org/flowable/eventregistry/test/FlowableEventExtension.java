@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -104,15 +105,29 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
 
     @Override
     public void beforeEach(ExtensionContext context) {
-        AnnotationSupport.findAnnotation(context.getTestMethod(), EventDeploymentAnnotation.class)
-            .ifPresent(deployment -> {
-                FlowableEventTestHelper testHelper = getTestHelper(context);
-                String deploymentIdFromDeploymentAnnotation = EventTestHelper
-                    .annotationDeploymentSetUp(testHelper.getEventRegistryEngine(), context.getRequiredTestClass(), context.getRequiredTestMethod(),
-                        deployment);
-                testHelper.setDeploymentIdFromDeploymentAnnotation(deploymentIdFromDeploymentAnnotation);
-            });
-
+        Optional<EventDeploymentAnnotation> optionalEventDeploymentAnnotation = AnnotationSupport.findAnnotation(
+                        context.getTestMethod(), EventDeploymentAnnotation.class);
+        
+        Optional<ChannelDeploymentAnnotation> optionalChannelDeploymentAnnotation = AnnotationSupport.findAnnotation(
+                        context.getTestMethod(), ChannelDeploymentAnnotation.class);
+        
+        if (optionalEventDeploymentAnnotation.isPresent() || optionalChannelDeploymentAnnotation.isPresent()) {
+            EventDeploymentAnnotation eventDeploymentAnnotation = null;
+            if (optionalEventDeploymentAnnotation.isPresent()) {
+                eventDeploymentAnnotation = optionalEventDeploymentAnnotation.get();
+            }
+            
+            ChannelDeploymentAnnotation channelDeploymentAnnotation = null;
+            if (optionalChannelDeploymentAnnotation.isPresent()) {
+                channelDeploymentAnnotation = optionalChannelDeploymentAnnotation.get();
+            }
+            
+            FlowableEventTestHelper testHelper = getTestHelper(context);
+            String deploymentIdFromDeploymentAnnotation = EventTestHelper
+                .annotationDeploymentSetUp(testHelper.getEventRegistryEngine(), context.getRequiredTestClass(), context.getRequiredTestMethod(),
+                                eventDeploymentAnnotation, channelDeploymentAnnotation);
+            testHelper.setDeploymentIdFromDeploymentAnnotation(deploymentIdFromDeploymentAnnotation);
+        }
     }
 
     @Override

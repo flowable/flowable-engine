@@ -15,14 +15,14 @@ package org.flowable.eventregistry.model;
 /**
  * @author Joram Barrez
  */
-public class EventPayloadDefinition {
+public class EventCorrelationParameter {
 
     protected String name;
     protected String type;
     
-    public EventPayloadDefinition() {}
+    public EventCorrelationParameter() {}
 
-    public EventPayloadDefinition(String name, String type) {
+    public EventCorrelationParameter(String name, String type) {
         this.name = name;
         this.type = type;
     }

@@ -12,23 +12,17 @@
  */
 package org.flowable.idm.engine;
 
+import org.flowable.common.engine.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 
-public interface IdmEngine {
+public interface IdmEngine extends Engine {
 
     /**
      * the version of the flowable idm library
      */
     public static String VERSION = FlowableVersions.CURRENT_VERSION;
-
-    /**
-     * The name as specified in 'idm-engine-name' in the flowable.idm.cfg.xml configuration file. The default name for a idm engine is 'default
-     */
-    String getName();
-
-    void close();
 
     IdmIdentityService getIdmIdentityService();
 
