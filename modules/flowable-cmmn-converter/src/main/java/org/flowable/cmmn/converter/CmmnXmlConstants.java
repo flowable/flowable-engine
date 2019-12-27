@@ -179,12 +179,9 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
 
-    String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType";
+    String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType"; // Note that this is the same as ELEMENT_EVENT_TYPE. We can't change this (backwards compatibility)
     String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";
     String ATTRIBUTE_EVENT_LISTENER_SIGNAL_REF = "signalRef";
-
-    String ATTRIBUTE_CASE_START_EVENT_TYPE = "startEventType";
-    String ATTRIBUTE_EVENT_LISTENER_EVENT_TYPE = "eventType";
 
     String ELEMENT_EVENT_TYPE = "eventType";
     String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";

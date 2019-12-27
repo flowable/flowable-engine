@@ -15,8 +15,9 @@
   	
   	<sequenceFlow sourceRef="task" targetRef="sendEventTask" />
   	
-  	<serviceTask id="sendEventTask" flowable:type="send-event" flowable:eventType="anotherEvent">
+  	<serviceTask id="sendEventTask" flowable:type="send-event">
         <extensionElements>
+            <flowable:eventType>anotherEvent</flowable:eventType>
             <flowable:eventInParameter source="${name}" target="nameProperty" />
             <flowable:eventInParameter source="${accountNumber}" target="numberProperty" />
         </extensionElements>

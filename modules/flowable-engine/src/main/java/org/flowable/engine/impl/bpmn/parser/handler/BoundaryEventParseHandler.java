@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
@@ -65,7 +66,7 @@ public class BoundaryEventParseHandler extends AbstractFlowNodeBpmnParseHandler<
             return;
             
         } else if (!boundaryEvent.getExtensionElements().isEmpty()) {
-            List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get("eventType");
+            List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
             if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
                 String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
                 if (StringUtils.isNotEmpty(eventTypeValue)) {

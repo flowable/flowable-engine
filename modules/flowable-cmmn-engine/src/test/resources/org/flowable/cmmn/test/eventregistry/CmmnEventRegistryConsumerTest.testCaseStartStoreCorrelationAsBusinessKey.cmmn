@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
-    <case id="testCaseStartEvent" name="testCaseStartEvent" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser" flowable:startEventType="myEvent">
+    <case id="testCaseStartEvent" name="testCaseStartEvent" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
         <extensionElements>
+            <flowable:eventType>myEvent</flowable:eventType>
             <flowable:startEventCorrelationConfiguration><![CDATA[storeAsBusinessKey]]></flowable:startEventCorrelationConfiguration>
         </extensionElements>
         <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">

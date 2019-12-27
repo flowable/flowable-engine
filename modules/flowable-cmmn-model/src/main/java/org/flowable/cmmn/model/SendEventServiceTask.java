@@ -19,8 +19,18 @@ public class SendEventServiceTask extends ServiceTask {
 
     public static final String SEND_EVENT = "send-event";
 
+    protected String eventType;
+
     public SendEventServiceTask() {
         this.type = SEND_EVENT;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
 }

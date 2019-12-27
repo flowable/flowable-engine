@@ -21,8 +21,9 @@
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>
             </sentry>
-            <eventListener id="eventListener1" flowable:eventType="myEvent">
+            <eventListener id="eventListener1">
                 <extensionElements>
+                    <flowable:eventType>myEvent</flowable:eventType>
                     <flowable:eventOutParameter source="customerId" target="customerIdVar"/>
                     <flowable:eventOutParameter source="payload1" target="payload1Transient" transient="true"/>
                 </extensionElements>

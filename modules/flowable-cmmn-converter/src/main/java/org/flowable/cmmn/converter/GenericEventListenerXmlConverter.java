@@ -14,7 +14,6 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.GenericEventListener;
@@ -42,16 +41,11 @@ public class GenericEventListenerXmlConverter extends PlanItemDefinitionXmlConve
             SignalEventListener signalEventListener = new SignalEventListener();
             signalEventListener.setSignalRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_SIGNAL_REF));
             return convertCommonAttributes(xtr, signalEventListener);
+
         } else {
-
             GenericEventListener genericEventListener = new GenericEventListener();
-
-            String eventType = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_EVENT_TYPE);
-            if (StringUtils.isNotEmpty(eventType)) {
-                genericEventListener.setEventType(eventType);
-            }
-
             return convertCommonAttributes(xtr, genericEventListener);
+
         }
     }
 

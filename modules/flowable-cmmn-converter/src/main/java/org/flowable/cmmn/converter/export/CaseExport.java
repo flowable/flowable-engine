@@ -42,10 +42,6 @@ public class CaseExport implements CmmnXmlConstants {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CASE_CANDIDATE_GROUPS, CmmnXmlUtil.convertToDelimitedString(caseModel.getCandidateStarterGroups()));
         }
 
-        if (StringUtils.isNotEmpty(caseModel.getStartEventType())) {
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CASE_START_EVENT_TYPE, caseModel.getStartEventType());
-        }
-
         if (StringUtils.isNotEmpty(caseModel.getDocumentation())) {
 
             xtw.writeStartElement(ELEMENT_DOCUMENTATION);

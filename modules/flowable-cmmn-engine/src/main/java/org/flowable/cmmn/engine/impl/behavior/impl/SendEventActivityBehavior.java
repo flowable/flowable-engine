@@ -13,14 +13,11 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
-import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
-import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -68,11 +65,10 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
     }
 
     protected String getEventKey() {
-        List<ExtensionElement> eventTypes = serviceTask.getExtensionElements().getOrDefault(CmmnXmlConstants.ELEMENT_EVENT_TYPE, Collections.emptyList());
-        if (eventTypes.isEmpty()) {
-            throw new FlowableException("No event key configured for " + serviceTask.getId());
+        if (StringUtils.isNotEmpty(serviceTask.getEventType())) {
+            return serviceTask.getEventType();
         } else {
-            return eventTypes.get(0).getElementText();
+            throw new FlowableException("No event key configured for " + serviceTask.getId());
         }
     }
 

@@ -281,28 +281,5 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createGenericEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count());
     }
 
-    // TODO: needs dedicated test setup with event registry
-//    @Test
-//    @CmmnDeployment
-//    public void testGenericEventListenerWithEventType() {
-//        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-//        assertEquals(1, cmmnTaskService.createTaskQuery().count());
-//
-//        // There should be one event subscription
-//        List<EventSubscription> allEventSubscriptions = getAllEventSubscriptions();
-//        assertEquals(1, allEventSubscriptions.size());
-//    }
-//
-//    protected List<EventSubscription> getAllEventSubscriptions() {
-//        return cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<EventSubscription>>() {
-//
-//            @Override
-//            public List<EventSubscription> execute(CommandContext commandContext) {
-//                return CommandContextUtil.getEventSubscriptionServiceConfiguration(commandContext)
-//                    .getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(new EventSubscriptionQueryImpl(commandContext));
-//            }
-//        });
-//    }
-
 }
 
