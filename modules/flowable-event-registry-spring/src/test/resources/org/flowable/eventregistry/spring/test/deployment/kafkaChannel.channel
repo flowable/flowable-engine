@@ -3,7 +3,7 @@
     "category": "channel",
     "name": "Test channel",
     "channelType": "inbound",
-    "type": "jms",
+    "type": "kafka",
     "destination": "test-new-customer",
     "deserializerType": "json",
     "channelEventKeyDetection": {

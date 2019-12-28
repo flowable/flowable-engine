@@ -187,25 +187,9 @@ class KafkaChannelDefinitionProcessorTest {
     
         try {
 
-            eventRegistry.newInboundChannelModel()
-                .key("newCustomerChannel")
-                .kafkaChannelAdapter("test-new-customer")
-                .eventProcessingPipeline()
-                .jsonDeserializer()
-                .detectEventKeyUsingJsonField("eventKey")
-                .jsonFieldsMapDirectlyToPayload()
-                .register();
-    
             // Give time for the consumers to register properly in the groups
             // This is linked to the session timeout property for the consumers
             Thread.sleep(600);
-    
-            eventRepositoryService.createEventModelBuilder()
-                .resourceName("testEvent.event")
-                .key("test")
-                .correlationParameter("customer", EventPayloadTypes.STRING)
-                .payload("name", EventPayloadTypes.STRING)
-                .deploy();
     
             kafkaTemplate.send("test-new-customer", "{"
                 + "    \"eventKey\": \"test\","
