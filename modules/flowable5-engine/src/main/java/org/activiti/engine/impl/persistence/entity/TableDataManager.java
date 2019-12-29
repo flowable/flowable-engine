@@ -164,7 +164,7 @@ public class TableDataManager extends AbstractManager {
                     String tableName = tables.getString("TABLE_NAME");
                     tableName = tableName.toUpperCase();
                     tableNames.add(tableName);
-                    LOGGER.debug("  retrieved activiti table name {}", tableName);
+                    LOGGER.debug("retrieved activiti table name {}", tableName);
                 }
             } finally {
                 tables.close();

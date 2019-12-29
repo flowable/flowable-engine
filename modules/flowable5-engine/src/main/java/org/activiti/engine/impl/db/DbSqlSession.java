@@ -543,16 +543,16 @@ public class DbSqlSession implements Session {
             int nrOfDeletes = 0;
             for (List<PersistentObject> insertedObjectList : insertedObjectLists) {
                 for (PersistentObject insertedObject : insertedObjectList) {
-                    LOGGER.debug("  insert {}", insertedObject);
+                    LOGGER.debug("insert {}", insertedObject);
                     nrOfInserts++;
                 }
             }
             for (PersistentObject updatedObject : updatedObjects) {
-                LOGGER.debug("  update {}", updatedObject);
+                LOGGER.debug("update {}", updatedObject);
                 nrOfUpdates++;
             }
             for (DeleteOperation deleteOperation : deleteOperations) {
-                LOGGER.debug("  {}", deleteOperation);
+                LOGGER.debug("{}", deleteOperation);
                 nrOfDeletes++;
             }
             LOGGER.debug("flush summary: {} insert, {} update, {} delete.", nrOfInserts, nrOfUpdates, nrOfDeletes);

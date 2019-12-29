@@ -423,23 +423,23 @@ public class DbSqlSession implements Session {
         int nrOfDeletes = 0;
         for (Map<String, Entity> insertedObjectMap : insertedObjects.values()) {
             for (Entity insertedObject : insertedObjectMap.values()) {
-                LOGGER.debug("  insert {}", insertedObject);
+                LOGGER.debug("insert {}", insertedObject);
                 nrOfInserts++;
             }
         }
         for (Entity updatedObject : updatedObjects) {
-            LOGGER.debug("  update {}", updatedObject);
+            LOGGER.debug("update {}", updatedObject);
             nrOfUpdates++;
         }
         for (Map<String, Entity> deletedObjectMap : deletedObjects.values()) {
             for (Entity deletedObject : deletedObjectMap.values()) {
-                LOGGER.debug("  delete {} with id {}", deletedObject, deletedObject.getId());
+                LOGGER.debug("delete {} with id {}", deletedObject, deletedObject.getId());
                 nrOfDeletes++;
             }
         }
         for (Collection<BulkDeleteOperation> bulkDeleteOperationList : bulkDeleteOperations.values()) {
             for (BulkDeleteOperation bulkDeleteOperation : bulkDeleteOperationList) {
-                LOGGER.debug("  {}", bulkDeleteOperation);
+                LOGGER.debug("{}", bulkDeleteOperation);
                 nrOfDeletes++;
             }
         }
