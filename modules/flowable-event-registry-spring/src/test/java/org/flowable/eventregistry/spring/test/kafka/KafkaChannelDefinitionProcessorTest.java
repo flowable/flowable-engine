@@ -445,6 +445,53 @@ class KafkaChannelDefinitionProcessorTest {
 
     }
 
+    @Test
+    void eventShouldBeSendAfterOutboundChannelModelIsDeployed() {
+        createTopic("outbound-customer");
+
+        EventDeployment deployment = eventRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaOutboundEvent.event")
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaOutboundChannel.channel")
+            .deploy();
+
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            consumer.subscribe(Collections.singleton("outbound-customer"));
+
+            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent);
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                .hasSize(1)
+                .first()
+                .isNotNull()
+                .satisfies(record -> {
+                    assertThat(record.key()).isEqualTo("customer");
+                    assertThatJson(record.value())
+                        .isEqualTo("{"
+                            + "  customer: 'kermit',"
+                            + "  name: 'Kermit the Frog'"
+                            + "}");
+                });
+        } finally {
+            eventRepositoryService.deleteDeployment(deployment.getId());
+        }
+
+    }
+
     protected void createTopic(String topicName) {
 
         CreateTopicsResult topicsResult = adminClient.createTopics(Collections.singleton(new NewTopic(topicName, 1, (short) 1)));

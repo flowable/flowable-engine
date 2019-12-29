@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.test.deployment;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -25,6 +26,7 @@ import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
+import org.flowable.eventregistry.model.JmsInboundChannelModel;
 import org.flowable.eventregistry.test.AbstractFlowableEventTest;
 import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
@@ -157,13 +159,17 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         assertEquals(1, channelDefinition.getVersion());
 
         ChannelModel channelModel = repositoryService.getChannelModelById(channelDefinition.getId());
-        assertEquals("myChannel", channelModel.getKey());
-        assertEquals("inbound", channelModel.getChannelType());
-        assertEquals("jms", channelModel.getType());
-        assertEquals("testQueue", channelModel.getDestination());
-        assertEquals("json", channelModel.getDeserializerType());
-        assertEquals("myEvent", channelModel.getChannelEventKeyDetection().getFixedValue());
-        
+        assertThat(channelModel)
+            .isInstanceOfSatisfying(JmsInboundChannelModel.class, channel -> {
+                assertThat(channel.getKey()).isEqualTo("myChannel");
+                assertThat(channel.getChannelType()).isEqualTo("inbound");
+                assertThat(channel.getType()).isEqualTo("jms");
+
+                assertThat(channel.getDestination()).isEqualTo("testQueue");
+                assertThat(channel.getDeserializerType()).isEqualTo("json");
+                assertThat(channel.getChannelEventKeyDetection().getFixedValue()).isEqualTo("myEvent");
+            });
+
         EventDeployment redeployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel")
                 .deploy();
@@ -177,11 +183,15 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         assertEquals(2, channelDefinition.getVersion());
 
         channelModel = repositoryService.getChannelModelById(channelDefinition.getId());
-        assertEquals("inbound", channelModel.getChannelType());
-        assertEquals("jms", channelModel.getType());
-        assertEquals("testQueue2", channelModel.getDestination());
-        assertEquals("json", channelModel.getDeserializerType());
-        assertEquals("myEvent2", channelModel.getChannelEventKeyDetection().getFixedValue());
+        assertThat(channelModel)
+            .isInstanceOfSatisfying(JmsInboundChannelModel.class, channel -> {
+                assertThat(channel.getChannelType()).isEqualTo("inbound");
+                assertThat(channel.getType()).isEqualTo("jms");
+                assertThat(channel.getDestination()).isEqualTo("testQueue2");
+
+                assertThat(channel.getDeserializerType()).isEqualTo("json");
+                assertThat(channel.getChannelEventKeyDetection().getFixedValue()).isEqualTo("myEvent2");
+            });
 
         repositoryService.deleteDeployment(redeployment.getId());
     }

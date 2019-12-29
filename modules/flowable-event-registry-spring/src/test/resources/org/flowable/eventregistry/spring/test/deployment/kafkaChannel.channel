@@ -4,7 +4,9 @@
     "name": "Test channel",
     "channelType": "inbound",
     "type": "kafka",
-    "destination": "test-new-customer",
+    "topics": [
+        "test-new-customer"
+    ],
     "deserializerType": "json",
     "channelEventKeyDetection": {
         "jsonField": "eventKey"

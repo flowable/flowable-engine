@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -292,5 +293,82 @@ class RabbitChannelDefinitionProcessorTest {
                 + "}");
 
         eventRegistry.removeChannelModel("outboundCustomer");
+    }
+
+    @Test
+    void eventShouldBeReceivedWhenChannelModelIsDeployed() {
+        rabbitAdmin.declareQueue(new Queue("test-customer"));
+        queuesToDelete.add("test-customer");
+
+        EventDeployment deployment = eventRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/rabbitEvent.event")
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/rabbitChannel.channel")
+            .deploy();
+
+        try {
+            rabbitTemplate.convertAndSend("test-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"customer\": \"kermit\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}");
+
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                    .extracting(EventRegistryEvent::getType)
+                    .containsExactlyInAnyOrder("test"));
+
+            EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+            assertThat(eventInstance).isNotNull();
+            assertThat(eventInstance.getPayloadInstances())
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("customer", "kermit"),
+                    tuple("name", "Kermit the Frog")
+                );
+            assertThat(eventInstance.getCorrelationParameterInstances())
+                .extracting(EventCorrelationParameterInstance::getDefinitionName, EventCorrelationParameterInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("customer", "kermit")
+                );
+
+        } finally {
+            eventRepositoryService.deleteDeployment(deployment.getId());
+        }
+    }
+
+    @Test
+    void eventShouldBeSendAfterOutboundChannelModelIsDeployed() {
+        rabbitAdmin.declareQueue(new Queue("outbound-customer"));
+        queuesToDelete.add("outbound-customer");
+
+        EventDeployment deployment = eventRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/rabbitOutboundEvent.event")
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/rabbitOutboundChannel.channel")
+            .deploy();
+
+        try {
+
+            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+
+            eventRegistry.sendEventOutbound(kermitEvent);
+
+            Object message = rabbitTemplate.receiveAndConvert("outbound-customer");
+            assertThat(message).isNotNull();
+            assertThatJson(message)
+                .isEqualTo("{"
+                    + "  customer: 'kermit',"
+                    + "  name: 'Kermit the Frog'"
+                    + "}");
+        } finally {
+            eventRepositoryService.deleteDeployment(deployment.getId());
+        }
     }
 }

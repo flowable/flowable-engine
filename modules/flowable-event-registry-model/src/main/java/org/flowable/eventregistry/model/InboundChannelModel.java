@@ -12,22 +12,36 @@
  */
 package org.flowable.eventregistry.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Joram Barrez
  */
 public class InboundChannelModel extends ChannelModel {
 
-    protected String type;
+    protected String deserializerType;
+    protected ChannelEventKeyDetection channelEventKeyDetection;
 
+    @JsonIgnore
     protected Object inboundEventChannelAdapter;
+
+    @JsonIgnore
     protected Object inboundEventProcessingPipeline;
 
-    public String getType() {
-        return type;
+    public String getDeserializerType() {
+        return deserializerType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setDeserializerType(String deserializerType) {
+        this.deserializerType = deserializerType;
+    }
+
+    public ChannelEventKeyDetection getChannelEventKeyDetection() {
+        return channelEventKeyDetection;
+    }
+
+    public void setChannelEventKeyDetection(ChannelEventKeyDetection channelEventKeyDetection) {
+        this.channelEventKeyDetection = channelEventKeyDetection;
     }
 
     public Object getInboundEventProcessingPipeline() {

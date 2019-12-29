@@ -12,13 +12,28 @@
  */
 package org.flowable.eventregistry.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Joram Barrez
  */
 public class OutboundChannelModel extends ChannelModel {
 
+    protected String serializerType;
+
+    @JsonIgnore
     protected Object outboundEventChannelAdapter;
+
+    @JsonIgnore
     protected Object outboundEventProcessingPipeline;
+
+    public String getSerializerType() {
+        return serializerType;
+    }
+
+    public void setSerializerType(String serializerType) {
+        this.serializerType = serializerType;
+    }
 
     public Object getOutboundEventChannelAdapter() {
         return outboundEventChannelAdapter;

@@ -12,9 +12,9 @@
  */
 package org.flowable.eventregistry.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import org.flowable.eventregistry.json.converter.EventJsonConverter;
 import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
