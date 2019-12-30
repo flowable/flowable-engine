@@ -255,7 +255,8 @@
 				</plugins>
 			</build>
 		</profile>
-		<!-- database qa profile -->
+		
+        <!-- database qa profile -->
 		<profile>
 			<id>databaseidm</id>
 			<activation>
