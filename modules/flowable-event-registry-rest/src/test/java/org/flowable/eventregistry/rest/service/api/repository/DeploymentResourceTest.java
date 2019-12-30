@@ -145,19 +145,16 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
      * Test deleting a single deployment. DELETE repository/deployments/{deploymentId}
      */
     public void testDeleteDeployment() throws Exception {
-        repositoryService.createDeployment().name("Deployment 1").category("DEF")
+        EventDeployment existingDeployment = repositoryService.createDeployment().name("Deployment 1").category("DEF")
                     .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event")
                     .deploy();
-        
-        EventDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(existingDeployment);
 
         // Delete the deployment
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT);
         closeResponse(response);
 
-        existingDeployment = repositoryService.createDeploymentQuery().singleResult();
+        existingDeployment = repositoryService.createDeploymentQuery().deploymentId(existingDeployment.getId()).singleResult();
         assertNull(existingDeployment);
     }
 
