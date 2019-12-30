@@ -124,12 +124,12 @@ public class CollectionUtil {
         // elements to check
         if (DMNParseUtil.isParseableCollection(value)) {
             Collection valueCollection = DMNParseUtil.parseCollection(value, targetCollection);
-            return valueCollection != null && CollectionUtils.containsAny(targetCollection, valueCollection);
+            return CollectionUtils.containsAny(targetCollection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return CollectionUtils.containsAny(targetCollection, (Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
-            return valueCollection != null && CollectionUtils.containsAny(targetCollection, valueCollection);
+            return CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
             Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
             return targetCollection.contains(formattedValue);
