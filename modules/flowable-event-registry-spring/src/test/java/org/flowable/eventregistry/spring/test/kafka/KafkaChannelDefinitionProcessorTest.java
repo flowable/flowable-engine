@@ -21,19 +21,25 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
-import org.apache.kafka.clients.admin.DeleteTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.RecordsToDelete;
+import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.TopicPartitionInfo;
+import org.apache.kafka.common.errors.TopicExistsException;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
@@ -89,8 +95,29 @@ class KafkaChannelDefinitionProcessorTest {
     void tearDown() throws Exception {
         testEventConsumer.clear();
         eventRegistry.removeFlowableEventConsumer(testEventConsumer);
-        DeleteTopicsResult deleteTopicsResult = adminClient.deleteTopics(topicsToDelete);
-        deleteTopicsResult.all().get(10, TimeUnit.SECONDS);
+        Map<TopicPartition, RecordsToDelete> recordsToDelete = new HashMap<>();
+        Map<String, TopicDescription> topicDescriptions = adminClient.describeTopics(topicsToDelete)
+            .all()
+            .get(10, TimeUnit.SECONDS);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testCleanup")) {
+
+            List<TopicPartition> partitions = new ArrayList<>();
+            for (TopicDescription topicDescription : topicDescriptions.values()) {
+                for (TopicPartitionInfo partition : topicDescription.partitions()) {
+                    partitions.add(new TopicPartition(topicDescription.name(), partition.partition()));
+                }
+            }
+
+            for (Map.Entry<TopicPartition, Long> entry : consumer.endOffsets(partitions).entrySet()) {
+                recordsToDelete.put(entry.getKey(), RecordsToDelete.beforeOffset(entry.getValue()));
+            }
+
+        }
+
+        adminClient.deleteRecords(recordsToDelete)
+            .all()
+            .get(10, TimeUnit.SECONDS);
     }
 
     @Test
@@ -160,25 +187,9 @@ class KafkaChannelDefinitionProcessorTest {
     
         try {
 
-            eventRegistry.newInboundChannelModel()
-                .key("newCustomerChannel")
-                .kafkaChannelAdapter("test-new-customer")
-                .eventProcessingPipeline()
-                .jsonDeserializer()
-                .detectEventKeyUsingJsonField("eventKey")
-                .jsonFieldsMapDirectlyToPayload()
-                .register();
-    
             // Give time for the consumers to register properly in the groups
             // This is linked to the session timeout property for the consumers
             Thread.sleep(600);
-    
-            eventRepositoryService.createEventModelBuilder()
-                .resourceName("testEvent.event")
-                .key("test")
-                .correlationParameter("customer", EventPayloadTypes.STRING)
-                .payload("name", EventPayloadTypes.STRING)
-                .deploy();
     
             kafkaTemplate.send("test-new-customer", "{"
                 + "    \"eventKey\": \"test\","
@@ -443,7 +454,10 @@ class KafkaChannelDefinitionProcessorTest {
             Thread.currentThread().interrupt();
             throw new AssertionError("Interrupted while waiting for topic creation", e);
         } catch (ExecutionException e) {
-            throw new AssertionError("Failed to create topics", e);
+            if (!(e.getCause() instanceof TopicExistsException)) {
+                // If the topic already exists, then we ignore it
+                throw new AssertionError("Failed to create topics", e);
+            }
         } catch (TimeoutException e) {
             throw new AssertionError("Timed out waiting for create topics results", e);
         }
