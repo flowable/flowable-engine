@@ -14,6 +14,7 @@ package org.flowable.spring.boot.eventregistry;
 
 import org.flowable.app.engine.AppEngine;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
@@ -123,6 +124,11 @@ public class EventRegistryServicesAutoConfiguration {
     @Bean
     public EventRepositoryService eventRepositoryService(EventRegistryEngine eventRegistryEngine) {
         return eventRegistryEngine.getEventRepositoryService();
+    }
+    
+    @Bean
+    public EventManagementService eventManagementService(EventRegistryEngine eventRegistryEngine) {
+        return eventRegistryEngine.getEventManagementService();
     }
 
     @Bean
