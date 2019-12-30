@@ -94,46 +94,41 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     @Override
     public List<String> getTablesPresentInDatabase() {
         List<String> tableNames = new ArrayList<>();
-        Connection connection = null;
         try {
-            connection = getDbSqlSession().getSqlSession().getConnection();
+            Connection connection = getDbSqlSession().getSqlSession().getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
-            ResultSet tables = null;
-            try {
-                LOGGER.debug("retrieving flowable tables from jdbc metadata");
-                String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
-                String tableNameFilter = databaseTablePrefix + "ACT_%";
-                if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
-                        || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                    tableNameFilter = databaseTablePrefix + "act_%";
-                }
+            LOGGER.debug("retrieving flowable tables from jdbc metadata");
+            String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
+            String tableNameFilter = databaseTablePrefix + "ACT_%";
+            if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
+                    || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                tableNameFilter = databaseTablePrefix + "act_%";
+            }
+            if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                tableNameFilter = databaseTablePrefix + "ACT" + databaseMetaData.getSearchStringEscape() + "_%";
+            }
+
+            String catalog = null;
+            if (getIdmEngineConfiguration().getDatabaseCatalog() != null && getIdmEngineConfiguration().getDatabaseCatalog().length() > 0) {
+                catalog = getIdmEngineConfiguration().getDatabaseCatalog();
+            }
+
+            String schema = null;
+            if (getIdmEngineConfiguration().getDatabaseSchema() != null && getIdmEngineConfiguration().getDatabaseSchema().length() > 0) {
                 if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                    tableNameFilter = databaseTablePrefix + "ACT" + databaseMetaData.getSearchStringEscape() + "_%";
+                    schema = getIdmEngineConfiguration().getDatabaseSchema().toUpperCase();
+                } else {
+                    schema = getIdmEngineConfiguration().getDatabaseSchema();
                 }
+            }
 
-                String catalog = null;
-                if (getIdmEngineConfiguration().getDatabaseCatalog() != null && getIdmEngineConfiguration().getDatabaseCatalog().length() > 0) {
-                    catalog = getIdmEngineConfiguration().getDatabaseCatalog();
-                }
-
-                String schema = null;
-                if (getIdmEngineConfiguration().getDatabaseSchema() != null && getIdmEngineConfiguration().getDatabaseSchema().length() > 0) {
-                    if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                        schema = getIdmEngineConfiguration().getDatabaseSchema().toUpperCase();
-                    } else {
-                        schema = getIdmEngineConfiguration().getDatabaseSchema();
-                    }
-                }
-
-                tables = databaseMetaData.getTables(catalog, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
+            try (ResultSet tables = databaseMetaData.getTables(catalog, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES)) {
                 while (tables.next()) {
                     String tableName = tables.getString("TABLE_NAME");
                     tableName = tableName.toUpperCase();
                     tableNames.add(tableName);
                     LOGGER.debug("  retrieved flowable table name {}", tableName);
                 }
-            } finally {
-                tables.close();
             }
         } catch (Exception e) {
             throw new FlowableException("couldn't get flowable table names using metadata: " + e.getMessage(), e);

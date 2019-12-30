@@ -133,41 +133,36 @@ public class TableDataManager extends AbstractManager {
 
     public List<String> getTablesPresentInDatabase() {
         List<String> tableNames = new ArrayList<>();
-        Connection connection = null;
         try {
-            connection = getDbSqlSession().getSqlSession().getConnection();
+            Connection connection = getDbSqlSession().getSqlSession().getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
-            ResultSet tables = null;
-            try {
-                LOGGER.debug("retrieving activiti tables from jdbc metadata");
-                String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
-                String tableNameFilter = databaseTablePrefix + "ACT_%";
-                if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                    tableNameFilter = databaseTablePrefix + "act_%";
-                }
-                if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
-                    tableNameFilter = databaseTablePrefix + "ACT" + databaseMetaData.getSearchStringEscape() + "_%";
-                }
+            LOGGER.debug("retrieving activiti tables from jdbc metadata");
+            String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
+            String tableNameFilter = databaseTablePrefix + "ACT_%";
+            if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                tableNameFilter = databaseTablePrefix + "act_%";
+            }
+            if ("oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                tableNameFilter = databaseTablePrefix + "ACT" + databaseMetaData.getSearchStringEscape() + "_%";
+            }
 
-                String catalog = null;
-                if (getProcessEngineConfiguration().getDatabaseCatalog() != null && getProcessEngineConfiguration().getDatabaseCatalog().length() > 0) {
-                    catalog = getProcessEngineConfiguration().getDatabaseCatalog();
-                }
+            String catalog = null;
+            if (getProcessEngineConfiguration().getDatabaseCatalog() != null && getProcessEngineConfiguration().getDatabaseCatalog().length() > 0) {
+                catalog = getProcessEngineConfiguration().getDatabaseCatalog();
+            }
 
-                String schema = null;
-                if (getProcessEngineConfiguration().getDatabaseSchema() != null && getProcessEngineConfiguration().getDatabaseSchema().length() > 0) {
-                    schema = getProcessEngineConfiguration().getDatabaseSchema();
-                }
+            String schema = null;
+            if (getProcessEngineConfiguration().getDatabaseSchema() != null && getProcessEngineConfiguration().getDatabaseSchema().length() > 0) {
+                schema = getProcessEngineConfiguration().getDatabaseSchema();
+            }
 
-                tables = databaseMetaData.getTables(catalog, schema, tableNameFilter, getDbSqlSession().JDBC_METADATA_TABLE_TYPES);
+            try (ResultSet tables = databaseMetaData.getTables(catalog, schema, tableNameFilter, getDbSqlSession().JDBC_METADATA_TABLE_TYPES)) {
                 while (tables.next()) {
                     String tableName = tables.getString("TABLE_NAME");
                     tableName = tableName.toUpperCase();
                     tableNames.add(tableName);
                     LOGGER.debug("  retrieved activiti table name {}", tableName);
                 }
-            } finally {
-                tables.close();
             }
         } catch (Exception e) {
             throw new ActivitiException("couldn't get activiti table names using metadata: " + e.getMessage(), e);
