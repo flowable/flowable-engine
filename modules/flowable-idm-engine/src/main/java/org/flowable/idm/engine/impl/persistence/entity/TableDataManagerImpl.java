@@ -127,7 +127,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
                     String tableName = tables.getString("TABLE_NAME");
                     tableName = tableName.toUpperCase();
                     tableNames.add(tableName);
-                    LOGGER.debug("  retrieved flowable table name {}", tableName);
+                    LOGGER.debug("retrieved flowable table name {}", tableName);
                 }
             }
         } catch (Exception e) {
