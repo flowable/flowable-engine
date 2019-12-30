@@ -10,28 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.impl.persistence.entity;
+package org.flowable.eventregistry.impl.cmd;
 
-import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.management.TableMetaData;
-import org.flowable.common.engine.api.management.TablePage;
-import org.flowable.eventregistry.impl.TablePageQueryImpl;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.eventregistry.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
  */
-public interface TableDataManager {
+public class GetTableCountsCmd implements Command<Map<String, Long>> {
 
-    Map<String, Long> getTableCount();
-
-    List<String> getTablesPresentInDatabase();
-
-    TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults);
-
-    String getTableName(Class<?> entityClass, boolean withPrefix);
-
-    TableMetaData getTableMetaData(String tableName);
-
+    @Override
+    public Map<String, Long> execute(CommandContext commandContext) {
+        return CommandContextUtil.getTableDataManager(commandContext).getTableCount();
+    }
+   
 }

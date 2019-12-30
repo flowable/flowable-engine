@@ -601,6 +601,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-eventsubscription-service</artifactId>
 				<version>${project.version}</version>
@@ -1329,6 +1334,7 @@
                 <module>modules/flowable-spring-configurator</module>
                 <module>modules/flowable-event-registry-spring</module>
                 <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-app-engine-spring</module>
                 <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
@@ -1590,6 +1596,7 @@
                 <module>modules/flowable-idm-rest</module>
                 <module>modules/flowable-event-registry-spring</module>
                 <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-content-engine</module>
                 <module>modules/flowable-content-engine-configurator</module>
                 <module>modules/flowable-content-spring</module>
@@ -1784,6 +1791,7 @@
                 <module>modules/flowable-event-registry-configurator</module>
                 <module>modules/flowable-event-registry-spring</module>
                 <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>

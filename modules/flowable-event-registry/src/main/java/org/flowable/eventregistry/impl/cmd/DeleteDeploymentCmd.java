@@ -37,7 +37,7 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("deploymentId is null");
         }
 
-        // Remove forms from cache:
+        // Remove definitions from cache:
         CommandContextUtil.getEventRegistryConfiguration().getDeploymentManager().removeDeployment(deploymentId);
 
         return null;

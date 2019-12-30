@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.ChannelDefinitionQuery;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDefinitionQuery;
@@ -28,12 +29,15 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.model.EventModelBuilder;
 import org.flowable.eventregistry.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.eventregistry.impl.cmd.DeployCmd;
+import org.flowable.eventregistry.impl.cmd.GetChannelDefinitionCmd;
+import org.flowable.eventregistry.impl.cmd.GetChannelDefinitionResourceCmd;
 import org.flowable.eventregistry.impl.cmd.GetChannelModelCmd;
 import org.flowable.eventregistry.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.eventregistry.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.flowable.eventregistry.impl.cmd.GetEventDefinitionCmd;
 import org.flowable.eventregistry.impl.cmd.GetEventDefinitionResourceCmd;
 import org.flowable.eventregistry.impl.cmd.GetEventModelCmd;
+import org.flowable.eventregistry.impl.cmd.SetChannelDefinitionCategoryCmd;
 import org.flowable.eventregistry.impl.cmd.SetDeploymentCategoryCmd;
 import org.flowable.eventregistry.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.eventregistry.impl.cmd.SetDeploymentTenantIdCmd;
@@ -117,13 +121,28 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
     }
 
     @Override
-    public InputStream getEventDefinitionResource(String formId) {
-        return commandExecutor.execute(new GetEventDefinitionResourceCmd(formId));
+    public InputStream getEventDefinitionResource(String eventDefinitionId) {
+        return commandExecutor.execute(new GetEventDefinitionResourceCmd(eventDefinitionId));
     }
 
     @Override
     public void setEventDefinitionCategory(String eventDefinitionId, String category) {
         commandExecutor.execute(new SetEventDefinitionCategoryCmd(eventDefinitionId, category));
+    }
+    
+    @Override
+    public ChannelDefinition getChannelDefinition(String channelDefinitionId) {
+        return commandExecutor.execute(new GetChannelDefinitionCmd(channelDefinitionId));
+    }
+
+    @Override
+    public InputStream getChannelDefinitionResource(String channelDefinitionId) {
+        return commandExecutor.execute(new GetChannelDefinitionResourceCmd(channelDefinitionId));
+    }
+
+    @Override
+    public void setChannelDefinitionCategory(String channelDefinitionId, String category) {
+        commandExecutor.execute(new SetChannelDefinitionCategoryCmd(channelDefinitionId, category));
     }
     
     @Override

@@ -76,6 +76,12 @@ public interface EventRepositoryService {
 
     void setEventDefinitionCategory(String eventDefinitionId, String category);
     
+    ChannelDefinition getChannelDefinition(String channelDefinitionId);
+
+    InputStream getChannelDefinitionResource(String channelDefinitionId);
+
+    void setChannelDefinitionCategory(String channelDefinitionId, String category);
+    
     EventModel getEventModelById(String eventDefinitionId);
 
     EventModel getEventModelByKey(String eventDefinitionKey);

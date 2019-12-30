@@ -1,0 +1,23 @@
+{
+    "key": "myOrderEvent",
+    "name": "My order event",
+    "inboundChannelKeys": [
+        "order-channel"
+    ],
+    "correlationParameters": [
+        {
+            "name": "orderId",
+            "type": "string"
+        }
+    ],
+    "payload": [
+        {
+            "name": "amount",
+            "type": "integer"
+        },
+        {
+            "name": "productNumber",
+            "type": "string"
+        }
+    ]
+}

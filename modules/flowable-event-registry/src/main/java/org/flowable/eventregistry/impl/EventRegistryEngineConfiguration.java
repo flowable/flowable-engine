@@ -28,6 +28,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -57,16 +58,16 @@ import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityM
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityManagerImpl;
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityManagerImpl;
-import org.flowable.eventregistry.impl.persistence.entity.TableDataManager;
-import org.flowable.eventregistry.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.eventregistry.impl.persistence.entity.data.ChannelDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.EventDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.EventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.EventResourceDataManager;
+import org.flowable.eventregistry.impl.persistence.entity.data.TableDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisChannelDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDefinitionDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventResourceDataManager;
+import org.flowable.eventregistry.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 
@@ -87,6 +88,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     // /////////////////////////////////////////////////////////////////
 
     protected EventRepositoryService eventRepositoryService = new EventRepositoryServiceImpl(this);
+    protected EventManagementService eventManagementService = new EventManagementServiceImpl(this);
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
@@ -217,6 +219,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     protected void initServices() {
         initService(eventRepositoryService);
+        initService(eventManagementService);
     }
 
     public void initExpressionManager() {
@@ -261,7 +264,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
             resourceEntityManager = new EventResourceEntityManagerImpl(this, resourceDataManager);
         }
         if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl(this);
+            tableDataManager = new TableDataManagerImpl();
         }
     }
 
@@ -500,6 +503,16 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setEventRepositoryService(EventRepositoryService eventRepositoryService) {
         this.eventRepositoryService = eventRepositoryService;
+        return this;
+    }
+    
+    @Override
+    public EventManagementService getEventManagementService() {
+        return eventManagementService;
+    }
+
+    public EventRegistryEngineConfiguration setEventManagementService(EventManagementService eventManagementService) {
+        this.eventManagementService = eventManagementService;
         return this;
     }
 

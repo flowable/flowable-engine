@@ -14,6 +14,7 @@ package org.flowable.eventregistry.impl;
 
 import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
+import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 
@@ -25,6 +26,8 @@ public interface EventRegistryEngine extends Engine {
     public static String VERSION = FlowableVersions.CURRENT_VERSION;
 
     EventRepositoryService getEventRepositoryService();
+    
+    EventManagementService getEventManagementService();
     
     EventRegistry getEventRegistry();
 
