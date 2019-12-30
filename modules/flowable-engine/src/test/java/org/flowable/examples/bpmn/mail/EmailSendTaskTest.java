@@ -51,7 +51,7 @@ public class EmailSendTaskTest extends PluggableFlowableTestCase {
                 wiser.start();
                 serverUpAndRunning = true;
             } catch (RuntimeException e) { // Fix for slow port-closing Jenkins
-                if (e.getMessage().toLowerCase().contains("BindException")) {
+                if (e.getMessage().toLowerCase().contains("bindexception")) {
                     Thread.sleep(250L);
                 }
             }
