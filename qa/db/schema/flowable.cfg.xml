@@ -23,6 +23,7 @@
   <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
     <property name="dataSource" ref="dataSource" />
+    <property name="databaseSchema" value="@jdbc.schema@" />
 
     <property name="engineLifecycleListeners">
       <list>
