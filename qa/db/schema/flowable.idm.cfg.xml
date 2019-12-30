@@ -22,6 +22,7 @@
     <bean id="idmEngineConfiguration" class="org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration">
 
 		<property name="dataSource" ref="dataSource" />
+        <property name="databaseSchema" value="@jdbc.schema@" />
 
 		<property name="engineLifecycleListeners">
 			<list>
