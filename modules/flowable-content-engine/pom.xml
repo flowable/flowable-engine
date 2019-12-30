@@ -287,6 +287,58 @@
 				</plugins>
 			</build>
 		</profile>
+        
+        <profile>
+            <id>databasemssqlcontent</id>
+            <activation>
+                <property>
+                    <name>databasemssqlcontent</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating flowable content configuration to db ${databasemssqlcontent}" />
+                                        <copy file="${basedir}/../../qa/db/flowable.mssql.content.cfg.xml"
+                                            tofile="target/test-classes/flowable.content.cfg.xml" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqlcontent}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="dropping schema in ${databasemssqlcontent}" />
+                                        <java classname="org.flowable.content.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
 		<profile>
 			<id>databasewithschemacontent</id>
@@ -395,7 +447,7 @@
 			<id>mssql</id>
 			<activation>
 				<property>
-					<name>databasecontent</name>
+					<name>databasemssqlcontent</name>
 					<value>mssql</value>
 				</property>
 			</activation>

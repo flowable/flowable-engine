@@ -327,6 +327,58 @@
 				</plugins>
 			</build>
 		</profile>
+        
+        <profile>
+            <id>databasemssqlform</id>
+            <activation>
+                <property>
+                    <name>databasemssqlform</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating flowable form configuration to db ${databasemssqlform}" />
+                                        <copy file="${basedir}/../../qa/db/flowable.mssql.form.cfg.xml"
+                                            tofile="target/test-classes/flowable.form.cfg.xml" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqlform}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="dropping schema in ${databasemssqlform}" />
+                                        <java classname="org.flowable.form.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
 		<profile>
 			<id>databasewithschemaform</id>
@@ -435,7 +487,7 @@
 			<id>mssql</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databasemssqlform</name>
 					<value>mssql</value>
 				</property>
 			</activation>

@@ -599,12 +599,28 @@
                                         <echo
                                             message="updating flowable configuration to db ${databasemssql}" />
                                         <copy
-                                            file="${basedir}/../../qa/db/mssql/flowable.cfg.xml"
-                                            todir="target/test-classes"
+                                            file="${basedir}/../../qa/db/flowable.mssql.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
                                             overwrite="true">
                                             <filterset
                                                 filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssql}.properties" />
                                         </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${databasemssql}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
                             </execution>
