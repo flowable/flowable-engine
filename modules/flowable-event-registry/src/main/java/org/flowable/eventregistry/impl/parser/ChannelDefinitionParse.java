@@ -14,6 +14,7 @@ package org.flowable.eventregistry.impl.parser;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -68,14 +69,7 @@ public class ChannelDefinitionParse {
         String encoding = eventEngineConfig.getXmlEncoding();
         ChannelJsonConverter converter = new ChannelJsonConverter();
 
-        try {
-            InputStreamReader in = null;
-            if (encoding != null) {
-                in = new InputStreamReader(streamSource.getInputStream(), encoding);
-            } else {
-                in = new InputStreamReader(streamSource.getInputStream());
-            }
-
+        try (InputStreamReader in = newInputStreamReaderForSource(encoding)) {
             String channelJson = IOUtils.toString(in);
             channelModel = converter.convertToChannelModel(channelJson);
 
@@ -94,6 +88,14 @@ public class ChannelDefinitionParse {
             throw new FlowableException("Error parsing channel definition JSON", e);
         }
         return this;
+    }
+
+    private InputStreamReader newInputStreamReaderForSource(String encoding) throws UnsupportedEncodingException {
+        if (encoding != null) {
+            return new InputStreamReader(streamSource.getInputStream(), encoding);
+        } else {
+            return new InputStreamReader(streamSource.getInputStream());
+        }
     }
 
     public ChannelDefinitionParse name(String name) {
