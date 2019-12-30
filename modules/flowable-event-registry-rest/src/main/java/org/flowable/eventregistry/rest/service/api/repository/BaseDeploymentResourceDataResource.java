@@ -68,8 +68,8 @@ public class BaseDeploymentResourceDataResource {
             final InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, resourceName);
 
             String contentType = null;
-            if (resourceName.toLowerCase().endsWith(".cmmn")) {
-                contentType = ContentType.TEXT_XML.getMimeType();
+            if (resourceName.toLowerCase().endsWith(".event") || resourceName.toLowerCase().endsWith(".channel")) {
+                contentType = ContentType.APPLICATION_JSON.getMimeType();
             } else {
                 contentType = contentTypeResolver.resolveContentType(resourceName);
             }
