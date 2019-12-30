@@ -12,8 +12,6 @@
  */
 package org.flowable.eventregistry.rest.conf.engine;
 
-import java.sql.Driver;
-
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -26,16 +24,21 @@ import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
+import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
@@ -44,7 +47,7 @@ public class EngineConfiguration {
     protected String jdbcUrl;
 
     @Value("${jdbc.driver:org.h2.Driver}")
-    protected Class<? extends Driver> jdbcDriver;
+    protected String jdbcDriver;
 
     @Value("${jdbc.username:sa}")
     protected String jdbcUsername;
@@ -54,15 +57,13 @@ public class EngineConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setDriverClass(jdbcDriver);
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
+        dataSource.setDriverClassName(jdbcDriver);
+        dataSource.setUsername(jdbcUsername);
+        dataSource.setPassword(jdbcPassword);
 
-        // Connection settings
-        ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
-        ds.setUsername(jdbcUsername);
-        ds.setPassword(jdbcPassword);
-
-        return ds;
+        return dataSource;
     }
 
     @Bean(name = "transactionManager")
@@ -80,12 +81,50 @@ public class EngineConfiguration {
     }
 
     @Bean(name = "processEngineConfiguration")
-    public ProcessEngineConfigurationImpl processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
+    public ProcessEngineConfigurationImpl processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+                    SpringEventRegistryConfigurator eventRegistryConfigurator, SpringIdmEngineConfigurator idmEngineConfigurator) {
+        
         SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
         processEngineConfiguration.setDataSource(dataSource);
         processEngineConfiguration.setDatabaseSchemaUpdate(EventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         processEngineConfiguration.setTransactionManager(transactionManager);
+        processEngineConfiguration.setDisableIdmEngine(true);
+        processEngineConfiguration.setDisableEventRegistry(true);
+        processEngineConfiguration.addConfigurator(eventRegistryConfigurator);
+        processEngineConfiguration.addConfigurator(idmEngineConfigurator);
         return processEngineConfiguration;
+    }
+    
+    @Bean(name = "eventRegistryConfigurator")
+    public SpringEventRegistryConfigurator eventRegistryConfigurator(EventRegistryEngineConfiguration configuration) {
+        SpringEventRegistryConfigurator configurator = new SpringEventRegistryConfigurator();
+        configurator.setEventEngineConfiguration(configuration);
+        return configurator;
+    }
+
+    @Bean(name = "eventRegistryEngineConfiguration")
+    public EventRegistryEngineConfiguration eventRegistryEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
+        SpringEventRegistryEngineConfiguration configuration = new SpringEventRegistryEngineConfiguration();
+        configuration.setDataSource(dataSource);
+        configuration.setDatabaseSchemaUpdate(EventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        configuration.setTransactionManager(transactionManager);
+        return configuration;
+    }
+    
+    @Bean(name = "idmEngineConfigurator")
+    public SpringIdmEngineConfigurator idmEngineConfigurator(IdmEngineConfiguration configuration) {
+        SpringIdmEngineConfigurator configurator = new SpringIdmEngineConfigurator();
+        configurator.setIdmEngineConfiguration(configuration);
+        return configurator;
+    }
+
+    @Bean(name = "idmEngineConfiguration")
+    public IdmEngineConfiguration idmEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
+        SpringIdmEngineConfiguration configuration = new SpringIdmEngineConfiguration();
+        configuration.setDataSource(dataSource);
+        configuration.setDatabaseSchemaUpdate(EventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        configuration.setTransactionManager(transactionManager);
+        return configuration;
     }
     
     @Bean
@@ -102,7 +141,7 @@ public class EngineConfiguration {
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
-
+    
     @Bean
     public EventRepositoryService eventRepositoryService(ProcessEngine processEngine) {
         return getEventRegistryEngineConfiguration(processEngine).getEventRepositoryService();

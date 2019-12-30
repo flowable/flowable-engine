@@ -33,8 +33,8 @@ public class TestServerUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestServerUtil.class);
 
-    protected static final int START_PORT = 9797;
-    private static AtomicInteger NEXT_PORT = new AtomicInteger(9797);
+    protected static final int START_PORT = 9898;
+    private static AtomicInteger NEXT_PORT = new AtomicInteger(9898);
 
     public static TestServer createAndStartServer(Class<?>... configClasses) {
         int port = NEXT_PORT.incrementAndGet();

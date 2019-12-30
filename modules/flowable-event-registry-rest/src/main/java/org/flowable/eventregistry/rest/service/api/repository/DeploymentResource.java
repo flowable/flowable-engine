@@ -58,7 +58,7 @@ public class DeploymentResource extends BaseDeploymentResource {
             @ApiResponse(code = 204, message = "Indicates the deployment was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
     })
-    @DeleteMapping(value = "/event-registry-repository/deployments/{deploymentId}", produces = "application/json")
+    @DeleteMapping(value = "/event-registry-repository/deployments/{deploymentId}")
     public void deleteDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
         
         EventDeployment deployment = getEventDeployment(deploymentId);
