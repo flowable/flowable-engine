@@ -21,14 +21,6 @@
 	</properties>
 	
 	<dependencies>
-		<dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-engine</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-spring</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-event-registry-spring</artifactId>
@@ -37,7 +29,12 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-event-registry-configurator</artifactId>
         </dependency>
-        <dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
