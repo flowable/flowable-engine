@@ -44,7 +44,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
-import org.flowable.spring.boot.eventregistry.FlowableEventProperties;
+import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
@@ -73,7 +73,7 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableProperties.class,
     FlowableAutoDeploymentProperties.class,
     FlowableIdmProperties.class,
-    FlowableEventProperties.class,
+    FlowableEventRegistryProperties.class,
     FlowableCmmnProperties.class,
     FlowableAppProperties.class,
     FlowableHttpProperties.class
@@ -95,12 +95,12 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
-    protected final FlowableEventProperties eventProperties;
+    protected final FlowableEventRegistryProperties eventProperties;
     protected final FlowableHttpProperties httpProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties,
-                    FlowableEventProperties eventProperties, FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
+                    FlowableEventRegistryProperties eventProperties, FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
         
         super(flowableProperties);
         this.cmmnProperties = cmmnProperties;

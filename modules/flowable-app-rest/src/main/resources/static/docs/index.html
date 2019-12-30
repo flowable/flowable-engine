@@ -50,6 +50,9 @@
           case "specfile/cmmn/flowable.json":
               api = "cmmn";
               break;
+          case "specfile/eventregistry/flowable.json":
+              api = "eventregistry";
+              break;
           case "specfile/form/flowable.json":
               api = "form";
               break;
@@ -120,6 +123,9 @@
               case "cmmn":
                   specFile = "specfile/cmmn/flowable.json";
                   break;
+              case "eventregistry":
+                  specFile = "specfile/eventregistry/flowable.json";
+                  break;
               case "form":
                   specFile = "specfile/form/flowable.json";
                   break;
@@ -154,6 +160,7 @@
           <option value="idm">IDM</option>
           <option value="dmn">DMN</option>
           <option value="cmmn">CMMN</option>
+          <option value="eventregistry">Event Registry</option>
           <option value="form">Form</option>
           <option value="content">Content</option>
           <option value="app">App</option>

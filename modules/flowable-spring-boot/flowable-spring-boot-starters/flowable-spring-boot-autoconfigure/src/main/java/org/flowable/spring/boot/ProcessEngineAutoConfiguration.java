@@ -33,7 +33,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
-import org.flowable.spring.boot.eventregistry.FlowableEventProperties;
+import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.Process;
@@ -78,7 +78,7 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableProcessProperties.class,
     FlowableAppProperties.class,
     FlowableIdmProperties.class,
-    FlowableEventProperties.class
+    FlowableEventRegistryProperties.class
 })
 @AutoConfigureAfter(value = {
     FlowableJpaAutoConfiguration.class,
@@ -97,14 +97,14 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     protected final FlowableProcessProperties processProperties;
     protected final FlowableAppProperties appProperties;
     protected final FlowableIdmProperties idmProperties;
-    protected final FlowableEventProperties eventProperties;
+    protected final FlowableEventRegistryProperties eventProperties;
     protected final FlowableMailProperties mailProperties;
     protected final FlowableHttpProperties httpProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
         FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, 
-        FlowableEventProperties eventProperties, FlowableMailProperties mailProperties,
+        FlowableEventRegistryProperties eventProperties, FlowableMailProperties mailProperties,
         FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
         
         super(flowableProperties);

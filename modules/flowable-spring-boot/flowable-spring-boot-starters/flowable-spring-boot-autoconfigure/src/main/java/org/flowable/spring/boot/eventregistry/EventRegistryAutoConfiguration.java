@@ -72,7 +72,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableAutoDeploymentProperties.class,
-    FlowableEventProperties.class
+    FlowableEventRegistryProperties.class
 })
 @AutoConfigureAfter({
     AppEngineAutoConfiguration.class,
@@ -87,10 +87,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 })
 public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
-    protected final FlowableEventProperties eventProperties;
+    protected final FlowableEventRegistryProperties eventProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
-    public EventRegistryAutoConfiguration(FlowableProperties flowableProperties, FlowableEventProperties eventProperties,
+    public EventRegistryAutoConfiguration(FlowableProperties flowableProperties, FlowableEventRegistryProperties eventProperties,
                     FlowableAutoDeploymentProperties autoDeploymentProperties) {
         
         super(flowableProperties);

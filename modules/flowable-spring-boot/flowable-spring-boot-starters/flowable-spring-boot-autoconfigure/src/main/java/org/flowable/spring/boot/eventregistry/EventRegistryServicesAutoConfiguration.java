@@ -43,7 +43,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnEventRegistry
 @EnableConfigurationProperties({
     FlowableProperties.class,
-    FlowableEventProperties.class
+    FlowableEventRegistryProperties.class
 })
 @AutoConfigureAfter({
     EventRegistryAutoConfiguration.class,

@@ -12,11 +12,14 @@
  */
 package org.flowable.spring.boot.eventregistry;
 
-import org.flowable.form.rest.FormRestResponseFactory;
+import org.flowable.eventregistry.rest.service.api.EventRegistryRestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Component scan for the Form Rest API Configuration.
@@ -26,9 +29,12 @@ import org.springframework.context.annotation.Import;
 @Import(DispatcherServletConfiguration.class)
 @ComponentScan("org.flowable.eventregistry.rest.service.api")
 public class EventRegistryRestConfiguration {
+    
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Bean
-    public FormRestResponseFactory eventRestResponseFactory() {
-        return new FormRestResponseFactory();
+    public EventRegistryRestResponseFactory eventRegistryRestResponseFactory() {
+        return new EventRegistryRestResponseFactory(objectMapper);
     }
 }

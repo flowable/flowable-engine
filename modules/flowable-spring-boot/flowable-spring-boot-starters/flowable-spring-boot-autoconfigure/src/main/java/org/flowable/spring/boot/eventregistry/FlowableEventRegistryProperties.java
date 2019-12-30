@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot.eventregistry;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.spring.boot.FlowableServlet;
@@ -22,8 +22,8 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 /**
  * Properties for configuring the event registry engine.
  */
-@ConfigurationProperties(prefix = "flowable.event")
-public class FlowableEventProperties {
+@ConfigurationProperties(prefix = "flowable.eventregistry")
+public class FlowableEventRegistryProperties {
 
     /**
      * The name of the deployment for the form resources.
@@ -38,9 +38,9 @@ public class FlowableEventProperties {
 
     /**
      * The suffixes for the resources that need to be scanned.
-     * Default is {@code **.event}
+     * Default is {@code **.event} and {@code **.channel}
      */
-    private List<String> resourceSuffixes = Collections.singletonList("**.event");
+    private List<String> resourceSuffixes = Arrays.asList("**.event", "**.channel");
 
     /**
      * Whether to perform deployment of resources, default is true.
@@ -56,7 +56,7 @@ public class FlowableEventProperties {
      * The servlet configuration for the Form Rest API.
      */
     @NestedConfigurationProperty
-    private final FlowableServlet servlet = new FlowableServlet("/event-api", "Flowable Form Rest API");
+    private final FlowableServlet servlet = new FlowableServlet("/event-registry-api", "Flowable Event Registry Rest API");
 
     public String getDeploymentName() {
         return deploymentName;
