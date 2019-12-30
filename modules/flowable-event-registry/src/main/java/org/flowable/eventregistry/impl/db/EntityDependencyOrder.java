@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityImpl;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityImpl;
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityImpl;
@@ -31,6 +32,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(EventResourceEntityImpl.class);
         DELETE_ORDER.add(EventDeploymentEntityImpl.class);
         DELETE_ORDER.add(EventDefinitionEntityImpl.class);
+        DELETE_ORDER.add(ChannelDefinitionEntityImpl.class);
         
         INSERT_ORDER = new ArrayList<>(DELETE_ORDER);
         Collections.reverse(INSERT_ORDER);
