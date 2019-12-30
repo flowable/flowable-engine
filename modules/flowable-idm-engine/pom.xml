@@ -467,7 +467,7 @@
 			<id>mssql</id>
 			<activation>
 				<property>
-					<name>databaseidm</name>
+					<name>databasemssqlidm</name>
 					<value>mssql</value>
 				</property>
 			</activation>
