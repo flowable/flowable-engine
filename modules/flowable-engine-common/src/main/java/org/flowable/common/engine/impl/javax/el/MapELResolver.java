@@ -296,8 +296,6 @@ public class MapELResolver extends ELResolver {
 	 * 
 	 * @param base
 	 *            The bean to analyze.
-	 * @param property
-	 *            The name of the property to analyze. Will be coerced to a String.
 	 * @return base instanceof Map
 	 */
 	private final boolean isResolvable(Object base) {

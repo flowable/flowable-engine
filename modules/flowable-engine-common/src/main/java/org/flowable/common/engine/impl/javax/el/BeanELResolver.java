@@ -625,8 +625,6 @@ public class BeanELResolver extends ELResolver {
 	 * 
 	 * @param base
 	 *            The bean to analyze.
-	 * @param property
-	 *            The name of the property to analyze. Will be coerced to a String.
 	 * @return base != null
 	 */
 	private final boolean isResolvable(Object base) {
@@ -664,7 +662,7 @@ public class BeanELResolver extends ELResolver {
 	 * Note: this method is present in the reference implementation, so we're adding it here to ease
 	 * migration.
 	 * 
-	 * @param classloader
+	 * @param loader
 	 *            The classLoader used to load the beans.
 	 */
 	@SuppressWarnings("unused")
