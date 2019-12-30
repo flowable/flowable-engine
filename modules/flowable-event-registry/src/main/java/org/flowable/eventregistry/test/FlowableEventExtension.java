@@ -124,7 +124,7 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
             
             FlowableEventTestHelper testHelper = getTestHelper(context);
             String deploymentIdFromDeploymentAnnotation = EventTestHelper
-                .annotationDeploymentSetUp(testHelper.getEventRegistryEngine(), context.getRequiredTestClass(), context.getRequiredTestMethod(),
+                .annotationDeploymentSetUp(testHelper.getEventRepositoryService(), context.getRequiredTestClass(), context.getRequiredTestMethod(),
                                 eventDeploymentAnnotation, channelDeploymentAnnotation);
             testHelper.setDeploymentIdFromDeploymentAnnotation(deploymentIdFromDeploymentAnnotation);
         }
@@ -136,8 +136,8 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
         EventRegistryEngine eventRegistryEngine = flowableTestHelper.getEventRegistryEngine();
         String deploymentIdFromDeploymentAnnotation = flowableTestHelper.getDeploymentIdFromDeploymentAnnotation();
         if (deploymentIdFromDeploymentAnnotation != null) {
-            EventTestHelper.annotationDeploymentTearDown(eventRegistryEngine, deploymentIdFromDeploymentAnnotation, context.getRequiredTestClass(),
-                context.getRequiredTestMethod().getName());
+            EventTestHelper.annotationDeploymentTearDown(flowableTestHelper.getEventRepositoryService(), 
+                            deploymentIdFromDeploymentAnnotation, context.getRequiredTestClass(), context.getRequiredTestMethod().getName());
             flowableTestHelper.setDeploymentIdFromDeploymentAnnotation(null);
         }
 

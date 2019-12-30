@@ -57,9 +57,7 @@ import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
-import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
-import org.flowable.eventregistry.impl.EventRegistryEngines;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventregistry.rest.conf.ApplicationConfiguration;
 import org.flowable.eventregistry.rest.service.api.RestUrlBuilder;
@@ -100,7 +98,6 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     protected static ProcessEngine processEngine;
-    protected static EventRegistryEngine eventRegistryEngine;
 
     protected String processDeploymentId;
     protected String deploymentId;
@@ -130,7 +127,6 @@ public abstract class BaseSpringRestTestCase extends TestCase {
 
         // Lookup services
         processEngine = appContext.getBean(ProcessEngine.class);
-        eventRegistryEngine = EventRegistryEngines.getDefaultEventRegistryEngine();
         eventRegistryEngineConfiguration = appContext.getBean(EventRegistryEngineConfiguration.class);
         repositoryService = appContext.getBean(EventRepositoryService.class);
         managementService = appContext.getBean(EventManagementService.class);
@@ -206,7 +202,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         try {
 
             processDeploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
-            deploymentId = EventTestHelper.annotationDeploymentSetUp(eventRegistryEngine, getClass(), getName());
+            deploymentId = EventTestHelper.annotationDeploymentSetUp(repositoryService, getClass(), getName());
 
             super.runBare();
 
@@ -224,7 +220,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
 
         } finally {
             Authentication.setAuthenticatedUserId(null);
-            EventTestHelper.annotationDeploymentTearDown(eventRegistryEngine, deploymentId, getClass(), getName());
+            EventTestHelper.annotationDeploymentTearDown(repositoryService, deploymentId, getClass(), getName());
             TestHelper.annotationDeploymentTearDown(processEngine, processDeploymentId, getClass(), getName());
             dropUsers();
             assertAndEnsureCleanDb();
@@ -326,7 +322,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
 
             LOGGER.info("dropping and recreating db");
 
-            CommandExecutor commandExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getCommandExecutor();
+            CommandExecutor commandExecutor = eventRegistryEngineConfiguration.getCommandExecutor();
             commandExecutor.execute(commandContext -> {
                 SchemaManager schemaManager = CommandContextUtil.getEventRegistryConfiguration(commandContext).getSchemaManager();
                 schemaManager.schemaDrop();

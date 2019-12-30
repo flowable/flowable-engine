@@ -45,7 +45,7 @@ public abstract class EventTestHelper {
 
     // Test annotation support /////////////////////////////////////////////
 
-    public static String annotationDeploymentSetUp(EventRegistryEngine eventRegistryEngine, Class<?> testClass, String methodName) {
+    public static String annotationDeploymentSetUp(EventRepositoryService eventRepositoryService, Class<?> testClass, String methodName) {
         Method method = null;
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
@@ -56,10 +56,10 @@ public abstract class EventTestHelper {
         
         EventDeploymentAnnotation eventDeploymentAnnotation = method.getAnnotation(EventDeploymentAnnotation.class);
         ChannelDeploymentAnnotation channelDeploymentAnnotation = method.getAnnotation(ChannelDeploymentAnnotation.class);
-        return annotationDeploymentSetUp(eventRegistryEngine, testClass, method, eventDeploymentAnnotation, channelDeploymentAnnotation);
+        return annotationDeploymentSetUp(eventRepositoryService, testClass, method, eventDeploymentAnnotation, channelDeploymentAnnotation);
     }
 
-    public static String annotationDeploymentSetUp(EventRegistryEngine eventRegistryEngine, Class<?> testClass, Method method, 
+    public static String annotationDeploymentSetUp(EventRepositoryService eventRepositoryService, Class<?> testClass, Method method, 
                     EventDeploymentAnnotation eventDeploymentAnnotation, ChannelDeploymentAnnotation channelDeploymentAnnotation) {
         
         String deploymentId = null;
@@ -96,7 +96,7 @@ public abstract class EventTestHelper {
         }
         
         if (resources != null && resources.length > 0) {
-            EventDeploymentBuilder deploymentBuilder = eventRegistryEngine.getEventRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + method.getName());
+            EventDeploymentBuilder deploymentBuilder = eventRepositoryService.createDeployment().name(testClass.getSimpleName() + "." + method.getName());
     
             for (String resource : resources) {
                 deploymentBuilder.addClasspathResource(resource);
@@ -112,11 +112,11 @@ public abstract class EventTestHelper {
         return deploymentId;
     }
 
-    public static void annotationDeploymentTearDown(EventRegistryEngine eventRegistryEngine, String deploymentId, Class<?> testClass, String methodName) {
+    public static void annotationDeploymentTearDown(EventRepositoryService eventRepositoryService, String deploymentId, Class<?> testClass, String methodName) {
         LOGGER.debug("annotation @Deployment deletes deployment for {}.{}", testClass.getSimpleName(), methodName);
         if (deploymentId != null) {
             try {
-                eventRegistryEngine.getEventRepositoryService().deleteDeployment(deploymentId);
+                eventRepositoryService.deleteDeployment(deploymentId);
             } catch (FlowableObjectNotFoundException e) {
                 // Deployment was already deleted by the test case. Ignore.
             }

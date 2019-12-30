@@ -15,6 +15,7 @@ package org.flowable.eventregistry.test;
 import java.time.Instant;
 import java.util.Date;
 
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 
 /**
@@ -34,6 +35,10 @@ public class FlowableEventTestHelper {
 
     public EventRegistryEngine getEventRegistryEngine() {
         return eventRegistryEngine;
+    }
+    
+    public EventRepositoryService getEventRepositoryService() {
+        return eventRegistryEngine.getEventRepositoryService();
     }
 
     public String getDeploymentIdFromDeploymentAnnotation() {

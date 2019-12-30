@@ -179,10 +179,10 @@ public class FlowableEventRule implements TestRule {
             initializeServices();
         }
 
-        configureFormEngine();
+        configureEventRegistryEngine();
 
         try {
-            deploymentId = EventTestHelper.annotationDeploymentSetUp(eventRegistryEngine, Class.forName(description.getClassName()), description.getMethodName());
+            deploymentId = EventTestHelper.annotationDeploymentSetUp(repositoryService, Class.forName(description.getClassName()), description.getMethodName());
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Programmatic error: could not instantiate " + description.getClassName(), e);
         }
@@ -197,7 +197,7 @@ public class FlowableEventRule implements TestRule {
         repositoryService = eventRegistryEngine.getEventRepositoryService();
     }
 
-    protected void configureFormEngine() {
+    protected void configureEventRegistryEngine() {
         /* meant to be overridden */
     }
 
@@ -205,7 +205,7 @@ public class FlowableEventRule implements TestRule {
 
         // Remove the test deployment
         try {
-            EventTestHelper.annotationDeploymentTearDown(eventRegistryEngine, deploymentId, Class.forName(description.getClassName()), description.getMethodName());
+            EventTestHelper.annotationDeploymentTearDown(repositoryService, deploymentId, Class.forName(description.getClassName()), description.getMethodName());
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Programmatic error: could not instantiate " + description.getClassName(), e);
         }
