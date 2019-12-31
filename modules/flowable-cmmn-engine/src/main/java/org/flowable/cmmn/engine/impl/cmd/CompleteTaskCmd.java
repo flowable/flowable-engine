@@ -16,15 +16,18 @@ import static org.flowable.cmmn.engine.impl.task.TaskHelper.logUserTaskCompleted
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -81,7 +84,20 @@ public class CompleteTaskCmd implements Command<Void> {
         cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
 
         if (planItemInstanceEntity != null) {
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                String taskLabel = null;
+                if (StringUtils.isNotEmpty(taskEntity.getName())) {
+                    taskLabel = taskEntity.getName();
+                } else {
+                    taskLabel = taskEntity.getId();
+                }
+            
+                CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_COMPLETE, 
+                                "Human task '" + taskLabel + "' completed", taskEntity, planItemInstanceEntity);
+            }
+            
             CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
+            
         } else {
             TaskHelper.deleteTask(taskEntity, null, false, true);
         }

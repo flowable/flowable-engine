@@ -1459,6 +1459,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+        this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
 
         this.variableServiceConfiguration.init();
 

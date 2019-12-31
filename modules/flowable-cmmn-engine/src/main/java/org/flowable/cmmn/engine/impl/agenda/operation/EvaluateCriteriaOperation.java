@@ -26,6 +26,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.converter.util.CriterionUtil;
 import org.flowable.cmmn.converter.util.PlanItemUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.PlanItemEvaluationResult;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
@@ -39,6 +40,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
@@ -96,7 +98,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         if (satisfiedExitCriterion != null) {
             // propagate the exit event type and exit type, if provided with the exit sentry / criterion
             CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), satisfiedExitCriterion.getId(),
-                satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
+                            satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
 
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
@@ -104,7 +106,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     && evaluatePlanModelComplete()
                     && !criteriaChangeOrActiveChildren
                     && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
-                    ){
+                    ) {
+                
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
@@ -372,6 +375,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             // There can be zero or more on parts and zero or one if part.
             // All defined parts need to be satisfied for the sentry to trigger.
 
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one on part and no if part: no need to fetch the previously satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
@@ -380,12 +384,21 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("{}: single onPart matches life cycle event: [{}]", criterion, planItemLifeCycleEvent);
                         }
+                        
+                        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                            CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), entityWithSentryPartInstances);
+                        }
 
                         return criterion;
                     }
                 }
 
             } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) { // Only an if part: simply evaluate the if part
+                
+                if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                    CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                }
+                
                 if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
 
                     if (LOGGER.isDebugEnabled()) {
@@ -407,13 +420,15 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 for (SentryPartInstanceEntity sentryPartInstanceEntity : entityWithSentryPartInstances.getSatisfiedSentryPartInstances()) {
                     if (sentryPartInstanceEntity.getOnPartId() != null) {
                         satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
+                        
                     } else if (sentryPartInstanceEntity.getIfPartId() != null
-                        && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
+                            && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
+                        
                         sentryIfPartSatisfied = true;
                     }
                 }
 
-                // Verify if the onParts which are not yet satisfied, become satisifed due to the new event
+                // Verify if the onParts which are not yet satisfied, become satisfied due to the new event
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
                     if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
                         if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
@@ -438,6 +453,10 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 // In the onEvent triggerMode all onParts need to be satisfied before the if is evaluated
                 if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied
                         && (isDefaultTriggerMode || (sentry.isOnEventTriggerMode() && allOnPartsSatisfied) )) {
+                    
+                    if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                    }
 
                     if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
 
@@ -448,7 +467,6 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         createSentryPartInstanceEntity(entityWithSentryPartInstances, sentry, null, sentry.getSentryIfPart());
                         sentryIfPartSatisfied = true;
                     }
-
                 }
 
                 if (allOnPartsSatisfied && (sentryIfPartSatisfied || sentry.getSentryIfPart() == null)) {
@@ -530,15 +548,24 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
     
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
-        Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
-        Object result = conditionExpression.getValue(variableContainer);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Evaluation of sentry if condition {} for {} results in '{}'", sentry.getSentryIfPart().getCondition(), entityWithSentryPartInstances, result);
-        }
-
-        if (result instanceof Boolean) {
-            return (Boolean) result;
+        try {
+            Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
+            Object result = conditionExpression.getValue(variableContainer);
+    
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Evaluation of sentry if condition {} for {} results in '{}'", sentry.getSentryIfPart().getCondition(), entityWithSentryPartInstances, result);
+            }
+    
+            if (result instanceof Boolean) {
+                return (Boolean) result;
+            }
+            
+        } catch (RuntimeException e) {
+            if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addEvaluateSentryFailedLoggingData(sentry.getSentryIfPart(), e, entityWithSentryPartInstances);
+            }
+            
+            throw e;
         }
         return false;
     }
@@ -586,7 +613,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
             // Find event listeners with an available condition to become available
             List<PlanItemInstanceEntity> planItemInstanceToInitiate = findChangedEventListenerInstances(planItemInstanceContainer,
-                PlanItemInstanceState.UNAVAILABLE, true);
+                            PlanItemInstanceState.UNAVAILABLE, true);
+            
             if (!planItemInstanceToInitiate.isEmpty()) {
                 for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceToInitiate) {
                     CommandContextUtil.getAgenda(commandContext).planInitiatePlanItemInstanceOperation(planItemInstanceEntity);
@@ -596,7 +624,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
             // Find event listeners with an available condition to become unavailable
             List<PlanItemInstanceEntity> planItemInstanceToDismiss = findChangedEventListenerInstances(planItemInstanceContainer,
-                PlanItemInstanceState.AVAILABLE, false);
+                            PlanItemInstanceState.AVAILABLE, false);
+            
             if (!planItemInstanceToDismiss.isEmpty()) {
                 for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceToDismiss) {
                     CommandContextUtil.getAgenda(commandContext).planDismissPlanItemInstanceOperation(planItemInstanceEntity);
@@ -658,7 +687,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
                 List<PlanItemInstanceEntity> childPlanItemInstances = CaseInstanceUtil.findChildPlanItemInstances(caseInstanceEntity, entryDependentPlanItem);
                 List<PlanItemInstanceEntity> potentialTerminatedPlanItemInstances = planItemInstanceEntityManager
-                    .findByCaseInstanceIdAndPlanItemId(caseInstanceEntity.getId(), entryDependentPlanItem.getId());
+                                .findByCaseInstanceIdAndPlanItemId(caseInstanceEntity.getId(), entryDependentPlanItem.getId());
 
                 if (childPlanItemInstances.isEmpty() // runtime state
                         && (potentialTerminatedPlanItemInstances.isEmpty()
@@ -712,15 +741,15 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
                         // Creating plan item instance for the activated plan item
                         PlanItemInstanceEntity entryDependentPlanItemInstance = planItemInstanceEntityManager
-                            .createPlanItemInstanceBuilder()
-                            .planItem(entryDependentPlanItem)
-                            .caseDefinitionId(caseInstanceEntity.getCaseDefinitionId())
-                            .caseInstanceId(caseInstanceEntity.getId())
-                            .stagePlanItemInstanceId(previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null)
-                            // previous is closest parent stage plan item instance
-                            .tenantId(caseInstanceEntity.getTenantId())
-                            .addToParent(true)
-                            .create();
+                                .createPlanItemInstanceBuilder()
+                                .planItem(entryDependentPlanItem)
+                                .caseDefinitionId(caseInstanceEntity.getCaseDefinitionId())
+                                .caseInstanceId(caseInstanceEntity.getId())
+                                .stagePlanItemInstanceId(previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null)
+                                // previous is closest parent stage plan item instance
+                                .tenantId(caseInstanceEntity.getTenantId())
+                                .addToParent(true)
+                                .create();
 
                         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(entryDependentPlanItemInstance);
 

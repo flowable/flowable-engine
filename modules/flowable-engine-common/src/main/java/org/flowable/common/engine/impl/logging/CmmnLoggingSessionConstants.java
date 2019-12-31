@@ -39,6 +39,9 @@ public interface CmmnLoggingSessionConstants {
     String TYPE_HUMAN_TASK_SET_USER_IDENTITY_LINKS = "humanTaskSetUserIdentityLinks";
     String TYPE_HUMAN_TASK_COMPLETE = "humanTaskComplete";
     
+    String TYPE_EVALUATE_SENTRY = "evaluateSentry";
+    String TYPE_EVALUATE_SENTRY_FAILED = "evaluateSentryFailed";
+    
     String TYPE_VARIABLE_CREATE = "variableCreate";
     String TYPE_VARIABLE_UPDATE = "variableUpdate";
     String TYPE_VARIABLE_DELETE = "variableDelete";

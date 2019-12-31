@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -237,7 +238,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     
     @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
-        // TODO
+        CmmnLoggingSessionUtil.fillLoggingData(loggingNode, this);
     }
 
     @Override

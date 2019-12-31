@@ -16,24 +16,18 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.BoundaryEvent;
-import org.flowable.bpmn.model.CancelEventDefinition;
-import org.flowable.bpmn.model.CompensateEventDefinition;
-import org.flowable.bpmn.model.ConditionalEventDefinition;
-import org.flowable.bpmn.model.EscalationEventDefinition;
-import org.flowable.bpmn.model.EventDefinition;
-import org.flowable.bpmn.model.MessageEventDefinition;
-import org.flowable.bpmn.model.SignalEventDefinition;
-import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.EntityWithSentryPartInstances;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.SentryIfPart;
+import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -56,20 +50,7 @@ public class CmmnLoggingSessionUtil {
     }
     
     public static void addLoggingData(String type, String message, String oldState, String newState, PlanItemInstanceEntity planItemInstanceEntity) {
-        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
-        String activityId = null;
-        String activityName = null;
-        String activityType = null;
-        String activitySubType = null;
-        if (planItemDefinition != null) {
-            activityId = planItemDefinition.getId();
-            activityName = planItemDefinition.getName();
-            activityType = planItemDefinition.getClass().getSimpleName();
-            activitySubType = getActivitySubType(planItemDefinition);
-        }
-        
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(), 
-                        ScopeTypes.CMMN, planItemInstanceEntity.getCaseDefinitionId(), activityId, activityName, activityType, activitySubType);
+        ObjectNode loggingNode = fillPlanItemInstanceInfo(message, planItemInstanceEntity);
         loggingNode.put("state", planItemInstanceEntity.getState());
         if (oldState != null) {
             loggingNode.put("oldState", oldState);
@@ -142,36 +123,88 @@ public class CmmnLoggingSessionUtil {
         return loggingNode;
     }
     
-    public static void addErrorLoggingData(String type, String message, Throwable t, PlanItemInstanceEntity planItemInstanceEntity) {
-        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
-        String activityId = null;
-        String activityName = null;
-        String activityType = null;
-        String activitySubType = null;
-        if (planItemDefinition != null) {
-            activityId = planItemDefinition.getId();
-            activityName = planItemDefinition.getName();
-            activityType = planItemDefinition.getClass().getSimpleName();
-            activitySubType = getActivitySubType(planItemDefinition);
+    public static void addEvaluateSentryLoggingData(List<SentryOnPart> sentryOnParts, SentryIfPart sentryIfPart, EntityWithSentryPartInstances instance) {
+        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance);
+        ArrayNode onPartArrayNode = loggingNode.putArray("onParts");
+        for (SentryOnPart onPart : sentryOnParts) {
+            ObjectNode onPartNode = onPartArrayNode.addObject();
+            onPartNode.put("id", onPart.getId());
+            onPartNode.put("source", onPart.getSourceRef());
+            onPartNode.put("elementId", onPart.getSource().getPlanItemDefinition().getId());
+            onPartNode.put("standardEvent", onPart.getStandardEvent());
         }
         
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(), 
-                        ScopeTypes.CMMN, planItemInstanceEntity.getCaseDefinitionId(), activityId, activityName, activityType, activitySubType);
+        ObjectNode ifPartNode = loggingNode.putObject("ifPart");
+        ifPartNode.put("condition", sentryIfPart.getCondition());
+        
+        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode);
+    }
+    
+    public static void addEvaluateSentryLoggingData(List<SentryOnPart> sentryOnParts, EntityWithSentryPartInstances instance) {
+        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance);
+        ArrayNode onPartArrayNode = loggingNode.putArray("onParts");
+        for (SentryOnPart onPart : sentryOnParts) {
+            ObjectNode onPartNode = onPartArrayNode.addObject();
+            onPartNode.put("id", onPart.getId());
+            onPartNode.put("source", onPart.getSourceRef());
+            onPartNode.put("elementId", onPart.getSource().getPlanItemDefinition().getId());
+            onPartNode.put("standardEvent", onPart.getStandardEvent());
+        }
+        
+        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode);
+    }
+    
+    public static void addEvaluateSentryLoggingData(SentryIfPart sentryIfPart, EntityWithSentryPartInstances instance) {
+        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance);
+        ObjectNode ifPartNode = loggingNode.putObject("ifPart");
+        ifPartNode.put("condition", sentryIfPart.getCondition());
+        
+        LoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode);
+    }
+    
+    public static void addEvaluateSentryFailedLoggingData(SentryIfPart sentryIfPart, RuntimeException e, EntityWithSentryPartInstances instance) {
+        ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance);
+        
+        String label = null;
+        if (instance instanceof PlanItemInstanceEntity) {
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) instance;
+            label = planItemInstanceEntity.getPlanItemDefinitionId();
+            if (StringUtils.isNotEmpty(planItemInstanceEntity.getPlanItemDefinition().getName())) {
+                label = planItemInstanceEntity.getPlanItemDefinition().getName();
+            }
+        } else {
+            label = instance.getId();
+        }
+        
+        loggingNode.put("message", "IfPart evaluation failed for " + label);
+        ObjectNode ifPartNode = loggingNode.putObject("ifPart");
+        ifPartNode.put("condition", sentryIfPart.getCondition());
+        LoggingSessionUtil.addErrorLoggingData(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY_FAILED, loggingNode, e);
+    }
+    
+    public static void addErrorLoggingData(String type, String message, Throwable t, PlanItemInstanceEntity planItemInstanceEntity) {
+        ObjectNode loggingNode = fillPlanItemInstanceInfo(message, planItemInstanceEntity);
         fillScopeDefinitionInfo(planItemInstanceEntity.getCaseDefinitionId(), loggingNode);
         LoggingSessionUtil.addErrorLoggingData(type, loggingNode, t);
     }
     
-    public static void fillLoggingData(ObjectNode loggingNode, PlanItemInstanceEntity planItemInstanceEntitys) {
-        loggingNode.put("scopeDefinitionId", planItemInstanceEntitys.getCaseDefinitionId());
+    public static void fillLoggingData(ObjectNode loggingNode, PlanItemInstanceEntity planItemInstanceEntity) {
+        loggingNode.put("scopeDefinitionId", planItemInstanceEntity.getCaseDefinitionId());
         
-        fillScopeDefinitionInfo(planItemInstanceEntitys.getCaseDefinitionId(), loggingNode);
+        fillScopeDefinitionInfo(planItemInstanceEntity.getCaseDefinitionId(), loggingNode);
         
-        PlanItemDefinition planItemDefinition = planItemInstanceEntitys.getPlanItemDefinition();
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
         if (planItemDefinition != null) {
             loggingNode.put("elementId", planItemDefinition.getId());
             putIfNotNull("elementName", planItemDefinition.getName(), loggingNode);
             loggingNode.put("elementType", planItemDefinition.getClass().getSimpleName());
         }
+    }
+    
+    public static void fillLoggingData(ObjectNode loggingNode, CaseInstanceEntity caseInstanceEntity) {
+        loggingNode.put("scopeDefinitionId", caseInstanceEntity.getCaseDefinitionId());
+        
+        fillScopeDefinitionInfo(caseInstanceEntity.getCaseDefinitionId(), loggingNode);
     }
     
     public static void addTaskIdentityLinkData(String type, String message, boolean isUser, List<IdentityLinkEntity> identityLinkEntities, 
@@ -199,40 +232,6 @@ public class CmmnLoggingSessionUtil {
         LoggingSessionUtil.addLoggingData(type, loggingNode);
     }
     
-    public static String getBoundaryCreateEventType(BoundaryEvent boundaryEvent) {
-        List<EventDefinition> eventDefinitions = boundaryEvent.getEventDefinitions();
-        if (eventDefinitions != null && !eventDefinitions.isEmpty()) {
-            EventDefinition eventDefinition = eventDefinitions.get(0);
-            if (eventDefinition instanceof TimerEventDefinition) {
-                return LoggingSessionConstants.TYPE_BOUNDARY_TIMER_EVENT_CREATE;
-            } else if (eventDefinition instanceof MessageEventDefinition) {
-                return LoggingSessionConstants.TYPE_BOUNDARY_MESSAGE_EVENT_CREATE;
-            } else if (eventDefinition instanceof SignalEventDefinition) {
-                return LoggingSessionConstants.TYPE_BOUNDARY_SIGNAL_EVENT_CREATE;
-            } else if (eventDefinition instanceof CancelEventDefinition) {
-                return LoggingSessionConstants.TYPE_BOUNDARY_CANCEL_EVENT_CREATE;
-            } else if (eventDefinition instanceof CompensateEventDefinition) {
-                return LoggingSessionConstants.TYPE_BOUNDARY_COMPENSATE_EVENT_CREATE;
-            } else if (eventDefinition instanceof ConditionalEventDefinition) {
-                return LoggingSessionConstants.TYPE_BOUNDARY_CONDITIONAL_EVENT_CREATE;
-            } else if (eventDefinition instanceof EscalationEventDefinition) {
-                return LoggingSessionConstants.TYPE_BOUNDARY_ESCALATION_EVENT_CREATE;
-            }
-        }
-        
-        return LoggingSessionConstants.TYPE_BOUNDARY_EVENT_CREATE;
-    }
-    
-    public static String getBoundaryEventType(BoundaryEvent boundaryEvent) {
-        List<EventDefinition> eventDefinitions = boundaryEvent.getEventDefinitions();
-        if (eventDefinitions != null && !eventDefinitions.isEmpty()) {
-            EventDefinition eventDefinition = eventDefinitions.get(0);
-            return eventDefinition.getClass().getSimpleName();
-        }
-        
-        return "unknown";
-    }
-    
     protected static String getActivitySubType(PlanItemDefinition planItemDefinition) {
         String activitySubType = null;
         if (planItemDefinition instanceof ServiceTask) {
@@ -247,6 +246,46 @@ public class CmmnLoggingSessionUtil {
         CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(caseDefinitionId);
         loggingNode.put("scopeDefinitionKey", caseDefinition.getKey());
         loggingNode.put("scopeDefinitionName", caseDefinition.getName());
+    }
+    
+    protected static ObjectNode fillPlanItemInstanceInfo(String message, PlanItemInstanceEntity planItemInstanceEntity) {
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
+        String activityId = null;
+        String activityName = null;
+        String activityType = null;
+        String activitySubType = null;
+        if (planItemDefinition != null) {
+            activityId = planItemDefinition.getId();
+            activityName = planItemDefinition.getName();
+            activityType = planItemDefinition.getClass().getSimpleName();
+            activitySubType = getActivitySubType(planItemDefinition);
+        }
+        
+        return LoggingSessionUtil.fillLoggingData(message, planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(), 
+                        ScopeTypes.CMMN, planItemInstanceEntity.getCaseDefinitionId(), activityId, activityName, activityType, activitySubType);
+    }
+    
+    protected static ObjectNode fillEvaluateSentryInstanceEntity(EntityWithSentryPartInstances instance) {
+        ObjectNode loggingNode = null;
+        String caseDefinitionId = null;
+        if (instance instanceof PlanItemInstanceEntity) {
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) instance;
+            String label = planItemInstanceEntity.getPlanItemDefinitionId();
+            if (StringUtils.isNotEmpty(planItemInstanceEntity.getPlanItemDefinition().getName())) {
+                label = planItemInstanceEntity.getPlanItemDefinition().getName();
+            }
+            loggingNode = fillPlanItemInstanceInfo("Evaluate sentry parts for " + label, planItemInstanceEntity);
+            caseDefinitionId = planItemInstanceEntity.getCaseDefinitionId();
+        
+        } else {
+            CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) instance;
+            loggingNode = LoggingSessionUtil.fillLoggingData("Evaluate sentry parts for case instance " + instance.getId(), 
+                            caseInstanceEntity.getId(), null, ScopeTypes.CMMN);
+            caseDefinitionId = caseInstanceEntity.getCaseDefinitionId();
+        }
+        
+        fillScopeDefinitionInfo(caseDefinitionId, loggingNode);
+        return loggingNode;
     }
     
     protected static void fillPlanItemDefinitionInfo(ObjectNode loggingNode, PlanItemInstanceEntity planItemInstanceEntity) {

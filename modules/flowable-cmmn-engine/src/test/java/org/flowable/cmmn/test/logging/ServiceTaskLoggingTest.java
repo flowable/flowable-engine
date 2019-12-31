@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -162,7 +163,7 @@ public class ServiceTaskLoggingTest extends CustomCmmnConfigurationFlowableTestC
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneServiceTaskCase").latestVersion().singleResult();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneServiceTaskCase").start();
         
-        assertEquals(8, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+        assertEquals(9, FlowableLoggingListener.TEST_LOGGING_NODES.size());
         
         int loggingItemCounter = 0;
         int loggingNumberCounter = 1;
@@ -210,6 +211,21 @@ public class ServiceTaskLoggingTest extends CustomCmmnConfigurationFlowableTestC
         assertEquals("active", loggingNode.get("state").asText());
         assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(loggingItemCounter++);
+        assertEquals(LoggingSessionConstants.TYPE_VARIABLE_CREATE, loggingNode.get("type").asText());
+        assertEquals("Variable 'javaDelegate' created", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertFalse(loggingNode.has("subScopeId"));
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("javaDelegate", loggingNode.get("variableName").asText());
+        assertEquals("string", loggingNode.get("variableType").asText());
+        assertEquals("executed", loggingNode.get("variableValue").asText());
+        assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertEquals("executed", loggingNode.get("variableRawValue").asText());
         
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(loggingItemCounter++);
         assertEquals(CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_EXIT, loggingNode.get("type").asText());
@@ -284,6 +300,345 @@ public class ServiceTaskLoggingTest extends CustomCmmnConfigurationFlowableTestC
         assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
         assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
         assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+    }
+    
+    @Test
+    @CmmnDeployment(resources="org/flowable/cmmn/test/logging/oneHumanTaskCase.cmmn")
+    public void testCompleteTaskLogging() {
+        FlowableLoggingListener.clear();
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").latestVersion().singleResult();
+            
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                        .variable("newVariable", "test")
+                        .caseDefinitionKey("oneHumanTaskCase")
+                        .start();
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            
+        assertEquals(7, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+        
+        FlowableLoggingListener.clear();
+        
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("newVariable", "newValue");
+        variableMap.put("numVar", 123);
+        cmmnRuntimeService.setVariables(caseInstance.getId(), variableMap);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertEquals(7, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+        
+        ObjectNode loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
+        assertEquals(LoggingSessionConstants.TYPE_VARIABLE_UPDATE, loggingNode.get("type").asText());
+        assertEquals("Variable 'newVariable' updated", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertFalse(loggingNode.has("subScopeId"));
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("newVariable", loggingNode.get("variableName").asText());
+        assertEquals("string", loggingNode.get("variableType").asText());
+        assertEquals("newValue", loggingNode.get("variableValue").asText());
+        assertEquals("newValue", loggingNode.get("variableRawValue").asText());
+        assertEquals("string", loggingNode.get("oldVariableType").asText());
+        assertEquals("test", loggingNode.get("oldVariableValue").asText());
+        assertEquals("test", loggingNode.get("oldVariableRawValue").asText());
+        assertEquals(1, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(1);
+        assertEquals(LoggingSessionConstants.TYPE_VARIABLE_CREATE, loggingNode.get("type").asText());
+        assertEquals("Variable 'numVar' created", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertFalse(loggingNode.has("subScopeId"));
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("numVar", loggingNode.get("variableName").asText());
+        assertEquals("integer", loggingNode.get("variableType").asText());
+        assertEquals(123, loggingNode.get("variableValue").asInt());
+        assertEquals(2, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertEquals("123", loggingNode.get("variableRawValue").asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(2);
+        assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE, loggingNode.get("type").asText());
+        assertEquals("Closed command context for cmmn engine", loggingNode.get("message").asText());
+        assertEquals("cmmn", loggingNode.get("engineType").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals(3, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(3);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_COMPLETE, loggingNode.get("type").asText());
+        assertEquals("Human task 'The Task' completed", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(planItemInstance.getId(), loggingNode.get("subScopeId").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("theTask", loggingNode.get("elementId").asText());
+        assertEquals("HumanTask", loggingNode.get("elementType").asText());
+        assertEquals("The Task", loggingNode.get("elementName").asText());
+        assertNotNull(loggingNode.get("taskId").asText());
+        assertEquals("The Task", loggingNode.get("taskName").asText());
+        assertFalse(loggingNode.has("taskCategory"));
+        assertFalse(loggingNode.has("taskDescription"));
+        assertEquals("someKey", loggingNode.get("taskFormKey").asText());
+        assertEquals(50, loggingNode.get("taskPriority").asInt());
+        assertFalse(loggingNode.has("taskDueDate"));
+        assertEquals(1, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(4);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_NEW_STATE, loggingNode.get("type").asText());
+        assertEquals("Plan item instance state change with type humantask, old state active, new state completed", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("theTask", loggingNode.get("elementId").asText());
+        assertEquals("The Task", loggingNode.get("elementName").asText());
+        assertEquals("HumanTask", loggingNode.get("elementType").asText());
+        assertEquals("completed", loggingNode.get("state").asText());
+        assertEquals("active", loggingNode.get("oldState").asText());
+        assertEquals("completed", loggingNode.get("newState").asText());
+        assertEquals(2, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(5);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_CASE_COMPLETED, loggingNode.get("type").asText());
+        assertEquals("Completed case instance with id " + caseInstance.getId(), loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals(3, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(6);
+        assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE, loggingNode.get("type").asText());
+        assertEquals("Closed command context for cmmn engine", loggingNode.get("message").asText());
+        assertEquals("cmmn", loggingNode.get("engineType").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals(4, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        FlowableLoggingListener.clear();
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/logging/sentryConditionCase.cmmn")
+    public void testSentryConditionLogging() {
+        FlowableLoggingListener.clear();
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("conditionCase").latestVersion().singleResult();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("conditionCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                        .planItemDefinitionId(task.getTaskDefinitionKey())
+                        .singleResult();
+        
+        assertEquals(6, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+        
+        int loggingItemCounter = 0;
+        int loggingNumberCounter = 1;
+        
+        ObjectNode loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(loggingItemCounter++);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, loggingNode.get("type").asText());
+        assertEquals("Started case instance with id " + caseInstance.getId(), loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertFalse(loggingNode.has("elementId"));
+        assertFalse(loggingNode.has("elementName"));
+        assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(loggingItemCounter++);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_CREATED, loggingNode.get("type").asText());
+        assertEquals("Plan item instance created with type humantask, new state available", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("taskA", loggingNode.get("elementId").asText());
+        assertEquals("Task A", loggingNode.get("elementName").asText());
+        assertEquals("HumanTask", loggingNode.get("elementType").asText());
+        assertEquals("available", loggingNode.get("state").asText());
+        assertEquals("available", loggingNode.get("newState").asText());
+        assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(loggingItemCounter++);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_CREATED, loggingNode.get("type").asText());
+        assertEquals("Plan item instance created with type stage, new state available", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("stage1", loggingNode.get("elementId").asText());
+        assertEquals("Stage 1", loggingNode.get("elementName").asText());
+        assertEquals("Stage", loggingNode.get("elementType").asText());
+        assertEquals("available", loggingNode.get("state").asText());
+        assertEquals("available", loggingNode.get("newState").asText());
+        assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(loggingItemCounter++);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_CREATE, loggingNode.get("type").asText());
+        assertEquals("Human task 'Task A' created", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals(task.getId(), loggingNode.get("taskId").asText());
+        assertEquals("Task A", loggingNode.get("taskName").asText());
+        assertEquals("taskA", loggingNode.get("elementId").asText());
+        assertEquals("Task A", loggingNode.get("elementName").asText());
+        assertEquals("HumanTask", loggingNode.get("elementType").asText());
+        assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(loggingItemCounter++);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_NEW_STATE, loggingNode.get("type").asText());
+        assertEquals("Plan item instance state change with type humantask, old state available, new state active", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("taskA", loggingNode.get("elementId").asText());
+        assertEquals("Task A", loggingNode.get("elementName").asText());
+        assertEquals("HumanTask", loggingNode.get("elementType").asText());
+        assertEquals("active", loggingNode.get("state").asText());
+        assertEquals("available", loggingNode.get("oldState").asText());
+        assertEquals("active", loggingNode.get("newState").asText());
+        assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(loggingItemCounter++);
+        assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE, loggingNode.get("type").asText());
+        assertEquals("Closed command context for cmmn engine", loggingNode.get("message").asText());
+        assertEquals("cmmn", loggingNode.get("engineType").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals(loggingNumberCounter++, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        FlowableLoggingListener.clear();
+        
+        try {
+            cmmnTaskService.complete(task.getId());
+            fail("Expected condition evaluation error");
+        } catch (Exception e) {
+            // expected
+        }
+        
+        assertEquals(5, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_COMPLETE, loggingNode.get("type").asText());
+        assertEquals("Human task 'Task A' completed", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(planItemInstance.getId(), loggingNode.get("subScopeId").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("taskA", loggingNode.get("elementId").asText());
+        assertEquals("HumanTask", loggingNode.get("elementType").asText());
+        assertEquals("Task A", loggingNode.get("elementName").asText());
+        assertNotNull(loggingNode.get("taskId").asText());
+        assertEquals("Task A", loggingNode.get("taskName").asText());
+        assertEquals(1, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(1);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_NEW_STATE, loggingNode.get("type").asText());
+        assertEquals("Plan item instance state change with type humantask, old state active, new state completed", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("taskA", loggingNode.get("elementId").asText());
+        assertEquals("Task A", loggingNode.get("elementName").asText());
+        assertEquals("HumanTask", loggingNode.get("elementType").asText());
+        assertEquals("completed", loggingNode.get("state").asText());
+        assertEquals("active", loggingNode.get("oldState").asText());
+        assertEquals("completed", loggingNode.get("newState").asText());
+        assertEquals(2, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(2);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY, loggingNode.get("type").asText());
+        assertEquals("Evaluate sentry parts for Stage 1", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("stage1", loggingNode.get("elementId").asText());
+        assertEquals("Stage 1", loggingNode.get("elementName").asText());
+        assertEquals("Stage", loggingNode.get("elementType").asText());
+        assertEquals(1, loggingNode.get("onParts").size());
+        assertEquals("sentryOnPart1", loggingNode.get("onParts").get(0).get("id").asText());
+        assertEquals("planItem1", loggingNode.get("onParts").get(0).get("source").asText());
+        assertEquals("taskA", loggingNode.get("onParts").get(0).get("elementId").asText());
+        assertEquals("complete", loggingNode.get("onParts").get(0).get("standardEvent").asText());
+        assertEquals("${gotoStage1}", loggingNode.get("ifPart").get("condition").asText());
+        assertEquals(3, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(3);
+        assertEquals(CmmnLoggingSessionConstants.TYPE_EVALUATE_SENTRY_FAILED, loggingNode.get("type").asText());
+        assertEquals("IfPart evaluation failed for Stage 1", loggingNode.get("message").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals("stage1", loggingNode.get("elementId").asText());
+        assertEquals("Stage 1", loggingNode.get("elementName").asText());
+        assertEquals("Stage", loggingNode.get("elementType").asText());
+        assertEquals("Unknown property used in expression: ${gotoStage1}", loggingNode.get("exception").get("message").asText());
+        assertNotNull(loggingNode.get("exception").get("stackTrace").asText());
+        assertEquals(4, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(4);
+        assertEquals(LoggingSessionConstants.TYPE_COMMAND_CONTEXT_CLOSE_FAILURE, loggingNode.get("type").asText());
+        assertEquals("Exception at closing command context for cmmn engine", loggingNode.get("message").asText());
+        assertEquals("cmmn", loggingNode.get("engineType").asText());
+        assertEquals(caseInstance.getId(), loggingNode.get("scopeId").asText());
+        assertEquals(ScopeTypes.CMMN, loggingNode.get("scopeType").asText());
+        assertEquals(caseDefinition.getId(), loggingNode.get("scopeDefinitionId").asText());
+        assertEquals(caseDefinition.getKey(), loggingNode.get("scopeDefinitionKey").asText());
+        assertEquals(caseDefinition.getName(), loggingNode.get("scopeDefinitionName").asText());
+        assertEquals(5, loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt());
+        assertNotNull(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText());
+        
+        FlowableLoggingListener.clear();
     }
     
     @Test
@@ -378,7 +733,7 @@ public class ServiceTaskLoggingTest extends CustomCmmnConfigurationFlowableTestC
         
         FlowableLoggingListener.clear();
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 5000, 200, true);
-        assertEquals(10, FlowableLoggingListener.TEST_LOGGING_NODES.size());
+        assertEquals(11, FlowableLoggingListener.TEST_LOGGING_NODES.size());
         
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
         assertEquals(CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, loggingNode.get("type").asText());

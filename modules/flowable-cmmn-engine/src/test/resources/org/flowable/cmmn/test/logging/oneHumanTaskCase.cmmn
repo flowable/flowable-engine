@@ -6,7 +6,7 @@
     <case id="oneHumanTaskCase" name="One Human Task Case">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
             <planItem id="planItem1" name="The Task" definitionRef="theTask" />
-            <humanTask id="theTask" name="The Task" flowable:assignee="johnDoe" />
+            <humanTask id="theTask" name="The Task" flowable:assignee="johnDoe" flowable:formKey="someKey" />
         </casePlanModel>
     </case>
 
