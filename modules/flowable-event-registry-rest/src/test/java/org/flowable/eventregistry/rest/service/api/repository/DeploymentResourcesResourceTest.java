@@ -49,7 +49,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
             assertNotNull(responseNode.get(0));
             assertTrue(responseNode.get(0).get("url").textValue().endsWith(EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "simpleEvent.event")));
             assertTrue(responseNode.get(0).get("contentUrl").textValue().endsWith(EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "simpleEvent.event")));
-            assertTrue(responseNode.get(0).get("mediaType").isNull());
+            assertEquals("application/json", responseNode.get(0).get("mediaType").textValue());
             assertEquals("eventDefinition", responseNode.get(0).get("type").textValue());
 
         } finally {
