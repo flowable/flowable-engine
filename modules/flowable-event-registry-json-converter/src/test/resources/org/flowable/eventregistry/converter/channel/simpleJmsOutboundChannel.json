@@ -1,0 +1,10 @@
+{
+  "key": "jmsChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test JMS channel",
+  "channelType": "outbound",
+  "type": "jms",
+  "destination": "customer",
+  "serializerType": "json"
+}

@@ -25,16 +25,6 @@ public class ChannelModel {
     // jms, rabbitmq, kafka etc
     protected String type;
     
-    protected String destination;
-    
-    // inbound channel
-    protected String selector;
-    protected String deserializerType;
-    protected ChannelEventKeyDetection channelEventKeyDetection;
-    
-    // outbound channel
-    protected String serializerType;
-
     public String getKey() {
         return key;
     }
@@ -83,43 +73,4 @@ public class ChannelModel {
         this.type = type;
     }
 
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
-    public String getSelector() {
-        return selector;
-    }
-
-    public void setSelector(String selector) {
-        this.selector = selector;
-    }
-
-    public String getDeserializerType() {
-        return deserializerType;
-    }
-
-    public void setDeserializerType(String deserializerType) {
-        this.deserializerType = deserializerType;
-    }
-
-    public ChannelEventKeyDetection getChannelEventKeyDetection() {
-        return channelEventKeyDetection;
-    }
-
-    public void setChannelEventKeyDetection(ChannelEventKeyDetection channelEventKeyDetection) {
-        this.channelEventKeyDetection = channelEventKeyDetection;
-    }
-
-    public String getSerializerType() {
-        return serializerType;
-    }
-
-    public void setSerializerType(String serializerType) {
-        this.serializerType = serializerType;
-    }
 }

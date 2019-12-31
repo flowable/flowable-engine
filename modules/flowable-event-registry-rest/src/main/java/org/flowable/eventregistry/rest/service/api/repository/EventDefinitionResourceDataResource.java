@@ -55,6 +55,11 @@ public class EventDefinitionResourceDataResource extends BaseDeploymentResourceD
         if (eventDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find an event definition with id '" + eventDefinitionId + "'.", EventDefinition.class);
         }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessEventDefinitionById(eventDefinition);
+        }
+
         return eventDefinition;
     }
 }

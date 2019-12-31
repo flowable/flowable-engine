@@ -1,0 +1,25 @@
+
+{
+  "key": "rabbitChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test Rabbit channel",
+  "channelType": "inbound",
+  "type": "rabbit",
+
+  "queues": [
+    "customer",
+    "test-customer"
+  ],
+  "exclusive": true,
+  "priority": "10",
+  "admin": "rabbitAdmin",
+  "concurrency": "3",
+  "executor": "rabbitTaskExecutor",
+  "ackMode": "NONE",
+
+  "deserializerType": "json",
+  "channelEventKeyDetection": {
+    "jsonField": "eventKey"
+  }
+}

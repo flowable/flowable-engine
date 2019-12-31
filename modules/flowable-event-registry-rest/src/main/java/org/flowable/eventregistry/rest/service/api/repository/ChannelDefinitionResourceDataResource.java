@@ -55,6 +55,11 @@ public class ChannelDefinitionResourceDataResource extends BaseDeploymentResourc
         if (channelDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a channel definition with id '" + channelDefinitionId + "'.", ChannelDefinition.class);
         }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessChannelDefinitionById(channelDefinition);
+        }
+
         return channelDefinition;
     }
 }

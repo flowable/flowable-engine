@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.IterableAssert;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
@@ -32,6 +33,8 @@ import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
+import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.jms.JmsChannelDefinitionProcessor;
 import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
@@ -81,7 +84,20 @@ public class EventRegistryAutoConfigurationTest {
             EventRegistryEngine eventRegistryEngine = context.getBean(EventRegistryEngine.class);
             assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
             assertAllServicesPresent(context, eventRegistryEngine);
-            assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors()).isEmpty();
+
+            IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors());
+
+            channelModelProcessorAssert
+                .hasSize(2);
+
+            channelModelProcessorAssert
+                .element(0)
+                .isInstanceOf(InboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(1)
+                .isInstanceOf(OutboundChannelModelProcessor.class);
 
             assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
                 .getBean(CustomUserEngineConfigurerConfiguration.class)
@@ -114,7 +130,19 @@ public class EventRegistryAutoConfigurationTest {
 
             assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration()).as("Event registry Configuration")
                 .isEqualTo(eventRegistryEngineConfiguration);
-            assertThat(eventRegistryEngineConfiguration.getChannelDefinitionProcessors()).isEmpty();
+            IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors());
+
+            channelModelProcessorAssert
+                .hasSize(2);
+
+            channelModelProcessorAssert
+                .element(0)
+                .isInstanceOf(InboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(1)
+                .isInstanceOf(OutboundChannelModelProcessor.class);
 
             assertAllServicesPresent(context, eventRegistryEngine);
 
@@ -154,7 +182,19 @@ public class EventRegistryAutoConfigurationTest {
 
             assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration()).as("Event registry Configuration")
                 .isEqualTo(eventRegistryEngineConfiguration);
-            assertThat(eventRegistryEngineConfiguration.getChannelDefinitionProcessors()).isEmpty();
+            IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors());
+
+            channelModelProcessorAssert
+                .hasSize(2);
+
+            channelModelProcessorAssert
+                .element(0)
+                .isInstanceOf(InboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(1)
+                .isInstanceOf(OutboundChannelModelProcessor.class);
 
             assertAllServicesPresent(context, eventRegistryEngine);
 
@@ -189,8 +229,25 @@ public class EventRegistryAutoConfigurationTest {
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-                assertThat(eventRegistryEngineConfiguration.getChannelDefinitionProcessors())
-                    .containsExactlyInAnyOrder(context.getBean("jmsChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
+                    eventRegistryEngineConfiguration.getChannelDefinitionProcessors());
+
+                channelModelProcessorAssert
+                    .hasSize(3);
+
+                channelModelProcessorAssert
+                    .element(0)
+                    .isEqualTo(context.getBean("jmsChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+                channelModelProcessorAssert
+                    .element(1)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(2)
+                    .isInstanceOf(OutboundChannelModelProcessor.class);
+
             });
     }
 
@@ -206,8 +263,21 @@ public class EventRegistryAutoConfigurationTest {
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-                assertThat(eventRegistryEngineConfiguration.getChannelDefinitionProcessors())
-                    .containsExactlyInAnyOrder(context.getBean("rabbitChannelDefinitionProcessor", ChannelModelProcessor.class));
+                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
+                    eventRegistryEngineConfiguration.getChannelDefinitionProcessors())
+                    .hasSize(3);
+
+                channelModelProcessorAssert
+                    .element(0)
+                    .isEqualTo(context.getBean("rabbitChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+                channelModelProcessorAssert
+                    .element(1)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(2)
+                    .isInstanceOf(OutboundChannelModelProcessor.class);
             });
     }
 
@@ -223,8 +293,24 @@ public class EventRegistryAutoConfigurationTest {
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-                assertThat(eventRegistryEngineConfiguration.getChannelDefinitionProcessors())
-                    .containsExactlyInAnyOrder(context.getBean("kafkaChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
+                    eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors());
+
+                channelModelProcessorAssert
+                    .hasSize(3);
+
+                channelModelProcessorAssert
+                    .element(0)
+                    .isEqualTo(context.getBean("kafkaChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+                channelModelProcessorAssert
+                    .element(1)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(2)
+                    .isInstanceOf(OutboundChannelModelProcessor.class);
             });
     }
 
@@ -249,12 +335,23 @@ public class EventRegistryAutoConfigurationTest {
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-                assertThat(eventRegistryEngineConfiguration.getChannelDefinitionProcessors())
-                    .containsExactlyInAnyOrder(
+                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
+                    eventRegistryEngineConfiguration.getChannelDefinitionProcessors());
+                channelModelProcessorAssert
+                    .hasSize(5)
+                    .contains(
                         context.getBean("jmsChannelDefinitionProcessor", JmsChannelDefinitionProcessor.class),
                         context.getBean("rabbitChannelDefinitionProcessor", RabbitChannelDefinitionProcessor.class),
                         context.getBean("kafkaChannelDefinitionProcessor", KafkaChannelDefinitionProcessor.class)
                     );
+
+                channelModelProcessorAssert
+                    .element(3)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(4)
+                    .isInstanceOf(OutboundChannelModelProcessor.class);
             });
     }
 
@@ -281,13 +378,34 @@ public class EventRegistryAutoConfigurationTest {
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-                assertThat(eventRegistryEngineConfiguration.getChannelDefinitionProcessors())
-                    .containsExactly(
-                        context.getBean("customChannelDefinitionProcessor", ChannelModelProcessor.class),
-                        context.getBean("rabbitChannelDefinitionProcessor", ChannelModelProcessor.class),
-                        context.getBean("jmsChannelDefinitionProcessor", ChannelModelProcessor.class),
-                        context.getBean("kafkaChannelDefinitionProcessor", ChannelModelProcessor.class)
-                    );
+                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
+                    eventRegistryEngineConfiguration.getChannelDefinitionProcessors());
+                channelModelProcessorAssert
+                    .hasSize(6);
+
+                channelModelProcessorAssert
+                    .element(0)
+                    .isEqualTo(context.getBean("customChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+                channelModelProcessorAssert
+                    .element(1)
+                    .isEqualTo(context.getBean("rabbitChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+                channelModelProcessorAssert
+                    .element(2)
+                    .isEqualTo(context.getBean("jmsChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+            channelModelProcessorAssert
+                    .element(3)
+                    .isEqualTo(context.getBean("kafkaChannelDefinitionProcessor", ChannelModelProcessor.class));
+
+                channelModelProcessorAssert
+                    .element(4)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(5)
+                    .isInstanceOf(OutboundChannelModelProcessor.class);
             });
     }
 

@@ -268,4 +268,34 @@ class JmsChannelDefinitionProcessorTest {
 
         eventRegistry.removeChannelModel("outboundCustomer");
     }
+
+    @Test
+    void eventShouldBeSendAfterOutboundChannelModelIsDeployed() {
+        EventDeployment deployment = eventRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/jmsOutboundEvent.event")
+            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/jmsOutboundChannel.channel")
+            .deploy();
+
+        try {
+
+            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+
+            eventRegistry.sendEventOutbound(kermitEvent);
+
+            Object message = jmsTemplate.receiveAndConvert("outbound-customer");
+            assertThat(message).isNotNull();
+            assertThatJson(message)
+                .isEqualTo("{"
+                    + "  customer: 'kermit',"
+                    + "  name: 'Kermit the Frog'"
+                    + "}");
+        } finally {
+            eventRepositoryService.deleteDeployment(deployment.getId());
+        }
+    }
 }

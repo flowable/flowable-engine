@@ -68,6 +68,8 @@ import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEvent
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventResourceDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.TableDataManagerImpl;
+import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
+import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 
@@ -210,6 +212,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initEventRegistry();
         initInboundEventProcessor();
         initOutboundEventProcessor();
+        initChannelDefinitionProcessors();
         initDeployers();
         initClock();
     }
@@ -475,6 +478,12 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.eventRegistry.setOutboundEventProcessor(outboundEventProcessor);
     }
 
+    public void initChannelDefinitionProcessors() {
+        channelDefinitionProcessors.add(new InboundChannelModelProcessor());
+        channelDefinitionProcessors.add(new OutboundChannelModelProcessor());
+    }
+
+
     // myBatis SqlSessionFactory
     // ////////////////////////////////////////////////
 
@@ -505,7 +514,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.eventRepositoryService = eventRepositoryService;
         return this;
     }
-    
+
     @Override
     public EventManagementService getEventManagementService() {
         return eventManagementService;
