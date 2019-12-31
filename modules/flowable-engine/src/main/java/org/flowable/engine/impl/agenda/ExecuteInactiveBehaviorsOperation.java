@@ -41,7 +41,7 @@ public class ExecuteInactiveBehaviorsOperation extends AbstractOperation {
 
     public ExecuteInactiveBehaviorsOperation(CommandContext commandContext) {
         super(commandContext, null);
-        this.involvedExecutions = new ArrayList<ExecutionEntity>(CommandContextUtil.getInvolvedExecutions(commandContext).values());
+        this.involvedExecutions = new ArrayList<>(CommandContextUtil.getInvolvedExecutions(commandContext).values());
     }
 
     @Override
