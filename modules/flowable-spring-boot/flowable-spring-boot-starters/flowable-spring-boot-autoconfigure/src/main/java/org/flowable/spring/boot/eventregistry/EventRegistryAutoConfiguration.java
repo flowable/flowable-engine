@@ -103,7 +103,7 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
     public SpringEventRegistryEngineConfiguration eventEngineConfiguration(
         DataSource dataSource,
         PlatformTransactionManager platformTransactionManager,
-        ObjectProvider<ChannelModelProcessor> channelDefinitionProcessors,
+        ObjectProvider<List<ChannelModelProcessor>> channelModelProcessors,
         ObjectProvider<List<AutoDeploymentStrategy<EventRegistryEngine>>> eventAutoDeploymentStrategies
     ) throws IOException {
         
@@ -136,8 +136,13 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         configuration.setDeploymentStrategies(deploymentStrategies);
 
-        channelDefinitionProcessors.orderedStream()
-            .forEach(configuration::addChannelDefinitionProcessor);
+        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
+        List<ChannelModelProcessor> channelProcessors = channelModelProcessors.getIfAvailable();
+        if (channelProcessors != null && channelProcessors.size() > 0) {
+            for (ChannelModelProcessor channelModelProcessor : channelProcessors) {
+                configuration.addChannelDefinitionProcessor(channelModelProcessor);
+            }
+        }
 
         return configuration;
     }
@@ -161,7 +166,7 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
 
         @Bean
         @ConditionalOnMissingBean
-        public SpringEventRegistryConfigurator eventEngineConfigurator(SpringEventRegistryEngineConfiguration configuration) {
+        public EventRegistryEngineConfigurator eventEngineConfigurator(SpringEventRegistryEngineConfiguration configuration) {
             SpringEventRegistryConfigurator eventEngineConfigurator = new SpringEventRegistryConfigurator();
             eventEngineConfigurator.setEventEngineConfiguration(configuration);
             invokeConfigurers(configuration);
@@ -186,7 +191,7 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
 
         @Bean
         @ConditionalOnMissingBean
-        public SpringEventRegistryConfigurator eventEngineConfigurator(SpringEventRegistryEngineConfiguration configuration) {
+        public EventRegistryEngineConfigurator eventEngineConfigurator(SpringEventRegistryEngineConfiguration configuration) {
             SpringEventRegistryConfigurator eventEngineConfigurator = new SpringEventRegistryConfigurator();
             eventEngineConfigurator.setEventEngineConfiguration(configuration);
 
