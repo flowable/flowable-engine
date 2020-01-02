@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -380,10 +381,12 @@ public class TenancyTest extends PluggableFlowableTestCase {
     public void testChangeDeploymentIdWithClash() {
         String processDefinitionIdWithTenant = deployTestProcessWithTestTenant("tenantA");
         deployOneTaskTestProcess();
+        String deploymentId = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdWithTenant).singleResult().getDeploymentId();
 
         // Changing the one with tenant now back to one without should clash,
         // cause there already exists one
-        assertThatThrownBy(() -> repositoryService.changeDeploymentTenantId(processDefinitionIdWithTenant, ""));
+        assertThatThrownBy(() -> repositoryService.changeDeploymentTenantId(deploymentId, ""))
+                .isInstanceOf(PersistenceException.class);
 
         // Deploying another version should just up the version
         String processDefinitionIdNoTenant2 = deployOneTaskTestProcess();
