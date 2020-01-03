@@ -322,6 +322,10 @@ public class DefaultProcessDiagramCanvas {
     public void drawMessageStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
         drawStartEvent(graphicInfo, MESSAGE_CATCH_IMAGE, scaleFactor);
     }
+    
+    public void drawEventRegistryStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
+        drawStartEvent(graphicInfo, MESSAGE_CATCH_IMAGE, scaleFactor);
+    }
 
     public void drawStartEvent(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
         Paint originalPaint = g.getPaint();

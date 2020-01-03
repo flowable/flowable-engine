@@ -17,15 +17,20 @@ import java.util.List;
 import java.util.Objects;
 
 import org.flowable.eventregistry.api.EventRegistryEvent;
-import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.opentest4j.AssertionFailedError;
 
 /**
  * @author Filip Hrisafov
  */
-public class TestEventConsumer implements EventRegistryEventBusConsumer {
+public class TestEventConsumer implements EventRegistryEventConsumer {
 
     protected final List<EventRegistryEvent> events = new ArrayList<>();
+    
+    @Override
+    public String getConsumerKey() {
+        return "testEventConsumer";
+    }
 
     @Override
     public void eventReceived(EventRegistryEvent event) {

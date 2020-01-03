@@ -12,7 +12,10 @@
  */
 package org.flowable.eventregistry.impl;
 
+import java.util.List;
+
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -55,6 +58,15 @@ public class EventRegistryEngineImpl implements EventRegistryEngine {
             for (EngineLifecycleListener engineLifecycleListener : engineConfiguration.getEngineLifecycleListeners()) {
                 engineLifecycleListener.onEngineBuilt(this);
             }
+        }
+    }
+    
+    @Override
+    public void handleDeployedChannelDefinitions() {
+        List<ChannelDefinition> channelDefinitions = repositoryService.createChannelDefinitionQuery().latestVersion().list();
+        for (ChannelDefinition channelDefinition : channelDefinitions) {
+            // trigger channel model deployment
+            repositoryService.getChannelModelById(channelDefinition.getId());
         }
     }
 

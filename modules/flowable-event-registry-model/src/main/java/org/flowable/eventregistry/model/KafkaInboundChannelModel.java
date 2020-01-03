@@ -16,9 +16,13 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * @author Filip Hrisafov
  */
+@JsonInclude(Include.NON_NULL)
 public class KafkaInboundChannelModel extends InboundChannelModel {
 
     protected String groupId;

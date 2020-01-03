@@ -12,10 +12,6 @@
  */
 package org.flowable.ui.modeler.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +27,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
@@ -43,6 +41,10 @@ import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.editor.dmn.converter.DmnJsonConverter;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
+import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
+import org.flowable.eventregistry.json.converter.EventJsonConverter;
+import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.EventModel;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.modeler.domain.AbstractModel;
@@ -51,7 +53,12 @@ import org.flowable.ui.modeler.domain.AppModelDefinition;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.repository.ModelRepository;
 import org.flowable.ui.modeler.serviceapi.ModelService;
+import org.flowable.ui.modeler.util.BpmnEventModelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Yvo Swillens
@@ -75,24 +82,33 @@ public class BaseAppDefinitionService {
     
     protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
     protected CmmnXmlConverter cmmnXMLConverter = new CmmnXmlConverter();
+    
+    protected EventJsonConverter eventJsonConverter = new EventJsonConverter();
+    protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter();
 
-    protected Map<String, StartEvent> processNoneStartEvents(BpmnModel bpmnModel) {
-        Map<String, StartEvent> startEventMap = new HashMap<>();
+    protected void postProcessFlowElements(List<Event> eventRegistryEvents, Map<String, StartEvent> noneStartEventMap, BpmnModel bpmnModel) {
         for (Process process : bpmnModel.getProcesses()) {
             for (FlowElement flowElement : process.getFlowElements()) {
-                if (flowElement instanceof StartEvent) {
-                    StartEvent startEvent = (StartEvent) flowElement;
-                    if (org.apache.commons.collections.CollectionUtils.isEmpty(startEvent.getEventDefinitions())) {
-                        if (StringUtils.isEmpty(startEvent.getInitiator())) {
-                            startEvent.setInitiator("initiator");
+                if (flowElement instanceof Event) {
+                    
+                    List<ExtensionElement> eventTypeElements = flowElement.getExtensionElements().get("eventType");
+                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                        eventRegistryEvents.add((Event) flowElement);
+                    }
+                    
+                    if (flowElement instanceof StartEvent) {
+                        StartEvent startEvent = (StartEvent) flowElement;
+                        if (org.apache.commons.collections.CollectionUtils.isEmpty(startEvent.getEventDefinitions())) {
+                            if (StringUtils.isEmpty(startEvent.getInitiator())) {
+                                startEvent.setInitiator("initiator");
+                            }
+                            noneStartEventMap.put(process.getId(), startEvent);
+                            break;
                         }
-                        startEventMap.put(process.getId(), startEvent);
-                        break;
                     }
                 }
             }
         }
-        return startEventMap;
     }
 
     protected void processUserTasks(Collection<FlowElement> flowElements, Process process, Map<String, StartEvent> startEventMap) {
@@ -225,12 +241,19 @@ public class BaseAppDefinitionService {
             }
         }
 
+        Map<String, EventModel> eventModelMap = new HashMap<>();
+        Map<String, ChannelModel> channelModelMap = new HashMap<>();
         if (parentModel.getModelType() == null || parentModel.getModelType() == AbstractModel.MODEL_TYPE_BPMN) {
             BpmnModel bpmnModel = modelService.getBpmnModel(parentModel, formMap, decisionTableMap);
-            Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
+            List<Event> eventRegistryEvents = new ArrayList<>();
+            Map<String, StartEvent> noneStartEventMap = new HashMap<>();
+            postProcessFlowElements(eventRegistryEvents, noneStartEventMap, bpmnModel);
+            
+            BpmnEventModelUtil.fillEventModelMap(eventRegistryEvents, eventModelMap);
+            BpmnEventModelUtil.fillChannelModelMap(eventRegistryEvents, channelModelMap);
 
             for (Process process : bpmnModel.getProcesses()) {
-                processUserTasks(process.getFlowElements(), process, startEventMap);
+                processUserTasks(process.getFlowElements(), process, noneStartEventMap);
             }
 
             byte[] modelXML = modelService.getBpmnXML(bpmnModel);
@@ -242,12 +265,27 @@ public class BaseAppDefinitionService {
             byte[] modelXML = modelService.getCmmnXML(cmmnModel);
             deployableAssets.put(parentModel.getKey().replaceAll(" ", "") + ".cmmn", modelXML);
         }
+        
+        if (eventModelMap.size() > 0) {
+            for (EventModel eventModel : eventModelMap.values()) {
+                String eventJson = eventJsonConverter.convertToJson(eventModel);
+                deployableAssets.put("event-" + eventModel.getKey() + ".event", eventJson.getBytes(StandardCharsets.UTF_8));
+            }
+            
+            if (channelModelMap.size() > 0) {
+                for (ChannelModel channelModel : channelModelMap.values()) {
+                    String channelJson = channelJsonConverter.convertToJson(channelModel);
+                    deployableAssets.put("channel-" + channelModel.getKey() + ".channel", channelJson.getBytes(StandardCharsets.UTF_8));
+                }
+            }
+        }
     }
 
     protected byte[] createDeployZipArtifact(Map<String, byte[]> deployableAssets) {
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             ZipOutputStream zos = new ZipOutputStream(baos)) {
+                    ZipOutputStream zos = new ZipOutputStream(baos)) {
+            
             for (Map.Entry<String, byte[]> entry : deployableAssets.entrySet()) {
                 ZipEntry zipEntry = new ZipEntry(entry.getKey());
                 zipEntry.setSize(entry.getValue().length);

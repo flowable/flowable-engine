@@ -10,24 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.model;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+package org.flowable.eventregistry.api;
 
 /**
- * @author Filip Hrisafov
+ * @author Joram Barrez
  */
-@JsonInclude(Include.NON_NULL)
-public class JmsOutboundChannelModel extends OutboundChannelModel {
+public interface EventRegistryEventConsumer {
 
-    protected String destination;
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
+    void eventReceived(EventRegistryEvent event);
+    
+    String getConsumerKey();
 }

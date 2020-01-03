@@ -172,7 +172,11 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngine buildEventRegistryEngine() {
         init();
-        return new EventRegistryEngineImpl(this);
+        EventRegistryEngineImpl eventRegistryEngine = new EventRegistryEngineImpl(this);
+        
+        eventRegistryEngine.handleDeployedChannelDefinitions();
+        
+        return eventRegistryEngine;
     }
 
     // init
@@ -482,7 +486,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         channelDefinitionProcessors.add(new InboundChannelModelProcessor());
         channelDefinitionProcessors.add(new OutboundChannelModelProcessor());
     }
-
 
     // myBatis SqlSessionFactory
     // ////////////////////////////////////////////////

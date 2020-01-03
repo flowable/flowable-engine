@@ -55,9 +55,9 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     public Collection<EventRegistryEvent> run(String channelKey, String rawEvent) {
         T event = deserialize(rawEvent);
         String eventKey = detectEventDefinitionKey(event);
-
+        
         EventModel eventDefinition = eventRegistry.getEventModel(eventKey);
-
+        
         EventInstanceImpl eventInstance = new EventInstanceImpl(
             eventDefinition,
             extractCorrelationParameters(eventDefinition, event),

@@ -75,6 +75,7 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelM
 
             JmsListenerEndpoint endpoint = createJmsListenerEndpoint(channelModel, eventRegistry, jmsChannelDefinition);
             registerEndpoint(endpoint, null);
+            
         } else if (channelModel instanceof JmsOutboundChannelModel) {
             processOutboundDefinition((JmsOutboundChannelModel) channelModel);
         }

@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
-import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -33,7 +33,7 @@ import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventBusConsumer {
+public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventConsumer {
 
     protected AbstractEngineConfiguration engingeConfiguration;
 

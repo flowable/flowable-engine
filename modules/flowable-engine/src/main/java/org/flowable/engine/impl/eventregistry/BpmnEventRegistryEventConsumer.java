@@ -41,6 +41,11 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     }
 
     @Override
+    public String getConsumerKey() {
+        return "bpmnEventConsumer";
+    }
+    
+    @Override
     protected void eventReceived(EventInstance eventInstance) {
         EventModel eventModel = eventInstance.getEventModel();
 

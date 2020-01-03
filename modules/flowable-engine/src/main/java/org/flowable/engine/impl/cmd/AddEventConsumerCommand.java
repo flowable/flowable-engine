@@ -16,13 +16,13 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 
 public class AddEventConsumerCommand implements Command<Void> {
 
-    protected EventRegistryEventBusConsumer eventConsumer;
+    protected EventRegistryEventConsumer eventConsumer;
 
-    public AddEventConsumerCommand(EventRegistryEventBusConsumer eventConsumer) {
+    public AddEventConsumerCommand(EventRegistryEventConsumer eventConsumer) {
         this.eventConsumer = eventConsumer;
     }
 

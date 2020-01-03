@@ -116,6 +116,25 @@ public class EventDeploymentBuilderImpl implements EventDeploymentBuilder, Seria
         addString(resourceName, eventDefinition);
         return this;
     }
+    
+    @Override
+    public EventDeploymentBuilder addChannelDefinitionBytes(String resourceName, byte[] channelDefinitionBytes) {
+        if (channelDefinitionBytes == null) {
+            throw new FlowableException("channel definition bytes is null");
+        }
+
+        EventResourceEntity resource = resourceEntityManager.create();
+        resource.setName(resourceName);
+        resource.setBytes(channelDefinitionBytes);
+        deployment.addResource(resource);
+        return this;
+    }
+
+    @Override
+    public EventDeploymentBuilder addChannelDefinition(String resourceName, String channelDefinition) {
+        addString(resourceName, channelDefinition);
+        return this;
+    }
 
     @Override
     public EventDeploymentBuilder name(String name) {

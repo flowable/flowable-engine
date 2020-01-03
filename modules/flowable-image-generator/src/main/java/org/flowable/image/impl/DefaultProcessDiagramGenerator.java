@@ -41,6 +41,7 @@ import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.FlowNode;
@@ -117,7 +118,13 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                         processDiagramCanvas.drawNoneStartEvent(graphicInfo);
                     }
                 } else {
-                    processDiagramCanvas.drawNoneStartEvent(graphicInfo);
+                    List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
+                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                        processDiagramCanvas.drawEventRegistryStartEvent(graphicInfo, scaleFactor);
+                        
+                    } else {
+                        processDiagramCanvas.drawNoneStartEvent(graphicInfo);
+                    }
                 }
             }
         });

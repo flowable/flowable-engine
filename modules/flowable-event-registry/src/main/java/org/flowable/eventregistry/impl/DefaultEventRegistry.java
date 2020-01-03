@@ -12,8 +12,7 @@
  */
 package org.flowable.eventregistry.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +23,7 @@ import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.CorrelationKeyGenerator;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
-import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventProcessor;
@@ -49,7 +48,6 @@ public class DefaultEventRegistry implements EventRegistry {
     protected Map<String, InboundChannelModel> inboundChannelModels = new ConcurrentHashMap<>();
     protected Map<String, OutboundChannelModel> outboundChannelModels = new ConcurrentHashMap<>();
 
-    protected List<EventRegistryEventBusConsumer> eventRegistryEventBusConsumers = new ArrayList<>();
     protected CorrelationKeyGenerator<Map<String, Object>> correlationKeyGenerator;
 
     protected InboundEventProcessor inboundEventProcessor;
@@ -100,6 +98,7 @@ public class DefaultEventRegistry implements EventRegistry {
 
         for (ChannelModelProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
             if (channelDefinitionProcessor.canProcess(channelModel)) {
+                channelDefinitionProcessor.unregisterChannelModel(channelModel, engineConfiguration.getEventRegistry());
                 channelDefinitionProcessor.registerChannelModel(channelModel, engineConfiguration.getEventRegistry());
             }
         }
@@ -165,7 +164,8 @@ public class DefaultEventRegistry implements EventRegistry {
     
     @Override
     public void sendEventToConsumers(EventRegistryEvent eventRegistryEvent) {
-        for (EventRegistryEventBusConsumer eventConsumer : eventRegistryEventBusConsumers) {
+        Collection<EventRegistryEventConsumer> engineEventRegistryEventConsumers = engineConfiguration.getEventRegistryEventConsumers().values();
+        for (EventRegistryEventConsumer eventConsumer : engineEventRegistryEventConsumers) {
             eventConsumer.eventReceived(eventRegistryEvent);
         }
     }
@@ -176,13 +176,13 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void registerEventRegistryEventBusConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer) {
-        eventRegistryEventBusConsumers.add(eventRegistryEventBusConsumer);
+    public void registerEventRegistryEventBusConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer) {
+        engineConfiguration.getEventRegistryEventConsumers().put(eventRegistryEventBusConsumer.getConsumerKey(), eventRegistryEventBusConsumer);
     }
     
     @Override
-    public void removeFlowableEventConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer) {
-        eventRegistryEventBusConsumers.remove(eventRegistryEventBusConsumer);
+    public void removeFlowableEventConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer) {
+        engineConfiguration.getEventRegistryEventConsumers().remove(eventRegistryEventBusConsumer.getConsumerKey());
     }
 
     @Override

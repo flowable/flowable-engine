@@ -45,6 +45,11 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         this.commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
     }
+    
+    @Override
+    public String getConsumerKey() {
+        return "cmmnEventConsumer";
+    }
 
     @Override
     protected void eventReceived(EventInstance eventInstance) {

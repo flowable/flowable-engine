@@ -239,32 +239,28 @@ function _drawDecisionTaskIcon(paper, startX, startY) {
 
 function _drawEventIcon(paper, element)
 {
-	if (element.eventDefinition && element.eventDefinition.type)
-	{
-		if ("timer" === element.eventDefinition.type)
-		{
+	if (element.eventDefinition && element.eventDefinition.type) {
+		if ("timer" === element.eventDefinition.type) {
 			_drawTimerIcon(paper, element);
-		}
-		else if ("conditional" === element.eventDefinition.type)
-        {
+			
+		} else if ("conditional" === element.eventDefinition.type) {
             _drawConditionalIcon(paper, element);
-        }
-		else if ("error" === element.eventDefinition.type)
-		{
+            
+        } else if ("error" === element.eventDefinition.type) {
 			_drawErrorIcon(paper, element);
-		}
-		else if ("escalation" === element.eventDefinition.type)
-        {
+			
+		} else if ("escalation" === element.eventDefinition.type) {
             _drawEscalationIcon(paper, element);
-        }
-		else if ("signal" === element.eventDefinition.type)
-		{
+            
+        } else if ("signal" === element.eventDefinition.type) {
 			_drawSignalIcon(paper, element);
-		}
-		else if ("message" === element.eventDefinition.type)
-		{
+			
+		} else if ("message" === element.eventDefinition.type) {
 			_drawMessageIcon(paper, element);
-		}
+		
+		} else if ("eventRegistry" === element.eventDefinition.type) {
+            _drawMessageIcon(paper, element);
+        }
 	}
 }
 

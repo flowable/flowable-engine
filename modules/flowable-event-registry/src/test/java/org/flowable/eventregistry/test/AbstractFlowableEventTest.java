@@ -40,7 +40,7 @@ public class AbstractFlowableEventTest {
     protected EventRepositoryService repositoryService;
 
     @BeforeEach
-    public void initFormEngine(EventRegistryEngine eventRegistryEngine) {
+    public void initEventRegistryEngine(EventRegistryEngine eventRegistryEngine) {
         this.eventRegistryEngine = eventRegistryEngine;
         this.eventEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
         this.repositoryService = eventRegistryEngine.getEventRepositoryService();

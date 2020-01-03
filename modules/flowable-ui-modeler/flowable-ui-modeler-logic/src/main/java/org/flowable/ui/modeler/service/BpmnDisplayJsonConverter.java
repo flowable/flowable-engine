@@ -30,6 +30,7 @@ import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.Lane;
@@ -374,6 +375,17 @@ public class BpmnDisplayJsonConverter {
                     }
                 }
                 elementNode.set("eventDefinition", eventNode);
+            
+            } else {
+                if (event.getExtensionElements().get("eventType") != null) {
+                    List<ExtensionElement> eventTypeElements = event.getExtensionElements().get("eventType");
+                    if (eventTypeElements.size() > 0) {
+                        ObjectNode eventNode = objectMapper.createObjectNode();
+                        eventNode.put("type", "eventRegistry");
+                        eventNode.put("eventKey", eventTypeElements.get(0).getElementText());
+                        elementNode.set("eventDefinition", eventNode);
+                    }
+                }
             }
         }
     }

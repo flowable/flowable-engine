@@ -12,6 +12,7 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
         convertersToBpmnMap.put(STENCIL_EVENT_START_ERROR, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_ESCALATION, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_MESSAGE, StartEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_START_EVENT_REGISTRY, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_SIGNAL, StartEventJsonConverter.class);
     }
 
@@ -78,7 +80,14 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
             } else if (eventDefinition instanceof SignalEventDefinition) {
                 return STENCIL_EVENT_START_SIGNAL;
             }
+            
+        } else if (event.getExtensionElements().get("eventType") != null && event.getExtensionElements().get("eventType").size() > 0) {
+            String eventType = event.getExtensionElements().get("eventType").get(0).getElementText();
+            if (StringUtils.isNotEmpty(eventType)) {
+                return STENCIL_EVENT_START_EVENT_REGISTRY;
+            }
         }
+        
         return STENCIL_EVENT_START_NONE;
     }
 
@@ -113,6 +122,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
 
         addFormProperties(startEvent.getFormProperties(), propertiesNode);
         addEventProperties(startEvent, propertiesNode);
+        addEventRegistryProperties(startEvent, propertiesNode);
     }
 
     @Override
@@ -141,16 +151,51 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
 
         } else if (STENCIL_EVENT_START_TIMER.equals(stencilId)) {
             convertJsonToTimerDefinition(elementNode, startEvent);
+            
         } else if (STENCIL_EVENT_START_CONDITIONAL.equals(stencilId)) {
             convertJsonToConditionalDefinition(elementNode, startEvent);
+            
         } else if (STENCIL_EVENT_START_ERROR.equals(stencilId)) {
             convertJsonToErrorDefinition(elementNode, startEvent);
+            
         } else if (STENCIL_EVENT_START_ESCALATION.equals(stencilId)) {
             convertJsonToEscalationDefinition(elementNode, startEvent);
+            
         } else if (STENCIL_EVENT_START_MESSAGE.equals(stencilId)) {
             convertJsonToMessageDefinition(elementNode, startEvent);
+            
         } else if (STENCIL_EVENT_START_SIGNAL.equals(stencilId)) {
             convertJsonToSignalDefinition(elementNode, startEvent);
+        
+        } else if (STENCIL_EVENT_START_EVENT_REGISTRY.equals(stencilId)) {
+            String eventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, elementNode);
+            if (StringUtils.isNotEmpty(eventKey)) {
+                addFlowableExtensionElementWithValue("eventType", eventKey, startEvent);
+                addFlowableExtensionElementWithValue("eventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, elementNode), startEvent);
+                convertJsonToOutParameters(elementNode, startEvent);
+                convertJsonToCorrelationParameters(elementNode, startEvent);
+                
+                addFlowableExtensionElementWithValue("channelKey", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, elementNode), startEvent);
+                addFlowableExtensionElementWithValue("channelName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, elementNode), startEvent);
+                addFlowableExtensionElementWithValue("channelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, elementNode), startEvent);
+                addFlowableExtensionElementWithValue("channelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, elementNode), startEvent);
+                
+                String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
+                String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
+                String jsonPath = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, elementNode);
+                if (StringUtils.isNotEmpty(fixedValue)) {
+                    addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", startEvent);
+                    addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, startEvent);
+                    
+                } else if (StringUtils.isNotEmpty(jsonField)) {
+                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", startEvent);
+                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, startEvent);
+                    
+                } else if (StringUtils.isNotEmpty(jsonPath)) {
+                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPath", startEvent);
+                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPath, startEvent);
+                }
+            }
         }
 
         if (!getPropertyValueAsBoolean(PROPERTY_INTERRUPTING, elementNode)) {
@@ -158,15 +203,6 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
         }
 
         return startEvent;
-    }
-
-    protected void addExtensionElement(String name, String elementText, Event event) {
-        ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setNamespace(NAMESPACE);
-        extensionElement.setNamespacePrefix("modeler");
-        extensionElement.setName(name);
-        extensionElement.setElementText(elementText);
-        event.addExtensionElement(extensionElement);
     }
 
     @Override
@@ -177,5 +213,49 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
     @Override
     public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
         this.formKeyMap = formKeyMap;
+    }
+    
+    protected void addEventRegistryProperties(StartEvent startEvent, ObjectNode propertiesNode) {
+        String eventType = getExtensionValue("eventType", startEvent);
+        if (StringUtils.isNotEmpty(eventType)) {
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_KEY, eventType, propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", startEvent), propertiesNode);
+            addEventOutParameters(startEvent.getExtensionElements().get("eventOutParameter"), propertiesNode);
+            addEventCorrelationParameters(startEvent.getExtensionElements().get("eventCorrelationParameter"), propertiesNode);
+            
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, getExtensionValue("channelKey", startEvent), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, getExtensionValue("channelName", startEvent), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", startEvent), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", startEvent), propertiesNode);
+            
+            String keyDetectionType = getExtensionValue("keyDetectionType", startEvent);
+            String keyDetectionValue = getExtensionValue("keyDetectionValue", startEvent);
+            if (StringUtils.isNotEmpty(keyDetectionType) && StringUtils.isNotEmpty(keyDetectionValue)) {
+                if ("fixedValue".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, keyDetectionValue, propertiesNode);
+                    
+                } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
+                    
+                } else if ("jsonPath".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, keyDetectionValue, propertiesNode);
+                }
+            }
+        }
+    }
+    
+    protected String getExtensionValue(String name, FlowElement flowElement) {
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(name);
+        if (extensionElements != null && extensionElements.size() > 0) {
+            return extensionElements.get(0).getElementText();
+        }
+        
+        return null;
+    }
+    
+    protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
+        if (StringUtils.isNotEmpty(value)) {
+            propertiesNode.put(name, value);
+        }
     }
 }

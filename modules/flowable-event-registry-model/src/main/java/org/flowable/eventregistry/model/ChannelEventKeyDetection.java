@@ -12,9 +12,13 @@
  */
 package org.flowable.eventregistry.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * @author Joram Barrez
  */
+@JsonInclude(Include.NON_NULL)
 public class ChannelEventKeyDetection {
 
     protected String fixedValue;

@@ -94,6 +94,7 @@ import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,6 +169,7 @@ public abstract class AbstractEngineConfiguration {
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
     protected Map<String, AbstractServiceConfiguration> serviceConfigurations = new HashMap<>();
+    protected Map<String, EventRegistryEventConsumer> eventRegistryEventConsumers = new HashMap<>();
 
     protected ClassLoader classLoader;
     /**
@@ -1355,6 +1357,22 @@ public abstract class AbstractEngineConfiguration {
             serviceConfigurations = new HashMap<>();
         }
         serviceConfigurations.put(key, serviceConfiguration);
+    }
+
+    public Map<String, EventRegistryEventConsumer> getEventRegistryEventConsumers() {
+        return eventRegistryEventConsumers;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryEventConsumers(Map<String, EventRegistryEventConsumer> eventRegistryEventConsumers) {
+        this.eventRegistryEventConsumers = eventRegistryEventConsumers;
+        return this;
+    }
+    
+    public void addEventRegistryEventConsumer(String key, EventRegistryEventConsumer eventRegistryEventConsumer) {
+        if (eventRegistryEventConsumers == null) {
+            eventRegistryEventConsumers = new HashMap<>();
+        }
+        eventRegistryEventConsumers.put(key, eventRegistryEventConsumer);
     }
 
     public void setDefaultCommandInterceptors(Collection<? extends CommandInterceptor> defaultCommandInterceptors) {

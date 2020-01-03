@@ -49,6 +49,15 @@ public class EventDeployer implements EngineDeployer {
                 }
 
                 eventDeploymentBuilder.addEventDefinitionBytes(resourceName, resources.get(resourceName).getBytes());
+            
+            } else if (resourceName.endsWith(".channel")) {
+                LOGGER.info("EventDeployer: processing resource {}", resourceName);
+                if (eventDeploymentBuilder == null) {
+                    EventRepositoryService eventRepositoryService = CommandContextUtil.getEventRepositoryService();
+                    eventDeploymentBuilder = eventRepositoryService.createDeployment().name(deployment.getName());
+                }
+
+                eventDeploymentBuilder.addChannelDefinitionBytes(resourceName, resources.get(resourceName).getBytes());
             }
         }
 

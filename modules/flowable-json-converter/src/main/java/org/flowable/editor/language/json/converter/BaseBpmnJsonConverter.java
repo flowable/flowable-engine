@@ -12,10 +12,10 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.Artifact;
@@ -31,6 +31,7 @@ import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
@@ -61,9 +62,10 @@ import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -470,6 +472,66 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         formPropertiesNode.set("formProperties", propertiesArrayNode);
         propertiesNode.set(PROPERTY_FORM_PROPERTIES, formPropertiesNode);
     }
+    
+    protected void addEventOutParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode) {
+        if (CollectionUtils.isEmpty(eventParameterElements)) {
+            return;
+        }
+
+        ObjectNode valueNode = objectMapper.createObjectNode();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        for (ExtensionElement element : eventParameterElements) {
+            ObjectNode itemNode = objectMapper.createObjectNode();
+            itemNode.put(PROPERTY_EVENT_REGISTRY_EVENTNAME, element.getAttributeValue(null, "source"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_EVENTTYPE, element.getAttributeValue(null, "sourceType"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_VARIABLENAME, element.getAttributeValue(null, "target"));
+
+            arrayNode.add(itemNode);
+        }
+
+        valueNode.set("outParameters", arrayNode);
+        propertiesNode.set(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, valueNode);
+    }
+    
+    protected void addEventInParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode) {
+        if (CollectionUtils.isEmpty(eventParameterElements)) {
+            return;
+        }
+
+        ObjectNode valueNode = objectMapper.createObjectNode();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        for (ExtensionElement element : eventParameterElements) {
+            ObjectNode itemNode = objectMapper.createObjectNode();
+            itemNode.put(PROPERTY_EVENT_REGISTRY_VARIABLENAME, element.getAttributeValue(null, "source"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_EVENTNAME, element.getAttributeValue(null, "target"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_EVENTTYPE, element.getAttributeValue(null, "targetType"));
+
+            arrayNode.add(itemNode);
+        }
+
+        valueNode.set("inParameters", arrayNode);
+        propertiesNode.set(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, valueNode);
+    }
+    
+    protected void addEventCorrelationParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode) {
+        if (CollectionUtils.isEmpty(eventParameterElements)) {
+            return;
+        }
+
+        ObjectNode valueNode = objectMapper.createObjectNode();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        for (ExtensionElement element : eventParameterElements) {
+            ObjectNode itemNode = objectMapper.createObjectNode();
+            itemNode.put(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME, element.getAttributeValue(null, "name"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE, element.getAttributeValue(null, "nameType"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE, element.getAttributeValue(null, "value"));
+
+            arrayNode.add(itemNode);
+        }
+
+        valueNode.set("correlationParameters", arrayNode);
+        propertiesNode.set(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS, valueNode);
+    }
 
     protected void addMapException(List<MapExceptionEntry> exceptions, ObjectNode propertiesNode) {
         ObjectNode exceptionsNode = objectMapper.createObjectNode();
@@ -685,6 +747,63 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         event.getEventDefinitions().add(eventDefinition);
     }
     
+    protected void convertJsonToOutParameters(JsonNode objectNode, Event event) {
+        JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, objectNode);
+        if (parametersNode != null && parametersNode.get("outParameters") != null) {
+            JsonNode parameterArray = parametersNode.get("outParameters");
+            for (JsonNode parameterNode : parameterArray) {
+                if (parameterNode.get(PROPERTY_EVENT_REGISTRY_EVENTNAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_EVENTNAME).isNull()) {
+                    ExtensionElement extensionElement = addFlowableExtensionElement("eventOutParameter", event);
+                    String eventName = parameterNode.get(PROPERTY_EVENT_REGISTRY_EVENTNAME).asText();
+                    String eventType = parameterNode.get(PROPERTY_EVENT_REGISTRY_EVENTTYPE).asText();
+                    String variableName = parameterNode.get(PROPERTY_EVENT_REGISTRY_VARIABLENAME).asText();
+                    
+                    addExtensionAttribute("source", eventName, extensionElement);
+                    addExtensionAttribute("sourceType", eventType, extensionElement);
+                    addExtensionAttribute("target", variableName, extensionElement);
+                }
+            }
+        }
+    }
+    
+    protected void convertJsonToInParameters(JsonNode objectNode, Event event) {
+        JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, objectNode);
+        if (parametersNode != null && parametersNode.get("inParameters") != null) {
+            JsonNode parameterArray = parametersNode.get("inParameters");
+            for (JsonNode parameterNode : parameterArray) {
+                if (parameterNode.get(PROPERTY_EVENT_REGISTRY_VARIABLENAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_VARIABLENAME).isNull()) {
+                    ExtensionElement extensionElement = addFlowableExtensionElement("eventInParameter", event);
+                    String variableName = parameterNode.get(PROPERTY_EVENT_REGISTRY_VARIABLENAME).asText();
+                    String eventName = parameterNode.get(PROPERTY_EVENT_REGISTRY_EVENTNAME).asText();
+                    String eventType = parameterNode.get(PROPERTY_EVENT_REGISTRY_EVENTTYPE).asText();
+                    
+                    addExtensionAttribute("source", variableName, extensionElement);
+                    addExtensionAttribute("target", eventName, extensionElement);
+                    addExtensionAttribute("targetType", eventType, extensionElement);
+                }
+            }
+        }
+    }
+    
+    protected void convertJsonToCorrelationParameters(JsonNode objectNode, Event event) {
+        JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS, objectNode);
+        if (parametersNode != null && parametersNode.get("correlationParameters") != null) {
+            JsonNode parameterArray = parametersNode.get("correlationParameters");
+            for (JsonNode parameterNode : parameterArray) {
+                if (parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME).isNull()) {
+                    ExtensionElement extensionElement = addFlowableExtensionElement("eventCorrelationParameter", event);
+                    String name = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME).asText();
+                    String type = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE).asText();
+                    String value = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE).asText();
+                    
+                    addExtensionAttribute("name", name, extensionElement);
+                    addExtensionAttribute("type", type, extensionElement);
+                    addExtensionAttribute("value", value, extensionElement);
+                }
+            }
+        }
+    }
+    
     protected void convertJsonToConditionalDefinition(JsonNode objectNode, Event event) {
         String condition = getPropertyValueAsString(PROPERTY_CONDITIONAL_EVENT_CONDITION, objectNode);
         ConditionalEventDefinition eventDefinition = new ConditionalEventDefinition();
@@ -803,5 +922,30 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             resultString = expressionBuilder.toString();
         }
         return resultString;
+    }
+    
+    protected ExtensionElement addFlowableExtensionElement(String name, FlowElement flowElement) {
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setName(name);
+        extensionElement.setNamespace("http://flowable.org/bpmn");
+        extensionElement.setNamespacePrefix("flowable");
+        flowElement.addExtensionElement(extensionElement);
+        return extensionElement;
+    }
+    
+    protected ExtensionElement addFlowableExtensionElementWithValue(String name, String value, FlowElement flowElement) {
+        ExtensionElement extensionElement = null;
+        if (StringUtils.isNotEmpty(value)) {
+            extensionElement = addFlowableExtensionElement(name, flowElement);
+            extensionElement.setElementText(value);
+        }
+        
+        return extensionElement;
+    }
+    
+    public void addExtensionAttribute(String name, String value, ExtensionElement extensionElement) {
+        ExtensionAttribute attribute = new ExtensionAttribute(name);
+        attribute.setValue(value);
+        extensionElement.addAttribute(attribute);
     }
 }

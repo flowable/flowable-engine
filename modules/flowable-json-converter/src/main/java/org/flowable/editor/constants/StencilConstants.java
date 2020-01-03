@@ -24,6 +24,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_START_MESSAGE = "StartMessageEvent";
     final String STENCIL_EVENT_START_SIGNAL = "StartSignalEvent";
     final String STENCIL_EVENT_START_ERROR = "StartErrorEvent";
+    final String STENCIL_EVENT_START_EVENT_REGISTRY = "StartEventRegistryEvent";
     final String STENCIL_EVENT_START_CONDITIONAL = "StartConditionalEvent";
     final String STENCIL_EVENT_START_ESCALATION = "StartEscalationEvent";
 
@@ -327,6 +328,26 @@ public interface StencilConstants {
     final String PROPERTY_SHELLTASK_ERROR_REDIRECT = "shellerrorredirect";
     final String PROPERTY_SHELLTASK_CLEAN_ENV = "shellcleanenv";
     final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
+    
+    final String PROPERTY_EVENT_REGISTRY_EVENT_KEY = "eventkey";
+    final String PROPERTY_EVENT_REGISTRY_EVENT_NAME = "eventname";
+    final String PROPERTY_EVENT_REGISTRY_IN_PARAMETERS = "eventinparameters";
+    final String PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS = "eventoutparameters";
+    final String PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS = "eventcorrelationparameters";
+    final String PROPERTY_EVENT_REGISTRY_CHANNEL_KEY = "channelkey";
+    final String PROPERTY_EVENT_REGISTRY_CHANNEL_NAME = "channelname";
+    final String PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE = "channeltype";
+    final String PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION = "channeldestination";
+    final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE = "keydetectionfixedvalue";
+    final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD = "keydetectionjsonfield";
+    final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH = "keydetectionjsonpath";
+    
+    final String PROPERTY_EVENT_REGISTRY_EVENTNAME = "eventName";
+    final String PROPERTY_EVENT_REGISTRY_EVENTTYPE = "eventType";
+    final String PROPERTY_EVENT_REGISTRY_VARIABLENAME = "variableName";
+    final String PROPERTY_EVENT_REGISTRY_CORRELATIONNAME = "name";
+    final String PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE = "type";
+    final String PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE = "value";
 
     final String PROPERTY_FOR_COMPENSATION = "isforcompensation";
     final String PROPERTY_COMPENSATION_ACTIVITY_REF = "compensationactivityref";

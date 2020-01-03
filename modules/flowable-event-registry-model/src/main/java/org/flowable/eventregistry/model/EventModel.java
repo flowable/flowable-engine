@@ -15,9 +15,10 @@ package org.flowable.eventregistry.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * @author Joram Barrez
- */
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class EventModel {
 
     protected String key;
@@ -46,6 +47,10 @@ public class EventModel {
     public Collection<String> getInboundChannelKeys() {
         return inboundChannelKeys;
     }
+    
+    public void addInboundChannelKey(String inboundChannelKey) {
+        this.inboundChannelKeys.add(inboundChannelKey);
+    }
 
     public void setInboundChannelKeys(Collection<String> inboundChannelKeys) {
         this.inboundChannelKeys = inboundChannelKeys;
@@ -53,6 +58,10 @@ public class EventModel {
 
     public Collection<String> getOutboundChannelKeys() {
         return outboundChannelKeys;
+    }
+    
+    public void addOutboundChannelKey(String outboundChannelKey) {
+        this.outboundChannelKeys.add(outboundChannelKey);
     }
 
     public void setOutboundChannelKeys(Collection<String> outboundChannelKeys) {

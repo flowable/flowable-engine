@@ -14,9 +14,13 @@ package org.flowable.eventregistry.model;
 
 import java.util.Collection;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * @author Filip Hrisafov
  */
+@JsonInclude(Include.NON_NULL)
 public class RabbitInboundChannelModel extends InboundChannelModel {
 
     protected Collection<String> queues;

@@ -83,15 +83,15 @@ public interface EventRegistry {
     void setOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor);
 
     /**
-     * Registers a {@link EventRegistryEventBusConsumer} instance (a consumer of event registry events which
+     * Registers a {@link EventRegistryEventConsumer} instance (a consumer of event registry events which
      * is created by any of the engines).
      */
-    void registerEventRegistryEventBusConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer);
+    void registerEventRegistryEventBusConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer);
     
     /**
      * Removes the event consumer from the event registry
      */
-    void removeFlowableEventConsumer(EventRegistryEventBusConsumer eventRegistryEventBusConsumer);
+    void removeFlowableEventConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer);
 
     /**
      * Method to generate the unique key used to correlate an event.

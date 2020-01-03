@@ -87,7 +87,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
-import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
@@ -668,12 +668,12 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
     
     @Override
-    public void addEventBusConsumer(EventRegistryEventBusConsumer eventConsumer) {
+    public void addEventBusConsumer(EventRegistryEventConsumer eventConsumer) {
         commandExecutor.execute(new AddEventConsumerCommand(eventConsumer));
     }
     
     @Override
-    public void removeEventBusConsumer(EventRegistryEventBusConsumer eventConsumer) {
+    public void removeEventBusConsumer(EventRegistryEventConsumer eventConsumer) {
         commandExecutor.execute(new RemoveEventConsumerCommand(eventConsumer));
     }
 

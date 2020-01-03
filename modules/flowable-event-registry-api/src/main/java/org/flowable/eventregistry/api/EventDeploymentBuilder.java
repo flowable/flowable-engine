@@ -34,9 +34,13 @@ public interface EventDeploymentBuilder {
 
     EventDeploymentBuilder addString(String resourceName, String text);
 
-    EventDeploymentBuilder addEventDefinitionBytes(String resourceName, byte[] formBytes);
+    EventDeploymentBuilder addEventDefinitionBytes(String resourceName, byte[] eventBytes);
 
     EventDeploymentBuilder addEventDefinition(String resourceName, String eventDefinition);
+    
+    EventDeploymentBuilder addChannelDefinitionBytes(String resourceName, byte[] channelBytes);
+
+    EventDeploymentBuilder addChannelDefinition(String resourceName, String channelDefinition);
 
     /**
      * Gives the deployment the given name.

@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.test;
 
 import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ import java.util.Objects;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
-import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
@@ -225,10 +226,15 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         return inboundEventChannelAdapter;
     }
 
-    private static class TestEventConsumer implements EventRegistryEventBusConsumer {
+    private static class TestEventConsumer implements EventRegistryEventConsumer {
 
         public List<EventRegistryEvent> eventsReceived = new ArrayList<>();
 
+        @Override
+        public String getConsumerKey() {
+            return "myTestEventConsumer";
+        }
+        
         @Override
         public void eventReceived(EventRegistryEvent event) {
             eventsReceived.add(event);

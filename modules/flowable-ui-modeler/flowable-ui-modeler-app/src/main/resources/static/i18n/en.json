@@ -781,6 +781,56 @@
             "DESCRIPTION" : "Escalation definitions"
           }
         },
+        "EVENTREGISTRYPACKAGE" : {
+          "EVENTKEY" : {
+            "TITLE" : "Event key",
+            "DESCRIPTION" : "Definition of the event key"
+          },
+          "EVENTNAME" : {
+            "TITLE" : "Event name",
+            "DESCRIPTION" : "Definition of the event name"
+          },
+          "EVENTINPARAMETERS" : {
+            "TITLE" : "Event in parameters",
+            "DESCRIPTION" : "Definition of the event in parameters"
+          },
+          "EVENTOUTPARAMETERS" : {
+            "TITLE" : "Event out parameters",
+            "DESCRIPTION" : "Definition of the event out parameters"
+          },
+          "EVENTCORRELATIONPARAMETERS" : {
+            "TITLE" : "Correlation parameters",
+            "DESCRIPTION" : "Definition of the correlation parameters"
+          },
+          "CHANNELKEY" : {
+            "TITLE" : "Channel key",
+            "DESCRIPTION" : "Definition of the channel key"
+          },
+          "CHANNELNAME" : {
+            "TITLE" : "Channel name",
+            "DESCRIPTION" : "Definition of the channel name"
+          },
+          "CHANNELTYPE" : {
+            "TITLE" : "Channel type",
+            "DESCRIPTION" : "Definition of the channel type"
+          },
+          "CHANNELDESTINATION" : {
+            "TITLE" : "Channel destination",
+            "DESCRIPTION" : "Definition of the channel destination"
+          },
+          "KEYDETECTIONFIXEDVALUE" : {
+            "TITLE" : "Event fixed value",
+            "DESCRIPTION" : "Definition of the event key fixed value"
+          },
+          "KEYDETECTIONJSONFIELD" : {
+            "TITLE" : "Event key json field",
+            "DESCRIPTION" : "Definition of the event key detection with a json field"
+          },
+          "KEYDETECTIONJSONPATH" : {
+            "TITLE" : "Event key json path",
+            "DESCRIPTION" : "Definition of the event key detection with a json path value"
+          }
+        },
         "ISTRANSACTIONPACKAGE" : {
           "ISTRANSACTION" : {
             "TITLE" : "Is a transaction sub process",
@@ -877,6 +927,10 @@
         "STARTMESSAGEEVENT" : {
           "TITLE" : "Start message event",
           "DESCRIPTION" : "A start event with a message trigger"
+        },
+        "STARTEVENTREGISTRYEVENT" : {
+          "TITLE" : "Start event registry event",
+          "DESCRIPTION" : "A start event with an event registry trigger"
         },
         "STARTCONDITIONALEVENT" : {
           "TITLE" : "Start conditional event",
@@ -2601,6 +2655,36 @@
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.EXPRESSION" : "Expression definition",
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.STATIC" : "Fixed duration after task creation",
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "Based on field",
+    
+    "PROPERTY.EVENTINPARAMETERS.VALUE" : "{{length}} event in parameter items",
+    "PROPERTY.EVENTINPARAMETERS.EMPTY" : "No in parameter configured",
+
+    "PROPERTY.EVENTINPARAMETERS.EVENTNAME" : "Event property name",
+    "PROPERTY.EVENTINPARAMETERS.EVENTNAME.PLACEHOLDER" : "Enter an event property name",
+    "PROPERTY.EVENTINPARAMETERS.EVENTTYPE" : "Type",
+    "PROPERTY.EVENTINPARAMETERS.VARIABLENAME" : "Variable name",
+    "PROPERTY.EVENTINPARAMETERS.VARIABLENAME.PLACEHOLDER" : "Enter a variable name",
+    "PROPERTY.EVENTINPARAMETERS.NOSELECTION" : "No parameter selected",
+    
+    "PROPERTY.EVENTOUTPARAMETERS.VALUE" : "{{length}} event out parameter items",
+    "PROPERTY.EVENTOUTPARAMETERS.EMPTY" : "No out parameter configured",
+
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTNAME" : "Event property name",
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTNAME.PLACEHOLDER" : "Enter an event property name",
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTTYPE" : "Type",
+    "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME" : "Variable name",
+    "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME.PLACEHOLDER" : "Enter a variable name",
+    "PROPERTY.EVENTOUTPARAMETERS.NOSELECTION" : "No parameter selected",
+    
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUE" : "{{length}} correlation parameters",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.EMPTY" : "No correlation parameters configured",
+
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NAME" : "Name",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NAME.PLACEHOLDER" : "Enter a name",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.TYPE" : "Type",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NOSELECTION" : "No parameter selected",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP" : "Value",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP.PLACEHOLDER" : "Enter a value / expression",
 
     "MODEL.SAVE.TITLE" : "Save model",
     "MODEL.VALIDATE.TITLE" : "Validation results",

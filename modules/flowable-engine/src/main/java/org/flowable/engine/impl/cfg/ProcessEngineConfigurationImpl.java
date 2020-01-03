@@ -348,8 +348,7 @@ import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.engine.repository.InternalProcessDefinitionLocalizationManager;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
-import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
-import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
@@ -868,6 +867,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected FormFieldHandler formFieldHandler;
     protected boolean isFormFieldValidationEnabled;
+    
+    protected EventRegistryEventConsumer eventRegistryEventConsumer;
 
     /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
@@ -1711,18 +1712,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     
     public void afterInitEventRegistryEventBusConsumer() {
-        if (engineConfigurations.containsKey(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG)) {
-            EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
-            if (eventRegistryEventBusConsumer != null) {
-                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration)
-                                engineConfigurations.get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-                eventRegistryEngineConfiguration.getEventRegistry().registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
-            }
+        EventRegistryEventConsumer bpmnEventRegistryEventConsumer = null;
+        if (eventRegistryEventConsumer != null) {
+            bpmnEventRegistryEventConsumer = eventRegistryEventConsumer;
+        } else {
+            bpmnEventRegistryEventConsumer = new BpmnEventRegistryEventConsumer(this);
         }
-    }
-    
-    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
-        return new BpmnEventRegistryEventConsumer(this);
+        
+        addEventRegistryEventConsumer(bpmnEventRegistryEventConsumer.getConsumerKey(), bpmnEventRegistryEventConsumer);
     }
     
     public void initHistoryCleaningManager() {
@@ -3679,6 +3676,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setFormFieldValidationEnabled(boolean flag) {
         this.isFormFieldValidationEnabled = flag;
+        return this;
+    }
+
+    public EventRegistryEventConsumer getEventRegistryEventConsumer() {
+        return eventRegistryEventConsumer;
+    }
+
+    public ProcessEngineConfigurationImpl setEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventConsumer) {
+        this.eventRegistryEventConsumer = eventRegistryEventConsumer;
         return this;
     }
 

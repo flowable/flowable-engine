@@ -91,7 +91,7 @@ public class EventRegistryServicesAutoConfiguration {
 
         @Bean
         public EventRegistryEngine eventRegistryEngine(@SuppressWarnings("unused") AppEngine appEngine) {
-            // The app engine needs to be injected, as otherwise it won't be initialized, which means that the FormEngine is not initialized yet
+            // The app engine needs to be injected, as otherwise it won't be initialized, which means that the EventRegistryEngine is not initialized yet
             if (!EventRegistryEngines.isInitialized()) {
                 throw new IllegalStateException("Event registry has not been initialized");
             }

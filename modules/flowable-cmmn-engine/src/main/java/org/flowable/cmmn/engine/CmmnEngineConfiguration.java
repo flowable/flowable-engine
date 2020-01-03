@@ -239,8 +239,7 @@ import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
-import org.flowable.eventregistry.api.EventRegistryEventBusConsumer;
-import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
@@ -745,6 +744,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected FormFieldHandler formFieldHandler;
     protected boolean isFormFieldValidationEnabled;
+    
+    protected EventRegistryEventConsumer eventRegistryEventConsumer;
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -1368,18 +1369,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
     
     public void afterInitEventRegistryEventBusConsumer() {
-        if (engineConfigurations.containsKey(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG)) {
-            EventRegistryEventBusConsumer eventRegistryEventBusConsumer = getEventRegistryEventBusConsumer();
-            if (eventRegistryEventBusConsumer != null) {
-                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration)
-                                engineConfigurations.get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-                eventRegistryEngineConfiguration.getEventRegistry().registerEventRegistryEventBusConsumer(eventRegistryEventBusConsumer);
-            }
+        EventRegistryEventConsumer cmmnEventRegistryEventConsumer = null;
+        if (eventRegistryEventConsumer != null) {
+            cmmnEventRegistryEventConsumer = eventRegistryEventConsumer;
+        } else {
+            cmmnEventRegistryEventConsumer = new CmmnEventRegistryEventConsumer(this);
         }
-    }
-    
-    protected EventRegistryEventBusConsumer getEventRegistryEventBusConsumer() {
-        return new CmmnEventRegistryEventConsumer(this);
+        
+        addEventRegistryEventConsumer(cmmnEventRegistryEventConsumer.getConsumerKey(), cmmnEventRegistryEventConsumer);
     }
     
     public void initHistoryCleaningManager() {
@@ -2888,6 +2885,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setBusinessCalendarManager(BusinessCalendarManager businessCalendarManager) {
         this.businessCalendarManager = businessCalendarManager;
+        return this;
+    }
+    
+    public EventRegistryEventConsumer getEventRegistryEventConsumer() {
+        return eventRegistryEventConsumer;
+    }
+
+    public CmmnEngineConfiguration setEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventConsumer) {
+        this.eventRegistryEventConsumer = eventRegistryEventConsumer;
         return this;
     }
 

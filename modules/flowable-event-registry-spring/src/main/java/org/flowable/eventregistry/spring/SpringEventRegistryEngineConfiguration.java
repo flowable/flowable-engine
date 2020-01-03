@@ -198,7 +198,11 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
     public void start() {
         synchronized (lifeCycleMonitor) {
             if (!isRunning()) {
-                enginesBuild.forEach(name -> autoDeployResources(EventRegistryEngines.getEventRegistryEngine(name)));
+                enginesBuild.forEach(name -> {
+                    EventRegistryEngine eventRegistryEngine = EventRegistryEngines.getEventRegistryEngine(name);
+                    eventRegistryEngine.handleDeployedChannelDefinitions();
+                    autoDeployResources(eventRegistryEngine);
+                });
                 running = true;
             }
         }

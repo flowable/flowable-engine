@@ -1,0 +1,52 @@
+
+<div class="modal" ng-controller="FlowableEventInParametersPopupCtrl">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+			<div class="modal-header">
+			    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+			    <h2>{{'PROPERTY.PROPERTY.EDIT.TITLE' | translate}} "{{property.title | translate}}"</h2>
+			</div>
+			<div class="modal-body">
+			
+			    <div class="row row-no-gutter">
+			        <div class="col-xs-6">
+                        <div ng-if="translationsRetrieved" class="kis-listener-grid" ui-grid="gridOptions" ui-grid-selection></div>
+			            <div class="pull-right">
+			                <div class="btn-group">
+			                    <a class="btn btn-icon btn-lg" rel="tooltip" data-title="{{'ACTION.ADD' | translate:property}}" data-placement="bottom" data-original-title="" title="" ng-click="addNewParameter()"><i class="glyphicon glyphicon-plus"></i></a>
+			                    <a class="btn btn-icon btn-lg" rel="tooltip" data-title="{{'ACTION.REMOVE' | translate:property}}" data-placement="bottom" data-original-title="" title="" ng-click="removeParameter()"><i class="glyphicon glyphicon-minus"></i></a>
+			                </div>
+			            </div>
+			        </div>
+			
+			        <div class="col-xs-6">
+			            <div ng-show="selectedParameter">
+							<div class="form-group">
+                                <label for="variableNameField">{{'PROPERTY.EVENTINPARAMETERS.VARIABLENAME' | translate}}</label>
+                                <input type="text" id="variableNameField" class="form-control" ng-model="selectedParameter.variableName" placeholder="{{'PROPERTY.EVENTINPARAMETERS.VARIABLENAME.PLACEHOLDER' | translate}}" />
+                            </div>
+							<div class="form-group">
+						   		<label for="eventNameField">{{'PROPERTY.EVENTINPARAMETERS.EVENTNAME' | translate}}</label>
+						   		<input type="text" id="eventNameField" class="form-control" ng-model="selectedParameter.eventName" placeholder="{{'PROPERTY.EVENTINPARAMETERS.EVENTNAME.PLACEHOLDER' | translate}}" />
+							</div>
+							<div class="form-group">
+                                <label for="eventTypeField">{{'PROPERTY.EVENTINPARAMETERS.EVENTTYPE' | translate}}</label>
+                                <select id="eventTypeField" class="form-control" ng-model="selectedParameter.eventType">
+                                    <option>string</option>
+                                    <option>integer</option>
+                                    <option>double</option>
+                                    <option>boolean</option>
+                                </select>
+                            </div>
+			            </div>
+			            <div ng-show="!selectedParameter" class="muted no-property-selected" translate>PROPERTY.EVENTINPARAMETERS.NOSELECTION</div>
+			        </div>
+			    </div>
+			</div>
+			<div class="modal-footer">
+			    <button ng-click="cancel()" class="btn btn-primary" translate>ACTION.CANCEL</button>
+			    <button ng-click="save()" class="btn btn-primary" translate>ACTION.SAVE</button>
+			</div>
+		</div>
+	</div>
+</div>
