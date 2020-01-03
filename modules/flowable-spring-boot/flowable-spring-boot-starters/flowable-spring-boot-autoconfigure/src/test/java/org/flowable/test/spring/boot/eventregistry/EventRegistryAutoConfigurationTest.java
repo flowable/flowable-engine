@@ -411,7 +411,7 @@ public class EventRegistryAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, EventRegistryEngine eventRegistryEngine) {
         List<Method> methods = Stream.of(EventRegistryEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName")))
+            .filter(method -> !(method.getReturnType().equals(void.class)) || method.getName().equals("close") || method.getName().equals("getName"))
             .collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {
