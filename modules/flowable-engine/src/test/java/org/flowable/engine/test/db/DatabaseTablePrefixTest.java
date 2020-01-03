@@ -45,6 +45,7 @@ public class DatabaseTablePrefixTest {
                 .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
         config1.setDatabaseTablePrefix("SCHEMA1.");
         config1.setValidateFlowable5EntitiesEnabled(false);
+        config1.setDisableEventRegistry(true);
         config1.getPerformanceSettings().setValidateExecutionRelationshipCountConfigOnBoot(false);
         config1.getPerformanceSettings().setValidateTaskRelationshipCountConfigOnBoot(false);
         ProcessEngine engine1 = config1.buildProcessEngine();
@@ -54,6 +55,7 @@ public class DatabaseTablePrefixTest {
                 .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
         config2.setDatabaseTablePrefix("SCHEMA2.");
         config2.setValidateFlowable5EntitiesEnabled(false);
+        config2.setDisableEventRegistry(true);
         config2.getPerformanceSettings().setValidateExecutionRelationshipCountConfigOnBoot(false);
         config2.getPerformanceSettings().setValidateTaskRelationshipCountConfigOnBoot(false);
         ProcessEngine engine2 = config2.buildProcessEngine();
