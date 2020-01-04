@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -31,6 +30,7 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -95,7 +95,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             }
         }
 
-        planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
+        planItemInstanceEntity.setReferenceType(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
         planItemInstanceEntity.setReferenceId(processInstanceId);
 
         if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isEnableEntityLinks()) {
@@ -127,7 +127,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         if (planItemInstance.getReferenceId() == null) {
             throw new FlowableException("Cannot trigger process task plan item instance : no reference id set");
         }
-        if (!CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
+        if (!ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger process task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }
@@ -163,11 +163,11 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
     @Override
     public void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade) {
-        if (CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(delegatePlanItemInstance.getReferenceType())) {
+        if (ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(delegatePlanItemInstance.getReferenceType())) {
             delegatePlanItemInstance.setState(PlanItemInstanceState.TERMINATED); // This is not the regular termination, but the state still needs to be correct
             deleteProcessInstance(commandContext, delegatePlanItemInstance);
         } else {
-            throw new FlowableException("Can only delete a child entity for a plan item with callback type " + CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
+            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
         }
     }
 

@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -336,7 +337,8 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
             inboundEventChannelAdapter.triggerTestEvent("testCustomer");
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(1);
         }
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getBusinessKey()).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceId()).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceType()).isEqualTo(ReferenceTypes.EVENT_CASE);
     }
 
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {

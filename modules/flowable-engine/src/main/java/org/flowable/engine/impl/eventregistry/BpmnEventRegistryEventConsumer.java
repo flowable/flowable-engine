@@ -16,13 +16,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.impl.consumer.BaseEventRegistryEventConsumer;
+import org.flowable.eventregistry.impl.consumer.CorrelationKey;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
@@ -61,7 +65,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             handleEventSubscription(runtimeService, eventSubscription, eventInstance);
         }
 
-        Collection<String> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
+        Collection<CorrelationKey> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
         if (!correlationKeys.isEmpty()) {
             // If there are correlation keys then look for all event subscriptions matching them
             eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventModel, correlationKeys);
@@ -71,10 +75,12 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         }
     }
 
-    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(EventModel eventDefinition, Collection<String> correlationKeys) {
+    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(EventModel eventDefinition, Collection<CorrelationKey> correlationKeys) {
+        Set<String> allCorrelationKeyValues = correlationKeys.stream().map(CorrelationKey::getValue).collect(Collectors.toSet());
+
         return commandExecutor.execute(commandContext ->
             CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(
-                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).configurations(correlationKeys).scopeType(ScopeTypes.BPMN)));
+                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).configurations(allCorrelationKeyValues).scopeType(ScopeTypes.BPMN)));
     }
 
     protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(EventModel eventDefinition) {
@@ -86,14 +92,14 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     protected void handleEventSubscription(RuntimeService runtimeService, EventSubscription eventSubscription, EventInstance eventInstance) {
         if (eventSubscription.getExecutionId() != null) {
             Map<String, Object> transientVariableMap = new HashMap<>();
-            transientVariableMap.put("eventInstance", eventInstance);
+            transientVariableMap.put(EventConstants.EVENT_INSTANCE, eventInstance);
             runtimeService.trigger(eventSubscription.getExecutionId(), null, transientVariableMap);
 
         } else if (eventSubscription.getProcessDefinitionId() != null
                         && eventSubscription.getProcessInstanceId() == null && eventSubscription.getExecutionId() == null) {
             
             runtimeService.createProcessInstanceBuilder().processDefinitionId(eventSubscription.getProcessDefinitionId())
-                    .transientVariable("eventInstance", eventInstance)
+                    .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance)
                     .startAsync();
         }
     }

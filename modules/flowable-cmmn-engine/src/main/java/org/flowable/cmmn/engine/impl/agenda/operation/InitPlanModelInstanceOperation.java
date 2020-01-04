@@ -20,6 +20,7 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.eventregistry.impl.constant.EventConstants;
 
 /**
  * @author Joram Barrez
@@ -38,7 +39,7 @@ public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperatio
         super.run();
         
         Case caseModel = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId());
-        Object eventInstance = caseInstanceEntity.getTransientVariable("eventInstance");
+        Object eventInstance = caseInstanceEntity.getTransientVariable(EventConstants.EVENT_INSTANCE);
         if (eventInstance instanceof EventInstance) {
             EventInstanceCmmnUtil.handleEventInstanceOutParameters(caseInstanceEntity, caseModel, (EventInstance) eventInstance);
         }

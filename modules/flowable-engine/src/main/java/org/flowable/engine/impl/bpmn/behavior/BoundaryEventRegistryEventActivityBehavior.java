@@ -31,6 +31,7 @@ import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -76,7 +77,7 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         BoundaryEvent boundaryEvent = (BoundaryEvent) execution.getCurrentFlowElement();
         
-        Object eventInstance = execution.getTransientVariables().get("eventInstance");
+        Object eventInstance = execution.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
         if (eventInstance instanceof EventInstance) {
             EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, boundaryEvent, (EventInstance) eventInstance);
         }

@@ -27,9 +27,9 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -805,7 +805,7 @@ public class ExecutionEntityManagerImpl
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         CaseInstanceService caseInstanceService = processEngineConfiguration.getCaseInstanceService();
         if (caseInstanceService != null) {
-            if (executionEntity.getReferenceId() != null && CallbackTypes.EXECUTION_CHILD_CASE.equals(executionEntity.getReferenceType())) {
+            if (executionEntity.getReferenceId() != null && ReferenceTypes.EXECUTION_CHILD_CASE.equals(executionEntity.getReferenceType())) {
                 caseInstanceService.deleteCaseInstance(executionEntity.getReferenceId());
             } else if (executionEntity.getCurrentFlowElement() instanceof CaseServiceTask) {
                 // backwards compatibility in case there is no reference

@@ -40,6 +40,7 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -238,7 +239,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(1, planItemInstances.size());
         assertEquals("The Process", planItemInstances.get(0).getName());
         assertNotNull(planItemInstances.get(0).getReferenceId());
-        assertEquals(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
+        assertEquals(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
 
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().singleResult();

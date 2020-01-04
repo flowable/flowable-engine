@@ -170,10 +170,12 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
         Case caseModel = cmmnModel.getCaseById(caseDefinition.getKey());
-        
-        StartCaseInstanceBeforeContext instanceBeforeContext = new StartCaseInstanceBeforeContext(caseInstanceBuilder.getBusinessKey(), caseInstanceBuilder.getName(), 
-                        caseInstanceBuilder.getCallbackId(), caseInstanceBuilder.getCallbackType(), caseInstanceBuilder.getParentId(), caseInstanceBuilder.getVariables(),
-                        caseInstanceBuilder.getTransientVariables(), caseInstanceBuilder.getTenantId(), caseModel.getInitiatorVariableName(), 
+
+        StartCaseInstanceBeforeContext instanceBeforeContext = new StartCaseInstanceBeforeContext(caseInstanceBuilder.getBusinessKey(), caseInstanceBuilder.getName(),
+                        caseInstanceBuilder.getCallbackId(), caseInstanceBuilder.getCallbackType(),
+                        caseInstanceBuilder.getReferenceId(), caseInstanceBuilder.getReferenceType(),
+                        caseInstanceBuilder.getParentId(), caseInstanceBuilder.getVariables(),
+                        caseInstanceBuilder.getTransientVariables(), caseInstanceBuilder.getTenantId(), caseModel.getInitiatorVariableName(),
                         caseModel, caseDefinition, cmmnModel, caseInstanceBuilder.getOverrideDefinitionTenantId(), caseInstanceBuilder.getPredefinedCaseInstanceId());
         
         if (cmmnEngineConfiguration.getStartCaseInstanceInterceptor() != null) {
@@ -237,6 +239,14 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         if (instanceBeforeContext.getCallbackType() != null) {
             caseInstanceEntity.setCallbackType(instanceBeforeContext.getCallbackType());
+        }
+
+        if (instanceBeforeContext.getReferenceId() != null) {
+            caseInstanceEntity.setReferenceId(instanceBeforeContext.getReferenceId());
+        }
+
+        if (instanceBeforeContext.getReferenceType() != null) {
+            caseInstanceEntity.setReferenceType(instanceBeforeContext.getReferenceType());
         }
 
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {

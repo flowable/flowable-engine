@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -56,15 +56,22 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
      * Generates all possible correlation keys for the given correlation parameters.
      * The first element in the list will only have used one parameter. The last element in the list has included all parameters.
      */
-    protected Collection<String> generateCorrelationKeys(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
+    protected Collection<CorrelationKey> generateCorrelationKeys(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
+
         if (correlationParameterInstances.isEmpty()) {
             return Collections.emptySet();
         }
+
         List<EventCorrelationParameterInstance> list = new ArrayList<>(correlationParameterInstances);
-        Collection<String> correlationKeys = new HashSet<>();
+        Collection<CorrelationKey> correlationKeys = new ArrayList<>();
         for (int i = 1; i <= list.size(); i++) {
             for (int j = 0; j <= list.size() - i; j++) {
-                correlationKeys.add(generateCorrelationKey(list.subList(j, j + i)));
+                List<EventCorrelationParameterInstance> parameterSubList = list.subList(j, j + i);
+                String correlationKey = generateCorrelationKey(parameterSubList);
+
+                if (correlationKeys.stream().noneMatch(c -> Objects.equals(c.getValue(), correlationKey))) {
+                    correlationKeys.add(new CorrelationKey(correlationKey, parameterSubList));
+                }
             }
         }
 

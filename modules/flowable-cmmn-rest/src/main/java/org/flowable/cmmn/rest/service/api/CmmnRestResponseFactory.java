@@ -461,6 +461,8 @@ public class CmmnRestResponseFactory {
         result.setParentId(caseInstance.getParentId());
         result.setCallbackId(caseInstance.getCallbackId());
         result.setCallbackType(caseInstance.getCallbackType());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
         result.setTenantId(caseInstance.getTenantId());
 
         for (String name : caseInstance.getCaseVariables().keySet()) {
@@ -486,6 +488,8 @@ public class CmmnRestResponseFactory {
         result.setParentId(caseInstance.getParentId());
         result.setCallbackId(caseInstance.getCallbackId());
         result.setCallbackType(caseInstance.getCallbackType());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
         result.setTenantId(caseInstance.getTenantId());
         result.setCompleted(false);
 
@@ -568,6 +572,10 @@ public class CmmnRestResponseFactory {
         }
         result.setTenantId(caseInstance.getTenantId());
         result.setState(caseInstance.getState());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
+        result.setCallbackId(caseInstance.getCallbackId());
+        result.setCallbackType(caseInstance.getCallbackType());
         return result;
     }
 

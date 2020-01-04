@@ -4,7 +4,7 @@
     <case id="testCaseStartEvent" name="testCaseStartEvent" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
         <extensionElements>
             <flowable:eventType>myEvent</flowable:eventType>
-            <flowable:startEventCorrelationConfiguration><![CDATA[storeAsUniqueBusinessKey]]></flowable:startEventCorrelationConfiguration>
+            <flowable:startEventCorrelationConfiguration><![CDATA[storeAsUniqueReferenceId]]></flowable:startEventCorrelationConfiguration>
         </extensionElements>
         <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
             <extensionElements>

@@ -51,6 +51,7 @@ import org.flowable.engine.interceptor.StartProcessInstanceBeforeContext;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
@@ -215,7 +216,7 @@ public class ProcessInstanceHelper {
         
         if (startInstanceBeforeContext.getTransientVariables() != null) {
             
-            Object eventInstance = startInstanceBeforeContext.getTransientVariables().get("eventInstance");
+            Object eventInstance = startInstanceBeforeContext.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
             if (eventInstance instanceof EventInstance) {
                 EventInstanceBpmnUtil.handleEventInstanceOutParameters(processInstance, startInstanceBeforeContext.getInitialFlowElement(), 
                                 (EventInstance) eventInstance);

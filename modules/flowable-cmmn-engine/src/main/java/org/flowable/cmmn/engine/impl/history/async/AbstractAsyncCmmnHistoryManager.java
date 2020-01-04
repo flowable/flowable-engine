@@ -65,6 +65,8 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_START_TIME, caseInstanceEntity.getStartTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CALLBACK_ID, caseInstanceEntity.getCallbackId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CALLBACK_TYPE, caseInstanceEntity.getCallbackType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID, caseInstanceEntity.getReferenceId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE, caseInstanceEntity.getReferenceType());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, caseInstanceEntity.getTenantId());
 
         if (caseInstanceEntity.getCaseDefinitionId() != null) {
@@ -86,6 +88,8 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TENANT_ID, historicCaseInstanceEntity.getTenantId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CALLBACK_ID, historicCaseInstanceEntity.getCallbackId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CALLBACK_TYPE, historicCaseInstanceEntity.getCallbackType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID, historicCaseInstanceEntity.getReferenceId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE, historicCaseInstanceEntity.getReferenceType());
 
         if (historicCaseInstanceEntity.getCaseDefinitionId() != null) {
             addCaseDefinitionFields(data, CaseDefinitionUtil.getCaseDefinition(historicCaseInstanceEntity.getCaseDefinitionId()));

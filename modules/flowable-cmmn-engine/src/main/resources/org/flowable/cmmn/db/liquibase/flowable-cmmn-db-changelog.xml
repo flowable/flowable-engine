@@ -473,4 +473,25 @@
     
     </changeSet>
 
+    <changeSet id="10" author="flowable">
+
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="REFERENCE_ID_" type="varchar(255)" />
+        </addColumn>
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="REFERENCE_TYPE_" type="varchar(255)" />
+        </addColumn>
+        <createIndex tableName="ACT_CMMN_RU_CASE_INST" indexName="ACT_IDX_CASE_INST_REF_ID_">
+            <column name="REFERENCE_ID_" />
+        </createIndex>
+
+        <addColumn tableName="ACT_CMMN_HI_CASE_INST">
+            <column name="REFERENCE_ID_" type="varchar(255)" />
+        </addColumn>
+        <addColumn tableName="ACT_CMMN_HI_CASE_INST">
+            <column name="REFERENCE_TYPE_" type="varchar(255)" />
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>
