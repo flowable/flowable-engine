@@ -48,6 +48,8 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String deploymentId;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected List<HistoricVariableInstanceEntity> queryVariables;
 
     public HistoricProcessInstanceEntityImpl() {
@@ -55,25 +57,27 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     }
 
     public HistoricProcessInstanceEntityImpl(ExecutionEntity processInstance) {
-        id = processInstance.getId();
-        processInstanceId = processInstance.getId();
-        businessKey = processInstance.getBusinessKey();
-        name = processInstance.getName();
-        processDefinitionId = processInstance.getProcessDefinitionId();
-        processDefinitionKey = processInstance.getProcessDefinitionKey();
-        processDefinitionName = processInstance.getProcessDefinitionName();
-        processDefinitionVersion = processInstance.getProcessDefinitionVersion();
-        deploymentId = processInstance.getDeploymentId();
-        startActivityId = processInstance.getStartActivityId();
-        startTime = processInstance.getStartTime();
-        startUserId = processInstance.getStartUserId();
-        superProcessInstanceId = processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null;
-        callbackId = processInstance.getCallbackId();
-        callbackType = processInstance.getCallbackType();
-        
+        this.id = processInstance.getId();
+        this.processInstanceId = processInstance.getId();
+        this.businessKey = processInstance.getBusinessKey();
+        this.name = processInstance.getName();
+        this.processDefinitionId = processInstance.getProcessDefinitionId();
+        this.processDefinitionKey = processInstance.getProcessDefinitionKey();
+        this.processDefinitionName = processInstance.getProcessDefinitionName();
+        this.processDefinitionVersion = processInstance.getProcessDefinitionVersion();
+        this.deploymentId = processInstance.getDeploymentId();
+        this.startActivityId = processInstance.getStartActivityId();
+        this.startTime = processInstance.getStartTime();
+        this.startUserId = processInstance.getStartUserId();
+        this.superProcessInstanceId = processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null;
+        this.callbackId = processInstance.getCallbackId();
+        this.callbackType = processInstance.getCallbackType();
+        this.referenceId = processInstance.getReferenceId();
+        this.referenceType = processInstance.getReferenceType();
+
         // Inherit tenant id (if applicable)
         if (processInstance.getTenantId() != null) {
-            tenantId = processInstance.getTenantId();
+            this.tenantId = processInstance.getTenantId();
         }
     }
 
@@ -95,6 +99,8 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("deploymentId", deploymentId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
         return persistentState;
     }
 
@@ -264,6 +270,26 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    @Override
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    @Override
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @Override
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    @Override
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
 
     @Override

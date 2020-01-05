@@ -66,18 +66,13 @@ public class ProcessInstanceHelper {
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
                     Map<String, Object> variables, Map<String, Object> transientVariables) {
         
-        return createProcessInstance(processDefinition, businessKey, processInstanceName, null, null , variables, transientVariables, null, null, null, false);
+        return createProcessInstance(processDefinition, businessKey, processInstanceName, null, null ,
+            variables, transientVariables, null, null, null, null, null, false);
     }
 
-    public ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
-                    Map<String, Object> variables, Map<String, Object> transientVariables) {
-        
-        return createProcessInstance(processDefinition, businessKey, processInstanceName, null, null , variables, transientVariables, null, null, null, true);
-    }
-
-    public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
+    public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName,
                     String overrideDefinitionTenantId, String predefinedProcessInstanceId, Map<String, Object> variables, Map<String, Object> transientVariables, 
-                    String callbackId, String callbackType, String stageInstanceId, boolean startProcessInstance) {
+                    String callbackId, String callbackType, String referenceId, String referenceType, String stageInstanceId, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
@@ -104,11 +99,12 @@ public class ProcessInstanceHelper {
 
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, processInstanceName, overrideDefinitionTenantId, 
                         predefinedProcessInstanceId, initialFlowElement, process, variables, transientVariables, 
-                        callbackId, callbackType, stageInstanceId, startProcessInstance);
+                        callbackId, callbackType, referenceId, referenceType, stageInstanceId, startProcessInstance);
     }
 
     public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, String messageName, String businessKey, 
-                    Map<String, Object> variables, Map<String, Object> transientVariables, String callbackId, String callbackType) {
+            Map<String, Object> variables, Map<String, Object> transientVariables,
+            String callbackId, String callbackType, String referenceId, String referenceType) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
@@ -146,7 +142,7 @@ public class ProcessInstanceHelper {
         }
 
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, null, null, null, initialFlowElement, 
-                        process, variables, transientVariables, callbackId, callbackType, null, true);
+                        process, variables, transientVariables, callbackId, callbackType, referenceId, referenceType, null, true);
     }
     
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
@@ -154,12 +150,16 @@ public class ProcessInstanceHelper {
             Map<String, Object> transientVariables, boolean startProcessInstance) {
         
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, processInstanceName, null, null, initialFlowElement, 
-                        process, variables, transientVariables, null, null, null, startProcessInstance);
+                        process, variables, transientVariables, null, null, null, null, null, startProcessInstance);
     }
 
-    public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
-                    String overrideDefinitionTenantId, String predefinedProcessInstanceId, FlowElement initialFlowElement, Process process, Map<String, Object> variables, 
-                    Map<String, Object> transientVariables, String callbackId, String callbackType, String stageInstanceId, boolean startProcessInstance) {
+    public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
+            String businessKey, String processInstanceName,
+            String overrideDefinitionTenantId, String predefinedProcessInstanceId,
+            FlowElement initialFlowElement, Process process,
+            Map<String, Object> variables, Map<String, Object> transientVariables,
+            String callbackId, String callbackType, String referenceId, String referenceType,
+            String stageInstanceId, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
 
@@ -176,9 +176,10 @@ public class ProcessInstanceHelper {
             tenantId = processDefinition.getTenantId();
         }
         
-        StartProcessInstanceBeforeContext startInstanceBeforeContext = new StartProcessInstanceBeforeContext(businessKey, processInstanceName, callbackId, 
-                        callbackType, variables, transientVariables, tenantId, initiatorVariableName, initialFlowElement.getId(), 
-                        initialFlowElement, process, processDefinition, overrideDefinitionTenantId, predefinedProcessInstanceId);
+        StartProcessInstanceBeforeContext startInstanceBeforeContext = new StartProcessInstanceBeforeContext(businessKey, processInstanceName,
+            callbackId, callbackType, referenceId, referenceType,
+            variables, transientVariables, tenantId, initiatorVariableName, initialFlowElement.getId(),
+            initialFlowElement, process, processDefinition, overrideDefinitionTenantId, predefinedProcessInstanceId);
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
@@ -188,7 +189,9 @@ public class ProcessInstanceHelper {
         ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager(commandContext)
                 .createProcessInstanceExecution(startInstanceBeforeContext.getProcessDefinition(), startInstanceBeforeContext.getPredefinedProcessInstanceId(), 
                         startInstanceBeforeContext.getBusinessKey(), startInstanceBeforeContext.getProcessInstanceName(),
-                        startInstanceBeforeContext.getCallbackId(), startInstanceBeforeContext.getCallbackType(), stageInstanceId,
+                        startInstanceBeforeContext.getCallbackId(), startInstanceBeforeContext.getCallbackType(),
+                        startInstanceBeforeContext.getReferenceId(), startInstanceBeforeContext.getReferenceType(),
+                        stageInstanceId,
                         startInstanceBeforeContext.getTenantId(), startInstanceBeforeContext.getInitiatorVariableName(),
                         startInstanceBeforeContext.getInitialActivityId());
 
@@ -404,13 +407,13 @@ public class ProcessInstanceHelper {
         if (processInstance.getCallbackId() != null && processInstance.getCallbackType() != null) {
             Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceCallbacks = CommandContextUtil
                     .getProcessEngineConfiguration(commandContext).getProcessInstanceStateChangedCallbacks();
+
             if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(processInstance.getCallbackType())) {
                 for (RuntimeInstanceStateChangeCallback caseInstanceCallback : caseInstanceCallbacks.get(processInstance.getCallbackType())) {
+
                     caseInstanceCallback.stateChanged(new CallbackData(processInstance.getCallbackId(), 
-                                                                       processInstance.getCallbackType(), 
-                                                                       processInstance.getId(), 
-                                                                       oldState, 
-                                                                       newState));
+                        processInstance.getCallbackType(), processInstance.getId(), oldState, newState));
+
                 }
             }
         }

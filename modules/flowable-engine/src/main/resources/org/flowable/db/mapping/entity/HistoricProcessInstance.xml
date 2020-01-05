@@ -38,7 +38,9 @@
         TENANT_ID_,
         NAME_,
         CALLBACK_ID_,
-        CALLBACK_TYPE_
+        CALLBACK_TYPE_,
+        REFERENCE_ID_,
+        REFERENCE_TYPE_
       ) values (
         #{id ,jdbcType=VARCHAR},
         1,
@@ -56,7 +58,9 @@
         #{tenantId, jdbcType=VARCHAR},
         #{name, jdbcType=VARCHAR},
         #{callbackId, jdbcType=VARCHAR},
-        #{callbackType, jdbcType=VARCHAR}
+        #{callbackType, jdbcType=VARCHAR},
+        #{referenceId, jdbcType=VARCHAR},
+        #{referenceType, jdbcType=VARCHAR},
       )
   </insert>
   
@@ -78,7 +82,9 @@
         TENANT_ID_,
         NAME_,
         CALLBACK_ID_,
-        CALLBACK_TYPE_
+        CALLBACK_TYPE_,
+        REFERENCE_ID_,
+        REFERENCE_TYPE_
       ) values 
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
           (
@@ -98,7 +104,9 @@
            #{historicProcessInstance.tenantId, jdbcType=VARCHAR},
            #{historicProcessInstance.name, jdbcType=VARCHAR},
            #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
-           #{historicProcessInstance.callbackType, jdbcType=VARCHAR}
+           #{historicProcessInstance.callbackType, jdbcType=VARCHAR},
+           #{historicProcessInstance.referenceId, jdbcType=VARCHAR},
+           #{historicProcessInstance.referenceType, jdbcType=VARCHAR}
           )
          </foreach>
   </insert>
@@ -123,7 +131,9 @@
             TENANT_ID_,
             NAME_,
             CALLBACK_ID_,
-            CALLBACK_TYPE_
+            CALLBACK_TYPE_,
+            REFERENCE_ID_,
+            REFERENCE_TYPE_
           ) VALUES 
               (
                #{historicProcessInstance.id ,jdbcType=VARCHAR},
@@ -142,7 +152,9 @@
                #{historicProcessInstance.tenantId, jdbcType=VARCHAR},
                #{historicProcessInstance.name, jdbcType=VARCHAR},
                #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
-               #{historicProcessInstance.callbackType, jdbcType=VARCHAR}
+               #{historicProcessInstance.callbackType, jdbcType=VARCHAR},
+               #{historicProcessInstance.referenceId, jdbcType=VARCHAR},
+               #{historicProcessInstance.referenceType, jdbcType=VARCHAR}
               )
        </foreach>
     SELECT * FROM dual
@@ -183,7 +195,13 @@
         </if> 
         <if test="originalPersistentState.callbackType != callbackType">
           CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR}
-        </if>    
+        </if>
+        <if test="originalPersistentState.referenceId != referenceId">
+          REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.referenceType != referenceType">
+          REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
+        </if>
       </set>
     where ID_ = #{id}
     and REV_ = #{revision, jdbcType=INTEGER}
@@ -226,6 +244,8 @@
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
     <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+    <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
+    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="historicProcessInstanceAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
@@ -250,6 +270,8 @@
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
     <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+    <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
+    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
@@ -749,6 +771,12 @@
       <if test="callbackType != null">
         and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType}
       </if>
+      <if test="referenceId != null">
+          and ${queryTablePrefix}REFERENCE_ID_ = #{referenceId}
+      </if>
+      <if test="referenceType != null">
+          and ${queryTablePrefix}REFERENCE_TYPE_ = #{referenceType}
+      </if>
       <if test="tenantId != null">
         and ${queryTablePrefix}TENANT_ID_ = #{tenantId}
       </if>
@@ -839,6 +867,12 @@
       </if>
       <if test="orQueryObject.callbackType != null">
         or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType}
+      </if>
+      <if test="orQueryObject.referenceId != null">
+          or ${queryTablePrefix}REFERENCE_ID_ = #{orQueryObject.referenceId}
+      </if>
+      <if test="orQueryObject.referenceType != null">
+          or ${queryTablePrefix}REFERENCE_TYPE_ = #{orQueryObject.referenceType}
       </if>
       <if test="orQueryObject.tenantId != null">
         or ${queryTablePrefix}TENANT_ID_ = #{orQueryObject.tenantId}

@@ -2090,16 +2090,62 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByReferenceId() {
+        String processInstanceId = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .referenceId("testReferenceId")
+            .start()
+            .getId();
+
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceReferenceId("testReferenceId").list())
+            .extracting(ProcessInstance::getId)
+            .containsExactly(processInstanceId);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryByInvalidReferenceId() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
         Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceReferenceId("foo").list()).isNullOrEmpty();
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByReferenceType() {
+        String processInstanceId = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .referenceType("testReferenceType")
+            .start()
+            .getId();
+
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceReferenceType("testReferenceType").list())
+            .extracting(ProcessInstance::getId)
+            .containsExactly(processInstanceId);
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryByInvalidReferenceType() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
         Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceReferenceType("foo").list()).isNullOrEmpty();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByReferenceIdAndType() {
+        String[] processInstanceIds = new String[6];
+        for (int i = 0; i < processInstanceIds.length; i++) {
+            String processInstanceId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .referenceId("testReferenceId")
+                .referenceType("testReferenceType")
+                .start()
+                .getId();
+            processInstanceIds[i] = processInstanceId;
+        }
+
+        Assertions.assertThat(runtimeService.createProcessInstanceQuery().processInstanceReferenceId("testReferenceId").processInstanceReferenceType("testReferenceType").list())
+            .extracting(ProcessInstance::getId)
+            .containsExactly(processInstanceIds);
     }
 }

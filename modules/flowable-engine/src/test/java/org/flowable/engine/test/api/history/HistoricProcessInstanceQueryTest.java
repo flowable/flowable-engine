@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -96,5 +98,68 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
             assertEquals(1, historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).count());
         }
     }
-    
+
+    @Test
+    public void testQueryByReferenceId() {
+        deployOneTaskTestProcess();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .referenceId("testReferenceId")
+            .start();
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceId("testReferenceId").list())
+            .extracting(HistoricProcessInstance::getId)
+            .contains(processInstance.getId());
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().or()
+                .processInstanceReferenceId("testReferenceId").processInstanceName("doesn't exist").list())
+            .extracting(HistoricProcessInstance::getId)
+            .contains(processInstance.getId());
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceId("invalid").list()).isEmpty();
+    }
+
+    @Test
+    public void testQueryByReferenceType() {
+        deployOneTaskTestProcess();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .referenceType("testReferenceType")
+            .start();
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceType("testReferenceType").list())
+            .extracting(HistoricProcessInstance::getId)
+            .contains(processInstance.getId());
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().or()
+            .processInstanceReferenceType("testReferenceType").processInstanceName("doesn't exist").list())
+            .extracting(HistoricProcessInstance::getId)
+            .contains(processInstance.getId());
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceType("invalid").list()).isEmpty();
+    }
+
+    @Test
+    public void testQueryByReferenceIdAndType() {
+        deployOneTaskTestProcess();
+
+        String[] ids = new String[7];
+        for (int i = 0; i < ids.length; i++) {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .referenceId("testReferenceId")
+                .referenceType("testReferenceType")
+                .start();
+
+            ids[i] = processInstance.getId();
+        }
+
+        assertThat(historyService.createHistoricProcessInstanceQuery()
+                .processInstanceReferenceId("testReferenceId")
+                .processInstanceReferenceType("testReferenceType").list())
+            .extracting(HistoricProcessInstance::getId)
+            .containsExactlyInAnyOrder(ids);
+
+    }
+
 }

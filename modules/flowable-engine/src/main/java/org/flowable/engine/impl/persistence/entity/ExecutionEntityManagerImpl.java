@@ -233,8 +233,9 @@ public class ExecutionEntityManagerImpl
 
     @Override
     public ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId, 
-                    String businessKey, String processInstanceName, String callbackId, String callbackType, String propagatedStageInstanceId,
-                    String tenantId, String initiatorVariableName, String startActivityId) {
+            String businessKey, String processInstanceName,
+            String callbackId, String callbackType, String referenceId, String referenceType,
+            String propagatedStageInstanceId, String tenantId, String initiatorVariableName, String startActivityId) {
 
         ExecutionEntity processInstanceExecution = dataManager.create();
 
@@ -260,6 +261,12 @@ public class ExecutionEntityManagerImpl
         }
         if (callbackType != null) {
             processInstanceExecution.setCallbackType(callbackType);
+        }
+        if (referenceId != null) {
+            processInstanceExecution.setReferenceId(referenceId);
+        }
+        if (referenceType != null) {
+            processInstanceExecution.setReferenceType(referenceType);
         }
         if (propagatedStageInstanceId != null) {
             processInstanceExecution.setPropagatedStageInstanceId(propagatedStageInstanceId);

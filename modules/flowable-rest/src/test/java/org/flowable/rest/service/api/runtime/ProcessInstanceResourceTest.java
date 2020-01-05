@@ -49,7 +49,14 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testGetProcessInstance() throws Exception {
         Authentication.setAuthenticatedUserId("testUser");
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("processOne")
+            .businessKey("myBusinessKey")
+            .callbackId("testCallbackId")
+            .callbackType("testCallbackType")
+            .referenceId("testReferenceId")
+            .referenceType("testReferenceType")
+            .start();
         Authentication.setAuthenticatedUserId(null);
 
         String url = buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
@@ -65,6 +72,10 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         assertEquals(processInstance.getStartUserId(), responseNode.get("startUserId").textValue());
         assertEquals(processInstance.getProcessDefinitionName(), responseNode.get("processDefinitionName").textValue());
         assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
+        assertEquals("testCallbackId", responseNode.get("callbackId").textValue());
+        assertEquals("testCallbackType", responseNode.get("callbackType").textValue());
+        assertEquals("testReferenceId", responseNode.get("referenceId").textValue());
+        assertEquals("testReferenceType", responseNode.get("referenceType").textValue());
         assertFalse(responseNode.get("suspended").booleanValue());
         assertEquals("", responseNode.get("tenantId").textValue());
 

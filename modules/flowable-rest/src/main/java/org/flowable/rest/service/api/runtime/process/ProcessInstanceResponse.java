@@ -49,6 +49,8 @@ public class ProcessInstanceResponse {
     protected List<RestVariable> variables = new ArrayList<>();
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId;
 
     // Added by Ryan Johnston
@@ -197,6 +199,24 @@ public class ProcessInstanceResponse {
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @ApiModelProperty(example = "event-to-bpmn-2.0-process")
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
 
     public void setTenantId(String tenantId) {
