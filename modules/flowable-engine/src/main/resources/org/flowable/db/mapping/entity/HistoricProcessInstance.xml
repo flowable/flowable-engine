@@ -60,7 +60,7 @@
         #{callbackId, jdbcType=VARCHAR},
         #{callbackType, jdbcType=VARCHAR},
         #{referenceId, jdbcType=VARCHAR},
-        #{referenceType, jdbcType=VARCHAR},
+        #{referenceType, jdbcType=VARCHAR}
       )
   </insert>
   
