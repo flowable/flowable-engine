@@ -339,6 +339,11 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
         }
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceId()).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceType()).isEqualTo(ReferenceTypes.EVENT_CASE);
+
+        for (int i = 1; i <= 4; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("anotherCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(2);
+        }
     }
 
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {

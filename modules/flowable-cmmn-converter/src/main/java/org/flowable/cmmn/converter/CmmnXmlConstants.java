@@ -187,6 +187,9 @@ public interface CmmnXmlConstants {
     String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
     String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
     String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
+    String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
+    String START_EVENT_CORRELATION_STORE_AS_BUSINESS_KEY = "storeAsBusinessKey";
+    String START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID = "storeAsUniqueReferenceId";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

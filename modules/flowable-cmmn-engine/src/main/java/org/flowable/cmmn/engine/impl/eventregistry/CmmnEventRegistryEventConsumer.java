@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
@@ -124,10 +125,10 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
                 CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
 
-                if (Objects.equals(startCorrelationConfiguration, EventConstants.START_EVENT_CORRELATION_STORE_AS_BUSINESS_KEY)) {
+                if (Objects.equals(startCorrelationConfiguration, CmmnXmlConstants.START_EVENT_CORRELATION_STORE_AS_BUSINESS_KEY)) {
                     caseInstanceBuilder.businessKey(correlationKeyWithAllParameters.getValue());
 
-                } else if (Objects.equals(startCorrelationConfiguration, EventConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
+                } else if (Objects.equals(startCorrelationConfiguration, CmmnXmlConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
                     long caseInstanceCount = cmmnRuntimeService.createCaseInstanceQuery()
                         .caseInstanceReferenceId(correlationKeyWithAllParameters.getValue())
                         .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE)
@@ -153,22 +154,12 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         CmmnModel cmmnModel = cmmnEngineConfiguration.getCmmnRepositoryService().getCmmnModel(eventSubscription.getScopeDefinitionId());
         if (cmmnModel != null) {
             List<ExtensionElement> correlationCfgExtensions = cmmnModel.getPrimaryCase().getExtensionElements()
-                .getOrDefault(EventConstants.START_EVENT_CORRELATION_CONFIGURATION, Collections.emptyList());
+                .getOrDefault(CmmnXmlConstants.START_EVENT_CORRELATION_CONFIGURATION, Collections.emptyList());
             if (!correlationCfgExtensions.isEmpty()) {
                 return correlationCfgExtensions.get(0).getElementText();
             }
         }
         return null;
-    }
-
-    protected CorrelationKey getCorrelationKeyWithAllParameters(Collection<CorrelationKey> correlationKeys) {
-        CorrelationKey result = null;
-        for (CorrelationKey correlationKey : correlationKeys) {
-            if (result == null || (correlationKey.getParameterInstances().size() >= result.getParameterInstances().size()) ) {
-                result = correlationKey;
-            }
-        }
-        return result;
     }
 
 }

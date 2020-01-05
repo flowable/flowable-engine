@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -241,6 +242,22 @@ public class BpmnEventRegistryConsumerTest extends FlowableTestCase {
                 entry("customerIdVar", "payloadStartCustomer"),
                 entry("payload1", "Hello World")
             );
+    }
+
+    @Test
+    @Deployment
+    public void testStartOnlyOneInstance() {
+        for (int i = 1; i <= 9; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(1);
+        }
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult().getReferenceId()).isNotNull();
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult().getReferenceType()).isEqualTo(ReferenceTypes.EVENT_PROCESS);
+
+        for (int i = 1; i <= 3; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("anotherTestCustomer");
+            assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(2);
+        }
     }
 
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {

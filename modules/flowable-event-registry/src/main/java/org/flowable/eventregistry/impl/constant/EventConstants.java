@@ -19,8 +19,4 @@ public interface EventConstants {
 
     String EVENT_INSTANCE = "eventInstance";
 
-    String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
-    String START_EVENT_CORRELATION_STORE_AS_BUSINESS_KEY = "storeAsBusinessKey";
-    String START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID = "storeAsUniqueReferenceId";
-
 }

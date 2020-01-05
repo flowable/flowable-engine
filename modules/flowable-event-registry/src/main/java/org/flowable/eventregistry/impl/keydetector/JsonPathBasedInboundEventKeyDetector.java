@@ -13,6 +13,8 @@
 package org.flowable.eventregistry.impl.keydetector;
 
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,6 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Filip Hrisafov
  */
 public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDetector<JsonNode> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonPathBasedInboundEventKeyDetector.class);
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -37,7 +41,8 @@ public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDete
         JsonNode result = event.at(jsonPathExpression);
 
         if (result == null || result.isMissingNode() || result.isNull()) {
-            // TODO: throw exception? Log? ...?
+            LOGGER.warn("JsonPath expression {} did not detect event key", jsonPathExpression);
+            return null;
         }
 
         if (result.isTextual()) {

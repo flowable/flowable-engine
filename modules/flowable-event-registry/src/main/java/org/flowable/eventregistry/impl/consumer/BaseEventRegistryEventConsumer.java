@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -46,7 +47,11 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         if (event.getEventObject() != null && event.getEventObject() instanceof EventInstance) {
             eventReceived((EventInstance) event.getEventObject());
         } else {
-            // TODO: what should happen in this case?
+            if (event.getEventObject() == null) {
+                throw new FlowableIllegalArgumentException("No event object was passed to the consumer");
+            } else {
+                throw new FlowableIllegalArgumentException("Unsupported event object type: " + event.getEventObject().getClass());
+            }
         }
     }
 
@@ -92,4 +97,15 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                         engingeConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         return eventRegistryEngineConfiguration.getEventRegistry();
     }
+
+    protected CorrelationKey getCorrelationKeyWithAllParameters(Collection<CorrelationKey> correlationKeys) {
+        CorrelationKey result = null;
+        for (CorrelationKey correlationKey : correlationKeys) {
+            if (result == null || (correlationKey.getParameterInstances().size() >= result.getParameterInstances().size()) ) {
+                result = correlationKey;
+            }
+        }
+        return result;
+    }
+
 }
