@@ -121,12 +121,10 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             if (correlationKeys != null) {
                 String startCorrelationConfiguration = getStartCorrelationConfiguration(eventSubscription);
 
-                CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
+                if (Objects.equals(startCorrelationConfiguration, BpmnXMLConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
 
-                if (Objects.equals(startCorrelationConfiguration, BpmnXMLConstants.START_EVENT_CORRELATION_STORE_AS_BUSINESS_KEY)) {
-                    processInstanceBuilder.businessKey(correlationKeyWithAllParameters.getValue());
+                    CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
 
-                } else if (Objects.equals(startCorrelationConfiguration, BpmnXMLConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
                     long processInstanceCount = runtimeService.createProcessInstanceQuery()
                         .processInstanceReferenceId(correlationKeyWithAllParameters.getValue())
                         .processInstanceReferenceType(ReferenceTypes.EVENT_PROCESS)
