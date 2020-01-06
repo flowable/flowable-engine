@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.api.tenant;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
@@ -392,6 +394,94 @@ public class TenancyTest extends PluggableFlowableTestCase {
         String processDefinitionIdNoTenant2 = deployOneTaskTestProcess();
         assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdNoTenant2).singleResult().getVersion());
 
+    }
+
+    @Test
+    public void testChangeDeploymentTenantId_withMergingTwoTenantsAsANewDeployment_ensureDeploymentsOrderedCorrectly() {
+        String processDefinitionIdWithTenant = deployTestProcessWithTestTenant("tenantA");
+        deployOneTaskTestProcess();
+        String deploymentId = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdWithTenant).singleResult().getDeploymentId();
+
+        // Act
+        repositoryService.changeDeploymentTenantId(deploymentId, "", MergeMode.AS_NEW);
+
+        // Assert
+        // Since we are using the "as-new" merge strategy, the version number should be increased
+        ProcessDefinition mergedProcessDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdWithTenant).singleResult();
+        assertThat(mergedProcessDefinition).isNotNull();
+        assertThat(mergedProcessDefinition.getVersion()).isEqualTo(2);
+
+        // Deploying another version should just up the version
+        String processDefinitionIdNoTenant2 = deployOneTaskTestProcess();
+        assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdNoTenant2).singleResult().getVersion())
+            .isEqualTo(3);
+    }
+
+    @Test
+    public void testChangeDeploymentTenantId_withMergingTwoTenantsAsAnOldDeployment_ensureDeploymentsOrderedCorrectly() {
+        String processDefinitionIdWithTenant = deployTestProcessWithTestTenant("tenantA");
+        String originalProcessDefinitionId = deployOneTaskTestProcess();
+        String deploymentId = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdWithTenant).singleResult().getDeploymentId();
+
+        // Act
+        repositoryService.changeDeploymentTenantId(deploymentId, "", MergeMode.AS_OLD);
+
+        // Assert
+        // Since we are using the "as-old" merge strategy, the version number of the original one should be increased
+        ProcessDefinition mergedProcessDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdWithTenant).singleResult();
+        assertThat(mergedProcessDefinition).isNotNull();
+        assertThat(mergedProcessDefinition.getVersion()).isEqualTo(1);
+
+        ProcessDefinition originalProcessDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(originalProcessDefinitionId).singleResult();
+        assertThat(originalProcessDefinition).isNotNull();
+        assertThat(originalProcessDefinition.getVersion()).isEqualTo(2);
+
+        // Deploying another version should just up the version
+        String processDefinitionIdNoTenant2 = deployOneTaskTestProcess();
+        assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdNoTenant2).singleResult().getVersion())
+            .isEqualTo(3);
+    }
+
+    @Test
+    public void testChangeDeploymentTenantId_withMergingTwoTenantsByDateOfdeployment_ensureDeploymentsOrderedCorrectly() {
+        List<String> expectedOrderOfProcessDefinitionIds = new ArrayList<>();
+        expectedOrderOfProcessDefinitionIds.add(deployOneTaskTestProcess());
+        expectedOrderOfProcessDefinitionIds.add(deployOneTaskTestProcess());
+        String processDefinitionIdWithTenant = deployTestProcessWithTestTenant("tenantA");
+        expectedOrderOfProcessDefinitionIds.add(processDefinitionIdWithTenant);
+        expectedOrderOfProcessDefinitionIds.add(deployOneTaskTestProcess());
+        expectedOrderOfProcessDefinitionIds.add(deployOneTaskTestProcess());
+        ProcessDefinition processDefinitionToBeMerged = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdWithTenant).singleResult();
+        String processDefinitionKey = processDefinitionToBeMerged.getKey();
+        String deploymentId = processDefinitionToBeMerged.getDeploymentId();
+
+        // Act
+        repositoryService.changeDeploymentTenantId(deploymentId, "", MergeMode.BY_DATE);
+
+        // Assert
+        // Since we are using the "by-date" merge strategy, the version number of the original one should be matches
+        List<ProcessDefinition> allDeployedProcessDefinitions = this.repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(processDefinitionKey)
+                .processDefinitionTenantId("")
+                .orderByProcessDefinitionVersion()
+                .asc()
+                .list();
+        assertThat(allDeployedProcessDefinitions).hasSize(5);
+        assertThat(allDeployedProcessDefinitions)
+                .extracting(ProcessDefinition::getId)
+                .containsExactlyElementsOf(expectedOrderOfProcessDefinitionIds);
+        assertThat(allDeployedProcessDefinitions)
+                .extracting(ProcessDefinition::getVersion)
+                .containsExactly(1, 2, 3, 4, 5);
+
+        assertThat(this.repositoryService.createProcessDefinitionQuery()
+                .processDefinitionTenantId("tenantA")
+                .count()).isEqualTo(0);
+
+        // Deploying another version should just up the version
+        String processDefinitionIdNoTenant2 = deployOneTaskTestProcess();
+        assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdNoTenant2).singleResult().getVersion())
+            .isEqualTo(6);
     }
 
     @Test

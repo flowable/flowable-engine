@@ -48,6 +48,8 @@ public interface ProcessDefinitionEntityManager extends EntityManager<ProcessDef
 
     void updateProcessDefinitionTenantIdForDeployment(String deploymentId, String newTenantId);
 
+    void updateProcessDefinitionVersionForProcessDefinitionId(String processDefinitionId, int version);
+
     void deleteProcessDefinitionsByDeploymentId(String deploymentId);
 
 }

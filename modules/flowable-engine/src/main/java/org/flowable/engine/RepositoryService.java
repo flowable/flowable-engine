@@ -22,6 +22,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.app.AppModel;
+import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
@@ -130,7 +131,37 @@ public interface RepositoryService {
      *            The new tenant identifier.
      */
     void changeDeploymentTenantId(String deploymentId, String newTenantId);
-    
+
+    /**
+     *
+     * EXPERIMENTAL FEATURE!
+     *
+     * See more usage information {@link RepositoryService#changeDeploymentTenantId(String, String)}
+     *
+     * @param deploymentId
+     *            The id of the deployment of which the tenant identifier will be changed.
+     * @param newTenantId
+     *            The new tenant identifier.
+     * @param mergeMode
+     *            Mode which is used to merge the deployment into the new tenant, in case the second tenant already has the same deployment key
+     */
+    void changeDeploymentTenantId(String deploymentId, String newTenantId, String mergeMode);
+
+    /**
+     *
+     * EXPERIMENTAL FEATURE!
+     *
+     * See more usage information {@link RepositoryService#changeDeploymentTenantId(String, String)}
+     *
+     * @param deploymentId
+     *            The id of the deployment of which the tenant identifier will be changed.
+     * @param newTenantId
+     *            The new tenant identifier.
+     * @param deploymentMergeStrategy
+     *            Strategy to be used to merge the deployment into the new tenant, in case the second tenant already has this deployment key
+     */
+    void changeDeploymentTenantId(String deploymentId, String newTenantId, DeploymentMergeStrategy deploymentMergeStrategy);
+
     /**
      * Changes the parent deployment id of a deployment. This is used to move deployments to a different app deployment parent.
      * 
