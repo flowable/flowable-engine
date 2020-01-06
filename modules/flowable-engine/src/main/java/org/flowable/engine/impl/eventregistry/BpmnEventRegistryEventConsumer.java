@@ -143,7 +143,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 }
             }
 
-            processInstanceBuilder.start();
+            processInstanceBuilder.startAsync();
         }
 
     }

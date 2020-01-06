@@ -145,7 +145,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 }
             }
 
-            caseInstanceBuilder.start();
+            caseInstanceBuilder.startAsync();
 
         }
     }

@@ -304,7 +304,7 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
             .containsOnly(
                 entry("customerIdVar", "payloadStartCustomer"),
-                entry("payload1", "Hello World")
+                entry("anotherVarName", "Hello World")
             );
     }
 
