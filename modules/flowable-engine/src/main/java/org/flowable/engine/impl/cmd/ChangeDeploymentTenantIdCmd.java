@@ -24,13 +24,13 @@ import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.repository.AddAsNewDeploymentMergeStrategy;
 import org.flowable.engine.impl.repository.AddAsOldDeploymentMergeStrategy;
-import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.impl.repository.MergeByDateDeploymentMergeStrategy;
-import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.impl.repository.VerifyDeploymentMergeStrategy;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentMergeStrategy;
+import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**

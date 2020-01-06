@@ -355,6 +355,16 @@ The query API's also allow to filter on the tenant identifier with _like_ semant
 
 [Experimental] It is possible to change the tenant identifier by calling the _changeDeploymentTenantId(String deploymentId, String newTenantId)_ method on the _repositoryService_. This will change the tenant identifier everywhere it was inherited before. This can be useful when going from a non-multitenant setup to a multitenant configuration. See the Javadoc on the method for more detailed information.
 
+In case you would like to merge two existing tenants, you can use _changeDeploymentTenantId(String deploymentId, String newTenantId, String mergeMode)_.
+Those methods are taking care of conflict handling, in case you have the same process definition key and version number.
+It allows you to specify the mode by setting _mergeMode_ to one of the following:
+
+* _MergeMode.AS_NEW_: adds the merged deployment with the most recent version number. This is the most efficient merging version which is not throwing a conflict but will make the merged version the default for all new processes with this definition key.
+* _MergeMode.AS_OLD_: will increase the version number for all existing process definition and insert the merged version with the version number _1_.
+* _MergeMode.BY_DATE_: will insert the process definition by the deployment date of the deployed apps. This needs to lookup the deployment date, which makes it inefficient.
+
+It is also possible to implement an own strategy by implementing _DeploymentMergeStrategy_ and using the _changeDeploymentTenantId(String deploymentId, String newTenantId, DeploymentMergeStrategy deploymentMergeStrategy)_ method.
+
 [[advanced.custom.sql.queries]]
 
 
