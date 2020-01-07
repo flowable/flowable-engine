@@ -17,8 +17,6 @@ import static org.assertj.core.api.Assertions.entry;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -304,30 +302,8 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
             .containsOnly(
                 entry("customerIdVar", "payloadStartCustomer"),
-                entry("payload1", "Hello World")
+                entry("anotherVarName", "Hello World")
             );
-    }
-
-    @Test
-    @CmmnDeployment
-    public void testCaseStartStoreCorrelationAsBusinessKey() {
-        for (int i = 1; i <= 3; i++) {
-            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(i);
-        }
-
-        // Business keys should be all equal
-        Set<String> businessKeys = cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getBusinessKey).collect(Collectors.toSet());
-        assertThat(businessKeys).hasSize(1);
-
-        for (int i = 1; i <= 5; i++) {
-            inboundEventChannelAdapter.triggerTestEvent("testCustomer" + i);
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(3 + i);
-        }
-
-        // Business keys should be all equal
-        businessKeys = cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getBusinessKey).collect(Collectors.toSet());
-        assertThat(businessKeys).hasSize(6);
     }
 
     @Test

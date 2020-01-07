@@ -123,12 +123,10 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             if (correlationKeys != null) {
                 String startCorrelationConfiguration = getStartCorrelationConfiguration(eventSubscription);
 
-                CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
+                if (Objects.equals(startCorrelationConfiguration, CmmnXmlConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
 
-                if (Objects.equals(startCorrelationConfiguration, CmmnXmlConstants.START_EVENT_CORRELATION_STORE_AS_BUSINESS_KEY)) {
-                    caseInstanceBuilder.businessKey(correlationKeyWithAllParameters.getValue());
+                    CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
 
-                } else if (Objects.equals(startCorrelationConfiguration, CmmnXmlConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
                     long caseInstanceCount = cmmnRuntimeService.createCaseInstanceQuery()
                         .caseInstanceReferenceId(correlationKeyWithAllParameters.getValue())
                         .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE)
@@ -145,7 +143,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 }
             }
 
-            caseInstanceBuilder.start();
+            caseInstanceBuilder.startAsync();
 
         }
     }

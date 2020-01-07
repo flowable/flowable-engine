@@ -363,7 +363,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             genericEventListener.setEventType(eventType);
 
         } else {
-            LOGGER.warn("Unsupported eventType detected for element " + currentCmmnElement);
+            LOGGER.warn("Unsupported eventType detected for element {}", currentCmmnElement);
 
         }
     }

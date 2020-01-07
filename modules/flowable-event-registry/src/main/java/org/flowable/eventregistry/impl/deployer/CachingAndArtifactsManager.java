@@ -12,18 +12,7 @@
  */
 package org.flowable.eventregistry.impl.deployer;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
-import org.flowable.eventregistry.api.model.InboundChannelModelBuilder;
-import org.flowable.eventregistry.api.model.InboundChannelModelBuilder.InboundEventKeyJsonDetectorBuilder;
-import org.flowable.eventregistry.api.model.InboundChannelModelBuilder.InboundEventKeyXmlDetectorBuilder;
-import org.flowable.eventregistry.api.model.InboundChannelModelBuilder.InboundEventPayloadJsonExtractorBuilder;
-import org.flowable.eventregistry.api.model.InboundChannelModelBuilder.InboundEventPayloadXmlExtractorBuilder;
-import org.flowable.eventregistry.api.model.InboundChannelModelBuilder.InboundEventProcessingPipelineBuilder;
-import org.flowable.eventregistry.api.model.InboundChannelModelBuilder.InboundEventTransformerBuilder;
-import org.flowable.eventregistry.api.model.OutboundChannelModelBuilder;
-import org.flowable.eventregistry.api.model.OutboundChannelModelBuilder.OutboundEventProcessingPipelineBuilder;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDefinitionCacheEntry;
@@ -33,10 +22,8 @@ import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
-import org.flowable.eventregistry.model.ChannelEventKeyDetection;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.OutboundChannelModel;
 
 /**
  * Updates caches and artifacts for a deployment and its event and channel definitions
