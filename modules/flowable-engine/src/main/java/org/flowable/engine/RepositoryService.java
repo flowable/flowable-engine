@@ -26,6 +26,7 @@ import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
+import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.NativeDeploymentQuery;
@@ -145,7 +146,7 @@ public interface RepositoryService {
      * @param mergeMode
      *            Mode which is used to merge the deployment into the new tenant, in case the second tenant already has the same deployment key
      */
-    void changeDeploymentTenantId(String deploymentId, String newTenantId, String mergeMode);
+    void changeDeploymentTenantId(String deploymentId, String newTenantId, MergeMode mergeMode);
 
     /**
      *

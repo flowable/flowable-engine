@@ -66,6 +66,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
+import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.NativeDeploymentQuery;
@@ -154,7 +155,7 @@ public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     }
 
     @Override
-    public void changeDeploymentTenantId(String deploymentId, String newTenantId, String mergeMode) {
+    public void changeDeploymentTenantId(String deploymentId, String newTenantId, MergeMode mergeMode) {
         commandExecutor.execute(new ChangeDeploymentTenantIdCmd(deploymentId, newTenantId, mergeMode));
     }
 

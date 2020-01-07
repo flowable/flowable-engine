@@ -16,9 +16,21 @@ package org.flowable.engine.repository;
 /**
  * @author Valentin Zickner
  */
-public class MergeMode {
-    public static final String VERIFY = "verify";
-    public static final String AS_NEW = "as-new";
-    public static final String AS_OLD = "as-old";
-    public static final String BY_DATE = "by-date";
+public enum MergeMode {
+
+    VERIFY("verify"),
+    AS_NEW("as-new"),
+    AS_OLD("as-old"),
+    BY_DATE("by-date");
+
+    protected String name;
+
+    MergeMode(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
 }

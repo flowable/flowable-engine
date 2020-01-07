@@ -48,19 +48,24 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
         this(deploymentId, newTenantId, MergeMode.VERIFY);
     }
 
-    public ChangeDeploymentTenantIdCmd(String deploymentId, String newTenantId, String mergeMode) {
+    public ChangeDeploymentTenantIdCmd(String deploymentId, String newTenantId, MergeMode mergeMode) {
         this.deploymentId = deploymentId;
         this.newTenantId = newTenantId;
-        if (MergeMode.VERIFY.equals(mergeMode)) {
-            deploymentMergeStrategy = new VerifyDeploymentMergeStrategy();
-        } else if (MergeMode.AS_NEW.equals(mergeMode)) {
-            deploymentMergeStrategy = new AddAsNewDeploymentMergeStrategy();
-        } else if (MergeMode.AS_OLD.equals(mergeMode)) {
-            deploymentMergeStrategy = new AddAsOldDeploymentMergeStrategy();
-        } else if (MergeMode.BY_DATE.equals(mergeMode)) {
-            deploymentMergeStrategy = new MergeByDateDeploymentMergeStrategy();
-        } else {
-            throw new FlowableException("Merge mode '" + mergeMode + "' not found.");
+        switch (mergeMode) {
+            case VERIFY:
+                deploymentMergeStrategy = new VerifyDeploymentMergeStrategy();
+                break;
+            case AS_NEW:
+                deploymentMergeStrategy = new AddAsNewDeploymentMergeStrategy();
+                break;
+            case AS_OLD:
+                deploymentMergeStrategy = new AddAsOldDeploymentMergeStrategy();
+                break;
+            case BY_DATE:
+                deploymentMergeStrategy = new MergeByDateDeploymentMergeStrategy();
+                break;
+            default:
+                throw new FlowableException("Merge mode '" + mergeMode + "' not found.");
         }
     }
 
