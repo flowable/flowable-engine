@@ -117,7 +117,7 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     
     protected void internalPlanEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent planItemLifeCycleEvent, boolean evaluateCaseInstanceCompleted) {
         EvaluateCriteriaOperation evaluateCriteriaOperation = new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, planItemLifeCycleEvent);
-        evaluateCriteriaOperation.setEvaluateCaseInstanceCompleted(evaluateCaseInstanceCompleted);
+        evaluateCriteriaOperation.setEvaluateStagesAndCaseInstanceCompletion(evaluateCaseInstanceCompleted);
         addOperation(evaluateCriteriaOperation);
     }
     

@@ -36,6 +36,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -87,7 +88,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
             }
         }
         
-        EventInstance eventInstance = (EventInstance) planItemInstanceEntity.getTransientVariable("eventInstance");
+        EventInstance eventInstance = (EventInstance) planItemInstanceEntity.getTransientVariable(EventConstants.EVENT_INSTANCE);
         if (eventInstance != null) {
             handleEventInstance(planItemInstanceEntity, eventInstance);
         }

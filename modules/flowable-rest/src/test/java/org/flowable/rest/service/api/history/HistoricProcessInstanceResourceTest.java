@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Test for REST-operation related to get and delete a historic process instance.
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class HistoricProcessInstanceResourceTest extends BaseSpringRestTestCase {
 
@@ -42,7 +43,14 @@ public class HistoricProcessInstanceResourceTest extends BaseSpringRestTestCase 
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetProcessInstance() throws Exception {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .businessKey("myBusinessKey")
+            .callbackId("testCallbackId")
+            .callbackType("testCallbackType")
+            .referenceId("testReferenceId")
+            .referenceType("testReferenceType")
+            .start();
 
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, processInstance.getId())),
                 HttpStatus.SC_OK);
@@ -53,6 +61,11 @@ public class HistoricProcessInstanceResourceTest extends BaseSpringRestTestCase 
         closeResponse(response);
         assertNotNull(responseNode);
         assertEquals(processInstance.getId(), responseNode.get("id").textValue());
+        assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
+        assertEquals("testCallbackId", responseNode.get("callbackId").textValue());
+        assertEquals("testCallbackType", responseNode.get("callbackType").textValue());
+        assertEquals("testReferenceId", responseNode.get("referenceId").textValue());
+        assertEquals("testReferenceType", responseNode.get("referenceType").textValue());
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);

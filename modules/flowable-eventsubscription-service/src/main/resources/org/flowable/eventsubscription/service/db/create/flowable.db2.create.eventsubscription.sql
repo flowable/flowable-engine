@@ -20,4 +20,4 @@ create table ACT_RU_EVENT_SUBSCR (
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_EVENT_SUBSCR_EXEC_ID on ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
 
-insert into ACT_GE_PROPERTY values ('eventsubscription.schema.version', '6.5.0.5', 1);
+insert into ACT_GE_PROPERTY values ('eventsubscription.schema.version', '6.5.0.6', 1);

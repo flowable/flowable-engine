@@ -109,8 +109,8 @@ public class EventSubscriptionManager {
                         }
                         
                     } else {
-                        if (startEvent.getExtensionElements().get("eventType") != null) {
-                            List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
+                        if (startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE) != null) {
+                            List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
                             if (!eventTypeElements.isEmpty()) {
                                 String eventDefinitionKey = eventTypeElements.get(0).getElementText();
                                 insertEventRegistryEvent(eventDefinitionKey, startEvent, processDefinition, bpmnModel);

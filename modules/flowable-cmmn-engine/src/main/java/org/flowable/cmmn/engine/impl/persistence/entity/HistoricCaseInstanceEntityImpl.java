@@ -37,6 +37,8 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected List<HistoricVariableInstanceEntity> queryVariables;
 
@@ -53,6 +55,8 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
         persistentState.put("startUserId", startUserId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
         persistentState.put("tenantId", tenantId);
         return persistentState;
     }
@@ -136,6 +140,22 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+    @Override
+    public String getReferenceId() {
+        return referenceId;
+    }
+    @Override
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+    @Override
+    public String getReferenceType() {
+        return referenceType;
+    }
+    @Override
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
     @Override
     public String getTenantId() {

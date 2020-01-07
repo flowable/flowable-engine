@@ -22,6 +22,8 @@ import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventCorrelationParameterInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -30,6 +32,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Filip Hrisafov
  */
 public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtractor<JsonNode> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonFieldToMapPayloadExtractor.class);
 
     @Override
     public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, JsonNode event) {
@@ -64,7 +68,8 @@ public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtrac
             value = parameterNode.doubleValue();
 
         } else {
-            // TODO: handle type not matching
+            LOGGER.warn("Unsupported payload type: {} ", definitionType);
+            value = parameterNode.asText();
 
         }
 

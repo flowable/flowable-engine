@@ -50,6 +50,8 @@ public class HistoricProcessInstanceResponse {
     protected List<RestVariable> variables = new ArrayList<>();
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId;
 
     @ApiModelProperty(example = "5")
@@ -226,6 +228,23 @@ public class HistoricProcessInstanceResponse {
         this.callbackType = callbackType;
     }
 
+    @ApiModelProperty(example = "123")
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @ApiModelProperty(example = "event-to-bpmn-2.0-process")
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
     @ApiModelProperty(example = "someTenantId")
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;

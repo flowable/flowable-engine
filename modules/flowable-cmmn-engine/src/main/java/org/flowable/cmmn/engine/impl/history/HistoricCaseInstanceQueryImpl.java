@@ -69,6 +69,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String startedBy;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
@@ -367,7 +369,33 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
-    
+
+    @Override
+    public HistoricCaseInstanceQuery caseInstanceReferenceId(String referenceId) {
+        if (referenceId == null) {
+            throw new FlowableIllegalArgumentException("referenceId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery caseInstanceReferenceType(String referenceType) {
+        if (referenceType == null) {
+            throw new FlowableIllegalArgumentException("referenceType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
+        }
+        return this;
+    }
+
     @Override
     public HistoricCaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
         if (tenantId == null) {
@@ -797,6 +825,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public String getTenantId() {

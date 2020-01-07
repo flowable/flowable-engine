@@ -22,6 +22,8 @@ import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventCorrelationParameterInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -30,6 +32,8 @@ import org.w3c.dom.NodeList;
  * @author Joram Barrez
  */
 public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtractor<Document> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlElementsToMapPayloadExtractor.class);
 
     @Override
     public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, Document event) {
@@ -66,7 +70,8 @@ public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtr
                 return Double.valueOf(textContent);
 
             } else {
-                // TODO: handle type not matching
+                LOGGER.warn("Unsupported payload type: {} ", definitionType);
+                return textContent;
 
             }
 

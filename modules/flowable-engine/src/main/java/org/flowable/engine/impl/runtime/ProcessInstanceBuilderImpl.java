@@ -34,6 +34,8 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String businessKey;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String stageInstanceId;
     protected String tenantId;
     protected String overrideDefinitionTenantId;
@@ -87,6 +89,18 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder callbackType(String callbackType) {
         this.callbackType = callbackType;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder referenceId(String referenceId) {
+        this.referenceId = referenceId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder referenceType(String referenceType) {
+        this.referenceType = referenceType;
         return this;
     }
 
@@ -222,6 +236,14 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public String getStageInstanceId() {

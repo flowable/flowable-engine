@@ -46,6 +46,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected boolean completable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
@@ -69,6 +71,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         persistentState.put("startUserId", startUserId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
         persistentState.put("completeable", completable);
         persistentState.put("tenantId", tenantId);
         persistentState.put("lockTime", lockTime);
@@ -166,6 +170,22 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+    @Override
+    public String getReferenceId() {
+        return referenceId;
+    }
+    @Override
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+    @Override
+    public String getReferenceType() {
+        return referenceType;
+    }
+    @Override
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
     @Override
     public String getTenantId() {

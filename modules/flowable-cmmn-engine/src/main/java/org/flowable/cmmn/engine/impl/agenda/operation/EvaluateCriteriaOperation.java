@@ -73,7 +73,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     protected PlanItemLifeCycleEvent planItemLifeCycleEvent;
 
     // only the last evaluation planned on the agenda operation will have this true
-    protected boolean evaluateCaseInstanceCompleted;
+    protected boolean evaluateStagesAndCaseInstanceCompletion;
 
     public EvaluateCriteriaOperation(CommandContext commandContext, String caseInstanceEntityId) {
         super(commandContext, caseInstanceEntityId, null);
@@ -102,7 +102,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
-            if (evaluateCaseInstanceCompleted
+            if (evaluateStagesAndCaseInstanceCompletion
                     && evaluatePlanModelComplete()
                     && !criteriaChangeOrActiveChildren
                     && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
@@ -572,14 +572,17 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
     protected boolean isStageCompletable(PlanItemInstanceEntity stagePlanItemInstanceEntity, Stage stage) {
         boolean autoComplete = ExpressionUtil.evaluateAutoComplete(commandContext, stagePlanItemInstanceEntity, stage);
-        CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
-            .shouldPlanItemContainerComplete(commandContext, stagePlanItemInstanceEntity, autoComplete);
+        if (!autoComplete || evaluateStagesAndCaseInstanceCompletion) { // auto completion should only be evaluated when children are stable
+            CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
+                .shouldPlanItemContainerComplete(commandContext, stagePlanItemInstanceEntity, autoComplete);
 
-        if (completionEvaluationResult.isCompletable()) {
-            stagePlanItemInstanceEntity.setCompletable(true);
+            if (completionEvaluationResult.isCompletable()) {
+                stagePlanItemInstanceEntity.setCompletable(true);
+            }
+
+            return completionEvaluationResult.shouldBeCompleted();
         }
-
-        return completionEvaluationResult.shouldBeCompleted();
+        return false;
     }
 
     protected boolean evaluatePlanModelComplete() {
@@ -844,12 +847,12 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         this.planItemLifeCycleEvent = planItemLifeCycleEvent;
     }
 
-    public boolean isEvaluateCaseInstanceCompleted() {
-        return evaluateCaseInstanceCompleted;
+    public boolean isEvaluateStagesAndCaseInstanceCompletion() {
+        return evaluateStagesAndCaseInstanceCompletion;
     }
 
-    public void setEvaluateCaseInstanceCompleted(boolean evaluateCaseInstanceCompleted) {
-        this.evaluateCaseInstanceCompleted = evaluateCaseInstanceCompleted;
+    public void setEvaluateStagesAndCaseInstanceCompletion(boolean evaluateStagesAndCaseInstanceCompletion) {
+        this.evaluateStagesAndCaseInstanceCompletion = evaluateStagesAndCaseInstanceCompletion;
     }
 
     @Override

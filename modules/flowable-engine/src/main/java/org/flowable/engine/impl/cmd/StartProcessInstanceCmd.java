@@ -63,6 +63,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected String processInstanceName;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String stageInstanceId;
     protected Map<String, Object> startFormVariables;
     protected String outcome;
@@ -94,6 +96,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         this.transientVariables = processInstanceBuilder.getTransientVariables();
         this.callbackId = processInstanceBuilder.getCallbackId();
         this.callbackType = processInstanceBuilder.getCallbackType();
+        this.referenceId = processInstanceBuilder.getReferenceId();
+        this.referenceType = processInstanceBuilder.getReferenceType();
         this.stageInstanceId = processInstanceBuilder.getStageInstanceId();
         this.startFormVariables = processInstanceBuilder.getStartFormVariables();
         this.outcome = processInstanceBuilder.getOutcome();
@@ -181,7 +185,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
     protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {
         return processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName,
-                            overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType, stageInstanceId, true);
+            overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables,
+            callbackId, callbackType, referenceId, referenceType, stageInstanceId, true);
     }
 
     protected boolean hasStartFormData() {

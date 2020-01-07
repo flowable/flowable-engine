@@ -52,6 +52,8 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String startedBy;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected boolean completeable;
     protected String tenantId;
     protected String tenantIdLike;
@@ -280,9 +282,35 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             throw new FlowableIllegalArgumentException("callbackType is null");
         }
         if (inOrStatement) {
-            this.currentOrQueryObject.callbackType= callbackType;
+            this.currentOrQueryObject.callbackType = callbackType;
         } else {
             this.callbackType = callbackType;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceReferenceId(String referenceId) {
+        if (referenceId == null) {
+            throw new FlowableIllegalArgumentException("referenceId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceReferenceType(String referenceType) {
+        if (referenceType == null) {
+            throw new FlowableIllegalArgumentException("referenceType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
         }
         return this;
     }
@@ -654,6 +682,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public boolean isCompleteable() {

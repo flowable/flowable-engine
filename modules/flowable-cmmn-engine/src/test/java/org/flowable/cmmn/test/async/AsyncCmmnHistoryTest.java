@@ -92,6 +92,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
                 .caseDefinitionKey("oneHumanTaskCase")
                 .name("someName")
                 .businessKey("someBusinessKey")
+                .callbackId("someCallbackId")
+                .callbackType("someCallbackType")
+                .referenceId("someReferenceId")
+                .referenceType("someReferenceType")
                 .start();
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
         
@@ -105,6 +109,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertEquals("someBusinessKey", historicCaseInstance.getBusinessKey());
         assertEquals(caseInstance.getCaseDefinitionId(), historicCaseInstance.getCaseDefinitionId());
         assertEquals(CaseInstanceState.ACTIVE, historicCaseInstance.getState());
+        assertEquals("someCallbackId", historicCaseInstance.getCallbackId());
+        assertEquals("someCallbackType", historicCaseInstance.getCallbackType());
+        assertEquals("someReferenceId", historicCaseInstance.getReferenceId());
+        assertEquals("someReferenceType", historicCaseInstance.getReferenceType());
         assertNotNull(historicCaseInstance.getStartTime());
         assertNull(historicCaseInstance.getEndTime());
         
@@ -121,6 +129,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertEquals("someBusinessKey", historicCaseInstance.getBusinessKey());
         assertEquals(caseInstance.getCaseDefinitionId(), historicCaseInstance.getCaseDefinitionId());
         assertEquals(CaseInstanceState.COMPLETED, historicCaseInstance.getState());
+        assertEquals("someCallbackId", historicCaseInstance.getCallbackId());
+        assertEquals("someCallbackType", historicCaseInstance.getCallbackType());
+        assertEquals("someReferenceId", historicCaseInstance.getReferenceId());
+        assertEquals("someReferenceType", historicCaseInstance.getReferenceType());
         assertNotNull(historicCaseInstance.getStartTime());
         assertNotNull(historicCaseInstance.getEndTime());
     }

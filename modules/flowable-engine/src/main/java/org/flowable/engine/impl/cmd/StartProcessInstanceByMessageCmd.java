@@ -40,6 +40,8 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
     protected Map<String, Object> transientVariables;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId;
 
     public StartProcessInstanceByMessageCmd(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId) {
@@ -57,6 +59,8 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
         this.transientVariables = processInstanceBuilder.getTransientVariables();
         this.callbackId = processInstanceBuilder.getCallbackId();
         this.callbackType = processInstanceBuilder.getCallbackType();
+        this.referenceId = processInstanceBuilder.getReferenceId();
+        this.referenceType = processInstanceBuilder.getReferenceType();
     }
 
     @Override
@@ -86,12 +90,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
 
         ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
         ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(processDefinition, 
-                                                                                                       messageName, 
-                                                                                                       businessKey, 
-                                                                                                       processVariables, 
-                                                                                                       transientVariables,
-                                                                                                       callbackId,
-                                                                                                       callbackType);
+            messageName, businessKey, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType);
 
         return processInstance;
     }

@@ -16,10 +16,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -46,7 +47,11 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         if (event.getEventObject() != null && event.getEventObject() instanceof EventInstance) {
             eventReceived((EventInstance) event.getEventObject());
         } else {
-            // TODO: what should happen in this case?
+            if (event.getEventObject() == null) {
+                throw new FlowableIllegalArgumentException("No event object was passed to the consumer");
+            } else {
+                throw new FlowableIllegalArgumentException("Unsupported event object type: " + event.getEventObject().getClass());
+            }
         }
     }
 
@@ -56,15 +61,22 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
      * Generates all possible correlation keys for the given correlation parameters.
      * The first element in the list will only have used one parameter. The last element in the list has included all parameters.
      */
-    protected Collection<String> generateCorrelationKeys(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
+    protected Collection<CorrelationKey> generateCorrelationKeys(Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
+
         if (correlationParameterInstances.isEmpty()) {
             return Collections.emptySet();
         }
+
         List<EventCorrelationParameterInstance> list = new ArrayList<>(correlationParameterInstances);
-        Collection<String> correlationKeys = new HashSet<>();
+        Collection<CorrelationKey> correlationKeys = new ArrayList<>();
         for (int i = 1; i <= list.size(); i++) {
             for (int j = 0; j <= list.size() - i; j++) {
-                correlationKeys.add(generateCorrelationKey(list.subList(j, j + i)));
+                List<EventCorrelationParameterInstance> parameterSubList = list.subList(j, j + i);
+                String correlationKey = generateCorrelationKey(parameterSubList);
+
+                if (correlationKeys.stream().noneMatch(c -> Objects.equals(c.getValue(), correlationKey))) {
+                    correlationKeys.add(new CorrelationKey(correlationKey, parameterSubList));
+                }
             }
         }
 
@@ -85,4 +97,15 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                         engingeConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         return eventRegistryEngineConfiguration.getEventRegistry();
     }
+
+    protected CorrelationKey getCorrelationKeyWithAllParameters(Collection<CorrelationKey> correlationKeys) {
+        CorrelationKey result = null;
+        for (CorrelationKey correlationKey : correlationKeys) {
+            if (result == null || (correlationKey.getParameterInstances().size() >= result.getParameterInstances().size()) ) {
+                result = correlationKey;
+            }
+        }
+        return result;
+    }
+
 }

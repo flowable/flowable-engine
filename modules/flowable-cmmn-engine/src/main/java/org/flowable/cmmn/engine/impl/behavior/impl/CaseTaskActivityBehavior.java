@@ -33,6 +33,7 @@ import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
@@ -110,7 +111,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         }
 
         // Bidirectional storing of reference to avoid queries later on
-        planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
+        planItemInstanceEntity.setReferenceType(ReferenceTypes.PLAN_ITEM_CHILD_CASE);
         planItemInstanceEntity.setReferenceId(caseInstanceEntity.getId());
 
         if (!evaluateIsBlocking(planItemInstanceEntity)) {
@@ -126,7 +127,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         if (planItemInstance.getReferenceId() == null) {
             throw new FlowableException("Cannot trigger case task plan item instance : no reference id set");
         }
-        if (!CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(planItemInstance.getReferenceType())) {
+        if (!ReferenceTypes.PLAN_ITEM_CHILD_CASE.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger case task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }
@@ -166,7 +167,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
     @Override
     public void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade) {
-        if (CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(delegatePlanItemInstance.getReferenceType())) {
+        if (ReferenceTypes.PLAN_ITEM_CHILD_CASE.equals(delegatePlanItemInstance.getReferenceType())) {
             CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
             CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(delegatePlanItemInstance.getReferenceId());
             if (caseInstance != null && !caseInstance.isDeleted()) {
@@ -174,7 +175,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
             }
             
         } else {
-            throw new FlowableException("Can only delete a child entity for a plan item with callback type " + CallbackTypes.PLAN_ITEM_CHILD_CASE);
+            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_CASE);
         }
     }
 

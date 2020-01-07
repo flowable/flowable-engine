@@ -434,6 +434,86 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void getCaseInstanceByReferenceId() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .referenceId("testReferenceId")
+            .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").list().get(0).getId(),
+            is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").singleResult().getId(),
+            is(caseInstance.getId()));
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            caseInstanceReferenceId("testReferenceId").
+            caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            caseInstanceReferenceId("testReferenceId").
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            caseInstanceReferenceId("testReferenceId").
+            caseDefinitionId("undefined").
+            endOr().
+            singleResult().getId(), is(caseInstance.getId()));
+    }
+
+    @Test
+    public void getCaseInstanceByReferenceType() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .referenceType("testReferenceType")
+            .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").list().get(0).getId(),
+            is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").singleResult().getId(),
+            is(caseInstance.getId()));
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            caseInstanceReferenceType("testReferenceType").
+            caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            caseInstanceReferenceType("testReferenceType").
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            caseInstanceReferenceType("testReferenceType").
+            caseDefinitionId("undefined").
+            endOr().
+            singleResult().getId(), is(caseInstance.getId()));
+    }
+
+    @Test
+    public void getCaseInstanceByReferenceIdAndType() {
+        for (int i = 0; i < 4; i++) {
+            cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .referenceId("testReferenceId")
+                .referenceType("testReferenceType")
+                .start();
+        }
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceId("testReferenceId")
+            .caseInstanceReferenceType("testReferenceType").count(), is(4L));
+    }
+
+    @Test
     public void getCaseInstanceByTenantId() {
         String tempDeploymentId = cmmnRepositoryService.createDeployment().
             addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn").

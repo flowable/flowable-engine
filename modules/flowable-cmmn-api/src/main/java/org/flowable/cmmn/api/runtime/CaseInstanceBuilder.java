@@ -56,6 +56,14 @@ public interface CaseInstanceBuilder {
     CaseInstanceBuilder outcome(String outcome);
 
     /**
+     * Set callback id of the newly created case instance.
+     *
+     * @param callbackId id of the callback
+     * @return case instance builder which creates case instance with defined callback id
+     */
+    CaseInstanceBuilder callbackId(String callbackId);
+
+    /**
      * Set callback type of the newly created case instance.
      * @param callbackType type of the callback
      * @return case instance builder which creates case instance with defined callback type
@@ -63,12 +71,14 @@ public interface CaseInstanceBuilder {
     CaseInstanceBuilder callbackType(String callbackType);
 
     /**
-     * Set callback id of the newly created case instance.
-     *
-     * @param callbackId id of the callback
-     * @return case instance builder which creates case instance with defined callback id
+     * Set the reference id on the newly create case instance.
      */
-    CaseInstanceBuilder callbackId(String callbackId);
+    CaseInstanceBuilder referenceId(String referenceId);
+
+    /**
+     * Set the reference type on the newly create case instance.
+     */
+    CaseInstanceBuilder referenceType(String referenceType);
 
     /**
      * Set parent case instanceId of the newly create case instance
@@ -113,9 +123,13 @@ public interface CaseInstanceBuilder {
 
     String getOutcome();
 
+    String getCallbackId();
+
     String getCallbackType();
 
-    String getCallbackId();
+    String getReferenceId();
+
+    String getReferenceType();
 
     String getParentId();
 

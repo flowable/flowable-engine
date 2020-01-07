@@ -35,6 +35,7 @@ import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -131,7 +132,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         
         if (sendEventServiceTask.isTriggerable()) {
-            Object eventInstance = execution.getTransientVariables().get("eventInstance");
+            Object eventInstance = execution.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
             if (eventInstance instanceof EventInstance) {
                 EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, sendEventServiceTask, (EventInstance) eventInstance);
             }

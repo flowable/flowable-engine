@@ -360,6 +360,16 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery processInstanceCallbackType(String callbackType);
 
     /**
+     * Only select process instances with the given reference identifier.
+     */
+    HistoricProcessInstanceQuery processInstanceReferenceId(String referenceId);
+
+    /**
+     * Only select process instances with the given reference type.
+     */
+    HistoricProcessInstanceQuery processInstanceReferenceType(String referenceType);
+
+    /**
      * Localize historic process name and description to specified locale.
      */
     HistoricProcessInstanceQuery locale(String locale);

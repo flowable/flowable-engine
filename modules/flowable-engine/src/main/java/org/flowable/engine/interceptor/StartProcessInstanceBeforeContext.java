@@ -22,6 +22,8 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
 
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected Map<String, Object> transientVariables;
     protected String tenantId;
     protected String initiatorVariableName;
@@ -32,7 +34,8 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
         
     }
     
-    public StartProcessInstanceBeforeContext(String businessKey, String processInstanceName, String callbackId, String callbackType, 
+    public StartProcessInstanceBeforeContext(String businessKey, String processInstanceName,
+                    String callbackId, String callbackType, String referenceId, String referenceType,
                     Map<String, Object> variables, Map<String, Object> transientVariables, String tenantId, 
                     String initiatorVariableName, String initialActivityId, FlowElement initialFlowElement, Process process,
                     ProcessDefinition processDefinition, String overrideDefinitionTenantId, String predefinedProcessInstanceId) {
@@ -41,6 +44,8 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
         
         this.callbackId = callbackId;
         this.callbackType = callbackType;
+        this.referenceId = referenceId;
+        this.referenceType = referenceType;
         this.transientVariables = transientVariables;
         this.tenantId = tenantId;
         this.initiatorVariableName = initiatorVariableName;
@@ -62,6 +67,22 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
 
     public Map<String, Object> getTransientVariables() {

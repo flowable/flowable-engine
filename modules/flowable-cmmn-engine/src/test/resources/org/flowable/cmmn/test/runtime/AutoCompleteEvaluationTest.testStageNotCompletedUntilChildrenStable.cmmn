@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+    <case id="myCase" name="Basic Test Case" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:includeInStageOverview="false">
+            <planItem id="planItem5" name="stage 1" definitionRef="oneexpandedstage3"></planItem>
+            <planItem id="planItem7" name="stage 2" definitionRef="oneexpandedstage5">
+                <entryCriterion id="oneentrycriterion13" sentryRef="sentry3"></entryCriterion>
+            </planItem>
+            <sentry id="sentry3">
+                <planItemOnPart id="sentryOnPart3" sourceRef="planItem5">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="oneexpandedstage3" name="stage 1" autoComplete="true" flowable:includeInStageOverview="true">
+                <planItem id="planItem1" name="mandatory task 1" definitionRef="onehumantask1">
+                    <entryCriterion id="oneentrycriterion6" sentryRef="sentry1"></entryCriterion>
+                </planItem>
+                <planItem id="planItem2" name="init case vars 1" definitionRef="variableactivity1"></planItem>
+                <planItem id="planItem3" name="init case vars 2" definitionRef="variableactivity3">
+                    <itemControl>
+                        <manualActivationRule></manualActivationRule>
+                    </itemControl>
+                </planItem>
+                <planItem id="planItem4" name="optional task 2" definitionRef="onehumantask7">
+                    <entryCriterion id="oneentrycriterion16" sentryRef="sentry2"></entryCriterion>
+                </planItem>
+                <sentry id="sentry1">
+                    <planItemOnPart id="sentryOnPart1" sourceRef="planItem2">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <sentry id="sentry2">
+                    <planItemOnPart id="sentryOnPart2" sourceRef="planItem3">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <humanTask id="onehumantask1" name="mandatory task 1" flowable:assignee="${initiator}" flowable:formKey="basicTestTaskForm">
+                </humanTask>
+                <task id="variableactivity1" name="init case vars 1" isBlocking="false" flowable:type="java" flowable:expression="${true}">
+                </task>
+                <task id="variableactivity3" name="init case vars 2" isBlocking="false" flowable:type="java" flowable:expression="${true}">
+                </task>
+                <humanTask id="onehumantask7" name="optional task 2" flowable:assignee="${initiator}" flowable:formKey="basicTestTaskForm">
+                </humanTask>
+            </stage>
+            <stage id="oneexpandedstage5" name="stage 2" flowable:includeInStageOverview="true">
+                <planItem id="planItem6" name="mandatory task 3" definitionRef="onehumantask6"></planItem>
+                <humanTask id="onehumantask6" name="mandatory task 3" flowable:assignee="${initiator}" flowable:formKey="basicTestTaskForm">
+                </humanTask>
+            </stage>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_myCase">
+            <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+                <dc:Bounds height="525.0" width="750.0" x="30.0" y="30.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+                <dc:Bounds height="165.99999809265137" width="690.0" x="60.0" y="74.00000190734863"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="269.0" y="119.00000190734863"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion6" cmmnElementRef="oneentrycriterion6">
+                <dc:Bounds height="28.0" width="18.0" x="260.0" y="145.00000190734863"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="80.0" width="100.0" x="88.0" y="119.00000190734863"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+                <dc:Bounds height="80.0" width="100.0" x="420.0" y="119.00000190734863"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+                <dc:Bounds height="80.0" width="100.0" x="600.0" y="117.00000095367432"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion16" cmmnElementRef="oneentrycriterion16">
+                <dc:Bounds height="28.0" width="18.0" x="591.0" y="145.00000095367432"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem7" cmmnElementRef="planItem7">
+                <dc:Bounds height="165.99999809265137" width="690.0" x="60.0" y="299.00000190734863"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion13" cmmnElementRef="oneentrycriterion13">
+                <dc:Bounds height="28.0" width="18.0" x="396.0" y="285.00000190734863"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem6" cmmnElementRef="planItem6">
+                <dc:Bounds height="80.0" width="100.0" x="269.0" y="344.00000190734863"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge id="CMMNEdge_oneconnector13" cmmnElementRef="planItem3" targetCMMNElementRef="oneentrycriterion16">
+                <di:waypoint x="519.95" y="159.00000190734863"></di:waypoint>
+                <di:waypoint x="560.0" y="159.00000190734863"></di:waypoint>
+                <di:waypoint x="560.0" y="159.00000095367432"></di:waypoint>
+                <di:waypoint x="591.0" y="159.00000095367432"></di:waypoint>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNEdge>
+            <cmmndi:CMMNEdge id="CMMNEdge_oneconnector11" cmmnElementRef="planItem5" targetCMMNElementRef="oneentrycriterion13">
+                <di:waypoint x="405.0" y="239.95"></di:waypoint>
+                <di:waypoint x="405.0" y="269.5000009536743"></di:waypoint>
+                <di:waypoint x="405.0" y="269.5000009536743"></di:waypoint>
+                <di:waypoint x="405.0" y="285.00000190734863"></di:waypoint>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNEdge>
+            <cmmndi:CMMNEdge id="CMMNEdge_oneconnector5" cmmnElementRef="planItem2" targetCMMNElementRef="oneentrycriterion6">
+                <di:waypoint x="187.9499999999503" y="159.00000190734863"></di:waypoint>
+                <di:waypoint x="260.0" y="159.00000190734863"></di:waypoint>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

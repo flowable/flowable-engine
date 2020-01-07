@@ -66,6 +66,16 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder callbackType(String callbackType);
 
     /**
+     * Sets the reference identifier of the process instance.
+     */
+    ProcessInstanceBuilder referenceId(String referenceId);
+
+    /**
+     * Sets the reference type of the process instance.
+     */
+    ProcessInstanceBuilder referenceType(String referenceType);
+
+    /**
      * Set the optional instance id of the stage this process instance belongs to, if it runns in the context of a CMMN case.
      */
     ProcessInstanceBuilder stageInstanceId(String stageInstanceId);

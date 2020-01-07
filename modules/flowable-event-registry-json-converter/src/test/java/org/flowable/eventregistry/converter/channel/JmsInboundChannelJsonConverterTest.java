@@ -14,7 +14,6 @@ package org.flowable.eventregistry.converter.channel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.model.ChannelEventKeyDetection;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.JmsInboundChannelModel;
