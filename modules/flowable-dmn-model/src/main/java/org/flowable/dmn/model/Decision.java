@@ -20,6 +20,7 @@ public class Decision extends NamedElement {
     protected String question;
     protected String allowedAnswers;
     protected Expression expression;
+    protected boolean forceDMN11;
 
     public String getQuestion() {
         return question;
@@ -43,5 +44,12 @@ public class Decision extends NamedElement {
 
     public void setExpression(Expression expression) {
         this.expression = expression;
+    }
+
+    public boolean isForceDMN11() {
+        return forceDMN11;
+    }
+    public void setForceDMN11(boolean forceDMN11) {
+        this.forceDMN11 = forceDMN11;
     }
 }

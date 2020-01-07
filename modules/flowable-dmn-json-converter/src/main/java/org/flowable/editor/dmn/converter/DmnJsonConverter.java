@@ -26,6 +26,7 @@ import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DecisionTableOrientation;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.DmnExtensionAttribute;
 import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
@@ -69,6 +70,10 @@ public class DmnJsonConverter {
         decision.setId(DmnJsonConverterUtil.getValueAsString("key", modelNode));
         decision.setName(DmnJsonConverterUtil.getValueAsString("name", modelNode));
         decision.setDescription(DmnJsonConverterUtil.getValueAsString("description", modelNode));
+
+        if (modelNode.has("forceDMN11") && "true".equals(DmnJsonConverterUtil.getValueAsString("forceDMN11", modelNode))) {
+            addExtensionAttribute("forceDMN11", "true", decision);
+        }
 
         definition.addDecision(decision);
 
@@ -114,6 +119,10 @@ public class DmnJsonConverter {
 
         if (decisionTable.getAggregation() != null) {
             modelNode.put("collectOperator", decisionTable.getAggregation().name());
+        }
+
+        if (firstDecision.isForceDMN11()) {
+            modelNode.put("forceDMN11", true);
         }
 
         // input expressions
@@ -494,5 +503,15 @@ public class DmnJsonConverter {
         extensionElement.setElementText(value);
 
         element.addExtensionElement(extensionElement);
+    }
+
+    protected void addExtensionAttribute(String name, String value, DmnElement element) {
+        DmnExtensionAttribute extensionAttribute = new DmnExtensionAttribute();
+        extensionAttribute.setNamespace(MODEL_NAMESPACE);
+        extensionAttribute.setNamespacePrefix("flowable");
+        extensionAttribute.setName(name);
+        extensionAttribute.setValue(value);
+
+        element.addAttribute(extensionAttribute);
     }
 }
