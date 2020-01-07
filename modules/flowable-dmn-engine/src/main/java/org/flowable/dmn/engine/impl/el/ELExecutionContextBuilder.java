@@ -41,6 +41,7 @@ public class ELExecutionContextBuilder {
         executionContext.setInstanceId(executeDecisionInfo.getInstanceId());
         executionContext.setScopeType(executeDecisionInfo.getScopeType());
         executionContext.setTenantId(executeDecisionInfo.getTenantId());
+        executionContext.setForceDMN11(decision.isForceDMN11());
 
         // initialize audit trail
         executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, executeDecisionInfo));

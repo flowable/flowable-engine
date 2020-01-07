@@ -34,6 +34,7 @@ public class ELExecutionContext {
     protected String instanceId;
     protected String scopeType;
     protected String tenantId;
+    protected boolean forceDMN11;
 
     public void checkExecutionContext(String variableId) {
 
@@ -115,5 +116,12 @@ public class ELExecutionContext {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public boolean isForceDMN11() {
+        return forceDMN11;
+    }
+    public void setForceDMN11(boolean forceDMN11) {
+        this.forceDMN11 = forceDMN11;
     }
 }
