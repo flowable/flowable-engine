@@ -18,9 +18,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -33,6 +36,7 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.context.Context;
@@ -294,6 +298,30 @@ public class ProcessInstanceHelper {
 
             StartEvent startEvent = (StartEvent) subElement;
             if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
+                List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
+                if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
+                    String eventType = eventTypeElements.get(0).getElementText();
+                    if (StringUtils.isNotEmpty(eventType)) {
+                        ExecutionEntity eventRegistryExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(parentExecution);
+                        eventRegistryExecution.setCurrentFlowElement(startEvent);
+                        eventRegistryExecution.setEventScope(true);
+                        eventRegistryExecution.setActive(false);
+
+                        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+                                        .eventType(eventType)
+                                        .executionId(eventRegistryExecution.getId())
+                                        .processInstanceId(eventRegistryExecution.getProcessInstanceId())
+                                        .activityId(eventRegistryExecution.getCurrentActivityId())
+                                        .processDefinitionId(eventRegistryExecution.getProcessDefinitionId())
+                                        .scopeType(ScopeTypes.BPMN)
+                                        .tenantId(eventRegistryExecution.getTenantId())
+                                        .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, eventRegistryExecution))
+                                        .create();
+                        
+                        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+                    }
+                }
+                
                 continue;
             }
 

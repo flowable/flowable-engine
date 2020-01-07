@@ -1176,6 +1176,66 @@
         "popular" : true
       } ]
     }, {
+      "name" : "eventregistrytriggereventpackage",
+      "properties" : [ {
+        "id" : "triggereventkey",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGEREVENTKEY.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGEREVENTKEY.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "eventregistrytriggereventnamepackage",
+      "properties" : [ {
+        "id" : "triggereventname",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGEREVENTNAME.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGEREVENTNAME.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "eventregistrytriggerchannelkeypackage",
+      "properties" : [ {
+        "id" : "triggerchannelkey",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGERCHANNELKEY.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGERHANNELKEY.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "eventregistrytriggerchannelnamepackage",
+      "properties" : [ {
+        "id" : "triggerchannelname",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGERCHANNELNAME.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGERCHANNELNAME.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "eventregistrytriggerchanneltypepackage",
+      "properties" : [ {
+        "id" : "triggerchanneltype",
+        "type" : "flowable-channeltype",
+        "title" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGERHANNELTYPE.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGERCHANNELTYPE.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "eventregistrychanneltriggerdestinationpackage",
+      "properties" : [ {
+        "id" : "triggerchanneldestination",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGERCHANNELDESTINATION.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.TRIGGERCHANNELDESTINATION.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
       "name" : "eventregistrykeydetectionfixedvaluepackage",
       "properties" : [ {
         "id" : "keydetectionfixedvalue",
@@ -1695,8 +1755,18 @@
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "asynchronousdefinitionpackage", "exclusivedefinitionpackage", "executionlistenerspackage", "multiinstance_typepackage", "multiinstance_cardinalitypackage", "multiinstance_collectionpackage", "multiinstance_variablepackage", "multiinstance_conditionpackage", "isforcompensationpackage", "decisiontaskdecisiontablereferencepackage", "decisiontaskthrowerroronnohitspackage", "decisiontaskfallbacktodefaulttenantpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "sequence_start", "sequence_end", "ActivitiesMorph", "all" ]
-  },
-    {
+  }, {
+    "type" : "node",
+    "id" : "SendEventTask",
+    "title" : "BPMN.STENCILS.SENDEVENTTASK.TITLE",
+    "description" : "BPMN.STENCILS.SENDEVENTTASK.DESCRIPTION",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n    \n\t<g id=\"sendTask\" transform=\"translate(4,3)\">\n\t\n\t<!-- path here -->\n\t\t<path oryx:anchors=\"top left\"\n\t\t\tstyle=\"fill:#16964d;stroke:none;\"\n     \t\td=\"M 1 3 L 9 11 L 17 3 L 1 3 z M 1 5 L 1 13 L 5 9 L 1 5 z M 17 5 L 13 9 L 17 13 L 17 5 z M 6 10 L 1 15 L 17 15 L 12 10 L 9 13 L 6 10 z \"\n     \t/>\n\t</g>\n\t\n\t<g id=\"parallel\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" d=\"M46 70 v8 M50 70 v8 M54 70 v8\" stroke-width=\"2\" />\n\t</g>\n\t\n\t<g id=\"sequential\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M46,76h10M46,72h10 M46,68h10\"/>\n\t</g>\n\n\t<g id=\"compensation\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" d=\"M 62 74 L 66 70 L 66 78 L 62 74 L 62 70 L 58 74 L 62 78 L 62 74\" stroke-width=\"1\" />\n\t</g>\n  </g>\n</svg>",
+    "icon" : "activity/list/type.send.png",
+    "groups" : [ "BPMN.STENCILS.GROUPS.ACTIVITIES" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "asynchronousdefinitionpackage", "exclusivedefinitionpackage", "executionlistenerspackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryinparameterspackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrytriggereventpackage", "eventregistrytriggereventnamepackage", "eventregistrytriggerchannelkeypackage", "eventregistrytriggerchannelnamepackage", "eventregistrytriggerchanneltypepackage", "eventregistrytriggerchanneldestinationpackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpathpackage" ],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "Activity", "sequence_start", "sequence_end", "ActivitiesMorph", "all" ]
+  }, {
       "type": "node",
       "id": "ShellTask",
       "title" : "BPMN.STENCILS.SHELLTASK.TITLE",
@@ -1892,6 +1962,17 @@
       "icon" : "catching/cancel.png",
       "groups" : [ "BPMN.STENCILS.GROUPS.BOUNDARYEVENTS" ],
       "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "sequence_start", "BoundaryEventsMorph", "IntermediateEventOnActivityBoundary" ]
+    }, {
+      "type" : "node",
+      "id" : "BoundaryEventRegistryEvent",
+      "title" : "BPMN.STENCILS.BOUNDARYEVENTREGISTRYEVENT.TITLE",
+      "description" : "BPMN.STENCILS.BOUNDARYEVENTREGISTRYEVENT.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle \n    \tid=\"bg_frame\" \n    \tcx=\"16\" \n    \tcy=\"16\" \n    \tr=\"15\" \n    \tstroke=\"#585858\" \n    \tfill=\"#ffffff\" \n    \tstroke-width=\"1\"\n    \tstyle=\"stroke-dasharray: 5.5, 3\" />\n    \t\n    <circle \n    \tid=\"frame2_non_interrupting\" \n    \tcx=\"16\" \n    \tcy=\"16\" \n    \tr=\"12\" \n    \tstroke=\"#585858\" \n    \tfill=\"none\" \n    \tstroke-width=\"1\"\n    \tstyle=\"stroke-dasharray: 4.5, 3\" />\n    \t\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    <circle id=\"frame2\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    \n\t<g id=\"messageCatching\">\n\t\t<path transform=\"translate(7,7)\" id=\"path1\" stroke=\"none\" fill=\"#585858\" stroke-width=\"1\" d=\"M 1 3 L 9 11 L 17 3 L 1 3 z M 1 5 L 1 13 L 5 9 L 1 5 z M 17 5 L 13 9 L 17 13 L 17 5 z M 6 10 L 1 15 L 17 15 L 12 10 L 9 13 L 6 10 z \"/>\n\t</g>\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n\t\n  </g>\n</svg>",
+      "icon" : "catching/message.png",
+      "groups" : [ "BPMN.STENCILS.GROUPS.BOUNDARYEVENTS" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "messagerefpackage", "cancelactivitypackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpathpackage" ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "sequence_start", "BoundaryEventsMorph", "IntermediateEventOnActivityBoundary" ]
     }, {

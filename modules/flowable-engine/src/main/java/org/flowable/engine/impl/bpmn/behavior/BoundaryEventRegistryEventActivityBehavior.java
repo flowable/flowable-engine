@@ -90,6 +90,7 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 if (Objects.equals(eventModel.getKey(), eventSubscription.getEventType())) {
                     eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                    CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscription);
                 }
             }
         }

@@ -517,8 +517,17 @@ public class DefaultProcessDiagramCanvas {
     public void drawCatchingMessageEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
     }
+    
+    public void drawCatchingEventRegistryEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
+    }
 
     public void drawCatchingMessageEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
+        drawLabel(name, graphicInfo);
+    }
+    
+    public void drawCatchingEventRegistryEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
         drawLabel(name, graphicInfo);
     }
@@ -911,6 +920,10 @@ public class DefaultProcessDiagramCanvas {
 
     public void drawManualTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(MANUALTASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+    
+    public void drawSendEventServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SENDTASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawBusinessRuleTask(String name, GraphicInfo graphicInfo, double scaleFactor) {

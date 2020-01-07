@@ -68,6 +68,7 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessConditionalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessErrorStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessEscalationStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessEventRegistryStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
@@ -202,6 +203,8 @@ public interface ActivityBehaviorFactory {
     public abstract EventSubProcessSignalStartEventActivityBehavior createEventSubProcessSignalStartEventActivityBehavior(StartEvent startEvent, SignalEventDefinition signalEventDefinition, Signal signal);
 
     public abstract EventSubProcessTimerStartEventActivityBehavior createEventSubProcessTimerStartEventActivityBehavior(StartEvent startEvent, TimerEventDefinition timerEventDefinition);
+    
+    public abstract EventSubProcessEventRegistryStartEventActivityBehavior createEventSubProcessEventRegistryStartEventActivityBehavior(StartEvent startEvent, String eventDefinitionKey);
 
     public abstract AdhocSubProcessActivityBehavior createAdhocSubprocessActivityBehavior(SubProcess subProcess);
 

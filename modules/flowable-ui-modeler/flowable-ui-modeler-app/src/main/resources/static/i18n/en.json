@@ -791,12 +791,12 @@
             "DESCRIPTION" : "Definition of the event name"
           },
           "EVENTINPARAMETERS" : {
-            "TITLE" : "Event in parameters",
-            "DESCRIPTION" : "Definition of the event in parameters"
+            "TITLE" : "Mapping to event payload",
+            "DESCRIPTION" : "Mapping of the process variables to event payload properties"
           },
           "EVENTOUTPARAMETERS" : {
-            "TITLE" : "Event out parameters",
-            "DESCRIPTION" : "Definition of the event out parameters"
+            "TITLE" : "Mapping from event payload",
+            "DESCRIPTION" : "Mapping of the event payload properties to process variables"
           },
           "EVENTCORRELATIONPARAMETERS" : {
             "TITLE" : "Correlation parameters",
@@ -817,6 +817,30 @@
           "CHANNELDESTINATION" : {
             "TITLE" : "Channel destination",
             "DESCRIPTION" : "Definition of the channel destination"
+          },
+          "TRIGGEREVENTKEY" : {
+            "TITLE" : "Trigger event key",
+            "DESCRIPTION" : "Definition of the trigger event key"
+          },
+          "TRIGGEREVENTNAME" : {
+            "TITLE" : "Trigger event name",
+            "DESCRIPTION" : "Definition of the trigger event name"
+          },
+          "TRIGGERCHANNELKEY" : {
+            "TITLE" : "Trigger channel key",
+            "DESCRIPTION" : "Definition of the trigger channel key"
+          },
+          "TRIGGERCHANNELNAME" : {
+            "TITLE" : "Trigger channel name",
+            "DESCRIPTION" : "Definition of the trigger channel name"
+          },
+          "TRIGGERCHANNELTYPE" : {
+            "TITLE" : "Trigger channel type",
+            "DESCRIPTION" : "Definition of the trigger channel type"
+          },
+          "TRIGGERCHANNELDESTINATION" : {
+            "TITLE" : "Trigger channel destination",
+            "DESCRIPTION" : "Definition of the trigger channel destination"
           },
           "KEYDETECTIONFIXEDVALUE" : {
             "TITLE" : "Event fixed value",
@@ -991,6 +1015,10 @@
         "DECISIONTASK" : {
           "TITLE" : "Decision task",
           "DESCRIPTION" : "Task to use the Flowable DMN rule engine"
+        },
+        "SENDEVENTTASK" : {
+          "TITLE" : "Send event task",
+          "DESCRIPTION" : "An task that sends an event to the event registry"
         },
         "SHELLTASK" : {
           "TITLE" : "Shell task",

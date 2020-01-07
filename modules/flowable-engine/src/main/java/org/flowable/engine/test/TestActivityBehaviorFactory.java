@@ -76,6 +76,7 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessConditionalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessErrorStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessEscalationStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessEventRegistryStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
@@ -353,6 +354,11 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public EventSubProcessTimerStartEventActivityBehavior createEventSubProcessTimerStartEventActivityBehavior(StartEvent startEvent, TimerEventDefinition timerEventDefinition) {
         return wrappedActivityBehaviorFactory.createEventSubProcessTimerStartEventActivityBehavior(startEvent, timerEventDefinition);
+    }
+
+    @Override
+    public EventSubProcessEventRegistryStartEventActivityBehavior createEventSubProcessEventRegistryStartEventActivityBehavior(StartEvent startEvent, String eventDefinitionKey) {
+        return wrappedActivityBehaviorFactory.createEventSubProcessEventRegistryStartEventActivityBehavior(startEvent, eventDefinitionKey);
     }
 
     @Override

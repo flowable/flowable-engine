@@ -17,6 +17,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
@@ -25,6 +26,7 @@ import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -53,6 +55,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_ESCALATION, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_SIGNAL, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_MESSAGE, BoundaryEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_CANCEL, BoundaryEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_BOUNDARY_COMPENSATION, BoundaryEventJsonConverter.class);
     }
@@ -65,6 +68,16 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
     protected String getStencilId(BaseElement baseElement) {
         BoundaryEvent boundaryEvent = (BoundaryEvent) baseElement;
         List<EventDefinition> eventDefinitions = boundaryEvent.getEventDefinitions();
+        
+        if (eventDefinitions.isEmpty()) {
+            if (boundaryEvent.getExtensionElements().get("eventType") != null && boundaryEvent.getExtensionElements().get("eventType").size() > 0) {
+                String eventType = boundaryEvent.getExtensionElements().get("eventType").get(0).getElementText();
+                if (StringUtils.isNotEmpty(eventType)) {
+                    return STENCIL_EVENT_START_EVENT_REGISTRY;
+                }
+            }
+        }
+        
         if (eventDefinitions.size() != 1) {
             // return timer event as default;
             return STENCIL_EVENT_BOUNDARY_TIMER;
@@ -120,6 +133,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         propertiesNode.put(PROPERTY_CANCEL_ACTIVITY, boundaryEvent.isCancelActivity());
 
         addEventProperties(boundaryEvent, propertiesNode);
+        addEventRegistryProperties(boundaryEvent, propertiesNode);
     }
 
     @Override
@@ -157,12 +171,42 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
             CompensateEventDefinition compensateEventDefinition = new CompensateEventDefinition();
             boundaryEvent.getEventDefinitions().add(compensateEventDefinition);
             boundaryEvent.setCancelActivity(getPropertyValueAsBoolean(PROPERTY_CANCEL_ACTIVITY, elementNode));
+        
+        } else if (STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY.equals(stencilId)) {
+            String eventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, elementNode);
+            if (StringUtils.isNotEmpty(eventKey)) {
+                addFlowableExtensionElementWithValue("eventType", eventKey, boundaryEvent);
+                addFlowableExtensionElementWithValue("eventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, elementNode), boundaryEvent);
+                convertJsonToOutParameters(elementNode, boundaryEvent);
+                convertJsonToCorrelationParameters(elementNode, boundaryEvent);
+                
+                addFlowableExtensionElementWithValue("channelKey", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, elementNode), boundaryEvent);
+                addFlowableExtensionElementWithValue("channelName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, elementNode), boundaryEvent);
+                addFlowableExtensionElementWithValue("channelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, elementNode), boundaryEvent);
+                addFlowableExtensionElementWithValue("channelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, elementNode), boundaryEvent);
+                
+                String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
+                String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
+                String jsonPath = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, elementNode);
+                if (StringUtils.isNotEmpty(fixedValue)) {
+                    addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", boundaryEvent);
+                    addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, boundaryEvent);
+                    
+                } else if (StringUtils.isNotEmpty(jsonField)) {
+                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", boundaryEvent);
+                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, boundaryEvent);
+                    
+                } else if (StringUtils.isNotEmpty(jsonPath)) {
+                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPath", boundaryEvent);
+                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPath, boundaryEvent);
+                }
+            }
         }
         boundaryEvent.setAttachedToRefId(lookForAttachedRef(elementNode.get(EDITOR_SHAPE_ID).asText(), modelNode.get(EDITOR_CHILD_SHAPES)));
         return boundaryEvent;
     }
 
-    private String lookForAttachedRef(String boundaryEventId, JsonNode childShapesNode) {
+    protected String lookForAttachedRef(String boundaryEventId, JsonNode childShapesNode) {
         String attachedRefId = null;
 
         if (childShapesNode != null) {
@@ -192,5 +236,49 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         }
 
         return attachedRefId;
+    }
+    
+    protected void addEventRegistryProperties(BoundaryEvent boundaryEvent, ObjectNode propertiesNode) {
+        String eventType = getExtensionValue("eventType", boundaryEvent);
+        if (StringUtils.isNotEmpty(eventType)) {
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_KEY, eventType, propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", boundaryEvent), propertiesNode);
+            addEventOutParameters(boundaryEvent.getExtensionElements().get("eventOutParameter"), propertiesNode);
+            addEventCorrelationParameters(boundaryEvent.getExtensionElements().get("eventCorrelationParameter"), propertiesNode);
+            
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, getExtensionValue("channelKey", boundaryEvent), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, getExtensionValue("channelName", boundaryEvent), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", boundaryEvent), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", boundaryEvent), propertiesNode);
+            
+            String keyDetectionType = getExtensionValue("keyDetectionType", boundaryEvent);
+            String keyDetectionValue = getExtensionValue("keyDetectionValue", boundaryEvent);
+            if (StringUtils.isNotEmpty(keyDetectionType) && StringUtils.isNotEmpty(keyDetectionValue)) {
+                if ("fixedValue".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, keyDetectionValue, propertiesNode);
+                    
+                } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
+                    
+                } else if ("jsonPath".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, keyDetectionValue, propertiesNode);
+                }
+            }
+        }
+    }
+    
+    protected String getExtensionValue(String name, FlowElement flowElement) {
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(name);
+        if (extensionElements != null && extensionElements.size() > 0) {
+            return extensionElements.get(0).getElementText();
+        }
+        
+        return null;
+    }
+    
+    protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
+        if (StringUtils.isNotEmpty(value)) {
+            propertiesNode.put(name, value);
+        }
     }
 }

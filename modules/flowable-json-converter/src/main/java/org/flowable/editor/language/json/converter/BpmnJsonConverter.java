@@ -109,6 +109,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         HttpTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         SendTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         DecisionTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
+        SendEventTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
 
         // gateways
         ExclusiveGatewayJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
@@ -155,6 +156,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_SIGNAL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_TIMER);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_MESSAGE);
+        DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_CANCEL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_COMPENSATION);
 
@@ -191,6 +193,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_RECTANGLES.add(STENCIL_TASK_MULE);
         DI_RECTANGLES.add(STENCIL_TASK_HTTP);
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
+        DI_RECTANGLES.add(STENCIL_TASK_SEND_EVENT);
         DI_RECTANGLES.add(STENCIL_TASK_SHELL);
         DI_RECTANGLES.add(STENCIL_TEXT_ANNOTATION);
 
