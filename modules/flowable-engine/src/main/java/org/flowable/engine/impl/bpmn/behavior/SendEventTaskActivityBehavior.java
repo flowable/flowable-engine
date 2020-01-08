@@ -24,7 +24,7 @@ import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -61,8 +61,13 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     @Override
     public void execute(DelegateExecution execution) {
         EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
-        
-        EventModel eventDefinition = eventRegistry.getEventModel(sendEventServiceTask.getEventType());
+
+        EventModel eventDefinition = null;
+        if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
+            eventDefinition = CommandContextUtil.getEventRegistry().getEventModel(sendEventServiceTask.getEventType());
+        } else {
+            eventDefinition = CommandContextUtil.getEventRegistry().getEventModel(sendEventServiceTask.getEventType(), execution.getTenantId());
+        }
 
         if (eventDefinition == null) {
             throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType());
@@ -102,7 +107,13 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         if (sendEventServiceTask.isTriggerable()) {
             EventModel triggerEventDefinition = null;
             if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
-                triggerEventDefinition = eventRegistry.getEventModel(sendEventServiceTask.getTriggerEventType());
+
+                if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
+                    triggerEventDefinition = CommandContextUtil.getEventRegistry().getEventModel(sendEventServiceTask.getTriggerEventType());
+                } else {
+                    triggerEventDefinition = CommandContextUtil.getEventRegistry().getEventModel(sendEventServiceTask.getTriggerEventType(), execution.getTenantId());
+                }
+
             } else {
                 triggerEventDefinition = eventDefinition;
             }
@@ -129,8 +140,6 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        
         if (sendEventServiceTask.isTriggerable()) {
             Object eventInstance = execution.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
             if (eventInstance instanceof EventInstance) {
@@ -148,8 +157,13 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 eventType = sendEventServiceTask.getEventType();
             }
             
-            EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
-            EventModel eventModel = eventRegistry.getEventModel(eventType);
+            EventModel eventModel = null;
+            if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
+                eventModel = CommandContextUtil.getEventRegistry().getEventModel(eventType);
+            } else {
+                eventModel = CommandContextUtil.getEventRegistry().getEventModel(eventType, execution.getTenantId());
+            }
+
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 if (Objects.equals(eventModel.getKey(), eventSubscription.getEventType())) {
                     eventSubscriptionService.deleteEventSubscription(eventSubscription);

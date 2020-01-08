@@ -13,11 +13,13 @@
 package org.flowable.engine.impl.jobexecutor;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
@@ -53,7 +55,13 @@ public class AsyncSendEventJobHandler implements JobHandler {
         SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) flowElement;
         
         EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
-        EventModel eventModel = eventRegistry.getEventModel(sendEventServiceTask.getEventType());
+
+        EventModel eventModel = null;
+        if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, job.getTenantId())) {
+            eventModel = CommandContextUtil.getEventRegistry().getEventModel(sendEventServiceTask.getEventType());
+        } else {
+            eventModel = CommandContextUtil.getEventRegistry().getEventModel(sendEventServiceTask.getEventType(), job.getTenantId());
+        }
 
         if (eventModel == null) {
             throw new FlowableException("No event model found for event key " + sendEventServiceTask.getEventType());

@@ -22,31 +22,33 @@ import java.util.Random;
 
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.FlowableTestCase;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class BpmnEventRegistryConsumerTest extends FlowableTestCase {
+public class BpmnEventRegistryConsumerTest extends PluggableFlowableTestCase {
 
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @BeforeEach
+    public void setUp() throws Exception {
         inboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
@@ -74,16 +76,14 @@ public class BpmnEventRegistryConsumerTest extends FlowableTestCase {
         return inboundEventChannelAdapter;
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @AfterEach
+    public void tearDown() throws Exception {
         getEventRegistry().removeChannelModel("test-channel");
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {
             eventRepositoryService.deleteDeployment(eventDeployment.getId());
         }
-
-        super.tearDown();
     }
 
     @Test
@@ -308,6 +308,19 @@ public class BpmnEventRegistryConsumerTest extends FlowableTestCase {
             }
         }
 
+    }
+
+    protected EventRepositoryService getEventRepositoryService() {
+        return getEventRegistryEngineConfiguration().getEventRepositoryService();
+    }
+
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
+            .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
     }
 
 }

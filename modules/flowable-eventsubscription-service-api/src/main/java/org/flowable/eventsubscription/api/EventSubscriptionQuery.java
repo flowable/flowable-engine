@@ -66,6 +66,9 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
     /** Only select event subscriptions with the given tenant id. **/
     EventSubscriptionQuery tenantId(String tenantId);
 
+    /** Only select event subscriptions without a tenant id. */
+    EventSubscriptionQuery withoutTenantId(String tenantId);
+
     /** Only select event subscriptions with the given configuration. **/
     EventSubscriptionQuery configuration(String configuration);
 

@@ -47,6 +47,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     protected Date createdBefore;
     protected Date createdAfter;
     protected String tenantId;
+    protected boolean withoutTenantId;
     protected String configuration;
     protected Collection<String> configurations;
     protected boolean withoutConfiguration;
@@ -188,6 +189,12 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     }
 
     @Override
+    public EventSubscriptionQuery withoutTenantId(String tenantId) {
+        this.withoutTenantId = true;
+        return this;
+    }
+
+    @Override
     public EventSubscriptionQueryImpl configuration(String configuration) {
         if (configuration == null) {
             throw new FlowableIllegalArgumentException("configuration is null");
@@ -309,6 +316,10 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
     }
 
     public String getConfiguration() {

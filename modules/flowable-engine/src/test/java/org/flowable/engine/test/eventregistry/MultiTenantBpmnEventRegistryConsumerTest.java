@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.test.eventregistry;
+package org.flowable.engine.test.eventregistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -19,22 +19,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
-import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventModelBuilder;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +45,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Joram Barrez
  */
-public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestCase {
+public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableTestCase {
 
     /**
      * Setup: two tenants: tenantA and tenantB.
@@ -72,7 +74,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
 
     private Set<String> cleanupDeploymentIds = new HashSet<>();
 
-    @Before
+    @BeforeEach
     public void setup() {
         // Shared channel and event in default tenant
         defaultSharedInboundChannelModel = getEventRegistry().newInboundChannelModel()
@@ -145,7 +147,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
         eventModelBuilder.deploy();
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         getEventRegistry().removeChannelModel(defaultSharedInboundChannelModel.getKey());
         getEventRegistry().removeChannelModel(sharedInboundChannelModel.getKey());
@@ -156,16 +158,30 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
 
         for (String cleanupDeploymentId : cleanupDeploymentIds) {
-            cmmnRepositoryService.deleteDeployment(cleanupDeploymentId, true);
+            repositoryService.deleteDeployment(cleanupDeploymentId, true);
         }
         cleanupDeploymentIds.clear();
+    }
+
+    private void deployProcessModel(String modelResource, String tenantId) {
+        String resource = getClass().getPackage().toString().replace("package ", "").replace(".", "/");
+        resource += "/MultiTenantBpmnEventRegistryConsumerTest." + modelResource;
+        DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().addClasspathResource(resource);
+        if (tenantId != null) {
+            deploymentBuilder.tenantId(tenantId);
+        }
+
+        String deploymentId = deploymentBuilder.deploy().getId();
+        cleanupDeploymentIds.add(deploymentId);
+
+        assertThat(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult()).isNotNull();
     }
 
     @Test
     public void validateEventModelDeployments() {
         EventDefinition eventDefinitionDefaultTenant = getEventRepositoryService().createEventDefinitionQuery()
             .eventDefinitionKey("defaultTenantSameKey").singleResult();
-        assertThat(eventDefinitionDefaultTenant.getTenantId()).isEqualTo(CmmnEngineConfiguration.NO_TENANT_ID);
+        assertThat(eventDefinitionDefaultTenant.getTenantId()).isEqualTo(ProcessEngineConfiguration.NO_TENANT_ID);
 
         List<EventDefinition> sameKeyEventDefinitions = getEventRepositoryService().createEventDefinitionQuery()
             .eventDefinitionKey("sameKey").orderByTenantId().asc().list();
@@ -190,160 +206,129 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             .eventDefinitionKey("tenantAKey").tenantId(TENANT_B).singleResult()).isNull();
     }
 
-    private void deployCaseModel(String modelResource, String tenantId) {
-        String resource = getClass().getPackage().toString().replace("package ", "").replace(".", "/");
-        resource += "/MultiTenantCmmnEventRegistryConsumerTest." + modelResource;
-        CmmnDeploymentBuilder cmmnDeploymentBuilder = cmmnRepositoryService.createDeployment().addClasspathResource(resource);
-        if (tenantId != null) {
-            cmmnDeploymentBuilder.tenantId(tenantId);
-        }
-
-        String deploymentId = cmmnDeploymentBuilder.deploy().getId();
-        cleanupDeploymentIds.add(deploymentId);
-
-        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId).singleResult()).isNotNull();
-    }
-
     @Test
-    public void testStartCaseInstanceWithTenantSpecificEvent() {
-        deployCaseModel("startCaseInstanceTenantA.cmmn", TENANT_A);
-        deployCaseModel("startCaseInstanceTenantB.cmmn", TENANT_B);
+    public void testStartProcessInstanceWithTenantSpecificEvent() {
+        deployProcessModel("startProcessInstanceTenantA.bpmn20.xml", TENANT_A);
+        deployProcessModel("startProcessInstanceTenantB.bpmn20.xml", TENANT_B);
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0L);
 
-        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().tenantId(TENANT_A).list())
+        assertThat(runtimeService.createEventSubscriptionQuery().tenantId(TENANT_A).list())
             .extracting(EventSubscription::getEventType, EventSubscription::getTenantId)
             .containsOnly(tuple("tenantAKey", "tenantA"));
-        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().tenantId(TENANT_B).list())
+        assertThat(runtimeService.createEventSubscriptionQuery().tenantId(TENANT_B).list())
             .extracting(EventSubscription::getEventType, EventSubscription::getTenantId)
             .containsOnly(tuple("tenantBKey", "tenantB"));
 
         // Note that #triggerEventWithoutTenantId doesn't have a tenantId set, but the channel has it hardcoded
 
-        ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+        for (int i = 0; i < 5; i++) {
+            ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(i + 1);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+        }
 
-        ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
-        ((TestInboundChannelAdapter) tenantBChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerB");
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(2L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(1L);
-    }
-
-    @Test
-    public void testStartUniqueCaseInstanceWithSpecificTenantEvent() {
-        deployCaseModel("startUniqueCaseInstanceTenantA.cmmn", TENANT_A);
-        deployCaseModel("startUniqueCaseInstanceTenantB.cmmn", TENANT_B);
-
-        ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
-
-        ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
         ((TestInboundChannelAdapter) tenantBChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L); // no new instance for A started
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(1L); // but a new instance for B (different tenant)
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(5L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(1L);
+
+        waitForJobExecutorOnCondition(10000L, 100L, () -> taskService.createTaskQuery().count() == 6);
+        assertThat(taskService.createTaskQuery().orderByTaskName().asc().list())
+            .extracting(Task::getName)
+            .containsExactly("task tenant A", "task tenant A", "task tenant A", "task tenant A", "task tenant A", "task tenant B");
     }
 
     @Test
-    public void testStartCaseInstanceWithSameEventKeyDeployedInDifferentTenants() {
-        deployCaseModel("startCaseInstanceSameKeyA.cmmn", TENANT_A);
-        deployCaseModel("startCaseInstanceSameKeyB.cmmn", TENANT_B);
+    public void testStartProcessInstanceWithSameEventKeyDeployedInDifferentTenants() {
+        deployProcessModel("startProcessInstanceSameKeyTenantA.bpmn20.xml", TENANT_A);
+        deployProcessModel("startProcessInstanceSameKeyTenantB.bpmn20.xml", TENANT_B);
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(1L);
-
-        // The event definitions have the same key, but different payload handling
-        CaseInstance tenantAInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).singleResult();
-        assertThat(cmmnRuntimeService.getVariable(tenantAInstance.getId(), "tenantSpecificVar")).isEqualTo("tenantAValue");
-        assertThat(cmmnRuntimeService.getVariable(tenantAInstance.getId(), "tenantSpecificVar2")).isNull();
-
-        CaseInstance tenantBInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).singleResult();
-        assertThat(cmmnRuntimeService.getVariable(tenantBInstance.getId(), "tenantSpecificVar")).isEqualTo("tenantBValue");
-        assertThat(cmmnRuntimeService.getVariable(tenantBInstance.getId(), "tenantSpecificVar2")).isEqualTo("someMoreTenantBValue");
-
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(2L);
-    }
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(2L);
 
-    // TODO
-//    @Test
-//    public void testStartCaseInstanceWithEventFromDefaultTenant() {
-//        deployCaseModel("startCaseInstanceDefaultTenant.cmmn", null);
-//
-//        // The chanel has a tenant detector that will use the correct tenant to start the case instance
-//
-//        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
-//
-//        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(2L);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
-//
-//        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(2L);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(1L);
-//    }
-
-    @Test
-    public void testEventListenerForSpecificTenantEvent() {
-        deployCaseModel("eventListenerTenantA.cmmn", TENANT_A);
-        deployCaseModel("eventListenerTenantB.cmmn", TENANT_B);
-
-        // Start a case instance in both tenants
-        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId(TENANT_A).start();
-        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId(TENANT_B).start();
-        assertThat(cmmnTaskService.createTaskQuery().list()).isEmpty();
-
-        // Now trigger the event, which should only trigger tasks in the specific tenant
-        ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
-        assertThat(cmmnTaskService.createTaskQuery().list())
+        waitForJobExecutorOnCondition(10000L, 100L, () -> taskService.createTaskQuery().count() == 3);
+        assertThat(taskService.createTaskQuery().orderByTaskName().asc().list())
             .extracting(Task::getName)
-            .containsOnly("TenantATask");
+            .containsExactly("task tenant A", "task tenant B", "task tenant B");
 
-        ((TestInboundChannelAdapter) tenantBChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
-        assertThat(cmmnTaskService.createTaskQuery().list())
-            .extracting(Task::getName)
-            .containsOnly("TenantATask", "TenantBTask");
-
-        ((TestInboundChannelAdapter) tenantBChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
-        assertThat(cmmnTaskService.createTaskQuery().list())
-            .extracting(Task::getName)
-            .containsOnly("TenantATask", "TenantBTask", "TenantBTask");
     }
 
     @Test
-    public void testEventListenerSameEventKeyForDifferentTenants() {
-        deployCaseModel("eventListenerSameKeyTenantA.cmmn", TENANT_A);
-        deployCaseModel("eventListenerSameKeyTenantB.cmmn", TENANT_B);
+    public void testUniqueStartProcessInstanceWithSameEventKeyDeployedInDifferentTenants() {
+        deployProcessModel("startUniqueProcessInstanceSameKeyTenantA.bpmn20.xml", TENANT_A);
+        deployProcessModel("startUniqueProcessInstanceSameKeyTenantB.bpmn20.xml", TENANT_B);
 
-        // Start a case instance in both tenants
-        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId(TENANT_A).start();
-        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId(TENANT_B).start();
-        assertThat(cmmnTaskService.createTaskQuery().list()).isEmpty();
-
-        // Now trigger the event, which should only trigger tasks in the specific tenant
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-        assertThat(cmmnTaskService.createTaskQuery().list())
-            .extracting(Task::getName)
-            .containsOnly("TenantATask");
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
-        assertThat(cmmnTaskService.createTaskQuery().list())
-            .extracting(Task::getName)
-            .containsOnly("TenantATask", "TenantBTask");
-
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
-        assertThat(cmmnTaskService.createTaskQuery().list())
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(1L); // unique instance for same correlation
+
+        waitForJobExecutorOnCondition(10000L, 100L, () -> taskService.createTaskQuery().count() == 2);
+        assertThat(taskService.createTaskQuery().orderByTaskName().asc().list())
             .extracting(Task::getName)
-            .containsOnly("TenantATask", "TenantBTask", "TenantBTask");
+            .containsExactly("task tenant A", "task tenant B");
+    }
+
+    @Test
+    public void testBoundaryEventWithSpecificTenantEvent() {
+        // Note that both events correlate on 'customerId' being 'ABC'
+        deployProcessModel("boundaryEventTenantA.bpmn20.xml", TENANT_A);
+        deployProcessModel("boundaryEventTenantB.bpmn20.xml", TENANT_B);
+
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").tenantId(TENANT_A).start();
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").tenantId(TENANT_B).start();
+
+        // Triggering through the tenant A channel should only correlate
+        ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("ABC");
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").tenantId(TENANT_A).start();
+        ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("Doesn't correlate");
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+
+        ((TestInboundChannelAdapter) tenantBChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("ABC");
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(1L);
+    }
+
+    @Test
+    public void testBoundaryEventWithSameEventKeyEvent() {
+        // Note that both events correlate on 'customerId' being 'ABC'
+        deployProcessModel("boundaryEventSameKeyTenantA.bpmn20.xml", TENANT_A);
+        deployProcessModel("boundaryEventSameKeyTenantB.bpmn20.xml", TENANT_B);
+
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").tenantId(TENANT_A).start();
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").tenantId(TENANT_B).start();
+
+        // Triggering through the tenant A channel should only correlate
+        ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("ABC", TENANT_A);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").tenantId(TENANT_A).start();
+        ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("Doesn't correlate", TENANT_A);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+
+        ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("ABC", TENANT_A);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(2L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+
+        ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("ABC", TENANT_B);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(2L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(1L);
     }
 
     private static class TestInboundChannelAdapter implements InboundEventChannelAdapter {
@@ -402,6 +387,19 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             }
         }
 
+    }
+
+    protected EventRepositoryService getEventRepositoryService() {
+        return getEventRegistryEngineConfiguration().getEventRepositoryService();
+    }
+
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
+            .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
     }
 
 }

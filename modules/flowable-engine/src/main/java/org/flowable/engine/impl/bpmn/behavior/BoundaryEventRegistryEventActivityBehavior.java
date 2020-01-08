@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -55,8 +56,7 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        EventModel eventModel = getEventModel(commandContext, executionEntity);
-        
+        EventModel eventModel = getEventModel(execution);
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
                         .eventType(eventModel.getKey())
                         .executionId(executionEntity.getId())
@@ -70,6 +70,16 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
         executionEntity.getEventSubscriptions().add(eventSubscription);
+    }
+
+    protected EventModel getEventModel(DelegateExecution execution) {
+        EventModel eventModel = null;
+        if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
+            eventModel = CommandContextUtil.getEventRegistry().getEventModel(eventDefinitionKey);
+        } else {
+            eventModel = CommandContextUtil.getEventRegistry().getEventModel(eventDefinitionKey, execution.getTenantId());
+        }
+        return eventModel;
     }
 
     @Override
@@ -107,7 +117,7 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
             key = expression.getValue(executionEntity).toString();
         }
 
-        EventModel eventModel = CommandContextUtil.getEventRegistry().getEventModel(key);
+        EventModel eventModel = getEventModel(executionEntity);
         if (eventModel == null) {
             throw new FlowableException("Could not find event model for key " +key);
         }
