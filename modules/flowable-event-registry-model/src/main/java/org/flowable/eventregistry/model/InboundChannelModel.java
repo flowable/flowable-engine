@@ -21,6 +21,7 @@ public class InboundChannelModel extends ChannelModel {
 
     protected String deserializerType;
     protected ChannelEventKeyDetection channelEventKeyDetection;
+    protected ChannelEventTenantIdDetection channelEventTenantIdDetection;
 
     @JsonIgnore
     protected Object inboundEventChannelAdapter;
@@ -42,6 +43,14 @@ public class InboundChannelModel extends ChannelModel {
 
     public void setChannelEventKeyDetection(ChannelEventKeyDetection channelEventKeyDetection) {
         this.channelEventKeyDetection = channelEventKeyDetection;
+    }
+
+    public ChannelEventTenantIdDetection getChannelEventTenantIdDetection() {
+        return channelEventTenantIdDetection;
+    }
+
+    public void setChannelEventTenantIdDetection(ChannelEventTenantIdDetection channelEventTenantIdDetection) {
+        this.channelEventTenantIdDetection = channelEventTenantIdDetection;
     }
 
     public Object getInboundEventProcessingPipeline() {

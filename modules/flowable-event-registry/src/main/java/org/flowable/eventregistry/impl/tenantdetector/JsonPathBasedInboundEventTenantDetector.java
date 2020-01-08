@@ -30,18 +30,20 @@ public class JsonPathBasedInboundEventTenantDetector implements InboundEventTena
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected JsonPointer jsonPathExpression;
+    protected String jsonPathExpression;
+    protected JsonPointer jsonPointer;
 
     public JsonPathBasedInboundEventTenantDetector(String jsonPathExpression) {
-        this.jsonPathExpression = JsonPointer.compile(jsonPathExpression);
+        this.jsonPathExpression = jsonPathExpression;
+        this.jsonPointer = JsonPointer.compile(jsonPathExpression);
     }
 
     @Override
     public String detectTenantId(JsonNode event) {
-        JsonNode result = event.at(jsonPathExpression);
+        JsonNode result = event.at(jsonPointer);
 
         if (result == null || result.isMissingNode() || result.isNull()) {
-            LOGGER.warn("JsonPath expression {} did not detect event tenant", jsonPathExpression);
+            LOGGER.warn("JsonPath expression {} did not detect event tenant", jsonPointer);
             return null;
         }
 
@@ -50,5 +52,12 @@ public class JsonPathBasedInboundEventTenantDetector implements InboundEventTena
         }
 
         return null;
+    }
+
+    public String getJsonPathExpression() {
+        return jsonPathExpression;
+    }
+    public void setJsonPathExpression(String jsonPathExpression) {
+        this.jsonPathExpression = jsonPathExpression;
     }
 }

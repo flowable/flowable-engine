@@ -43,4 +43,10 @@ public class XpathBasedInboundEventTenantDetector implements InboundEventTenantD
         }
     }
 
+    public String getXpathExpression() {
+        return xpathExpression;
+    }
+    public void setXpathExpression(String xpathExpression) {
+        this.xpathExpression = xpathExpression;
+    }
 }

@@ -10,24 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.impl.keydetector;
+package org.flowable.eventregistry.impl.tenantdetector;
 
-import org.flowable.eventregistry.api.InboundEventKeyDetector;
+import org.flowable.eventregistry.api.InboundEventTenantDetector;
 
 /**
  * @author Joram Barrez
  */
-public class StaticKeyDetector<T> implements InboundEventKeyDetector<T> {
+public class InboundEventStaticTenantDetector<T> implements InboundEventTenantDetector<T> {
 
-    protected String staticKey;
+    protected String staticTenantId;
 
-    public StaticKeyDetector(String staticKey) {
-        this.staticKey = staticKey;
+    public InboundEventStaticTenantDetector(String staticTenantId) {
+        this.staticTenantId = staticTenantId;
     }
 
     @Override
-    public String detectEventDefinitionKey(T event) {
-        return staticKey;
+    public String detectTenantId(T event) {
+        return staticTenantId;
     }
 
 }

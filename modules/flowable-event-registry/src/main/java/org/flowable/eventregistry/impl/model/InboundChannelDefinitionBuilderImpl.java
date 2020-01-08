@@ -26,7 +26,7 @@ import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.model.InboundChannelModelBuilder;
 import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
-import org.flowable.eventregistry.impl.keydetector.StaticKeyDetector;
+import org.flowable.eventregistry.impl.keydetector.InboundEventStaticKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
@@ -34,7 +34,7 @@ import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPip
 import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.impl.tenantdetector.JsonPathBasedInboundEventTenantDetector;
-import org.flowable.eventregistry.impl.tenantdetector.StaticTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
 import org.flowable.eventregistry.model.InboundChannelModel;
@@ -338,7 +338,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
 
         @Override
         public InboundEventTenantJsonDetectorBuilder fixedEventKey(String key) {
-            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new StaticKeyDetector(key);
+            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new InboundEventStaticKeyDetector(key);
             return new InboundEventTenantJsonDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
@@ -365,7 +365,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
 
         @Override
         public InboundEventTenantXmlDetectorBuilder fixedEventKey(String key) {
-            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new StaticKeyDetector(key);
+            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new InboundEventStaticKeyDetector(key);
             return new InboundEventTenantXmlDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
@@ -402,7 +402,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
 
         @Override
         public InboundEventPayloadJsonExtractorBuilder fixedTenantId(String tenantId) {
-            inboundEventProcessingPipelineBuilder.inboundEventTenantDetector = new StaticTenantDetector(tenantId);
+            inboundEventProcessingPipelineBuilder.inboundEventTenantDetector = new InboundEventStaticTenantDetector(tenantId);
             return new InboundEventPayloadJsonExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
@@ -423,7 +423,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
 
         @Override
         public InboundEventPayloadXmlExtractorBuilder fixedTenantId(String tenantId) {
-            inboundEventProcessingPipelineBuilder.inboundEventTenantDetector = new StaticTenantDetector(tenantId);
+            inboundEventProcessingPipelineBuilder.inboundEventTenantDetector = new InboundEventStaticTenantDetector(tenantId);
             return new InboundEventPayloadXmlExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
@@ -444,7 +444,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
 
         @Override
         public InboundEventPayloadExtractorBuilder<T> fixedTenantId(String tenantId) {
-            inboundEventProcessingPipelineBuilder.inboundEventTenantDetector = new StaticTenantDetector(tenantId);
+            inboundEventProcessingPipelineBuilder.inboundEventTenantDetector = new InboundEventStaticTenantDetector(tenantId);
             return new InboundEventPayloadExtractorBuilderImpl<>(inboundEventProcessingPipelineBuilder);
         }
 

@@ -22,10 +22,15 @@ import java.util.List;
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDeployment;
+import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
+import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.JsonPathBasedInboundEventTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.JmsInboundChannelModel;
 import org.flowable.eventregistry.test.AbstractFlowableEventTest;
 import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
@@ -45,7 +50,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         assertEquals("myEvent", eventDefinition.getKey());
         assertEquals(1, eventDefinition.getVersion());
     }
-    
+
     @Test
     @ChannelDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/simpleChannel.channel")
     public void deploySingleChannelDefinition() {
@@ -57,7 +62,31 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         assertEquals("myChannel", channelDefinition.getKey());
         assertEquals(1, channelDefinition.getVersion());
     }
-    
+
+    @Test
+    @ChannelDeploymentAnnotation(resources = {
+        "org/flowable/eventregistry/test/deployment/simpleChannelWithFixedTenant.channel",
+        "org/flowable/eventregistry/test/deployment/simpleChannelWithJsonPathTenant.channel",
+        "org/flowable/eventregistry/test/deployment/simpleChannelWithXPathTenant.channel"
+        }
+    )
+    public void deployChannelsWithTenantDetection() {
+        InboundChannelModel channel1 = eventRegistryEngine.getEventRegistry().getInboundChannelModel("channel1");
+        assertThat(((DefaultInboundEventProcessingPipeline) channel1.getInboundEventProcessingPipeline()).getInboundEventTenantDetector())
+            .isInstanceOf(InboundEventStaticTenantDetector.class);
+
+        InboundChannelModel channel2 = eventRegistryEngine.getEventRegistry().getInboundChannelModel("channel2");
+        DefaultInboundEventProcessingPipeline inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel2.getInboundEventProcessingPipeline();
+        assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(JsonPathBasedInboundEventTenantDetector.class);
+        assertThat(((JsonPathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getJsonPathExpression()).isEqualTo("/tenantId");
+
+        InboundChannelModel channel3 = eventRegistryEngine.getEventRegistry().getInboundChannelModel("channel3");
+        inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel3.getInboundEventProcessingPipeline();
+        assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(XpathBasedInboundEventTenantDetector.class);
+        assertThat(((XpathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getXpathExpression()).isEqualTo("/data/tenantId");
+    }
+
+
     @Test
     @EventDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/simpleEvent.event")
     @ChannelDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/simpleChannel.channel")

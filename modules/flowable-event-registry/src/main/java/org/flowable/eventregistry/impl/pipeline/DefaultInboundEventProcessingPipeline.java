@@ -101,4 +101,41 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     public Collection<EventRegistryEvent> transform(EventInstance eventInstance) {
         return inboundEventTransformer.transform(eventInstance);
     }
+
+    public EventRegistry getEventRegistry() {
+        return eventRegistry;
+    }
+    public void setEventRegistry(EventRegistry eventRegistry) {
+        this.eventRegistry = eventRegistry;
+    }
+    public InboundEventDeserializer<T> getInboundEventDeserializer() {
+        return inboundEventDeserializer;
+    }
+    public void setInboundEventDeserializer(InboundEventDeserializer<T> inboundEventDeserializer) {
+        this.inboundEventDeserializer = inboundEventDeserializer;
+    }
+    public InboundEventKeyDetector<T> getInboundEventKeyDetector() {
+        return inboundEventKeyDetector;
+    }
+    public void setInboundEventKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector) {
+        this.inboundEventKeyDetector = inboundEventKeyDetector;
+    }
+    public InboundEventTenantDetector<T> getInboundEventTenantDetector() {
+        return inboundEventTenantDetector;
+    }
+    public void setInboundEventTenantDetector(InboundEventTenantDetector<T> inboundEventTenantDetector) {
+        this.inboundEventTenantDetector = inboundEventTenantDetector;
+    }
+    public InboundEventPayloadExtractor<T> getInboundEventPayloadExtractor() {
+        return inboundEventPayloadExtractor;
+    }
+    public void setInboundEventPayloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor) {
+        this.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
+    }
+    public InboundEventTransformer getInboundEventTransformer() {
+        return inboundEventTransformer;
+    }
+    public void setInboundEventTransformer(InboundEventTransformer inboundEventTransformer) {
+        this.inboundEventTransformer = inboundEventTransformer;
+    }
 }

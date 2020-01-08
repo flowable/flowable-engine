@@ -24,14 +24,18 @@ import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
-import org.flowable.eventregistry.impl.keydetector.StaticKeyDetector;
+import org.flowable.eventregistry.impl.keydetector.InboundEventStaticKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
+import org.flowable.eventregistry.impl.tenantdetector.JsonPathBasedInboundEventTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
 import org.flowable.eventregistry.model.ChannelEventKeyDetection;
+import org.flowable.eventregistry.model.ChannelEventTenantIdDetection;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.w3c.dom.Document;
@@ -74,7 +78,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                 }
 
                 if (StringUtils.isNotEmpty(keyDetection.getFixedValue())) {
-                    eventKeyDetector = new StaticKeyDetector<>(keyDetection.getFixedValue());
+                    eventKeyDetector = new InboundEventStaticKeyDetector<>(keyDetection.getFixedValue());
                 } else if (StringUtils.isNotEmpty(keyDetection.getJsonField())) {
                     eventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(keyDetection.getJsonField());
                 } else if (StringUtils.isNotEmpty(keyDetection.getJsonPathExpression())) {
@@ -85,24 +89,36 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                             + ". One of fixedValue, jsonField or jsonPathExpression should be set.");
                 }
 
+                ChannelEventTenantIdDetection channelEventTenantIdDetection = inboundChannelModel.getChannelEventTenantIdDetection();
+                if (channelEventTenantIdDetection != null) {
+                    if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getFixedValue())) {
+                        eventTenantDetector = new InboundEventStaticTenantDetector<>(channelEventTenantIdDetection.getFixedValue());
+                    } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getJsonPathExpression())) {
+                        eventTenantDetector = new JsonPathBasedInboundEventTenantDetector(channelEventTenantIdDetection.getJsonPathExpression());
+                    } else {
+                        throw new FlowableException(
+                            "The channel xml tenant detection value was not found for the channel model with key " + inboundChannelModel.getKey()
+                                + ". One of fixedValue, jsonPathExpression should be set.");
+                    }
+                }
+
                 eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRegistry, eventDeserializer,
-                    eventKeyDetector, null, eventPayloadExtractor, eventTransformer);
+                    eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
 
             } else if ("xml".equals(inboundChannelModel.getDeserializerType())) {
 
                 InboundEventDeserializer<Document> eventDeserializer = new StringToXmlDocumentDeserializer();
+                InboundEventTenantDetector<Document> eventTenantDetector = null; // By default no multi-tenancy is applied
                 InboundEventPayloadExtractor<Document> eventPayloadExtractor = new XmlElementsToMapPayloadExtractor();
                 InboundEventTransformer eventTransformer = new DefaultInboundEventTransformer();
                 InboundEventKeyDetector<Document> eventKeyDetector;
 
                 ChannelEventKeyDetection keyDetection = inboundChannelModel.getChannelEventKeyDetection();
-
                 if (keyDetection == null) {
                     throw new FlowableException("A channel key detection value is required");
                 }
-
                 if (StringUtils.isNotEmpty(keyDetection.getFixedValue())) {
-                    eventKeyDetector = new StaticKeyDetector<>(keyDetection.getFixedValue());
+                    eventKeyDetector = new InboundEventStaticKeyDetector<>(keyDetection.getFixedValue());
                 } else if (StringUtils.isNotEmpty(keyDetection.getXmlXPathExpression())) {
                     eventKeyDetector = new XpathBasedInboundEventKeyDetector(keyDetection.getXmlXPathExpression());
                 } else {
@@ -111,8 +127,21 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                             + ". One of fixedValue, xmlPathExpression should be set.");
                 }
 
+                ChannelEventTenantIdDetection channelEventTenantIdDetection = inboundChannelModel.getChannelEventTenantIdDetection();
+                if (channelEventTenantIdDetection != null) {
+                    if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getFixedValue())) {
+                        eventTenantDetector = new InboundEventStaticTenantDetector<>(channelEventTenantIdDetection.getFixedValue());
+                    } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getxPathExpression())) {
+                        eventTenantDetector = new XpathBasedInboundEventTenantDetector(channelEventTenantIdDetection.getxPathExpression());
+                    } else {
+                        throw new FlowableException(
+                            "The channel xml tenant detection value was not found for the channel model with key " + inboundChannelModel.getKey()
+                                + ". One of fixedValue, xPathExpression should be set.");
+                    }
+                }
+
                 eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRegistry, eventDeserializer,
-                    eventKeyDetector, null, eventPayloadExtractor, eventTransformer);
+                    eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
 
             } else {
                 eventProcessingPipeline = null;
