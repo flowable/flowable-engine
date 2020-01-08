@@ -10,23 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.api.runtime;
-
-import java.util.Collection;
-
-import org.flowable.eventregistry.model.EventModel;
+package org.flowable.eventregistry.api;
 
 /**
  * @author Joram Barrez
  */
-public interface EventInstance {
+@FunctionalInterface
+public interface InboundEventTenantDetector<T> {
 
-    EventModel getEventModel();
-
-    Collection<EventPayloadInstance> getPayloadInstances();
-
-    Collection<EventCorrelationParameterInstance> getCorrelationParameterInstances();
-
-    String getTenantId();
+    String detectTenantId(T event);
 
 }

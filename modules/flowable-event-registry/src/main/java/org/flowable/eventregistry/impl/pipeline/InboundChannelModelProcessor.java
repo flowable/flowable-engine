@@ -20,6 +20,7 @@ import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
+import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
@@ -62,6 +63,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
 
             if ("json".equals(inboundChannelModel.getDeserializerType())) {
                 InboundEventDeserializer<JsonNode> eventDeserializer = new StringToJsonDeserializer();
+                InboundEventTenantDetector<JsonNode> eventTenantDetector = null; // By default no multi-tenancy is applied
                 InboundEventPayloadExtractor<JsonNode> eventPayloadExtractor = new JsonFieldToMapPayloadExtractor();
                 InboundEventTransformer eventTransformer = new DefaultInboundEventTransformer();
                 InboundEventKeyDetector<JsonNode> eventKeyDetector;
@@ -83,9 +85,11 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                             + ". One of fixedValue, jsonField or jsonPathExpression should be set.");
                 }
 
-                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRegistry, eventDeserializer, eventKeyDetector, eventPayloadExtractor,
-                    eventTransformer);
+                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRegistry, eventDeserializer,
+                    eventKeyDetector, null, eventPayloadExtractor, eventTransformer);
+
             } else if ("xml".equals(inboundChannelModel.getDeserializerType())) {
+
                 InboundEventDeserializer<Document> eventDeserializer = new StringToXmlDocumentDeserializer();
                 InboundEventPayloadExtractor<Document> eventPayloadExtractor = new XmlElementsToMapPayloadExtractor();
                 InboundEventTransformer eventTransformer = new DefaultInboundEventTransformer();
@@ -107,8 +111,9 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                             + ". One of fixedValue, xmlPathExpression should be set.");
                 }
 
-                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRegistry, eventDeserializer, eventKeyDetector, eventPayloadExtractor,
-                    eventTransformer);
+                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRegistry, eventDeserializer,
+                    eventKeyDetector, null, eventPayloadExtractor, eventTransformer);
+
             } else {
                 eventProcessingPipeline = null;
             }

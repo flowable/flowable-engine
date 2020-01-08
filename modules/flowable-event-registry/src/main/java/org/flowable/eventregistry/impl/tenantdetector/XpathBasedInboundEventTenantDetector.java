@@ -10,30 +10,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.impl.keydetector;
+package org.flowable.eventregistry.impl.tenantdetector;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.eventregistry.api.InboundEventKeyDetector;
+import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
  * @author Joram Barrez
  */
-public class XpathBasedInboundEventKeyDetector implements InboundEventKeyDetector<Document> {
+public class XpathBasedInboundEventTenantDetector implements InboundEventTenantDetector<Document> {
 
     protected String xpathExpression;
 
-    public XpathBasedInboundEventKeyDetector(String xpathExpression) {
+    public XpathBasedInboundEventTenantDetector(String xpathExpression) {
         this.xpathExpression = xpathExpression;
     }
 
     @Override
-    public String detectEventDefinitionKey(Document document) {
+    public String detectTenantId(Document document) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
             Node result = (Node) xPath.compile(xpathExpression).evaluate(document, XPathConstants.NODESET);

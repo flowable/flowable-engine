@@ -10,23 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.api.runtime;
+package org.flowable.eventregistry.impl.tenantdetector;
 
-import java.util.Collection;
-
-import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.api.InboundEventTenantDetector;
 
 /**
  * @author Joram Barrez
  */
-public interface EventInstance {
+public class StaticTenantDetector<T> implements InboundEventTenantDetector<T> {
 
-    EventModel getEventModel();
+    protected String staticTenantId;
 
-    Collection<EventPayloadInstance> getPayloadInstances();
+    public StaticTenantDetector(String staticTenantId) {
+        this.staticTenantId = staticTenantId;
+    }
 
-    Collection<EventCorrelationParameterInstance> getCorrelationParameterInstances();
-
-    String getTenantId();
+    @Override
+    public String detectTenantId(T event) {
+        return staticTenantId;
+    }
 
 }
