@@ -174,11 +174,6 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
             .deserializer(new InboundEventDeserializer<Customer>() {
 
                 @Override
-                public String getType() {
-                    return "customer";
-                }
-
-                @Override
                 public Customer deserialize(String rawEvent) {
                     try {
                         return new ObjectMapper().readValue(rawEvent, Customer.class);

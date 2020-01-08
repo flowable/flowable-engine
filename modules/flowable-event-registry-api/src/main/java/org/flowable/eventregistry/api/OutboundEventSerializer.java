@@ -21,11 +21,6 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
 public interface OutboundEventSerializer {
 
     /**
-     * Returns the unique type for this serializer.
-     */
-    String getType();
-
-    /**
      * The actual serialization.
      */
     String serialize(EventInstance eventInstance);

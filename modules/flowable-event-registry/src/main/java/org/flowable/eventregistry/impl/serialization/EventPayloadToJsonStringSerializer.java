@@ -33,14 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EventPayloadToJsonStringSerializer implements OutboundEventSerializer {
 
-    public static String TYPE = "payloadToJsonString";
-
     protected ObjectMapper objectMapper = new ObjectMapper();
-
-    @Override
-    public String getType() {
-        return TYPE;
-    }
 
     @Override
     public String serialize(EventInstance eventInstance) {

@@ -36,13 +36,6 @@ import org.w3c.dom.Element;
  */
 public class EventPayloadToXmlStringSerializer implements OutboundEventSerializer {
 
-    public static String TYPE = "payloadToXmlString";
-
-    @Override
-    public String getType() {
-        return TYPE;
-    }
-
     @Override
     public String serialize(EventInstance eventInstance) {
         try {
