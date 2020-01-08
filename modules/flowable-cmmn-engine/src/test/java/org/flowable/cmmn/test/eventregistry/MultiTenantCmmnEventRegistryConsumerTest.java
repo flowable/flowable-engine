@@ -272,25 +272,27 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(2L);
     }
 
-    // TODO
-//    @Test
-//    public void testStartCaseInstanceWithEventFromDefaultTenant() {
-//        deployCaseModel("startCaseInstanceDefaultTenant.cmmn", null);
-//
-//        // The chanel has a tenant detector that will use the correct tenant to start the case instance
-//
-//        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
-//
-//        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(2L);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
-//
-//        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(2L);
-//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(1L);
-//    }
+    @Test
+    public void testStartCaseInstanceWithEventFromDefaultTenant() {
+        deployCaseModel("startCaseInstanceDefaultTenant.cmmn", null);
+
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().singleResult())
+            .extracting(EventSubscription::getTenantId).isEqualTo(CmmnEngineConfiguration.NO_TENANT_ID);
+
+        // The chanel has a tenant detector that will use the correct tenant to start the case instance
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(2L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(2L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(1L);
+    }
 
     @Test
     public void testEventListenerForSpecificTenantEvent() {

@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -277,6 +278,31 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
         assertThat(taskService.createTaskQuery().orderByTaskName().asc().list())
             .extracting(Task::getName)
             .containsExactly("task tenant A", "task tenant B");
+    }
+
+    @Test
+    public void testStartProcessInstanceWithProcessAndEventInDefaultTenant() {
+        // Both the process model and the event definition are part of the default tenant
+        deployProcessModel("startProcessInstanceDefaultTenant.bpmn20.xml", null);
+
+        assertThat(runtimeService.createEventSubscriptionQuery().singleResult())
+            .extracting(EventSubscription::getTenantId).isEqualTo(ProcessEngineConfiguration.NO_TENANT_ID);
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).singleResult();
+        assertThat(processInstance.getTenantId()).isEqualTo(TENANT_A);
+
+        for (int i = 0; i < 4; i++) {
+            ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerB", TENANT_B);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(i + 1);
+        }
     }
 
     @Test

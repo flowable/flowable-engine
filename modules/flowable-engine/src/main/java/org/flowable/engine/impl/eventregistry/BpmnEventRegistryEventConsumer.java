@@ -39,8 +39,12 @@ import org.flowable.eventregistry.impl.consumer.CorrelationKey;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer  {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnEventRegistryEventConsumer.class);
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected CommandExecutor commandExecutor;
@@ -92,8 +96,13 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 .scopeType(ScopeTypes.BPMN);
 
 
-            if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                eventSubscriptionQuery.tenantId(eventInstance.getTenantId());
+            // Note: the tenantId of the model, not the event instance.
+            // The event instance tenantId will always be the 'real' tenantId,
+            // but the event could have been deployed to the default tenant
+            // (which is reflected in the eventModel tenantId).
+            String eventModelTenantId = eventInstance.getEventModel().getTenantId();
+            if (eventModelTenantId != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventModelTenantId)) {
+                eventSubscriptionQuery.tenantId(eventModelTenantId);
             }
 
             return CommandContextUtil.getEventSubscriptionEntityManager(commandContext)
@@ -112,8 +121,13 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 .configurations(allCorrelationKeyValues)
                 .scopeType(ScopeTypes.BPMN);
 
-            if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                eventSubscriptionQuery.tenantId(eventInstance.getTenantId());
+            // Note: the tenantId of the model, not the event instance.
+            // The event instance tenantId will always be the 'real' tenantId,
+            // but the event could have been deployed to the default tenant
+            // (which is reflected in the eventModel tenantId).
+            String eventModelTenantId = eventInstance.getEventModel().getTenantId();
+            if (eventModelTenantId != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventModelTenantId)) {
+                eventSubscriptionQuery.tenantId(eventModelTenantId);
             }
 
             return CommandContextUtil.getEventSubscriptionEntityManager(commandContext)
@@ -142,6 +156,14 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 .processDefinitionId(eventSubscription.getProcessDefinitionId())
                 .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
+            if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+                processInstanceBuilder.tenantId(eventInstance.getTenantId());
+
+                if (!Objects.equals(eventInstance.getTenantId(), eventInstance.getEventModel().getTenantId())) {
+                    processInstanceBuilder.overrideProcessDefinitionTenantId(eventInstance.getTenantId());
+                }
+            }
+
             if (correlationKeys != null) {
                 String startCorrelationConfiguration = getStartCorrelationConfiguration(eventSubscription);
 
@@ -157,6 +179,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
                     if (processInstanceCount > 0) {
                         // Returning, no new instance should be started
+                        LOGGER.debug("Event received to start a new process instance, but a unique instance already exists.");
                         return;
                     }
 

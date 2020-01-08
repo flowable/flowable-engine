@@ -151,6 +151,8 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
         }
 
         EventDefinitionCacheEntry eventDefinitionCacheEntry = deploymentManager.resolveEventDefinition(eventDefinitionEntity);
-        return eventEngineConfiguration.getEventJsonConverter().convertToEventModel(eventDefinitionCacheEntry.getEventDefinitionJson());
+        EventModel eventModel = eventEngineConfiguration.getEventJsonConverter().convertToEventModel(eventDefinitionCacheEntry.getEventDefinitionJson());
+        eventModel.setTenantId(eventDefinitionCacheEntry.getEventDefinitionEntity().getTenantId());
+        return eventModel;
     }
 }
