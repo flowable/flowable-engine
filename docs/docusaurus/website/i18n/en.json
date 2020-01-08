@@ -83,6 +83,9 @@
       "cmmn/ch07-architecture": {
         "title": "Architecture"
       },
+      "disclaimer": {
+        "title": "Disclaimer"
+      },
       "dmn/ch02-Configuration": {
         "title": "Configuration"
       },
@@ -141,7 +144,8 @@
       "CMMN User Guide": "CMMN User Guide",
       "DMN User Guide": "DMN User Guide",
       "Forms User Guide": "Forms User Guide",
-      "Migration from v5": "Migration from v5"
+      "Migration from v5": "Migration from v5",
+      "Disclaimer": "Disclaimer"
     }
   },
   "pages-strings": {
