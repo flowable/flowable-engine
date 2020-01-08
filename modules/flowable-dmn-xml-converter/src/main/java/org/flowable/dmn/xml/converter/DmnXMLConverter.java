@@ -42,7 +42,6 @@ import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
-import org.flowable.dmn.model.DmnExtensionAttribute;
 import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
@@ -350,7 +349,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     xtw.writeAttribute(ATTRIBUTE_NAME, decision.getName());
                 }
 
-                if (Boolean.parseBoolean(decision.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORCE_DMN_11))) {
+                if (decision.isForceDMN11()) {
                     xtw.writeNamespace(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE);
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORCE_DMN_11, "true");
                 }

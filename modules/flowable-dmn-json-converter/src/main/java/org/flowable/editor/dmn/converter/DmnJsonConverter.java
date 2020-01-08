@@ -72,7 +72,7 @@ public class DmnJsonConverter {
         decision.setDescription(DmnJsonConverterUtil.getValueAsString("description", modelNode));
 
         if (modelNode.has("forceDMN11") && "true".equals(DmnJsonConverterUtil.getValueAsString("forceDMN11", modelNode))) {
-            addExtensionAttribute("forceDMN11", "true", decision);
+            decision.setForceDMN11(true);
         }
 
         definition.addDecision(decision);
