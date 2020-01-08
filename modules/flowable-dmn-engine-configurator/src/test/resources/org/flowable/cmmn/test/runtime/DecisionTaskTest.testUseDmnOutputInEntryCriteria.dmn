@@ -1,0 +1,61 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_DMN_MODEL-96da6bd6-1f9d-44e3-9112-7eba5cf1a32a" name="check inputs" namespace="http://www.flowable.org/dmn">
+    <decision id="checkinputs" name="check inputs">
+        <decisionTable id="decisionTable_DMN_MODEL-96da6bd6-1f9d-44e3-9112-7eba5cf1a32a" hitPolicy="FIRST">
+            <input label="First">
+                <inputExpression id="inputExpression_1" typeRef="number">
+                    <text>first</text>
+                </inputExpression>
+            </input>
+            <input label="Second">
+                <inputExpression id="inputExpression_3" typeRef="number">
+                    <text>second</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression_2" label="Output" name="decided" typeRef="number"></output>
+            <rule>
+                <inputEntry id="inputEntry_1_1">
+                    <text><![CDATA[< 22]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry_3_1">
+                    <text><![CDATA[< 22]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_2_1">
+                    <text><![CDATA[2]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_1_2">
+                    <text><![CDATA[> 22]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry_3_2">
+                    <text><![CDATA[> 22]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_2_2">
+                    <text><![CDATA[3]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_1_3">
+                    <text><![CDATA[< 22]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry_3_3">
+                    <text><![CDATA[> 22]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_2_3">
+                    <text><![CDATA[4]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_1_4">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry_3_4">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_2_4">
+                    <text><![CDATA[5]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+</definitions>
