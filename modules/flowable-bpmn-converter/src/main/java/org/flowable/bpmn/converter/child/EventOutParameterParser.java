@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.SendEventServiceTask;
 
@@ -32,7 +33,9 @@ public class EventOutParameterParser extends BaseChildElementParser {
         String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
         String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
         String target = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET);
-        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && StringUtils.isNotEmpty(target)) {
+        String targetExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION);
+        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && 
+                        (StringUtils.isNotEmpty(target) || StringUtils.isNotEmpty(targetExpression))) {
 
             IOParameter parameter = new IOParameter();
             if (StringUtils.isNotEmpty(sourceExpression)) {
@@ -41,7 +44,31 @@ public class EventOutParameterParser extends BaseChildElementParser {
                 parameter.setSource(source);
             }
 
-            parameter.setTarget(target);
+            if (StringUtils.isNotEmpty(targetExpression)) {
+                parameter.setTargetExpression(targetExpression);
+            } else {
+                parameter.setTarget(target);
+            }
+            
+            for (int i = 0; i < xtr.getAttributeCount(); i++) {
+                String attributeName = xtr.getAttributeLocalName(i);
+                if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
+                                ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName) || ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION.equals(attributeName)) {
+                    
+                    continue;
+                }
+                
+                ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+                extensionAttribute.setName(attributeName);
+                extensionAttribute.setValue(xtr.getAttributeValue(i));
+                if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                    extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+                }
+                if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                    extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+                }
+                parameter.addAttribute(extensionAttribute);
+            }
 
             ((SendEventServiceTask) parentElement).getEventOutParameters().add(parameter);
         }

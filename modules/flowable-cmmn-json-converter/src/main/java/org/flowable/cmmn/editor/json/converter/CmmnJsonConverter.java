@@ -32,6 +32,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
+import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.Association;
@@ -39,6 +40,7 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
@@ -81,6 +83,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         ServiceTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         DecisionTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         HttpTaskJsonConverter.fillTypes(convertersToCmmnMap);
+        SendEventTaskJsonConverter.fillTypes(convertersToCmmnMap);
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         GenericEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
@@ -112,6 +115,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         DI_RECTANGLES.add(STENCIL_TASK_HUMAN);
         DI_RECTANGLES.add(STENCIL_TASK_SERVICE);
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
+        DI_RECTANGLES.add(STENCIL_TASK_HTTP);
+        DI_RECTANGLES.add(STENCIL_TASK_SEND_EVENT);
         DI_RECTANGLES.add(STENCIL_TASK_CASE);
         DI_RECTANGLES.add(STENCIL_TASK_PROCESS);
         DI_RECTANGLES.add(STENCIL_MILESTONE);
@@ -182,6 +187,34 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
 
         if (StringUtils.isNoneEmpty(model.getTargetNamespace())) {
             propertiesNode.put(PROPERTY_CASE_NAMESPACE, model.getTargetNamespace());
+        }
+        
+        String eventType = caseModel.getStartEventType();
+        if (StringUtils.isNotEmpty(eventType)) {
+            propertiesNode.put(PROPERTY_EVENT_TYPE, eventType);
+            
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", caseModel), propertiesNode);
+            CmmnModelJsonConverterUtil.addEventOutParameters(caseModel.getExtensionElements().get("eventOutParameter"), propertiesNode, objectMapper);
+            CmmnModelJsonConverterUtil.addEventCorrelationParameters(caseModel.getExtensionElements().get("eventCorrelationParameter"), propertiesNode, objectMapper);
+            
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, getExtensionValue("channelKey", caseModel), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, getExtensionValue("channelName", caseModel), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", caseModel), propertiesNode);
+            setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", caseModel), propertiesNode);
+            
+            String keyDetectionType = getExtensionValue("keyDetectionType", caseModel);
+            String keyDetectionValue = getExtensionValue("keyDetectionValue", caseModel);
+            if (StringUtils.isNotEmpty(keyDetectionType) && StringUtils.isNotEmpty(keyDetectionValue)) {
+                if ("fixedValue".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, keyDetectionValue, propertiesNode);
+                    
+                } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
+                    
+                } else if ("jsonPath".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, keyDetectionValue, propertiesNode);
+                }
+            }
         }
 
         modelNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
@@ -327,6 +360,35 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             cmmnModel.setTargetNamespace(namespace);
         }
         caseModel.setDocumentation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, modelNode));
+        
+        String eventKey = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, modelNode);
+        if (StringUtils.isNotEmpty(eventKey)) {
+            caseModel.setStartEventType(eventKey);
+            addFlowableExtensionElementWithValue("eventName", CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, modelNode), caseModel);
+            CmmnModelJsonConverterUtil.convertJsonToOutParameters(modelNode, caseModel);
+            CmmnModelJsonConverterUtil.convertJsonToCorrelationParameters(modelNode, "eventCorrelationParameter", caseModel);
+            
+            addFlowableExtensionElementWithValue("channelKey", CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, modelNode), caseModel);
+            addFlowableExtensionElementWithValue("channelName", CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, modelNode), caseModel);
+            addFlowableExtensionElementWithValue("channelType", CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, modelNode), caseModel);
+            addFlowableExtensionElementWithValue("channelDestination", CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, modelNode), caseModel);
+            
+            String fixedValue = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, modelNode);
+            String jsonField = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, modelNode);
+            String jsonPath = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, modelNode);
+            if (StringUtils.isNotEmpty(fixedValue)) {
+                addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", caseModel);
+                addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, caseModel);
+                
+            } else if (StringUtils.isNotEmpty(jsonField)) {
+                addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", caseModel);
+                addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, caseModel);
+                
+            } else if (StringUtils.isNotEmpty(jsonPath)) {
+                addFlowableExtensionElementWithValue("keyDetectionType", "jsonPath", caseModel);
+                addFlowableExtensionElementWithValue("keyDetectionValue", jsonPath, caseModel);
+            }
+        }
 
         JsonNode planModelShape = shapesArrayNode.get(0);
 
@@ -573,6 +635,40 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             }
 
         }
+    }
+    
+    protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
+        if (StringUtils.isNotEmpty(value)) {
+            propertiesNode.put(name, value);
+        }
+    }
+    
+    protected String getExtensionValue(String name, Case caseModel) {
+        List<ExtensionElement> extensionElements = caseModel.getExtensionElements().get(name);
+        if (extensionElements != null && extensionElements.size() > 0) {
+            return extensionElements.get(0).getElementText();
+        }
+        
+        return null;
+    }
+    
+    protected ExtensionElement addFlowableExtensionElement(String name, Case caseModel) {
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setName(name);
+        extensionElement.setNamespace("http://flowable.org/cmmn");
+        extensionElement.setNamespacePrefix("flowable");
+        caseModel.addExtensionElement(extensionElement);
+        return extensionElement;
+    }
+    
+    protected ExtensionElement addFlowableExtensionElementWithValue(String name, String value, Case caseModel) {
+        ExtensionElement extensionElement = null;
+        if (StringUtils.isNotEmpty(value)) {
+            extensionElement = addFlowableExtensionElement(name, caseModel);
+            extensionElement.setElementText(value);
+        }
+        
+        return extensionElement;
     }
 
     protected void readShapeInfo(JsonNode objectNode, Map<String, JsonNode> shapeMap, Map<String, JsonNode> sourceRefMap) {

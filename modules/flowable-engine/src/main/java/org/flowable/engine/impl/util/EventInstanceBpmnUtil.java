@@ -83,7 +83,13 @@ public class EventInstanceBpmnUtil {
             SendEventServiceTask eventServiceTask = (SendEventServiceTask) baseElement;
             if (!eventServiceTask.getEventInParameters().isEmpty()) {
                 for (IOParameter parameter : eventServiceTask.getEventInParameters()) {
-                    addEventPayloadInstance(eventPayloadInstances, parameter.getSource(), parameter.getTarget(), 
+                    String sourceValue = null;
+                    if (StringUtils.isNotEmpty(parameter.getSourceExpression())) {
+                        sourceValue = parameter.getSourceExpression();
+                    } else {
+                        sourceValue = parameter.getSource();
+                    }
+                    addEventPayloadInstance(eventPayloadInstances, sourceValue, parameter.getTarget(), 
                                     variableScope, expressionManager, eventDefinition);
                 }
             }
@@ -96,10 +102,18 @@ public class EventInstanceBpmnUtil {
     
                 for (ExtensionElement inParameter : inParameters) {
     
+                    String sourceExpression = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
                     String source = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
                     String target = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
+                    
+                    String sourceValue = null;
+                    if (StringUtils.isNotEmpty(sourceExpression)) {
+                        sourceValue = sourceExpression;
+                    } else {
+                        sourceValue = source;
+                    }
     
-                    addEventPayloadInstance(eventPayloadInstances, source, target, variableScope, expressionManager, eventDefinition);
+                    addEventPayloadInstance(eventPayloadInstances, sourceValue, target, variableScope, expressionManager, eventDefinition);
                 }
             }
         }

@@ -37,6 +37,7 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
@@ -104,6 +105,16 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
             public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
                 GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
                 caseDiagramCanvas.drawUserTask(caseElement.getName(), graphicInfo, scaleFactor);
+            }
+        });
+        
+        // send event task
+        activityDrawInstructions.put(SendEventServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawSendEventTask(caseElement.getName(), graphicInfo, scaleFactor);
             }
         });
 

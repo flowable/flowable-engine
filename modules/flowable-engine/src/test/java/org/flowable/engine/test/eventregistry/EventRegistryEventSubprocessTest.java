@@ -91,7 +91,7 @@ public class EventRegistryEventSubprocessTest extends FlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
         assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
         
-        inboundEventChannelAdapter.triggerTestEvent("nooexisting");
+        inboundEventChannelAdapter.triggerTestEvent("notexisting");
         
         assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
@@ -139,7 +139,7 @@ public class EventRegistryEventSubprocessTest extends FlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
         assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
 
-        inboundEventChannelAdapter.triggerTestEvent("nooexisting");
+        inboundEventChannelAdapter.triggerTestEvent("notexisting");
         assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
         
         inboundEventChannelAdapter.triggerTestEvent("gonzo");

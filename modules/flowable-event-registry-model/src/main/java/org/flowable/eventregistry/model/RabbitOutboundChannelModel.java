@@ -23,6 +23,10 @@ public class RabbitOutboundChannelModel extends OutboundChannelModel {
 
     protected String routingKey;
     protected String exchange;
+    
+    public RabbitOutboundChannelModel() {
+        setType("rabbit");
+    }
 
     public String getRoutingKey() {
         return routingKey;

@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.ExtensionElement;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.IOParameter;
-import org.flowable.bpmn.model.SendEventServiceTask;
+import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.GenericEventListener;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.eventregistry.model.ChannelEventKeyDetection;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventCorrelationParameter;
@@ -24,50 +25,45 @@ import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.flowable.eventregistry.model.RabbitInboundChannelModel;
 import org.flowable.eventregistry.model.RabbitOutboundChannelModel;
 
-public class BpmnEventModelUtil {
+public class CmmnEventModelUtil {
     
-    public static void fillChannelModelMap(List<FlowElement> flowElements, Map<String, ChannelModel> channelModelMap) {
-        for (FlowElement elementObject : flowElements) {
-            String channelKey = getElementValue("channelKey", elementObject);
-            String channelType = getElementValue("channelType", elementObject);
-            String channelDestination = getElementValue("channelDestination", elementObject);
+    public static void fillChannelModelMap(List<BaseElement> elements, Map<String, ChannelModel> channelModelMap) {
+        for (BaseElement element : elements) {
+            String channelKey = getElementValue("channelKey", element);
+            String channelType = getElementValue("channelType", element);
+            String channelDestination = getElementValue("channelDestination", element);
             if (StringUtils.isNotEmpty(channelKey) && !channelModelMap.containsKey(channelKey) && StringUtils.isNotEmpty(channelType) &&
                             StringUtils.isNotEmpty(channelDestination)) {
                 
-                if (elementObject instanceof SendEventServiceTask) {
-                    createOutboundChannelInMap(channelKey, channelType, channelDestination, elementObject, channelModelMap);
-                    SendEventServiceTask task = (SendEventServiceTask) elementObject;
-                    
-                    String triggerChannelKey = getElementValue("triggerChannelKey", elementObject);
-                    String triggerChannelType = getElementValue("triggerChannelType", elementObject);
-                    String triggerChannelDestination = getElementValue("triggerChannelDestination", elementObject);
-                    if (task.isTriggerable() && StringUtils.isNotEmpty(triggerChannelKey) && !channelModelMap.containsKey(triggerChannelKey) && 
-                                    StringUtils.isNotEmpty(triggerChannelType) && StringUtils.isNotEmpty(triggerChannelDestination)) {
-                        
-                        createInboundChannelInMap(triggerChannelKey, triggerChannelType, triggerChannelDestination, 
-                                        "triggerChannelName", elementObject, channelModelMap);
-                    }
+                if (element instanceof SendEventServiceTask) {
+                    createOutboundChannelInMap(channelKey, channelType, channelDestination, element, channelModelMap);
                     
                 } else {
-                    createInboundChannelInMap(channelKey, channelType, channelDestination, "channelName", elementObject, channelModelMap);
+                    createInboundChannelInMap(channelKey, channelType, channelDestination, "channelName", element, channelModelMap);
                 }
             }
         }
     }
 
-    public static void fillEventModelMap(List<FlowElement> flowElements, Map<String, EventModel> eventModelMap) {
-        for (FlowElement flowElement : flowElements) {
+    public static void fillEventModelMap(List<BaseElement> elements, Map<String, EventModel> eventModelMap) {
+        for (BaseElement element : elements) {
             String eventKey = null;
-            if (flowElement instanceof SendEventServiceTask) {
-                SendEventServiceTask task = (SendEventServiceTask) flowElement;
+            if (element instanceof SendEventServiceTask) {
+                SendEventServiceTask task = (SendEventServiceTask) element;
                 eventKey = task.getEventType();
-            } else {
-                eventKey = getElementValue("eventType", flowElement);
+                
+            } else if (element instanceof GenericEventListener) {
+                GenericEventListener genericEventListener = (GenericEventListener) element;
+                eventKey = genericEventListener.getEventType();
+            
+            } else if (element instanceof Case) {
+                Case caseModel = (Case) element;
+                eventKey = caseModel.getStartEventType();
             }
             
             if (StringUtils.isNotEmpty(eventKey) && !eventModelMap.containsKey(eventKey)) {
                 EventModel eventModel = new EventModel();
-                String eventName = getElementValue("eventName", flowElement);
+                String eventName = getElementValue("eventName", element);
                 eventModel.setKey(eventKey);
                 if (StringUtils.isNotEmpty(eventName)) {
                     eventModel.setName(eventName);
@@ -75,40 +71,19 @@ public class BpmnEventModelUtil {
                     eventModel.setName(eventKey);
                 }
                 
-                if (flowElement instanceof SendEventServiceTask) {
-                    SendEventServiceTask task = (SendEventServiceTask) flowElement;
-                    eventModel.setPayload(getInIOParameterEventPayload(task.getEventInParameters()));
-                    String channelKey = getElementValue("channelKey", flowElement);
+                if (element instanceof SendEventServiceTask) {
+                    SendEventServiceTask task = (SendEventServiceTask) element;
+                    eventModel.setPayload(getInParameterEventPayload(task.getExtensionElements().get("eventInParameter")));
+                    String channelKey = getElementValue("channelKey", task);
                     if (StringUtils.isNotEmpty(channelKey)) {
                         eventModel.addOutboundChannelKey(channelKey);
                     }
                     
-                    if (task.isTriggerable() && StringUtils.isNotEmpty(task.getTriggerEventType())) {
-                        EventModel triggerEventModel = new EventModel();
-                        String triggerEventName = getElementValue("triggerEventName", flowElement);
-                        triggerEventModel.setKey(task.getTriggerEventType());
-                        if (StringUtils.isNotEmpty(triggerEventName)) {
-                            triggerEventModel.setName(triggerEventName);
-                        } else {
-                            triggerEventModel.setName(task.getTriggerEventType());
-                        }
-                        
-                        triggerEventModel.setPayload(getOutIOParameterEventPayload(task.getEventOutParameters()));
-                        triggerEventModel.setCorrelationParameters(getEventCorrelationParameters(flowElement.getExtensionElements().get("triggerEventCorrelationParameter")));
-                        
-                        String triggerChannelKey = getElementValue("triggerChannelKey", flowElement);
-                        if (StringUtils.isNotEmpty(triggerChannelKey)) {
-                            triggerEventModel.addInboundChannelKey(triggerChannelKey);
-                        }
-                        
-                        eventModelMap.put(task.getTriggerEventType(), triggerEventModel);
-                    }
-                    
                 } else {
-                    eventModel.setPayload(getOutParameterEventPayload(flowElement.getExtensionElements().get("eventOutParameter")));
-                    eventModel.setCorrelationParameters(getEventCorrelationParameters(flowElement.getExtensionElements().get("eventCorrelationParameter")));
+                    eventModel.setPayload(getOutParameterEventPayload(element.getExtensionElements().get("eventOutParameter")));
+                    eventModel.setCorrelationParameters(getEventCorrelationParameters(element.getExtensionElements().get("eventCorrelationParameter")));
                     
-                    String channelKey = getElementValue("channelKey", flowElement);
+                    String channelKey = getElementValue("channelKey", element);
                     if (StringUtils.isNotEmpty(channelKey)) {
                         eventModel.addInboundChannelKey(channelKey);
                     }
@@ -120,7 +95,7 @@ public class BpmnEventModelUtil {
     }
     
     protected static void createOutboundChannelInMap(String channelKey, String channelType, String channelDestination, 
-                    FlowElement elementObject, Map<String, ChannelModel> channelModelMap) {
+                    BaseElement elementObject, Map<String, ChannelModel> channelModelMap) {
         
         OutboundChannelModel channelModel = null;
         if ("jms".equalsIgnoreCase(channelType)) {
@@ -158,7 +133,7 @@ public class BpmnEventModelUtil {
     }
     
     protected static void createInboundChannelInMap(String channelKey, String channelType, String channelDestination, 
-                    String channelNameProperty, FlowElement elementObject, Map<String, ChannelModel> channelModelMap) {
+                    String channelNameProperty, BaseElement elementObject, Map<String, ChannelModel> channelModelMap) {
         
         InboundChannelModel channelModel = null;
         if ("jms".equalsIgnoreCase(channelType)) {
@@ -228,30 +203,14 @@ public class BpmnEventModelUtil {
         
         return eventPayloadList;
     }
+
     
-    protected static List<EventPayload> getOutIOParameterEventPayload(List<IOParameter> parameterList) {
+    protected static List<EventPayload> getInParameterEventPayload(List<ExtensionElement> parameterList) {
         List<EventPayload> eventPayloadList = new ArrayList<>();
         if (parameterList != null && parameterList.size() > 0) {
-            for (IOParameter parameter : parameterList) {
-                String name = parameter.getSource();
-                String type = parameter.getAttributeValue(null, "sourceType");
-                if (StringUtils.isEmpty(type)) {
-                    type = "string";
-                }
-                
-                eventPayloadList.add(new EventPayload(name, type));
-            }
-        }
-        
-        return eventPayloadList;
-    }
-    
-    protected static List<EventPayload> getInIOParameterEventPayload(List<IOParameter> parameterList) {
-        List<EventPayload> eventPayloadList = new ArrayList<>();
-        if (parameterList != null && parameterList.size() > 0) {
-            for (IOParameter parameter : parameterList) {
-                String name = parameter.getTarget();
-                String type = parameter.getAttributeValue(null, "targetType");
+            for (ExtensionElement parameterElement : parameterList) {
+                String name = parameterElement.getAttributeValue(null, "target");
+                String type = parameterElement.getAttributeValue(null, "targetType");
                 if (StringUtils.isEmpty(type)) {
                     type = "string";
                 }
@@ -280,7 +239,7 @@ public class BpmnEventModelUtil {
         return correlationParameterList;
     }
     
-    protected static String getElementValue(String name, FlowElement elementObject) {
+    protected static String getElementValue(String name, BaseElement elementObject) {
         List<ExtensionElement> elementList = elementObject.getExtensionElements().get(name);
         if (elementList != null && elementList.size() > 0) {
             return elementList.get(0).getElementText();

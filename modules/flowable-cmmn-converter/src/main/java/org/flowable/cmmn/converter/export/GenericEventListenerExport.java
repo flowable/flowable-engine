@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.GenericEventListener;
 
 /**
@@ -42,6 +43,15 @@ public class GenericEventListenerExport extends AbstractPlanItemDefinitionExport
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
                 CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION,
                 genericEventListener.getAvailableConditionExpression());
+        }
+        
+        if (StringUtils.isNotEmpty(genericEventListener.getEventType()) && genericEventListener.getExtensionElements().get("eventType") == null) {
+            ExtensionElement extensionElement = new ExtensionElement();
+            extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+            extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+            extensionElement.setName("eventType");
+            extensionElement.setElementText(genericEventListener.getEventType());
+            genericEventListener.addExtensionElement(extensionElement);
         }
     }
 

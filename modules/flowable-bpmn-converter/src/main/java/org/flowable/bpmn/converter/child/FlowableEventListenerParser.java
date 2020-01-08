@@ -35,9 +35,11 @@ public class FlowableEventListenerParser extends BaseChildElementParser {
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_CLASS))) {
             listener.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_CLASS));
             listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+            
         } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_DELEGATEEXPRESSION))) {
             listener.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_DELEGATEEXPRESSION));
             listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+            
         } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_THROW_EVENT_TYPE))) {
             String eventType = xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_THROW_EVENT_TYPE);
             if (ATTRIBUTE_LISTENER_THROW_EVENT_TYPE_SIGNAL.equals(eventType)) {

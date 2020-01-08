@@ -230,6 +230,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET = "target";
+    public static final String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
     public static final String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
     
     public static final String ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY = "caseDefinitionKey";

@@ -16,6 +16,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TaskWithFieldExtensions;
 
@@ -44,6 +46,18 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
         if (task.isAsync()) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_ASYNCHRONOUS, String.valueOf(task.isAsync()));
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_EXCLUSIVE, String.valueOf(task.isExclusive()));
+        }
+        
+        if (task instanceof SendEventServiceTask) {
+            SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) task;
+            if (StringUtils.isNotEmpty(sendEventServiceTask.getEventType()) && sendEventServiceTask.getExtensionElements().get("eventType") == null) {
+                ExtensionElement extensionElement = new ExtensionElement();
+                extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+                extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+                extensionElement.setName("eventType");
+                extensionElement.setElementText(sendEventServiceTask.getEventType());
+                sendEventServiceTask.addExtensionElement(extensionElement);
+            }
         }
     }
 

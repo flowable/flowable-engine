@@ -37,6 +37,14 @@ public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
     @Test
     public void convertModelToXML() throws Exception {
         BpmnModel bpmnModel = readXMLFile();
+        
+        FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement("sendEventServiceTask");
+        flowElement.getExtensionElements().remove("eventType");
+        flowElement.getExtensionElements().remove("triggerEventType");
+        flowElement.getExtensionElements().remove("sendSynchronously");
+        flowElement.getExtensionElements().remove("eventInParameter");
+        flowElement.getExtensionElements().remove("eventOutParameter");
+        
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         validateModel(parsedModel);
     }
@@ -67,11 +75,13 @@ public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
         parameter = parameters.get(1);
         assertEquals("anotherProperty", parameter.getSource());
         assertEquals("anotherCustomerId", parameter.getTarget());
+        assertEquals("string", parameter.getAttributeValue(null, "targetType"));
 
         parameters = sendEventServiceTask.getEventOutParameters();
         assertEquals(1, parameters.size());
         parameter = parameters.get(0);
         assertEquals("eventProperty", parameter.getSource());
+        assertEquals("integer", parameter.getAttributeValue(null, "sourceType"));
         assertEquals("newVariable", parameter.getTarget());
         
         List<ExtensionElement> correlationParameters = sendEventServiceTask.getExtensionElements().get(ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER);

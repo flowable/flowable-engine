@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.SendEventServiceTask;
 
@@ -42,6 +43,26 @@ public class EventInParameterParser extends BaseChildElementParser {
             }
 
             parameter.setTarget(target);
+            
+            for (int i = 0; i < xtr.getAttributeCount(); i++) {
+                String attributeName = xtr.getAttributeLocalName(i);
+                if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
+                                ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName)) {
+                    
+                    continue;
+                }
+                
+                ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+                extensionAttribute.setName(attributeName);
+                extensionAttribute.setValue(xtr.getAttributeValue(i));
+                if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                    extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+                }
+                if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                    extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+                }
+                parameter.addAttribute(extensionAttribute);
+            }
 
             ((SendEventServiceTask) parentElement).getEventInParameters().add(parameter);
         }

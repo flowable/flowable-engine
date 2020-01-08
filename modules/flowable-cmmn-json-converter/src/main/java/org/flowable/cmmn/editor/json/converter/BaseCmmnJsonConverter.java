@@ -20,12 +20,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.ExtensionAttribute;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.ManualActivationRule;
@@ -393,6 +396,37 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             task.getFieldExtensions().add(field);
         }
     }
+    
+    protected ExtensionElement addFlowableExtensionElement(String name, PlanItemDefinition planItemDefinition) {
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setName(name);
+        extensionElement.setNamespace("http://flowable.org/cmmn");
+        extensionElement.setNamespacePrefix("flowable");
+        planItemDefinition.addExtensionElement(extensionElement);
+        return extensionElement;
+    }
+    
+    protected ExtensionElement addFlowableExtensionElementWithValue(String name, String value, PlanItemDefinition planItemDefinition) {
+        ExtensionElement extensionElement = null;
+        if (StringUtils.isNotEmpty(value)) {
+            extensionElement = addFlowableExtensionElement(name, planItemDefinition);
+            extensionElement.setElementText(value);
+        }
+        
+        return extensionElement;
+    }
+    
+    public void addExtensionAttribute(String name, String value, ExtensionElement extensionElement) {
+        ExtensionAttribute attribute = new ExtensionAttribute(name);
+        attribute.setValue(value);
+        extensionElement.addAttribute(attribute);
+    }
+    
+    public ExtensionAttribute createExtensionAttribute(String name, String value) {
+        ExtensionAttribute attribute = new ExtensionAttribute(name);
+        attribute.setValue(value);
+        return attribute;
+    }
 
     protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
         if (StringUtils.isNotEmpty(value)) {
@@ -416,6 +450,23 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             propertyValue = propertyNode.asBoolean();
         }
         return propertyValue;
+    }
+    
+    protected String getPropertyValueAsString(String name, JsonNode objectNode) {
+        return CmmnModelJsonConverterUtil.getPropertyValueAsString(name, objectNode);
+    }
+    
+    protected JsonNode getProperty(String name, JsonNode objectNode) {
+        return CmmnModelJsonConverterUtil.getProperty(name, objectNode);
+    }
+    
+    protected String getExtensionValue(String name, PlanItemDefinition planItemDefinition) {
+        List<ExtensionElement> extensionElements = planItemDefinition.getExtensionElements().get(name);
+        if (extensionElements != null && extensionElements.size() > 0) {
+            return extensionElements.get(0).getElementText();
+        }
+        
+        return null;
     }
 
     protected List<String> getValueAsList(String name, JsonNode objectNode) {

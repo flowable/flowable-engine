@@ -22,6 +22,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class JmsOutboundChannelModel extends OutboundChannelModel {
 
     protected String destination;
+    
+    public JmsOutboundChannelModel() {
+        setType("jms");
+    }
 
     public String getDestination() {
         return destination;

@@ -31,7 +31,7 @@
 	      	<div class="stencils" id="paletteSection">
 			    <div ng-if="stencilItemGroups.length > 1">
                     <div ng-repeat="group in stencilItemGroups">
-
+                    
                         <ul ng-if="group.visible && group.items" class="stencil-group"  ng-class="{collapsed: !group.expanded, 'first': $first}">
                             <li ng-include="'editor-app/partials/stencil-item-template.html?version=6'"></li>
                         </ul>

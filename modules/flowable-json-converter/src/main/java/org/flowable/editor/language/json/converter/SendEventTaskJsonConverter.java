@@ -63,6 +63,10 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
             setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", sendEventServiceTask), propertiesNode);
             setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", sendEventServiceTask), propertiesNode);
             
+            if (sendEventServiceTask.isTriggerable()) {
+                propertiesNode.put(PROPERTY_SERVICETASK_TRIGGERABLE, sendEventServiceTask.isTriggerable());
+            }
+            
             setPropertyValue(PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_KEY, sendEventServiceTask.getTriggerEventType(), propertiesNode);
             setPropertyValue(PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_NAME, getExtensionValue("triggerEventName", sendEventServiceTask), propertiesNode);
             addEventOutIOParameters(sendEventServiceTask.getEventOutParameters(), propertiesNode);
@@ -108,6 +112,11 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
             String triggerEventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_KEY, elementNode);
             if (StringUtils.isNotEmpty(triggerEventKey)) {
                 task.setTriggerEventType(triggerEventKey);
+                
+                if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_TRIGGERABLE, elementNode)) {
+                    task.setTriggerable(true);
+                }
+                
                 addFlowableExtensionElementWithValue("triggerEventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_NAME, elementNode), task);
                 convertJsonToOutIOParameters(elementNode, task);
                 
@@ -116,7 +125,7 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
                 addFlowableExtensionElementWithValue("triggerChannelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_TYPE, elementNode), task);
                 addFlowableExtensionElementWithValue("triggerChannelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_DESTINATION, elementNode), task);
                 
-                convertJsonToCorrelationParameters(elementNode, task); 
+                convertJsonToCorrelationParameters(elementNode, "triggerEventCorrelationParameter", task); 
                 
                 String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
                 String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);

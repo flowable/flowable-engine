@@ -1084,6 +1084,10 @@
           "TITLE" : "Boundary cancel event",
           "DESCRIPTION" : "A boundary cancel event"
         },
+        "BOUNDARYEVENTREGISTRYEVENT" : {
+          "TITLE" : "Boundary event registry event",
+          "DESCRIPTION" : "A boundary event registry event"
+        },
         "BOUNDARYCOMPENSATIONEVENT" : {
           "TITLE" : "Boundary compensation event",
           "DESCRIPTION" : "A boundary compensation event"
@@ -1499,6 +1503,56 @@
             "DESCRIPTION": "Flag indicating to store the response variable as a JSON variable instead of a String"
           }
         },
+        "EVENTREGISTRYPACKAGE" : {
+          "EVENTKEY" : {
+            "TITLE" : "Event key",
+            "DESCRIPTION" : "Definition of the event key"
+          },
+          "EVENTNAME" : {
+            "TITLE" : "Event name",
+            "DESCRIPTION" : "Definition of the event name"
+          },
+          "EVENTINPARAMETERS" : {
+            "TITLE" : "Mapping to event payload",
+            "DESCRIPTION" : "Mapping of the process variables to event payload properties"
+          },
+          "EVENTOUTPARAMETERS" : {
+            "TITLE" : "Mapping from event payload",
+            "DESCRIPTION" : "Mapping of the event payload properties to process variables"
+          },
+          "EVENTCORRELATIONPARAMETERS" : {
+            "TITLE" : "Correlation parameters",
+            "DESCRIPTION" : "Definition of the correlation parameters"
+          },
+          "CHANNELKEY" : {
+            "TITLE" : "Channel key",
+            "DESCRIPTION" : "Definition of the channel key"
+          },
+          "CHANNELNAME" : {
+            "TITLE" : "Channel name",
+            "DESCRIPTION" : "Definition of the channel name"
+          },
+          "CHANNELTYPE" : {
+            "TITLE" : "Channel type",
+            "DESCRIPTION" : "Definition of the channel type"
+          },
+          "CHANNELDESTINATION" : {
+            "TITLE" : "Channel destination",
+            "DESCRIPTION" : "Definition of the channel destination"
+          },
+          "KEYDETECTIONFIXEDVALUE" : {
+            "TITLE" : "Event fixed value",
+            "DESCRIPTION" : "Definition of the event key fixed value"
+          },
+          "KEYDETECTIONJSONFIELD" : {
+            "TITLE" : "Event key json field",
+            "DESCRIPTION" : "Definition of the event key detection with a json field"
+          },
+          "KEYDETECTIONJSONPATH" : {
+            "TITLE" : "Event key json path",
+            "DESCRIPTION" : "Definition of the event key detection with a json path value"
+          }
+        },
         "CASETASKCASEREFERENCEPACKAGE": {
           "CASETASKCASEREFERENCE": {
             "TITLE": "Case reference",
@@ -1710,6 +1764,10 @@
         "SCRIPTTASK" : {
           "TITLE" : "Script task",
           "DESCRIPTION" : "An automatic task with script logic"
+        },
+        "SENDEVENTTASK" : {
+          "TITLE" : "Send event task",
+          "DESCRIPTION" : "A send event task"
         },
         "MILESTONE" : {
           "TITLE" : "Milestone",

@@ -228,6 +228,13 @@ function _drawServiceTask(element)
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
+function _drawSendEventServiceTask(element)
+{
+    _drawTask(element);
+    _drawSendTaskIcon(paper, element.x + 4, element.y + 4);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
 function _drawHttpServiceTask(element)
 {
     _drawTask(element);

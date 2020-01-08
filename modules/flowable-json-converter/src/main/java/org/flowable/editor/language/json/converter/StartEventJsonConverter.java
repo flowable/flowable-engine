@@ -173,7 +173,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter implements Fo
                 addFlowableExtensionElementWithValue("eventType", eventKey, startEvent);
                 addFlowableExtensionElementWithValue("eventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, elementNode), startEvent);
                 convertJsonToOutParameters(elementNode, startEvent);
-                convertJsonToCorrelationParameters(elementNode, startEvent);
+                convertJsonToCorrelationParameters(elementNode, "eventCorrelationParameter", startEvent);
                 
                 addFlowableExtensionElementWithValue("channelKey", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, elementNode), startEvent);
                 addFlowableExtensionElementWithValue("channelName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, elementNode), startEvent);

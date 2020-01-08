@@ -258,8 +258,29 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     protected boolean writeSendServiceExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) element;
-        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_IN_PARAMETER, sendEventServiceTask.getEventInParameters(), didWriteExtensionStartElement, xtw);
-        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_OUT_PARAMETER, sendEventServiceTask.getEventOutParameters(), didWriteExtensionStartElement, xtw);
+        if (!didWriteExtensionStartElement) {
+            xtw.writeStartElement(ELEMENT_EXTENSIONS);
+            didWriteExtensionStartElement = true;
+        }
+        
+        xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_EVENT_TYPE, FLOWABLE_EXTENSIONS_NAMESPACE);
+        xtw.writeCData(sendEventServiceTask.getEventType());
+        xtw.writeEndElement();
+        
+        if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_TRIGGER_EVENT_TYPE, FLOWABLE_EXTENSIONS_NAMESPACE);
+            xtw.writeCData(sendEventServiceTask.getTriggerEventType());
+            xtw.writeEndElement();
+        }
+        
+        if (sendEventServiceTask.isSendSynchronously()) {
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_SEND_SYNCHRONOUSLY, FLOWABLE_EXTENSIONS_NAMESPACE);
+            xtw.writeCData(String.valueOf(sendEventServiceTask.isSendSynchronously()));
+            xtw.writeEndElement();
+        }
+        
+        BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_IN_PARAMETER, sendEventServiceTask.getEventInParameters(), didWriteExtensionStartElement, xtw);
+        BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_OUT_PARAMETER, sendEventServiceTask.getEventOutParameters(), didWriteExtensionStartElement, xtw);
 
         return didWriteExtensionStartElement;
     }

@@ -178,7 +178,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
                 addFlowableExtensionElementWithValue("eventType", eventKey, boundaryEvent);
                 addFlowableExtensionElementWithValue("eventName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, elementNode), boundaryEvent);
                 convertJsonToOutParameters(elementNode, boundaryEvent);
-                convertJsonToCorrelationParameters(elementNode, boundaryEvent);
+                convertJsonToCorrelationParameters(elementNode, "eventCorrelationParameter", boundaryEvent);
                 
                 addFlowableExtensionElementWithValue("channelKey", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, elementNode), boundaryEvent);
                 addFlowableExtensionElementWithValue("channelName", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, elementNode), boundaryEvent);

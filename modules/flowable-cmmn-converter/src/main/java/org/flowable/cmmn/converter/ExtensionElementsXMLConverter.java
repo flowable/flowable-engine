@@ -103,6 +103,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
                     } else if (CmmnXmlConstants.ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER.equals(xtr.getLocalName()) ||
                                     CmmnXmlConstants.ELEMENT_CASE_LIFECYCLE_LISTENER.equals(xtr.getLocalName())) {
+                        
                         readLifecycleListener(xtr, conversionHelper);
 
                     } else if (CmmnXmlConstants.ELEMENT_EVENT_TYPE.equals(xtr.getLocalName())) {
@@ -344,8 +345,8 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
             // Parsing and storing as an extension element, which means the export will work automatically
             ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
-            conversionHelper.getCurrentCmmnElement().addExtensionElement(extensionElement);
             eventType = extensionElement.getElementText();
+            
         } catch (Exception e) {
             throw new FlowableException("Error while reading eventType element", e);
         }

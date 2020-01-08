@@ -801,7 +801,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     
     protected void convertJsonToOutParameters(JsonNode objectNode, Event event) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, objectNode);
+        parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
         if (parametersNode != null && parametersNode.get("outParameters") != null) {
+            parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
             JsonNode parameterArray = parametersNode.get("outParameters");
             for (JsonNode parameterNode : parameterArray) {
                 if (parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).isNull()) {
@@ -820,7 +822,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     
     protected void convertJsonToOutIOParameters(JsonNode objectNode, SendEventServiceTask task) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, objectNode);
+        parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
         if (parametersNode != null && parametersNode.get("outParameters") != null) {
+            parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
             JsonNode parameterArray = parametersNode.get("outParameters");
             for (JsonNode parameterNode : parameterArray) {
                 if (parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).isNull()) {
@@ -847,7 +851,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     
     protected void convertJsonToInParameters(JsonNode objectNode, Event event) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, objectNode);
+        parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
         if (parametersNode != null && parametersNode.get("inParameters") != null) {
+            parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
             JsonNode parameterArray = parametersNode.get("inParameters");
             for (JsonNode parameterNode : parameterArray) {
                 if (parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).isNull()) {
@@ -866,7 +872,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     
     protected void convertJsonToInIOParameters(JsonNode objectNode, SendEventServiceTask task) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, objectNode);
+        parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
         if (parametersNode != null && parametersNode.get("inParameters") != null) {
+            parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
             JsonNode parameterArray = parametersNode.get("inParameters");
             for (JsonNode parameterNode : parameterArray) {
                 if (parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).isNull()) {
@@ -891,13 +899,15 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
         }
     }
     
-    protected void convertJsonToCorrelationParameters(JsonNode objectNode, FlowElement flowElement) {
+    protected void convertJsonToCorrelationParameters(JsonNode objectNode, String correlationPropertyName, FlowElement flowElement) {
         JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS, objectNode);
+        parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
         if (parametersNode != null && parametersNode.get("correlationParameters") != null) {
+            parametersNode = BpmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
             JsonNode parameterArray = parametersNode.get("correlationParameters");
             for (JsonNode parameterNode : parameterArray) {
                 if (parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME).isNull()) {
-                    ExtensionElement extensionElement = addFlowableExtensionElement("eventCorrelationParameter", flowElement);
+                    ExtensionElement extensionElement = addFlowableExtensionElement(correlationPropertyName, flowElement);
                     String name = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME).asText();
                     String type = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE).asText();
                     String value = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE).asText();

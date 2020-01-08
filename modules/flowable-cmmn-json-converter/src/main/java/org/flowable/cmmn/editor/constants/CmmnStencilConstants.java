@@ -27,6 +27,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_SERVICE = "ServiceTask";
     String STENCIL_TASK_DECISION = "DecisionTask";
     String STENCIL_TASK_HTTP = "HttpTask";
+    String STENCIL_TASK_SEND_EVENT = "SendEventTask";
     String STENCIL_TASK_CASE = "CaseTask";
     String STENCIL_TASK_PROCESS = "ProcessTask";
     String STENCIL_TASK_SCRIPT = "ScriptTask";
@@ -180,5 +181,32 @@ public interface CmmnStencilConstants {
     String PROPERTY_EVENT_LISTENER_AVAILABLE_CONDITION = "availablecondition";
 
     String PROPERTY_EVENT_TYPE = "eventType";
+    
+    String PROPERTY_EVENT_REGISTRY_EVENT_KEY = "eventkey";
+    String PROPERTY_EVENT_REGISTRY_EVENT_NAME = "eventname";
+    String PROPERTY_EVENT_REGISTRY_IN_PARAMETERS = "eventinparameters";
+    String PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS = "eventoutparameters";
+    String PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS = "eventcorrelationparameters";
+    String PROPERTY_EVENT_REGISTRY_CHANNEL_KEY = "channelkey";
+    String PROPERTY_EVENT_REGISTRY_CHANNEL_NAME = "channelname";
+    String PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE = "channeltype";
+    String PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION = "channeldestination";
+    String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE = "keydetectionfixedvalue";
+    String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD = "keydetectionjsonfield";
+    String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH = "keydetectionjsonpath";
+    
+    String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_KEY = "triggereventkey";
+    String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_NAME = "triggereventname";
+    String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_KEY = "triggerchannelkey";
+    String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_NAME = "triggerchannelname";
+    String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_TYPE = "triggerchanneltype";
+    String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_DESTINATION = "triggerchanneldestination";
+    
+    String PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME = "eventName";
+    String PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE = "eventType";
+    String PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME = "variableName";
+    String PROPERTY_EVENT_REGISTRY_CORRELATIONNAME = "name";
+    String PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE = "type";
+    String PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE = "value";
 
 }
