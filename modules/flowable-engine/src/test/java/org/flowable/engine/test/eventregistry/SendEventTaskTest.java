@@ -17,35 +17,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.test.JobTestHelper;
+import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.FlowableTestCase;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class SendEventTaskTest extends FlowableTestCase {
+public class SendEventTaskTest extends PluggableFlowableTestCase {
 
     protected TestOutboundEventChannelAdapter outboundEventChannelAdapter;
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-        
         outboundEventChannelAdapter = setupTestChannel();
         inboundEventChannelAdapter = setupTestInboundChannel();
 
@@ -99,7 +101,7 @@ public class SendEventTaskTest extends FlowableTestCase {
         return inboundEventChannelAdapter;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         getEventRegistry().removeChannelModel("out-channel");
         getEventRegistry().removeChannelModel("test-channel");
@@ -376,5 +378,18 @@ public class SendEventTaskTest extends FlowableTestCase {
             this.eventRegistry = eventRegistry;
         }
         
+    }
+
+    protected EventRepositoryService getEventRepositoryService() {
+        return getEventRegistryEngineConfiguration().getEventRepositoryService();
+    }
+
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
+            .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
     }
 }

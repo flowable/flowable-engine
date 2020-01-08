@@ -68,7 +68,13 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
             key = expression.getValue(planItemInstanceEntity).toString();
         }
 
-        EventModel eventModel = CommandContextUtil.getEventRegistry().getEventModel(key);
+        EventModel eventModel = null;
+        if (Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, planItemInstanceEntity.getTenantId())) {
+            eventModel = CommandContextUtil.getEventRegistry().getEventModel(key);
+        } else {
+            eventModel = CommandContextUtil.getEventRegistry().getEventModel(key, planItemInstanceEntity.getTenantId());
+        }
+
         if (eventModel == null) {
             throw new FlowableException("Could not find event model for key " +key);
         }

@@ -14,12 +14,14 @@ package org.flowable.eventregistry.impl.pipeline;
 
 import java.util.Collection;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
+import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -36,17 +38,20 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     protected EventRegistry eventRegistry;
     protected InboundEventDeserializer<T> inboundEventDeserializer;
     protected InboundEventKeyDetector<T> inboundEventKeyDetector;
+    protected InboundEventTenantDetector<T> inboundEventTenantDetector;
     protected InboundEventPayloadExtractor<T> inboundEventPayloadExtractor;
     protected InboundEventTransformer inboundEventTransformer;
 
     public DefaultInboundEventProcessingPipeline(EventRegistry eventRegistry,
             InboundEventDeserializer<T> inboundEventDeserializer,
             InboundEventKeyDetector<T> inboundEventKeyDetector,
+            InboundEventTenantDetector<T> inboundEventTenantDetector,
             InboundEventPayloadExtractor<T> inboundEventPayloadExtractor,
             InboundEventTransformer inboundEventTransformer) {
         this.eventRegistry = eventRegistry;
         this.inboundEventDeserializer = inboundEventDeserializer;
         this.inboundEventKeyDetector = inboundEventKeyDetector;
+        this.inboundEventTenantDetector = inboundEventTenantDetector;
         this.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
         this.inboundEventTransformer = inboundEventTransformer;
     }
@@ -55,13 +60,23 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     public Collection<EventRegistryEvent> run(String channelKey, String rawEvent) {
         T event = deserialize(rawEvent);
         String eventKey = detectEventDefinitionKey(event);
-        
-        EventModel eventDefinition = eventRegistry.getEventModel(eventKey);
+
+        String tenantId = AbstractEngineConfiguration.NO_TENANT_ID;
+        EventModel eventModel = null;
+        if (inboundEventTenantDetector != null) {
+            tenantId = inboundEventTenantDetector.detectTenantId(event);
+            eventModel = eventRegistry.getEventModel(eventKey, tenantId);
+
+        } else {
+            eventModel = eventRegistry.getEventModel(eventKey);
+
+        }
         
         EventInstanceImpl eventInstance = new EventInstanceImpl(
-            eventDefinition,
-            extractCorrelationParameters(eventDefinition, event),
-            extractPayload(eventDefinition, event)
+            eventModel,
+            extractCorrelationParameters(eventModel, event),
+            extractPayload(eventModel, event),
+            tenantId
         );
 
         return transform(eventInstance);
@@ -85,5 +100,42 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
 
     public Collection<EventRegistryEvent> transform(EventInstance eventInstance) {
         return inboundEventTransformer.transform(eventInstance);
+    }
+
+    public EventRegistry getEventRegistry() {
+        return eventRegistry;
+    }
+    public void setEventRegistry(EventRegistry eventRegistry) {
+        this.eventRegistry = eventRegistry;
+    }
+    public InboundEventDeserializer<T> getInboundEventDeserializer() {
+        return inboundEventDeserializer;
+    }
+    public void setInboundEventDeserializer(InboundEventDeserializer<T> inboundEventDeserializer) {
+        this.inboundEventDeserializer = inboundEventDeserializer;
+    }
+    public InboundEventKeyDetector<T> getInboundEventKeyDetector() {
+        return inboundEventKeyDetector;
+    }
+    public void setInboundEventKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector) {
+        this.inboundEventKeyDetector = inboundEventKeyDetector;
+    }
+    public InboundEventTenantDetector<T> getInboundEventTenantDetector() {
+        return inboundEventTenantDetector;
+    }
+    public void setInboundEventTenantDetector(InboundEventTenantDetector<T> inboundEventTenantDetector) {
+        this.inboundEventTenantDetector = inboundEventTenantDetector;
+    }
+    public InboundEventPayloadExtractor<T> getInboundEventPayloadExtractor() {
+        return inboundEventPayloadExtractor;
+    }
+    public void setInboundEventPayloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor) {
+        this.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
+    }
+    public InboundEventTransformer getInboundEventTransformer() {
+        return inboundEventTransformer;
+    }
+    public void setInboundEventTransformer(InboundEventTransformer inboundEventTransformer) {
+        this.inboundEventTransformer = inboundEventTransformer;
     }
 }

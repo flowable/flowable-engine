@@ -19,11 +19,6 @@ package org.flowable.eventregistry.api;
 public interface InboundEventDeserializer<T> {
 
     /**
-     * Returns the unique type for this deserializer.
-     */
-    String getType();
-
-    /**
      * The actual deserialization.
      */
     T deserialize(String rawEvent);

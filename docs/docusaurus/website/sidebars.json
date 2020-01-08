@@ -47,6 +47,7 @@
 		"form/ch06-Form-Introduction",
 		"form/ch07-REST"
 	],
-    "Migration from v5": ["migration"]
+    "Migration from v5": ["migration"],
+    "Disclaimer": ["disclaimer"]
   }
 }

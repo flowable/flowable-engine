@@ -28,6 +28,7 @@ public class EventInstanceImpl implements EventInstance {
     protected EventModel eventModel;
     protected Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
     protected Collection<EventCorrelationParameterInstance> correlationParameterInstances = new ArrayList<>();
+    protected String tenantId;
 
     public EventInstanceImpl() {
 
@@ -40,6 +41,17 @@ public class EventInstanceImpl implements EventInstance {
         this.eventModel = eventModel;
         this.correlationParameterInstances = correlationParameterInstances;
         this.payloadInstances = payloadInstances;
+    }
+
+    public EventInstanceImpl(EventModel eventModel,
+            Collection<EventCorrelationParameterInstance> correlationParameterInstances,
+            Collection<EventPayloadInstance> payloadInstances,
+            String tenantId) {
+
+        this.eventModel = eventModel;
+        this.correlationParameterInstances = correlationParameterInstances;
+        this.payloadInstances = payloadInstances;
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -61,5 +73,12 @@ public class EventInstanceImpl implements EventInstance {
     public void setCorrelationParameterInstances(
         Collection<EventCorrelationParameterInstance> correlationParameterInstances) {
         this.correlationParameterInstances = correlationParameterInstances;
+    }
+    @Override
+    public String getTenantId() {
+        return tenantId;
+    }
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 }

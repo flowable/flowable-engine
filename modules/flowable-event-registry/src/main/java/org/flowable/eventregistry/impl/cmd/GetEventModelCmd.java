@@ -97,7 +97,7 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
             }
             
             if (eventDefinitionEntity == null) {
-                throw new FlowableObjectNotFoundException("No event definition found for key '" + eventDefinitionKey + "' for tenant identifier " + tenantId, EventDefinitionEntity.class);
+                throw new FlowableObjectNotFoundException("No event definition found for key '" + eventDefinitionKey + "' for tenant identifier '" + tenantId + "'", EventDefinitionEntity.class);
             }
 
         } else if (eventDefinitionKey != null && (tenantId == null || EventRegistryEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId != null) {
@@ -151,6 +151,8 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
         }
 
         EventDefinitionCacheEntry eventDefinitionCacheEntry = deploymentManager.resolveEventDefinition(eventDefinitionEntity);
-        return eventEngineConfiguration.getEventJsonConverter().convertToEventModel(eventDefinitionCacheEntry.getEventDefinitionJson());
+        EventModel eventModel = eventEngineConfiguration.getEventJsonConverter().convertToEventModel(eventDefinitionCacheEntry.getEventDefinitionJson());
+        eventModel.setTenantId(eventDefinitionCacheEntry.getEventDefinitionEntity().getTenantId());
+        return eventModel;
     }
 }

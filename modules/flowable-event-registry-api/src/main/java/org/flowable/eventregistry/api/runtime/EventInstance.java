@@ -27,4 +27,6 @@ public interface EventInstance {
 
     Collection<EventCorrelationParameterInstance> getCorrelationParameterInstances();
 
+    String getTenantId();
+
 }

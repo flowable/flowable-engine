@@ -21,8 +21,6 @@ By default, the IDM engine is initialized and started when the Flowable engine i
 
 Since the DB contains historic entities for past as well as ongoing instances, you might want to consider querying these tables in order to minimize access to the runtime process instance data, and that way keep the runtime execution performant.
 
-\[\[IDM engine configuration\]\]
-
 ## IDM engine configuration
 
 By default the Flowable engine is started with the org.flowable.idm.engine.configurator.IdmEngineConfigurator. This configurator uses the same datasource configuration as the Flowable process engine configuration. No additional configuration is needed to use the identity component as it was configured in Flowable v5.

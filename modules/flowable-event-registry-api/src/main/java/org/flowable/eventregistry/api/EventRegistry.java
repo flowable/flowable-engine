@@ -71,6 +71,11 @@ public interface EventRegistry {
     EventModel getEventModel(String eventDefinitionKey);
 
     /**
+     * Retrieves the {@link EventModel} for the given eventDefinitionKey, within the given tenant.
+     */
+    EventModel getEventModel(String eventDefinitionKey, String tenantId);
+
+    /**
      * The {@link InboundEventProcessor} is responsible for handling any new event.
      * The event registry will simply pass any event it receives to this instance.
      */

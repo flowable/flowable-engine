@@ -32,16 +32,19 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.impl.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.eventregistry.impl.consumer.CorrelationKey;
-import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
 public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer  {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(CmmnEventRegistryEventConsumer.class);
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CommandExecutor commandExecutor;
@@ -59,7 +62,6 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
     @Override
     protected void eventReceived(EventInstance eventInstance) {
-        EventModel eventModel = eventInstance.getEventModel();
 
         // Fetching the event subscriptions happens in one transaction,
         // executing them one per subscription. There is no overarching transaction.
@@ -69,7 +71,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         Collection<CorrelationKey> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
 
         // Always execute the events without a correlation key
-        List<EventSubscription> eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(eventModel);
+        List<EventSubscription> eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(eventInstance);
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
             handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys);
@@ -77,7 +79,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
         if (!correlationKeys.isEmpty()) {
             // If there are correlation keys then look for all event subscriptions matching them
-            eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventModel, correlationKeys);
+            eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventInstance, correlationKeys);
             for (EventSubscription eventSubscription : eventSubscriptions) {
                 handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys);
             }
@@ -85,18 +87,48 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
     }
 
-    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(EventModel eventDefinition, Collection<CorrelationKey> correlationKeys) {
-        Set<String> correlationKeyValues = correlationKeys.stream().map(CorrelationKey::getValue).collect(Collectors.toSet());
+    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(EventInstance eventInstance) {
+        return commandExecutor.execute(commandContext -> {
+            EventSubscriptionQueryImpl eventSubscriptionQuery = new EventSubscriptionQueryImpl(commandContext)
+                .eventType(eventInstance.getEventModel().getKey())
+                .withoutConfiguration()
+                .scopeType(ScopeTypes.CMMN);
 
-        return commandExecutor.execute(commandContext ->
-            CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(
-                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).configurations(correlationKeyValues).scopeType(ScopeTypes.CMMN)));
+            // Note: the tenantId of the model, not the event instance.
+            // The event instance tenantId will always be the 'real' tenantId,
+            // but the event could have been deployed to the default tenant
+            // (which is reflected in the eventModel tenantId).
+            String eventModelTenantId = eventInstance.getEventModel().getTenantId();
+            if (eventModelTenantId != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventModelTenantId)) {
+                eventSubscriptionQuery.tenantId(eventModelTenantId);
+            }
+
+            return CommandContextUtil.getEventSubscriptionEntityManager(commandContext)
+                .findEventSubscriptionsByQueryCriteria(eventSubscriptionQuery);
+
+        });
     }
 
-    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(EventModel eventDefinition) {
-        return commandExecutor.execute(commandContext ->
-            CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(
-                new EventSubscriptionQueryImpl(commandContext).eventType(eventDefinition.getKey()).withoutConfiguration().scopeType(ScopeTypes.CMMN)));
+    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(EventInstance eventInstance, Collection<CorrelationKey> correlationKeys) {
+        Set<String> correlationKeyValues = correlationKeys.stream().map(CorrelationKey::getValue).collect(Collectors.toSet());
+
+        return commandExecutor.execute(commandContext -> {
+            EventSubscriptionQueryImpl eventSubscriptionQuery = new EventSubscriptionQueryImpl(commandContext)
+                .eventType(eventInstance.getEventModel().getKey())
+                .configurations(correlationKeyValues)
+                .scopeType(ScopeTypes.CMMN);
+
+            // Note: the tenantId of the model, not the event instance.
+            // The event instance tenantId will always be the 'real' tenantId,
+            // but the event could have been deployed to the default tenant
+            // (which is reflected in the eventModel tenantId).
+            String eventModelTenantId = eventInstance.getEventModel().getTenantId();
+            if (eventModelTenantId != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventModelTenantId)) {
+                eventSubscriptionQuery.tenantId(eventModelTenantId);
+            }
+
+            return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(eventSubscriptionQuery);
+        });
     }
 
     protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
@@ -120,6 +152,14 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 .caseDefinitionId(eventSubscription.getScopeDefinitionId())
                 .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
+            if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+                caseInstanceBuilder.tenantId(eventInstance.getTenantId());
+
+                if (!Objects.equals(eventInstance.getTenantId(), eventInstance.getEventModel().getTenantId())) {
+                    caseInstanceBuilder.overrideCaseDefinitionTenantId(eventInstance.getTenantId());
+                }
+            }
+
             if (correlationKeys != null) {
                 String startCorrelationConfiguration = getStartCorrelationConfiguration(eventSubscription);
 
@@ -128,12 +168,14 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                     CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
 
                     long caseInstanceCount = cmmnRuntimeService.createCaseInstanceQuery()
+                        .caseDefinitionId(eventSubscription.getScopeDefinitionId())
                         .caseInstanceReferenceId(correlationKeyWithAllParameters.getValue())
                         .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE)
                         .count();
 
                     if (caseInstanceCount > 0) {
                         // Returning, no new instance should be started
+                        LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
                         return;
                     }
 

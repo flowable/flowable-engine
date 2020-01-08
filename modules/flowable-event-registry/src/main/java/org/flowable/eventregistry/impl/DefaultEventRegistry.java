@@ -44,7 +44,7 @@ import org.flowable.eventregistry.model.OutboundChannelModel;
 public class DefaultEventRegistry implements EventRegistry {
 
     protected EventRegistryEngineConfiguration engineConfiguration;
-    
+
     protected Map<String, InboundChannelModel> inboundChannelModels = new ConcurrentHashMap<>();
     protected Map<String, OutboundChannelModel> outboundChannelModels = new ConcurrentHashMap<>();
 
@@ -145,6 +145,11 @@ public class DefaultEventRegistry implements EventRegistry {
     @Override
     public EventModel getEventModel(String eventDefinitionKey) {
         return getEventRepositoryService().getEventModelByKey(eventDefinitionKey);
+    }
+
+    @Override
+    public EventModel getEventModel(String eventDefinitionKey, String tenantId) {
+        return getEventRepositoryService().getEventModelByKey(eventDefinitionKey, tenantId, true);
     }
 
     @Override

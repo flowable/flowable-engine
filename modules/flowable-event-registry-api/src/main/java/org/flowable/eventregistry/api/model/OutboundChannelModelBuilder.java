@@ -18,51 +18,112 @@ import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.model.OutboundChannelModel;
 
 /**
+ * A builder to create an {@link OutboundChannelModel} instance.
+ *  which represents a channel to send events to the 'outside world'.
+ *
+ * An {@link OutboundChannelModel} consists of the following parts:
+ * - An adapter that defines how/where the events are sent, each with specific configurations.
+ * - An event processing pipeline that
+ *      - allows for serialization to the proper format
+ *      - (Optionally) custom steps (or override any of the above)
+ *
  * @author Joram Barrez
  */
 public interface OutboundChannelModelBuilder {
 
+    /**
+     * Each channel needs to have a unique key to identity it.
+     */
     OutboundChannelModelBuilder key(String key);
 
+    /**
+     * Sets a custom {@link OutboundEventChannelAdapter} adapter instance which will send the events.
+     */
     OutboundEventProcessingPipelineBuilder channelAdapter(OutboundEventChannelAdapter outboundEventChannelAdapter);
 
+    /**
+     * Configures an adapter which will send events using JMS.
+     */
     OutboundJmsChannelBuilder jmsChannelAdapter(String destination);
 
+    /**
+     * Configures an adapter which will send events using RabbitMQ.
+     */
     OutboundRabbitChannelBuilder rabbitChannelAdapter(String routingKey);
 
+    /**
+     * Configures an adapter which will send events using Kafka.
+     */
     OutboundKafkaChannelBuilder kafkaChannelAdapter(String topic);
 
+    /**
+     * Creates the {@link OutboundChannelModel} instance based on the configuration
+     * and registers it with the {@link org.flowable.eventregistry.api.EventRegistry}.
+     */
     OutboundChannelModel register();
 
+    /**
+     * Builder to create an {@link OutboundEventChannelAdapter} using JMS.
+     */
     interface OutboundJmsChannelBuilder {
 
         OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
     }
 
+    /**
+     * Builder to create an {@link OutboundEventChannelAdapter} using RabbitMQ.
+     */
     interface OutboundRabbitChannelBuilder {
 
+        /**
+         * Sets the exchange to which events need to be sent.
+         */
         OutboundRabbitChannelBuilder exchange(String exchange);
 
         OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
     }
 
+    /**
+     * Builder to create an {@link OutboundEventChannelAdapter} using Kafka.
+     */
     interface OutboundKafkaChannelBuilder {
 
+        /**
+         * Sets the record key for the outgoing message.
+         */
         OutboundKafkaChannelBuilder recordKey(String key);
 
         OutboundEventProcessingPipelineBuilder eventProcessingPipeline();
     }
 
+    /**
+     * Builder for the 'event processing' pipeline which gets invoked before sending out the event.
+     */
     interface OutboundEventProcessingPipelineBuilder {
 
+        /**
+         * Serializes the event to JSON.
+         */
         OutboundChannelModelBuilder jsonSerializer();
 
+        /**
+         * Serializes the event to XML.
+         */
         OutboundChannelModelBuilder xmlSerializer();
 
+        /**
+         * Serializes the event using a custom {@link OutboundEventSerializer} instance.
+         */
         OutboundChannelModelBuilder serializer(OutboundEventSerializer serializer);
 
+        /**
+         * Sets a fully custom {@link OutboundEventProcessingPipeline} instance.
+         */
         OutboundChannelModelBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline);
 
+        /**
+         * Finishes building the pipeline.
+         */
         OutboundEventProcessingPipeline build();
 
     }

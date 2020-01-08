@@ -13,8 +13,10 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
@@ -41,13 +43,19 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
 
-        String eventDefinitionKey = getEventKey();
+        String key = getEventKey();
 
         EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
-        EventModel eventModel = eventRegistry.getEventModel(eventDefinitionKey);
+
+        EventModel eventModel = null;
+        if (Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, planItemInstanceEntity.getTenantId())) {
+            eventModel = CommandContextUtil.getEventRegistry().getEventModel(key);
+        } else {
+            eventModel = CommandContextUtil.getEventRegistry().getEventModel(key, planItemInstanceEntity.getTenantId());
+        }
 
         if (eventModel == null) {
-            throw new FlowableException("No event model found for event key " + eventDefinitionKey);
+            throw new FlowableException("No event model found for event key " + key);
         }
 
         EventInstanceImpl eventInstance = new EventInstanceImpl();

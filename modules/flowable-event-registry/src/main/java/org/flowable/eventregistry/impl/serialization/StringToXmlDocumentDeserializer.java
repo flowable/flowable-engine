@@ -28,13 +28,6 @@ import org.w3c.dom.Document;
  */
 public class StringToXmlDocumentDeserializer implements InboundEventDeserializer<Document> {
 
-    public static String TYPE = "xmlToJson";
-
-    @Override
-    public String getType() {
-        return TYPE;
-    }
-
     @Override
     public Document deserialize(String rawEvent) {
         try {

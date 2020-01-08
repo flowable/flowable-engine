@@ -12,13 +12,13 @@ class Footer extends React.Component {
     const baseUrl = this.props.config.baseUrl;
     const docsUrl = this.props.config.docsUrl;
     const docsPart = `${docsUrl ? `${docsUrl}/` : ''}`;
-    const langPart = `${language ? `${language}/` : ''}`;
+    const langPart = '';
     return `${baseUrl}${docsPart}${langPart}${doc}`;
   }
 
   pageUrl(doc, language) {
     const baseUrl = this.props.config.baseUrl;
-    return baseUrl + (language ? `${language}/` : '') + doc;
+    return baseUrl + doc;
   }
 
   render() {
@@ -43,8 +43,13 @@ class Footer extends React.Component {
             </a>
           </div>
           <div>
-            <h5>Disclaimer</h5>
-            <p className="disclaimer">Flowable may change, amend or delete information contained in its documents at any time and without formal arrangement. Documents and other informational items concerning a release of a Flowable product that has not yet been officially released by Flowable are non-binding and may be incomplete or contain errors. Flowable strives to provide complete and exact information in its documents. If permitted by applicable law, Flowable takes no responsibility for the accuracy of the issued informational items and documentation and does not provide any warranty for their content. Flowable assumes no liability for any direct, indirect or incidental damages incurred by the use of its documents and informational items. Documents or informational items do not change or amend the contractual terms and conditions regarding Flowable products.</p>
+            <h5>Legal</h5>
+            <a href={this.docUrl('disclaimer', this.props.language)}>
+              Disclaimer
+            </a>
+            <a href="https://flowable.com/disclaimer/">
+              Policies
+            </a>
           </div>
         </section>
 

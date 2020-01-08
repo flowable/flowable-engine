@@ -66,8 +66,6 @@ import org.junit.runners.model.Statement;
  * order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
  * time rather then the time that was set during a test method.
  * </p>
- * 
- * @author Tom Baeyens
  */
 public class FlowableCmmnRule implements TestRule {
 
@@ -261,6 +259,10 @@ public class FlowableCmmnRule implements TestRule {
 
     public CmmnRuntimeService getCmmnRuntimeService() {
         return cmmnRuntimeService;
+    }
+
+    public CmmnTaskService getCmmnTaskService() {
+        return cmmnTaskService;
     }
 
     public CmmnHistoryService getCmmnHistoryService() {
