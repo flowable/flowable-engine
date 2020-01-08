@@ -29,10 +29,10 @@ import org.flowable.eventregistry.model.InboundChannelModel;
  * - An adapter that defines how/where the events are received, each with specific configurations.
  * - An event processing pipeline, which transforms the incoming event and extracts data and metadata:
  *     - deserialization (from the 'raw' event to something else)
- *     - event key detection: detects the 'key' which will define the {@link org.flowable.eventregistry.api.EventDefinition} to be used.
+ *     - event key detection: detects the 'key' which will define the {@link org.flowable.eventregistry.model.EventModel} to be used.
  *     - tenant detection (only relevant when using multi-tenant): detects a 'tenantId' which is used to determine
  *       the correct {@link org.flowable.eventregistry.api.EventDefinition}.
- *     - payload extraction: with the {@link org.flowable.eventregistry.api.EventDefinition} determined,
+ *     - payload extraction: with the {@link org.flowable.eventregistry.model.EventModel} determined,
  *       the definition is used to extract the payload from the event data.
  *     - transformation: transforms the event to an internal representation,
  *       ready to be passed to the {@link org.flowable.eventregistry.api.EventRegistry}.
