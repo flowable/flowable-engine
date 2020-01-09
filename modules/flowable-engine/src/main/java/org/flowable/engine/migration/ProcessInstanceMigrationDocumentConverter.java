@@ -56,6 +56,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dennis
+ * @author martin.grofcik
  */
 public class ProcessInstanceMigrationDocumentConverter {
 

@@ -26,6 +26,7 @@ import org.flowable.engine.migration.Script;
 
 /**
  * @author Dennis Federico
+ * @author martin.grofcik
  */
 public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInstanceMigrationDocumentBuilder {
 

@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Dennis Federico
+ * @author martin.grofcik
  */
 public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigrationDocument {
 
