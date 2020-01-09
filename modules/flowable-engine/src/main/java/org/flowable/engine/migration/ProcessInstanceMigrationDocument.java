@@ -34,7 +34,13 @@ public interface ProcessInstanceMigrationDocument {
 
     String getPreUpgradeJavaDelegate();
 
-    String getPreUpgradeExpression();
+    String getPreUpgradeJavaDelegateExpression();
+
+    Script getPostUpgradeScript();
+
+    String getPostUpgradeJavaDelegate();
+
+    String getPostUpgradeJavaDelegateExpression();
 
     List<ActivityMigrationMapping> getActivityMigrationMappings();
 

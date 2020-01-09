@@ -21,7 +21,10 @@ import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentCons
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.LANGUAGE;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.LOCAL_VARIABLES_JSON_SECTION;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY;
-import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_EXPRESSION;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.POST_UPGRADE_JAVA_DELEGATE;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.POST_UPGRADE_JAVA_DELEGATE_EXPRESSION;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.POST_UPGRADE_SCRIPT;
+import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_JAVA_DELEGATE_EXPRESSION;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_JAVA_DELEGATE;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_SCRIPT;
 import static org.flowable.engine.migration.ProcessInstanceMigrationDocumentConstants.PROCESS_INSTANCE_VARIABLES_JSON_SECTION;
@@ -96,7 +99,7 @@ public class ProcessInstanceMigrationDocumentConverter {
             documentNode.put(TO_PROCESS_DEFINITION_TENANT_ID_JSON_PROPERTY, processInstanceMigrationDocument.getMigrateToProcessDefinitionTenantId());
         }
 
-        JsonNode preUpgradeScriptNode = convertToJsonPreUpgradeScript(processInstanceMigrationDocument.getPreUpgradeScript(), objectMapper);
+        JsonNode preUpgradeScriptNode = convertToJsonUpgradeScript(processInstanceMigrationDocument.getPreUpgradeScript(), objectMapper);
         if (preUpgradeScriptNode != null && !preUpgradeScriptNode.isNull()) {
             documentNode.set(PRE_UPGRADE_SCRIPT, preUpgradeScriptNode);
         }
@@ -105,8 +108,21 @@ public class ProcessInstanceMigrationDocumentConverter {
             documentNode.put(PRE_UPGRADE_JAVA_DELEGATE, processInstanceMigrationDocument.getPreUpgradeJavaDelegate());
         }
 
-        if (processInstanceMigrationDocument.getPreUpgradeExpression() != null) {
-            documentNode.put(PRE_UPGRADE_EXPRESSION, processInstanceMigrationDocument.getPreUpgradeExpression());
+        if (processInstanceMigrationDocument.getPreUpgradeJavaDelegateExpression() != null) {
+            documentNode.put(PRE_UPGRADE_JAVA_DELEGATE_EXPRESSION, processInstanceMigrationDocument.getPreUpgradeJavaDelegateExpression());
+        }
+
+        JsonNode postUpgradeScriptNode = convertToJsonUpgradeScript(processInstanceMigrationDocument.getPostUpgradeScript(), objectMapper);
+        if (postUpgradeScriptNode != null && !postUpgradeScriptNode.isNull()) {
+            documentNode.set(POST_UPGRADE_SCRIPT, postUpgradeScriptNode);
+        }
+
+        if (processInstanceMigrationDocument.getPostUpgradeJavaDelegate() != null) {
+            documentNode.put(POST_UPGRADE_JAVA_DELEGATE, processInstanceMigrationDocument.getPostUpgradeJavaDelegate());
+        }
+
+        if (processInstanceMigrationDocument.getPostUpgradeJavaDelegateExpression() != null) {
+            documentNode.put(POST_UPGRADE_JAVA_DELEGATE_EXPRESSION, processInstanceMigrationDocument.getPostUpgradeJavaDelegateExpression());
         }
 
         ArrayNode mappingNodes = convertToJsonActivityMigrationMappings(processInstanceMigrationDocument.getActivityMigrationMappings());
@@ -178,9 +194,24 @@ public class ProcessInstanceMigrationDocumentConverter {
                 .map(JsonNode::textValue).orElse(null);
             documentBuilder.setPreUpgradeJavaDelegate(javaDelegateClassName);
 
-            String expression = Optional.ofNullable(rootNode.get(PRE_UPGRADE_EXPRESSION))
+            String expression = Optional.ofNullable(rootNode.get(PRE_UPGRADE_JAVA_DELEGATE_EXPRESSION))
                 .map(JsonNode::textValue).orElse(null);
-            documentBuilder.setPreUpgradeExpression(expression);
+            documentBuilder.setPreUpgradeJavaDelegateExpression(expression);
+
+            JsonNode postUpgradeScriptNode = rootNode.get(POST_UPGRADE_SCRIPT);
+            if (postUpgradeScriptNode != null) {
+                String language = Optional.ofNullable(postUpgradeScriptNode.get(LANGUAGE)).map(JsonNode::asText).orElse("javascript");
+                String script = Optional.ofNullable(postUpgradeScriptNode.get(SCRIPT)).map(JsonNode::asText).orElse("javascript");
+                documentBuilder.setPostUpgradeScript(new Script(language, script));
+            }
+
+            String postJavaDelegateClassName = Optional.ofNullable(rootNode.get(POST_UPGRADE_JAVA_DELEGATE))
+                .map(JsonNode::textValue).orElse(null);
+            documentBuilder.setPostUpgradeJavaDelegate(postJavaDelegateClassName);
+
+            String postExpression = Optional.ofNullable(rootNode.get(POST_UPGRADE_JAVA_DELEGATE_EXPRESSION))
+                .map(JsonNode::textValue).orElse(null);
+            documentBuilder.setPostUpgradeJavaDelegateExpression(postExpression);
 
             JsonNode activityMigrationMappings = rootNode.get(ACTIVITY_MAPPINGS_JSON_SECTION);
             if (activityMigrationMappings != null) {
@@ -224,7 +255,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         return null;
     }
 
-    protected static JsonNode convertToJsonPreUpgradeScript(Script script, ObjectMapper objectMapper) {
+    protected static JsonNode convertToJsonUpgradeScript(Script script, ObjectMapper objectMapper) {
         if (script != null) {
             return objectMapper.valueToTree(script);
         }

@@ -2544,7 +2544,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     }
 
     @Test
-    public void preUpgradeExpression() {
+    public void preUpgradeJavaDelegateExpression() {
         //Deploy first version of the process
         deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/serializable-variable-process.bpmn20.xml");
 
@@ -2563,7 +2563,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
         processMigrationService.createProcessInstanceMigrationBuilder()
-            .preUpgradeExpression("${convertProcessVariable}")
+            .preUpgradeJavaDelegateExpression("${convertProcessVariable}")
             .migrateToProcessDefinition(targetProcessDefinition.getId())
             .migrate(processInstanceToMigrate.getId());
 
@@ -2571,6 +2571,92 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "json", "json");
 
     }
+
+    @Test
+    public void postUpgradeScriptMigration() {
+        //Deploy first version of the process
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/serializable-variable-process.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP", Collections.singletonMap("listVariable", new ArrayList()));
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions().singleResult();
+        runtimeService.trigger(execution.getId());
+
+        assertThat((List)runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
+
+        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+
+        processMigrationService.createProcessInstanceMigrationBuilder().postUpgradeScript(new Script("groovy",
+            "import com.fasterxml.jackson.databind.ObjectMapper\n"
+                + "import com.fasterxml.jackson.databind.node.ArrayNode\n"
+                + "import org.flowable.engine.impl.context.Context\n"
+                + "\n"
+                + "List<String> list  = execution.getVariable('listVariable')\n"
+                + "\n"
+                + "ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()\n"
+                + "\n"
+                + "ArrayNode jsonArray = mapper.createArrayNode()\n"
+                + "list.each {jsonArray.add(it)}\n"
+                + "\n"
+                + "execution.setVariable(\"listVariable\", jsonArray)"))
+            .migrateToProcessDefinition(targetProcessDefinition.getId())
+            .migrate(processInstanceToMigrate.getId());
+
+        assertThatProcessVariableConverted(processInstanceToMigrate, execution);
+        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
+
+    }
+
+    @Test
+    public void postUpgradeJavaDelegate() {
+        //Deploy first version of the process
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/serializable-variable-process.bpmn20.xml");
+
+        ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("MP", Collections.singletonMap("listVariable", new ArrayList()));
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions().singleResult();
+        runtimeService.trigger(execution.getId());
+
+        assertThat((List)runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
+
+        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+
+        processMigrationService.createProcessInstanceMigrationBuilder().postUpgradeJavaDelegate("org.flowable.engine.test.api.runtime.migration.ConvertProcessVariable")
+            .migrateToProcessDefinition(targetProcessDefinition.getId())
+            .migrate(processInstanceToMigrate.getId());
+
+        assertThatProcessVariableConverted(processInstanceToMigrate, execution);
+        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
+    }
+
+    @Test
+    public void postUpgradeJavaDelegateExpression() {
+        //Deploy first version of the process
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/serializable-variable-process.bpmn20.xml");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("listVariable", new ArrayList());
+        variables.put("convertProcessVariable", new ConvertProcessVariable()); // using instead of beans. Not nice, but it uses similar resolver as beans
+        ProcessInstance processInstanceToMigrate = runtimeService
+            .startProcessInstanceByKey("MP", variables);
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceToMigrate.getId()).onlyChildExecutions()
+            .singleResult();
+        runtimeService.trigger(execution.getId());
+
+        assertThat((List) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable")).contains("new value");
+
+        ProcessDefinition targetProcessDefinition = deployProcessDefinition("my deploy",
+            "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
+
+        processMigrationService.createProcessInstanceMigrationBuilder()
+            .postUpgradeJavaDelegateExpression("${convertProcessVariable}")
+            .migrateToProcessDefinition(targetProcessDefinition.getId())
+            .migrate(processInstanceToMigrate.getId());
+
+        assertThatProcessVariableConverted(processInstanceToMigrate, execution);
+        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "json", "json");
+
+    }
+
     private void assertThatVariablesTypeHistoryIs(ProcessInstance processInstanceToMigrate, String... values) {
         List<HistoricDetail> updateList = historyService.createHistoricDetailQuery().processInstanceId(processInstanceToMigrate.getId()).variableUpdates().list();
 

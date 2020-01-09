@@ -41,7 +41,10 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
         migrationDocumentBuilder.addActivityMigrationMappings(document.getActivityMigrationMappings());
         migrationDocumentBuilder.setPreUpgradeScript(document.getPreUpgradeScript());
         migrationDocumentBuilder.setPreUpgradeJavaDelegate(document.getPreUpgradeJavaDelegate());
-        migrationDocumentBuilder.setPreUpgradeExpression(document.getPreUpgradeExpression());
+        migrationDocumentBuilder.setPreUpgradeJavaDelegateExpression(document.getPreUpgradeJavaDelegateExpression());
+        migrationDocumentBuilder.setPostUpgradeScript(document.getPostUpgradeScript());
+        migrationDocumentBuilder.setPostUpgradeJavaDelegate(document.getPostUpgradeJavaDelegate());
+        migrationDocumentBuilder.setPostUpgradeJavaDelegateExpression(document.getPostUpgradeJavaDelegateExpression());
         return this;
     }
 
@@ -83,8 +86,26 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessInstanceMigrationBuilder preUpgradeExpression(String expression) {
-        this.migrationDocumentBuilder.setPreUpgradeExpression(expression);
+    public ProcessInstanceMigrationBuilder preUpgradeJavaDelegateExpression(String expression) {
+        this.migrationDocumentBuilder.setPreUpgradeJavaDelegateExpression(expression);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder postUpgradeScript(Script script) {
+        this.migrationDocumentBuilder.setPostUpgradeScript(script);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder postUpgradeJavaDelegate(String javaDelegateClassName) {
+        this.migrationDocumentBuilder.setPostUpgradeJavaDelegate(javaDelegateClassName);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder postUpgradeJavaDelegateExpression(String expression) {
+        this.migrationDocumentBuilder.setPostUpgradeJavaDelegateExpression(expression);
         return this;
     }
 

@@ -32,7 +32,13 @@ public interface ProcessInstanceMigrationDocumentBuilder {
 
     ProcessInstanceMigrationDocumentBuilder setPreUpgradeJavaDelegate(String javaDelegateClassName);
 
-    ProcessInstanceMigrationDocumentBuilder setPreUpgradeExpression(String expression);
+    ProcessInstanceMigrationDocumentBuilder setPreUpgradeJavaDelegateExpression(String expression);
+
+    ProcessInstanceMigrationDocumentBuilder setPostUpgradeScript(Script script);
+
+    ProcessInstanceMigrationDocumentBuilder setPostUpgradeJavaDelegate(String javaDelegateClassName);
+
+    ProcessInstanceMigrationDocumentBuilder setPostUpgradeJavaDelegateExpression(String expression);
 
     ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings);
 

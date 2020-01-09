@@ -391,7 +391,8 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     protected void doMigrateProcessInstance(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        LOGGER.debug("Start migration of process instance with Id:'{}' to process definition identified by {}", processInstance.getId(), printProcessDefinitionIdentifierMessage(document));
+        LOGGER.debug("Start migration of process instance with Id:'{}' to process definition identified by {}", processInstance.getId(),
+            printProcessDefinitionIdentifierMessage(document));
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
@@ -405,20 +406,23 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             executeJavaDelegate(processInstance, procDefToMigrateTo, document.getPreUpgradeJavaDelegate(), commandContext);
         }
 
-        if (document.getPreUpgradeExpression() != null) {
+        if (document.getPreUpgradeJavaDelegateExpression() != null) {
             LOGGER.debug("Execute pre upgrade process instance script");
-            executeExpression(processInstance, procDefToMigrateTo, document.getPreUpgradeExpression(), commandContext);
+            executeExpression(processInstance, procDefToMigrateTo, document.getPreUpgradeJavaDelegateExpression(), commandContext);
         }
 
-        List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders((ExecutionEntity) processInstance, procDefToMigrateTo, document, commandContext);
+        List<ChangeActivityStateBuilderImpl> changeActivityStateBuilders = prepareChangeStateBuilders((ExecutionEntity) processInstance, procDefToMigrateTo,
+            document, commandContext);
 
-        LOGGER.debug("Updating Process definition reference of process root execution with id:'{}' to '{}'", processInstance.getId(), procDefToMigrateTo.getId());
+        LOGGER
+            .debug("Updating Process definition reference of process root execution with id:'{}' to '{}'", processInstance.getId(), procDefToMigrateTo.getId());
         ((ExecutionEntity) processInstance).setProcessDefinitionId(procDefToMigrateTo.getId());
 
         LOGGER.debug("Resolve activity executions to migrate");
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
         for (ChangeActivityStateBuilderImpl builder : changeActivityStateBuilders) {
-            moveExecutionEntityContainerList.addAll(resolveMoveExecutionEntityContainers(builder, Optional.of(procDefToMigrateTo.getId()), document.getProcessInstanceVariables(), commandContext));
+            moveExecutionEntityContainerList.addAll(
+                resolveMoveExecutionEntityContainers(builder, Optional.of(procDefToMigrateTo.getId()), document.getProcessInstanceVariables(), commandContext));
         }
 
         ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
@@ -442,8 +446,24 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         LOGGER.debug("Updating Process definition reference in history");
         changeProcessDefinitionReferenceOfHistory(processInstance, procDefToMigrateTo, commandContext);
 
+        if (document.getPostUpgradeScript() != null) {
+            LOGGER.debug("Execute post upgrade process instance script");
+            executeScript(processInstance, procDefToMigrateTo, document.getPostUpgradeScript(), commandContext);
+        }
+
+        if (document.getPostUpgradeJavaDelegate() != null) {
+            LOGGER.debug("Execute post upgrade process instance script");
+            executeJavaDelegate(processInstance, procDefToMigrateTo, document.getPostUpgradeJavaDelegate(), commandContext);
+        }
+
+        if (document.getPostUpgradeJavaDelegateExpression() != null) {
+            LOGGER.debug("Execute post upgrade process instance script");
+            executeExpression(processInstance, procDefToMigrateTo, document.getPostUpgradeJavaDelegateExpression(), commandContext);
+        }
+
         LOGGER.debug("Process migration ended for process instance with Id:'{}'", processInstance.getId());
     }
+
     @Override
     protected Map<String, List<ExecutionEntity>> resolveActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext) {
         return Collections.emptyMap();
@@ -476,9 +496,9 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 (ExecutionEntityImpl) processInstance));
     }
 
-    protected void executeExpression(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, String preUpgradeExpression,
+    protected void executeExpression(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, String preUpgradeJavaDelegateExpression,
         CommandContext commandContext) {
-        Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(preUpgradeExpression);
+        Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(preUpgradeJavaDelegateExpression);
 
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, (VariableContainer) processInstance, Collections.emptyList());
         if (delegate instanceof ActivityBehavior) {

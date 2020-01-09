@@ -43,7 +43,10 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     protected Map<String, Object> processInstanceVariables;
     protected Script preUpgradeScript;
     protected String preUpgradeJavaDelegate;
-    protected String preUpgradeExpression;
+    protected String preUpgradeJavaDelegateExpression;
+    protected Script postUpgradeScript;
+    protected String postUpgradeJavaDelegate;
+    protected String postUpgradeJavaDelegateExpression;
 
     public static ProcessInstanceMigrationDocument fromJson(String processInstanceMigrationDocumentJson) {
         return ProcessInstanceMigrationDocumentConverter.convertFromJson(processInstanceMigrationDocumentJson);
@@ -65,7 +68,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     public void setPreUpgradeScript(Script script) {
-        if (this.preUpgradeJavaDelegate == null && this.preUpgradeExpression == null) {
+        if (this.preUpgradeJavaDelegate == null && this.preUpgradeJavaDelegateExpression == null) {
             if (script != null) {
                 this.preUpgradeScript = script;
             } else {
@@ -77,7 +80,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     public void setPreUpgradeJavaDelegate(String javaDelegateClassName) {
-        if (this.preUpgradeScript == null && this.preUpgradeExpression == null) {
+        if (this.preUpgradeScript == null && this.preUpgradeJavaDelegateExpression == null) {
             if (StringUtils.isNotEmpty(javaDelegateClassName)) {
                 this.preUpgradeJavaDelegate = javaDelegateClassName;
             } else {
@@ -88,15 +91,51 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         }
     }
 
-    public void setPreUpgradeExpression(String expression) {
+    public void setPreUpgradeJavaDelegateExpression(String expression) {
         if (this.preUpgradeScript == null && this.preUpgradeJavaDelegate == null) {
             if (StringUtils.isNotEmpty(expression)) {
-                this.preUpgradeExpression = expression;
+                this.preUpgradeJavaDelegateExpression = expression;
             } else {
                 throw new IllegalArgumentException("Pre upgrade expression can't be empty or null.");
             }
         } else {
             throw new IllegalArgumentException("Pre upgrade expression can't be set when another pre-upgrade task was already specified.");
+        }
+    }
+
+    public void setPostUpgradeScript(Script script) {
+        if (this.postUpgradeJavaDelegate == null && this.postUpgradeJavaDelegateExpression == null) {
+            if (script != null) {
+                this.postUpgradeScript = script;
+            } else {
+                throw new IllegalArgumentException("Post upgrade script can't be null.");
+            }
+        } else {
+            throw new IllegalArgumentException("Post upgrade script can't be set when another post-upgrade task was already specified.");
+        }
+    }
+
+    public void setPostUpgradeJavaDelegate(String javaDelegateClassName) {
+        if (this.postUpgradeScript == null && this.postUpgradeJavaDelegateExpression == null) {
+            if (StringUtils.isNotEmpty(javaDelegateClassName)) {
+                this.postUpgradeJavaDelegate = javaDelegateClassName;
+            } else {
+                throw new IllegalArgumentException("Post upgrade java delegate can't be empty or null.");
+            }
+        } else {
+            throw new IllegalArgumentException("Post upgrade java delegate can't be set when another post-upgrade task was already specified.");
+        }
+    }
+
+    public void setPostUpgradeJavaDelegateExpression(String expression) {
+        if (this.postUpgradeScript == null && this.postUpgradeJavaDelegate == null) {
+            if (StringUtils.isNotEmpty(expression)) {
+                this.postUpgradeJavaDelegateExpression = expression;
+            } else {
+                throw new IllegalArgumentException("Post upgrade expression can't be empty or null.");
+            }
+        } else {
+            throw new IllegalArgumentException("Post upgrade expression can't be set when another post-upgrade task was already specified.");
         }
     }
 
@@ -131,8 +170,23 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     @Override
-    public String getPreUpgradeExpression() {
-        return preUpgradeExpression;
+    public String getPreUpgradeJavaDelegateExpression() {
+        return preUpgradeJavaDelegateExpression;
+    }
+
+    @Override
+    public Script getPostUpgradeScript() {
+        return postUpgradeScript;
+    }
+
+    @Override
+    public String getPostUpgradeJavaDelegate() {
+        return postUpgradeJavaDelegate;
+    }
+
+    @Override
+    public String getPostUpgradeJavaDelegateExpression() {
+        return postUpgradeJavaDelegateExpression;
     }
 
     public void setActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings) {

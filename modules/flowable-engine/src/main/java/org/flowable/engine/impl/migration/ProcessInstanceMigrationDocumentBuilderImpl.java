@@ -36,8 +36,11 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     protected List<ActivityMigrationMapping> activityMigrationMappings = new ArrayList<>();
     protected Map<String, Object> processInstanceVariables = new HashMap<>();
     protected Script preUpgradeScript;
-    private String preUpgradeJavaDelegate;
-    private String preUpgradeExpression;
+    protected String preUpgradeJavaDelegate;
+    protected String preUpgradeJavaDelegateExpression;
+    protected Script postUpgradeScript;
+    protected String postUpgradeJavaDelegate;
+    protected String postUpgradeJavaDelegateExpression;
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId) {
@@ -71,8 +74,26 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder setPreUpgradeExpression(String expression) {
-        this.preUpgradeExpression = expression;
+    public ProcessInstanceMigrationDocumentBuilder setPreUpgradeJavaDelegateExpression(String expression) {
+        this.preUpgradeJavaDelegateExpression = expression;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPostUpgradeScript(Script script) {
+        this.postUpgradeScript = script;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPostUpgradeJavaDelegate(String preUpgradeJavaDelegate) {
+        this.postUpgradeJavaDelegate = preUpgradeJavaDelegate;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPostUpgradeJavaDelegateExpression(String expression) {
+        this.postUpgradeJavaDelegateExpression = expression;
         return this;
     }
 
@@ -121,8 +142,17 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
         if (preUpgradeJavaDelegate != null) {
             document.setPreUpgradeJavaDelegate(preUpgradeJavaDelegate);
         }
-        if (preUpgradeExpression != null) {
-            document.setPreUpgradeExpression(preUpgradeExpression);
+        if (preUpgradeJavaDelegateExpression != null) {
+            document.setPreUpgradeJavaDelegateExpression(preUpgradeJavaDelegateExpression);
+        }
+        if (postUpgradeScript != null) {
+            document.setPostUpgradeScript(postUpgradeScript);
+        }
+        if (postUpgradeJavaDelegate != null) {
+            document.setPostUpgradeJavaDelegate(postUpgradeJavaDelegate);
+        }
+        if (postUpgradeJavaDelegateExpression != null) {
+            document.setPostUpgradeJavaDelegateExpression(postUpgradeJavaDelegateExpression);
         }
         document.setActivityMigrationMappings(activityMigrationMappings);
         document.setProcessInstanceVariables(processInstanceVariables);
