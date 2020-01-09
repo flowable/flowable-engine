@@ -28,9 +28,6 @@ public class EvaluateCriteriaOperation extends AbstractEvaluationCriteriaOperati
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EvaluateCriteriaOperation.class);
 
-    // only the last evaluation planned on the agenda operation will have this true
-    protected boolean evaluateStagesAndCaseInstanceCompletion;
-
     public EvaluateCriteriaOperation(CommandContext commandContext, String caseInstanceEntityId) {
         super(commandContext, caseInstanceEntityId, null, null);
     }
@@ -73,14 +70,6 @@ public class EvaluateCriteriaOperation extends AbstractEvaluationCriteriaOperati
             }
 
         }
-    }
-
-    public boolean isEvaluateCaseInstanceCompleted() {
-        return evaluateCaseInstanceCompleted;
-    }
-
-    public void setEvaluateStagesAndCaseInstanceCompletion(boolean evaluateStagesAndCaseInstanceCompletion) {
-        this.evaluateStagesAndCaseInstanceCompletion = evaluateStagesAndCaseInstanceCompletion;
     }
 
     @Override

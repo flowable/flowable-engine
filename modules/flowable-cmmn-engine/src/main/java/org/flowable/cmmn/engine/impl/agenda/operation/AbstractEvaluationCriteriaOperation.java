@@ -25,6 +25,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.converter.util.CriterionUtil;
 import org.flowable.cmmn.converter.util.PlanItemUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.PlanItemEvaluationResult;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
@@ -38,6 +39,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
@@ -69,6 +71,9 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     private static final Logger LOGGER = LoggerFactory.getLogger(EvaluateCriteriaOperation.class);
 
     protected PlanItemLifeCycleEvent planItemLifeCycleEvent;
+
+    /** only the last evaluation planned on the agenda operation will have this true. */
+    protected boolean evaluateStagesAndCaseInstanceCompletion;
 
     public AbstractEvaluationCriteriaOperation(CommandContext commandContext, String caseInstanceId, CaseInstanceEntity caseInstanceEntity, PlanItemLifeCycleEvent planItemLifeCycleEvent) {
         super(commandContext, caseInstanceId, caseInstanceEntity);
@@ -414,14 +419,17 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
     protected boolean isStageCompletable(PlanItemInstanceEntity stagePlanItemInstanceEntity, Stage stage) {
         boolean autoComplete = ExpressionUtil.evaluateAutoComplete(commandContext, stagePlanItemInstanceEntity, stage);
-        CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
-            .shouldPlanItemContainerComplete(commandContext, stagePlanItemInstanceEntity, autoComplete);
+        if (!autoComplete || evaluateStagesAndCaseInstanceCompletion) { // auto completion should only be evaluated when children are stable
+            CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
+                .shouldPlanItemContainerComplete(commandContext, stagePlanItemInstanceEntity, autoComplete);
 
-        if (completionEvaluationResult.isCompletable()) {
-            stagePlanItemInstanceEntity.setCompletable(true);
+            if (completionEvaluationResult.isCompletable()) {
+                stagePlanItemInstanceEntity.setCompletable(true);
+            }
+
+            return completionEvaluationResult.shouldBeCompleted();
         }
-
-        return completionEvaluationResult.shouldBeCompleted();
+        return false;
     }
 
     protected boolean evaluatePlanModelComplete() {
@@ -506,6 +514,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             // There can be zero or more on parts and zero or one if part.
             // All defined parts need to be satisfied for the sentry to trigger.
 
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one on part and no if part: no need to fetch the previously satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
@@ -515,12 +524,20 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                             LOGGER.debug("{}: single onPart matches life cycle event: [{}]", criterion, planItemLifeCycleEvent);
                         }
 
+                        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                            CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), entityWithSentryPartInstances);
+                        }
+
                         return criterion;
                     }
                 }
 
             } else if (sentry.getOnParts().isEmpty() && sentry.getSentryIfPart() != null) { // Only an if part: simply evaluate the if part
                 if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
+
+                    if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                    }
 
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("{}: single ifPart has evaluated to true", criterion);
@@ -541,13 +558,15 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 for (SentryPartInstanceEntity sentryPartInstanceEntity : entityWithSentryPartInstances.getSatisfiedSentryPartInstances()) {
                     if (sentryPartInstanceEntity.getOnPartId() != null) {
                         satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
+
                     } else if (sentryPartInstanceEntity.getIfPartId() != null
                         && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
+
                         sentryIfPartSatisfied = true;
                     }
                 }
 
-                // Verify if the onParts which are not yet satisfied, become satisifed due to the new event
+                // Verify if the onParts which are not yet satisfied, become satisfied due to the new event
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
                     if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
                         if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
@@ -572,6 +591,10 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 // In the onEvent triggerMode all onParts need to be satisfied before the if is evaluated
                 if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied
                     && (isDefaultTriggerMode || (sentry.isOnEventTriggerMode() && allOnPartsSatisfied) )) {
+
+                    if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                    }
 
                     if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
 
@@ -694,15 +717,23 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     }
 
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
-        Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
-        Object result = conditionExpression.getValue(variableContainer);
+        try {
+            Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
+            Object result = conditionExpression.getValue(variableContainer);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Evaluation of sentry if condition {} for {} results in '{}'", sentry.getSentryIfPart().getCondition(), entityWithSentryPartInstances, result);
-        }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Evaluation of sentry if condition {} for {} results in '{}'", sentry.getSentryIfPart().getCondition(), entityWithSentryPartInstances, result);
+            }
 
-        if (result instanceof Boolean) {
-            return (Boolean) result;
+            if (result instanceof Boolean) {
+                return (Boolean) result;
+            }
+        } catch (RuntimeException e) {
+            if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addEvaluateSentryFailedLoggingData(sentry.getSentryIfPart(), e, entityWithSentryPartInstances);
+            }
+
+            throw e;
         }
         return false;
     }
@@ -773,5 +804,14 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
     public void setPlanItemLifeCycleEvent(PlanItemLifeCycleEvent planItemLifeCycleEvent) {
         this.planItemLifeCycleEvent = planItemLifeCycleEvent;
+    }
+
+
+    public boolean isEvaluateCaseInstanceCompleted() {
+        return evaluateStagesAndCaseInstanceCompletion;
+    }
+
+    public void setEvaluateStagesAndCaseInstanceCompletion(boolean evaluateStagesAndCaseInstanceCompletion) {
+        this.evaluateStagesAndCaseInstanceCompletion = evaluateStagesAndCaseInstanceCompletion;
     }
 }
