@@ -41,12 +41,12 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
             .changeState();
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         
         cmmnTaskService.complete(task.getId());
         
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
@@ -70,11 +70,11 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
         assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task1").singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         cmmnTaskService.complete(task.getId());
         
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
@@ -105,11 +105,11 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
         assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         cmmnTaskService.complete(task.getId());
         
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
@@ -134,11 +134,11 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
         assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         cmmnTaskService.complete(task.getId());
         
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 3", task.getName());
+        assertEquals("Task Three", task.getName());
         
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
@@ -164,7 +164,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
             .changeState();
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         
         assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count());
         PlanItemInstance dbPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult();
@@ -174,7 +174,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
         
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
@@ -198,7 +198,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
             .changeState();
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         
         assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count());
         PlanItemInstance dbPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult();
@@ -207,7 +207,7 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
         
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
@@ -246,12 +246,12 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.evaluateCriteria(caseInstance.getId());
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         
         cmmnTaskService.complete(task.getId());
         
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);

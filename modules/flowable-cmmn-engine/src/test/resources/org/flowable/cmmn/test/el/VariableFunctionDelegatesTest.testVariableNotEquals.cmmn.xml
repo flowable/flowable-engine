@@ -11,7 +11,7 @@
           <condition><![CDATA[${var:ne(myVar, 123)}]]></condition>
         </ifPart>
       </sentry>
-      <humanTask id="sid-3D4B7A72-8A16-40ED-A41D-A57D36457FE8" name="The Task"></humanTask>
+      <humanTask id="sid-3D4B7A72-8A16-40ED-A41D-A57D36457FE8" name="Unguarded Task"></humanTask>
       <humanTask id="sid-B8631F0D-DA56-42D3-AFA2-46E147559E2A" name="Guarded Task"></humanTask>
     </casePlanModel>
   </case>
