@@ -65,9 +65,8 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
             .create();
 
         // after adding the plan item to the stage, add it to the agenda for activation processing
-        //CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity, null);
         CommandContextUtil.getAgenda(commandContext).planEvaluateToActivatePlanItemInstanceOperation(planItemInstanceEntity);
-        //CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceBuilder.getParentPlanItemInstance().getCaseInstanceId());
+
         return planItemInstanceEntity;
     }
 }
