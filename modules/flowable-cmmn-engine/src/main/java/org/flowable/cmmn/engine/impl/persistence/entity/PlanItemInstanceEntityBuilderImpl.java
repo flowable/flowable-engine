@@ -22,10 +22,11 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
  *
  * @author Micha Kiener
  */
-public class PlanItemInstanceBuilderImpl  implements PlanItemInstanceBuilder {
+public class PlanItemInstanceEntityBuilderImpl implements PlanItemInstanceEntityBuilder {
 
     protected final PlanItemInstanceEntityManagerImpl planItemInstanceEntityManager;
     protected PlanItem planItem;
+    protected String name;
     protected String caseDefinitionId;
     protected String caseInstanceId;
     protected String stagePlanItemInstanceId;
@@ -34,47 +35,52 @@ public class PlanItemInstanceBuilderImpl  implements PlanItemInstanceBuilder {
     protected boolean addToParent;
     protected boolean silentNameExpressionEvaluation;
 
-    public PlanItemInstanceBuilderImpl(PlanItemInstanceEntityManagerImpl planItemInstanceEntityManager) {
+    public PlanItemInstanceEntityBuilderImpl(PlanItemInstanceEntityManagerImpl planItemInstanceEntityManager) {
         this.planItemInstanceEntityManager = planItemInstanceEntityManager;
     }
 
     @Override
-    public PlanItemInstanceBuilder planItem(PlanItem planItem) {
+    public PlanItemInstanceEntityBuilder planItem(PlanItem planItem) {
         this.planItem = planItem;
         return this;
     }
     @Override
-    public PlanItemInstanceBuilder caseDefinitionId(String caseDefinitionId) {
+    public PlanItemInstanceEntityBuilder name(String name) {
+        this.name = name;
+        return this;
+    }
+    @Override
+    public PlanItemInstanceEntityBuilder caseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
         return this;
     }
     @Override
-    public PlanItemInstanceBuilder caseInstanceId(String caseInstanceId) {
+    public PlanItemInstanceEntityBuilder caseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
         return this;
     }
     @Override
-    public PlanItemInstanceBuilder stagePlanItemInstanceId(String stagePlanItemInstanceId) {
+    public PlanItemInstanceEntityBuilder stagePlanItemInstanceId(String stagePlanItemInstanceId) {
         this.stagePlanItemInstanceId = stagePlanItemInstanceId;
         return this;
     }
     @Override
-    public PlanItemInstanceBuilder tenantId(String tenantId) {
+    public PlanItemInstanceEntityBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
         return this;
     }
     @Override
-    public PlanItemInstanceBuilder localVariables(Map<String, Object> localVariables) {
+    public PlanItemInstanceEntityBuilder localVariables(Map<String, Object> localVariables) {
         this.localVariables = localVariables;
         return this;
     }
     @Override
-    public PlanItemInstanceBuilder addToParent(boolean addToParent) {
+    public PlanItemInstanceEntityBuilder addToParent(boolean addToParent) {
         this.addToParent = addToParent;
         return this;
     }
     @Override
-    public PlanItemInstanceBuilder silentNameExpressionEvaluation(boolean silentNameExpressionEvaluation) {
+    public PlanItemInstanceEntityBuilder silentNameExpressionEvaluation(boolean silentNameExpressionEvaluation) {
         this.silentNameExpressionEvaluation = silentNameExpressionEvaluation;
         return this;
     }
@@ -86,6 +92,9 @@ public class PlanItemInstanceBuilderImpl  implements PlanItemInstanceBuilder {
 
     public PlanItem getPlanItem() {
         return planItem;
+    }
+    public String getName() {
+        return name;
     }
     public String getCaseDefinitionId() {
         return caseDefinitionId;

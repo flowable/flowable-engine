@@ -37,6 +37,7 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
+import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.runner.RunWith;
 
@@ -134,6 +135,16 @@ public abstract class AbstractFlowableCmmnTestCase {
         assertTrue("Found no plan items for case instance", cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count() > 0);
         assertTrue("No runtime case instance found", cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count() > 0);
         assertNull("Historical case instance is already marked as ended", cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getEndTime());
+    }
+
+    protected void assertSingleTaskExists(List<Task> tasks, String name) {
+        List<String> taskIds = tasks.stream()
+            .filter(task -> Objects.equals(name, task.getName()))
+            .map(Task::getId)
+            .collect(Collectors.toList());
+
+        assertNotNull(taskIds);
+        assertEquals(1, taskIds.size());
     }
 
     protected void assertPlanItemInstanceState(CaseInstance caseInstance, String name, String ... states) {

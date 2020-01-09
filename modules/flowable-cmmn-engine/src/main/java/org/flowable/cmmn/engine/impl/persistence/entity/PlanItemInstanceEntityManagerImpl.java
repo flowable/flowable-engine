@@ -61,12 +61,12 @@ public class PlanItemInstanceEntityManagerImpl
     }
 
     @Override
-    public PlanItemInstanceBuilder createPlanItemInstanceBuilder() {
-        return new PlanItemInstanceBuilderImpl(this);
+    public PlanItemInstanceEntityBuilder createPlanItemInstanceEntityBuilder() {
+        return new PlanItemInstanceEntityBuilderImpl(this);
     }
 
-    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItemInstanceBuilderImpl builder) {
-        
+    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItemInstanceEntityBuilderImpl builder) {
+
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
 
@@ -88,7 +88,7 @@ public class PlanItemInstanceEntityManagerImpl
         }
         planItemInstanceEntity.setStageInstanceId(builder.getStagePlanItemInstanceId());
         planItemInstanceEntity.setTenantId(builder.getTenantId());
-       
+
         insert(planItemInstanceEntity);
 
 
@@ -97,24 +97,29 @@ public class PlanItemInstanceEntityManagerImpl
             planItemInstanceEntity.setVariablesLocal(builder.getLocalVariables());
         }
 
-        // the name might have an expression being based on local variables, so we can only set the name after insertion
-        if (builder.getPlanItem().getName() != null) {
-            Expression nameExpression = expressionManager.createExpression(builder.getPlanItem().getName());
-            String name;
-            if (builder.isSilentNameExpressionEvaluation()) {
-                try {
+        // check for an explicitly set name for the plan item instance
+        if (builder.getName() != null) {
+            planItemInstanceEntity.setName(builder.getName());
+        } else {
+            // the name might have an expression being based on local variables, so we can only set the name after insertion
+            if (builder.getPlanItem().getName() != null) {
+                Expression nameExpression = expressionManager.createExpression(builder.getPlanItem().getName());
+                String name;
+                if (builder.isSilentNameExpressionEvaluation()) {
+                    try {
+                        name = nameExpression.getValue(planItemInstanceEntity).toString();
+                    } catch (Exception e) {
+                        // we silently catch this exception as it is expected to a possible failure due to the state of the name evaluation
+                        // we use the expression itself as a fallback in this case
+                        name = builder.getPlanItem().getName();
+                    }
+                } else {
                     name = nameExpression.getValue(planItemInstanceEntity).toString();
-                } catch (Exception e) {
-                    // we silently catch this exception as it is expected to a possible failure due to the state of the name evaluation
-                    // we use the expression itself as a fallback in this case
-                    name = builder.getPlanItem().getName();
                 }
-            } else {
-                name = nameExpression.getValue(planItemInstanceEntity).toString();
+                planItemInstanceEntity.setName(name);
             }
-            planItemInstanceEntity.setName(name);
         }
-        
+
         if (builder.addToParent) {
             addPlanItemInstanceToParent(commandContext, planItemInstanceEntity);
         }

@@ -99,7 +99,7 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
             PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
             
             // Create new plan item instance based on the data of the original one
-            PlanItemInstanceEntity newPlanItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceBuilder()
+            PlanItemInstanceEntity newPlanItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceEntityBuilder()
                 .planItem(planItemInstanceEntity.getPlanItem())
                 .caseDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
                 .caseInstanceId(planItemInstanceEntity.getCaseInstanceId())

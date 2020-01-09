@@ -37,7 +37,9 @@ public interface CmmnEngineAgenda extends Agenda {
     void planDismissPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
-    
+
+    void planEvaluateToActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
     void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
     
     void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Map<String, Object> variables);

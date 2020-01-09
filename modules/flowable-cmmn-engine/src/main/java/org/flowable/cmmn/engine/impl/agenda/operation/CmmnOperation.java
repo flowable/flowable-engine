@@ -89,7 +89,7 @@ public abstract class CmmnOperation implements Runnable {
                 }
 
                 PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                    .createPlanItemInstanceBuilder()
+                    .createPlanItemInstanceEntityBuilder()
                     .planItem(planItem)
                     .caseDefinitionId(caseDefinitionId)
                     .caseInstanceId(caseInstanceId)
@@ -146,7 +146,7 @@ public abstract class CmmnOperation implements Runnable {
         }
 
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-            .createPlanItemInstanceBuilder()
+            .createPlanItemInstanceEntityBuilder()
             .planItem(planItemInstanceEntityToCopy.getPlanItem())
             .caseDefinitionId(planItemInstanceEntityToCopy.getCaseDefinitionId())
             .caseInstanceId(planItemInstanceEntityToCopy.getCaseInstanceId())
