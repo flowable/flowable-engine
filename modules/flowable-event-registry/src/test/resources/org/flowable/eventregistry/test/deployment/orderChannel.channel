@@ -5,7 +5,7 @@
     "description": "My order channel description",
     "channelType": "inbound",
     "type": "jms",
-    "destination": "ordrQueue",
+    "destination": "orderQueue",
     "deserializerType": "json",
     "channelEventKeyDetection": {
         "jsonField": "type"
