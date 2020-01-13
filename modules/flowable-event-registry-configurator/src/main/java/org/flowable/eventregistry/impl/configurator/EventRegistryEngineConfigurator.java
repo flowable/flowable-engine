@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.eventregistry.api.management.EventRegistryHouseKeepingManager;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
@@ -33,6 +34,7 @@ import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
  */
 public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator {
 
+    protected EventRegistryEngine eventRegistryEngine;
     protected EventRegistryEngineConfiguration eventEngineConfiguration;
 
     @Override
@@ -59,9 +61,8 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
         }
 
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
-
-        initEventRegistryEngine();
-
+        initEventRegistryHouseKeepingManager(engineConfiguration);
+        this.eventRegistryEngine = initEventRegistryEngine();
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
     }
 
@@ -73,6 +74,14 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
     @Override
     protected List<Class<? extends Entity>> getEntityDeletionOrder() {
         return EntityDependencyOrder.DELETE_ORDER;
+    }
+
+    protected void initEventRegistryHouseKeepingManager(AbstractEngineConfiguration engineConfiguration) {
+        EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager = engineConfiguration.getEventRegistryHouseKeepingManager();
+        if (eventRegistryHouseKeepingManager != null) {
+            eventEngineConfiguration.setEventRegistryHouseKeepingManager(eventRegistryHouseKeepingManager);
+            eventRegistryHouseKeepingManager.setEventRegistryConfiguration(eventEngineConfiguration);
+        }
     }
     
     protected synchronized EventRegistryEngine initEventRegistryEngine() {
@@ -92,4 +101,11 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
         return this;
     }
 
+    public EventRegistryEngine getEventRegistryEngine() {
+        return eventRegistryEngine;
+    }
+
+    public void setEventRegistryEngine(EventRegistryEngine eventRegistryEngine) {
+        this.eventRegistryEngine = eventRegistryEngine;
+    }
 }

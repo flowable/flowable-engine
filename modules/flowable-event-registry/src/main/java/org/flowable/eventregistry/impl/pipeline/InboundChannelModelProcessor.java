@@ -97,7 +97,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                         eventTenantDetector = new JsonPathBasedInboundEventTenantDetector(channelEventTenantIdDetection.getJsonPathExpression());
                     } else {
                         throw new FlowableException(
-                            "The channel xml tenant detection value was not found for the channel model with key " + inboundChannelModel.getKey()
+                            "The channel json tenant detection value was not found for the channel model with key " + inboundChannelModel.getKey()
                                 + ". One of fixedValue, jsonPathExpression should be set.");
                     }
                 }

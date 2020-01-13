@@ -38,4 +38,10 @@ public class EventManagementServiceImpl extends CommonEngineServiceImpl<EventReg
     public Collection<String> getTableNames() {
         return commandExecutor.execute(new GetTableNamesCmd());
     }
+
+    @Override
+    public void executeHouseKeeping() {
+        configuration.getEventRegistryHouseKeepingManager().executeHouseKeeping();
+    }
+
 }

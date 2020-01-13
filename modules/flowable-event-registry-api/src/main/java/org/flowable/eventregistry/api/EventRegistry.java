@@ -46,6 +46,11 @@ public interface EventRegistry {
     Map<String, InboundChannelModel> getInboundChannelModels();
 
     /**
+     * Returns all {@link OutboundChannelModel} instances.
+     */
+    Map<String, OutboundChannelModel> getOutboundChannelModels();
+
+    /**
      * Programmatically build and register a new {@link OutboundChannelModel}.
      */
     OutboundChannelModelBuilder newOutboundChannelModel();
@@ -58,7 +63,7 @@ public interface EventRegistry {
     /**
      * Low-level (vs the {@link InboundChannelModelBuilder}) way of registering a new {@link ChannelModel}.
      */
-    void registerChannelModel(ChannelModel channelModel);
+    void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition);
 
     /**
      * Removes a previously registered {@link ChannelModel}.

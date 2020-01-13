@@ -14,7 +14,9 @@ package org.flowable.eventregistry.api;
 
 public interface EventRegistryConfigurationApi {
 
-    public EventRepositoryService getEventRepositoryService();
+    EventRepositoryService getEventRepositoryService();
     
-    public EventManagementService getEventManagementService();
+    EventManagementService getEventManagementService();
+
+    EventRegistry getEventRegistry();
 }

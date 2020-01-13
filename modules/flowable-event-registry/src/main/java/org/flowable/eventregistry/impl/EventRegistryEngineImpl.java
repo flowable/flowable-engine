@@ -19,6 +19,7 @@ import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +64,12 @@ public class EventRegistryEngineImpl implements EventRegistryEngine {
     
     @Override
     public void handleDeployedChannelDefinitions() {
+        // Fetching and deploying all existing channel definitions at bootup
         List<ChannelDefinition> channelDefinitions = repositoryService.createChannelDefinitionQuery().latestVersion().list();
         for (ChannelDefinition channelDefinition : channelDefinitions) {
-            // trigger channel model deployment
-            repositoryService.getChannelModelById(channelDefinition.getId());
+            // Getting the channel model will trigger a deployment and set up the channel and associated adapters
+            ChannelModel channelModel = repositoryService.getChannelModelById(channelDefinition.getId());
+            LOGGER.info("Booted up channel {} ", channelModel.getKey());
         }
     }
 

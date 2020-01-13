@@ -32,6 +32,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.eventregistry.api.management.EventRegistryHouseKeepingManager;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,13 @@ public class ProcessEngineImpl implements ProcessEngine {
 
         if (processEngineConfiguration.getSchemaManagementCmd() != null) {
             commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), processEngineConfiguration.getSchemaManagementCmd());
+        }
+
+        // Should be moved to eventRegistry engine, but currently not possible due to that engine not depending on the job service
+        // (and being initialized - including schema - before this engine) it needs to be here, after the job tables have been created.
+        EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager = processEngineConfiguration.getEventRegistryHouseKeepingManager();
+        if (eventRegistryHouseKeepingManager != null && processEngineConfiguration.isEnableAutomaticEventRegistryHouseKeeping()) {
+            eventRegistryHouseKeepingManager.initializeHouseKeepingJobs();
         }
 
         if (name == null) {

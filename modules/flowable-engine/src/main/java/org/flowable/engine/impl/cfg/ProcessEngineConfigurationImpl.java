@@ -208,6 +208,8 @@ import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.eventregistry.BpmnEventRegistryEventConsumer;
+import org.flowable.engine.impl.eventregistry.EventRegistryHouseKeepingJobHandler;
+import org.flowable.engine.impl.eventregistry.EventRegistryHouseKeepingManagerImpl;
 import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
 import org.flowable.engine.impl.form.DoubleFormType;
@@ -1059,6 +1061,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initBatchServiceConfiguration();
         initAsyncExecutor();
         initAsyncHistoryExecutor();
+        initEventRegistryHouseKeepingManager();
+
         configuratorsAfterInit();
         afterInitTaskServiceConfiguration();
         afterInitEventRegistryEventBusConsumer();
@@ -1725,6 +1729,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initHistoryCleaningManager() {
         if (historyCleaningManager == null) {
             historyCleaningManager = new DefaultHistoryCleaningManager(this);
+        }
+    }
+
+    public void initEventRegistryHouseKeepingManager() {
+        if (eventRegistryHouseKeepingManager == null && !disableEventRegistry) {
+            eventRegistryHouseKeepingManager = new EventRegistryHouseKeepingManagerImpl(this);
+
+            jobServiceConfiguration.addJobHandler(EventRegistryHouseKeepingJobHandler.TYPE, new EventRegistryHouseKeepingJobHandler());
         }
     }
 

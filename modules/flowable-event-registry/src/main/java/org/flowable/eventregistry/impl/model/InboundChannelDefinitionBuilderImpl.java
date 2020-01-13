@@ -118,7 +118,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         InboundEventProcessingPipeline inboundEventProcessingPipeline = inboundEventProcessingPipelineBuilder.build();
         channelModel.setInboundEventProcessingPipeline(inboundEventProcessingPipeline);
 
-        eventRegistry.registerChannelModel(channelModel);
+        eventRegistry.registerChannelModel(channelModel, null);
 
         return channelModel;
     }

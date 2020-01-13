@@ -95,6 +95,7 @@ import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventregistry.api.management.EventRegistryHouseKeepingManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,7 +170,6 @@ public abstract class AbstractEngineConfiguration {
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
     protected Map<String, AbstractServiceConfiguration> serviceConfigurations = new HashMap<>();
-    protected Map<String, EventRegistryEventConsumer> eventRegistryEventConsumers = new HashMap<>();
 
     protected ClassLoader classLoader;
     /**
@@ -178,6 +178,12 @@ public abstract class AbstractEngineConfiguration {
     protected boolean useClassForNameClassLoading = true;
 
     protected List<EngineLifecycleListener> engineLifecycleListeners;
+
+    // Event Registry //////////////////////////////////////////////////
+    protected Map<String, EventRegistryEventConsumer> eventRegistryEventConsumers = new HashMap<>();
+    protected boolean enableAutomaticEventRegistryHouseKeeping = false;
+    protected EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager;
+    protected String eventRegistryHouseKeepingTimeCycleConfig = "0 * * * * ?";
 
     // MYBATIS SQL SESSION FACTORY /////////////////////////////////////
 
@@ -1375,6 +1381,33 @@ public abstract class AbstractEngineConfiguration {
         eventRegistryEventConsumers.put(key, eventRegistryEventConsumer);
     }
 
+    public EventRegistryHouseKeepingManager getEventRegistryHouseKeepingManager() {
+        return eventRegistryHouseKeepingManager;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryHouseKeepingManager(EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager) {
+        this.eventRegistryHouseKeepingManager = eventRegistryHouseKeepingManager;
+        return this;
+    }
+
+    public boolean isEnableAutomaticEventRegistryHouseKeeping() {
+        return enableAutomaticEventRegistryHouseKeeping;
+    }
+
+    public AbstractEngineConfiguration setEnableAutomaticEventRegistryHouseKeeping(boolean enableAutomaticEventRegistryHouseKeeping) {
+        this.enableAutomaticEventRegistryHouseKeeping = enableAutomaticEventRegistryHouseKeeping;
+        return this;
+    }
+
+    public String getEventRegistryHouseKeepingTimeCycleConfig() {
+        return eventRegistryHouseKeepingTimeCycleConfig;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryHouseKeepingTimeCycleConfig(String eventRegistryHouseKeepingTimeCycleConfig) {
+        this.eventRegistryHouseKeepingTimeCycleConfig = eventRegistryHouseKeepingTimeCycleConfig;
+        return this;
+    }
+
     public void setDefaultCommandInterceptors(Collection<? extends CommandInterceptor> defaultCommandInterceptors) {
         this.defaultCommandInterceptors = defaultCommandInterceptors;
     }
@@ -1869,6 +1902,14 @@ public abstract class AbstractEngineConfiguration {
         }
         configurators.add(configurator);
         return this;
+    }
+
+    /**
+     * @return All {@link EngineConfigurator} instances. Will only contain values after init of the engine.
+     * Use the {@link #getConfigurators()} or {@link #addConfigurator(EngineConfigurator)} methods otherwise.
+     */
+    public List<EngineConfigurator> getAllConfigurators() {
+        return allConfigurators;
     }
 
     public AbstractEngineConfiguration setConfigurators(List<EngineConfigurator> configurators) {

@@ -34,6 +34,7 @@ import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
+import org.flowable.eventregistry.api.management.EventRegistryHouseKeepingManager;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneInMemEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBuild;
@@ -139,6 +140,11 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
 
+    // Housekeeping
+    protected EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager;
+
+    protected boolean handleEventRegistryEngineDeploymentsAfterEngineCreate = true;
+
     public static EventRegistryEngineConfiguration createEventRegistryEngineConfigurationFromResourceDefault() {
         return createEventRegistryEngineConfigurationFromResource("flowable.eventregistry.cfg.xml", "eventRegistryEngineConfiguration");
     }
@@ -173,8 +179,10 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     public EventRegistryEngine buildEventRegistryEngine() {
         init();
         EventRegistryEngineImpl eventRegistryEngine = new EventRegistryEngineImpl(this);
-        
-        eventRegistryEngine.handleDeployedChannelDefinitions();
+
+        if (handleEventRegistryEngineDeploymentsAfterEngineCreate) {
+            eventRegistryEngine.handleDeployedChannelDefinitions();
+        }
         
         return eventRegistryEngine;
     }
@@ -732,5 +740,23 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.channelJsonConverter = channelJsonConverter;
         return this;
     }
-    
+
+    public EventRegistryHouseKeepingManager getEventRegistryHouseKeepingManager() {
+        return eventRegistryHouseKeepingManager;
+    }
+
+    public EventRegistryEngineConfiguration setEventRegistryHouseKeepingManager(EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager) {
+        this.eventRegistryHouseKeepingManager = eventRegistryHouseKeepingManager;
+        return this;
+    }
+
+    public boolean isHandleEventRegistryEngineDeploymentsAfterEngineCreate() {
+        return handleEventRegistryEngineDeploymentsAfterEngineCreate;
+    }
+
+    public EventRegistryEngineConfiguration setHandleEventRegistryEngineDeploymentsAfterEngineCreate(boolean handleEventRegistryEngineDeploymentsAfterEngineCreate) {
+        this.handleEventRegistryEngineDeploymentsAfterEngineCreate = handleEventRegistryEngineDeploymentsAfterEngineCreate;
+        return this;
+    }
+
 }

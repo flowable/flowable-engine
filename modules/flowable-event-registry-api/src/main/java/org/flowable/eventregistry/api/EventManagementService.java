@@ -27,4 +27,9 @@ public interface EventManagementService {
      */
     Collection<String> getTableNames();
 
+    /**
+     * Programmatically execute the house keeping functionality.
+     */
+    void executeHouseKeeping();
+
 }

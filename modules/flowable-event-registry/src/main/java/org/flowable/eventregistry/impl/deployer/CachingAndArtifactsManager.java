@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.impl.deployer;
 
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDefinitionCacheEntry;
@@ -57,14 +58,14 @@ public class CachingAndArtifactsManager {
             ChannelDefinitionCacheEntry cacheEntry = new ChannelDefinitionCacheEntry(channelDefinition, channelJsonConverter.convertToJson(channelModel));
             channelDefinitionCache.add(channelDefinition.getId(), cacheEntry);
             
-            registerChannelModel(channelModel, eventRegistryEngineConfiguration);
+            registerChannelModel(channelModel, channelDefinition, eventRegistryEngineConfiguration);
 
             // Add to deployment for further usage
             deployment.addDeployedArtifact(channelDefinition);
         }
     }
     
-    protected void registerChannelModel(ChannelModel channelModel, EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
-        eventRegistryEngineConfiguration.getEventRegistry().registerChannelModel(channelModel);
+    protected void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition, EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
+        eventRegistryEngineConfiguration.getEventRegistry().registerChannelModel(channelModel, channelDefinition);
     }
 }

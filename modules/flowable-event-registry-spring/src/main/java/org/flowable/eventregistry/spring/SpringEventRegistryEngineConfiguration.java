@@ -59,6 +59,7 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
 
     public SpringEventRegistryEngineConfiguration() {
         this.transactionsExternallyManaged = true;
+        this.handleEventRegistryEngineDeploymentsAfterEngineCreate = false;
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
