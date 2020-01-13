@@ -2518,8 +2518,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
-
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+            assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
+        }
     }
 
     @Test
@@ -2540,7 +2542,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+            assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
+        }
     }
 
     @Test
@@ -2568,8 +2573,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "json", "json");
-
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+            assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "json", "json");
+        }
     }
 
     @Test
@@ -2603,8 +2610,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
-
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+            assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
+        }
     }
 
     @Test
@@ -2625,7 +2634,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+            assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "json", "json");
+        }
     }
 
     @Test
@@ -2653,7 +2665,10 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             .migrate(processInstanceToMigrate.getId());
 
         assertThatProcessVariableConverted(processInstanceToMigrate, execution);
-        assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "json", "json");
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+            assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "json", "json");
+        }
 
     }
 
