@@ -3,6 +3,14 @@
   "toProcessDefinitionKey": "MyProcessKey",
   "toProcessDefinitionVersion": 9,
   "toProcessDefinitionTenantId": "admin",
+  "preUpgradeScript": {
+    "language": "groovy",
+    "script": "1+1"
+  },
+  "postUpgradeScript": {
+    "language": "groovy",
+    "script": "2+2"
+  },
   "activityMappings": [
     {
       "fromActivityId": "originalActivity1",

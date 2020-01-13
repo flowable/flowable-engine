@@ -1,0 +1,60 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_ad55494e-316f-11ea-b048-da8e6afe55af" name="ForceDMN11 Collect SUM" namespace="http://www.flowable.org/dmn">
+  <decision id="ForceDMN11_Collect_SUM_1" name="ForceDMN11 Collect SUM" xmlns:flowable="http://flowable.org/dmn" flowable:forceDMN11="true">
+    <decisionTable id="decisionTable_ad55494e-316f-11ea-b048-da8e6afe55af" hitPolicy="COLLECT" aggregation="SUM">
+      <input>
+        <inputExpression id="inputExpression_1" typeRef="number">
+          <text>input1</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" name="output1" typeRef="number"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[< 10]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA[10]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[< 20]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA[20]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[< 30]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_3">
+          <text><![CDATA[30]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_4">
+          <text><![CDATA[< 40]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_4">
+          <text><![CDATA[40]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_5">
+          <text><![CDATA[< 50]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_5">
+          <text><![CDATA[50]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_6">
+          <text><![CDATA[< 60]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_6">
+          <text><![CDATA[50]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

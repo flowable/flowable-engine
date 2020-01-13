@@ -13,8 +13,10 @@
 package org.flowable.editor.dmn.converter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -71,7 +73,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_18 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_input.json";
     private static final String JSON_RESOURCE_19 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_compare.json";
     private static final String JSON_RESOURCE_20 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression.json";
-
+    private static final String JSON_RESOURCE_21 = "org/flowable/editor/dmn/converter/decisiontable_forceDMN11.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -595,6 +597,24 @@ public class DmnJsonConverterTest {
         assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get("inputExpression_1_expression").asText());
         assertEquals("IS IN", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
         assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get("inputExpression_1_expression").asText());
+    }
+
+    @Test
+    public void testConvertJsonToDMNForceDMN11Enabled() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_21);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        Decision decision = dmnDefinition.getDecisions().get(0);
+
+        assertTrue(decision.isForceDMN11());
+    }
+
+    @Test
+    public void testConvertJsonToDMNForceDMN11Disabled() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_1);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        Decision decision = dmnDefinition.getDecisions().get(0);
+
+        assertFalse(decision.isForceDMN11());
     }
 
     /* Helper methods */
