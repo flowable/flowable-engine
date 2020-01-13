@@ -246,6 +246,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     model.addDecision(decision);
                     decision.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
                     decision.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+
+                    if (Boolean.parseBoolean(xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORCE_DMN_11))) {
+                        decision.setForceDMN11(true);
+                    }
+
                     parentElement = decision;
                 } else if (ELEMENT_DECISION_TABLE.equals(xtr.getLocalName())) {
                     currentDecisionTable = new DecisionTable();
@@ -342,6 +347,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 xtw.writeAttribute(ATTRIBUTE_ID, decision.getId());
                 if (StringUtils.isNotEmpty(decision.getName())) {
                     xtw.writeAttribute(ATTRIBUTE_NAME, decision.getName());
+                }
+
+                if (decision.isForceDMN11()) {
+                    xtw.writeNamespace(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE);
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORCE_DMN_11, "true");
                 }
 
                 DmnXMLUtil.writeElementDescription(decision, xtw);

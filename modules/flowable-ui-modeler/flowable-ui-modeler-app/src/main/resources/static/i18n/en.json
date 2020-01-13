@@ -2212,7 +2212,8 @@
             "USE-AS-NEW-VERSION": "Use as new version",
             "USE-AS-NEW-DESCRIPTION": "Are you sure you want to use version {{version}} to create a new version of \"{{name}}\"?",
             "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "Could not fully restore the app model to the chosen version: some referenced models are missing due to being deleted in the past. Please update the app model accordingly. Missing models:",
-            "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}"
+            "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}",
+            "FORCE-DMN-11": "Force DMN 1.1"
         },
         "ALERT": {
             "FAVORITE-CONFIRM": "This decision table is now favorited",

@@ -28,6 +28,7 @@ public class ExecuteDecisionInfo {
     protected Map<String, Object> variables;
     protected String tenantId;
     protected boolean fallbackToDefaultTenant;
+    protected boolean forceDMN11;
     
     public String getDecisionKey() {
         return decisionKey;
@@ -100,5 +101,11 @@ public class ExecuteDecisionInfo {
     }
     public void setFallbackToDefaultTenant(boolean fallbackToDefaultTenant) {
         this.fallbackToDefaultTenant = fallbackToDefaultTenant;
+    }
+    public boolean isForceDMN11() {
+        return forceDMN11;
+    }
+    public void setForceDMN11(boolean forceDMN11) {
+        this.forceDMN11 = forceDMN11;
     }
 }
