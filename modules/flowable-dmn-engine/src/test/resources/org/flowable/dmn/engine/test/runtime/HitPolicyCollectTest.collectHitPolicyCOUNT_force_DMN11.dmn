@@ -1,6 +1,6 @@
-<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="simple" name="Simple" namespace="http://flowable.org/dmn">
-  <decision id="decision1" name="Full Decision">
-    <decisionTable id="decisionTable" hitPolicy="COLLECT" aggregation="SUM">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="full" name="Full" namespace="http://www.flowable.org/dmn">
+  <decision id="decision1" name="Full Decision" xmlns:flowable="http://flowable.org/dmn" flowable:forceDMN11="true">
+    <decisionTable id="decisionTable" hitPolicy="COLLECT" aggregation="COUNT">
       <input>
         <inputExpression id="inputVariable1" typeRef="double">
           <text>inputVariable1</text>

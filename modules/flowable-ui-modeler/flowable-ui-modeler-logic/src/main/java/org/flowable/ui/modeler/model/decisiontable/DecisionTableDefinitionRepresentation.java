@@ -29,6 +29,7 @@ public class DecisionTableDefinitionRepresentation {
     protected String name;
     protected String key;
     protected String description;
+    protected boolean forceDMN11;
     protected String hitIndicator;
     protected String collectOperator;
     protected String completenessIndicator;
@@ -76,6 +77,13 @@ public class DecisionTableDefinitionRepresentation {
         this.description = description;
     }
 
+    public boolean isForceDMN11() {
+        return forceDMN11;
+    }
+    public void setForceDMN11(boolean forceDMN11) {
+        this.forceDMN11 = forceDMN11;
+    }
+
     public String getHitIndicator() {
         return hitIndicator;
     }
@@ -108,7 +116,6 @@ public class DecisionTableDefinitionRepresentation {
         this.inputExpressions = inputExpressions;
     }
 
-
     public List<DecisionTableExpressionRepresentation> getOutputExpressions() {
         return outputExpressions;
     }
@@ -124,5 +131,4 @@ public class DecisionTableDefinitionRepresentation {
     public void setRules(List<Map<String, Object>> rules) {
         this.rules = rules;
     }
-
 }

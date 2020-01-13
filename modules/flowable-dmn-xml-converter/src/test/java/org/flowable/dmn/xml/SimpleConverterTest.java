@@ -13,6 +13,7 @@
 package org.flowable.dmn.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class SimpleConverterTest extends AbstractConverterTest {
     private void validateModel(DmnDefinition model) {
         List<Decision> decisions = model.getDecisions();
         assertEquals(1, decisions.size());
+        assertFalse(decisions.get(0).isForceDMN11());
 
         DecisionTable decisionTable = (DecisionTable) decisions.get(0).getExpression();
         assertNotNull(decisionTable);

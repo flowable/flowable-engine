@@ -1,5 +1,5 @@
 <definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="simple" name="Simple" namespace="http://flowable.org/dmn">
-  <decision id="decision1" name="Full Decision">
+  <decision id="decision1" name="Full Decision" xmlns:flowable="http://flowable.org/dmn" flowable:forceDMN11="true">
     <decisionTable id="decisionTable" hitPolicy="COLLECT" aggregation="SUM">
       <input>
         <inputExpression id="inputVariable1" typeRef="double">
