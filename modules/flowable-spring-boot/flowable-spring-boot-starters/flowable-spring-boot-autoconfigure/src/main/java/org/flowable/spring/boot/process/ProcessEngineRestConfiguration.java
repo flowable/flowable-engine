@@ -15,6 +15,7 @@ package org.flowable.spring.boot.process;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -33,6 +34,7 @@ public class ProcessEngineRestConfiguration {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @ConditionalOnMissingBean //If we don't include this annotation, we cannot override the RestResponseFactory bean
     @Bean
     public RestResponseFactory restResponseFactory() {
         return new RestResponseFactory(objectMapper);
