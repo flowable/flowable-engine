@@ -24,16 +24,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * 
  * Boots up a form engine and caches it.
  * 
- * When using H2 and the default schema name, it will also boot the H2 webapp (reachable with browser on http://localhost:8082/)
- * 
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 @ExtendWith(FlowableEventExtension.class)
 @ExtendWith(LoggingExtension.class)
 public class AbstractFlowableEventTest {
-
-    public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowableevent;DB_CLOSE_DELAY=1000";
 
     protected EventRegistryEngine eventRegistryEngine;
     protected EventRegistryEngineConfiguration eventEngineConfiguration;

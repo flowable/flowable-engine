@@ -95,7 +95,7 @@ import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
-import org.flowable.eventregistry.api.management.EventRegistryHouseKeepingManager;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,9 +181,10 @@ public abstract class AbstractEngineConfiguration {
 
     // Event Registry //////////////////////////////////////////////////
     protected Map<String, EventRegistryEventConsumer> eventRegistryEventConsumers = new HashMap<>();
-    protected boolean enableAutomaticEventRegistryHouseKeeping = false;
-    protected EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager;
-    protected String eventRegistryHouseKeepingTimeCycleConfig = "0 * * * * ?";
+    protected boolean enableEventRegistryChangeDetection;
+    protected long eventRegistryChangeDetectionInitialDelayInMs = 10000L;
+    protected long eventRegistryChangeDetectionDelayInMs = 60000L;
+    protected EventRegistryChangeDetector eventRegistryChangeDetector;
 
     // MYBATIS SQL SESSION FACTORY /////////////////////////////////////
 
@@ -1381,35 +1382,45 @@ public abstract class AbstractEngineConfiguration {
         eventRegistryEventConsumers.put(key, eventRegistryEventConsumer);
     }
 
-    public EventRegistryHouseKeepingManager getEventRegistryHouseKeepingManager() {
-        return eventRegistryHouseKeepingManager;
+    public boolean isEnableEventRegistryChangeDetection() {
+        return enableEventRegistryChangeDetection;
     }
 
-    public AbstractEngineConfiguration setEventRegistryHouseKeepingManager(EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager) {
-        this.eventRegistryHouseKeepingManager = eventRegistryHouseKeepingManager;
+    public AbstractEngineConfiguration setEnableEventRegistryChangeDetection(boolean enableEventRegistryChangeDetection) {
+        this.enableEventRegistryChangeDetection = enableEventRegistryChangeDetection;
         return this;
     }
 
-    public boolean isEnableAutomaticEventRegistryHouseKeeping() {
-        return enableAutomaticEventRegistryHouseKeeping;
+    public long getEventRegistryChangeDetectionInitialDelayInMs() {
+        return eventRegistryChangeDetectionInitialDelayInMs;
     }
 
-    public AbstractEngineConfiguration setEnableAutomaticEventRegistryHouseKeeping(boolean enableAutomaticEventRegistryHouseKeeping) {
-        this.enableAutomaticEventRegistryHouseKeeping = enableAutomaticEventRegistryHouseKeeping;
+    public AbstractEngineConfiguration setEventRegistryChangeDetectionInitialDelayInMs(long eventRegistryChangeDetectionInitialDelayInMs) {
+        this.eventRegistryChangeDetectionInitialDelayInMs = eventRegistryChangeDetectionInitialDelayInMs;
         return this;
     }
 
-    public String getEventRegistryHouseKeepingTimeCycleConfig() {
-        return eventRegistryHouseKeepingTimeCycleConfig;
+    public long getEventRegistryChangeDetectionDelayInMs() {
+        return eventRegistryChangeDetectionDelayInMs;
     }
 
-    public AbstractEngineConfiguration setEventRegistryHouseKeepingTimeCycleConfig(String eventRegistryHouseKeepingTimeCycleConfig) {
-        this.eventRegistryHouseKeepingTimeCycleConfig = eventRegistryHouseKeepingTimeCycleConfig;
+    public AbstractEngineConfiguration setEventRegistryChangeDetectionDelayInMs(long eventRegistryChangeDetectionDelayInMs) {
+        this.eventRegistryChangeDetectionDelayInMs = eventRegistryChangeDetectionDelayInMs;
         return this;
     }
 
-    public void setDefaultCommandInterceptors(Collection<? extends CommandInterceptor> defaultCommandInterceptors) {
+    public EventRegistryChangeDetector getEventRegistryChangeDetector() {
+        return eventRegistryChangeDetector;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryChangeDetector(EventRegistryChangeDetector eventRegistryChangeDetector) {
+        this.eventRegistryChangeDetector = eventRegistryChangeDetector;
+        return this;
+    }
+
+    public AbstractEngineConfiguration setDefaultCommandInterceptors(Collection<? extends CommandInterceptor> defaultCommandInterceptors) {
         this.defaultCommandInterceptors = defaultCommandInterceptors;
+        return this;
     }
 
     public SqlSessionFactory getSqlSessionFactory() {

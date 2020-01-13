@@ -40,8 +40,8 @@ public class EventManagementServiceImpl extends CommonEngineServiceImpl<EventReg
     }
 
     @Override
-    public void executeHouseKeeping() {
-        configuration.getEventRegistryHouseKeepingManager().executeHouseKeeping();
+    public void executeEventRegistryChangeDetection() {
+        configuration.getEventRegistryChangeDetector().detectChanges();
     }
 
 }

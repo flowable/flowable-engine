@@ -28,8 +28,10 @@ public interface EventManagementService {
     Collection<String> getTableNames();
 
     /**
-     * Programmatically execute the house keeping functionality.
+     * Programmatically execute the house keeping functionality: any new channel definitions
+     * deployed on other engine nodes (using the same datasource) will be deployed.
+     * Any removed channel definitions on other engine nodes will be removed.
      */
-    void executeHouseKeeping();
+    void executeEventRegistryChangeDetection();
 
 }

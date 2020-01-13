@@ -12,25 +12,21 @@
  */
 package org.flowable.eventregistry.api.management;
 
-import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
-
 /**
  * @author Joram Barrez
  */
-public interface EventRegistryHouseKeepingManager {
+public interface EventRegistryChangeDetector {
 
     /**
-     * Typically called on bootup.
-     * Will initialize necessary timer jobs to make sure the house keeping is executed regularly.
+     * Will be called after the engine has booted up.
+     * Any initialization logic can be placed here.
      */
-    void initializeHouseKeepingJobs();
+    void initialize();
 
     /**
      * Allows to programmatically trigger the house keeping functionality.
-     * Normally this will be executed by a timer job in the background.
+     * Normally this will be executed by a background thread.
      */
-    void executeHouseKeeping();
-
-    void setEventRegistryConfiguration(EventRegistryConfigurationApi eventRegistryConfiguration);
+    void detectChanges();
 
 }

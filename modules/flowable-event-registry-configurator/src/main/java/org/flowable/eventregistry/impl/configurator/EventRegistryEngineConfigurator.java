@@ -21,7 +21,6 @@ import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
-import org.flowable.eventregistry.api.management.EventRegistryHouseKeepingManager;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
@@ -61,7 +60,7 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
         }
 
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
-        initEventRegistryHouseKeepingManager(engineConfiguration);
+        initChangeDetectorProperties(engineConfiguration);
         this.eventRegistryEngine = initEventRegistryEngine();
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
     }
@@ -76,14 +75,20 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
         return EntityDependencyOrder.DELETE_ORDER;
     }
 
-    protected void initEventRegistryHouseKeepingManager(AbstractEngineConfiguration engineConfiguration) {
-        EventRegistryHouseKeepingManager eventRegistryHouseKeepingManager = engineConfiguration.getEventRegistryHouseKeepingManager();
-        if (eventRegistryHouseKeepingManager != null) {
-            eventEngineConfiguration.setEventRegistryHouseKeepingManager(eventRegistryHouseKeepingManager);
-            eventRegistryHouseKeepingManager.setEventRegistryConfiguration(eventEngineConfiguration);
+    protected void initChangeDetectorProperties(AbstractEngineConfiguration engineConfiguration) {
+        if (engineConfiguration.isEnableEventRegistryChangeDetection()) {
+
+            eventEngineConfiguration.setEnableEventRegistryChangeDetection(true);
+            if (engineConfiguration.getEventRegistryChangeDetector() != null) {
+                eventEngineConfiguration.setEventRegistryChangeDetector(engineConfiguration.getEventRegistryChangeDetector());
+            }
+
+            eventEngineConfiguration.setEventRegistryChangeDetectionInitialDelayInMs(engineConfiguration.getEventRegistryChangeDetectionInitialDelayInMs());
+            eventEngineConfiguration.setEventRegistryChangeDetectionDelayInMs(engineConfiguration.getEventRegistryChangeDetectionDelayInMs());
+
         }
     }
-    
+
     protected synchronized EventRegistryEngine initEventRegistryEngine() {
         if (eventEngineConfiguration == null) {
             throw new FlowableException("EventRegistryEngineConfiguration is required");

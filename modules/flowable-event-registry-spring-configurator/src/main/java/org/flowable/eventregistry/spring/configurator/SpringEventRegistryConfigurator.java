@@ -38,6 +38,7 @@ public class SpringEventRegistryConfigurator extends EventRegistryEngineConfigur
         }
 
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
+        initChangeDetectorProperties(engineConfiguration);
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
         ((SpringEventRegistryEngineConfiguration) eventEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
 
@@ -46,7 +47,6 @@ public class SpringEventRegistryConfigurator extends EventRegistryEngineConfigur
                 springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
         }
 
-        initEventRegistryHouseKeepingManager(engineConfiguration);
         initEventRegistryEngine();
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
     }
