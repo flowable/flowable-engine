@@ -14,7 +14,7 @@
 package org.flowable.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
