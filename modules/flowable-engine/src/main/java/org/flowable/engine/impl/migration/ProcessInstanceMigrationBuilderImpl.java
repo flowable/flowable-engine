@@ -22,6 +22,7 @@ import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
+import org.flowable.engine.migration.Script;
 
 public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigrationBuilder {
 
@@ -38,6 +39,12 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
         migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion());
         migrationDocumentBuilder.setTenantId(document.getMigrateToProcessDefinitionTenantId());
         migrationDocumentBuilder.addActivityMigrationMappings(document.getActivityMigrationMappings());
+        migrationDocumentBuilder.setPreUpgradeScript(document.getPreUpgradeScript());
+        migrationDocumentBuilder.setPreUpgradeJavaDelegate(document.getPreUpgradeJavaDelegate());
+        migrationDocumentBuilder.setPreUpgradeJavaDelegateExpression(document.getPreUpgradeJavaDelegateExpression());
+        migrationDocumentBuilder.setPostUpgradeScript(document.getPostUpgradeScript());
+        migrationDocumentBuilder.setPostUpgradeJavaDelegate(document.getPostUpgradeJavaDelegate());
+        migrationDocumentBuilder.setPostUpgradeJavaDelegateExpression(document.getPostUpgradeJavaDelegateExpression());
         return this;
     }
 
@@ -63,6 +70,42 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     @Override
     public ProcessInstanceMigrationBuilder withMigrateToProcessDefinitionTenantId(String processDefinitionTenantId) {
         this.migrationDocumentBuilder.setTenantId(processDefinitionTenantId);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder preUpgradeScript(Script script) {
+        this.migrationDocumentBuilder.setPreUpgradeScript(script);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder preUpgradeJavaDelegate(String javaDelegateClassName) {
+        this.migrationDocumentBuilder.setPreUpgradeJavaDelegate(javaDelegateClassName);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder preUpgradeJavaDelegateExpression(String expression) {
+        this.migrationDocumentBuilder.setPreUpgradeJavaDelegateExpression(expression);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder postUpgradeScript(Script script) {
+        this.migrationDocumentBuilder.setPostUpgradeScript(script);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder postUpgradeJavaDelegate(String javaDelegateClassName) {
+        this.migrationDocumentBuilder.setPostUpgradeJavaDelegate(javaDelegateClassName);
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationBuilder postUpgradeJavaDelegateExpression(String expression) {
+        this.migrationDocumentBuilder.setPostUpgradeJavaDelegateExpression(expression);
         return this;
     }
 

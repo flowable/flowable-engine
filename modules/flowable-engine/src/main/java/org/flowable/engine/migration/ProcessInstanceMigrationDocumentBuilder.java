@@ -18,6 +18,7 @@ import java.util.Map;
 
 /**
  * @author Dennis Federico
+ * @author martin.grofcik
  */
 public interface ProcessInstanceMigrationDocumentBuilder {
 
@@ -26,6 +27,18 @@ public interface ProcessInstanceMigrationDocumentBuilder {
     ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, Integer processDefinitionVersion);
 
     ProcessInstanceMigrationDocumentBuilder setTenantId(String processDefinitionTenantId);
+
+    ProcessInstanceMigrationDocumentBuilder setPreUpgradeScript(Script script);
+
+    ProcessInstanceMigrationDocumentBuilder setPreUpgradeJavaDelegate(String javaDelegateClassName);
+
+    ProcessInstanceMigrationDocumentBuilder setPreUpgradeJavaDelegateExpression(String expression);
+
+    ProcessInstanceMigrationDocumentBuilder setPostUpgradeScript(Script script);
+
+    ProcessInstanceMigrationDocumentBuilder setPostUpgradeJavaDelegate(String javaDelegateClassName);
+
+    ProcessInstanceMigrationDocumentBuilder setPostUpgradeJavaDelegateExpression(String expression);
 
     ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings);
 
