@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -85,6 +86,15 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task A");
         assertSingleTaskExists(tasks, "Injected Task A");
 
+        // test the query for the derived case definition (in this unit test, it will be the same as the running one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(caseInstance.getCaseDefinitionId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(1, derivedPlanItems.size());
+        assertEquals("Injected Task A", derivedPlanItems.get(0).getName());
+
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(3, planItemInstances.size());
@@ -139,6 +149,15 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task A");
         assertSingleTaskExists(tasks, "Injected Task A");
 
+        // test the query for the derived case definition (in this unit test, it will be the same as the running one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(caseInstance.getCaseDefinitionId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(1, derivedPlanItems.size());
+        assertEquals("Injected Task A", derivedPlanItems.get(0).getName());
+
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(3, planItemInstances.size());
@@ -156,6 +175,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDerivedCaseDefinitionId(caseInstance.getCaseDefinitionId())
+            .list();
+
+        assertNotNull(historicPlanItemInstances);
+        assertEquals(1, historicPlanItemInstances.size());
+        assertEquals("Injected Task A", historicPlanItemInstances.get(0).getName());
     }
 
     @Test
@@ -206,6 +233,15 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task A");
         assertSingleTaskExists(tasks, "Injected Task A");
 
+        // test the query for the derived case definition (in this unit test, it will be a different one from the running case one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(1, derivedPlanItems.size());
+        assertEquals("Injected Task A", derivedPlanItems.get(0).getName());
+
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(3, planItemInstances.size());
@@ -218,6 +254,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(2, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(historicPlanItemInstances);
+        assertEquals(1, historicPlanItemInstances.size());
+        assertEquals("Injected Task A", historicPlanItemInstances.get(0).getName());
     }
 
     @Test
@@ -268,6 +312,15 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task A");
         assertSingleTaskExists(tasks, "Injected Task A");
 
+        // test the query for the derived case definition (in this unit test, it will be a different one from the running case one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(1, derivedPlanItems.size());
+        assertEquals("Injected Task A", derivedPlanItems.get(0).getName());
+
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(3, planItemInstances.size());
@@ -285,6 +338,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(historicPlanItemInstances);
+        assertEquals(1, historicPlanItemInstances.size());
+        assertEquals("Injected Task A", historicPlanItemInstances.get(0).getName());
     }
 
     @Test
@@ -338,6 +399,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task A");
         assertSingleTaskExists(tasks, "Injected Task A");
 
+        // test the query for the derived case definition (in this unit test, it will be a different one from the running case one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(3, derivedPlanItems.size());
+
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(5, planItemInstances.size());
@@ -360,6 +429,13 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(2, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(historicPlanItemInstances);
+        assertEquals(3, historicPlanItemInstances.size());
     }
 
     @Test
@@ -413,6 +489,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task A");
         assertSingleTaskExists(tasks, "Injected Task A");
 
+        // test the query for the derived case definition (in this unit test, it will be a different one from the running case one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(3, derivedPlanItems.size());
+
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(5, planItemInstances.size());
@@ -441,6 +525,13 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(historicPlanItemInstances);
+        assertEquals(3, historicPlanItemInstances.size());
     }
 
     @Test
@@ -496,6 +587,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task A");
         assertSingleTaskExists(tasks, "Task X");
         assertSingleTaskExists(tasks, "Task Y");
+
+        // test the query for the derived case definition (in this unit test, it will be a different one from the running case one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(3, derivedPlanItems.size());
 
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -575,6 +674,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task X");
         assertSingleTaskExists(tasks, "Task Y");
 
+        // test the query for the derived case definition (in this unit test, it will be a different one from the running case one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(3, derivedPlanItems.size());
+
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(5, planItemInstances.size());
@@ -603,6 +710,13 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(historicPlanItemInstances);
+        assertEquals(3, historicPlanItemInstances.size());
     }
 
     @Test
@@ -664,6 +778,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task A");
         assertSingleTaskExists(tasks, "Task X");
         assertSingleTaskExists(tasks, "Task Y");
+
+        // test the query for the derived case definition (in this unit test, it will be a different one from the running case one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(3, derivedPlanItems.size());
 
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -749,6 +871,14 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertSingleTaskExists(tasks, "Task X");
         assertSingleTaskExists(tasks, "Task Y");
 
+        // test the query for the derived case definition (in this unit test, it will be a different one from the running case one)
+        List<PlanItemInstance> derivedPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .derivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(derivedPlanItems);
+        assertEquals(3, derivedPlanItems.size());
+
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertEquals(5, planItemInstances.size());
@@ -777,6 +907,13 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
+            .list();
+
+        assertNotNull(historicPlanItemInstances);
+        assertEquals(3, historicPlanItemInstances.size());
     }
 
     @Override
