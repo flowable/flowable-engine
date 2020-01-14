@@ -36,6 +36,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.DecisionTableVariableManager;
+import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
@@ -183,6 +184,7 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.runtime.DefaultCmmnDynamicStateManager;
+import org.flowable.cmmn.engine.impl.runtime.DynamicCmmnServiceImpl;
 import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
@@ -314,6 +316,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 
     protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl(this);
+    protected DynamicCmmnService dynamicCmmnService = new DynamicCmmnServiceImpl(this);
     protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl(this);
     protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl(this);
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl(this);
@@ -1936,6 +1939,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCmmnRuntimeService(CmmnRuntimeService cmmnRuntimeService) {
         this.cmmnRuntimeService = cmmnRuntimeService;
+        return this;
+    }
+
+    @Override
+    public DynamicCmmnService getDynamicCmmnService() {
+        return dynamicCmmnService;
+    }
+
+    public CmmnEngineConfiguration setDynamicCmmnService(DynamicCmmnService dynamicCmmnService) {
+        this.dynamicCmmnService = dynamicCmmnService;
         return this;
     }
 

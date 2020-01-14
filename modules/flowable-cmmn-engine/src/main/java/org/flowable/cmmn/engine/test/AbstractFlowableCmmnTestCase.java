@@ -31,6 +31,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
@@ -53,6 +54,7 @@ public abstract class AbstractFlowableCmmnTestCase {
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected DynamicCmmnService dynamicCmmnService;
     protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
 

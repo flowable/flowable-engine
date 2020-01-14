@@ -21,7 +21,6 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
-import org.flowable.cmmn.api.runtime.InjectedPlanItemInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
 import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
@@ -41,13 +40,6 @@ public interface CmmnRuntimeService {
     CaseInstanceBuilder createCaseInstanceBuilder();
 
     PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId);
-
-    /**
-     * Creates a new builder to dynamically create a new plan item and inject it into a running stage.
-     * @param stagePlanItemInstanceId the id of the running stage plan item instance to inject a new plan item into
-     * @return the builder used to create the new plan item to be dynamically injected
-     */
-    InjectedPlanItemInstanceBuilder createInjectedPlanItemInstanceBuilder(String stagePlanItemInstanceId);
     
     void triggerPlanItemInstance(String planItemInstanceId);
     

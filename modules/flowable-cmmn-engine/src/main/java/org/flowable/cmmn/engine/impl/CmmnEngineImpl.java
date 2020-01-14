@@ -17,6 +17,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
@@ -36,6 +37,7 @@ public class CmmnEngineImpl implements CmmnEngine {
     protected String name;
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected DynamicCmmnService dynamicCmmnService;
     protected CmmnTaskService cmmnTaskService;
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
@@ -48,6 +50,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         this.name = cmmnEngineConfiguration.getEngineName();
         this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        this.dynamicCmmnService = cmmnEngineConfiguration.getDynamicCmmnService();
         this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
@@ -135,7 +138,16 @@ public class CmmnEngineImpl implements CmmnEngine {
     public void setCmmnRuntimeService(CmmnRuntimeService cmmnRuntimeService) {
         this.cmmnRuntimeService = cmmnRuntimeService;
     }
-    
+
+    @Override
+    public DynamicCmmnService getDynamicCmmnService() {
+        return dynamicCmmnService;
+    }
+
+    public void setDynamicCmmnService(DynamicCmmnService dynamicCmmnService) {
+        this.dynamicCmmnService = dynamicCmmnService;
+    }
+
     @Override
     public CmmnTaskService getCmmnTaskService() {
         return cmmnTaskService;
