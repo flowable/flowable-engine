@@ -123,8 +123,8 @@ org.apache.httpcomponents       httpclient                  4.5.10          Apac
 org.apache.httpcomponents       httpcore                    4.4.12          Apache License, Version 2.0
 org.apache.httpcomponents       httpmime                    4.5.10          Apache License, Version 2.0
 org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
-org.codehaus.groovy             groovy                      2.5.8           The Apache Software License, Version 2.0
-org.codehaus.groovy             groovy-jsr223               2.5.8           The Apache Software License, Version 2.0
+org.codehaus.groovy             groovy                      2.5.9           The Apache Software License, Version 2.0
+org.codehaus.groovy             groovy-jsr223               2.5.9           The Apache Software License, Version 2.0
 org.liquibase                   liquibase-core              3.8.0           Apache License, Version 2.0
 org.mybatis                     mybatis                     3.5.3           The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              2.0.3           The Apache Software License, Version 2.0
