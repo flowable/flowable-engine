@@ -14,9 +14,7 @@ package org.flowable.cmmn.engine.impl.runtime;
 
 import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.api.runtime.InjectedPlanItemInstanceBuilder;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 
 /**
@@ -31,18 +29,7 @@ public class DynamicCmmnServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
-    public InjectedPlanItemInstanceBuilder createInjectedPlanItemInstanceBuilder(String stagePlanItemInstanceId) {
-        PlanItemInstance planItemInstance = configuration.getPlanItemInstanceEntityManager().createPlanItemInstanceQuery()
-            .planItemInstanceId(stagePlanItemInstanceId).singleResult();
-
-        if (planItemInstance == null) {
-            throw new FlowableIllegalArgumentException(
-                "The stage plan item instance id " + stagePlanItemInstanceId + " could not be found or is no longer active.");
-        }
-        if (!planItemInstance.isStage()) {
-            throw new FlowableIllegalArgumentException("A dynamically created plan item can only be injected into a running stage plan item.");
-        }
-
-        return new InjectedPlanItemInstanceBuilderImpl(commandExecutor, planItemInstance);
+    public InjectedPlanItemInstanceBuilder createInjectedPlanItemInstanceBuilder() {
+        return new InjectedPlanItemInstanceBuilderImpl(commandExecutor);
     }
 }

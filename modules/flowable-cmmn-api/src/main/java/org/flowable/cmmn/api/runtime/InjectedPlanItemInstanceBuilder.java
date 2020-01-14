@@ -46,7 +46,16 @@ public interface InjectedPlanItemInstanceBuilder {
     /**
      * Create the newly setup plan item, add it to the parent running stage and plan it for activation and further processing in the case engine.
      *
+     * @param stagePlanItemInstanceId the id of the running stage plan item instance to inject a new plan item into
      * @return the plan item instance dynamically be created
      */
-    PlanItemInstance create();
+    PlanItemInstance createInStage(String stagePlanItemInstanceId);
+
+    /**
+     * Create the newly setup plan item, add it to the parent running case instance and plan it for activation and further processing in the case engine.
+     *
+     * @param caseInstanceId the id of the running case instance to inject a new plan item into
+     * @return the plan item instance dynamically be created
+     */
+    PlanItemInstance createInCase(String caseInstanceId);
 }

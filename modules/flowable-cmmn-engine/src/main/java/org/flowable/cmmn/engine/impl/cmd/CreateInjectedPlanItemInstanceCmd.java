@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.runtime.InjectedPlanItemInstanceBuilderImpl;
@@ -53,14 +55,31 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
             throw new FlowableIllegalArgumentException("The case element needs to be a plan item, but is a " + caseElement.getClass().getName());
         }
 
+        String caseInstanceId;
+        String stagePlanItemInstanceId = null;
+        String tenantId;
+
+        if (planItemInstanceBuilder.injectInStage()) {
+            stagePlanItemInstanceId = planItemInstanceBuilder.getStagePlanItemInstanceId();
+            PlanItemInstance stageInstance = getStageInstanceEntity(commandContext);
+            caseInstanceId = stageInstance.getCaseInstanceId();
+            tenantId = stageInstance.getTenantId();
+        } else if (planItemInstanceBuilder.injectInCase()) {
+            CaseInstance caseInstance = getCaseInstanceEntity(commandContext);
+            caseInstanceId = caseInstance.getId();
+            tenantId = caseInstance.getTenantId();
+        } else {
+            throw new FlowableIllegalArgumentException("A dynamically created plan item can only be injected into a running stage instance or case instance.");
+        }
+
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
             .createPlanItemInstanceEntityBuilder()
             .caseDefinitionId(planItemInstanceBuilder.getCaseDefinitionId())
             .planItem((PlanItem) caseElement)
             .name(planItemInstanceBuilder.getName())
-            .caseInstanceId(planItemInstanceBuilder.getParentPlanItemInstance().getCaseInstanceId())
-            .stagePlanItemInstanceId(planItemInstanceBuilder.getParentPlanItemInstance().getId())
-            .tenantId(planItemInstanceBuilder.getParentPlanItemInstance().getTenantId())
+            .caseInstanceId(caseInstanceId)
+            .stagePlanItemInstanceId(stagePlanItemInstanceId)
+            .tenantId(tenantId)
             .addToParent(true)
             .create();
 
@@ -68,5 +87,28 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
         CommandContextUtil.getAgenda(commandContext).planEvaluateToActivatePlanItemInstanceOperation(planItemInstanceEntity);
 
         return planItemInstanceEntity;
+    }
+
+    protected PlanItemInstanceEntity getStageInstanceEntity(CommandContext commandContext) {
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+            .findById(planItemInstanceBuilder.getStagePlanItemInstanceId());
+
+        if (planItemInstanceEntity == null) {
+            throw new FlowableIllegalArgumentException(
+                "The stage plan item instance id " + planItemInstanceBuilder.getStagePlanItemInstanceId() + " could not be found or is no longer active.");
+        }
+        if (!planItemInstanceEntity.isStage()) {
+            throw new FlowableIllegalArgumentException("A dynamically created plan item can only be injected into a running stage plan item.");
+        }
+        return planItemInstanceEntity;
+    }
+
+    protected CaseInstanceEntity getCaseInstanceEntity(CommandContext commandContext) {
+        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstanceBuilder.getCaseInstanceId());
+        if (caseInstanceEntity == null) {
+            throw new FlowableIllegalArgumentException(
+                "The case instance with id " + planItemInstanceBuilder.getCaseInstanceId() + " could not be found or is no longer an ative case instance.");
+        }
+        return caseInstanceEntity;
     }
 }

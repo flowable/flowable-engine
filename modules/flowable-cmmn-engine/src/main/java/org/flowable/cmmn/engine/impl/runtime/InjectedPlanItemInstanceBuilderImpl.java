@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.InjectedPlanItemInstanceBuilder;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.cmd.CreateInjectedPlanItemInstanceCmd;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -26,14 +26,14 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 public class InjectedPlanItemInstanceBuilderImpl implements InjectedPlanItemInstanceBuilder {
 
     protected final CommandExecutor commandExecutor;
-    protected final PlanItemInstance parentPlanItemInstance;
+    protected String stagePlanItemInstanceId;
+    protected String caseInstanceId;
     protected String caseDefinitionId;
     protected String elementId;
     protected String name;
 
-    public InjectedPlanItemInstanceBuilderImpl(CommandExecutor commandExecutor, PlanItemInstance parentPlanItemInstance) {
+    public InjectedPlanItemInstanceBuilderImpl(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
-        this.parentPlanItemInstance = parentPlanItemInstance;
     }
 
     @Override
@@ -55,8 +55,16 @@ public class InjectedPlanItemInstanceBuilderImpl implements InjectedPlanItemInst
     }
 
     @Override
-    public PlanItemInstance create() {
+    public PlanItemInstance createInStage(String stagePlanItemInstanceId) {
         validateData();
+        this.stagePlanItemInstanceId = stagePlanItemInstanceId;
+        return commandExecutor.execute(new CreateInjectedPlanItemInstanceCmd(this));
+    }
+
+    @Override
+    public PlanItemInstance createInCase(String caseInstanceId) {
+        validateData();
+        this.caseInstanceId = caseInstanceId;
         return commandExecutor.execute(new CreateInjectedPlanItemInstanceCmd(this));
     }
 
@@ -69,8 +77,17 @@ public class InjectedPlanItemInstanceBuilderImpl implements InjectedPlanItemInst
         }
     }
 
-    public PlanItemInstance getParentPlanItemInstance() {
-        return parentPlanItemInstance;
+    public boolean injectInStage() {
+        return stagePlanItemInstanceId != null;
+    }
+    public boolean injectInCase() {
+        return caseInstanceId != null;
+    }
+    public String getStagePlanItemInstanceId() {
+        return stagePlanItemInstanceId;
+    }
+    public String getCaseInstanceId() {
+        return caseInstanceId;
     }
     public String getName() {
         return name;
