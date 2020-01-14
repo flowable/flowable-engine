@@ -151,8 +151,6 @@ public class GetChannelModelCmd implements Command<ChannelModel>, Serializable {
         }
 
         ChannelDefinitionCacheEntry channelDefinitionCacheEntry = deploymentManager.resolveChannelDefinition(channelDefinitionEntity);
-        ChannelModel channelModel = eventEngineConfiguration.getChannelJsonConverter().convertToChannelModel(channelDefinitionCacheEntry.getChannelDefinitionJson());
-
-        return channelModel;
+        return eventEngineConfiguration.getChannelJsonConverter().convertToChannelModel(channelDefinitionCacheEntry.getChannelDefinitionJson());
     }
 }

@@ -83,22 +83,22 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
 
     @Override
     public OutboundChannelModel register() {
-        OutboundChannelModel outboundChannelDefinition;
+        OutboundChannelModel outboundChannelModel;
         if (this.channelDefinition == null) {
-            outboundChannelDefinition = new OutboundChannelModel();
+            outboundChannelModel = new OutboundChannelModel();
         } else {
-            outboundChannelDefinition = this.channelDefinition;
+            outboundChannelModel = this.channelDefinition;
         }
 
-        outboundChannelDefinition.setKey(key);
-        outboundChannelDefinition.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
+        outboundChannelModel.setKey(key);
+        outboundChannelModel.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
 
         OutboundEventProcessingPipeline outboundEventProcessingPipeline = this.outboundEventProcessingPipelineBuilder.build();
-        outboundChannelDefinition.setOutboundEventProcessingPipeline(outboundEventProcessingPipeline);
+        outboundChannelModel.setOutboundEventProcessingPipeline(outboundEventProcessingPipeline);
 
-        eventRegistry.registerChannelModel(outboundChannelDefinition);
+        eventRegistry.registerChannelModel(outboundChannelModel, null);
 
-        return outboundChannelDefinition;
+        return outboundChannelModel;
     }
 
     public static class OutboundJmsChannelBuilderImpl implements OutboundJmsChannelBuilder {

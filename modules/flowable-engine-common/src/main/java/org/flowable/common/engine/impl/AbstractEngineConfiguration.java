@@ -95,6 +95,7 @@ import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,7 +170,6 @@ public abstract class AbstractEngineConfiguration {
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
     protected Map<String, AbstractServiceConfiguration> serviceConfigurations = new HashMap<>();
-    protected Map<String, EventRegistryEventConsumer> eventRegistryEventConsumers = new HashMap<>();
 
     protected ClassLoader classLoader;
     /**
@@ -178,6 +178,13 @@ public abstract class AbstractEngineConfiguration {
     protected boolean useClassForNameClassLoading = true;
 
     protected List<EngineLifecycleListener> engineLifecycleListeners;
+
+    // Event Registry //////////////////////////////////////////////////
+    protected Map<String, EventRegistryEventConsumer> eventRegistryEventConsumers = new HashMap<>();
+    protected boolean enableEventRegistryChangeDetection;
+    protected long eventRegistryChangeDetectionInitialDelayInMs = 10000L;
+    protected long eventRegistryChangeDetectionDelayInMs = 60000L;
+    protected EventRegistryChangeDetector eventRegistryChangeDetector;
 
     // MYBATIS SQL SESSION FACTORY /////////////////////////////////////
 
@@ -1375,8 +1382,45 @@ public abstract class AbstractEngineConfiguration {
         eventRegistryEventConsumers.put(key, eventRegistryEventConsumer);
     }
 
-    public void setDefaultCommandInterceptors(Collection<? extends CommandInterceptor> defaultCommandInterceptors) {
+    public boolean isEnableEventRegistryChangeDetection() {
+        return enableEventRegistryChangeDetection;
+    }
+
+    public AbstractEngineConfiguration setEnableEventRegistryChangeDetection(boolean enableEventRegistryChangeDetection) {
+        this.enableEventRegistryChangeDetection = enableEventRegistryChangeDetection;
+        return this;
+    }
+
+    public long getEventRegistryChangeDetectionInitialDelayInMs() {
+        return eventRegistryChangeDetectionInitialDelayInMs;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryChangeDetectionInitialDelayInMs(long eventRegistryChangeDetectionInitialDelayInMs) {
+        this.eventRegistryChangeDetectionInitialDelayInMs = eventRegistryChangeDetectionInitialDelayInMs;
+        return this;
+    }
+
+    public long getEventRegistryChangeDetectionDelayInMs() {
+        return eventRegistryChangeDetectionDelayInMs;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryChangeDetectionDelayInMs(long eventRegistryChangeDetectionDelayInMs) {
+        this.eventRegistryChangeDetectionDelayInMs = eventRegistryChangeDetectionDelayInMs;
+        return this;
+    }
+
+    public EventRegistryChangeDetector getEventRegistryChangeDetector() {
+        return eventRegistryChangeDetector;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryChangeDetector(EventRegistryChangeDetector eventRegistryChangeDetector) {
+        this.eventRegistryChangeDetector = eventRegistryChangeDetector;
+        return this;
+    }
+
+    public AbstractEngineConfiguration setDefaultCommandInterceptors(Collection<? extends CommandInterceptor> defaultCommandInterceptors) {
         this.defaultCommandInterceptors = defaultCommandInterceptors;
+        return this;
     }
 
     public SqlSessionFactory getSqlSessionFactory() {
@@ -1869,6 +1913,14 @@ public abstract class AbstractEngineConfiguration {
         }
         configurators.add(configurator);
         return this;
+    }
+
+    /**
+     * @return All {@link EngineConfigurator} instances. Will only contain values after init of the engine.
+     * Use the {@link #getConfigurators()} or {@link #addConfigurator(EngineConfigurator)} methods otherwise.
+     */
+    public List<EngineConfigurator> getAllConfigurators() {
+        return allConfigurators;
     }
 
     public AbstractEngineConfiguration setConfigurators(List<EngineConfigurator> configurators) {

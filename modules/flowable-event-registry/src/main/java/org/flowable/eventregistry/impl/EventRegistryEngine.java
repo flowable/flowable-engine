@@ -23,15 +23,15 @@ public interface EventRegistryEngine extends Engine {
     /**
      * the version of the flowable event registry library
      */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
     
-    void handleDeployedChannelDefinitions();
-
     EventRepositoryService getEventRepositoryService();
-    
+
     EventManagementService getEventManagementService();
-    
+
     EventRegistry getEventRegistry();
 
     EventRegistryEngineConfiguration getEventRegistryEngineConfiguration();
+
+    void handleDeployedChannelDefinitions();
 }

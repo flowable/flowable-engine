@@ -30,20 +30,24 @@ public class SpringEventRegistryConfigurator extends EventRegistryEngineConfigur
     public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (eventEngineConfiguration == null) {
             eventEngineConfiguration = new SpringEventRegistryEngineConfiguration();
+
         } else if (!(eventEngineConfiguration instanceof SpringEventRegistryEngineConfiguration)) {
             throw new IllegalArgumentException("Expected eventRegistryEngine configuration to be of type "
                 + SpringEventRegistryEngineConfiguration.class + " but was " + eventEngineConfiguration.getClass());
+
         }
+
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
+        initChangeDetectorProperties(engineConfiguration);
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
         ((SpringEventRegistryEngineConfiguration) eventEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
+
         if (eventEngineConfiguration.getExpressionManager() == null) {
             eventEngineConfiguration.setExpressionManager(new SpringEventExpressionManager(
                 springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
         }
 
         initEventRegistryEngine();
-        
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
     }
 

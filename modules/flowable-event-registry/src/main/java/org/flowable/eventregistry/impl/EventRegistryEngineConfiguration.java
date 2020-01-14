@@ -44,6 +44,7 @@ import org.flowable.eventregistry.impl.deployer.ChannelDefinitionDeploymentHelpe
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeployer;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeploymentHelper;
 import org.flowable.eventregistry.impl.deployer.ParsedDeploymentBuilderFactory;
+import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetector;
 import org.flowable.eventregistry.impl.parser.ChannelDefinitionParseFactory;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParseFactory;
 import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
@@ -139,6 +140,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
 
+    protected boolean handleEventRegistryEngineDeploymentsAfterEngineCreate = true;
+
     public static EventRegistryEngineConfiguration createEventRegistryEngineConfigurationFromResourceDefault() {
         return createEventRegistryEngineConfigurationFromResource("flowable.eventregistry.cfg.xml", "eventRegistryEngineConfiguration");
     }
@@ -173,8 +176,14 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     public EventRegistryEngine buildEventRegistryEngine() {
         init();
         EventRegistryEngineImpl eventRegistryEngine = new EventRegistryEngineImpl(this);
-        
-        eventRegistryEngine.handleDeployedChannelDefinitions();
+
+        if (handleEventRegistryEngineDeploymentsAfterEngineCreate) {
+            eventRegistryEngine.handleDeployedChannelDefinitions();
+        }
+
+        if (enableEventRegistryChangeDetection) {
+            eventRegistryChangeDetector.initialize();
+        }
         
         return eventRegistryEngine;
     }
@@ -219,6 +228,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initChannelDefinitionProcessors();
         initDeployers();
         initClock();
+        initChangeDetector();
     }
 
     // services
@@ -487,6 +497,13 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         channelDefinitionProcessors.add(new OutboundChannelModelProcessor());
     }
 
+    public void initChangeDetector() {
+        if (this.eventRegistryChangeDetector == null) {
+            this.eventRegistryChangeDetector = new DefaultEventRegistryChangeDetector(this,
+                eventRegistryChangeDetectionInitialDelayInMs, eventRegistryChangeDetectionDelayInMs);
+        }
+    }
+
     // myBatis SqlSessionFactory
     // ////////////////////////////////////////////////
 
@@ -732,5 +749,14 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.channelJsonConverter = channelJsonConverter;
         return this;
     }
-    
+
+    public boolean isHandleEventRegistryEngineDeploymentsAfterEngineCreate() {
+        return handleEventRegistryEngineDeploymentsAfterEngineCreate;
+    }
+
+    public EventRegistryEngineConfiguration setHandleEventRegistryEngineDeploymentsAfterEngineCreate(boolean handleEventRegistryEngineDeploymentsAfterEngineCreate) {
+        this.handleEventRegistryEngineDeploymentsAfterEngineCreate = handleEventRegistryEngineDeploymentsAfterEngineCreate;
+        return this;
+    }
+
 }

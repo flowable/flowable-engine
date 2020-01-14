@@ -15,10 +15,12 @@ package org.flowable.eventregistry.impl;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.CorrelationKeyGenerator;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -45,8 +47,10 @@ public class DefaultEventRegistry implements EventRegistry {
 
     protected EventRegistryEngineConfiguration engineConfiguration;
 
-    protected Map<String, InboundChannelModel> inboundChannelModels = new ConcurrentHashMap<>();
-    protected Map<String, OutboundChannelModel> outboundChannelModels = new ConcurrentHashMap<>();
+    // The channel models in this map have been deployed,
+    // meaning that any adapter is also running and listening if found in this map
+    protected ChannelManager<InboundChannelModel> inboundChannelManager = new ChannelManager<>();
+    protected ChannelManager<OutboundChannelModel> outboundChannelManager = new ChannelManager<>();
 
     protected CorrelationKeyGenerator<Map<String, Object>> correlationKeyGenerator;
 
@@ -69,7 +73,7 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void registerChannelModel(ChannelModel channelModel) {
+    public void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition) {
         String channelDefinitionKey = channelModel.getKey();
         if (StringUtils.isEmpty(channelDefinitionKey)) {
             throw new FlowableIllegalArgumentException("No key set for channel model");
@@ -78,7 +82,7 @@ public class DefaultEventRegistry implements EventRegistry {
         if (channelModel instanceof InboundChannelModel) {
 
             InboundChannelModel inboundChannelModel = (InboundChannelModel) channelModel;
-            inboundChannelModels.put(inboundChannelModel.getKey(), inboundChannelModel);
+            inboundChannelManager.addChannelData(inboundChannelModel, channelDefinition);
 
             if (inboundChannelModel.getInboundEventChannelAdapter() != null) {
                 InboundEventChannelAdapter inboundEventChannelAdapter = (InboundEventChannelAdapter) inboundChannelModel.getInboundEventChannelAdapter();
@@ -89,7 +93,7 @@ public class DefaultEventRegistry implements EventRegistry {
         } else if (channelModel instanceof OutboundChannelModel) {
 
             OutboundChannelModel outboundChannelModel = (OutboundChannelModel) channelModel;
-            outboundChannelModels.put(outboundChannelModel.getKey(), outboundChannelModel);
+            outboundChannelManager.addChannelData(outboundChannelModel, channelDefinition);
 
         } else {
             throw new FlowableIllegalArgumentException("Unrecognized ChannelModel class : " + channelModel.getClass());
@@ -106,40 +110,48 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void removeChannelModel(String channelDefinitionKey) {
+    public void removeChannelModel(String channelKey) {
         // keys are unique over the two maps
-        InboundChannelModel inboundChannelDefinition = inboundChannelModels.remove(channelDefinitionKey);
-        if (inboundChannelDefinition != null) {
+        InboundChannelModel inboundChannelModel = inboundChannelManager.getChannelModel(channelKey);
+        if (inboundChannelModel != null) {
             for (ChannelModelProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
-                if (channelDefinitionProcessor.canProcess(inboundChannelDefinition)) {
-                    channelDefinitionProcessor.unregisterChannelModel(inboundChannelDefinition, engineConfiguration.getEventRegistry());
+                if (channelDefinitionProcessor.canProcess(inboundChannelModel)) {
+                    channelDefinitionProcessor.unregisterChannelModel(inboundChannelModel, engineConfiguration.getEventRegistry());
                 }
             }
+            inboundChannelManager.removeChannelDate(channelKey);
         }
-        OutboundChannelModel outboundChannelDefinition = outboundChannelModels.remove(channelDefinitionKey);
+
+        OutboundChannelModel outboundChannelDefinition = outboundChannelManager.getChannelModel(channelKey);
         if (outboundChannelDefinition != null) {
             for (ChannelModelProcessor channelDefinitionProcessor : engineConfiguration.getChannelDefinitionProcessors()) {
                 if (channelDefinitionProcessor.canProcess(outboundChannelDefinition)) {
                     channelDefinitionProcessor.unregisterChannelModel(outboundChannelDefinition, engineConfiguration.getEventRegistry());
                 }
             }
+            outboundChannelManager.removeChannelDate(channelKey);
         }
 
     }
 
     @Override
     public InboundChannelModel getInboundChannelModel(String channelKey) {
-        return inboundChannelModels.get(channelKey);
+        return inboundChannelManager.getChannelModel(channelKey);
     }
     
     @Override
     public Map<String, InboundChannelModel> getInboundChannelModels() {
-        return inboundChannelModels;
+        return inboundChannelManager.getAllChannelModels();
+    }
+
+    @Override
+    public Map<String, OutboundChannelModel> getOutboundChannelModels() {
+        return outboundChannelManager.getAllChannelModels();
     }
 
     @Override
     public OutboundChannelModel getOutboundChannelModel(String channelKey) {
-        return outboundChannelModels.get(channelKey);
+        return outboundChannelManager.getChannelModel(channelKey);
     }
 
     @Override
@@ -200,4 +212,62 @@ public class DefaultEventRegistry implements EventRegistry {
                         .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         return eventRegistryEngineConfiguration.getEventRepositoryService();
     }
+
+    /**
+     * A helper class that wraps a map of {@link ChannelModel} and {@link ChannelDefinition} instances.
+     */
+    public static class ChannelManager<T extends ChannelModel> {
+
+        protected Map<String, ChannelData<T>> channelData = new ConcurrentHashMap<>();
+
+        public void addChannelData(T channelModel, ChannelDefinition channelDefinition) {
+            channelData.put(channelModel.getKey(), new ChannelData<>(channelModel, channelDefinition));
+        }
+
+        public void removeChannelDate(String key) {
+            channelData.remove(key);
+        }
+
+        public T getChannelModel(String key) {
+            ChannelData<T> channelData = this.channelData.get(key);
+            if (channelData != null) {
+                return channelData.getChannelModel();
+            }
+            return null;
+        }
+
+        public ChannelDefinition getChannelDefinition(String key) {
+            return channelData.get(key).getChannelDefinition();
+        }
+
+        public Map<String, T> getAllChannelModels() {
+            return channelData.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getChannelModel()));
+        }
+
+        public static class ChannelData<T extends ChannelModel> {
+
+            protected T channelModel;
+            protected ChannelDefinition channelDefinition;
+
+            public ChannelData(T channelModel, ChannelDefinition channelDefinition) {
+                this.channelModel = channelModel;
+                this.channelDefinition = channelDefinition;
+            }
+
+            public T getChannelModel() {
+                return channelModel;
+            }
+            public void setChannelModel(T channelModel) {
+                this.channelModel = channelModel;
+            }
+            public ChannelDefinition getChannelDefinition() {
+                return channelDefinition;
+            }
+            public void setChannelDefinition(ChannelDefinition channelDefinition) {
+                this.channelDefinition = channelDefinition;
+            }
+        }
+
+    }
+
 }

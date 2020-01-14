@@ -1059,6 +1059,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initBatchServiceConfiguration();
         initAsyncExecutor();
         initAsyncHistoryExecutor();
+
         configuratorsAfterInit();
         afterInitTaskServiceConfiguration();
         afterInitEventRegistryEventBusConsumer();
