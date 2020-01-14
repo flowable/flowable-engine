@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Map;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.model.PlanItem;
 
 /**
@@ -49,6 +50,14 @@ public interface PlanItemInstanceEntityBuilder {
     PlanItemInstanceEntityBuilder caseDefinitionId(String caseDefinitionId);
 
     /**
+     * If this plan item is derived from another case definition than it is used in, set the case definition it is taken from using this method.
+     *
+     * @param derivedCaseDefinitionId the case definition id from which this plan item is derived from
+     * @return the builder instance for method chaining
+     */
+    PlanItemInstanceEntityBuilder derivedCaseDefinitionId(String derivedCaseDefinitionId);
+
+    /**
      * Set the id of the case instance the plan item instance is a direct or indirect child of. This is a mandatory information to be set.
      * @param caseInstanceId the id of the case instance the new plan item instance is a part of
      * @return the builder instance for method chaining
@@ -57,10 +66,10 @@ public interface PlanItemInstanceEntityBuilder {
 
     /**
      * Set the id of the stage plan item instace the new plan item instance is a direct child of.
-     * @param stagePlanItemInstanceId the id of the parent stage instance id for the new plan item instance
+     * @param stagePlanItemInstance the parent stage instance for the new plan item instance
      * @return the builder instance for method chaining
      */
-    PlanItemInstanceEntityBuilder stagePlanItemInstanceId(String stagePlanItemInstanceId);
+    PlanItemInstanceEntityBuilder stagePlanItemInstance(PlanItemInstance stagePlanItemInstance);
 
     /**
      * Set the id of the tenant for the new plan item instance.

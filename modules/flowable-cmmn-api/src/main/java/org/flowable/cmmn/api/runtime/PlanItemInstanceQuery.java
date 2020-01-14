@@ -35,6 +35,7 @@ import org.flowable.common.engine.api.query.Query;
 public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, PlanItemInstance> {
 
     PlanItemInstanceQuery caseDefinitionId(String caseDefinitionId);
+    PlanItemInstanceQuery derivedCaseDefinitionId(String derivedCaseDefinitionId);
     PlanItemInstanceQuery caseInstanceId(String caseInstanceId);
 
     PlanItemInstanceQuery stageInstanceId(String stageInstanceId);

@@ -33,6 +33,8 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
 
     void setCaseDefinitionId(String caseDefinitionId);
 
+    void setDerivedCaseDefinitionId(String derivedCaseDefinitionId);
+
     void setCaseInstanceId(String caseInstanceId);
 
     void setStageInstanceId(String stageInstanceId);

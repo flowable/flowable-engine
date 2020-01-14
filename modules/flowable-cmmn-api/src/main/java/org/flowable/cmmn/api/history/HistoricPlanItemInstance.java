@@ -28,6 +28,8 @@ public interface HistoricPlanItemInstance {
 
     String getCaseDefinitionId();
 
+    String getDerivedCaseDefinitionId();
+
     String getCaseInstanceId();
 
     String getStageInstanceId();

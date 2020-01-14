@@ -27,6 +27,7 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     void setName(String name);
     void setState(String state);
     void setCaseDefinitionId(String caseDefinitionId);
+    void setDerivedCaseDefinitionId(String derivedCaseDefinitionId);
     void setCaseInstanceId(String caseInstanceId);
     void setStageInstanceId(String stageInstanceId);
     void setStage(boolean isStage);
