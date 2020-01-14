@@ -18,15 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.FlowableTestCase;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,14 +40,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class EventRegistryEventSubprocessTest extends FlowableTestCase {
+public class EventRegistryEventSubprocessTest extends PluggableFlowableTestCase {
     
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         inboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
@@ -71,7 +73,7 @@ public class EventRegistryEventSubprocessTest extends FlowableTestCase {
         return inboundEventChannelAdapter;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         getEventRegistry().removeChannelModel("test-channel");
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
@@ -79,8 +81,6 @@ public class EventRegistryEventSubprocessTest extends FlowableTestCase {
         for (EventDeployment eventDeployment : deployments) {
             eventRepositoryService.deleteDeployment(eventDeployment.getId());
         }
-
-        super.tearDown();
     }
 
     @Test
@@ -200,5 +200,18 @@ public class EventRegistryEventSubprocessTest extends FlowableTestCase {
             }
         }
 
+    }
+    
+    protected EventRepositoryService getEventRepositoryService() {
+        return getEventRegistryEngineConfiguration().getEventRepositoryService();
+    }
+
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
+            .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
     }
 }

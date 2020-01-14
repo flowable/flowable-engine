@@ -91,10 +91,10 @@ public abstract class FlowableTestCase extends TestCase {
 
         if (processEngine == null) {
             initializeProcessEngine();
-            initializeServices();
-            initializeMockSupport();
         }
-
+        
+        initializeServices();
+        initializeMockSupport();
     }
 
     @Override
