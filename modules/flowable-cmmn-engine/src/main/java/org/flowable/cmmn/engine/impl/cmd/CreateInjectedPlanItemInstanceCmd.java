@@ -86,7 +86,8 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
             .addToParent(true)
             .create();
 
-        // after adding the plan item to the stage, add it to the agenda for activation processing
+        // after adding the plan item to the stage, add it to the agenda for creation and afterwards for activation processing
+        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(planItemInstanceEntity);
         CommandContextUtil.getAgenda(commandContext).planEvaluateToActivatePlanItemInstanceOperation(planItemInstanceEntity);
 
         return planItemInstanceEntity;
