@@ -51,8 +51,12 @@ public class DefaultEventRegistryChangeDetector implements EventRegistryChangeDe
     @Override
     public void initialize() {
         this.scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder().namingPattern(threadName).build());
-        this.changeDetectionRunnable = new EventRegistryChangeDetectionRunnable(this);
+        this.changeDetectionRunnable = createChangeDetectionRunnable();
         this.scheduledExecutorService.scheduleAtFixedRate(this.changeDetectionRunnable, initialDelayInMs, delayInMs, TimeUnit.MILLISECONDS);
+    }
+
+    protected Runnable createChangeDetectionRunnable() {
+        return new EventRegistryChangeDetectionRunnable(this);
     }
 
     @Override

@@ -179,12 +179,12 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
         if (handleEventRegistryEngineDeploymentsAfterEngineCreate) {
             eventRegistryEngine.handleDeployedChannelDefinitions();
+
+            if (enableEventRegistryChangeDetection) {
+                eventRegistryChangeDetector.initialize();
+            }
         }
 
-        if (enableEventRegistryChangeDetection) {
-            eventRegistryChangeDetector.initialize();
-        }
-        
         return eventRegistryEngine;
     }
 

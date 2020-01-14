@@ -62,6 +62,7 @@ import org.springframework.jms.config.JmsListenerEndpointRegistry;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaOperations;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -104,9 +105,10 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         DataSource dataSource,
         PlatformTransactionManager platformTransactionManager,
         ObjectProvider<List<ChannelModelProcessor>> channelModelProcessors,
-        ObjectProvider<List<AutoDeploymentStrategy<EventRegistryEngine>>> eventAutoDeploymentStrategies
+        ObjectProvider<List<AutoDeploymentStrategy<EventRegistryEngine>>> eventAutoDeploymentStrategies,
+        ObjectProvider<TaskScheduler> taskScheduler
     ) throws IOException {
-        
+
         SpringEventRegistryEngineConfiguration configuration = new SpringEventRegistryEngineConfiguration();
 
         List<Resource> resources = this.discoverDeploymentResources(
@@ -141,6 +143,14 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         if (channelProcessors != null && channelProcessors.size() > 0) {
             for (ChannelModelProcessor channelModelProcessor : channelProcessors) {
                 configuration.addChannelDefinitionProcessor(channelModelProcessor);
+            }
+        }
+
+        if (eventProperties.isEnableChangeDetection()) {
+            configuration.setEnableEventRegistryChangeDetection(true);
+            TaskScheduler taskSchedulerInstance = taskScheduler.getIfAvailable();
+            if (taskSchedulerInstance != null) {
+                configuration.setEventChangeDetectorTaskScheduler(taskSchedulerInstance);
             }
         }
 

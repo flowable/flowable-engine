@@ -33,10 +33,14 @@ import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfigur
 import org.flowable.eventregistry.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetector;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -44,7 +48,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author David Syer
  * @author Joram Barrez
  */
-public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineConfiguration implements SpringEngineConfiguration {
+public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineConfiguration implements SpringEngineConfiguration, DisposableBean {
 
     protected PlatformTransactionManager transactionManager;
     protected String deploymentName = "SpringAutoDeployment";
@@ -52,7 +56,10 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    private Collection<AutoDeploymentStrategy<EventRegistryEngine>> deploymentStrategies = new ArrayList<>();
+    protected Collection<AutoDeploymentStrategy<EventRegistryEngine>> deploymentStrategies = new ArrayList<>();
+    protected TaskScheduler eventChangeDetectorTaskScheduler;
+    protected boolean eventChangeDetectorTaskSchedulerIsSpringBean = true;
+
     protected volatile boolean running = false;
     protected List<String> enginesBuild = new ArrayList<>();
     protected final Object lifeCycleMonitor = new Object();
@@ -195,6 +202,14 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
         this.deploymentStrategies = deploymentStrategies;
     }
 
+    public TaskScheduler getEventChangeDetectorTaskScheduler() {
+        return eventChangeDetectorTaskScheduler;
+    }
+
+    public void setEventChangeDetectorTaskScheduler(TaskScheduler eventChangeDetectorTaskScheduler) {
+        this.eventChangeDetectorTaskScheduler = eventChangeDetectorTaskScheduler;
+    }
+
     @Override
     public void start() {
         synchronized (lifeCycleMonitor) {
@@ -202,10 +217,50 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
                 enginesBuild.forEach(name -> {
                     EventRegistryEngine eventRegistryEngine = EventRegistryEngines.getEventRegistryEngine(name);
                     eventRegistryEngine.handleDeployedChannelDefinitions();
+
+                    createAndInitEventRegistryChangeDetector();
+
                     autoDeployResources(eventRegistryEngine);
                 });
                 running = true;
             }
+        }
+    }
+
+    @Override
+    public void initChangeDetector() {
+        if (eventRegistryChangeDetector == null && enableEventRegistryChangeDetection) {
+
+            if (eventChangeDetectorTaskScheduler == null) {
+                ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+                threadPoolTaskScheduler.setPoolSize(1);
+                threadPoolTaskScheduler.setThreadNamePrefix("flowable-event-change-detector-");
+                eventChangeDetectorTaskScheduler = threadPoolTaskScheduler;
+
+                // Need to keep a flag to properly destroy the scheduler later if it's not injected
+                eventChangeDetectorTaskSchedulerIsSpringBean = false;
+            }
+
+            eventRegistryChangeDetector = new DefaultSpringEventRegistryChangeDetector(this,
+                eventRegistryChangeDetectionInitialDelayInMs, eventRegistryChangeDetectionDelayInMs, eventChangeDetectorTaskScheduler);
+        }
+    }
+
+    protected void createAndInitEventRegistryChangeDetector() {
+        if (eventRegistryChangeDetector != null) {
+
+            if (!eventChangeDetectorTaskSchedulerIsSpringBean && (eventChangeDetectorTaskScheduler instanceof ThreadPoolTaskScheduler)) {
+                ((ThreadPoolTaskScheduler) eventChangeDetectorTaskScheduler).initialize();
+            }
+
+            eventRegistryChangeDetector.initialize();
+        }
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if (!eventChangeDetectorTaskSchedulerIsSpringBean && eventChangeDetectorTaskScheduler != null) {
+            ((DisposableBean) eventChangeDetectorTaskScheduler).destroy();
         }
     }
 

@@ -26,7 +26,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 public class FlowableEventRegistryProperties {
 
     /**
-     * The name of the deployment for the form resources.
+     * The name of the deployment for the event registry resources.
      */
     private String deploymentName = "SpringBootAutoDeployment";
 
@@ -48,12 +48,17 @@ public class FlowableEventRegistryProperties {
     private boolean deployResources = true;
 
     /**
-     * Whether the form engine needs to be started.
+     * Whether to enable the automatic detection of changes when done on other engines (but against same database).
+     */
+    private boolean enableChangeDetection = false;
+
+    /**
+     * Whether the event registry engine needs to be started.
      */
     private boolean enabled = true;
 
     /**
-     * The servlet configuration for the Form Rest API.
+     * The servlet configuration for the event registry Rest API.
      */
     @NestedConfigurationProperty
     private final FlowableServlet servlet = new FlowableServlet("/event-registry-api", "Flowable Event Registry Rest API");
@@ -88,6 +93,14 @@ public class FlowableEventRegistryProperties {
 
     public void setDeployResources(boolean deployResources) {
         this.deployResources = deployResources;
+    }
+
+    public boolean isEnableChangeDetection() {
+        return enableChangeDetection;
+    }
+
+    public void setEnableChangeDetection(boolean enableChangeDetection) {
+        this.enableChangeDetection = enableChangeDetection;
     }
 
     public boolean isEnabled() {
