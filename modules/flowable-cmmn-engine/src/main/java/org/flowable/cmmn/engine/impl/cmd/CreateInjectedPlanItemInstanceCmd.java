@@ -55,30 +55,33 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
             throw new FlowableIllegalArgumentException("The case element needs to be a plan item, but is a " + caseElement.getClass().getName());
         }
 
+        String runningCaseDefinitionId;
         String caseInstanceId;
-        String stagePlanItemInstanceId = null;
         String tenantId;
 
+        PlanItemInstance stagePlanItemInstance = null;
         if (planItemInstanceBuilder.injectInStage()) {
-            stagePlanItemInstanceId = planItemInstanceBuilder.getStagePlanItemInstanceId();
-            PlanItemInstance stageInstance = getStageInstanceEntity(commandContext);
-            caseInstanceId = stageInstance.getCaseInstanceId();
-            tenantId = stageInstance.getTenantId();
+            stagePlanItemInstance = getStageInstanceEntity(commandContext);
+            caseInstanceId = stagePlanItemInstance.getCaseInstanceId();
+            tenantId = stagePlanItemInstance.getTenantId();
+            runningCaseDefinitionId = stagePlanItemInstance.getCaseDefinitionId();
         } else if (planItemInstanceBuilder.injectInCase()) {
             CaseInstance caseInstance = getCaseInstanceEntity(commandContext);
             caseInstanceId = caseInstance.getId();
             tenantId = caseInstance.getTenantId();
+            runningCaseDefinitionId = caseInstance.getCaseDefinitionId();
         } else {
             throw new FlowableIllegalArgumentException("A dynamically created plan item can only be injected into a running stage instance or case instance.");
         }
 
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
             .createPlanItemInstanceEntityBuilder()
-            .caseDefinitionId(planItemInstanceBuilder.getCaseDefinitionId())
+            .caseDefinitionId(runningCaseDefinitionId)
+            .derivedCaseDefinitionId(planItemInstanceBuilder.getCaseDefinitionId())
             .planItem((PlanItem) caseElement)
             .name(planItemInstanceBuilder.getName())
             .caseInstanceId(caseInstanceId)
-            .stagePlanItemInstanceId(stagePlanItemInstanceId)
+            .stagePlanItemInstance(stagePlanItemInstance)
             .tenantId(tenantId)
             .addToParent(true)
             .create();

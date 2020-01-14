@@ -26,6 +26,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String name;
     protected String state;
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected boolean isStage;
@@ -57,6 +58,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("caseDefinitionId", caseDefinitionId);
+        persistentState.put("derivedCaseDefinitionId", derivedCaseDefinitionId);
         persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("stageInstanceId", stageInstanceId);
         persistentState.put("isStage", isStage);
@@ -116,6 +118,16 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
+    }
+
+    @Override
+    public void setDerivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
+    }
+
+    @Override
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
     }
 
     @Override

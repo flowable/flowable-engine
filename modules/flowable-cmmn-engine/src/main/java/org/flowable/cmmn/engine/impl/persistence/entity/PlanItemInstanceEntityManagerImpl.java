@@ -72,6 +72,7 @@ public class PlanItemInstanceEntityManagerImpl
 
         PlanItemInstanceEntity planItemInstanceEntity = create();
         planItemInstanceEntity.setCaseDefinitionId(builder.getCaseDefinitionId());
+        planItemInstanceEntity.setDerivedCaseDefinitionId(builder.getDerivedCaseDefinitionId());
         planItemInstanceEntity.setCaseInstanceId(builder.getCaseInstanceId());
 
         planItemInstanceEntity.setCreateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
@@ -86,7 +87,17 @@ public class PlanItemInstanceEntityManagerImpl
         } else {
             planItemInstanceEntity.setStage(false);
         }
-        planItemInstanceEntity.setStageInstanceId(builder.getStagePlanItemInstanceId());
+
+        PlanItemInstance stagePlanItemInstance = builder.getStagePlanItemInstance();
+        if (stagePlanItemInstance != null) {
+            planItemInstanceEntity.setStageInstanceId(stagePlanItemInstance.getId());
+
+            // if the stage has a derived case definition id (e.g. was dynamically injected, we need to pass it on to child plan items, otherwise they cannot
+            // load the plan item model
+            if (stagePlanItemInstance.getDerivedCaseDefinitionId() != null && builder.getDerivedCaseDefinitionId() == null) {
+                planItemInstanceEntity.setDerivedCaseDefinitionId(stagePlanItemInstance.getDerivedCaseDefinitionId());
+            }
+        }
         planItemInstanceEntity.setTenantId(builder.getTenantId());
 
         insert(planItemInstanceEntity);

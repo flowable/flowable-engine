@@ -357,7 +357,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                                     .planItem(parentPlanItem)
                                     .caseDefinitionId(caseInstanceEntity.getCaseDefinitionId())
                                     .caseInstanceId(caseInstanceEntity.getId())
-                                    .stagePlanItemInstanceId(previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null)
+                                    .stagePlanItemInstance(previousParentPlanItemInstance)
                                     .tenantId(caseInstanceEntity.getTenantId())
                                     .addToParent(true)
                                     .create();
@@ -386,7 +386,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                             .planItem(entryDependentPlanItem)
                             .caseDefinitionId(caseInstanceEntity.getCaseDefinitionId())
                             .caseInstanceId(caseInstanceEntity.getId())
-                            .stagePlanItemInstanceId(previousParentPlanItemInstance != null ? previousParentPlanItemInstance.getId() : null)
+                            .stagePlanItemInstance(previousParentPlanItemInstance)
                             // previous is closest parent stage plan item instance
                             .tenantId(caseInstanceEntity.getTenantId())
                             .addToParent(true)

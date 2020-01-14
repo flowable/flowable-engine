@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Map;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
@@ -28,8 +29,9 @@ public class PlanItemInstanceEntityBuilderImpl implements PlanItemInstanceEntity
     protected PlanItem planItem;
     protected String name;
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
-    protected String stagePlanItemInstanceId;
+    protected PlanItemInstance stagePlanItemInstance;
     protected String tenantId;
     protected Map<String, Object> localVariables;
     protected boolean addToParent;
@@ -55,13 +57,18 @@ public class PlanItemInstanceEntityBuilderImpl implements PlanItemInstanceEntity
         return this;
     }
     @Override
+    public PlanItemInstanceEntityBuilder derivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
+        return this;
+    }
+    @Override
     public PlanItemInstanceEntityBuilder caseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
         return this;
     }
     @Override
-    public PlanItemInstanceEntityBuilder stagePlanItemInstanceId(String stagePlanItemInstanceId) {
-        this.stagePlanItemInstanceId = stagePlanItemInstanceId;
+    public PlanItemInstanceEntityBuilder stagePlanItemInstance(PlanItemInstance stagePlanItemInstance) {
+        this.stagePlanItemInstance = stagePlanItemInstance;
         return this;
     }
     @Override
@@ -99,11 +106,14 @@ public class PlanItemInstanceEntityBuilderImpl implements PlanItemInstanceEntity
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
+    }
     public String getCaseInstanceId() {
         return caseInstanceId;
     }
-    public String getStagePlanItemInstanceId() {
-        return stagePlanItemInstanceId;
+    public PlanItemInstance getStagePlanItemInstance() {
+        return stagePlanItemInstance;
     }
     public String getTenantId() {
         return tenantId;

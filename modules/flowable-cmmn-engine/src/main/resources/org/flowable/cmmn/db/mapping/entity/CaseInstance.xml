@@ -191,6 +191,7 @@
         P.ID_ as PI_ID_,
         P.REV_ as PI_REV_,
         P.CASE_DEF_ID_ as PI_CASE_DEF_ID_,
+        P.DERIVED_CASE_DEF_ID_ as PI_DERIVED_CASE_DEF_ID_,
         P.CASE_INST_ID_ as PI_CASE_INST_ID_,
         P.STAGE_INST_ID_ as PI_STAGE_INST_ID_,
         P.IS_STAGE_ as PI_IS_STAGE_,

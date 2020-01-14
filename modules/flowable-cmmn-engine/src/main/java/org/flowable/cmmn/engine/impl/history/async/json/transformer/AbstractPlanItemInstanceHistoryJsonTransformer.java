@@ -31,6 +31,7 @@ public abstract class AbstractPlanItemInstanceHistoryJsonTransformer extends Abs
         historicPlanItemInstanceEntity.setName(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_NAME));
         historicPlanItemInstanceEntity.setState(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STATE));
         historicPlanItemInstanceEntity.setCaseDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID));
+        historicPlanItemInstanceEntity.setDerivedCaseDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_DERIVED_CASE_DEFINITION_ID));
         historicPlanItemInstanceEntity.setCaseInstanceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID));
         historicPlanItemInstanceEntity.setStageInstanceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STAGE_INSTANCE_ID));
         historicPlanItemInstanceEntity.setStage(getBooleanFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_IS_STAGE));

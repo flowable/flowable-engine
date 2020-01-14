@@ -237,6 +237,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setName(planItemInstanceEntity.getName());
             historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
             historicPlanItemInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
+            historicPlanItemInstanceEntity.setDerivedCaseDefinitionId(planItemInstanceEntity.getDerivedCaseDefinitionId());
             historicPlanItemInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
             historicPlanItemInstanceEntity.setStageInstanceId(planItemInstanceEntity.getStageInstanceId());
             historicPlanItemInstanceEntity.setStage(planItemInstanceEntity.isStage());
