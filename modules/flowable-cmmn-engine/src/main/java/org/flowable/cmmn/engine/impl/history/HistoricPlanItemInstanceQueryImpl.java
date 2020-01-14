@@ -479,6 +479,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
     }
+    @Override
     public String getId() {
         return planItemInstanceId;
     }

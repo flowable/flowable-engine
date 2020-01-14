@@ -129,6 +129,7 @@ public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMi
         return CommandContextUtil.getHistoricMilestoneInstanceEntityManager(commandContext).findHistoricMilestoneInstancesByQueryCriteria(this);
     }
 
+    @Override
     public String getId() {
         return id;
     }

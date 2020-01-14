@@ -571,6 +571,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
     
+    @Override
     public EventRegistry getEventRegistry() {
         return eventRegistry;
     }

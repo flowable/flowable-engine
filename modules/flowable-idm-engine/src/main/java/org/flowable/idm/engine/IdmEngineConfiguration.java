@@ -378,6 +378,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
     }
 
+    @Override
     public void initEventDispatcher() {
         if (this.eventDispatcher == null) {
             this.eventDispatcher = new FlowableEventDispatcherImpl();

@@ -31,16 +31,19 @@ import org.junit.Test;
  */
 public class TaskJsonConverterTest  extends AbstractConverterTest{
 
+    @Override
     @Test
     public void convertJsonToModel() throws Exception {
         CmmnModel cmmnModel = readJsonFile();
         validateModel(cmmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.taskBlockingexpression.json";
     }
 
+    @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
         assertEquals("shareniu_test", caseModel.getId());

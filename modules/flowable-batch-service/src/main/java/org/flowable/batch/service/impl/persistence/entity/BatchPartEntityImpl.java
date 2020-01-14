@@ -64,6 +64,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return batchType;
     }
 
+    @Override
     public void setBatchType(String batchType) {
         this.batchType = batchType;
     }
@@ -73,6 +74,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return batchId;
     }
 
+    @Override
     public void setBatchId(String batchId) {
         this.batchId = batchId;
     }
@@ -82,6 +84,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return createTime;
     }
 
+    @Override
     public void setCreateTime(Date time) {
         this.createTime = time;
     }
@@ -91,6 +94,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return completeTime;
     }
 
+    @Override
     public void setCompleteTime(Date time) {
         this.completeTime = time;
     }
@@ -105,6 +109,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return scopeId;
     }
 
+    @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
     }
@@ -114,6 +119,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return subScopeId;
     }
 
+    @Override
     public void setSubScopeId(String subScopeId) {
         this.subScopeId = subScopeId;
     }
@@ -123,6 +129,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return scopeType;
     }
 
+    @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
     }
@@ -132,6 +139,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return batchSearchKey;
     }
 
+    @Override
     public void setBatchSearchKey(String batchSearchKey) {
         this.batchSearchKey = batchSearchKey;
     }
@@ -141,6 +149,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return batchSearchKey2;
     }
 
+    @Override
     public void setBatchSearchKey2(String batchSearchKey2) {
         this.batchSearchKey2 = batchSearchKey2;
     }
@@ -150,10 +159,12 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         return status;
     }
 
+    @Override
     public void setStatus(String status) {
         this.status = status;
     }
 
+    @Override
     public BatchByteArrayRef getResultDocRefId() {
         return resultDocRefId;
     }
@@ -178,10 +189,12 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         this.resultDocRefId = setByteArrayRef(this.resultDocRefId, BATCH_RESULT_LABEL, resultDocumentJson);
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

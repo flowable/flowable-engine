@@ -58,6 +58,7 @@ public class EventSubscriptionEntityManagerImpl
         return dataManager.createGenericEventSubscriptionEntity();
     }
 
+    @Override
     public EventSubscription createEventSubscription(EventSubscriptionBuilder eventSubscriptionBuilder) {
         if (SignalEventSubscriptionEntity.EVENT_TYPE.equals(eventSubscriptionBuilder.getEventType())) {
             return insertSignalEvent(eventSubscriptionBuilder);
