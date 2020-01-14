@@ -382,7 +382,7 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
 
         CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem5");
 
-        // inject new plan item into Stage A
+        // inject new plan item into running case
         PlanItemInstance injectedStage = dynamicCmmnService
             .createInjectedPlanItemInstanceBuilder()
             .name("Injected Stage")
@@ -544,7 +544,7 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
 
         CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem8");
 
-        // inject new plan item into Stage A
+        // inject new plan item into running case
         PlanItemInstance injectedStage = dynamicCmmnService
             .createInjectedPlanItemInstanceBuilder()
             .name("Injected Stage")
@@ -709,7 +709,7 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
 
         CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem8");
 
-        // inject new plan item into Stage A
+        // inject new plan item into running case
         PlanItemInstance injectedStage = dynamicCmmnService
             .createInjectedPlanItemInstanceBuilder()
             .name("Injected Stage")

@@ -18,6 +18,7 @@ CmmnRepositoryService repositoryService = cmmnEngine.getCmmnRepositoryService();
 CmmnTaskService taskService = cmmnEngine.getCmmnTaskService();
 CmmnManagementService managementService = cmmnEngine.getCmmnManagementService();
 CmmnHistoryService historyService = cmmnEngine.getCmmnHistoryService();
+DynamicCmmnService dynamicCmmnService = cmmnEngine.getDynamicCmmnService();
 ----
 
 +CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration()+ will initialize and build a CMMN engine and afterwards always return the CMMN engine.
@@ -48,6 +49,8 @@ Tasks that need to be performed by human users of the system are core to a CMMN 
 The *CmmnHistoryService* exposes all historical data gathered by the Flowable CMMN engine. When executing cases, a lot of data can be kept by the engine (this is configurable), such as case instance start times, who did which tasks, how long it took to complete the tasks, which path was followed in each case instance, and so on. This service exposes mainly query  capabilities to access this data.
 
 The *CmmnManagementService* gives access to low-level information about the database tables, allows to query for the different types of jobs and to execute them.
+
+The *DynamicCmmnService* supports various features to dynamically modify a running CMMN case or its plan items. As an example, you can dynamically inject a plan item into an existing, running case instance or into a running stage to dynamically change the runtime execution of the case.
 
 For more detailed information on the service operations and the engine API, see link:$$http://www.flowable.org/docs/javadocs/index.html$$[the javadocs].
 
@@ -413,6 +416,79 @@ Calendar cal = new GregorianCalendar();
       .finishedBefore(cal.getTime())
       .delete();
 ----
+
+[[apiDynamicCmmnService]]
+
+
+=== Dynamic CMMN Service
+
+With the *DynamicCmmnService* you can dynamically modify running case- and plan item instances at runtime. One option is to inject a new plan item into a running case instance or even a stage.
+
+A new plan item to be injected can be referenced from the same definition as the running case or even from another, referenced (delegated) case definition, which then acts like a template.
+
+Regardless where the new plan item is coming from, it will be injected into a running case or stage and will become part of the case agenda which means, that it is evaluated for activation right after injection and if it does not have any entry sentries, is immediately activated. If it has entry-sentries, they will evaluated in the very same way as any others and as soon as satisfied, the injected plan item will become active. It is also considered for parent completion evaluation.
+
+You can also use any of the query APIs to search for such injected plan items, they will be available the very same way as regular, non-injected plan items.
+
+
+Examples:
+
+* Inject a new human task into a running stage or case instance
+* Inject a full stage into a running case or as a child stage into an existing stage
+
+
+==== Inject a new plan item into a running stage
+
+Here is an example on how to inject a human task from a "template" case definition into a running stage:
+
+[source,java,linenums]
+----
+// load the case definition where we want to inject a plan item from
+CaseDefinition dynamicPlanItemCase = cmmnRepositoryService.createCaseDefinitionQuery()
+    .caseDefinitionKey("templateCaseDefinition")
+    .latestVersion()
+    .singleResult();
+
+// get the plan item we want to inject as a case element
+CaseElement templateTask = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("templateTask");
+
+// query for the running stage in an active case
+PlanItemInstance runningStage = cmmnRuntimeService.createPlanItemInstanceQuery()
+    .caseInstanceId(runningCaseId)
+    .planItemInstanceElementId("myStage")
+    .singleResult();
+
+// inject new plan item (human task) into the running stage
+PlanItemInstance injectedTask = dynamicCmmnService
+    .createInjectedPlanItemInstanceBuilder()
+    .name("Injected Task")
+    .caseDefinitionId(dynamicPlanItemCase.getId())
+    .elementId(templateTask.getId())
+    .createInStage(runningStage.getId());
+----
+
+The second example creates and injects a full blown stage (including child plan items) into a running case instance:
+
+[source,java,linenums]
+----
+// load the case definition where we want to inject a stage from
+CaseDefinition dynamicPlanItemCase = cmmnRepositoryService.createCaseDefinitionQuery()
+    .caseDefinitionKey("dynamicPlanItemCase")
+    .latestVersion()
+    .singleResult();
+
+CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("stageElement");
+
+// inject new stage into existing, running case
+PlanItemInstance injectedStage = dynamicCmmnService
+    .createInjectedPlanItemInstanceBuilder()
+    .name("Injected Stage")
+    .caseDefinitionId(dynamicPlanItemCase.getId())
+    .elementId(templateStage.getId())
+    .createInCase(runningCaseId);
+----
+
+
 
 [[apiUnitTesting]]
 
