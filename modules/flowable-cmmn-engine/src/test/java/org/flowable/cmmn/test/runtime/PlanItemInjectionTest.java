@@ -100,6 +100,65 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.testDynamicPlanItemInjection.cmmn" })
+    public void testDynamicPlanItemInjectionInCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("dynamicPlanItemInjection").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+
+        // inject new plan item into case instance
+        PlanItemInstance injectedTask = dynamicCmmnService
+            .createInjectedPlanItemInstanceBuilder()
+            .name("Injected Task A")
+            .caseDefinitionId(caseInstance.getCaseDefinitionId())
+            .elementId(getPlanItemInstanceByName(planItemInstances, "Task A", ACTIVE).getElementId())
+            .createInCase(caseInstance.getId());
+
+        assertNotNull(injectedTask);
+        assertEquals(ACTIVE, injectedTask.getState());
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task A", ACTIVE);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+            .caseInstanceId(caseInstance.getId())
+            .active()
+            .list();
+
+        assertNotNull(tasks);
+        assertEquals(2, tasks.size());
+        assertSingleTaskExists(tasks, "Task A");
+        assertSingleTaskExists(tasks, "Injected Task A");
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task A", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task B", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Injected Task A", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Injected Task A", ACTIVE));
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.testDynamicPlanItemInjection.cmmn",
         "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.dynamicPlanItemTemplates.cmmn" })
     public void testDynamicPlanItemInjectionFromTemplate() {
@@ -159,6 +218,73 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(2, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.testDynamicPlanItemInjection.cmmn",
+        "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.dynamicPlanItemTemplates.cmmn" })
+    public void testDynamicPlanItemInjectionFromTemplateInCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("dynamicPlanItemInjection").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+
+        CaseDefinition dynamicPlanItemCase = cmmnRepositoryService.createCaseDefinitionQuery()
+            .caseDefinitionKey("dynamicPlanItemCase")
+            .latestVersion()
+            .singleResult();
+
+        CaseElement templateTask = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem1");
+
+        // inject new plan item into case instance
+        PlanItemInstance injectedTask = dynamicCmmnService
+            .createInjectedPlanItemInstanceBuilder()
+            .name("Injected Task A")
+            .caseDefinitionId(dynamicPlanItemCase.getId())
+            .elementId(templateTask.getId())
+            .createInCase(caseInstance.getId());
+
+        assertNotNull(injectedTask);
+        assertEquals(ACTIVE, injectedTask.getState());
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task A", ACTIVE);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+            .caseInstanceId(caseInstance.getId())
+            .active()
+            .list();
+
+        assertNotNull(tasks);
+        assertEquals(2, tasks.size());
+        assertSingleTaskExists(tasks, "Task A");
+        assertSingleTaskExists(tasks, "Injected Task A");
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task A", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task B", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(1, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Injected Task A", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Injected Task A", ACTIVE));
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
 
     @Test
@@ -239,6 +365,87 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.testDynamicPlanItemInjection.cmmn",
         "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.dynamicPlanItemTemplates.cmmn" })
+    public void testDynamicStagePlanItemInjectionFromTemplateInCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("dynamicPlanItemInjection").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+
+        CaseDefinition dynamicPlanItemCase = cmmnRepositoryService.createCaseDefinitionQuery()
+            .caseDefinitionKey("dynamicPlanItemCase")
+            .latestVersion()
+            .singleResult();
+
+        CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem5");
+
+        // inject new plan item into Stage A
+        PlanItemInstance injectedStage = dynamicCmmnService
+            .createInjectedPlanItemInstanceBuilder()
+            .name("Injected Stage")
+            .caseDefinitionId(dynamicPlanItemCase.getId())
+            .elementId(templateStage.getId())
+            .createInCase(caseInstance.getId());
+
+        assertNotNull(injectedStage);
+        assertEquals(ACTIVE, injectedStage.getState());
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(6, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task B", AVAILABLE);
+        assertTrue(getPlanItemInstanceByName(planItemInstances, "Injected Stage", ACTIVE).isStage());
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+            .caseInstanceId(caseInstance.getId())
+            .active()
+            .list();
+
+        assertNotNull(tasks);
+        assertEquals(2, tasks.size());
+        assertSingleTaskExists(tasks, "Task A");
+        assertSingleTaskExists(tasks, "Injected Task A");
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(5, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task B", AVAILABLE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Injected Task A", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task B", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task B", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(2, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Task B", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Injected Task B", ACTIVE));
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.testDynamicPlanItemInjection.cmmn",
+        "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.dynamicPlanItemTemplates.cmmn" })
     public void testDynamicStagePlanItemInjectionWithSentryFromTemplate() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("dynamicPlanItemInjection").start();
 
@@ -312,6 +519,90 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(2, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.testDynamicPlanItemInjection.cmmn",
+        "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.dynamicPlanItemTemplates.cmmn" })
+    public void testDynamicStagePlanItemInjectionWithSentryFromTemplateInCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("dynamicPlanItemInjection").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+
+        CaseDefinition dynamicPlanItemCase = cmmnRepositoryService.createCaseDefinitionQuery()
+            .caseDefinitionKey("dynamicPlanItemCase")
+            .latestVersion()
+            .singleResult();
+
+        // already make sure the condition for the injected stage entry sentry will be satisfied when the stage will be injected
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "injectedStageEnabled", true);
+
+        CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem8");
+
+        // inject new plan item into Stage A
+        PlanItemInstance injectedStage = dynamicCmmnService
+            .createInjectedPlanItemInstanceBuilder()
+            .name("Injected Stage")
+            .caseDefinitionId(dynamicPlanItemCase.getId())
+            .elementId(templateStage.getId())
+            .createInCase(caseInstance.getId());
+
+        assertNotNull(injectedStage);
+        assertEquals(ACTIVE, injectedStage.getState());
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(6, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task X", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task Y", ACTIVE);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+            .caseInstanceId(caseInstance.getId())
+            .active()
+            .list();
+
+        assertNotNull(tasks);
+        assertEquals(3, tasks.size());
+        assertSingleTaskExists(tasks, "Task A");
+        assertSingleTaskExists(tasks, "Task X");
+        assertSingleTaskExists(tasks, "Task Y");
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(5, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task X", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task Y", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task X", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task Y", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task B", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(2, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task Y", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task Y", ACTIVE));
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
 
     @Test
@@ -396,6 +687,96 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertEquals(2, planItemInstances.size());
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.testDynamicPlanItemInjection.cmmn",
+        "org/flowable/cmmn/test/runtime/PlanItemInjectionTest.dynamicPlanItemTemplates.cmmn" })
+    public void testDynamicStagePlanItemInjectionWithSentryConditionFromTemplateInCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("dynamicPlanItemInjection").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+
+        assertEquals(3, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+
+        CaseDefinition dynamicPlanItemCase = cmmnRepositoryService.createCaseDefinitionQuery()
+            .caseDefinitionKey("dynamicPlanItemCase")
+            .latestVersion()
+            .singleResult();
+
+        CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem8");
+
+        // inject new plan item into Stage A
+        PlanItemInstance injectedStage = dynamicCmmnService
+            .createInjectedPlanItemInstanceBuilder()
+            .name("Injected Stage")
+            .caseDefinitionId(dynamicPlanItemCase.getId())
+            .elementId(templateStage.getId())
+            .createInCase(caseInstance.getId());
+
+        assertNotNull(injectedStage);
+        assertEquals(AVAILABLE, injectedStage.getState());
+
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", AVAILABLE);
+        assertTrue(getPlanItemInstanceByName(planItemInstances, "Injected Stage", AVAILABLE).isStage());
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "injectedStageEnabled", true);
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(6, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task X", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task Y", ACTIVE);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+            .caseInstanceId(caseInstance.getId())
+            .active()
+            .list();
+
+        assertNotNull(tasks);
+        assertEquals(3, tasks.size());
+        assertSingleTaskExists(tasks, "Task A");
+        assertSingleTaskExists(tasks, "Task X");
+        assertSingleTaskExists(tasks, "Task Y");
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(5, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task X", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task Y", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task X", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(4, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task Y", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task B", ACTIVE));
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertEquals(2, planItemInstances.size());
+        assertPlanItemInstanceState(planItemInstances, "Injected Stage", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task Y", ACTIVE);
+
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task Y", ACTIVE));
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
 
     @Override
