@@ -22,10 +22,9 @@ import org.flowable.cmmn.api.runtime.InjectedPlanItemInstanceBuilder;
 public interface DynamicCmmnService {
 
     /**
-     * Creates a new builder to dynamically create a new plan item and inject it into a running stage.
+     * Creates a new builder to dynamically create a new plan item and inject it into a running stage or case instance.
      *
-     * @param stagePlanItemInstanceId the id of the running stage plan item instance to inject a new plan item into
      * @return the builder used to create the new plan item to be dynamically injected
      */
-    InjectedPlanItemInstanceBuilder createInjectedPlanItemInstanceBuilder(String stagePlanItemInstanceId);
+    InjectedPlanItemInstanceBuilder createInjectedPlanItemInstanceBuilder();
 }

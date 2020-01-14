@@ -1063,6 +1063,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initServices() {
         initService(cmmnRuntimeService);
+        initService(dynamicCmmnService);
         initService(cmmnTaskService);
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
