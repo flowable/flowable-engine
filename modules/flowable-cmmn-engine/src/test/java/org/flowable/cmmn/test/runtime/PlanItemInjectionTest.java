@@ -58,7 +58,7 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
 
         // inject new plan item into Stage A
-        PlanItemInstance injectedTask = cmmnRuntimeService
+        PlanItemInstance injectedTask = dynamicCmmnService
             .createInjectedPlanItemInstanceBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Stage A", ACTIVE))
             .name("Injected Task A")
             .caseDefinitionId(caseInstance.getCaseDefinitionId())
@@ -120,7 +120,7 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         CaseElement templateTask = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem1");
 
         // inject new plan item into Stage A
-        PlanItemInstance injectedTask = cmmnRuntimeService
+        PlanItemInstance injectedTask = dynamicCmmnService
             .createInjectedPlanItemInstanceBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Stage A", ACTIVE))
             .name("Injected Task A")
             .caseDefinitionId(dynamicPlanItemCase.getId())
@@ -182,7 +182,7 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem5");
 
         // inject new plan item into Stage A
-        PlanItemInstance injectedStage = cmmnRuntimeService
+        PlanItemInstance injectedStage = dynamicCmmnService
             .createInjectedPlanItemInstanceBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Stage A", ACTIVE))
             .name("Injected Stage")
             .caseDefinitionId(dynamicPlanItemCase.getId())
@@ -260,7 +260,7 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem8");
 
         // inject new plan item into Stage A
-        PlanItemInstance injectedStage = cmmnRuntimeService
+        PlanItemInstance injectedStage = dynamicCmmnService
             .createInjectedPlanItemInstanceBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Stage A", ACTIVE))
             .name("Injected Stage")
             .caseDefinitionId(dynamicPlanItemCase.getId())
@@ -335,7 +335,7 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         CaseElement templateStage = getCase(dynamicPlanItemCase.getId()).getAllCaseElements().get("planItem8");
 
         // inject new plan item into Stage A
-        PlanItemInstance injectedStage = cmmnRuntimeService
+        PlanItemInstance injectedStage = dynamicCmmnService
             .createInjectedPlanItemInstanceBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Stage A", ACTIVE))
             .name("Injected Stage")
             .caseDefinitionId(dynamicPlanItemCase.getId())

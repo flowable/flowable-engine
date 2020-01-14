@@ -24,8 +24,6 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.api.runtime.InjectedPlanItemInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
 import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
@@ -70,7 +68,6 @@ import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminatePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
@@ -96,20 +93,6 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId) {
         return new PlanItemInstanceTransitionBuilderImpl(commandExecutor, planItemInstanceId);
-    }
-
-    @Override
-    public InjectedPlanItemInstanceBuilder createInjectedPlanItemInstanceBuilder(String stagePlanItemInstanceId) {
-        PlanItemInstance planItemInstance = createPlanItemInstanceQuery().planItemInstanceId(stagePlanItemInstanceId).singleResult();
-        if (planItemInstance == null) {
-            throw new FlowableIllegalArgumentException(
-                "The stage plan item instance id " + stagePlanItemInstanceId + " could not be found or is no longer active.");
-        }
-        if (!planItemInstance.isStage()) {
-            throw new FlowableIllegalArgumentException("A dynamically created plan item can only be injected into a running stage plan item.");
-        }
-
-        return new InjectedPlanItemInstanceBuilderImpl(commandExecutor, planItemInstance);
     }
 
     public CaseInstance startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
