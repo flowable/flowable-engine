@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -68,15 +68,12 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         }
 
         List<EventCorrelationParameterInstance> list = new ArrayList<>(correlationParameterInstances);
-        Collection<CorrelationKey> correlationKeys = new ArrayList<>();
+        Collection<CorrelationKey> correlationKeys = new HashSet<>();
         for (int i = 1; i <= list.size(); i++) {
             for (int j = 0; j <= list.size() - i; j++) {
                 List<EventCorrelationParameterInstance> parameterSubList = list.subList(j, j + i);
                 String correlationKey = generateCorrelationKey(parameterSubList);
-
-                if (correlationKeys.stream().noneMatch(c -> Objects.equals(c.getValue(), correlationKey))) {
-                    correlationKeys.add(new CorrelationKey(correlationKey, parameterSubList));
-                }
+                correlationKeys.add(new CorrelationKey(correlationKey, parameterSubList));
             }
         }
 

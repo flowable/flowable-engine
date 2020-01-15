@@ -12,6 +12,8 @@
  */
 package org.flowable.eventregistry.impl.runtime;
 
+import java.util.Objects;
+
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.model.EventCorrelationParameter;
 
@@ -58,4 +60,20 @@ public class EventCorrelationParameterInstanceImpl implements EventCorrelationPa
         this.value = value;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        EventCorrelationParameterInstanceImpl that = (EventCorrelationParameterInstanceImpl) o;
+        return Objects.equals(eventCorrelationParameterDefinition, that.eventCorrelationParameterDefinition) && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(eventCorrelationParameterDefinition, value);
+    }
 }
