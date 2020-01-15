@@ -668,12 +668,12 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
     
     @Override
-    public void addEventBusConsumer(EventRegistryEventConsumer eventConsumer) {
+    public void addEventRegistryConsumer(EventRegistryEventConsumer eventConsumer) {
         commandExecutor.execute(new AddEventConsumerCommand(eventConsumer));
     }
     
     @Override
-    public void removeEventBusConsumer(EventRegistryEventConsumer eventConsumer) {
+    public void removeEventRegistryConsumer(EventRegistryEventConsumer eventConsumer) {
         commandExecutor.execute(new RemoveEventConsumerCommand(eventConsumer));
     }
 

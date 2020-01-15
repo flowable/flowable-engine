@@ -1286,9 +1286,9 @@ public interface RuntimeService {
      */
     void dispatchEvent(FlowableEvent event);
     
-    void addEventBusConsumer(EventRegistryEventConsumer eventConsumer);
+    void addEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
     
-    void removeEventBusConsumer(EventRegistryEventConsumer eventConsumer);
+    void removeEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
 
     /**
      * Sets the name for the process instance with the given id.

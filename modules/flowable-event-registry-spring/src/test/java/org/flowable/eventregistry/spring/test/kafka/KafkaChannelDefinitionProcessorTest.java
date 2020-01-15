@@ -88,13 +88,13 @@ class KafkaChannelDefinitionProcessorTest {
     @BeforeEach
     void setUp() {
         testEventConsumer = new TestEventConsumer();
-        eventRegistry.registerEventRegistryEventBusConsumer(testEventConsumer);
+        eventRegistry.registerEventRegistryEventConsumer(testEventConsumer);
     }
 
     @AfterEach
     void tearDown() throws Exception {
         testEventConsumer.clear();
-        eventRegistry.removeFlowableEventConsumer(testEventConsumer);
+        eventRegistry.removeFlowableEventRegistryEventConsumer(testEventConsumer);
         Map<TopicPartition, RecordsToDelete> recordsToDelete = new HashMap<>();
         Map<String, TopicDescription> topicDescriptions = adminClient.describeTopics(topicsToDelete)
             .all()

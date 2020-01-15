@@ -32,7 +32,7 @@ public class RemoveEventConsumerCommand implements Command<Void> {
             throw new FlowableIllegalArgumentException("event consumer is null.");
         }
 
-        CommandContextUtil.getEventRegistry().removeFlowableEventConsumer(eventConsumer);
+        CommandContextUtil.getEventRegistry().removeFlowableEventRegistryEventConsumer(eventConsumer);
 
         return null;
     }

@@ -63,7 +63,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     public void setup() {
         testEventConsumer = new TestEventConsumer();
         EventRegistry eventRegistry = eventEngineConfiguration.getEventRegistry();
-        eventRegistry.registerEventRegistryEventBusConsumer(this.testEventConsumer);
+        eventRegistry.registerEventRegistryEventConsumer(this.testEventConsumer);
         eventRegistry.setInboundEventProcessor(new DefaultInboundEventProcessor(eventRegistry));
     }
     

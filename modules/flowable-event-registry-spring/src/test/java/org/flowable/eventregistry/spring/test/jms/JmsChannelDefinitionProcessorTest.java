@@ -61,13 +61,13 @@ class JmsChannelDefinitionProcessorTest {
     @BeforeEach
     void setUp() {
         testEventConsumer = new TestEventConsumer();
-        eventRegistry.registerEventRegistryEventBusConsumer(testEventConsumer);
+        eventRegistry.registerEventRegistryEventConsumer(testEventConsumer);
     }
 
     @AfterEach
     void tearDown() {
         testEventConsumer.clear();
-        eventRegistry.removeFlowableEventConsumer(testEventConsumer);
+        eventRegistry.removeFlowableEventRegistryEventConsumer(testEventConsumer);
     }
 
     @Test
