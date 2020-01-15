@@ -214,8 +214,8 @@ public class BpmnEventModelUtil {
             } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
                 channelEventKeyDetection.setJsonField(keyDetectionValue);
                 
-            } else if ("jsonPath".equalsIgnoreCase(keyDetectionType)) {
-                channelEventKeyDetection.setJsonPathExpression(keyDetectionValue);
+            } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
+                channelEventKeyDetection.setJsonPointerExpression(keyDetectionValue);
             }
             
             channelModel.setChannelEventKeyDetection(channelEventKeyDetection);

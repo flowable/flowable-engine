@@ -56,7 +56,7 @@ public class EventCorrelationParameter {
         EventCorrelationParameter that = (EventCorrelationParameter) o;
         return Objects.equals(name, that.name) && Objects.equals(type, that.type);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(name, type);

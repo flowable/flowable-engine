@@ -23,14 +23,14 @@ import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
-import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
+import org.flowable.eventregistry.impl.keydetector.JsonPointerBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.InboundEventStaticKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
-import org.flowable.eventregistry.impl.tenantdetector.JsonPathBasedInboundEventTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.JsonPointerBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
@@ -81,24 +81,24 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                     eventKeyDetector = new InboundEventStaticKeyDetector<>(keyDetection.getFixedValue());
                 } else if (StringUtils.isNotEmpty(keyDetection.getJsonField())) {
                     eventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(keyDetection.getJsonField());
-                } else if (StringUtils.isNotEmpty(keyDetection.getJsonPathExpression())) {
-                    eventKeyDetector = new JsonPathBasedInboundEventKeyDetector(keyDetection.getJsonPathExpression());
+                } else if (StringUtils.isNotEmpty(keyDetection.getJsonPointerExpression())) {
+                    eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(keyDetection.getJsonPointerExpression());
                 } else {
                     throw new FlowableException(
                         "The channel json key detection value was not found for the channel model with key " + inboundChannelModel.getKey()
-                            + ". One of fixedValue, jsonField or jsonPathExpression should be set.");
+                            + ". One of fixedValue, jsonField or jsonPointerExpression should be set.");
                 }
 
                 ChannelEventTenantIdDetection channelEventTenantIdDetection = inboundChannelModel.getChannelEventTenantIdDetection();
                 if (channelEventTenantIdDetection != null) {
                     if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getFixedValue())) {
                         eventTenantDetector = new InboundEventStaticTenantDetector<>(channelEventTenantIdDetection.getFixedValue());
-                    } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getJsonPathExpression())) {
-                        eventTenantDetector = new JsonPathBasedInboundEventTenantDetector(channelEventTenantIdDetection.getJsonPathExpression());
+                    } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getJsonPointerExpression())) {
+                        eventTenantDetector = new JsonPointerBasedInboundEventTenantDetector(channelEventTenantIdDetection.getJsonPointerExpression());
                     } else {
                         throw new FlowableException(
                             "The channel json tenant detection value was not found for the channel model with key " + inboundChannelModel.getKey()
-                                + ". One of fixedValue, jsonPathExpression should be set.");
+                                + ". One of fixedValue, jsonPointerExpression should be set.");
                     }
                 }
 

@@ -57,7 +57,7 @@ class KafkaInboundChannelJsonConverterTest extends AbstractChannelConverterTest 
                 assertThat(eventKeyDetection).isNotNull();
                 assertThat(eventKeyDetection.getFixedValue()).isNull();
                 assertThat(eventKeyDetection.getJsonField()).isEqualTo("eventKey");
-                assertThat(eventKeyDetection.getJsonPathExpression()).isNull();
+                assertThat(eventKeyDetection.getJsonPointerExpression()).isNull();
                 assertThat(eventKeyDetection.getXmlXPathExpression()).isNull();
 
                 assertThat(model.getTopics()).containsExactlyInAnyOrder("customer", "test-customer");

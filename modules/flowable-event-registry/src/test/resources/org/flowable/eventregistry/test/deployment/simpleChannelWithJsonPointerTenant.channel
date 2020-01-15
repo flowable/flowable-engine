@@ -11,6 +11,6 @@
         "fixedValue": "myEvent"
     },
     "channelEventTenantIdDetection": {
-        "jsonPathExpression": "/tenantId"
+        "jsonPointerExpression": "/tenantId"
     }
 }

@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class ChannelEventTenantIdDetection {
 
     protected String fixedValue;
-    protected String jsonPathExpression;
+    protected String jsonPointerExpression;
     protected String xPathExpression;
 
     public String getFixedValue() {
@@ -31,11 +31,11 @@ public class ChannelEventTenantIdDetection {
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
     }
-    public String getJsonPathExpression() {
-        return jsonPathExpression;
+    public String getJsonPointerExpression() {
+        return jsonPointerExpression;
     }
-    public void setJsonPathExpression(String jsonPathExpression) {
-        this.jsonPathExpression = jsonPathExpression;
+    public void setJsonPointerExpression(String jsonPointerExpression) {
+        this.jsonPointerExpression = jsonPointerExpression;
     }
     public String getxPathExpression() {
         return xPathExpression;

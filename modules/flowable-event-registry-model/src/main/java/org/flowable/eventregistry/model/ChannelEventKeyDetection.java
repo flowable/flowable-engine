@@ -23,7 +23,7 @@ public class ChannelEventKeyDetection {
 
     protected String fixedValue;
     protected String jsonField;
-    protected String jsonPathExpression;
+    protected String jsonPointerExpression;
     protected String xmlXPathExpression;
     
     public String getFixedValue() {
@@ -42,12 +42,12 @@ public class ChannelEventKeyDetection {
         this.jsonField = jsonField;
     }
     
-    public String getJsonPathExpression() {
-        return jsonPathExpression;
+    public String getJsonPointerExpression() {
+        return jsonPointerExpression;
     }
     
-    public void setJsonPathExpression(String jsonPathExpression) {
-        this.jsonPathExpression = jsonPathExpression;
+    public void setJsonPointerExpression(String jsonPointerExpression) {
+        this.jsonPointerExpression = jsonPointerExpression;
     }
 
     public String getXmlXPathExpression() {

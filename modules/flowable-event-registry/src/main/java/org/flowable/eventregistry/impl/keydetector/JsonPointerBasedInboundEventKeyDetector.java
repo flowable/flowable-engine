@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.impl.tenantdetector;
+package org.flowable.eventregistry.impl.keydetector;
 
-import org.flowable.eventregistry.api.InboundEventTenantDetector;
+import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,26 +24,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public class JsonPathBasedInboundEventTenantDetector implements InboundEventTenantDetector<JsonNode> {
+public class JsonPointerBasedInboundEventKeyDetector implements InboundEventKeyDetector<JsonNode> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonPathBasedInboundEventTenantDetector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonPointerBasedInboundEventKeyDetector.class);
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected String jsonPathExpression;
-    protected JsonPointer jsonPointer;
+    protected JsonPointer jsonPointerExpression;
 
-    public JsonPathBasedInboundEventTenantDetector(String jsonPathExpression) {
-        this.jsonPathExpression = jsonPathExpression;
-        this.jsonPointer = JsonPointer.compile(jsonPathExpression);
+    public JsonPointerBasedInboundEventKeyDetector(String jsonPointerExpression) {
+        this.jsonPointerExpression = JsonPointer.compile(jsonPointerExpression);
     }
 
     @Override
-    public String detectTenantId(JsonNode event) {
-        JsonNode result = event.at(jsonPointer);
+    public String detectEventDefinitionKey(JsonNode event) {
+        JsonNode result = event.at(jsonPointerExpression);
 
         if (result == null || result.isMissingNode() || result.isNull()) {
-            LOGGER.warn("JsonPath expression {} did not detect event tenant", jsonPointer);
+            LOGGER.warn("JsonPointer expression {} did not detect event key", jsonPointerExpression);
             return null;
         }
 
@@ -52,12 +50,5 @@ public class JsonPathBasedInboundEventTenantDetector implements InboundEventTena
         }
 
         return null;
-    }
-
-    public String getJsonPathExpression() {
-        return jsonPathExpression;
-    }
-    public void setJsonPathExpression(String jsonPathExpression) {
-        this.jsonPathExpression = jsonPathExpression;
     }
 }

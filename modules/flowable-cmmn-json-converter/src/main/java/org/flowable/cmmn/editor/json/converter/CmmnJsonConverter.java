@@ -211,8 +211,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
                     setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
                     
-                } else if ("jsonPath".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, keyDetectionValue, propertiesNode);
+                } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, keyDetectionValue, propertiesNode);
                 }
             }
         }
@@ -375,7 +375,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             
             String fixedValue = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, modelNode);
             String jsonField = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, modelNode);
-            String jsonPath = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, modelNode);
+            String jsonPointer = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, modelNode);
             if (StringUtils.isNotEmpty(fixedValue)) {
                 addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", caseModel);
                 addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, caseModel);
@@ -384,9 +384,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", caseModel);
                 addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, caseModel);
                 
-            } else if (StringUtils.isNotEmpty(jsonPath)) {
-                addFlowableExtensionElementWithValue("keyDetectionType", "jsonPath", caseModel);
-                addFlowableExtensionElementWithValue("keyDetectionValue", jsonPath, caseModel);
+            } else if (StringUtils.isNotEmpty(jsonPointer)) {
+                addFlowableExtensionElementWithValue("keyDetectionType", "jsonPointer", caseModel);
+                addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, caseModel);
             }
         }
 

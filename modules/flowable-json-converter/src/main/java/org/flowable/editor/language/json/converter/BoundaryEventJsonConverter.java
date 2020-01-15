@@ -187,7 +187,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
                 
                 String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
                 String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
-                String jsonPath = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, elementNode);
+                String jsonPointer = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, elementNode);
                 if (StringUtils.isNotEmpty(fixedValue)) {
                     addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", boundaryEvent);
                     addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, boundaryEvent);
@@ -196,9 +196,9 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
                     addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", boundaryEvent);
                     addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, boundaryEvent);
                     
-                } else if (StringUtils.isNotEmpty(jsonPath)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPath", boundaryEvent);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPath, boundaryEvent);
+                } else if (StringUtils.isNotEmpty(jsonPointer)) {
+                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPointer", boundaryEvent);
+                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, boundaryEvent);
                 }
             }
         }
@@ -260,8 +260,8 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
                 } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
                     setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
                     
-                } else if ("jsonPath".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, keyDetectionValue, propertiesNode);
+                } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, keyDetectionValue, propertiesNode);
                 }
             }
         }

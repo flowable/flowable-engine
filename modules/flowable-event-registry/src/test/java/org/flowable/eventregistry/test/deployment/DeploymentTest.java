@@ -24,7 +24,7 @@ import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
-import org.flowable.eventregistry.impl.tenantdetector.JsonPathBasedInboundEventTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.JsonPointerBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventCorrelationParameter;
@@ -66,7 +66,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
     @Test
     @ChannelDeploymentAnnotation(resources = {
         "org/flowable/eventregistry/test/deployment/simpleChannelWithFixedTenant.channel",
-        "org/flowable/eventregistry/test/deployment/simpleChannelWithJsonPathTenant.channel",
+        "org/flowable/eventregistry/test/deployment/simpleChannelWithJsonPointerTenant.channel",
         "org/flowable/eventregistry/test/deployment/simpleChannelWithXPathTenant.channel"
         }
     )
@@ -77,8 +77,8 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         InboundChannelModel channel2 = eventRegistryEngine.getEventRegistry().getInboundChannelModel("channel2");
         DefaultInboundEventProcessingPipeline inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel2.getInboundEventProcessingPipeline();
-        assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(JsonPathBasedInboundEventTenantDetector.class);
-        assertThat(((JsonPathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getJsonPathExpression()).isEqualTo("/tenantId");
+        assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(JsonPointerBasedInboundEventTenantDetector.class);
+        assertThat(((JsonPointerBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getJsonPointerExpression()).isEqualTo("/tenantId");
 
         InboundChannelModel channel3 = eventRegistryEngine.getEventRegistry().getInboundChannelModel("channel3");
         inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel3.getInboundEventProcessingPipeline();

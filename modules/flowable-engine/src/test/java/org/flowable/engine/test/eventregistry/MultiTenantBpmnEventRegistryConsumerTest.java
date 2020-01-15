@@ -83,7 +83,7 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .channelAdapter(new TestInboundChannelAdapter())
             .jsonDeserializer()
             .fixedEventKey("defaultTenantSameKey")
-            .detectEventTenantUsingJsonPathExpression("/tenantId")
+            .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .register();
 
@@ -95,7 +95,7 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .channelAdapter(new TestInboundChannelAdapter())
             .jsonDeserializer()
             .fixedEventKey("sameKey")
-            .detectEventTenantUsingJsonPathExpression("/tenantId")
+            .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .register();
 

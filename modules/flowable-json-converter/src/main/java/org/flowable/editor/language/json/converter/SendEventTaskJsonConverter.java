@@ -87,8 +87,8 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
                 } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
                     setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
                     
-                } else if ("jsonPath".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, keyDetectionValue, propertiesNode);
+                } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, keyDetectionValue, propertiesNode);
                 }
             }
         }   
@@ -129,7 +129,7 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
                 
                 String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
                 String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
-                String jsonPath = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, elementNode);
+                String jsonPointer = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, elementNode);
                 if (StringUtils.isNotEmpty(fixedValue)) {
                     addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", task);
                     addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, task);
@@ -138,9 +138,9 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
                     addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", task);
                     addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, task);
                     
-                } else if (StringUtils.isNotEmpty(jsonPath)) {
-                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPath", task);
-                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPath, task);
+                } else if (StringUtils.isNotEmpty(jsonPointer)) {
+                    addFlowableExtensionElementWithValue("keyDetectionType", "jsonPointer", task);
+                    addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, task);
                 }
             }
         }

@@ -45,10 +45,10 @@ public class InboundChannelModelValidator implements ChannelValidator {
         if ("json".equalsIgnoreCase(deserializerType)) {
             if (StringUtils.isEmpty(channelEventKeyDetection.getFixedValue()) &&
                 StringUtils.isEmpty(channelEventKeyDetection.getJsonField()) &&
-                StringUtils.isEmpty(channelEventKeyDetection.getJsonPathExpression())) {
+                StringUtils.isEmpty(channelEventKeyDetection.getJsonPointerExpression())) {
                 throw new FlowableEventJsonException(
                     "The channel json key detection value was not found for the channel model with key " + inboundChannelModel.getKey()
-                        + ". One of fixedValue, jsonField or jsonPathExpression should be set.");
+                        + ". One of fixedValue, jsonField or jsonPointerExpression should be set.");
             }
 
         } else if ("xml".equalsIgnoreCase(deserializerType)) {

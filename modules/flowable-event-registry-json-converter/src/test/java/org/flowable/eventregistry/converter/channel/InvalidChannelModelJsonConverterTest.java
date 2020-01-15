@@ -52,7 +52,7 @@ class InvalidChannelModelJsonConverterTest extends AbstractChannelConverterTest 
         assertThatThrownBy(() -> channelConverter.convertToChannelModel(modelJson))
             .isInstanceOf(FlowableEventJsonException.class)
             .hasMessage("The channel json key detection value was not found for the channel model with key jsonInboundWithEmptyKeyDetection."
-                + " One of fixedValue, jsonField or jsonPathExpression should be set.");
+                + " One of fixedValue, jsonField or jsonPointerExpression should be set.");
     }
 
     @Test

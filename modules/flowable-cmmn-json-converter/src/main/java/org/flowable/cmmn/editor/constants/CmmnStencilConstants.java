@@ -193,7 +193,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION = "channeldestination";
     String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE = "keydetectionfixedvalue";
     String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD = "keydetectionjsonfield";
-    String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH = "keydetectionjsonpath";
+    String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER = "keydetectionjsonpointer";
     
     String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_KEY = "triggereventkey";
     String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_NAME = "triggereventname";

@@ -342,7 +342,7 @@ public interface StencilConstants {
     final String PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION = "channeldestination";
     final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE = "keydetectionfixedvalue";
     final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD = "keydetectionjsonfield";
-    final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH = "keydetectionjsonpath";
+    final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER = "keydetectionjsonpointer";
     
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_KEY = "triggereventkey";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_NAME = "triggereventname";

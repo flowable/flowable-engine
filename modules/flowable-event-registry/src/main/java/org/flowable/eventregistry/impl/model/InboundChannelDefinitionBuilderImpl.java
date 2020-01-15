@@ -25,7 +25,7 @@ import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.model.InboundChannelModelBuilder;
 import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
-import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
+import org.flowable.eventregistry.impl.keydetector.JsonPointerBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.InboundEventStaticKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
@@ -33,7 +33,7 @@ import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
-import org.flowable.eventregistry.impl.tenantdetector.JsonPathBasedInboundEventTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.JsonPointerBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
@@ -349,8 +349,8 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         }
 
         @Override
-        public InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonPathExpression(String jsonPathExpression) {
-            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new JsonPathBasedInboundEventKeyDetector(jsonPathExpression);
+        public InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonPointerExpression(String jsonPointerExpression) {
+            this.inboundEventProcessingPipelineBuilder.inboundEventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(jsonPointerExpression);
             return new InboundEventTenantJsonDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
     }
@@ -407,8 +407,8 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         }
 
         @Override
-        public InboundEventPayloadJsonExtractorBuilder detectEventTenantUsingJsonPathExpression(String jsonPathExpression) {
-            inboundEventProcessingPipelineBuilder.inboundEventTenantDetector = new JsonPathBasedInboundEventTenantDetector(jsonPathExpression);
+        public InboundEventPayloadJsonExtractorBuilder detectEventTenantUsingJsonPointerExpression(String jsonPointerExpression) {
+            inboundEventProcessingPipelineBuilder.inboundEventTenantDetector = new JsonPointerBasedInboundEventTenantDetector(jsonPointerExpression);
             return new InboundEventPayloadJsonExtractorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
