@@ -32,6 +32,21 @@ public class FlowableTaskAppProperties {
      */
     private boolean appMigrationEnabled = true;
 
+    /**
+     * Enables JMS for the task app.
+     */
+    private boolean jmsEnabled = false;
+
+    /**
+     * Enables Kafka for the task app.
+     */
+    private boolean kafkaEnabled = false;
+
+    /**
+     * Enables RabbitMQ for the task app.
+     */
+    private boolean rabbitEnabled = false;
+
     public boolean isRestEnabled() {
         return restEnabled;
     }
@@ -46,5 +61,29 @@ public class FlowableTaskAppProperties {
 
     public void setAppMigrationEnabled(boolean appMigrationEnabled) {
         this.appMigrationEnabled = appMigrationEnabled;
+    }
+
+    public boolean isJmsEnabled() {
+        return jmsEnabled;
+    }
+
+    public void setJmsEnabled(boolean jmsEnabled) {
+        this.jmsEnabled = jmsEnabled;
+    }
+
+    public boolean isKafkaEnabled() {
+        return kafkaEnabled;
+    }
+
+    public void setKafkaEnabled(boolean kafkaEnabled) {
+        this.kafkaEnabled = kafkaEnabled;
+    }
+
+    public boolean isRabbitEnabled() {
+        return rabbitEnabled;
+    }
+
+    public void setRabbitEnabled(boolean rabbitEnabled) {
+        this.rabbitEnabled = rabbitEnabled;
     }
 }

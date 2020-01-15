@@ -34,8 +34,8 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Filip Hrisafov
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class FlowableTaskApplicationTest {
+@SpringBootTest(properties = "flowable.task.app.rabbit-enabled=true")
+public class FlowableTaskApplicationWithEnabledRabbitTest {
 
     @Autowired
     private ConfigurableEnvironment environment;
@@ -69,11 +69,11 @@ public class FlowableTaskApplicationTest {
 
         assertThat(applicationContext.getBeanProvider(org.springframework.amqp.rabbit.connection.ConnectionFactory.class).getIfAvailable())
             .as("Rabbit ConnectionFactory Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(RabbitTemplate.class).getIfAvailable())
             .as("RabbitTemplate Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(ConsumerFactory.class).getIfAvailable())
             .as("Kafka ConsumerFactory Bean")
@@ -83,6 +83,7 @@ public class FlowableTaskApplicationTest {
             .as("KafkaTemplate Bean")
             .isNull();
 
-        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class)).isEmpty();
+        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class))
+            .containsOnlyKeys("rabbitChannelDefinitionProcessor");
     }
 }

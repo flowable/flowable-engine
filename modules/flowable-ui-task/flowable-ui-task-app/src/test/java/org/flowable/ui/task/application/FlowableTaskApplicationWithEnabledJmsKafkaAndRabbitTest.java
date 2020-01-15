@@ -34,8 +34,12 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Filip Hrisafov
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class FlowableTaskApplicationTest {
+@SpringBootTest(properties = {
+    "flowable.task.app.jms-enabled=true",
+    "flowable.task.app.kafka-enabled=true",
+    "flowable.task.app.rabbit-enabled=true"
+})
+public class FlowableTaskApplicationWithEnabledJmsKafkaAndRabbitTest {
 
     @Autowired
     private ConfigurableEnvironment environment;
@@ -61,28 +65,33 @@ public class FlowableTaskApplicationTest {
 
         assertThat(applicationContext.getBeanProvider(JmsTemplate.class).getIfAvailable())
             .as("JmsTemplate Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(ConnectionFactory.class).getIfAvailable())
             .as("Jms ConnectionFactory Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(org.springframework.amqp.rabbit.connection.ConnectionFactory.class).getIfAvailable())
             .as("Rabbit ConnectionFactory Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(RabbitTemplate.class).getIfAvailable())
             .as("RabbitTemplate Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(ConsumerFactory.class).getIfAvailable())
             .as("Kafka ConsumerFactory Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(KafkaTemplate.class).getIfAvailable())
             .as("KafkaTemplate Bean")
-            .isNull();
+            .isNotNull();
 
-        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class)).isEmpty();
+        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class))
+            .containsOnlyKeys(
+                "jmsChannelDefinitionProcessor",
+                "kafkaChannelDefinitionProcessor",
+                "rabbitChannelDefinitionProcessor"
+            );
     }
 }

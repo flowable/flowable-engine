@@ -34,8 +34,8 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Filip Hrisafov
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class FlowableTaskApplicationTest {
+@SpringBootTest(properties = "flowable.task.app.jms-enabled=true")
+public class FlowableTaskApplicationWithEnabledJmsTest {
 
     @Autowired
     private ConfigurableEnvironment environment;
@@ -61,11 +61,11 @@ public class FlowableTaskApplicationTest {
 
         assertThat(applicationContext.getBeanProvider(JmsTemplate.class).getIfAvailable())
             .as("JmsTemplate Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(ConnectionFactory.class).getIfAvailable())
             .as("Jms ConnectionFactory Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(org.springframework.amqp.rabbit.connection.ConnectionFactory.class).getIfAvailable())
             .as("Rabbit ConnectionFactory Bean")
@@ -83,6 +83,7 @@ public class FlowableTaskApplicationTest {
             .as("KafkaTemplate Bean")
             .isNull();
 
-        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class)).isEmpty();
+        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class))
+            .containsOnlyKeys("jmsChannelDefinitionProcessor");
     }
 }

@@ -34,8 +34,8 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Filip Hrisafov
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class FlowableTaskApplicationTest {
+@SpringBootTest(properties = "flowable.task.app.kafka-enabled=true")
+public class FlowableTaskApplicationWithEnabledKafkaTest {
 
     @Autowired
     private ConfigurableEnvironment environment;
@@ -77,12 +77,13 @@ public class FlowableTaskApplicationTest {
 
         assertThat(applicationContext.getBeanProvider(ConsumerFactory.class).getIfAvailable())
             .as("Kafka ConsumerFactory Bean")
-            .isNull();
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(KafkaTemplate.class).getIfAvailable())
             .as("KafkaTemplate Bean")
-            .isNull();
+            .isNotNull();
 
-        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class)).isEmpty();
+        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class))
+            .containsOnlyKeys("kafkaChannelDefinitionProcessor");
     }
 }
