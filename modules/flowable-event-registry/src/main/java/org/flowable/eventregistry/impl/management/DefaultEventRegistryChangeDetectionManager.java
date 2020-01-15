@@ -14,15 +14,11 @@ package org.flowable.eventregistry.impl.management;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventRegistry;
-import org.flowable.eventregistry.api.management.EventRegistryChangeDetector;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,33 +26,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Joram Barrez
  */
-public class DefaultEventRegistryChangeDetector implements EventRegistryChangeDetector {
+public class DefaultEventRegistryChangeDetectionManager implements EventRegistryChangeDetectionManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultEventRegistryChangeDetector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultEventRegistryChangeDetectionManager.class);
 
     protected EventRegistryEngineConfiguration eventRegistryEngineConfiguration;
-    protected long initialDelayInMs;
-    protected long delayInMs;
 
-    protected ScheduledExecutorService scheduledExecutorService;
-    protected String threadName = "flowable-event-registry-change-detector-%d";
-    protected Runnable changeDetectionRunnable;
-
-    public DefaultEventRegistryChangeDetector(EventRegistryEngineConfiguration eventRegistryEngineConfiguration, long initialDelayInMs, long delayInMs) {
+    public DefaultEventRegistryChangeDetectionManager(EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
         this.eventRegistryEngineConfiguration = eventRegistryEngineConfiguration;
-        this.initialDelayInMs = initialDelayInMs;
-        this.delayInMs = delayInMs;
-    }
-
-    @Override
-    public void initialize() {
-        this.scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder().namingPattern(threadName).build());
-        this.changeDetectionRunnable = createChangeDetectionRunnable();
-        this.scheduledExecutorService.scheduleAtFixedRate(this.changeDetectionRunnable, initialDelayInMs, delayInMs, TimeUnit.MILLISECONDS);
-    }
-
-    protected Runnable createChangeDetectionRunnable() {
-        return new EventRegistryChangeDetectionRunnable(this);
     }
 
     @Override
@@ -98,22 +75,4 @@ public class DefaultEventRegistryChangeDetector implements EventRegistryChangeDe
         }
     }
 
-    public ScheduledExecutorService getScheduledExecutorService() {
-        return scheduledExecutorService;
-    }
-    public void setScheduledExecutorService(ScheduledExecutorService scheduledExecutorService) {
-        this.scheduledExecutorService = scheduledExecutorService;
-    }
-    public String getThreadName() {
-        return threadName;
-    }
-    public void setThreadName(String threadName) {
-        this.threadName = threadName;
-    }
-    public Runnable getChangeDetectionRunnable() {
-        return changeDetectionRunnable;
-    }
-    public void setChangeDetectionRunnable(Runnable changeDetectionRunnable) {
-        this.changeDetectionRunnable = changeDetectionRunnable;
-    }
 }

@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.eventregistry;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,6 +52,16 @@ public class FlowableEventRegistryProperties {
      * Whether to enable the automatic detection of changes when done on other engines (but against same database).
      */
     private boolean enableChangeDetection = false;
+
+    /**
+     * If change detection is enabled, this duration configures how long it will take until the first check is done.
+     */
+    private Duration changeDetectionInitialDelay = Duration.ofSeconds(10);
+
+    /**
+     * If change detection is enabled, this duration configures the time between two consecutive checks.
+     */
+    private Duration changeDetectionDelay = Duration.ofSeconds(60);
 
     /**
      * Whether the event registry engine needs to be started.
@@ -101,6 +112,22 @@ public class FlowableEventRegistryProperties {
 
     public void setEnableChangeDetection(boolean enableChangeDetection) {
         this.enableChangeDetection = enableChangeDetection;
+    }
+
+    public Duration getChangeDetectionInitialDelay() {
+        return changeDetectionInitialDelay;
+    }
+
+    public void setChangeDetectionInitialDelay(Duration changeDetectionInitialDelay) {
+        this.changeDetectionInitialDelay = changeDetectionInitialDelay;
+    }
+
+    public Duration getChangeDetectionDelay() {
+        return changeDetectionDelay;
+    }
+
+    public void setChangeDetectionDelay(Duration changeDetectionDelay) {
+        this.changeDetectionDelay = changeDetectionDelay;
     }
 
     public boolean isEnabled() {

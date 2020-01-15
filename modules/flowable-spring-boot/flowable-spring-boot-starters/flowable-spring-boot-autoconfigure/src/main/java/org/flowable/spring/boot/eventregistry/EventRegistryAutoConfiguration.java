@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
@@ -32,6 +33,7 @@ import org.flowable.eventregistry.spring.autodeployment.SingleResourceAutoDeploy
 import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.flowable.eventregistry.spring.jms.JmsChannelDefinitionProcessor;
 import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.spring.rabbit.RabbitChannelDefinitionProcessor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
@@ -52,6 +54,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -106,7 +109,8 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         PlatformTransactionManager platformTransactionManager,
         ObjectProvider<List<ChannelModelProcessor>> channelModelProcessors,
         ObjectProvider<List<AutoDeploymentStrategy<EventRegistryEngine>>> eventAutoDeploymentStrategies,
-        ObjectProvider<TaskScheduler> taskScheduler
+        ObjectProvider<TaskScheduler> taskScheduler,
+        ObjectProvider<EventRegistryChangeDetectionExecutor> eventRegistryChangeDetectionExecutor
     ) throws IOException {
 
         SpringEventRegistryEngineConfiguration configuration = new SpringEventRegistryEngineConfiguration();
@@ -146,15 +150,20 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
             }
         }
 
-        if (eventProperties.isEnableChangeDetection()) {
-            configuration.setEnableEventRegistryChangeDetection(true);
-            TaskScheduler taskSchedulerInstance = taskScheduler.getIfAvailable();
-            if (taskSchedulerInstance != null) {
-                configuration.setEventChangeDetectorTaskScheduler(taskSchedulerInstance);
-            }
+        EventRegistryChangeDetectionExecutor changeDetectionExecutor = eventRegistryChangeDetectionExecutor.getIfAvailable();
+        if (changeDetectionExecutor != null) {
+            configuration.setEventRegistryChangeDetectionExecutor(changeDetectionExecutor);
         }
 
         return configuration;
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "flowable.eventregistry", name = "enable-change-detection")
+    @ConditionalOnMissingBean
+    public EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor(ObjectProvider<TaskScheduler> taskScheduler) {
+        return new DefaultSpringEventRegistryChangeDetectionExecutor(eventProperties.getChangeDetectionInitialDelay().toMillis(),
+            eventProperties.getChangeDetectionDelay().toMillis(), taskScheduler.getIfAvailable());
     }
 
     @Configuration(proxyBeanMethods = false)

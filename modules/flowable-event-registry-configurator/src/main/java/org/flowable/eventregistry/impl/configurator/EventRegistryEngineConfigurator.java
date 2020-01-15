@@ -79,8 +79,11 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
         if (engineConfiguration.isEnableEventRegistryChangeDetection()) {
 
             eventEngineConfiguration.setEnableEventRegistryChangeDetection(true);
-            if (engineConfiguration.getEventRegistryChangeDetector() != null) {
-                eventEngineConfiguration.setEventRegistryChangeDetector(engineConfiguration.getEventRegistryChangeDetector());
+            if (engineConfiguration.getEventRegistryChangeDetectionManager() != null) {
+                eventEngineConfiguration.setEventRegistryChangeDetectionManager(engineConfiguration.getEventRegistryChangeDetectionManager());
+            }
+            if (engineConfiguration.getEventRegistryChangeDetectionExecutor() != null) {
+                eventEngineConfiguration.setEventRegistryChangeDetectionExecutor(engineConfiguration.getEventRegistryChangeDetectionExecutor());
             }
 
             eventEngineConfiguration.setEventRegistryChangeDetectionInitialDelayInMs(engineConfiguration.getEventRegistryChangeDetectionInitialDelayInMs());

@@ -44,7 +44,8 @@ import org.flowable.eventregistry.impl.deployer.ChannelDefinitionDeploymentHelpe
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeployer;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeploymentHelper;
 import org.flowable.eventregistry.impl.deployer.ParsedDeploymentBuilderFactory;
-import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetector;
+import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionExecutor;
+import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.parser.ChannelDefinitionParseFactory;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParseFactory;
 import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
@@ -181,7 +182,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
             eventRegistryEngine.handleDeployedChannelDefinitions();
 
             if (enableEventRegistryChangeDetection) {
-                eventRegistryChangeDetector.initialize();
+                eventRegistryChangeDetectionExecutor.initialize();
             }
         }
 
@@ -228,7 +229,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initChannelDefinitionProcessors();
         initDeployers();
         initClock();
-        initChangeDetector();
+        initChangeDetectionManager();
+        initChangeDetectionExecutor();
     }
 
     // services
@@ -497,9 +499,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         channelDefinitionProcessors.add(new OutboundChannelModelProcessor());
     }
 
-    public void initChangeDetector() {
-        if (this.eventRegistryChangeDetector == null) {
-            this.eventRegistryChangeDetector = new DefaultEventRegistryChangeDetector(this,
+    public void initChangeDetectionManager() {
+        if (this.eventRegistryChangeDetectionManager == null) {
+            this.eventRegistryChangeDetectionManager = new DefaultEventRegistryChangeDetectionManager(this);
+        }
+    }
+
+    public void initChangeDetectionExecutor() {
+        if (this.eventRegistryChangeDetectionExecutor == null) {
+            this.eventRegistryChangeDetectionExecutor = new DefaultEventRegistryChangeDetectionExecutor(eventRegistryChangeDetectionManager,
                 eventRegistryChangeDetectionInitialDelayInMs, eventRegistryChangeDetectionDelayInMs);
         }
     }

@@ -14,8 +14,10 @@ package org.flowable.eventregistry.spring.test.management;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
-import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetector;
+import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionManager;
+import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.spring.test.FlowableEventSpringExtension;
 import org.flowable.eventregistry.spring.test.jms.EventRegistryJmsConfiguration;
 import org.junit.jupiter.api.Test;
@@ -36,12 +38,14 @@ public class SpringEventRegistryChangeDetectorTest {
 
     @Test
     public void testChangeDetectionRunnableCreatedWhenNotExplicitelyInjected() {
-        assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetector())
-            .isInstanceOf(DefaultSpringEventRegistryChangeDetector.class);
+        assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionManager())
+            .isInstanceOf(DefaultEventRegistryChangeDetectionManager.class);
 
-        DefaultSpringEventRegistryChangeDetector eventRegistryChangeDetector =
-            (DefaultSpringEventRegistryChangeDetector) eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetector();
-        assertThat(eventRegistryChangeDetector.getTaskScheduler()).isInstanceOf(ThreadPoolTaskScheduler.class);
+        EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
+        assertThat(eventRegistryChangeDetectionExecutor).isInstanceOf(DefaultSpringEventRegistryChangeDetectionExecutor.class);
+
+        DefaultSpringEventRegistryChangeDetectionExecutor executor = (DefaultSpringEventRegistryChangeDetectionExecutor) eventRegistryChangeDetectionExecutor;
+        assertThat(executor.getTaskScheduler()).isInstanceOf(ThreadPoolTaskScheduler.class);
     }
 
 }

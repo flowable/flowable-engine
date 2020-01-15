@@ -95,7 +95,8 @@ import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
-import org.flowable.eventregistry.api.management.EventRegistryChangeDetector;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,7 +185,8 @@ public abstract class AbstractEngineConfiguration {
     protected boolean enableEventRegistryChangeDetection;
     protected long eventRegistryChangeDetectionInitialDelayInMs = 10000L;
     protected long eventRegistryChangeDetectionDelayInMs = 60000L;
-    protected EventRegistryChangeDetector eventRegistryChangeDetector;
+    protected EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager;
+    protected EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor;
 
     // MYBATIS SQL SESSION FACTORY /////////////////////////////////////
 
@@ -1409,12 +1411,21 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public EventRegistryChangeDetector getEventRegistryChangeDetector() {
-        return eventRegistryChangeDetector;
+    public EventRegistryChangeDetectionManager getEventRegistryChangeDetectionManager() {
+        return eventRegistryChangeDetectionManager;
     }
 
-    public AbstractEngineConfiguration setEventRegistryChangeDetector(EventRegistryChangeDetector eventRegistryChangeDetector) {
-        this.eventRegistryChangeDetector = eventRegistryChangeDetector;
+    public AbstractEngineConfiguration setEventRegistryChangeDetectionManager(EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager) {
+        this.eventRegistryChangeDetectionManager = eventRegistryChangeDetectionManager;
+        return this;
+    }
+
+    public EventRegistryChangeDetectionExecutor getEventRegistryChangeDetectionExecutor() {
+        return eventRegistryChangeDetectionExecutor;
+    }
+
+    public AbstractEngineConfiguration setEventRegistryChangeDetectionExecutor(EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor) {
+        this.eventRegistryChangeDetectionExecutor = eventRegistryChangeDetectionExecutor;
         return this;
     }
 

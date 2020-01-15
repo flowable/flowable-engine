@@ -15,13 +15,7 @@ package org.flowable.eventregistry.api.management;
 /**
  * @author Joram Barrez
  */
-public interface EventRegistryChangeDetector {
-
-    /**
-     * Will be called after the engine has booted up.
-     * Any initialization logic can be placed here.
-     */
-    void initialize();
+public interface EventRegistryChangeDetectionManager {
 
     /**
      * Allows to programmatically trigger the house keeping functionality.
