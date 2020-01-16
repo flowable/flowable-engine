@@ -267,7 +267,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(sendEventServiceTask.getEventType())) {
             xtw.writeCData(sendEventServiceTask.getEventType());
         } else {
-            LOGGER.warn("No event type configured for send event task " + sendEventServiceTask.getId());
+            LOGGER.warn("No event type configured for send event task {}", sendEventServiceTask.getId());
         }
         xtw.writeEndElement();
         
