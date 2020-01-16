@@ -214,13 +214,19 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
         }
     }
 
-    protected void createAndInitEventRegistryChangeDetectionExecutor() {
+    @Override
+    public void initChangeDetectionExecutor() {
         if (eventRegistryChangeDetectionExecutor == null) {
             eventRegistryChangeDetectionExecutor = new DefaultSpringEventRegistryChangeDetectionExecutor(
                 eventRegistryChangeDetectionInitialDelayInMs, eventRegistryChangeDetectionDelayInMs);
         }
-        eventRegistryChangeDetectionExecutor.setEventRegistryChangeDetectionManager(eventRegistryChangeDetectionManager);
-        eventRegistryChangeDetectionExecutor.initialize();
+    }
+
+    protected void createAndInitEventRegistryChangeDetectionExecutor() {
+        if (eventRegistryChangeDetectionExecutor == null) {
+            eventRegistryChangeDetectionExecutor.setEventRegistryChangeDetectionManager(eventRegistryChangeDetectionManager);
+            eventRegistryChangeDetectionExecutor.initialize();
+        }
     }
 
     @Override
