@@ -13,7 +13,11 @@
 
 package org.activiti.compatibility.spring;
 
+import java.util.Map;
+
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.impl.cfg.SpringBeanFactoryProxyMap;
+import org.activiti.spring.SpringExpressionManager;
 import org.flowable.compatibility.DefaultProcessEngineFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.spring.SpringProcessEngineConfiguration;
@@ -21,27 +25,36 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 public class DefaultSpringProcessEngineFactory extends DefaultProcessEngineFactory {
 
     /**
-     * Takes in an Activiti 6 process engine config, gives back an Activiti 5 Process engine.
+     * Takes in an V6 process engine config, gives back an V5 Process engine.
      */
     @Override
-    public ProcessEngine buildProcessEngine(ProcessEngineConfigurationImpl activiti6Configuration) {
+    public ProcessEngine buildProcessEngine(ProcessEngineConfigurationImpl v6Configuration) {
 
-        org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl activiti5Configuration = null;
-        if (activiti6Configuration instanceof SpringProcessEngineConfiguration) {
-            activiti5Configuration = new org.activiti.spring.SpringProcessEngineConfiguration();
-            super.copyConfigItems(activiti6Configuration, activiti5Configuration);
-            copySpringConfigItems((SpringProcessEngineConfiguration) activiti6Configuration, (org.activiti.spring.SpringProcessEngineConfiguration) activiti5Configuration);
-            return activiti5Configuration.buildProcessEngine();
+        org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl v5Configuration = null;
+        if (v6Configuration instanceof SpringProcessEngineConfiguration) {
+            v5Configuration = new org.activiti.spring.SpringProcessEngineConfiguration();
+            super.copyConfigItems(v6Configuration, v5Configuration);
+            copySpringConfigItems((SpringProcessEngineConfiguration) v6Configuration, (org.activiti.spring.SpringProcessEngineConfiguration) v5Configuration);
+            return v5Configuration.buildProcessEngine();
 
         } else {
-            return super.buildProcessEngine(activiti6Configuration);
+            return super.buildProcessEngine(v6Configuration);
         }
 
     }
 
-    protected void copySpringConfigItems(SpringProcessEngineConfiguration activiti6Configuration, org.activiti.spring.SpringProcessEngineConfiguration activiti5Configuration) {
-        activiti5Configuration.setApplicationContext(activiti6Configuration.getApplicationContext());
-        activiti5Configuration.setTransactionManager(activiti6Configuration.getTransactionManager());
+    protected void copySpringConfigItems(SpringProcessEngineConfiguration v6Configuration, org.activiti.spring.SpringProcessEngineConfiguration v5Configuration) {
+        v5Configuration.setApplicationContext(v6Configuration.getApplicationContext());
+        v5Configuration.setTransactionManager(v6Configuration.getTransactionManager());
+
+        Map<Object, Object> beans = v6Configuration.getBeans();
+
+        if (!(beans instanceof org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap)) {
+            v5Configuration.setBeans(new SpringBeanFactoryProxyMap(v6Configuration.getApplicationContext()));
+        }
+        if (v5Configuration.getExpressionManager() == null) {
+            v5Configuration.setExpressionManager(new SpringExpressionManager(v6Configuration.getApplicationContext(), null));
+        }
     }
 
 }
