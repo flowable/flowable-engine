@@ -29,6 +29,10 @@ public class InboundChannelModel extends ChannelModel {
     @JsonIgnore
     protected Object inboundEventProcessingPipeline;
 
+    public InboundChannelModel() {
+        setChannelType("inbound");
+    }
+
     public String getDeserializerType() {
         return deserializerType;
     }

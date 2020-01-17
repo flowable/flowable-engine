@@ -27,6 +27,10 @@ public class OutboundChannelModel extends ChannelModel {
     @JsonIgnore
     protected Object outboundEventProcessingPipeline;
 
+    public OutboundChannelModel() {
+        setChannelType("outbound");
+    }
+
     public String getSerializerType() {
         return serializerType;
     }

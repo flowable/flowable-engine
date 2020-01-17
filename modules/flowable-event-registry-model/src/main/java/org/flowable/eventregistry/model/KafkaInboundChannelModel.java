@@ -32,6 +32,10 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
     protected String concurrency;
     protected Map<String, String> properties;
 
+    public KafkaInboundChannelModel() {
+        setType("kafka");
+    }
+
     public String getGroupId() {
         return groupId;
     }
