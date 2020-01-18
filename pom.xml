@@ -26,7 +26,7 @@
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.24.0</camel.version>
-		<cxf.version>3.3.4</cxf.version>
+		<cxf.version>3.3.5</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<spring.boot.version>2.2.2.RELEASE</spring.boot.version>
 
