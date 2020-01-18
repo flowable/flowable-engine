@@ -33,11 +33,13 @@ import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.spring.rabbit.RabbitChannelDefinitionProcessor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -60,6 +62,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 public class EventRegistryAutoConfigurationTest {
 
@@ -107,6 +111,7 @@ public class EventRegistryAutoConfigurationTest {
                             SpringEventRegistryEngineConfiguration.class
                         );
                 });
+
         });
     }
 
@@ -407,6 +412,51 @@ public class EventRegistryAutoConfigurationTest {
                     .element(5)
                     .isInstanceOf(OutboundChannelModelProcessor.class);
             });
+    }
+
+    @Test
+    public void standaloneEventRegistryWithDefaultTaskScheduler() {
+        contextRunner
+            .withPropertyValues("flowable.eventregistry.enable-change-detection:true")
+            .run(context -> {
+
+                EventRegistryEngine eventRegistryEngine = context.getBean(EventRegistryEngine.class);
+                assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
+                assertAllServicesPresent(context, eventRegistryEngine);
+
+                assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionManager())
+                    .isInstanceOf(DefaultEventRegistryChangeDetectionManager.class);
+                assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor())
+                    .isInstanceOf(DefaultSpringEventRegistryChangeDetectionExecutor.class);
+
+                DefaultSpringEventRegistryChangeDetectionExecutor executor = (DefaultSpringEventRegistryChangeDetectionExecutor)
+                    eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
+                assertThat(executor.getTaskScheduler()).isNotNull();
+                assertThat(executor.getTaskScheduler()).isInstanceOf(ThreadPoolTaskScheduler.class);
+            });
+    }
+
+    @Test
+    public void standaloneEventRegistryWithCustomTaskScheduler() {
+        contextRunner
+            .withBean(ThreadPoolTaskScheduler.class)
+            .withPropertyValues("flowable.eventregistry.enable-change-detection:true")
+            .run(context -> {
+
+            EventRegistryEngine eventRegistryEngine = context.getBean(EventRegistryEngine.class);
+            assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
+            assertAllServicesPresent(context, eventRegistryEngine);
+
+            assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionManager())
+                .isInstanceOf(DefaultEventRegistryChangeDetectionManager.class);
+                assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor())
+                    .isInstanceOf(DefaultSpringEventRegistryChangeDetectionExecutor.class);
+
+            DefaultSpringEventRegistryChangeDetectionExecutor executor = (DefaultSpringEventRegistryChangeDetectionExecutor)
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
+            assertThat(executor.getTaskScheduler()).isNotNull();
+            assertThat(executor.getTaskScheduler()).isEqualTo(context.getBean(TaskScheduler.class));
+        });
     }
 
     private void assertAllServicesPresent(ApplicationContext context, EventRegistryEngine eventRegistryEngine) {

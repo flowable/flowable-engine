@@ -32,6 +32,7 @@ import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery, QueryCacheValues {
     
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected String planItemInstanceId;
@@ -97,6 +98,15 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
             throw new FlowableIllegalArgumentException("Case definition id is null");
         }
         this.caseDefinitionId = caseDefinitionId;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery derivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        if (derivedCaseDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Derived case definition id is null");
+        }
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
         return this;
     }
 
@@ -638,6 +648,9 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
+    }
     public String getCaseInstanceId() {
         return caseInstanceId;
     }
@@ -647,6 +660,7 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
     }
+    @Override
     public String getId() {
         return planItemInstanceId;
     }

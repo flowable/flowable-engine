@@ -124,7 +124,7 @@ public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
             .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
-            .detectEventTenantUsingJsonPathExpression("/tenantId")
+            .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         

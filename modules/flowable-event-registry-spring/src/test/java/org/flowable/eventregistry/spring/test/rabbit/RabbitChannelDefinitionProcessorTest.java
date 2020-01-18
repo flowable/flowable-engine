@@ -73,19 +73,20 @@ class RabbitChannelDefinitionProcessorTest {
     @BeforeEach
     void setUp() {
         testEventConsumer = new TestEventConsumer();
-        eventRegistry.registerEventRegistryEventBusConsumer(testEventConsumer);
+        eventRegistry.registerEventRegistryEventConsumer(testEventConsumer);
     }
 
     @AfterEach
     void tearDown() {
         testEventConsumer.clear();
-        eventRegistry.removeFlowableEventConsumer(testEventConsumer);
         
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {
             eventRepositoryService.deleteDeployment(eventDeployment.getId());
         }
-        
+
+        eventRegistry.removeFlowableEventRegistryEventConsumer(testEventConsumer);
+
         queuesToDelete.forEach(rabbitAdmin::deleteQueue);
     }
 

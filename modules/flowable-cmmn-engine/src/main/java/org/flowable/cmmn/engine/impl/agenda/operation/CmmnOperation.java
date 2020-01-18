@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -89,11 +90,11 @@ public abstract class CmmnOperation implements Runnable {
                 }
 
                 PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                    .createPlanItemInstanceBuilder()
+                    .createPlanItemInstanceEntityBuilder()
                     .planItem(planItem)
                     .caseDefinitionId(caseDefinitionId)
                     .caseInstanceId(caseInstanceId)
-                    .stagePlanItemInstanceId(stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null)
+                    .stagePlanItemInstance(stagePlanItemInstanceEntity)
                     .tenantId(tenantId)
                     .addToParent(true)
                     // we silently ignore any exceptions evaluating the name for the new plan item, if it has repetition on a collection, as the item / itemIndex
@@ -145,12 +146,17 @@ public abstract class CmmnOperation implements Runnable {
             localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
         }
 
+        PlanItemInstance stagePlanItem = planItemInstanceEntityToCopy.getStagePlanItemInstanceEntity();
+        if (stagePlanItem == null && planItemInstanceEntityToCopy.getStageInstanceId() != null) {
+            stagePlanItem = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceEntityToCopy.getStageInstanceId());
+        }
+
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-            .createPlanItemInstanceBuilder()
+            .createPlanItemInstanceEntityBuilder()
             .planItem(planItemInstanceEntityToCopy.getPlanItem())
             .caseDefinitionId(planItemInstanceEntityToCopy.getCaseDefinitionId())
             .caseInstanceId(planItemInstanceEntityToCopy.getCaseInstanceId())
-            .stagePlanItemInstanceId(planItemInstanceEntityToCopy.getStageInstanceId())
+            .stagePlanItemInstance(stagePlanItem)
             .tenantId(planItemInstanceEntityToCopy.getTenantId())
             .localVariables(localVariables)
             .addToParent(addToParent)

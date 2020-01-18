@@ -36,6 +36,7 @@ public abstract class AbstractEngineEntityManager<T extends AbstractEngineConfig
         return engineConfiguration;
     }
 
+    @Override
     protected FlowableEventDispatcher getEventDispatcher() {
         return engineConfiguration.getEventDispatcher();
     }

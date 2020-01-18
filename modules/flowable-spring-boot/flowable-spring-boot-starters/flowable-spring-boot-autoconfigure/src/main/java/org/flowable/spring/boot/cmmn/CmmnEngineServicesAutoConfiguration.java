@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
@@ -125,6 +126,11 @@ public class CmmnEngineServicesAutoConfiguration {
     @Bean
     public CmmnRuntimeService cmmnRuntimeService(CmmnEngine cmmnEngine) {
         return cmmnEngine.getCmmnRuntimeService();
+    }
+
+    @Bean
+    public DynamicCmmnService dynamicCmmnService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getDynamicCmmnService();
     }
 
     @Bean

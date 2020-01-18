@@ -250,9 +250,9 @@ public interface InboundChannelModelBuilder {
         InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonField(String field);
 
         /**
-         * Determines the key of the event using on a JSON Path expression to find the value.
+         * Determines the key of the event using on a JSON Pointer expression to find the value.
          */
-        InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonPathExpression(String jsonPathExpression);
+        InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonPointerExpression(String jsonPointerExpression);
 
     }
 
@@ -267,9 +267,9 @@ public interface InboundChannelModelBuilder {
         InboundEventPayloadJsonExtractorBuilder fixedTenantId(String tenantId);
 
         /**
-         * Determines the tenant ID by using a JSONPath expression.
+         * Determines the tenant ID by using a JSOn Pointer expression.
          */
-        InboundEventPayloadJsonExtractorBuilder detectEventTenantUsingJsonPathExpression(String jsonPathExpression);
+        InboundEventPayloadJsonExtractorBuilder detectEventTenantUsingJsonPointerExpression(String jsonPointerExpression);
 
     }
 

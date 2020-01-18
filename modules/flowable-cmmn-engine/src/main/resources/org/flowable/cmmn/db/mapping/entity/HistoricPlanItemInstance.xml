@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
 
     <insert id="insertHistoricPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
             LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
             START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
@@ -15,6 +15,7 @@
             #{name ,jdbcType=VARCHAR},
             #{state ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{derivedCaseDefinitionId ,jdbcType=VARCHAR},
             #{caseInstanceId ,jdbcType=VARCHAR},
             #{stageInstanceId ,jdbcType=VARCHAR},
             #{isStage ,jdbcType=BOOLEAN},
@@ -45,7 +46,7 @@
     </insert>
 
     <insert id="bulkInsertHistoricPlanItemInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
         ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
         LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
         START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
@@ -57,6 +58,7 @@
             #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.caseInstanceId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.stageInstanceId ,jdbcType=VARCHAR},
             #{historicPlanItemInstance.isStage ,jdbcType=BOOLEAN},
@@ -90,7 +92,7 @@
     <insert id="bulkInsertHistoricPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="historicPlanItemInstance" index="index">
-            into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+            into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
             LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
             START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
@@ -100,6 +102,7 @@
                 #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.stageInstanceId ,jdbcType=VARCHAR},
                 #{historicPlanItemInstance.isStage ,jdbcType=BOOLEAN},
@@ -144,6 +147,9 @@
             </if>
             <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
                 CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.derivedCaseDefinitionId != derivedCaseDefinitionId">
+                DERIVED_CASE_DEF_ID_ = #{derivedCaseDefinitionId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.caseInstanceId != caseInstanceId">
                 CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
@@ -257,6 +263,7 @@
         <result property="name" column="NAME_" jdbcType="VARCHAR"/>
         <result property="state" column="STATE_" jdbcType="VARCHAR"/>
         <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR"/>
+        <result property="derivedCaseDefinitionId" column="DERIVED_CASE_DEF_ID_" jdbcType="VARCHAR"/>
         <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR"/>
         <result property="stageInstanceId" column="STAGE_INST_ID_" jdbcType="VARCHAR"/>
         <result property="isStage" column="IS_STAGE_" jdbcType="BOOLEAN"/>
@@ -321,6 +328,9 @@
             </if>
             <if test="caseDefinitionId != null">
                 and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+            </if>
+            <if test="derivedCaseDefinitionId != null">
+                and RES.DERIVED_CASE_DEF_ID_ = #{derivedCaseDefinitionId}
             </if>
             <if test="caseInstanceId != null">
                 and RES.CASE_INST_ID_ = #{caseInstanceId}

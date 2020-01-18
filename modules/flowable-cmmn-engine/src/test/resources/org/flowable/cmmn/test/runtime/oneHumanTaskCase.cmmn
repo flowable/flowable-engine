@@ -8,7 +8,7 @@
 
     <case id="oneHumanTaskCase" name="oneHumanTaskCaseName">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
-            <planItem id="planItem1" name="The Task" definitionRef="theTask" />
+            <planItem id="planItem1" name="Sub task" definitionRef="theTask" />
             <humanTask id="theTask" name="Sub task"/>
         </casePlanModel>
     </case>

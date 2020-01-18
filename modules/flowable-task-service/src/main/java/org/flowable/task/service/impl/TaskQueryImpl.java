@@ -1810,6 +1810,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return taskId;
     }
     
+    @Override
     public String getId() {
         return taskId;
     }

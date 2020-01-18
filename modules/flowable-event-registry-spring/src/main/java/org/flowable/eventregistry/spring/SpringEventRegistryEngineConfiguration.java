@@ -33,6 +33,7 @@ import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfigur
 import org.flowable.eventregistry.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetectionExecutor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -52,14 +53,15 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    private Collection<AutoDeploymentStrategy<EventRegistryEngine>> deploymentStrategies = new ArrayList<>();
+    protected Collection<AutoDeploymentStrategy<EventRegistryEngine>> deploymentStrategies = new ArrayList<>();
+
     protected volatile boolean running = false;
     protected List<String> enginesBuild = new ArrayList<>();
     protected final Object lifeCycleMonitor = new Object();
 
     public SpringEventRegistryEngineConfiguration() {
         this.transactionsExternallyManaged = true;
-        this.handleEventRegistryEngineDeploymentsAfterEngineCreate = false;
+        this.enableEventRegistryChangeDetectionAfterEngineCreate = false;
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
@@ -202,10 +204,28 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
                 enginesBuild.forEach(name -> {
                     EventRegistryEngine eventRegistryEngine = EventRegistryEngines.getEventRegistryEngine(name);
                     eventRegistryEngine.handleDeployedChannelDefinitions();
+
+                    createAndInitEventRegistryChangeDetectionExecutor();
+
                     autoDeployResources(eventRegistryEngine);
                 });
                 running = true;
             }
+        }
+    }
+
+    @Override
+    public void initChangeDetectionExecutor() {
+        if (eventRegistryChangeDetectionExecutor == null) {
+            eventRegistryChangeDetectionExecutor = new DefaultSpringEventRegistryChangeDetectionExecutor(
+                eventRegistryChangeDetectionInitialDelayInMs, eventRegistryChangeDetectionDelayInMs);
+        }
+    }
+
+    protected void createAndInitEventRegistryChangeDetectionExecutor() {
+        if (eventRegistryChangeDetectionExecutor != null) {
+            eventRegistryChangeDetectionExecutor.setEventRegistryChangeDetectionManager(eventRegistryChangeDetectionManager);
+            eventRegistryChangeDetectionExecutor.initialize();
         }
     }
 

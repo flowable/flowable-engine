@@ -16,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +47,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Joram Barrez
  * @author Frederik Heremans
+ * @author Filip Hrisafov
  */
 public class ExecutionQueryTest extends PluggableFlowableTestCase {
 
@@ -1110,6 +1113,206 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         assertThat(execution.getId()).isEqualTo(processInstance3.getId());
 
         executions = runtimeService.createExecutionQuery().variableValueEquals(instant1).list();
+        assertThat(executions)
+            .extracting(Execution::getId)
+            .containsExactlyInAnyOrder(
+                processInstance1.getId(),
+                processInstance2.getId()
+            );
+
+        execution = runtimeService.createExecutionQuery().variableValueEquals(twoYearsLater).singleResult();
+        assertThat(execution).isNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryLocalDateVariable() throws Exception {
+        Map<String, Object> vars = new HashMap<>();
+        LocalDate localDate = LocalDate.now();
+        vars.put("localDateVar", localDate);
+
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        LocalDate localDate2 = localDate.plusDays(1);
+        vars = new HashMap<>();
+        vars.put("localDateVar", localDate);
+        vars.put("localDateVar2", localDate2);
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        LocalDate nextYear = localDate.plusYears(1);
+        vars = new HashMap<>();
+        vars.put("localDateVar", nextYear);
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        LocalDate nextMonth = localDate.plusMonths(1);
+
+        LocalDate twoYearsLater = localDate.plusYears(2);
+
+        LocalDate oneYearAgo = localDate.minusYears(1);
+
+        // Query on single localDate variable, should result in 2 matches
+        ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("localDateVar", localDate);
+        List<Execution> executions = query.list();
+        assertThat(executions).hasSize(2);
+
+        // Query on two localDate variables, should result in single value
+        query = runtimeService.createExecutionQuery().variableValueEquals("localDateVar", localDate).variableValueEquals("localDateVar2", localDate2);
+        Execution execution = query.singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance2.getId());
+
+        // Query with unexisting variable value
+        execution = runtimeService.createExecutionQuery().variableValueEquals("localDateVar", localDate.minusDays(1)).singleResult();
+        assertThat(execution).isNull();
+
+        // Test NOT_EQUALS
+        execution = runtimeService.createExecutionQuery().variableValueNotEquals("localDateVar", localDate).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        // Test GREATER_THAN
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThan("localDateVar", nextMonth).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThan("localDateVar", nextYear).count()).isEqualTo(0);
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThan("localDateVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test GREATER_THAN_OR_EQUAL
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("localDateVar", nextMonth).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("localDateVar", nextYear).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("localDateVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test LESS_THAN
+        executions = runtimeService.createExecutionQuery().variableValueLessThan("localDateVar", nextYear).list();
+        assertThat(executions)
+            .extracting(Execution::getId)
+            .containsExactlyInAnyOrder(
+                processInstance1.getId(),
+                processInstance2.getId()
+            );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThan("localDateVar", localDate).count()).isEqualTo(0);
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThan("localDateVar", twoYearsLater).count()).isEqualTo(3);
+
+        // Test LESS_THAN_OR_EQUAL
+        executions = runtimeService.createExecutionQuery().variableValueLessThanOrEqual("localDateVar", nextYear).list();
+        assertThat(executions).hasSize(3);
+
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThanOrEqual("localDateVar", oneYearAgo).count()).isEqualTo(0);
+
+        // Test value-only matching
+        execution = runtimeService.createExecutionQuery().variableValueEquals(nextYear).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        executions = runtimeService.createExecutionQuery().variableValueEquals(localDate).list();
+        assertThat(executions)
+            .extracting(Execution::getId)
+            .containsExactlyInAnyOrder(
+                processInstance1.getId(),
+                processInstance2.getId()
+            );
+
+        execution = runtimeService.createExecutionQuery().variableValueEquals(twoYearsLater).singleResult();
+        assertThat(execution).isNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryLocalDateTimeVariable() throws Exception {
+        Map<String, Object> vars = new HashMap<>();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        vars.put("localDateTimeVar", localDateTime);
+
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        LocalDateTime localDateTime2 = localDateTime.plusDays(1);
+        vars = new HashMap<>();
+        vars.put("localDateTimeVar", localDateTime);
+        vars.put("localDateTimeVar2", localDateTime2);
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        LocalDateTime nextYear = localDateTime.plusYears(1);
+        vars = new HashMap<>();
+        vars.put("localDateTimeVar", nextYear);
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        LocalDateTime nextMonth = localDateTime.plusMonths(1);
+
+        LocalDateTime twoYearsLater = localDateTime.plusYears(2);
+
+        LocalDateTime oneYearAgo = localDateTime.minusYears(1);
+
+        // Query on single localDateTime variable, should result in 2 matches
+        ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("localDateTimeVar", localDateTime);
+        List<Execution> executions = query.list();
+        assertThat(executions).hasSize(2);
+
+        // Query on two localDateTime variables, should result in single value
+        query = runtimeService.createExecutionQuery().variableValueEquals("localDateTimeVar", localDateTime).variableValueEquals("localDateTimeVar2", localDateTime2);
+        Execution execution = query.singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance2.getId());
+
+        // Query with unexisting variable value
+        execution = runtimeService.createExecutionQuery().variableValueEquals("localDateTimeVar", localDateTime.minusDays(1)).singleResult();
+        assertThat(execution).isNull();
+
+        // Test NOT_EQUALS
+        execution = runtimeService.createExecutionQuery().variableValueNotEquals("localDateTimeVar", localDateTime).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        // Test GREATER_THAN
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThan("localDateTimeVar", nextMonth).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThan("localDateTimeVar", nextYear).count()).isEqualTo(0);
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThan("localDateTimeVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test GREATER_THAN_OR_EQUAL
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("localDateTimeVar", nextMonth).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        execution = runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("localDateTimeVar", nextYear).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        assertThat(runtimeService.createExecutionQuery().variableValueGreaterThanOrEqual("localDateTimeVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test LESS_THAN
+        executions = runtimeService.createExecutionQuery().variableValueLessThan("localDateTimeVar", nextYear).list();
+        assertThat(executions)
+            .extracting(Execution::getId)
+            .containsExactlyInAnyOrder(
+                processInstance1.getId(),
+                processInstance2.getId()
+            );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThan("localDateTimeVar", localDateTime).count()).isEqualTo(0);
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThan("localDateTimeVar", twoYearsLater).count()).isEqualTo(3);
+
+        // Test LESS_THAN_OR_EQUAL
+        executions = runtimeService.createExecutionQuery().variableValueLessThanOrEqual("localDateTimeVar", nextYear).list();
+        assertThat(executions).hasSize(3);
+
+        assertThat(runtimeService.createExecutionQuery().variableValueLessThanOrEqual("localDateTimeVar", oneYearAgo).count()).isEqualTo(0);
+
+        // Test value-only matching
+        execution = runtimeService.createExecutionQuery().variableValueEquals(nextYear).singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getId()).isEqualTo(processInstance3.getId());
+
+        executions = runtimeService.createExecutionQuery().variableValueEquals(localDateTime).list();
         assertThat(executions)
             .extracting(Execution::getId)
             .containsExactlyInAnyOrder(

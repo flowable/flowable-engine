@@ -725,13 +725,13 @@
       } ]
     }, 
     {
-      "name" : "eventregistrykeydetectionjsonpathpackage",
+      "name" : "eventregistrykeydetectionjsonpointerpackage",
       "properties" : [ {
-        "id" : "keydetectionjsonpath",
+        "id" : "keydetectionjsonpointer",
         "type" : "String",
-        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONPATH.TITLE",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONPOINTER.TITLE",
         "value" : "",
-        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONPATH.DESCRIPTION",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONPOINTER.DESCRIPTION",
         "popular" : true
       } ]
     },
@@ -1037,7 +1037,7 @@
     "groups" : [ "CMMN.STENCILS.GROUPS.DIAGRAM" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_initiatorvariablenamepackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpathpackage"],
+    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_initiatorvariablenamepackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpointerpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {
@@ -1386,7 +1386,7 @@
         "eventregistrychanneldestinationpackage", 
         "eventregistrykeydetectionfixedvaluepackage", 
         "eventregistrykeydetectionjsonfieldpackage", 
-        "eventregistrykeydetectionjsonpathpackage"],
+        "eventregistrykeydetectionjsonpointerpackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {

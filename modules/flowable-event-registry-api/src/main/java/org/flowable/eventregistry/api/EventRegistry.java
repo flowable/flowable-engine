@@ -42,12 +42,12 @@ public interface EventRegistry {
      * Registers a {@link EventRegistryEventConsumer} instance (a consumer of event registry events which
      * is created by any of the engines).
      */
-    void registerEventRegistryEventBusConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer);
+    void registerEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer);
     
     /**
      * Removes the event consumer from the event registry
      */
-    void removeFlowableEventConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer);
+    void removeFlowableEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer);
 
     /**
      * Method to generate the unique key used to correlate an event.

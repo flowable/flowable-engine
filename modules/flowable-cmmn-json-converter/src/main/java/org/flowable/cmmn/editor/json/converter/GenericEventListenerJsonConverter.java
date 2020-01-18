@@ -73,8 +73,8 @@ public class GenericEventListenerJsonConverter extends AbstractEventListenerJson
                 } else if ("jsonField".equalsIgnoreCase(keyDetectionType)) {
                     setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, keyDetectionValue, propertiesNode);
                     
-                } else if ("jsonPath".equalsIgnoreCase(keyDetectionType)) {
-                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, keyDetectionValue, propertiesNode);
+                } else if ("jsonPointer".equalsIgnoreCase(keyDetectionType)) {
+                    setPropertyValue(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, keyDetectionValue, propertiesNode);
                 }
             }
         }
@@ -102,7 +102,7 @@ public class GenericEventListenerJsonConverter extends AbstractEventListenerJson
             
             String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
             String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);
-            String jsonPath = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_PATH, elementNode);
+            String jsonPointer = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER, elementNode);
             if (StringUtils.isNotEmpty(fixedValue)) {
                 addFlowableExtensionElementWithValue("keyDetectionType", "fixedValue", genericEventListener);
                 addFlowableExtensionElementWithValue("keyDetectionValue", fixedValue, genericEventListener);
@@ -111,9 +111,9 @@ public class GenericEventListenerJsonConverter extends AbstractEventListenerJson
                 addFlowableExtensionElementWithValue("keyDetectionType", "jsonField", genericEventListener);
                 addFlowableExtensionElementWithValue("keyDetectionValue", jsonField, genericEventListener);
                 
-            } else if (StringUtils.isNotEmpty(jsonPath)) {
-                addFlowableExtensionElementWithValue("keyDetectionType", "jsonPath", genericEventListener);
-                addFlowableExtensionElementWithValue("keyDetectionValue", jsonPath, genericEventListener);
+            } else if (StringUtils.isNotEmpty(jsonPointer)) {
+                addFlowableExtensionElementWithValue("keyDetectionType", "jsonPointer", genericEventListener);
+                addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, genericEventListener);
             }
         }
 

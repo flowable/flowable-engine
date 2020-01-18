@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.eventregistry;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 public class FlowableEventRegistryProperties {
 
     /**
-     * The name of the deployment for the form resources.
+     * The name of the deployment for the event registry resources.
      */
     private String deploymentName = "SpringBootAutoDeployment";
 
@@ -48,12 +49,27 @@ public class FlowableEventRegistryProperties {
     private boolean deployResources = true;
 
     /**
-     * Whether the form engine needs to be started.
+     * Whether to enable the automatic detection of changes when done on other engines (but against same database).
+     */
+    private boolean enableChangeDetection = false;
+
+    /**
+     * If change detection is enabled, this duration configures how long it will take until the first check is done.
+     */
+    private Duration changeDetectionInitialDelay = Duration.ofSeconds(10);
+
+    /**
+     * If change detection is enabled, this duration configures the time between two consecutive checks.
+     */
+    private Duration changeDetectionDelay = Duration.ofSeconds(60);
+
+    /**
+     * Whether the event registry engine needs to be started.
      */
     private boolean enabled = true;
 
     /**
-     * The servlet configuration for the Form Rest API.
+     * The servlet configuration for the event registry Rest API.
      */
     @NestedConfigurationProperty
     private final FlowableServlet servlet = new FlowableServlet("/event-registry-api", "Flowable Event Registry Rest API");
@@ -88,6 +104,30 @@ public class FlowableEventRegistryProperties {
 
     public void setDeployResources(boolean deployResources) {
         this.deployResources = deployResources;
+    }
+
+    public boolean isEnableChangeDetection() {
+        return enableChangeDetection;
+    }
+
+    public void setEnableChangeDetection(boolean enableChangeDetection) {
+        this.enableChangeDetection = enableChangeDetection;
+    }
+
+    public Duration getChangeDetectionInitialDelay() {
+        return changeDetectionInitialDelay;
+    }
+
+    public void setChangeDetectionInitialDelay(Duration changeDetectionInitialDelay) {
+        this.changeDetectionInitialDelay = changeDetectionInitialDelay;
+    }
+
+    public Duration getChangeDetectionDelay() {
+        return changeDetectionDelay;
+    }
+
+    public void setChangeDetectionDelay(Duration changeDetectionDelay) {
+        this.changeDetectionDelay = changeDetectionDelay;
     }
 
     public boolean isEnabled() {

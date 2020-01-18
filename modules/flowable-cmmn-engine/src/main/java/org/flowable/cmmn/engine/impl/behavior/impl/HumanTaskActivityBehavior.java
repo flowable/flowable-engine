@@ -81,8 +81,13 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             taskEntity.setPropagatedStageInstanceId(planItemInstanceEntity.getStageInstanceId());
 
             taskEntity.setTaskDefinitionKey(humanTask.getId());
+
+            String taskName = humanTask.getName();
+            if (planItemInstanceEntity.getName() != null) {
+                taskName = planItemInstanceEntity.getName();
+            }
             
-            CreateHumanTaskBeforeContext beforeContext = new CreateHumanTaskBeforeContext(humanTask, planItemInstanceEntity, humanTask.getName(), 
+            CreateHumanTaskBeforeContext beforeContext = new CreateHumanTaskBeforeContext(humanTask, planItemInstanceEntity, taskName,
                             humanTask.getDocumentation(), humanTask.getDueDate(), humanTask.getPriority(), humanTask.getCategory(), 
                             humanTask.getFormKey(), humanTask.getAssignee(), humanTask.getOwner(), 
                             humanTask.getCandidateUsers(), humanTask.getCandidateGroups());

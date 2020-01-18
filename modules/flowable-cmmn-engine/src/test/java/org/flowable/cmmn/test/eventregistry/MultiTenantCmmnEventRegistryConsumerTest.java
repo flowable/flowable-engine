@@ -84,7 +84,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("defaultTenantSameKey")
-            .detectEventTenantUsingJsonPathExpression("/tenantId")
+            .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
@@ -105,7 +105,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("sameKey")
-            .detectEventTenantUsingJsonPathExpression("/tenantId")
+            .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         

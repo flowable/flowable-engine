@@ -632,6 +632,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return caseInstanceId;
     }
     
+    @Override
     public String getId() {
         return caseInstanceId;
     }

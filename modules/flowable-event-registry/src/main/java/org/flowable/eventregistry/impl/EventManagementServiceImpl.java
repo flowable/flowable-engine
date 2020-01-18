@@ -41,7 +41,7 @@ public class EventManagementServiceImpl extends CommonEngineServiceImpl<EventReg
 
     @Override
     public void executeEventRegistryChangeDetection() {
-        configuration.getEventRegistryChangeDetector().detectChanges();
+        configuration.getEventRegistryChangeDetectionManager().detectChanges();
     }
 
 }

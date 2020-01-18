@@ -10,7 +10,7 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <name>Flowable - Event Registry API</name>
+    <name>Flowable - Event Registry</name>
     <artifactId>flowable-event-registry</artifactId>
 
     <dependencies>

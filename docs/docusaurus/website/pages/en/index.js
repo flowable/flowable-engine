@@ -159,10 +159,10 @@ In addition we’ve added Swagger in Flowable v6. Boot up the Flowable REST app 
         <h2>Flowable 5 Documentation</h2>
         <MarkdownBlock>The Flowable 5 version of the documentation items above can be found on these pages.</MarkdownBlock>
           <PromoSection>
-            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html">Getting Started v5</Button>
+            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html#_getting_started">Getting Started v5</Button>
             <Button href="https://flowable.com/open-source/docs/userguide-5/index.html">User Guide v5</Button>
-            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html">REST API v5</Button>
-            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html">Javadocs v5</Button>
+            <Button href="https://flowable.com/open-source/docs/userguide-5/index.html#restApiChapter">REST API v5</Button>
+            <Button href="https://flowable.com/open-source/docs/javadocs-5/index.html">Javadocs v5</Button>
           </PromoSection>
       </Container>
     );

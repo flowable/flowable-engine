@@ -32,7 +32,7 @@ public class AddEventConsumerCommand implements Command<Void> {
             throw new FlowableIllegalArgumentException("event consumer is null.");
         }
 
-        CommandContextUtil.getEventRegistry().registerEventRegistryEventBusConsumer(eventConsumer);
+        CommandContextUtil.getEventRegistry().registerEventRegistryEventConsumer(eventConsumer);
 
         return null;
     }

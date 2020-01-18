@@ -6,6 +6,8 @@
 
 	<property name="flowable.version" value="6.5.0-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
+	<property name="target.docs.root" value="${target.distro.root}/docs" />
+	<property name="target.newsite.root" value="target/website" />
 	<property name="flowable.website" value="../../flowable-website" />
 
 	<condition property="mvn.executable" value="mvn.bat" else="mvn">
@@ -390,66 +392,58 @@
 		<exec executable="${mvn.executable}" dir="../modules/flowable-engine">
 			<arg line="-DexcludePackageNames=org.flowable.engine.impl* javadoc:javadoc" />
 		</exec>
-		<mkdir dir="${target.distro.root}/docs/javadocs" />
-		<copy todir="${target.distro.root}/docs/javadocs">
+		<mkdir dir="${target.docs.root}/javadocs" />
+		<copy todir="${target.docs.root}/javadocs">
 			<fileset dir="../modules/flowable-engine/target/site/apidocs" />
 		</copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-cmmn-engine">
             <arg line="-DexcludePackageNames=org.flowable.cmmn.engine.impl* javadoc:javadoc" />
         </exec>
-        <mkdir dir="${target.distro.root}/docs/cmmn-javadocs" />
-        <copy todir="${target.distro.root}/docs/cmmn-javadocs">
+        <mkdir dir="${target.docs.root}/cmmn-javadocs" />
+        <copy todir="${target.docs.root}/cmmn-javadocs">
             <fileset dir="../modules/flowable-cmmn-engine/target/site/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-task-service-api">
 			<arg line="javadoc:javadoc" />
 		</exec>
-        <mkdir dir="${target.distro.root}/docs/task-javadocs" />
-        <copy todir="${target.distro.root}/docs/task-javadocs">
+        <mkdir dir="${target.docs.root}/task-javadocs" />
+        <copy todir="${target.docs.root}/task-javadocs">
             <fileset dir="../modules/flowable-task-service-api/target/site/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-variable-service-api">
 			<arg line="javadoc:javadoc" />
 	    </exec>
-        <mkdir dir="${target.distro.root}/docs/variable-javadocs" />
-        <copy todir="${target.distro.root}/docs/variable-javadocs">
+        <mkdir dir="${target.docs.root}/variable-javadocs" />
+        <copy todir="${target.docs.root}/variable-javadocs">
             <fileset dir="../modules/flowable-variable-service-api/target/site/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-job-service-api">
 			<arg line="javadoc:javadoc" />
         </exec>
-        <mkdir dir="${target.distro.root}/docs/job-javadocs" />
-        <copy todir="${target.distro.root}/docs/job-javadocs">
+        <mkdir dir="${target.docs.root}/job-javadocs" />
+        <copy todir="${target.docs.root}/job-javadocs">
             <fileset dir="../modules/flowable-job-service-api/target/site/apidocs" />
         </copy>
 		
 		<!-- USERGUIDE -->
-		<ant antfile="../docs/userguide/build.xml" inheritall="false" />
-		<mkdir dir="${target.distro.root}/docs/userguide" />
-		<copy todir="${target.distro.root}/docs/userguide">
-			<fileset dir="../docs/userguide/target/html/en/bpmn" />
+		<exec executable="yarn" dir="../docs/docusaurus/website">
+			<arg line="run build" />
+		</exec>
+		<copy todir="${target.docs.root}">
+			<fileset dir="../docs/docusaurus/website/build/flowable-userguide" />
 		</copy>
-        <mkdir dir="${target.distro.root}/docs/userguide-cmmn" />
-        <copy todir="${target.distro.root}/docs/userguide-cmmn">
-            <fileset dir="../docs/userguide/target/html/en/cmmn" />
-        </copy>
-		<mkdir dir="${target.distro.root}/docs/userguide-dmn" />
-		<copy todir="${target.distro.root}/docs/userguide-dmn">
-			<fileset dir="../docs/userguide/target/html/en/dmn" />
-		</copy>
-		<mkdir dir="${target.distro.root}/docs/userguide-form" />
-		<copy todir="${target.distro.root}/docs/userguide-form">
-			<fileset dir="../docs/userguide/target/html/en/form" />
-		</copy>
+		<move todir="${target.newsite.root}">
+			<fileset dir="${target.docs.root}/assets/static" />
+		</move>
 	</target>
 
 	<target name="copy.docs" depends="build.docs" unless="nodocs">
 		<!-- COPY XSD -->
-		<copy todir="${target.distro.root}/docs/xsd">
+		<copy todir="${target.docs.root}/xsd">
 			<fileset dir="../modules/flowable-bpmn-converter/src/main/resources/org/flowable/impl/bpmn/parser">
 				<include name="*.xsd" />
 			</fileset>

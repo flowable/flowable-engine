@@ -77,6 +77,7 @@ public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege>
         return this;
     }
 
+    @Override
     public String getId() {
         return id;
     }

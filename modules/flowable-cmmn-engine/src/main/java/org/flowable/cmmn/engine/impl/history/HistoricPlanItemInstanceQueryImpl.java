@@ -37,6 +37,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String planItemInstanceName;
     protected String state;
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected String elementId;
@@ -110,6 +111,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceDerivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
         return this;
     }
 
@@ -479,6 +486,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
     }
+    @Override
     public String getId() {
         return planItemInstanceId;
     }
@@ -490,6 +498,9 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public String getCaseDefinitionId() {
         return caseDefinitionId;
+    }
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
     }
     public String getCaseInstanceId() {
         return caseInstanceId;

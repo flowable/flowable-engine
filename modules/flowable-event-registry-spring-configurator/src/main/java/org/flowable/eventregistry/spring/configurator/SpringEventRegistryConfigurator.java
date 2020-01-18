@@ -38,7 +38,6 @@ public class SpringEventRegistryConfigurator extends EventRegistryEngineConfigur
         }
 
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
-        initChangeDetectorProperties(engineConfiguration);
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
         ((SpringEventRegistryEngineConfiguration) eventEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
 

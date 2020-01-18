@@ -874,6 +874,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return processInstanceId;
     }
     
+    @Override
     public String getId() {
         return processInstanceId;
     }

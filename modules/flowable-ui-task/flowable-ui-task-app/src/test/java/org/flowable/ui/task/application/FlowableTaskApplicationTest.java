@@ -14,12 +14,20 @@ package org.flowable.ui.task.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.jms.ConnectionFactory;
+
+import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -31,6 +39,9 @@ public class FlowableTaskApplicationTest {
 
     @Autowired
     private ConfigurableEnvironment environment;
+
+    @Autowired
+    protected ApplicationContext applicationContext;
 
     @Test
     public void contextShouldLoad() {
@@ -47,5 +58,31 @@ public class FlowableTaskApplicationTest {
                 "flowable-liquibase-override",
                 "Management Server"
             );
+
+        assertThat(applicationContext.getBeanProvider(JmsTemplate.class).getIfAvailable())
+            .as("JmsTemplate Bean")
+            .isNull();
+
+        assertThat(applicationContext.getBeanProvider(ConnectionFactory.class).getIfAvailable())
+            .as("Jms ConnectionFactory Bean")
+            .isNull();
+
+        assertThat(applicationContext.getBeanProvider(org.springframework.amqp.rabbit.connection.ConnectionFactory.class).getIfAvailable())
+            .as("Rabbit ConnectionFactory Bean")
+            .isNull();
+
+        assertThat(applicationContext.getBeanProvider(RabbitTemplate.class).getIfAvailable())
+            .as("RabbitTemplate Bean")
+            .isNull();
+
+        assertThat(applicationContext.getBeanProvider(ConsumerFactory.class).getIfAvailable())
+            .as("Kafka ConsumerFactory Bean")
+            .isNull();
+
+        assertThat(applicationContext.getBeanProvider(KafkaTemplate.class).getIfAvailable())
+            .as("KafkaTemplate Bean")
+            .isNull();
+
+        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class)).isEmpty();
     }
 }

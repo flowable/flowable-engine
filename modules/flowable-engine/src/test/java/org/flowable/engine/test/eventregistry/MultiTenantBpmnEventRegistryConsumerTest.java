@@ -87,7 +87,7 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("defaultTenantSameKey")
-            .detectEventTenantUsingJsonPathExpression("/tenantId")
+            .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
@@ -109,7 +109,7 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("sameKey")
-            .detectEventTenantUsingJsonPathExpression("/tenantId")
+            .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         

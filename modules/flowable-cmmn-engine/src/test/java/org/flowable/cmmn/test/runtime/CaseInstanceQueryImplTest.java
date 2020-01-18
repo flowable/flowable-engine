@@ -17,6 +17,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Collections;
@@ -923,6 +925,222 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
 
         caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(instant1).list();
+        Assertions.assertThat(caseInstances)
+            .extracting(CaseInstance::getId)
+            .containsExactlyInAnyOrder(
+                caseInstance1.getId(),
+                caseInstance2.getId()
+            );
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(twoYearsLater).singleResult();
+        Assertions.assertThat(caseInstance).isNull();
+    }
+
+    @Test
+    public void testQueryLocalDateVariable() throws Exception {
+        Map<String, Object> vars = new HashMap<>();
+        LocalDate localDate = LocalDate.now();
+        vars.put("localDateVar", localDate);
+
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
+
+        LocalDate localDate2 = localDate.plusDays(1);
+        vars = new HashMap<>();
+        vars.put("localDateVar", localDate);
+        vars.put("localDateVar2", localDate2);
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .variables(vars)
+            .start();
+
+        LocalDate nextYear = localDate.plusYears(1);
+        vars = new HashMap<>();
+        vars.put("localDateVar", nextYear);
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .variables(vars)
+            .start();
+
+        LocalDate nextMonth = localDate.plusMonths(1);
+
+        LocalDate twoYearsLater = localDate.plusYears(2);
+
+        LocalDate oneYearAgo = localDate.minusYears(2);
+
+        // Query on single localDate variable, should result in 2 matches
+        CaseInstanceQuery query = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("localDateVar", localDate);
+        List<CaseInstance> caseInstances = query.list();
+        Assertions.assertThat(caseInstances).hasSize(2);
+
+        // Query on two instant variables, should result in single value
+        query = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("localDateVar", localDate).variableValueEquals("localDateVar2", localDate2);
+        CaseInstance caseInstance = query.singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance2.getId());
+
+        // Query with unexisting variable value
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("localDateVar", localDate.minusDays(1)).singleResult();
+        Assertions.assertThat(caseInstance).isNull();
+
+        // Test NOT_EQUALS
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("localDateVar", localDate).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        // Test GREATER_THAN
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("localDateVar", nextMonth).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("localDateVar", nextYear).count()).isEqualTo(0);
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("localDateVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test GREATER_THAN_OR_EQUAL
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("localDateVar", nextMonth).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("localDateVar", nextYear).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("localDateVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test LESS_THAN
+        caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("localDateVar", nextYear).list();
+        Assertions.assertThat(caseInstances)
+            .extracting(CaseInstance::getId)
+            .containsExactlyInAnyOrder(
+                caseInstance1.getId(),
+                caseInstance2.getId()
+            );
+
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("localDateVar", localDate).count()).isEqualTo(0);
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("localDateVar", twoYearsLater).count()).isEqualTo(3);
+
+        // Test LESS_THAN_OR_EQUAL
+        caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThanOrEqual("localDateVar", nextYear).list();
+        Assertions.assertThat(caseInstances).hasSize(3);
+
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThanOrEqual("localDateVar", oneYearAgo).count()).isEqualTo(0);
+
+        // Test value-only matching
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(nextYear).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(localDate).list();
+        Assertions.assertThat(caseInstances)
+            .extracting(CaseInstance::getId)
+            .containsExactlyInAnyOrder(
+                caseInstance1.getId(),
+                caseInstance2.getId()
+            );
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(twoYearsLater).singleResult();
+        Assertions.assertThat(caseInstance).isNull();
+    }
+
+    @Test
+    public void testQueryLocalDateTimeVariable() throws Exception {
+        Map<String, Object> vars = new HashMap<>();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        vars.put("localDateTimeVar", localDateTime);
+
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
+
+        LocalDateTime localDateTime2 = localDateTime.plusDays(1);
+        vars = new HashMap<>();
+        vars.put("localDateTimeVar", localDateTime);
+        vars.put("localDateTimeVar2", localDateTime2);
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .variables(vars)
+            .start();
+
+        LocalDateTime nextYear = localDateTime.plusYears(1);
+        vars = new HashMap<>();
+        vars.put("localDateTimeVar", nextYear);
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .variables(vars)
+            .start();
+
+        LocalDateTime nextMonth = localDateTime.plusMonths(1);
+
+        LocalDateTime twoYearsLater = localDateTime.plusYears(2);
+
+        LocalDateTime oneYearAgo = localDateTime.minusYears(2);
+
+        // Query on single localDateTime variable, should result in 2 matches
+        CaseInstanceQuery query = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("localDateTimeVar", localDateTime);
+        List<CaseInstance> caseInstances = query.list();
+        Assertions.assertThat(caseInstances).hasSize(2);
+
+        // Query on two localDateTime variables, should result in single value
+        query = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("localDateTimeVar", localDateTime).variableValueEquals("localDateTimeVar2", localDateTime2);
+        CaseInstance caseInstance = query.singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance2.getId());
+
+        // Query with unexisting variable value
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("localDateTimeVar", localDateTime.minusSeconds(1)).singleResult();
+        Assertions.assertThat(caseInstance).isNull();
+
+        // Test NOT_EQUALS
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("localDateTimeVar", localDateTime).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        // Test GREATER_THAN
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("localDateTimeVar", nextMonth).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("localDateTimeVar", nextYear).count()).isEqualTo(0);
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThan("localDateTimeVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test GREATER_THAN_OR_EQUAL
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("localDateTimeVar", nextMonth).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("localDateTimeVar", nextYear).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("localDateTimeVar", oneYearAgo).count()).isEqualTo(3);
+
+        // Test LESS_THAN
+        caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("localDateTimeVar", nextYear).list();
+        Assertions.assertThat(caseInstances)
+            .extracting(CaseInstance::getId)
+            .containsExactlyInAnyOrder(
+                caseInstance1.getId(),
+                caseInstance2.getId()
+            );
+
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("localDateTimeVar", localDateTime).count()).isEqualTo(0);
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThan("localDateTimeVar", twoYearsLater).count()).isEqualTo(3);
+
+        // Test LESS_THAN_OR_EQUAL
+        caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThanOrEqual("localDateTimeVar", nextYear).list();
+        Assertions.assertThat(caseInstances).hasSize(3);
+
+        Assertions.assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueLessThanOrEqual("localDateTimeVar", oneYearAgo).count()).isEqualTo(0);
+
+        // Test value-only matching
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(nextYear).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(localDateTime).list();
         Assertions.assertThat(caseInstances)
             .extracting(CaseInstance::getId)
             .containsExactlyInAnyOrder(

@@ -12,7 +12,7 @@
  */
 package org.flowable.eventregistry.impl.management;
 
-import org.flowable.eventregistry.api.management.EventRegistryChangeDetector;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,16 +23,16 @@ public class EventRegistryChangeDetectionRunnable implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventRegistryChangeDetectionRunnable.class);
 
-    protected EventRegistryChangeDetector eventRegistryChangeDetector;
+    protected EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager;
 
-    public EventRegistryChangeDetectionRunnable(EventRegistryChangeDetector eventRegistryChangeDetector) {
-        this.eventRegistryChangeDetector = eventRegistryChangeDetector;
+    public EventRegistryChangeDetectionRunnable(EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager) {
+        this.eventRegistryChangeDetectionManager = eventRegistryChangeDetectionManager;
     }
 
     @Override
     public void run() {
         try {
-            eventRegistryChangeDetector.detectChanges();
+            eventRegistryChangeDetectionManager.detectChanges();
         } catch (Exception e) {
             LOGGER.error("Exception while detecting event registry changes", e);
         }

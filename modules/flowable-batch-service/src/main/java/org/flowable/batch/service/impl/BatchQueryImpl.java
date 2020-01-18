@@ -190,6 +190,7 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
     
     // getters //////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

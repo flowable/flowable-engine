@@ -17,6 +17,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 
@@ -36,6 +37,8 @@ public interface CmmnEngine extends Engine {
     void startExecutors();
 
     CmmnRuntimeService getCmmnRuntimeService();
+
+    DynamicCmmnService getDynamicCmmnService();
     
     CmmnTaskService getCmmnTaskService();
     

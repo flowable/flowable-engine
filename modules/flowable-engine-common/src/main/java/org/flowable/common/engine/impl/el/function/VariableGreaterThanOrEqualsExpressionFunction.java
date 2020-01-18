@@ -14,7 +14,7 @@ package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
 
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * @author Joram Barrez
@@ -25,8 +25,8 @@ public class VariableGreaterThanOrEqualsExpressionFunction extends AbstractVaria
         super(Arrays.asList("greaterThanOrEquals", "gte"), "greaterThanOrEquals");
     }
     
-    public static boolean greaterThanOrEquals(VariableScope variableScope, String variableName, Object comparedValue) {
-        return compareVariableValue(variableScope, variableName, comparedValue, OPERATOR.GTE);
+    public static boolean greaterThanOrEquals(VariableContainer variableContainer, String variableName, Object comparedValue) {
+        return compareVariableValue(variableContainer, variableName, comparedValue, OPERATOR.GTE);
     }
 
 }

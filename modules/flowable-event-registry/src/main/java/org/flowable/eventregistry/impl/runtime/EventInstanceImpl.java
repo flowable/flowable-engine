@@ -61,12 +61,14 @@ public class EventInstanceImpl implements EventInstance {
     public void setEventModel(EventModel eventModel) {
         this.eventModel = eventModel;
     }
+    @Override
     public Collection<EventPayloadInstance> getPayloadInstances() {
         return payloadInstances;
     }
     public void setPayloadInstances(Collection<EventPayloadInstance> payloadInstances) {
         this.payloadInstances = payloadInstances;
     }
+    @Override
     public Collection<EventCorrelationParameterInstance> getCorrelationParameterInstances() {
         return correlationParameterInstances;
     }

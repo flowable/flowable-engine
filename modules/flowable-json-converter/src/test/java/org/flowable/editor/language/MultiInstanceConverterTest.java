@@ -17,6 +17,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MultiInstanceConverterTest extends AbstractConverterTest {
 
@@ -33,13 +34,14 @@ public class MultiInstanceConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.multiinstance.json";
     }
 
     private void validateModel(BpmnModel model) {
         Activity activity = (Activity) model.getFlowElement("multi-instance");
-        assertEquals(true, activity.getLoopCharacteristics().isSequential());
+        assertTrue(activity.getLoopCharacteristics().isSequential());
         assertEquals("3", activity.getLoopCharacteristics().getLoopCardinality());
         assertEquals("instanceVar", activity.getLoopCharacteristics().getElementVariable());
         assertEquals("collection", activity.getLoopCharacteristics().getInputDataItem());

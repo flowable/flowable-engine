@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.model.BuiltinAggregator;

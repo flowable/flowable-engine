@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.callback;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
@@ -97,13 +98,18 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
         // as the original one is removed when the timer event has occurred.
         if (variableScope instanceof PlanItemInstanceEntity) {
             PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
-            
+
+            PlanItemInstance stagePlanItem = planItemInstanceEntity.getStagePlanItemInstanceEntity();
+            if (stagePlanItem == null && planItemInstanceEntity.getStageInstanceId() != null) {
+                stagePlanItem = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceEntity.getStageInstanceId());
+            }
+
             // Create new plan item instance based on the data of the original one
-            PlanItemInstanceEntity newPlanItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceBuilder()
+            PlanItemInstanceEntity newPlanItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceEntityBuilder()
                 .planItem(planItemInstanceEntity.getPlanItem())
                 .caseDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
                 .caseInstanceId(planItemInstanceEntity.getCaseInstanceId())
-                .stagePlanItemInstanceId(planItemInstanceEntity.getStageInstanceId())
+                .stagePlanItemInstance(stagePlanItem)
                 .tenantId(planItemInstanceEntity.getTenantId())
                 .addToParent(true)
                 .create();

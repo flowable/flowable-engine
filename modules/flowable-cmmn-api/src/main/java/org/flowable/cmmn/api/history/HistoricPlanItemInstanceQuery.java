@@ -28,6 +28,7 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceName(String planItemInstanceName);
     HistoricPlanItemInstanceQuery planItemInstanceState(String state);
     HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId);
+    HistoricPlanItemInstanceQuery planItemInstanceDerivedCaseDefinitionId(String derivedCaseDefinitionId);
     HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceId(String caseInstanceId);
     HistoricPlanItemInstanceQuery planItemInstanceStageInstanceId(String stageInstanceId);
     HistoricPlanItemInstanceQuery planItemInstanceElementId(String elementId);

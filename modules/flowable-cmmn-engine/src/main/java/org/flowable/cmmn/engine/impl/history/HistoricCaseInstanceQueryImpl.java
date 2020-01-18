@@ -775,6 +775,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return caseInstanceId;
     }
     
+    @Override
     public String getId() {
         return caseInstanceId;
     }

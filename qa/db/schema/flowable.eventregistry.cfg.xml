@@ -29,5 +29,7 @@
                 <ref bean="dataSource"/>
             </list>
         </property>
+
+        <property name="enableEventRegistryChangeDetection" value="true" />
     </bean>
 </beans>

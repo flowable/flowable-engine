@@ -843,16 +843,16 @@
             "DESCRIPTION" : "Definition of the trigger channel destination"
           },
           "KEYDETECTIONFIXEDVALUE" : {
-            "TITLE" : "Event fixed value",
+            "TITLE" : "Event key fixed value",
             "DESCRIPTION" : "Definition of the event key fixed value"
           },
           "KEYDETECTIONJSONFIELD" : {
             "TITLE" : "Event key json field",
             "DESCRIPTION" : "Definition of the event key detection with a json field"
           },
-          "KEYDETECTIONJSONPATH" : {
-            "TITLE" : "Event key json path",
-            "DESCRIPTION" : "Definition of the event key detection with a json path value"
+          "KEYDETECTIONJSONPOINTER" : {
+            "TITLE" : "Event key json pointer",
+            "DESCRIPTION" : "Definition of the event key detection with a json pointer expression"
           }
         },
         "ISTRANSACTIONPACKAGE" : {
@@ -1541,16 +1541,16 @@
             "DESCRIPTION" : "Definition of the channel destination"
           },
           "KEYDETECTIONFIXEDVALUE" : {
-            "TITLE" : "Event fixed value",
+            "TITLE" : "Event key fixed value",
             "DESCRIPTION" : "Definition of the event key fixed value"
           },
           "KEYDETECTIONJSONFIELD" : {
             "TITLE" : "Event key json field",
             "DESCRIPTION" : "Definition of the event key detection with a json field"
           },
-          "KEYDETECTIONJSONPATH" : {
-            "TITLE" : "Event key json path",
-            "DESCRIPTION" : "Definition of the event key detection with a json path value"
+          "KEYDETECTIONJSONPOINTER" : {
+            "TITLE" : "Event key json pointer",
+            "DESCRIPTION" : "Definition of the event key detection with a json pointer value"
           }
         },
         "CASETASKCASEREFERENCEPACKAGE": {

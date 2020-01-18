@@ -14,7 +14,8 @@ package org.flowable.eventregistry.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetector;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
+import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionExecutor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -24,10 +25,14 @@ public class DefaultEventRegistryDataChangeDetectorTest extends AbstractFlowable
 
     @Test
     public void testExecutorServiceAndRunnableCreated() {
-        DefaultEventRegistryChangeDetector eventRegistryChangeDetector = (DefaultEventRegistryChangeDetector) eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetector();
-        assertThat(eventRegistryChangeDetector).isNotNull();
-        assertThat(eventRegistryChangeDetector.getScheduledExecutorService()).isNotNull();
-        assertThat(eventRegistryChangeDetector.getChangeDetectionRunnable()).isNotNull();
+        assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionManager()).isNotNull();
+        EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getEventRegistryChangeDetectionExecutor();
+        assertThat(eventRegistryChangeDetectionExecutor).isNotNull();
+        assertThat(eventRegistryChangeDetectionExecutor).isInstanceOf(DefaultEventRegistryChangeDetectionExecutor.class);
+
+        DefaultEventRegistryChangeDetectionExecutor executor = (DefaultEventRegistryChangeDetectionExecutor) eventRegistryChangeDetectionExecutor;
+        assertThat(executor.getScheduledExecutorService()).isNotNull();
+        assertThat(executor.getChangeDetectionRunnable()).isNotNull();
     }
 
 }

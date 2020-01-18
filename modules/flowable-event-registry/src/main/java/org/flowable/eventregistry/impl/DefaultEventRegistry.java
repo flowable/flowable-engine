@@ -70,12 +70,12 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void registerEventRegistryEventBusConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer) {
+    public void registerEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer) {
         engineConfiguration.getEventRegistryEventConsumers().put(eventRegistryEventBusConsumer.getConsumerKey(), eventRegistryEventBusConsumer);
     }
     
     @Override
-    public void removeFlowableEventConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer) {
+    public void removeFlowableEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventBusConsumer) {
         engineConfiguration.getEventRegistryEventConsumers().remove(eventRegistryEventBusConsumer.getConsumerKey());
     }
 

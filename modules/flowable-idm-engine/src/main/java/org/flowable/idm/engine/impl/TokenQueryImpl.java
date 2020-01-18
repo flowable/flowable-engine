@@ -210,6 +210,7 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
 
     // getters //////////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

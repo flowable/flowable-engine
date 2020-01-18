@@ -34,6 +34,8 @@ import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneInMemEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBuild;
@@ -44,7 +46,8 @@ import org.flowable.eventregistry.impl.deployer.ChannelDefinitionDeploymentHelpe
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeployer;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeploymentHelper;
 import org.flowable.eventregistry.impl.deployer.ParsedDeploymentBuilderFactory;
-import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetector;
+import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionExecutor;
+import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.parser.ChannelDefinitionParseFactory;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParseFactory;
 import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
@@ -140,7 +143,14 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
 
-    protected boolean handleEventRegistryEngineDeploymentsAfterEngineCreate = true;
+    // Change detection
+    protected boolean enableEventRegistryChangeDetection;
+    protected long eventRegistryChangeDetectionInitialDelayInMs = 10000L;
+    protected long eventRegistryChangeDetectionDelayInMs = 60000L;
+    protected EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager;
+    protected EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor;
+
+    protected boolean enableEventRegistryChangeDetectionAfterEngineCreate = true;
 
     public static EventRegistryEngineConfiguration createEventRegistryEngineConfigurationFromResourceDefault() {
         return createEventRegistryEngineConfigurationFromResource("flowable.eventregistry.cfg.xml", "eventRegistryEngineConfiguration");
@@ -177,14 +187,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         init();
         EventRegistryEngineImpl eventRegistryEngine = new EventRegistryEngineImpl(this);
 
-        if (handleEventRegistryEngineDeploymentsAfterEngineCreate) {
+        if (enableEventRegistryChangeDetectionAfterEngineCreate) {
+
             eventRegistryEngine.handleDeployedChannelDefinitions();
+
+            if (enableEventRegistryChangeDetection) {
+                eventRegistryChangeDetectionExecutor.initialize();
+            }
         }
 
-        if (enableEventRegistryChangeDetection) {
-            eventRegistryChangeDetector.initialize();
-        }
-        
         return eventRegistryEngine;
     }
 
@@ -228,7 +239,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initChannelDefinitionProcessors();
         initDeployers();
         initClock();
-        initChangeDetector();
+        initChangeDetectionManager();
+        initChangeDetectionExecutor();
     }
 
     // services
@@ -497,9 +509,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         channelModelProcessors.add(new OutboundChannelModelProcessor());
     }
 
-    public void initChangeDetector() {
-        if (this.eventRegistryChangeDetector == null) {
-            this.eventRegistryChangeDetector = new DefaultEventRegistryChangeDetector(this,
+    public void initChangeDetectionManager() {
+        if (this.eventRegistryChangeDetectionManager == null) {
+            this.eventRegistryChangeDetectionManager = new DefaultEventRegistryChangeDetectionManager(this);
+        }
+    }
+
+    public void initChangeDetectionExecutor() {
+        if (this.eventRegistryChangeDetectionExecutor == null) {
+            this.eventRegistryChangeDetectionExecutor = new DefaultEventRegistryChangeDetectionExecutor(eventRegistryChangeDetectionManager,
                 eventRegistryChangeDetectionInitialDelayInMs, eventRegistryChangeDetectionDelayInMs);
         }
     }
@@ -571,6 +589,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
     
+    @Override
     public EventRegistry getEventRegistry() {
         return eventRegistry;
     }
@@ -595,6 +614,50 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setOutboundEventProcessor(OutboundEventProcessor outboundEventProcessor) {
         this.outboundEventProcessor = outboundEventProcessor;
+        return this;
+    }
+
+    public boolean isEnableEventRegistryChangeDetection() {
+        return enableEventRegistryChangeDetection;
+    }
+
+    public EventRegistryEngineConfiguration setEnableEventRegistryChangeDetection(boolean enableEventRegistryChangeDetection) {
+        this.enableEventRegistryChangeDetection = enableEventRegistryChangeDetection;
+        return this;
+    }
+
+    public long getEventRegistryChangeDetectionInitialDelayInMs() {
+        return eventRegistryChangeDetectionInitialDelayInMs;
+    }
+
+    public EventRegistryEngineConfiguration setEventRegistryChangeDetectionInitialDelayInMs(long eventRegistryChangeDetectionInitialDelayInMs) {
+        this.eventRegistryChangeDetectionInitialDelayInMs = eventRegistryChangeDetectionInitialDelayInMs;
+        return this;
+    }
+
+    public long getEventRegistryChangeDetectionDelayInMs() {
+        return eventRegistryChangeDetectionDelayInMs;
+    }
+
+    public EventRegistryEngineConfiguration setEventRegistryChangeDetectionDelayInMs(long eventRegistryChangeDetectionDelayInMs) {
+        this.eventRegistryChangeDetectionDelayInMs = eventRegistryChangeDetectionDelayInMs;
+        return this;
+    }
+
+    public EventRegistryChangeDetectionManager getEventRegistryChangeDetectionManager() {
+        return eventRegistryChangeDetectionManager;
+    }
+
+    public EventRegistryEngineConfiguration setEventRegistryChangeDetectionManager(EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager) {
+        this.eventRegistryChangeDetectionManager = eventRegistryChangeDetectionManager;
+        return this;
+    }
+
+    public EventRegistryChangeDetectionExecutor getEventRegistryChangeDetectionExecutor() {
+        return eventRegistryChangeDetectionExecutor;
+    }
+    public EventRegistryEngineConfiguration setEventRegistryChangeDetectionExecutor(EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor) {
+        this.eventRegistryChangeDetectionExecutor = eventRegistryChangeDetectionExecutor;
         return this;
     }
 
@@ -750,12 +813,12 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
 
-    public boolean isHandleEventRegistryEngineDeploymentsAfterEngineCreate() {
-        return handleEventRegistryEngineDeploymentsAfterEngineCreate;
+    public boolean isEnableEventRegistryChangeDetectionAfterEngineCreate() {
+        return enableEventRegistryChangeDetectionAfterEngineCreate;
     }
 
-    public EventRegistryEngineConfiguration setHandleEventRegistryEngineDeploymentsAfterEngineCreate(boolean handleEventRegistryEngineDeploymentsAfterEngineCreate) {
-        this.handleEventRegistryEngineDeploymentsAfterEngineCreate = handleEventRegistryEngineDeploymentsAfterEngineCreate;
+    public EventRegistryEngineConfiguration setEnableEventRegistryChangeDetectionAfterEngineCreate(boolean enableEventRegistryChangeDetectionAfterEngineCreate) {
+        this.enableEventRegistryChangeDetectionAfterEngineCreate = enableEventRegistryChangeDetectionAfterEngineCreate;
         return this;
     }
 

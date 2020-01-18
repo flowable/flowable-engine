@@ -38,6 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements PlanItemInstanceEntity, CountingPlanItemInstanceEntity {
     
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected boolean isStage;
@@ -81,6 +82,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("caseDefinitionId", caseDefinitionId);
+        persistentState.put("derivedCaseDefinitionId", derivedCaseDefinitionId);
         persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("stageInstanceId", stageInstanceId);
         persistentState.put("isStage", isStage);
@@ -117,7 +119,14 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public PlanItem getPlanItem() {
         if (planItem == null) {
-            Case caze = CaseDefinitionUtil.getCase(caseDefinitionId);
+            Case caze;
+
+            // check, if the plan item is a derived one
+            if (derivedCaseDefinitionId != null) {
+                caze = CaseDefinitionUtil.getCase(derivedCaseDefinitionId);
+            } else {
+                caze = CaseDefinitionUtil.getCase(caseDefinitionId);
+            }
             planItem = (PlanItem) caze.getAllCaseElements().get(elementId);
         }
         return planItem;
@@ -130,6 +139,14 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
+    }
+    @Override
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
+    }
+    @Override
+    public void setDerivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
     }
     @Override
     public String getCaseInstanceId() {

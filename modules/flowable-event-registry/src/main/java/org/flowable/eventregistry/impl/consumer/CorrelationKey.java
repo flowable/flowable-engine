@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.impl.consumer;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 
@@ -46,4 +47,20 @@ public class CorrelationKey {
         this.parameterInstances = parameterInstances;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CorrelationKey that = (CorrelationKey) o;
+        return Objects.equals(value, that.value) && Objects.equals(parameterInstances, that.parameterInstances);
+    }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode(); // The value is determined by the parameterInstance, so no need to use them in the hashcode
+    }
 }

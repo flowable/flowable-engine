@@ -62,18 +62,19 @@ class JmsChannelDefinitionProcessorTest {
     @BeforeEach
     void setUp() {
         testEventConsumer = new TestEventConsumer();
-        eventRegistry.registerEventRegistryEventBusConsumer(testEventConsumer);
+        eventRegistry.registerEventRegistryEventConsumer(testEventConsumer);
     }
 
     @AfterEach
     void tearDown() {
         testEventConsumer.clear();
-        eventRegistry.removeFlowableEventConsumer(testEventConsumer);
-        
+
         List<EventDeployment> eventDeployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : eventDeployments) {
             eventRepositoryService.deleteDeployment(eventDeployment.getId());
         }
+        
+        eventRegistry.removeFlowableEventRegistryEventConsumer(testEventConsumer);
     }
 
     @Test

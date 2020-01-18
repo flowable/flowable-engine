@@ -67,6 +67,8 @@ public class EventRegistryEngineTestConfiguration {
 
         channelDefinitionProcessors.stream().forEach(engineConfiguration::addChannelModelProcessor);
 
+        engineConfiguration.setEnableEventRegistryChangeDetection(true);
+
         return engineConfiguration;
     }
 
