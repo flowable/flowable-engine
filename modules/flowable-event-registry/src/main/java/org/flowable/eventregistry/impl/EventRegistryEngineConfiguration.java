@@ -34,6 +34,8 @@ import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
+import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneInMemEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBuild;
@@ -141,7 +143,14 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
 
-    protected boolean handleEventRegistryEngineDeploymentsAfterEngineCreate = true;
+    // Change detection
+    protected boolean enableEventRegistryChangeDetection;
+    protected long eventRegistryChangeDetectionInitialDelayInMs = 10000L;
+    protected long eventRegistryChangeDetectionDelayInMs = 60000L;
+    protected EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager;
+    protected EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor;
+
+    protected boolean enableEventRegistryChangeDetectionAfterEngineCreate = true;
 
     public static EventRegistryEngineConfiguration createEventRegistryEngineConfigurationFromResourceDefault() {
         return createEventRegistryEngineConfigurationFromResource("flowable.eventregistry.cfg.xml", "eventRegistryEngineConfiguration");
@@ -178,7 +187,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         init();
         EventRegistryEngineImpl eventRegistryEngine = new EventRegistryEngineImpl(this);
 
-        if (handleEventRegistryEngineDeploymentsAfterEngineCreate) {
+        if (enableEventRegistryChangeDetectionAfterEngineCreate) {
+
             eventRegistryEngine.handleDeployedChannelDefinitions();
 
             if (enableEventRegistryChangeDetection) {
@@ -606,6 +616,50 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
 
+    public boolean isEnableEventRegistryChangeDetection() {
+        return enableEventRegistryChangeDetection;
+    }
+
+    public EventRegistryEngineConfiguration setEnableEventRegistryChangeDetection(boolean enableEventRegistryChangeDetection) {
+        this.enableEventRegistryChangeDetection = enableEventRegistryChangeDetection;
+        return this;
+    }
+
+    public long getEventRegistryChangeDetectionInitialDelayInMs() {
+        return eventRegistryChangeDetectionInitialDelayInMs;
+    }
+
+    public EventRegistryEngineConfiguration setEventRegistryChangeDetectionInitialDelayInMs(long eventRegistryChangeDetectionInitialDelayInMs) {
+        this.eventRegistryChangeDetectionInitialDelayInMs = eventRegistryChangeDetectionInitialDelayInMs;
+        return this;
+    }
+
+    public long getEventRegistryChangeDetectionDelayInMs() {
+        return eventRegistryChangeDetectionDelayInMs;
+    }
+
+    public EventRegistryEngineConfiguration setEventRegistryChangeDetectionDelayInMs(long eventRegistryChangeDetectionDelayInMs) {
+        this.eventRegistryChangeDetectionDelayInMs = eventRegistryChangeDetectionDelayInMs;
+        return this;
+    }
+
+    public EventRegistryChangeDetectionManager getEventRegistryChangeDetectionManager() {
+        return eventRegistryChangeDetectionManager;
+    }
+
+    public EventRegistryEngineConfiguration setEventRegistryChangeDetectionManager(EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager) {
+        this.eventRegistryChangeDetectionManager = eventRegistryChangeDetectionManager;
+        return this;
+    }
+
+    public EventRegistryChangeDetectionExecutor getEventRegistryChangeDetectionExecutor() {
+        return eventRegistryChangeDetectionExecutor;
+    }
+    public EventRegistryEngineConfiguration setEventRegistryChangeDetectionExecutor(EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor) {
+        this.eventRegistryChangeDetectionExecutor = eventRegistryChangeDetectionExecutor;
+        return this;
+    }
+
     public int getEventDefinitionCacheLimit() {
         return eventDefinitionCacheLimit;
     }
@@ -758,12 +812,12 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
 
-    public boolean isHandleEventRegistryEngineDeploymentsAfterEngineCreate() {
-        return handleEventRegistryEngineDeploymentsAfterEngineCreate;
+    public boolean isEnableEventRegistryChangeDetectionAfterEngineCreate() {
+        return enableEventRegistryChangeDetectionAfterEngineCreate;
     }
 
-    public EventRegistryEngineConfiguration setHandleEventRegistryEngineDeploymentsAfterEngineCreate(boolean handleEventRegistryEngineDeploymentsAfterEngineCreate) {
-        this.handleEventRegistryEngineDeploymentsAfterEngineCreate = handleEventRegistryEngineDeploymentsAfterEngineCreate;
+    public EventRegistryEngineConfiguration setEnableEventRegistryChangeDetectionAfterEngineCreate(boolean enableEventRegistryChangeDetectionAfterEngineCreate) {
+        this.enableEventRegistryChangeDetectionAfterEngineCreate = enableEventRegistryChangeDetectionAfterEngineCreate;
         return this;
     }
 

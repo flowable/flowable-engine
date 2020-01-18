@@ -60,7 +60,6 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
         }
 
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
-        initChangeDetectorProperties(engineConfiguration);
         this.eventRegistryEngine = initEventRegistryEngine();
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
     }
@@ -73,23 +72,6 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
     @Override
     protected List<Class<? extends Entity>> getEntityDeletionOrder() {
         return EntityDependencyOrder.DELETE_ORDER;
-    }
-
-    protected void initChangeDetectorProperties(AbstractEngineConfiguration engineConfiguration) {
-        if (engineConfiguration.isEnableEventRegistryChangeDetection()) {
-
-            eventEngineConfiguration.setEnableEventRegistryChangeDetection(true);
-            if (engineConfiguration.getEventRegistryChangeDetectionManager() != null) {
-                eventEngineConfiguration.setEventRegistryChangeDetectionManager(engineConfiguration.getEventRegistryChangeDetectionManager());
-            }
-            if (engineConfiguration.getEventRegistryChangeDetectionExecutor() != null) {
-                eventEngineConfiguration.setEventRegistryChangeDetectionExecutor(engineConfiguration.getEventRegistryChangeDetectionExecutor());
-            }
-
-            eventEngineConfiguration.setEventRegistryChangeDetectionInitialDelayInMs(engineConfiguration.getEventRegistryChangeDetectionInitialDelayInMs());
-            eventEngineConfiguration.setEventRegistryChangeDetectionDelayInMs(engineConfiguration.getEventRegistryChangeDetectionDelayInMs());
-
-        }
     }
 
     protected synchronized EventRegistryEngine initEventRegistryEngine() {

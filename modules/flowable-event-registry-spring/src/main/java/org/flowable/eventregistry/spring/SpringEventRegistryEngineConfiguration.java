@@ -61,7 +61,7 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
 
     public SpringEventRegistryEngineConfiguration() {
         this.transactionsExternallyManaged = true;
-        this.handleEventRegistryEngineDeploymentsAfterEngineCreate = false;
+        this.enableEventRegistryChangeDetectionAfterEngineCreate = false;
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
@@ -223,7 +223,7 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
     }
 
     protected void createAndInitEventRegistryChangeDetectionExecutor() {
-        if (eventRegistryChangeDetectionExecutor == null) {
+        if (eventRegistryChangeDetectionExecutor != null) {
             eventRegistryChangeDetectionExecutor.setEventRegistryChangeDetectionManager(eventRegistryChangeDetectionManager);
             eventRegistryChangeDetectionExecutor.initialize();
         }

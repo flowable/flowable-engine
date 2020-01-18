@@ -150,6 +150,7 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
             }
         }
 
+        configuration.setEnableEventRegistryChangeDetection(eventProperties.isEnableChangeDetection());
         EventRegistryChangeDetectionExecutor changeDetectionExecutor = eventRegistryChangeDetectionExecutor.getIfAvailable();
         if (changeDetectionExecutor != null) {
             configuration.setEventRegistryChangeDetectionExecutor(changeDetectionExecutor);

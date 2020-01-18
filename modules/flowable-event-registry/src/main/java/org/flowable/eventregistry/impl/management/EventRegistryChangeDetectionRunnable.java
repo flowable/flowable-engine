@@ -23,16 +23,16 @@ public class EventRegistryChangeDetectionRunnable implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventRegistryChangeDetectionRunnable.class);
 
-    protected EventRegistryChangeDetectionManager eventRegistryChangeDetector;
+    protected EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager;
 
-    public EventRegistryChangeDetectionRunnable(EventRegistryChangeDetectionManager eventRegistryChangeDetector) {
-        this.eventRegistryChangeDetector = eventRegistryChangeDetector;
+    public EventRegistryChangeDetectionRunnable(EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager) {
+        this.eventRegistryChangeDetectionManager = eventRegistryChangeDetectionManager;
     }
 
     @Override
     public void run() {
         try {
-            eventRegistryChangeDetector.detectChanges();
+            eventRegistryChangeDetectionManager.detectChanges();
         } catch (Exception e) {
             LOGGER.error("Exception while detecting event registry changes", e);
         }
