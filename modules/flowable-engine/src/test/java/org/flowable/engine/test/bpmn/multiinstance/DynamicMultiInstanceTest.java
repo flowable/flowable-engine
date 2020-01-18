@@ -13,9 +13,12 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -64,6 +67,36 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             assertEquals("kermit_3", task.getAssignee());
             taskService.complete(task.getId());
     
+            assertNull(taskService.createTaskQuery().singleResult());
+            assertProcessEnded(procId);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasksWithCollection.bpmn20.xml" })
+    public void testAddSequentialUserTaskWithCollection() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            Map<String, Object> variableMap = new HashMap<>();
+            ArrayList<String> userList = new ArrayList<>();
+            userList.add("admin");
+            variableMap.put("taskUserList", userList);
+            String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks", variableMap).getId();
+
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+            assertEquals("My Task", task.getName());
+            assertEquals("admin", task.getAssignee());
+
+            userList.add("hr");
+            runtimeService.setVariable(procId, "taskUserList", userList);
+            runtimeService.addMultiInstanceExecution("miTasks", procId, CollectionUtil.singletonMap("taskUser", "hr"));
+
+            taskService.complete(task.getId());
+
+            task = taskService.createTaskQuery().singleResult();
+            assertEquals("My Task", task.getName());
+            assertEquals("hr", task.getAssignee());
+            taskService.complete(task.getId());
+
             assertNull(taskService.createTaskQuery().singleResult());
             assertProcessEnded(procId);
         }
