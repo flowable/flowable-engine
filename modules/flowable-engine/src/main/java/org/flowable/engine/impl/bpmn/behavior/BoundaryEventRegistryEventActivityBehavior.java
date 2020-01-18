@@ -32,6 +32,7 @@ import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -75,9 +76,11 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
     protected EventModel getEventModel(DelegateExecution execution) {
         EventModel eventModel = null;
         if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
-            eventModel = CommandContextUtil.getEventRegistry().getEventModel(eventDefinitionKey);
+            eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(eventDefinitionKey);
         } else {
-            eventModel = CommandContextUtil.getEventRegistry().getEventModel(eventDefinitionKey, execution.getTenantId());
+            EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration();
+            eventModel = eventRegistryEngineConfiguration.getEventRepositoryService().getEventModelByKey(eventDefinitionKey, execution.getTenantId(),
+                            eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
         }
         return eventModel;
     }

@@ -21,4 +21,5 @@ public interface OutboundEventProcessingPipeline {
 
     String run(EventInstance eventInstance);
 
+    OutboundEventSerializer getOutboundEventSerializer();
 }

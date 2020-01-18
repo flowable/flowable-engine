@@ -24,6 +24,7 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,13 +51,17 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
-        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
-
-        getEventRegistry().newOutboundChannelModel()
+        getEventRepositoryService().createOutboundChannelModelBuilder()
             .key("out-channel")
-            .channelAdapter(outboundEventChannelAdapter)
+            .resourceName("out.channel")
+            .jmsChannelAdapter("out")
+            .eventProcessingPipeline()
             .jsonSerializer()
-            .register();
+            .deploy();
+        
+        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
+        OutboundChannelModel outboundChannelModel = (OutboundChannelModel) getEventRepositoryService().getChannelModelByKey("out-channel");
+        outboundChannelModel.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
 
         return outboundEventChannelAdapter;
     }
@@ -64,7 +69,6 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
 
     @After
     public void unregisterEventDefinition() {
-        getEventRegistry().removeChannelModel("test-channel");
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {

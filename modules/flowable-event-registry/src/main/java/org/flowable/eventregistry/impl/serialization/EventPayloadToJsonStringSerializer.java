@@ -68,4 +68,8 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
         }
     }
 
+    @Override
+    public String getType() {
+        return "json";
+    }
 }

@@ -23,7 +23,9 @@ import java.util.regex.Pattern;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.KafkaInboundChannelModel;
 import org.flowable.eventregistry.model.KafkaOutboundChannelModel;
 import org.springframework.beans.BeansException;
@@ -74,11 +76,13 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
     }
 
     @Override
-    public void registerChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
+    public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
+                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+        
         if (channelModel instanceof KafkaInboundChannelModel) {
-            KafkaInboundChannelModel kafkaChannelDefinition = (KafkaInboundChannelModel) channelModel;
+            KafkaInboundChannelModel kafkaChannelModel = (KafkaInboundChannelModel) channelModel;
 
-            KafkaListenerEndpoint endpoint = createKafkaListenerEndpoint(kafkaChannelDefinition, eventRegistry);
+            KafkaListenerEndpoint endpoint = createKafkaListenerEndpoint(kafkaChannelModel, tenantId, eventRegistry);
             registerEndpoint(endpoint, null);
             
         } else if (channelModel instanceof KafkaOutboundChannelModel) {
@@ -86,30 +90,29 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         }
     }
 
-    protected KafkaListenerEndpoint createKafkaListenerEndpoint(KafkaInboundChannelModel channelDefinition, EventRegistry eventRegistry) {
-        String endpointId = getEndpointId(channelDefinition);
+    protected KafkaListenerEndpoint createKafkaListenerEndpoint(KafkaInboundChannelModel channelModel, String tenantId, EventRegistry eventRegistry) {
+        String endpointId = getEndpointId(channelModel, tenantId);
 
         SimpleKafkaListenerEndpoint<Object, Object> endpoint = new SimpleKafkaListenerEndpoint<>();
 
         endpoint.setId(endpointId);
-        endpoint.setGroupId(getEndpointGroupId(channelDefinition, endpoint.getId()));
-        endpoint.setTopics(resolveTopics(channelDefinition));
-        endpoint.setTopicPattern(resolvePattern(channelDefinition));
-        endpoint.setClientIdPrefix(resolveExpressionAsString(channelDefinition.getClientIdPrefix(), "clientIdPrefix"));
+        endpoint.setGroupId(getEndpointGroupId(channelModel, endpoint.getId()));
+        endpoint.setTopics(resolveTopics(channelModel));
+        endpoint.setTopicPattern(resolvePattern(channelModel));
+        endpoint.setClientIdPrefix(resolveExpressionAsString(channelModel.getClientIdPrefix(), "clientIdPrefix"));
 
-        endpoint.setConcurrency(resolveExpressionAsInteger(channelDefinition.getConcurrency(), "concurrency"));
-        endpoint.setConsumerProperties(resolveProperties(channelDefinition.getProperties()));
+        endpoint.setConcurrency(resolveExpressionAsInteger(channelModel.getConcurrency(), "concurrency"));
+        endpoint.setConsumerProperties(resolveProperties(channelModel.getProperties()));
 
-        String channelKey = channelDefinition.getKey();
-        endpoint.setMessageListener(createMessageListener(eventRegistry, channelKey));
+        endpoint.setMessageListener(createMessageListener(eventRegistry, channelModel));
         return endpoint;
     }
 
-    protected void processOutboundDefinition(KafkaOutboundChannelModel channelDefinition) {
-        String topic = channelDefinition.getTopic();
-        if (channelDefinition.getOutboundEventChannelAdapter() == null && StringUtils.hasText(topic)) {
-            channelDefinition
-                .setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(kafkaOperations, topic, channelDefinition.getRecordKey()));
+    protected void processOutboundDefinition(KafkaOutboundChannelModel channelModel) {
+        String topic = channelModel.getTopic();
+        if (channelModel.getOutboundEventChannelAdapter() == null && StringUtils.hasText(topic)) {
+            channelModel.setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(
+                            kafkaOperations, topic, channelModel.getRecordKey()));
         }
     }
 
@@ -171,9 +174,9 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         }
     }
 
-    protected Pattern resolvePattern(KafkaInboundChannelModel channelDefinition) {
+    protected Pattern resolvePattern(KafkaInboundChannelModel channelModel) {
         Pattern pattern = null;
-        String topicPattern = channelDefinition.getTopicPattern();
+        String topicPattern = channelModel.getTopicPattern();
         if (StringUtils.hasText(topicPattern)) {
             Object resolved = resolveExpression(topicPattern);
             if (resolved instanceof String) {
@@ -182,7 +185,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
                 pattern = (Pattern) resolved;
             } else if (resolved != null) {
                 throw new IllegalStateException(
-                    "topicPattern in channel definition [ " + channelDefinition + " ] must resolve to a Pattern or String, not " + resolved.getClass());
+                    "topicPattern in channel model [ " + channelModel + " ] must resolve to a Pattern or String, not " + resolved.getClass());
             }
         }
 
@@ -196,15 +199,15 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
     }
 
     @SuppressWarnings("unchecked")
-    protected GenericMessageListener<ConsumerRecord<Object, Object>> createMessageListener(EventRegistry eventRegistry, String channelKey) {
+    protected GenericMessageListener<ConsumerRecord<Object, Object>> createMessageListener(EventRegistry eventRegistry, InboundChannelModel inboundChannelModel) {
         @SuppressWarnings("rawtypes")
-        GenericMessageListener kafkaChannelMessageListenerAdapter = new KafkaChannelMessageListenerAdapter(eventRegistry, channelKey);
+        GenericMessageListener kafkaChannelMessageListenerAdapter = new KafkaChannelMessageListenerAdapter(eventRegistry, inboundChannelModel);
         return kafkaChannelMessageListenerAdapter;
     }
 
     @Override
-    public void unregisterChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
-        String endpointId = getEndpointId(channelModel);
+    public void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService) {
+        String endpointId = getEndpointId(channelModel, tenantId);
         // currently it is not possible to unregister a listener container
         // In order not to do a lot of the logic that Spring does we are manually accessing the containers to remove them
         // see https://github.com/spring-projects/spring-framework/issues/24228
@@ -266,10 +269,9 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         }
     }
 
-    protected String getEndpointId(ChannelModel channelModel) {
+    protected String getEndpointId(ChannelModel channelModel, String tenantId) {
         String channelDefinitionKey = channelModel.getKey();
-        //TODO multi tenant
-        return "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#" + channelDefinitionKey;
+        return "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#" + tenantId + "#" + channelDefinitionKey;
     }
 
     protected String getEndpointGroupId(KafkaInboundChannelModel channelDefinition, String id) {

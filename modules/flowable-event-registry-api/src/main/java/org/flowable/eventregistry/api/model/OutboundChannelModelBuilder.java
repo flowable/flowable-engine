@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.api.model;
 
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
@@ -35,6 +36,31 @@ public interface OutboundChannelModelBuilder {
      * Each channel needs to have a unique key to identity it.
      */
     OutboundChannelModelBuilder key(String key);
+    
+    /**
+     * Set the name for the channel deployment.
+     */
+    OutboundChannelModelBuilder deploymentName(String deploymentName);
+    
+    /**
+     * Set the resource name for the channel model.
+     */
+    OutboundChannelModelBuilder resourceName(String resourceName);
+    
+    /**
+     * Set the category for the channel deployment.
+     */
+    OutboundChannelModelBuilder category(String category);
+    
+    /**
+     * Set the tenant id for the channel deployment.
+     */
+    OutboundChannelModelBuilder deploymentTenantId(String deploymentTenantId);
+    
+    /**
+     * Set the parent deployment id for the channel deployment.
+     */
+    OutboundChannelModelBuilder parentDeploymentId(String parentDeploymentId);
 
     /**
      * Sets a custom {@link OutboundEventChannelAdapter} adapter instance which will send the events.
@@ -60,7 +86,7 @@ public interface OutboundChannelModelBuilder {
      * Creates the {@link OutboundChannelModel} instance based on the configuration
      * and registers it with the {@link org.flowable.eventregistry.api.EventRegistry}.
      */
-    OutboundChannelModel register();
+    EventDeployment deploy();
 
     /**
      * Builder to create an {@link OutboundEventChannelAdapter} using JMS.

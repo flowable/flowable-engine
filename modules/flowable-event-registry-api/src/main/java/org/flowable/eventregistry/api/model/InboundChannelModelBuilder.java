@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.api.model;
 
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
@@ -47,6 +48,31 @@ public interface InboundChannelModelBuilder {
      * Each channel needs to have a unique key to identity it.
      */
     InboundChannelModelBuilder key(String key);
+    
+    /**
+     * Set the name for the channel deployment.
+     */
+    InboundChannelModelBuilder deploymentName(String deploymentName);
+    
+    /**
+     * Set the resource name for the channel model.
+     */
+    InboundChannelModelBuilder resourceName(String resourceName);
+    
+    /**
+     * Set the category for the channel deployment.
+     */
+    InboundChannelModelBuilder category(String category);
+    
+    /**
+     * Set the tenant id for the channel deployment.
+     */
+    InboundChannelModelBuilder deploymentTenantId(String deploymentTenantId);
+    
+    /**
+     * Set the parent deployment id for the channel deployment.
+     */
+    InboundChannelModelBuilder parentDeploymentId(String parentDeploymentId);
 
     /**
      * Sets a custom {@link InboundEventChannelAdapter} adapter instance which will receive
@@ -73,7 +99,7 @@ public interface InboundChannelModelBuilder {
      * Creates the {@link InboundChannelModel} instance based on the configuration
      * and registers it with the {@link org.flowable.eventregistry.api.EventRegistry}.
      */
-    InboundChannelModel register();
+    EventDeployment deploy();
 
     /**
      * Builder to create an {@link InboundEventChannelAdapter} using JMS.
@@ -350,7 +376,7 @@ public interface InboundChannelModelBuilder {
 
         InboundChannelModelBuilder transformer(InboundEventTransformer inboundEventTransformer);
 
-        InboundChannelModel register();
+        EventDeployment deploy();
 
     }
 

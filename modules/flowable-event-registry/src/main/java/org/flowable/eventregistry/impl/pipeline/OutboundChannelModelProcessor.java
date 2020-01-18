@@ -14,6 +14,7 @@ package org.flowable.eventregistry.impl.pipeline;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToJsonStringSerializer;
@@ -32,26 +33,28 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
     }
 
     @Override
-    public void registerChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
+    public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
+                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+        
         if (channelModel instanceof OutboundChannelModel) {
-            registerChannelModel((OutboundChannelModel) channelModel, eventRegistry);
+            registerChannelModel((OutboundChannelModel) channelModel, eventRepositoryService);
         }
 
     }
 
-    protected void registerChannelModel(OutboundChannelModel inboundChannelModel, EventRegistry eventRegistry) {
+    protected void registerChannelModel(OutboundChannelModel inboundChannelModel, EventRepositoryService eventRepositoryService) {
         if (inboundChannelModel.getOutboundEventProcessingPipeline() == null) {
 
             OutboundEventProcessingPipeline eventProcessingPipeline;
 
             if ("json".equals(inboundChannelModel.getSerializerType())) {
                 OutboundEventSerializer eventSerializer = new EventPayloadToJsonStringSerializer();
-
-                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventRegistry, eventSerializer);
+                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventRepositoryService, eventSerializer);
+                
             } else if ("xml".equals(inboundChannelModel.getSerializerType())) {
                 OutboundEventSerializer eventSerializer = new EventPayloadToXmlStringSerializer();
-
-                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventRegistry, eventSerializer);
+                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventRepositoryService, eventSerializer);
+                
             } else {
                 eventProcessingPipeline = null;
             }
@@ -64,7 +67,7 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
     }
 
     @Override
-    public void unregisterChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
+    public void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService) {
         // nothing to do
     }
 }

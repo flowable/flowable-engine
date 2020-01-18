@@ -133,7 +133,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected int channelDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache;
 
-    protected Collection<ChannelModelProcessor> channelDefinitionProcessors = new ArrayList<>();
+    protected Collection<ChannelModelProcessor> channelModelProcessors = new ArrayList<>();
 
     // Event registry
     protected EventRegistry eventRegistry;
@@ -487,14 +487,14 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public void initOutboundEventProcessor() {
         if (this.outboundEventProcessor == null) {
-            this.outboundEventProcessor = new DefaultOutboundEventProcessor(eventRegistry);
+            this.outboundEventProcessor = new DefaultOutboundEventProcessor(eventRepositoryService, fallbackToDefaultTenant);
         }
         this.eventRegistry.setOutboundEventProcessor(outboundEventProcessor);
     }
 
     public void initChannelDefinitionProcessors() {
-        channelDefinitionProcessors.add(new InboundChannelModelProcessor());
-        channelDefinitionProcessors.add(new OutboundChannelModelProcessor());
+        channelModelProcessors.add(new InboundChannelModelProcessor());
+        channelModelProcessors.add(new OutboundChannelModelProcessor());
     }
 
     public void initChangeDetector() {
@@ -634,19 +634,19 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
     
-    public Collection<ChannelModelProcessor> getChannelDefinitionProcessors() {
-        return channelDefinitionProcessors;
+    public Collection<ChannelModelProcessor> getChannelModelProcessors() {
+        return channelModelProcessors;
     }
 
-    public void addChannelDefinitionProcessor(ChannelModelProcessor channelDefinitionProcessor) {
-        if (this.channelDefinitionProcessors == null) {
-            this.channelDefinitionProcessors = new ArrayList<>();
+    public void addChannelModelProcessor(ChannelModelProcessor channelModelProcessor) {
+        if (this.channelModelProcessors == null) {
+            this.channelModelProcessors = new ArrayList<>();
         }
-        this.channelDefinitionProcessors.add(channelDefinitionProcessor);
+        this.channelModelProcessors.add(channelModelProcessor);
     }
 
-    public void setChannelDefinitionProcessors(Collection<ChannelModelProcessor> channelDefinitionProcessors) {
-        this.channelDefinitionProcessors = channelDefinitionProcessors;
+    public void setChannelModelProcessors(Collection<ChannelModelProcessor> channelModelProcessors) {
+        this.channelModelProcessors = channelModelProcessors;
     }
 
     public EventDeploymentDataManager getDeploymentDataManager() {

@@ -22,6 +22,10 @@ public class InboundChannelModel extends ChannelModel {
     protected String deserializerType;
     protected ChannelEventKeyDetection channelEventKeyDetection;
     protected ChannelEventTenantIdDetection channelEventTenantIdDetection;
+    
+    public InboundChannelModel() {
+        setChannelType("inbound");
+    }
 
     @JsonIgnore
     protected Object inboundEventChannelAdapter;

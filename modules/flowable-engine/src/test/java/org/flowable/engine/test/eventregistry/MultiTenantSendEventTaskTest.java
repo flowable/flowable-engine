@@ -31,6 +31,8 @@ import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.model.InboundChannelModel;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
@@ -66,7 +68,7 @@ public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
             .payload("tenantAProperty", EventPayloadTypes.STRING)
             .payload("customerId", EventPayloadTypes.STRING)
             .payload("eventProperty", EventPayloadTypes.STRING)
-            .tenantId(TENANT_A)
+            .deploymentTenantId(TENANT_A)
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
@@ -76,7 +78,7 @@ public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
             .payload("tenantBProperty", EventPayloadTypes.STRING)
             .payload("customerId", EventPayloadTypes.STRING)
             .payload("eventProperty", EventPayloadTypes.STRING)
-            .tenantId(TENANT_B)
+            .deploymentTenantId(TENANT_B)
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
@@ -85,7 +87,7 @@ public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
             .payload("customerId", EventPayloadTypes.STRING)
-            .tenantId(TENANT_A)
+            .deploymentTenantId(TENANT_A)
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
@@ -94,42 +96,50 @@ public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
             .payload("customerId", EventPayloadTypes.STRING)
-            .tenantId(TENANT_B)
+            .deploymentTenantId(TENANT_B)
             .deploy();
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
-        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
-
-        getEventRegistry().newOutboundChannelModel()
+        getEventRepositoryService().createOutboundChannelModelBuilder()
             .key("out-channel")
-            .channelAdapter(outboundEventChannelAdapter)
+            .resourceName("testOut.channel")
+            .jmsChannelAdapter("testOut")
+            .eventProcessingPipeline()
             .jsonSerializer()
-            .register();
+            .deploy();
+        
+        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
+        OutboundChannelModel outboundChannel = (OutboundChannelModel) getEventRepositoryService().getChannelModelByKey("out-channel");
+        outboundChannel.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
 
         return outboundEventChannelAdapter;
     }
 
     protected TestInboundEventChannelAdapter setupTestInboundChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-
-        getEventRegistry().newInboundChannelModel()
+        getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
-            .channelAdapter(inboundEventChannelAdapter)
+            .resourceName("testIn.channel")
+            .jmsChannelAdapter("testIn")
+            .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
             .detectEventTenantUsingJsonPathExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
+        
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
+        inboundChannel.setInboundEventChannelAdapter(inboundEventChannelAdapter);
+        
+        inboundEventChannelAdapter.setEventRegistry(getEventRegistry());
+        inboundEventChannelAdapter.setInboundChannelModel(inboundChannel);
 
         return inboundEventChannelAdapter;
     }
 
     @AfterEach
     protected void tearDown() throws Exception {
-        getEventRegistry().removeChannelModel("out-channel");
-        getEventRegistry().removeChannelModel("test-channel");
-
         getEventRepositoryService().createDeploymentQuery().list()
             .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
 
@@ -232,27 +242,28 @@ public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
         assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("customerForTenantB");
 
         // Triggering
+        InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectMapper objectMapper = new ObjectMapper();
 
         ObjectNode json = objectMapper.createObjectNode();
         json.put("type", "myTriggerEvent");
         json.put("customerId", "customerForTenantA");
         json.put("tenantId", TENANT_A);
-        getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
+        getEventRegistry().eventReceived(inboundChannel, objectMapper.writeValueAsString(json));
 
         assertThat(taskService.createTaskQuery().processInstanceId(instanceA.getId()).singleResult().getName()).isEqualTo("tenantA Task");
         assertThat(taskService.createTaskQuery().processInstanceId(instanceB.getId()).singleResult()).isNull();
 
         json.put("customerId", "customerForTenantB");
         json.put("tenantId", TENANT_B);
-        getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
+        getEventRegistry().eventReceived(inboundChannel, objectMapper.writeValueAsString(json));
 
         assertThat(taskService.createTaskQuery().processInstanceId(instanceA.getId()).singleResult().getName()).isEqualTo("tenantA Task");
         assertThat(taskService.createTaskQuery().processInstanceId(instanceB.getId()).singleResult().getName()).isEqualTo("tenantB Task");
 
         // Sending the event again shouldn't do anything, as there are no eventsubscriptions anymore
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2L);
-        getEventRegistry().eventReceived("test-channel", objectMapper.writeValueAsString(json));
+        getEventRegistry().eventReceived(inboundChannel, objectMapper.writeValueAsString(json));
         assertThat(taskService.createTaskQuery().count()).isEqualTo(2L);
     }
 
@@ -268,12 +279,12 @@ public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
     
     public static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
-        public String channelKey;
+        public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
 
         @Override
-        public void setChannelKey(String channelKey) {
-            this.channelKey = channelKey;
+        public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
+            this.inboundChannelModel = inboundChannelModel;
         }
 
         @Override

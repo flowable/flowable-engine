@@ -48,7 +48,7 @@ public interface EventModelBuilder {
     /**
      * Set the tenant id for the event deployment.
      */
-    EventModelBuilder tenantId(String tenantId);
+    EventModelBuilder deploymentTenantId(String deploymentTenantId);
     
     /**
      * Set the parent deployment id for the event deployment.

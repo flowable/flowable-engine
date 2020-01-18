@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.flowable.eventregistry.api.model.EventModelBuilder;
+import org.flowable.eventregistry.api.model.InboundChannelModelBuilder;
+import org.flowable.eventregistry.api.model.OutboundChannelModelBuilder;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
@@ -106,4 +108,8 @@ public interface EventRepositoryService {
      * Programmatically build and register a new {@link EventModel}.
      */
     EventModelBuilder createEventModelBuilder();
+    
+    InboundChannelModelBuilder createInboundChannelModelBuilder();
+    
+    OutboundChannelModelBuilder createOutboundChannelModelBuilder();
 }

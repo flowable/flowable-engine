@@ -19,7 +19,9 @@ import javax.jms.MessageListener;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.JmsInboundChannelModel;
 import org.flowable.eventregistry.model.JmsOutboundChannelModel;
 import org.springframework.beans.BeansException;
@@ -42,7 +44,7 @@ import org.springframework.util.StringValueResolver;
 /**
  * @author Filip Hrisafov
  */
-public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelModelProcessor {
+public class JmsChannelModelProcessor implements BeanFactoryAware, ChannelModelProcessor {
     
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.jms.ChannelJmsListenerEndpointContainer#";
 
@@ -69,11 +71,13 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelM
     }
 
     @Override
-    public void registerChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
+    public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
+                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+        
         if (channelModel instanceof JmsInboundChannelModel) {
-            JmsInboundChannelModel jmsChannelDefinition = (JmsInboundChannelModel) channelModel;
+            JmsInboundChannelModel jmsChannelModel = (JmsInboundChannelModel) channelModel;
 
-            JmsListenerEndpoint endpoint = createJmsListenerEndpoint(channelModel, eventRegistry, jmsChannelDefinition);
+            JmsListenerEndpoint endpoint = createJmsListenerEndpoint(jmsChannelModel, tenantId, eventRegistry);
             registerEndpoint(endpoint, null);
             
         } else if (channelModel instanceof JmsOutboundChannelModel) {
@@ -81,38 +85,36 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelM
         }
     }
 
-    protected JmsListenerEndpoint createJmsListenerEndpoint(ChannelModel channelDefinition, EventRegistry eventRegistry,
-                    JmsInboundChannelModel jmsChannelDefinition) {
+    protected JmsListenerEndpoint createJmsListenerEndpoint(JmsInboundChannelModel jmsChannelModel, String tenantId, EventRegistry eventRegistry) {
         
-        String endpointId = getEndpointId(jmsChannelDefinition);
+        String endpointId = getEndpointId(jmsChannelModel, tenantId);
 
         SimpleJmsListenerEndpoint endpoint = new SimpleJmsListenerEndpoint();
 
         endpoint.setId(endpointId);
-        endpoint.setDestination(resolve(jmsChannelDefinition.getDestination()));
+        endpoint.setDestination(resolve(jmsChannelModel.getDestination()));
 
-        String selector = jmsChannelDefinition.getSelector();
+        String selector = jmsChannelModel.getSelector();
         if (StringUtils.hasText(selector)) {
             endpoint.setSelector(resolve(selector));
         }
 
-        String subscription = jmsChannelDefinition.getSubscription();
+        String subscription = jmsChannelModel.getSubscription();
         if (StringUtils.hasText(subscription)) {
             endpoint.setSubscription(resolve(subscription));
         }
 
-        String concurrency = jmsChannelDefinition.getConcurrency();
+        String concurrency = jmsChannelModel.getConcurrency();
         if (StringUtils.hasText(concurrency)) {
             endpoint.setConcurrency(resolve(concurrency));
         }
 
-        String channelKey = channelDefinition.getKey();
-        endpoint.setMessageListener(createMessageListener(eventRegistry, channelKey));
+        endpoint.setMessageListener(createMessageListener(eventRegistry, jmsChannelModel));
         return endpoint;
     }
 
-    protected MessageListener createMessageListener(EventRegistry eventRegistry, String channelKey) {
-        return new JmsChannelMessageListenerAdapter(eventRegistry, channelKey);
+    protected MessageListener createMessageListener(EventRegistry eventRegistry, InboundChannelModel inboundChannelModel) {
+        return new JmsChannelMessageListenerAdapter(eventRegistry, inboundChannelModel);
     }
 
     protected void processOutboundDefinition(JmsOutboundChannelModel channelDefinition) {
@@ -123,8 +125,8 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelM
     }
 
     @Override
-    public void unregisterChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
-        String endpointId = getEndpointId(channelModel);
+    public void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService) {
+        String endpointId = getEndpointId(channelModel,tenantId);
         // currently it is not possible to unregister a listener container
         // In order not to do a lot of the logic that Spring does we are manually accessing the containers to remove them
         // see https://github.com/spring-projects/spring-framework/issues/24228
@@ -185,10 +187,9 @@ public class JmsChannelDefinitionProcessor implements BeanFactoryAware, ChannelM
         }
     }
 
-    protected String getEndpointId(ChannelModel channelModel) {
+    protected String getEndpointId(ChannelModel channelModel, String tenantId) {
         String channelDefinitionKey = channelModel.getKey();
-        //TODO multi tenant
-        return CHANNEL_ID_PREFIX + channelDefinitionKey;
+        return CHANNEL_ID_PREFIX + tenantId + "#" + channelDefinitionKey;
     }
 
     protected String resolve(String value) {

@@ -12,6 +12,8 @@
  */
 package org.flowable.common.engine.impl.persistence.deploy;
 
+import java.util.Collection;
+
 /**
  * Interface for cache implementations.
  * 
@@ -29,4 +31,7 @@ public interface DeploymentCache<T> {
 
     void clear();
     
+    Collection<T> getAll();
+
+    int size();
 }

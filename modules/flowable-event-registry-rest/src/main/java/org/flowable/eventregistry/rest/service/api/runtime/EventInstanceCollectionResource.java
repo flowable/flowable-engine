@@ -23,7 +23,10 @@ import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDefinitionQuery;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.rest.service.api.EventRegistryRestApiInterceptor;
 import org.flowable.eventregistry.rest.service.api.EventRegistryRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +60,9 @@ public class EventInstanceCollectionResource {
 
     @Autowired
     protected EventRepositoryService repositoryService;
+    
+    @Autowired
+    protected EventRegistryEngineConfiguration eventRegistryEngineConfiguration;
 
     @Autowired(required=false)
     protected EventRegistryRestApiInterceptor restApiInterceptor;
@@ -99,7 +105,15 @@ public class EventInstanceCollectionResource {
         
         EventModel eventModel = repositoryService.getEventModelById(eventDefinition.getId());
 
-        eventRegistry.eventReceived(eventModel.getInboundChannelKeys().iterator().next(), request.getEventPayload().toString());
+        String channelKey = eventModel.getInboundChannelKeys().iterator().next();
+        ChannelModel channelModel = null;
+        if (StringUtils.isNotEmpty(request.getTenantId())) {
+            channelModel = repositoryService.getChannelModelByKey(channelKey, request.getTenantId(), eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+        } else {
+            channelModel = repositoryService.getChannelModelByKey(channelKey);
+        }
+        
+        eventRegistry.eventReceived((InboundChannelModel) channelModel, request.getEventPayload().toString());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

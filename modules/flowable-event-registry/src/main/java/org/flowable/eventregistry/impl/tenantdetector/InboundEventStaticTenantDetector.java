@@ -30,4 +30,7 @@ public class InboundEventStaticTenantDetector<T> implements InboundEventTenantDe
         return staticTenantId;
     }
 
+    public String getStaticTenantId() {
+        return staticTenantId;
+    }
 }

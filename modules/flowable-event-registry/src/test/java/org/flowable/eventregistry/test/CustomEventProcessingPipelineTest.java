@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
@@ -32,8 +31,12 @@ import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
+import org.flowable.eventregistry.impl.pipeline.DefaultOutboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,13 +47,11 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
 
     @AfterEach
     public void cleanup () {
-        for (String key : eventRegistryEngine.getEventRegistry().getInboundChannelModels().keySet()) {
-            eventRegistryEngine.getEventRegistry().removeChannelModel(key);
-        }
         eventRegistryEngine.getEventRepositoryService().createDeploymentQuery().list()
             .forEach(eventDeployment -> eventRegistryEngine.getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testCustomInboundPipelineInvoked() {
 
@@ -61,19 +62,31 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         TestInboundEventPayloadExtractor testInboundEventPayloadExtractor = new TestInboundEventPayloadExtractor();
         TestInboundEventTransformer testInboundEventTransformer = new TestInboundEventTransformer();
 
-        eventRegistryEngine.getEventRegistry().newInboundChannelModel()
+        eventRegistryEngine.getEventRepositoryService().createInboundChannelModelBuilder()
             .key("customTestChannel")
-            .channelAdapter(testInboundChannelAdapter)
-            .deserializer(testInboundEventDeserializer)
-            .detectEventKeyUsingKeyDetector(testInboundEventKeyDetector)
-            .detectTenantUsingTenantDetector(testInboundEventTenantDetector)
-            .payloadExtractor(testInboundEventPayloadExtractor)
-            .transformer(testInboundEventTransformer)
-            .register();
+            .resourceName("customTest.channel")
+            .jmsChannelAdapter("test")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .fixedEventKey("test")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+        
+        InboundChannelModel inboundChannelModel = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("customTestChannel");
+        inboundChannelModel.setInboundEventChannelAdapter(testInboundChannelAdapter);
+        DefaultInboundEventProcessingPipeline<String> inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline<String>) inboundChannelModel.getInboundEventProcessingPipeline();
+        inboundEventProcessingPipeline.setInboundEventDeserializer(testInboundEventDeserializer);
+        inboundEventProcessingPipeline.setInboundEventKeyDetector(testInboundEventKeyDetector);
+        inboundEventProcessingPipeline.setInboundEventTenantDetector(testInboundEventTenantDetector);
+        inboundEventProcessingPipeline.setInboundEventPayloadExtractor(testInboundEventPayloadExtractor);
+        inboundEventProcessingPipeline.setInboundEventTransformer(testInboundEventTransformer);
+        
+        testInboundChannelAdapter.setEventRegistry(eventRegistryEngine.getEventRegistry());
+        testInboundChannelAdapter.setInboundChannelModel(inboundChannelModel);
 
         eventRegistryEngine.getEventRepositoryService().createEventModelBuilder()
             .key("testKey")
-            .tenantId("testTenantId")
+            .deploymentTenantId("testTenantId")
             .resourceName("myEvent.event")
             .deploy();
 
@@ -94,18 +107,26 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         TestOutboundChannelAdapter testOutboundChannelAdapter = new TestOutboundChannelAdapter();
         TestOutboundEventSerializer testOutboundEventSerializer = new TestOutboundEventSerializer();
 
-        eventRegistryEngine.getEventRegistry().newOutboundChannelModel()
+        eventRegistryEngine.getEventRepositoryService().createOutboundChannelModelBuilder()
             .key("customTestOutboundChannel")
-            .channelAdapter(testOutboundChannelAdapter)
-            .serializer(testOutboundEventSerializer)
-            .register();
+            .resourceName("customOutboundTest.channel")
+            .jmsChannelAdapter("testOut")
+            .eventProcessingPipeline()
+            .jsonSerializer()
+            .deploy();
+        
+        OutboundChannelModel outboundChannelModel = (OutboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("customTestOutboundChannel");
+        outboundChannelModel.setOutboundEventChannelAdapter(testOutboundChannelAdapter);
+        DefaultOutboundEventProcessingPipeline outboundEventProcessingPipeline = (DefaultOutboundEventProcessingPipeline) outboundChannelModel.getOutboundEventProcessingPipeline();
+        outboundEventProcessingPipeline.setOutboundEventSerializer(testOutboundEventSerializer);
 
-        EventDeployment eventDeployment = eventRegistryEngine.getEventRepositoryService().createEventModelBuilder()
+        eventRegistryEngine.getEventRepositoryService().createEventModelBuilder()
             .key("testKey")
-            .tenantId("testTenantId")
+            .deploymentTenantId("testTenantId")
             .outboundChannelKey("customTestOutboundChannel")
             .resourceName("myEvent.event")
             .deploy();
+        
         EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId", false);
 
         EventInstanceImpl eventInstance = new EventInstanceImpl();
@@ -118,16 +139,16 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
 
     private static class TestInboundChannelAdapter implements InboundEventChannelAdapter {
 
-        private String channelKey;
+        private InboundChannelModel inboundChannelModel;
         private EventRegistry eventRegistry;
 
         public void trigger(String event) {
-            eventRegistry.eventReceived(channelKey, event);
+            eventRegistry.eventReceived(inboundChannelModel, event);
         }
 
         @Override
-        public void setChannelKey(String channelKey) {
-            this.channelKey = channelKey;
+        public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
+            this.inboundChannelModel = inboundChannelModel;
         }
         @Override
         public void setEventRegistry(EventRegistry eventRegistry) {
@@ -143,6 +164,11 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public String deserialize(String rawEvent) {
             counter.incrementAndGet();
             return rawEvent;
+        }
+
+        @Override
+        public String getType() {
+            return "test";
         }
     }
 
@@ -227,6 +253,11 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         @Override
         public String serialize(EventInstance eventInstance) {
             counter.incrementAndGet();
+            return "test";
+        }
+
+        @Override
+        public String getType() {
             return "test";
         }
     }

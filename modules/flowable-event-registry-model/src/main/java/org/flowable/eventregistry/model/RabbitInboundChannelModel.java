@@ -33,6 +33,7 @@ public class RabbitInboundChannelModel extends InboundChannelModel {
     protected String ackMode;
 
     public RabbitInboundChannelModel() {
+        super();
         setType("rabbit");
     }
 

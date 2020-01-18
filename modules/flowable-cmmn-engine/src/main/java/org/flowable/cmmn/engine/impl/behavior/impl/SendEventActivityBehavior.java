@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 
@@ -49,9 +50,11 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
 
         EventModel eventModel = null;
         if (Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, planItemInstanceEntity.getTenantId())) {
-            eventModel = CommandContextUtil.getEventRegistry().getEventModel(key);
+            eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(key);
         } else {
-            eventModel = CommandContextUtil.getEventRegistry().getEventModel(key, planItemInstanceEntity.getTenantId());
+            EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext);
+            eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(key, planItemInstanceEntity.getTenantId(),
+                            eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
         }
 
         if (eventModel == null) {
@@ -64,8 +67,6 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
         Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceCmmnUtil
             .createEventPayloadInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventModel);
         eventInstance.setPayloadInstances(eventPayloadInstances);
-
-        // TODO: always async? Send event in post-commit? Triggerable?
 
         eventRegistry.sendEventOutbound(eventInstance);
 

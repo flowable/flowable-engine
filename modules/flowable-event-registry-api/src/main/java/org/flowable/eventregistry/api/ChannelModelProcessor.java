@@ -21,8 +21,9 @@ public interface ChannelModelProcessor {
 
     boolean canProcess(ChannelModel channelModel);
 
-    void registerChannelModel(ChannelModel channelModel, EventRegistry eventRegistry);
+    void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
+                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant);
 
-    void unregisterChannelModel(ChannelModel channelModel, EventRegistry eventRegistry);
+    void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService);
 
 }

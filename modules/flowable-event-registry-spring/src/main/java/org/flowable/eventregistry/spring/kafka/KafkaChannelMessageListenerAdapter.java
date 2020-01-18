@@ -14,6 +14,7 @@ package org.flowable.eventregistry.spring.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.springframework.kafka.listener.MessageListener;
 
 /**
@@ -22,16 +23,16 @@ import org.springframework.kafka.listener.MessageListener;
 public class KafkaChannelMessageListenerAdapter implements MessageListener<String, String> {
 
     protected EventRegistry eventRegistry;
-    protected String channelKey;
+    protected InboundChannelModel inboundChannelModel;
 
-    public KafkaChannelMessageListenerAdapter(EventRegistry eventRegistry, String channelKey) {
+    public KafkaChannelMessageListenerAdapter(EventRegistry eventRegistry, InboundChannelModel inboundChannelModel) {
         this.eventRegistry = eventRegistry;
-        this.channelKey = channelKey;
+        this.inboundChannelModel = inboundChannelModel;
     }
 
     @Override
     public void onMessage(ConsumerRecord<String, String> data) {
-        eventRegistry.eventReceived(channelKey, data.value());
+        eventRegistry.eventReceived(inboundChannelModel, data.value());
     }
 
     public EventRegistry getEventRegistry() {
@@ -42,12 +43,12 @@ public class KafkaChannelMessageListenerAdapter implements MessageListener<Strin
         this.eventRegistry = eventRegistry;
     }
 
-    public String getChannelKey() {
-        return channelKey;
+    public InboundChannelModel getInboundChannelModel() {
+        return inboundChannelModel;
     }
 
-    public void setChannelKey(String channelKey) {
-        this.channelKey = channelKey;
+    public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
+        this.inboundChannelModel = inboundChannelModel;
     }
 
 }

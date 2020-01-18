@@ -27,6 +27,8 @@ import org.flowable.eventregistry.api.EventDeploymentBuilder;
 import org.flowable.eventregistry.api.EventDeploymentQuery;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.model.EventModelBuilder;
+import org.flowable.eventregistry.api.model.InboundChannelModelBuilder;
+import org.flowable.eventregistry.api.model.OutboundChannelModelBuilder;
 import org.flowable.eventregistry.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.eventregistry.impl.cmd.DeployCmd;
 import org.flowable.eventregistry.impl.cmd.GetChannelDefinitionCmd;
@@ -43,6 +45,8 @@ import org.flowable.eventregistry.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.eventregistry.impl.cmd.SetDeploymentTenantIdCmd;
 import org.flowable.eventregistry.impl.cmd.SetEventDefinitionCategoryCmd;
 import org.flowable.eventregistry.impl.model.EventModelBuilderImpl;
+import org.flowable.eventregistry.impl.model.InboundChannelDefinitionBuilderImpl;
+import org.flowable.eventregistry.impl.model.OutboundChannelDefinitionBuilderImpl;
 import org.flowable.eventregistry.impl.repository.EventDeploymentBuilderImpl;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
@@ -52,8 +56,12 @@ import org.flowable.eventregistry.model.EventModel;
  */
 public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventRegistryEngineConfiguration> implements EventRepositoryService {
 
+    protected EventRegistryEngineConfiguration eventRegistryEngineConfiguration;
+    
     public EventRepositoryServiceImpl(EventRegistryEngineConfiguration engineConfiguration) {
         super(engineConfiguration);
+        
+        this.eventRegistryEngineConfiguration = engineConfiguration;
     }
 
     @Override
@@ -200,6 +208,18 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
         return new EventModelBuilderImpl(this);
     }
     
+    
+    @Override
+    public InboundChannelModelBuilder createInboundChannelModelBuilder() {
+        return new InboundChannelDefinitionBuilderImpl(eventRegistryEngineConfiguration.getEventRepositoryService(),
+                        eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+    }
+
+    @Override
+    public OutboundChannelModelBuilder createOutboundChannelModelBuilder() {
+        return new OutboundChannelDefinitionBuilderImpl(eventRegistryEngineConfiguration.getEventRepositoryService());
+    }
+
     public void registerEventModel(EventModel eventModel) {
         
     }

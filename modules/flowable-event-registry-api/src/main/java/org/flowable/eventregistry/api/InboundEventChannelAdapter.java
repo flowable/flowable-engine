@@ -12,12 +12,14 @@
  */
 package org.flowable.eventregistry.api;
 
+import org.flowable.eventregistry.model.InboundChannelModel;
+
 /**
  * @author Joram Barrez
  */
 public interface InboundEventChannelAdapter {
 
-    void setChannelKey(String channelKey);
+    void setInboundChannelModel(InboundChannelModel inboundChannelModel);
 
     void setEventRegistry(EventRegistry eventRegistry);
 

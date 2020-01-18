@@ -29,6 +29,7 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.junit.After;
 import org.junit.Before;
@@ -62,15 +63,22 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-
-        getEventRegistry().newInboundChannelModel()
+        getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
-            .channelAdapter(inboundEventChannelAdapter)
+            .resourceName("test.channel")
+            .jmsChannelAdapter("test")
+            .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
+        
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        InboundChannelModel inboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
+        inboundChannelModel.setInboundEventChannelAdapter(inboundEventChannelAdapter);
+        
+        inboundEventChannelAdapter.setEventRegistry(getEventRegistry());
+        inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
 
         return inboundEventChannelAdapter;
     }
@@ -78,7 +86,6 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
 
     @After
     public void unregisterEventDefinition() {
-        getEventRegistry().removeChannelModel("test-channel");
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {
@@ -324,12 +331,12 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
 
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
-        public String channelKey;
+        public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
 
         @Override
-        public void setChannelKey(String channelKey) {
-            this.channelKey = channelKey;
+        public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
+            this.inboundChannelModel = inboundChannelModel;
         }
 
         @Override
@@ -364,7 +371,7 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
             json.put("payload1", "Hello World");
             json.put("payload2", new Random().nextInt());
             try {
-                eventRegistry.eventReceived(channelKey, objectMapper.writeValueAsString(json));
+                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

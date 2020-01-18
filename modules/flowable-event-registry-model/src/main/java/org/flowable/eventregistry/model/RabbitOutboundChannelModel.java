@@ -25,6 +25,7 @@ public class RabbitOutboundChannelModel extends OutboundChannelModel {
     protected String exchange;
     
     public RabbitOutboundChannelModel() {
+        super();
         setType("rabbit");
     }
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -79,6 +80,12 @@ class RabbitChannelDefinitionProcessorTest {
     void tearDown() {
         testEventConsumer.clear();
         eventRegistry.removeFlowableEventConsumer(testEventConsumer);
+        
+        List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
+        for (EventDeployment eventDeployment : deployments) {
+            eventRepositoryService.deleteDeployment(eventDeployment.getId());
+        }
+        
         queuesToDelete.forEach(rabbitAdmin::deleteQueue);
     }
 
@@ -87,14 +94,15 @@ class RabbitChannelDefinitionProcessorTest {
         rabbitAdmin.declareQueue(new Queue("test-customer"));
         queuesToDelete.add("test-customer");
 
-        eventRegistry.newInboundChannelModel()
+        eventRepositoryService.createInboundChannelModelBuilder()
             .key("testChannel")
+            .resourceName("test.channel")
             .rabbitChannelAdapter("test-customer")
             .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("eventKey")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
 
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
@@ -131,8 +139,6 @@ class RabbitChannelDefinitionProcessorTest {
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
-
-        eventRegistry.removeChannelModel("testChannel");
     }
 
     @Test
@@ -153,14 +159,15 @@ class RabbitChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newInboundChannelModel()
+        eventRepositoryService.createInboundChannelModelBuilder()
             .key("testChannel")
+            .resourceName("test.channel")
             .rabbitChannelAdapter("test-customer")
             .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("eventKey")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
 
         rabbitTemplate.convertAndSend("test-customer", "{"
             + "    \"eventKey\": \"test\","
@@ -204,8 +211,6 @@ class RabbitChannelDefinitionProcessorTest {
             .containsExactlyInAnyOrder(
                 tuple("customer", "fozzie")
             );
-
-        eventRegistry.removeChannelModel("testChannel");
     }
 
     @Test
@@ -225,13 +230,14 @@ class RabbitChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newOutboundChannelModel()
+        eventRepositoryService.createOutboundChannelModelBuilder()
             .key("outboundCustomer")
+            .resourceName("outbound.channel")
             .rabbitChannelAdapter("customer")
             .exchange("flowable-test")
             .eventProcessingPipeline()
             .jsonSerializer()
-            .register();
+            .deploy();
 
         EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
 
@@ -250,7 +256,6 @@ class RabbitChannelDefinitionProcessorTest {
                 + "  name: 'Kermit the Frog'"
                 + "}");
 
-        eventRegistry.removeChannelModel("outboundCustomer");
         rabbitAdmin.removeBinding(binding);
         rabbitAdmin.deleteExchange(exchange.getName());
     }
@@ -268,12 +273,13 @@ class RabbitChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newOutboundChannelModel()
+        eventRepositoryService.createOutboundChannelModelBuilder()
             .key("outboundCustomer")
+            .resourceName("outboundCustomer.channel")
             .rabbitChannelAdapter("outbound-customer")
             .eventProcessingPipeline()
             .jsonSerializer()
-            .register();
+            .deploy();
 
         EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
 
@@ -291,8 +297,6 @@ class RabbitChannelDefinitionProcessorTest {
                 + "  customer: 'kermit',"
                 + "  name: 'Kermit the Frog'"
                 + "}");
-
-        eventRegistry.removeChannelModel("outboundCustomer");
     }
 
     @Test

@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.deploy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -95,19 +96,27 @@ public class ProcessDefinitionInfoCache implements DeploymentCache<ProcessDefini
         return cache.containsKey(id);
     }
 
+    @Override
     public void add(String id, ProcessDefinitionInfoCacheObject obj) {
         cache.put(id, obj);
     }
 
+    @Override
     public void remove(String id) {
         cache.remove(id);
     }
 
+    @Override
     public void clear() {
         cache.clear();
     }
 
-    // For testing purposes only
+    @Override
+    public Collection<ProcessDefinitionInfoCacheObject> getAll() {
+        return cache.values();
+    }
+
+    @Override
     public int size() {
         return cache.size();
     }

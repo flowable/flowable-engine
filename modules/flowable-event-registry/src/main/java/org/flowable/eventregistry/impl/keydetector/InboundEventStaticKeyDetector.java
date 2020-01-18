@@ -30,4 +30,8 @@ public class InboundEventStaticKeyDetector<T> implements InboundEventKeyDetector
         return staticKey;
     }
 
+    public String getStaticKey() {
+        return staticKey;
+    }
+    
 }

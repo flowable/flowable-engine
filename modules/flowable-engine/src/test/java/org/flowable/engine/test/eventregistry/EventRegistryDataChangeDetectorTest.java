@@ -15,6 +15,7 @@ package org.flowable.engine.test.eventregistry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngine;
@@ -27,6 +28,9 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
+import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
+import org.flowable.eventregistry.impl.persistence.deploy.EventDeploymentManager;
+import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,15 +76,21 @@ public class EventRegistryDataChangeDetectorTest extends PluggableFlowableTestCa
     public void testOtherEnginePicksUpChannelDeploymentsAutomatically() {
         initOtherProcessEngine();
 
-        EventRegistry eventRegistry = getEventRegistry();
-        EventRegistry otherEventRegistry = getOtherProcessEngineEventRegistry();
-        assertThat(eventRegistry.getInboundChannelModels()).hasSize(0);
-        assertThat(otherEventRegistry.getInboundChannelModels()).hasSize(0);
+        EventRepositoryService eventRepositoryService = getEventRepositoryService();
+        EventDeploymentManager eventDeploymentManager = getEventDeploymentManager();
+        EventRepositoryService otherEventRepositoryService = getOtherProcessEngineEventRegistryRepositoryService();
+        EventDeploymentManager otherEventDeploymentManager = getOtherProcessEngineEventRegistryDeploymentManager();
+        
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).hasSize(0);
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
+        
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(0);
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
 
         // Set the time for both engines to the same start time
-        Date startTtime = new Date();
-        processEngineConfiguration.getClock().setCurrentTime(startTtime);
-        otherProcessEngine.getProcessEngineConfiguration().getClock().setCurrentTime(startTtime);
+        Date startTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startTime);
+        otherProcessEngine.getProcessEngineConfiguration().getClock().setCurrentTime(startTime);
 
         assertThat(eventRegistryEngine.getEventRepositoryService().createEventDefinitionQuery().count()).isEqualTo(0);
 
@@ -89,63 +99,103 @@ public class EventRegistryDataChangeDetectorTest extends PluggableFlowableTestCa
         assertThat(eventRegistryEngine.getEventRepositoryService().createChannelDefinitionQuery().count()).isEqualTo(1);
 
         // Should be deployed on engine1, but not yet on engine2
-        assertThat(eventRegistry.getInboundChannelModels()).hasSize(1);
-        assertThat(otherEventRegistry.getInboundChannelModels()).hasSize(0);
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1);
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
+        
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1);
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(0);
 
         // Manually trigger the detect changes logic on engine2
         getOtherProcessEngineEventRegistryManagementService().executeEventRegistryChangeDetection();
 
-        assertThat(eventRegistry.getInboundChannelModels()).hasSize(1);
-        assertThat(otherEventRegistry.getInboundChannelModels()).hasSize(1);
-        assertThat(eventRegistry.getInboundChannelModels().keySet().iterator().next()).isEqualTo(otherEventRegistry.getInboundChannelModels().keySet().iterator().next());
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1);
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().getAll().iterator().next().getChannelDefinitionEntity().getKey()).isEqualTo(
+                        otherEventDeploymentManager.getChannelDefinitionCache().getAll().iterator().next().getChannelDefinitionEntity().getKey());
 
         // Deploying a channel definition on engine2, should have similar consequences on engine1
         EventDeployment engine2Deployment = getOtherProcessEngineEventRegistryRepositoryService()
             .createDeployment().addClasspathResource("org/flowable/engine/test/eventregistry/simpleChannel2.channel").deploy();
         assertThat(getOtherProcessEngineEventRegistryRepositoryService().createChannelDefinitionQuery().count()).isEqualTo(2);
 
-        assertThat(eventRegistry.getInboundChannelModels()).hasSize(1);
-        assertThat(otherEventRegistry.getInboundChannelModels()).hasSize(2);
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).hasSize(2);
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
+        
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(2);
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(2);
 
         // Manually trigger the detect changes logic on engine1
         eventRegistryEngine.getEventManagementService().executeEventRegistryChangeDetection();
 
-        assertThat(eventRegistry.getInboundChannelModels()).hasSize(2);
-        assertThat(otherEventRegistry.getInboundChannelModels()).hasSize(2);
-        assertThat(eventRegistry.getInboundChannelModels().keySet()).contains("myChannel", "myChannel2");
-        assertThat(otherEventRegistry.getInboundChannelModels().keySet()).contains("myChannel", "myChannel2");
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).hasSize(2);
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(2);
+        
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().getAll().stream()
+                        .map(ChannelDefinitionCacheEntry::getChannelDefinitionEntity)
+                        .map(ChannelDefinitionEntity::getKey)
+                        .collect(Collectors.toList())).contains("myChannel", "myChannel2");
+        
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().getAll().stream()
+                        .map(ChannelDefinitionCacheEntry::getChannelDefinitionEntity)
+                        .map(ChannelDefinitionEntity::getKey)
+                        .collect(Collectors.toList())).contains("myChannel", "myChannel2");
 
         // Removing a channel definition on engine1, should be gone on engine2
         eventRegistryEngine.getEventRepositoryService().deleteDeployment(engine1Deployment.getId());
-        assertThat(eventRegistry.getInboundChannelModels()).hasSize(1); // removed on engine1
-        assertThat(otherEventRegistry.getInboundChannelModels()).hasSize(2); // but not yet on engine2, timer job needs to pass first
+        
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1); // removed on engine1
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
+        
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1); // but not yet on engine2, timer job needs to pass first
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(2);
 
         // Manually trigger the detect changes logic on engine2
         getOtherProcessEngineEventRegistryManagementService().executeEventRegistryChangeDetection();
 
-        assertThat(eventRegistry.getInboundChannelModels()).hasSize(1);
-        assertThat(otherEventRegistry.getInboundChannelModels()).hasSize(1);
+        assertThat(eventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1);
+        assertThat(eventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
+        
+        assertThat(otherEventRepositoryService.createChannelDefinitionQuery().list()).hasSize(1);
+        assertThat(otherEventDeploymentManager.getChannelDefinitionCache().size()).isEqualTo(1);
     }
 
-    private EventRegistry getEventRegistry() {
+    protected EventRegistry getEventRegistry() {
         EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration
             .getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         return eventRegistryEngineConfiguration.getEventRegistry();
     }
+    
+    protected EventRepositoryService getEventRepositoryService() {
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration
+            .getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+        return eventRegistryEngineConfiguration.getEventRepositoryService();
+    }
+    
+    protected EventDeploymentManager getEventDeploymentManager() {
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration
+            .getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+        return eventRegistryEngineConfiguration.getDeploymentManager();
+    }
 
-    private EventRepositoryService getOtherProcessEngineEventRegistryRepositoryService() {
+    protected EventRepositoryService getOtherProcessEngineEventRegistryRepositoryService() {
         EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) otherProcessEngine.getProcessEngineConfiguration()
             .getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         return eventRegistryEngineConfiguration.getEventRepositoryService();
     }
 
-    private EventManagementService getOtherProcessEngineEventRegistryManagementService() {
+    protected EventManagementService getOtherProcessEngineEventRegistryManagementService() {
         EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) otherProcessEngine.getProcessEngineConfiguration()
             .getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         return eventRegistryEngineConfiguration.getEventManagementService();
     }
+    
+    protected EventDeploymentManager getOtherProcessEngineEventRegistryDeploymentManager() {
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) otherProcessEngine.getProcessEngineConfiguration()
+            .getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+        return eventRegistryEngineConfiguration.getDeploymentManager();
+    }
 
-    private EventRegistry getOtherProcessEngineEventRegistry() {
+    protected EventRegistry getOtherProcessEngineEventRegistry() {
         EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) otherProcessEngine.getProcessEngineConfiguration()
             .getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         return eventRegistryEngineConfiguration.getEventRegistry();

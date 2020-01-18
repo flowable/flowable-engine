@@ -38,7 +38,7 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     protected String resourceName;
     protected String category;
     protected String parentDeploymentId;
-    protected String tenantId;
+    protected String deploymentTenantId;
 
     protected String key;
     protected Collection<String> inboundChannelKeys;
@@ -81,8 +81,8 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     }
     
     @Override
-    public EventModelBuilder tenantId(String tenantId) {
-        this.tenantId = tenantId;
+    public EventModelBuilder deploymentTenantId(String deploymentTenantId) {
+        this.deploymentTenantId = deploymentTenantId;
         return this;
     }
 
@@ -128,6 +128,7 @@ public class EventModelBuilderImpl implements EventModelBuilder {
         eventPayloadDefinitions.put(name, new EventPayload(name, type));
         return this;
     }
+    
     @Override
     public EventModel createEventModel() {
         return buildEventModel();
@@ -146,7 +147,7 @@ public class EventModelBuilderImpl implements EventModelBuilder {
             .addEventDefinition(resourceName, new EventJsonConverter().convertToJson(eventModel))
             .category(category)
             .parentDeploymentId(parentDeploymentId)
-            .tenantId(tenantId)
+            .tenantId(deploymentTenantId)
             .deploy();
 
         return eventDeployment;

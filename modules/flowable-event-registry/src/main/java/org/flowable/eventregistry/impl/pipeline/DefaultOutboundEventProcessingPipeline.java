@@ -12,7 +12,7 @@
  */
 package org.flowable.eventregistry.impl.pipeline;
 
-import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -22,16 +22,27 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
  */
 public class DefaultOutboundEventProcessingPipeline implements OutboundEventProcessingPipeline {
 
-    protected EventRegistry eventRegistry;
+    protected EventRepositoryService eventRepositoryService;
     protected OutboundEventSerializer outboundEventSerializer;
 
-    public DefaultOutboundEventProcessingPipeline(EventRegistry eventRegistry,
-        OutboundEventSerializer outboundEventSerializer) {
-        this.eventRegistry = eventRegistry;
+    public DefaultOutboundEventProcessingPipeline(EventRepositoryService eventRepositoryService,
+                    OutboundEventSerializer outboundEventSerializer) {
+        
+        this.eventRepositoryService = eventRepositoryService;
         this.outboundEventSerializer = outboundEventSerializer;
     }
+    
     @Override
     public String run(EventInstance eventInstance) {
         return outboundEventSerializer.serialize(eventInstance);
+    }
+    
+    @Override
+    public OutboundEventSerializer getOutboundEventSerializer() {
+        return outboundEventSerializer;
+    }
+    
+    public void setOutboundEventSerializer(OutboundEventSerializer outboundEventSerializer) {
+        this.outboundEventSerializer = outboundEventSerializer;
     }
 }

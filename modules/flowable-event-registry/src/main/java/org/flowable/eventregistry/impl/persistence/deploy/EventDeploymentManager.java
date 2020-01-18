@@ -18,6 +18,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventregistry.api.ChannelDefinition;
+import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.impl.ChannelDefinitionQueryImpl;
 import org.flowable.eventregistry.impl.EventDefinitionQueryImpl;
@@ -29,6 +30,7 @@ import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityM
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntity;
+import org.flowable.eventregistry.model.ChannelModel;
 
 /**
  * @author Tijs Rademakers
@@ -232,9 +234,23 @@ public class EventDeploymentManager {
         }
         
         for (ChannelDefinition channelDefinition : channelDefinitions) {
-            channelDefinitionCache.remove(channelDefinition.getId());
-            engineConfig.getEventRegistry().removeChannelModel(channelDefinition.getKey());
+            removeChannelDefinitionFromCache(channelDefinition);
         }
+    }
+    
+    public void removeChannelDefinitionFromCache(ChannelDefinition channelDefinition) {
+        ChannelDefinitionCacheEntry cacheEntry = channelDefinitionCache.get(channelDefinition.getId());
+        
+        if (cacheEntry != null) {
+            ChannelModel channelModel = cacheEntry.getChannelModel();
+            for (ChannelModelProcessor channelModelProcessor : engineConfig.getChannelModelProcessors()) {
+                if (channelModelProcessor.canProcess(channelModel)) {
+                    channelModelProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), engineConfig.getEventRepositoryService());
+                }
+            }
+        }
+        
+        channelDefinitionCache.remove(channelDefinition.getId());
     }
 
     public List<Deployer> getDeployers() {

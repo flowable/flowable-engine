@@ -12,6 +12,8 @@
  */
 package org.flowable.eventregistry.impl.management;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -21,9 +23,10 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.flowable.eventregistry.api.ChannelDefinition;
-import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetector;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
+import org.flowable.eventregistry.impl.persistence.deploy.EventDeploymentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,16 +67,19 @@ public class DefaultEventRegistryChangeDetector implements EventRegistryChangeDe
             .createChannelDefinitionQuery()
             .latestVersion()
             .list();
-
-        EventRegistry eventRegistry = eventRegistryEngineConfiguration.getEventRegistry();
-        Set<String> inboundChannelKeys = eventRegistry.getInboundChannelModels().keySet();
-        Set<String> outboundChannelKeys = eventRegistry.getOutboundChannelModels().keySet();
+        
+        Set<String> channelDefinitionCacheIds = new HashSet<>();
+        EventDeploymentManager deploymentManager = eventRegistryEngineConfiguration.getDeploymentManager();
+        Collection<ChannelDefinitionCacheEntry> cacheEntries = deploymentManager.getChannelDefinitionCache().getAll();
+        for (ChannelDefinitionCacheEntry channelDefinitionCacheEntry : cacheEntries) {
+            channelDefinitionCacheIds.add(channelDefinitionCacheEntry.getChannelDefinitionEntity().getId());
+        }
 
         // Check for new deployments
         for (ChannelDefinition channelDefinition : channelDefinitions) {
 
-            // The key is unique. When no instance is returned, the channel definition has not yet been deployed before (e.g. deployed on another node)
-            if (!inboundChannelKeys.contains(channelDefinition.getKey()) && !outboundChannelKeys.contains(channelDefinition.getKey())) {
+            // When no instance is returned, the channel definition has not yet been deployed before (e.g. deployed on another node)
+            if (!channelDefinitionCacheIds.contains(channelDefinition.getId())) {
                 eventRegistryEngineConfiguration.getEventRepositoryService().getChannelModelById(channelDefinition.getId());
                 LOGGER.info("Deployed channel definition with key {}", channelDefinition.getKey());
             }
@@ -81,15 +87,10 @@ public class DefaultEventRegistryChangeDetector implements EventRegistryChangeDe
         }
 
         // Check for removed deployments
-        Set<String> channelDefinitionKeys = channelDefinitions.stream().map(ChannelDefinition::getKey).collect(Collectors.toSet());
-        for (String inboundChannelKey : inboundChannelKeys) {
-            if (!channelDefinitionKeys.contains(inboundChannelKey)) {
-                eventRegistry.removeChannelModel(inboundChannelKey);
-            }
-        }
-        for (String outboundChannelKey: outboundChannelKeys) {
-            if (!channelDefinitionKeys.contains(outboundChannelKey)) {
-                eventRegistry.removeChannelModel(outboundChannelKey);
+        Set<String> latestChannelDefinitionIds = channelDefinitions.stream().map(ChannelDefinition::getId).collect(Collectors.toSet());
+        for (ChannelDefinitionCacheEntry channelDefinitionCacheEntry : cacheEntries) {
+            if (!latestChannelDefinitionIds.contains(channelDefinitionCacheEntry.getChannelDefinitionEntity().getId())) {
+                deploymentManager.removeChannelDefinitionFromCache(channelDefinitionCacheEntry.getChannelDefinitionEntity());
             }
         }
     }

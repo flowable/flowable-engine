@@ -27,6 +27,7 @@ public class JmsInboundChannelModel extends InboundChannelModel {
     protected String concurrency;
 
     public JmsInboundChannelModel() {
+        super();
         setType("jms");
     }
 

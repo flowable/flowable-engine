@@ -23,8 +23,8 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
-import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.job.service.JobHandler;
@@ -53,14 +53,14 @@ public class AsyncSendEventJobHandler implements JobHandler {
             throw new FlowableException(String.format("unexpected activity type found for job %s, at activity %s", job.getId(), flowElement.getId()));
         }
         SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) flowElement;
-        
-        EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
 
         EventModel eventModel = null;
         if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, job.getTenantId())) {
-            eventModel = CommandContextUtil.getEventRegistry().getEventModel(sendEventServiceTask.getEventType());
+            eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(sendEventServiceTask.getEventType());
         } else {
-            eventModel = CommandContextUtil.getEventRegistry().getEventModel(sendEventServiceTask.getEventType(), job.getTenantId());
+            EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext);
+            eventModel = eventRegistryEngineConfiguration.getEventRepositoryService().getEventModelByKey(sendEventServiceTask.getEventType(), 
+                            job.getTenantId(), eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
         }
 
         if (eventModel == null) {
@@ -74,7 +74,7 @@ public class AsyncSendEventJobHandler implements JobHandler {
                         CommandContextUtil.getProcessEngineConfiguration().getExpressionManager(), sendEventServiceTask, eventModel);
         eventInstance.setPayloadInstances(eventPayloadInstances);
 
-        eventRegistry.sendEventOutbound(eventInstance);
+        CommandContextUtil.getEventRegistry(commandContext).sendEventOutbound(eventInstance);
         
         if (!sendEventServiceTask.isTriggerable()) {
             CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(executionEntity, true);

@@ -64,7 +64,10 @@ public class EventPayloadToXmlStringSerializer implements OutboundEventSerialize
         } catch (Exception e) {
             throw new FlowableException("Could not serialize eventInstance to xml string", e);
         }
-
     }
 
+    @Override
+    public String getType() {
+        return "xml";
+    }
 }

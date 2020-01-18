@@ -24,6 +24,7 @@ public class JmsOutboundChannelModel extends OutboundChannelModel {
     protected String destination;
     
     public JmsOutboundChannelModel() {
+        super();
         setType("jms");
     }
 

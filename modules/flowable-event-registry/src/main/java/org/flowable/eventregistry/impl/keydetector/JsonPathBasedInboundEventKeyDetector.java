@@ -30,18 +30,20 @@ public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDete
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    protected JsonPointer jsonPathExpression;
+    protected String jsonPathExpression;
+    protected JsonPointer jsonPathExpressionPointer;
 
     public JsonPathBasedInboundEventKeyDetector(String jsonPathExpression) {
-        this.jsonPathExpression = JsonPointer.compile(jsonPathExpression);
+        this.jsonPathExpression = jsonPathExpression;
+        this.jsonPathExpressionPointer = JsonPointer.compile(jsonPathExpression);
     }
 
     @Override
     public String detectEventDefinitionKey(JsonNode event) {
-        JsonNode result = event.at(jsonPathExpression);
+        JsonNode result = event.at(jsonPathExpressionPointer);
 
         if (result == null || result.isMissingNode() || result.isNull()) {
-            LOGGER.warn("JsonPath expression {} did not detect event key", jsonPathExpression);
+            LOGGER.warn("JsonPath expression {} did not detect event key", jsonPathExpressionPointer);
             return null;
         }
 
@@ -50,5 +52,9 @@ public class JsonPathBasedInboundEventKeyDetector implements InboundEventKeyDete
         }
 
         return null;
+    }
+    
+    public String getJsonPath() {
+        return jsonPathExpression;
     }
 }

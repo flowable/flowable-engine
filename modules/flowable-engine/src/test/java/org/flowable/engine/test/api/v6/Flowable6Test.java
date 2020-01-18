@@ -12,12 +12,14 @@
  */
 package org.flowable.engine.test.api.v6;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -284,6 +286,17 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         for (org.flowable.task.api.Task t : tasks) {
             taskService.complete(t.getId());
         }
+    }
+    
+    @Test
+    @org.flowable.engine.test.Deployment
+    public void testNonInterruptingWithVariables() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterrupting", Collections.singletonMap("testVar", "test"));
+        assertNotNull(processInstance);
+        assertTrue(processInstance.isEnded());
+        Map<String, Object> varMap = ((ExecutionEntity) processInstance).getVariables();
+        assertEquals(1, varMap.size());
+        assertEquals("test", varMap.get("testVar"));
     }
 
     @Test

@@ -71,16 +71,16 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         }
     )
     public void deployChannelsWithTenantDetection() {
-        InboundChannelModel channel1 = eventRegistryEngine.getEventRegistry().getInboundChannelModel("channel1");
+        InboundChannelModel channel1 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel1");
         assertThat(((DefaultInboundEventProcessingPipeline) channel1.getInboundEventProcessingPipeline()).getInboundEventTenantDetector())
             .isInstanceOf(InboundEventStaticTenantDetector.class);
 
-        InboundChannelModel channel2 = eventRegistryEngine.getEventRegistry().getInboundChannelModel("channel2");
+        InboundChannelModel channel2 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel2");
         DefaultInboundEventProcessingPipeline inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel2.getInboundEventProcessingPipeline();
         assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(JsonPathBasedInboundEventTenantDetector.class);
         assertThat(((JsonPathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getJsonPathExpression()).isEqualTo("/tenantId");
 
-        InboundChannelModel channel3 = eventRegistryEngine.getEventRegistry().getInboundChannelModel("channel3");
+        InboundChannelModel channel3 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel3");
         inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel3.getInboundEventProcessingPipeline();
         assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(XpathBasedInboundEventTenantDetector.class);
         assertThat(((XpathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getXpathExpression()).isEqualTo("/data/tenantId");

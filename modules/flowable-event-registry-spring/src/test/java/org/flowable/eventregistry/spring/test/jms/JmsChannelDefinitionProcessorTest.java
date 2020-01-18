@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -68,18 +69,24 @@ class JmsChannelDefinitionProcessorTest {
     void tearDown() {
         testEventConsumer.clear();
         eventRegistry.removeFlowableEventConsumer(testEventConsumer);
+        
+        List<EventDeployment> eventDeployments = eventRepositoryService.createDeploymentQuery().list();
+        for (EventDeployment eventDeployment : eventDeployments) {
+            eventRepositoryService.deleteDeployment(eventDeployment.getId());
+        }
     }
 
     @Test
     void eventShouldBeReceivedWhenChannelDefinitionIsRegistered() {
-        eventRegistry.newInboundChannelModel()
+        eventRepositoryService.createInboundChannelModelBuilder()
             .key("testChannel")
+            .resourceName("test.channel")
             .jmsChannelAdapter("test-customer")
             .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("eventKey")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
 
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
@@ -116,8 +123,6 @@ class JmsChannelDefinitionProcessorTest {
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
-
-        eventRegistry.removeChannelModel("testChannel");
     }
     
     @Test
@@ -177,14 +182,15 @@ class JmsChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newInboundChannelModel()
+        eventRepositoryService.createInboundChannelModelBuilder()
             .key("testChannel")
+            .resourceName("test.channel")
             .jmsChannelAdapter("test-customer")
             .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("eventKey")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
 
         jmsTemplate.convertAndSend("test-customer", "{"
             + "    \"eventKey\": \"test\","
@@ -228,8 +234,6 @@ class JmsChannelDefinitionProcessorTest {
             .containsExactlyInAnyOrder(
                 tuple("customer", "fozzie")
             );
-
-        eventRegistry.removeChannelModel("testChannel");
     }
 
     @Test
@@ -242,12 +246,13 @@ class JmsChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newOutboundChannelModel()
+        eventRepositoryService.createOutboundChannelModelBuilder()
             .key("outboundCustomer")
+            .resourceName("outbound.channel")
             .jmsChannelAdapter("outbound-customer")
             .eventProcessingPipeline()
             .jsonSerializer()
-            .register();
+            .deploy();
 
         EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
 
@@ -265,8 +270,6 @@ class JmsChannelDefinitionProcessorTest {
                 + "  customer: 'kermit',"
                 + "  name: 'Kermit the Frog'"
                 + "}");
-
-        eventRegistry.removeChannelModel("outboundCustomer");
     }
 
     @Test

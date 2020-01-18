@@ -18,44 +18,23 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * Default cache: keep everything in memory, unless a limit is set.
- * 
- * @author Joram Barrez
+ * Default cache: keep everything in memory, without a limit.
  */
-public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDeploymentCache.class);
+public class FullDeploymentCache<T> implements DeploymentCache<T> {
 
     protected Map<String, T> cache;
 
     /** Cache with no limit */
-    public DefaultDeploymentCache() {
+    public FullDeploymentCache() {
         this.cache = Collections.synchronizedMap(new HashMap<>());
     }
 
     /**
      * Cache which has a hard limit: no more elements will be cached than the limit.
      */
-    public DefaultDeploymentCache(final int limit) {
-        this.cache = Collections.synchronizedMap(new LinkedHashMap<String, T>(limit + 1, 0.75f, true) { // +1 is needed, because the entry is inserted first, before it is removed
-            // 0.75 is the default (see javadocs)
-            // true will keep the 'access-order', which is needed to have a real LRU cache
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<String, T> eldest) {
-                boolean removeEldest = size() > limit;
-                if (removeEldest && LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("Cache limit is reached, {} will be evicted", eldest.getKey());
-                }
-                return removeEldest;
-            }
-
-        });
+    public FullDeploymentCache(final int limit) {
+        this.cache = Collections.synchronizedMap(new LinkedHashMap<String, T>());
     }
 
     @Override

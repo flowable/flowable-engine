@@ -21,7 +21,9 @@ import java.util.Map;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.RabbitInboundChannelModel;
 import org.flowable.eventregistry.model.RabbitOutboundChannelModel;
 import org.springframework.amqp.core.AcknowledgeMode;
@@ -78,37 +80,38 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
     }
 
     @Override
-    public void registerChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
+    public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
+                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+        
         if (channelModel instanceof RabbitInboundChannelModel) {
             RabbitInboundChannelModel rabbitChannelDefinition = (RabbitInboundChannelModel) channelModel;
 
-            RabbitListenerEndpoint endpoint = createRabbitListenerEndpoint(rabbitChannelDefinition, eventRegistry);
+            RabbitListenerEndpoint endpoint = createRabbitListenerEndpoint(rabbitChannelDefinition, tenantId, eventRegistry);
             registerEndpoint(endpoint, null);
         } else if (channelModel instanceof RabbitOutboundChannelModel) {
             processOutboundDefinition((RabbitOutboundChannelModel) channelModel);
         }
     }
 
-    protected RabbitListenerEndpoint createRabbitListenerEndpoint(RabbitInboundChannelModel channelDefinition, EventRegistry eventRegistry) {
-        String endpointId = getEndpointId(channelDefinition);
+    protected RabbitListenerEndpoint createRabbitListenerEndpoint(RabbitInboundChannelModel channelModel, String tenantId, EventRegistry eventRegistry) {
+        String endpointId = getEndpointId(channelModel, tenantId);
 
         SimpleRabbitListenerEndpoint endpoint = new SimpleRabbitListenerEndpoint();
 
         endpoint.setId(endpointId);
-        endpoint.setQueueNames(resolveQueues(channelDefinition));
+        endpoint.setQueueNames(resolveQueues(channelModel));
 
-        endpoint.setConcurrency(resolveExpressionAsStringOrInteger(channelDefinition.getConcurrency(), "concurrency"));
+        endpoint.setConcurrency(resolveExpressionAsStringOrInteger(channelModel.getConcurrency(), "concurrency"));
         endpoint.setBeanFactory(beanFactory);
 
-        endpoint.setExclusive(channelDefinition.isExclusive());
+        endpoint.setExclusive(channelModel.isExclusive());
 
-        endpoint.setPriority(resolvePriority(channelDefinition));
-        endpoint.setAdmin(resolveAdmin(channelDefinition));
-        endpoint.setTaskExecutor(resolveExecutor(channelDefinition));
-        endpoint.setAckMode(resolveAckMode(channelDefinition));
+        endpoint.setPriority(resolvePriority(channelModel));
+        endpoint.setAdmin(resolveAdmin(channelModel));
+        endpoint.setTaskExecutor(resolveExecutor(channelModel));
+        endpoint.setAckMode(resolveAckMode(channelModel));
 
-        String channelKey = channelDefinition.getKey();
-        endpoint.setMessageListener(createMessageListener(eventRegistry, channelKey));
+        endpoint.setMessageListener(createMessageListener(eventRegistry, channelModel));
         return endpoint;
     }
 
@@ -238,13 +241,13 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
         return this.resolver.evaluate(resolvedValue, this.expressionContext);
     }
 
-    protected MessageListener createMessageListener(EventRegistry eventRegistry, String channelKey) {
-        return new RabbitChannelMessageListenerAdapter(eventRegistry, channelKey);
+    protected MessageListener createMessageListener(EventRegistry eventRegistry, InboundChannelModel inboundChannelModel) {
+        return new RabbitChannelMessageListenerAdapter(eventRegistry, inboundChannelModel);
     }
 
     @Override
-    public void unregisterChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
-        String endpointId = getEndpointId(channelModel);
+    public void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService) {
+        String endpointId = getEndpointId(channelModel, tenantId);
         // currently it is not possible to unregister a listener container
         // In order not to do a lot of the logic that Spring does we are manually accessing the containers to remove them
         // see https://github.com/spring-projects/spring-framework/issues/24228
@@ -306,10 +309,9 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
         }
     }
 
-    protected String getEndpointId(ChannelModel channelModel) {
+    protected String getEndpointId(ChannelModel channelModel, String tenantId) {
         String channelDefinitionKey = channelModel.getKey();
-        //TODO multi tenant
-        return "org.flowable.eventregistry.rabbit.ChannelRabbitListenerEndpointContainer#" + channelDefinitionKey;
+        return "org.flowable.eventregistry.rabbit.ChannelRabbitListenerEndpointContainer#" + tenantId + "#" + channelDefinitionKey;
     }
 
     protected String resolve(String value) {

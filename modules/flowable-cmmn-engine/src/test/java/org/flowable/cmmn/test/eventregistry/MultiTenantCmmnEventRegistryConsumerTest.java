@@ -74,52 +74,92 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
 
     @Before
     public void setup() {
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
+        
         // Shared channel and event in default tenant
-        defaultSharedInboundChannelModel = getEventRegistry().newInboundChannelModel()
+        getEventRepositoryService().createInboundChannelModelBuilder()
             .key("sharedDefaultChannel")
-            .channelAdapter(new TestInboundChannelAdapter())
+            .resourceName("sharedDefault.channel")
+            .jmsChannelAdapter("test")
+            .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("defaultTenantSameKey")
             .detectEventTenantUsingJsonPathExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
+        
+        TestInboundChannelAdapter inboundChannelAdapter = new TestInboundChannelAdapter();
+        defaultSharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedDefaultChannel");
+        defaultSharedInboundChannelModel.setInboundEventChannelAdapter(inboundChannelAdapter);
+    
+        inboundChannelAdapter.setEventRegistry(getEventRegistry());
+        inboundChannelAdapter.setInboundChannelModel(defaultSharedInboundChannelModel);
 
         deployEventDefinition(defaultSharedInboundChannelModel, "defaultTenantSameKey", null);
 
         // Shared channel with 'sameKey' event
-        sharedInboundChannelModel = getEventRegistry().newInboundChannelModel()
+        getEventRepositoryService().createInboundChannelModelBuilder()
             .key("sharedChannel")
-            .channelAdapter(new TestInboundChannelAdapter())
+            .resourceName("shared.channel")
+            .jmsChannelAdapter("test")
+            .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("sameKey")
             .detectEventTenantUsingJsonPathExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
+        
+        TestInboundChannelAdapter sharedInboundChannelAdapter = new TestInboundChannelAdapter();
+        sharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedChannel");
+        sharedInboundChannelModel.setInboundEventChannelAdapter(sharedInboundChannelAdapter);
+    
+        sharedInboundChannelAdapter.setEventRegistry(getEventRegistry());
+        sharedInboundChannelAdapter.setInboundChannelModel(sharedInboundChannelModel);
 
         deployEventDefinition(sharedInboundChannelModel, "sameKey", TENANT_A, "tenantAData");
         deployEventDefinition(sharedInboundChannelModel, "sameKey", TENANT_B, "tenantBData", "someMoreTenantBData");
 
         // Tenant A specific events
-        tenantAChannelModel = getEventRegistry().newInboundChannelModel()
+        getEventRepositoryService().createInboundChannelModelBuilder()
             .key("tenantAChannel")
-            .channelAdapter(new TestInboundChannelAdapter())
+            .resourceName("tenantA.channel")
+            .deploymentTenantId(TENANT_A)
+            .jmsChannelAdapter("test")
+            .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("tenantAKey")
             .fixedTenantId("tenantA")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
+        
+        TestInboundChannelAdapter tenantAChannelAdapter = new TestInboundChannelAdapter();
+        tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A, false);
+        tenantAChannelModel.setInboundEventChannelAdapter(tenantAChannelAdapter);
+    
+        tenantAChannelAdapter.setEventRegistry(getEventRegistry());
+        tenantAChannelAdapter.setInboundChannelModel(tenantAChannelModel);
 
         deployEventDefinition(tenantAChannelModel, "tenantAKey", TENANT_A);
 
         // Tenant B specific events
-        tenantBChannelModel = getEventRegistry().newInboundChannelModel()
+        getEventRepositoryService().createInboundChannelModelBuilder()
             .key("tenantBChannel")
-            .channelAdapter(new TestInboundChannelAdapter())
+            .resourceName("tenantB.channel")
+            .deploymentTenantId(TENANT_B)
+            .jmsChannelAdapter("test")
+            .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("tenantBKey")
             .fixedTenantId("tenantB")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
+        
+        TestInboundChannelAdapter tenantBChannelAdapter = new TestInboundChannelAdapter();
+        tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B, false);
+        tenantBChannelModel.setInboundEventChannelAdapter(tenantBChannelAdapter);
+    
+        tenantBChannelAdapter.setEventRegistry(getEventRegistry());
+        tenantBChannelAdapter.setInboundChannelModel(tenantBChannelModel);
 
         deployEventDefinition(tenantBChannelModel, "tenantBKey", TENANT_B);
     }
@@ -133,7 +173,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             .payload("testPayload", EventPayloadTypes.STRING);
 
         if (tenantId != null) {
-            eventModelBuilder.tenantId(tenantId);
+            eventModelBuilder.deploymentTenantId(tenantId);
         }
 
         if (optionalExtraPayload != null) {
@@ -147,11 +187,6 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
 
     @After
     public void cleanup() {
-        getEventRegistry().removeChannelModel(defaultSharedInboundChannelModel.getKey());
-        getEventRegistry().removeChannelModel(sharedInboundChannelModel.getKey());
-        getEventRegistry().removeChannelModel(tenantAChannelModel.getKey());
-        getEventRegistry().removeChannelModel(tenantBChannelModel.getKey());
-
         getEventRepositoryService().createDeploymentQuery().list()
             .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
 
@@ -159,6 +194,8 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             cmmnRepositoryService.deleteDeployment(cleanupDeploymentId, true);
         }
         cleanupDeploymentIds.clear();
+        
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(false);
     }
 
     @Test
@@ -350,12 +387,12 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
 
     private static class TestInboundChannelAdapter implements InboundEventChannelAdapter {
 
-        private String channelKey;
-        private EventRegistry eventRegistry;
+        public InboundChannelModel inboundChannelModel;
+        public EventRegistry eventRegistry;
 
         @Override
-        public void setChannelKey(String channelKey) {
-            this.channelKey = channelKey;
+        public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
+            this.inboundChannelModel = inboundChannelModel;
         }
 
         @Override
@@ -375,7 +412,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             json.put("payload", "Hello World");
 
             try {
-                eventRegistry.eventReceived(channelKey, objectMapper.writeValueAsString(json));
+                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -398,7 +435,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             json.put("tenantId", tenantId);
 
             try {
-                eventRegistry.eventReceived(channelKey, objectMapper.writeValueAsString(json));
+                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

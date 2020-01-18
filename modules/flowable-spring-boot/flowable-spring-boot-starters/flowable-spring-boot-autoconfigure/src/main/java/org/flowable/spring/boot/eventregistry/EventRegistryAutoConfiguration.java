@@ -30,7 +30,7 @@ import org.flowable.eventregistry.spring.autodeployment.DefaultAutoDeploymentStr
 import org.flowable.eventregistry.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
-import org.flowable.eventregistry.spring.jms.JmsChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
 import org.flowable.eventregistry.spring.rabbit.RabbitChannelDefinitionProcessor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
@@ -140,7 +140,7 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         List<ChannelModelProcessor> channelProcessors = channelModelProcessors.getIfAvailable();
         if (channelProcessors != null && channelProcessors.size() > 0) {
             for (ChannelModelProcessor channelModelProcessor : channelProcessors) {
-                configuration.addChannelDefinitionProcessor(channelModelProcessor);
+                configuration.addChannelModelProcessor(channelModelProcessor);
             }
         }
 
@@ -207,8 +207,8 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
 
         @Bean("jmsChannelDefinitionProcessor")
         @ConditionalOnMissingBean(name = "jmsChannelDefinitionProcessor")
-        public JmsChannelDefinitionProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, JmsOperations jmsOperations) {
-            JmsChannelDefinitionProcessor jmsChannelDefinitionProcessor = new JmsChannelDefinitionProcessor();
+        public JmsChannelModelProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, JmsOperations jmsOperations) {
+            JmsChannelModelProcessor jmsChannelDefinitionProcessor = new JmsChannelModelProcessor();
             jmsChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
             jmsChannelDefinitionProcessor.setJmsOperations(jmsOperations);
 

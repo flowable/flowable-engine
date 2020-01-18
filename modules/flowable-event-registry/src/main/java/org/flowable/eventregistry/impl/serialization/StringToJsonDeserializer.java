@@ -36,4 +36,9 @@ public class StringToJsonDeserializer implements InboundEventDeserializer<JsonNo
             throw new FlowableException("Could not deserialize event to json", e);
         }
     }
+    
+    @Override
+    public String getType() {
+        return "json";
+    }
 }

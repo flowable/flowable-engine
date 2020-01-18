@@ -12,8 +12,12 @@
  */
 package org.flowable.eventregistry.impl.deployer;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventregistry.api.ChannelDefinition;
+import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDefinitionCacheEntry;
@@ -25,6 +29,8 @@ import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 
 /**
  * Updates caches and artifacts for a deployment and its event and channel definitions
@@ -55,7 +61,7 @@ public class CachingAndArtifactsManager {
 
         for (ChannelDefinitionEntity channelDefinition : parsedDeployment.getAllChannelDefinitions()) {
             ChannelModel channelModel = parsedDeployment.getChannelModelForChannelDefinition(channelDefinition);
-            ChannelDefinitionCacheEntry cacheEntry = new ChannelDefinitionCacheEntry(channelDefinition, channelJsonConverter.convertToJson(channelModel));
+            ChannelDefinitionCacheEntry cacheEntry = new ChannelDefinitionCacheEntry(channelDefinition, channelModel);
             channelDefinitionCache.add(channelDefinition.getId(), cacheEntry);
             
             registerChannelModel(channelModel, channelDefinition, eventRegistryEngineConfiguration);
@@ -66,6 +72,31 @@ public class CachingAndArtifactsManager {
     }
     
     protected void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition, EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
-        eventRegistryEngineConfiguration.getEventRegistry().registerChannelModel(channelModel, channelDefinition);
+        String channelDefinitionKey = channelModel.getKey();
+        if (StringUtils.isEmpty(channelDefinitionKey)) {
+            throw new FlowableIllegalArgumentException("No key set for channel model");
+        }
+
+        if (channelModel instanceof InboundChannelModel) {
+
+            InboundChannelModel inboundChannelModel = (InboundChannelModel) channelModel;
+
+            if (inboundChannelModel.getInboundEventChannelAdapter() != null) {
+                InboundEventChannelAdapter inboundEventChannelAdapter = (InboundEventChannelAdapter) inboundChannelModel.getInboundEventChannelAdapter();
+                inboundEventChannelAdapter.setEventRegistry(eventRegistryEngineConfiguration.getEventRegistry());
+                inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
+            }
+
+        } else if (!(channelModel instanceof OutboundChannelModel)) {
+            throw new FlowableIllegalArgumentException("Unrecognized ChannelModel class : " + channelModel.getClass());
+        }
+
+        for (ChannelModelProcessor channelDefinitionProcessor : eventRegistryEngineConfiguration.getChannelModelProcessors()) {
+            if (channelDefinitionProcessor.canProcess(channelModel)) {
+                channelDefinitionProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRepositoryService());
+                channelDefinitionProcessor.registerChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRegistry(),
+                                eventRegistryEngineConfiguration.getEventRepositoryService(), eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+            }
+        }
     }
 }

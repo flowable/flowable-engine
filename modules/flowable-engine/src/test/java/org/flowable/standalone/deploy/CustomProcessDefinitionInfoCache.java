@@ -12,11 +12,12 @@
  */
 package org.flowable.standalone.deploy;
 
-import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
-
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
 
 public class CustomProcessDefinitionInfoCache implements DeploymentCache<ProcessDefinitionInfoCacheObject> {
 
@@ -47,7 +48,12 @@ public class CustomProcessDefinitionInfoCache implements DeploymentCache<Process
         cache.clear();
     }
 
-    //for testing purpose
+    @Override
+    public Collection<ProcessDefinitionInfoCacheObject> getAll() {
+        return cache.values();
+    }
+
+    @Override
     public int size(){
         return cache.size();
     }

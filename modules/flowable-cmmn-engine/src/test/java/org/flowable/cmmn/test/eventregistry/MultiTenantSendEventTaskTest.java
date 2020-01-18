@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class MultiTenantSendEventTaskTest extends FlowableCmmnTestCase {
             .key("testEvent")
             .resourceName("testEvent.event")
             .payload("tenantACustomerId", EventPayloadTypes.STRING)
-            .tenantId(TENANT_A)
+            .deploymentTenantId(TENANT_A)
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
@@ -59,26 +60,28 @@ public class MultiTenantSendEventTaskTest extends FlowableCmmnTestCase {
             .key("testEvent")
             .resourceName("testEvent.event")
             .payload("tenantBCustomerId", EventPayloadTypes.STRING)
-            .tenantId(TENANT_B)
+            .deploymentTenantId(TENANT_B)
             .deploy();
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
-        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
-
-        getEventRegistry().newOutboundChannelModel()
+        getEventRepositoryService().createOutboundChannelModelBuilder()
             .key("out-channel")
-            .channelAdapter(outboundEventChannelAdapter)
+            .resourceName("out.channel")
+            .jmsChannelAdapter("out")
+            .eventProcessingPipeline()
             .jsonSerializer()
-            .register();
+            .deploy();
+        
+        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
+        OutboundChannelModel outboundChannelModel = (OutboundChannelModel) getEventRepositoryService().getChannelModelByKey("out-channel");
+        outboundChannelModel.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
 
         return outboundEventChannelAdapter;
     }
 
     @After
     public void cleanup() {
-        getEventRegistry().removeChannelModel("test-channel");
-
         getEventRepositoryService().createDeploymentQuery().list()
             .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
 

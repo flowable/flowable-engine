@@ -15,6 +15,7 @@ package org.flowable.eventregistry.impl.persistence.deploy;
 import java.io.Serializable;
 
 import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
+import org.flowable.eventregistry.model.ChannelModel;
 
 /**
  * @author Tijs Rademakers
@@ -24,11 +25,11 @@ public class ChannelDefinitionCacheEntry implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected ChannelDefinitionEntity channelDefinitionEntity;
-    protected String channelDefinitionJson;
+    protected ChannelModel channelModel;
 
-    public ChannelDefinitionCacheEntry(ChannelDefinitionEntity channelDefinitionEntity, String channelDefinitionJson) {
+    public ChannelDefinitionCacheEntry(ChannelDefinitionEntity channelDefinitionEntity, ChannelModel channelModel) {
         this.channelDefinitionEntity = channelDefinitionEntity;
-        this.channelDefinitionJson = channelDefinitionJson;
+        this.channelModel = channelModel;
     }
 
     public ChannelDefinitionEntity getChannelDefinitionEntity() {
@@ -39,11 +40,11 @@ public class ChannelDefinitionCacheEntry implements Serializable {
         this.channelDefinitionEntity = channelDefinitionEntity;
     }
 
-    public String getChannelDefinitionJson() {
-        return channelDefinitionJson;
+    public ChannelModel getChannelModel() {
+        return channelModel;
     }
 
-    public void setChannelDefinitionJson(String channelDefinitionJson) {
-        this.channelDefinitionJson = channelDefinitionJson;
+    public void setChannelModel(ChannelModel channelModel) {
+        this.channelModel = channelModel;
     }
 }

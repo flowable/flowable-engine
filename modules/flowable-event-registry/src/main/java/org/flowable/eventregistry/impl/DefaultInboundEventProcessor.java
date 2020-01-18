@@ -14,7 +14,6 @@ package org.flowable.eventregistry.impl;
 
 import java.util.Collection;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
@@ -34,15 +33,10 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
     }
 
     @Override
-    public void eventReceived(String channelKey, String event) {
+    public void eventReceived(InboundChannelModel channelModel, String event) {
 
-        InboundChannelModel channelDefinition = eventRegistry.getInboundChannelModel(channelKey);
-        if (channelDefinition == null) {
-            throw new FlowableException("No channel definition found for key " + channelKey);
-        }
-
-        InboundEventProcessingPipeline inboundEventProcessingPipeline = (InboundEventProcessingPipeline) channelDefinition.getInboundEventProcessingPipeline();
-        Collection<EventRegistryEvent> eventRegistryEvents = inboundEventProcessingPipeline.run(channelKey, event);
+        InboundEventProcessingPipeline inboundEventProcessingPipeline = (InboundEventProcessingPipeline) channelModel.getInboundEventProcessingPipeline();
+        Collection<EventRegistryEvent> eventRegistryEvents = inboundEventProcessingPipeline.run(channelModel.getKey(), event);
 
         for (EventRegistryEvent eventRegistryEvent : eventRegistryEvents) {
             eventRegistry.sendEventToConsumers(eventRegistryEvent);

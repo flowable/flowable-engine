@@ -58,14 +58,14 @@ public class EventRegistryEngineTestConfiguration {
 
     @Bean
     public SpringEventRegistryEngineConfiguration eventRegistryEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
-        ObjectProvider<ChannelModelProcessor> channelDefinitionProcessors) {
+                    ObjectProvider<ChannelModelProcessor> channelDefinitionProcessors) {
+        
         SpringEventRegistryEngineConfiguration engineConfiguration = new SpringEventRegistryEngineConfiguration();
         engineConfiguration.setDataSource(dataSource);
         engineConfiguration.setTransactionManager(transactionManager);
         engineConfiguration.setDatabaseSchemaUpdate(SpringEventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
-        channelDefinitionProcessors.stream()
-            .forEach(engineConfiguration::addChannelDefinitionProcessor);
+        channelDefinitionProcessors.stream().forEach(engineConfiguration::addChannelModelProcessor);
 
         return engineConfiguration;
     }

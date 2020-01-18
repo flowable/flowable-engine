@@ -53,6 +53,7 @@ import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
@@ -363,13 +364,31 @@ public class CommandContextUtil {
     }
     
     public static EventRegistry getEventRegistry() {
+        return getEventRegistry(getCommandContext());
+    }
+    
+    public static EventRegistry getEventRegistry(CommandContext commandContext) {
         EventRegistry eventRegistry = null;
-        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration();
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration(commandContext);
         if (eventRegistryEngineConfiguration != null) {
             eventRegistry = eventRegistryEngineConfiguration.getEventRegistry();
         }
 
         return eventRegistry;
+    }
+    
+    public static EventRepositoryService getEventRepositoryService() {
+        return getEventRepositoryService(getCommandContext());
+    }
+    
+    public static EventRepositoryService getEventRepositoryService(CommandContext commandContext) {
+        EventRepositoryService eventRepositoryService = null;
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration(commandContext);
+        if (eventRegistryEngineConfiguration != null) {
+            eventRepositoryService = eventRegistryEngineConfiguration.getEventRepositoryService();
+        }
+
+        return eventRepositoryService;
     }
 
     // DMN ENGINE

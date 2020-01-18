@@ -36,6 +36,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -70,9 +71,11 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
 
         EventModel eventModel = null;
         if (Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, planItemInstanceEntity.getTenantId())) {
-            eventModel = CommandContextUtil.getEventRegistry().getEventModel(key);
+            eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(key);
         } else {
-            eventModel = CommandContextUtil.getEventRegistry().getEventModel(key, planItemInstanceEntity.getTenantId());
+            EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext);
+            eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(key, 
+                            planItemInstanceEntity.getTenantId(), eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
         }
 
         if (eventModel == null) {

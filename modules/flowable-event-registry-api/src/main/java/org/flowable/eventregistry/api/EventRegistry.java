@@ -14,13 +14,9 @@ package org.flowable.eventregistry.api;
 
 import java.util.Map;
 
-import org.flowable.eventregistry.api.model.InboundChannelModelBuilder;
-import org.flowable.eventregistry.api.model.OutboundChannelModelBuilder;
 import org.flowable.eventregistry.api.runtime.EventInstance;
-import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
-import org.flowable.eventregistry.model.OutboundChannelModel;
 
 /**
  * Central registry for events that are received through external channels through a {@link InboundEventChannelAdapter}
@@ -29,56 +25,6 @@ import org.flowable.eventregistry.model.OutboundChannelModel;
  * @author Joram Barrez
  */
 public interface EventRegistry {
-
-    /**
-     * Programmatically build and register a new {@link InboundChannelModel}.
-     */
-    InboundChannelModelBuilder newInboundChannelModel();
-
-    /**
-     * Returns the {@link InboundChannelModel} instance associated with the given key.
-     */
-    InboundChannelModel getInboundChannelModel(String channelKey);
-    
-    /**
-     * Returns all the {@link InboundChannelModel} instances.
-     */
-    Map<String, InboundChannelModel> getInboundChannelModels();
-
-    /**
-     * Returns all {@link OutboundChannelModel} instances.
-     */
-    Map<String, OutboundChannelModel> getOutboundChannelModels();
-
-    /**
-     * Programmatically build and register a new {@link OutboundChannelModel}.
-     */
-    OutboundChannelModelBuilder newOutboundChannelModel();
-
-    /**
-     * Returns the {@link OutboundChannelModel} instance associated with the given key.
-     */
-    OutboundChannelModel getOutboundChannelModel(String channelKey);
-
-    /**
-     * Low-level (vs the {@link InboundChannelModelBuilder}) way of registering a new {@link ChannelModel}.
-     */
-    void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition);
-
-    /**
-     * Removes a previously registered {@link ChannelModel}.
-     */
-    void removeChannelModel(String channelDefinitionKey);
-
-    /**
-     * Retrieves the {@link EventModel} for the given eventDefinitionKey.
-     */
-    EventModel getEventModel(String eventDefinitionKey);
-
-    /**
-     * Retrieves the {@link EventModel} for the given eventDefinitionKey, within the given tenant.
-     */
-    EventModel getEventModel(String eventDefinitionKey, String tenantId);
 
     /**
      * The {@link InboundEventProcessor} is responsible for handling any new event.
@@ -114,7 +60,7 @@ public interface EventRegistry {
     /**
      * Events received in adapters should call this method to process events.
      */
-    void eventReceived(String channelKey, String event);
+    void eventReceived(InboundChannelModel channelModel, String event);
     
     /**
      * Send an event to all the registered event consumers.

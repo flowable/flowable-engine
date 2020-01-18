@@ -95,6 +95,12 @@ class KafkaChannelDefinitionProcessorTest {
     void tearDown() throws Exception {
         testEventConsumer.clear();
         eventRegistry.removeFlowableEventConsumer(testEventConsumer);
+        
+        List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
+        for (EventDeployment eventDeployment : deployments) {
+            eventRepositoryService.deleteDeployment(eventDeployment.getId());
+        }
+        
         Map<TopicPartition, RecordsToDelete> recordsToDelete = new HashMap<>();
         Map<String, TopicDescription> topicDescriptions = adminClient.describeTopics(topicsToDelete)
             .all()
@@ -124,14 +130,15 @@ class KafkaChannelDefinitionProcessorTest {
     void eventShouldBeReceivedWhenChannelDefinitionIsRegistered() throws Exception {
         createTopic("test-new-customer");
 
-        eventRegistry.newInboundChannelModel()
+        eventRepositoryService.createInboundChannelModelBuilder()
             .key("newCustomerChannel")
+            .resourceName("customer.channel")
             .kafkaChannelAdapter("test-new-customer")
             .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("eventKey")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
 
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
@@ -172,8 +179,6 @@ class KafkaChannelDefinitionProcessorTest {
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
-
-        eventRegistry.removeChannelModel("newCustomerChannel");
     }
 
     @Test
@@ -229,23 +234,25 @@ class KafkaChannelDefinitionProcessorTest {
     void eventShouldBeReceivedWhenMultipleChannelDefinitionsAreRegistered() throws Exception {
         createTopic("test-multi-customer");
 
-        eventRegistry.newInboundChannelModel()
+        eventRepositoryService.createInboundChannelModelBuilder()
             .key("customer")
+            .resourceName("customer.channel")
             .kafkaChannelAdapter("test-multi-customer")
             .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("customer")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
 
-        eventRegistry.newInboundChannelModel()
+        eventRepositoryService.createInboundChannelModelBuilder()
             .key("newCustomer")
+            .resourceName("newCustomer.channel")
             .kafkaChannelAdapter("test-multi-customer")
             .eventProcessingPipeline()
             .jsonDeserializer()
             .fixedEventKey("newCustomer")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
 
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
@@ -305,9 +312,6 @@ class KafkaChannelDefinitionProcessorTest {
             .containsExactlyInAnyOrder(
                 tuple("customer", "kermit")
             );
-
-        eventRegistry.removeChannelModel("customer");
-        eventRegistry.removeChannelModel("newCustomer");
     }
 
     @Test
@@ -327,15 +331,16 @@ class KafkaChannelDefinitionProcessorTest {
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
 
-        eventRegistry.newInboundChannelModel()
+        eventRepositoryService.createInboundChannelModelBuilder()
             .key("testChannel")
+            .resourceName("test.channel")
             .kafkaChannelAdapter("test-customer")
             .property(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
             .eventProcessingPipeline()
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("eventKey")
             .jsonFieldsMapDirectlyToPayload()
-            .register();
+            .deploy();
 
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
@@ -384,65 +389,60 @@ class KafkaChannelDefinitionProcessorTest {
             .containsExactlyInAnyOrder(
                 tuple("customer", "fozzie")
             );
-
-        eventRegistry.removeChannelModel("testChannel");
     }
 
     @Test
     void eventShouldBeSendAfterOutboundChannelDefinitionIsRegistered() throws Exception {
         createTopic("outbound-customer");
 
-        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
-            consumer.subscribe(Collections.singleton("outbound-customer"));
+        Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient");
+        consumer.subscribe(Collections.singleton("outbound-customer"));
 
-            eventRepositoryService.createEventModelBuilder()
-                .resourceName("testEvent.event")
-                .key("customer")
-                .outboundChannelKey("outboundCustomer")
-                .correlationParameter("customer", EventPayloadTypes.STRING)
-                .payload("name", EventPayloadTypes.STRING)
-                .deploy();
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("customer")
+            .outboundChannelKey("outboundCustomer")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
 
-            eventRegistry.newOutboundChannelModel()
-                .key("outboundCustomer")
-                .kafkaChannelAdapter("outbound-customer")
-                .recordKey("customer")
-                .eventProcessingPipeline()
-                .jsonSerializer()
-                .register();
+        eventRepositoryService.createOutboundChannelModelBuilder()
+            .key("outboundCustomer")
+            .resourceName("outboundCustomer.channel")
+            .kafkaChannelAdapter("outbound-customer")
+            .recordKey("customer")
+            .eventProcessingPipeline()
+            .jsonSerializer()
+            .deploy();
 
-            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+        EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
 
-            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
-            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
-            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
 
-            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
-            assertThat(records).isEmpty();
-            consumer.commitSync();
-            consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
+        ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+        assertThat(records).isEmpty();
+        consumer.commitSync();
+        consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
 
-            eventRegistry.sendEventOutbound(kermitEvent);
+        eventRegistry.sendEventOutbound(kermitEvent);
 
-            records = consumer.poll(Duration.ofSeconds(2));
+        records = consumer.poll(Duration.ofSeconds(2));
 
-            assertThat(records)
-                .hasSize(1)
-                .first()
-                .isNotNull()
-                .satisfies(record -> {
-                    assertThat(record.key()).isEqualTo("customer");
-                    assertThatJson(record.value())
-                        .isEqualTo("{"
-                            + "  customer: 'kermit',"
-                            + "  name: 'Kermit the Frog'"
-                            + "}");
-                });
-        } finally {
-            eventRegistry.removeChannelModel("outboundCustomer");
-        }
-
+        assertThat(records)
+            .hasSize(1)
+            .first()
+            .isNotNull()
+            .satisfies(record -> {
+                assertThat(record.key()).isEqualTo("customer");
+                assertThatJson(record.value())
+                    .isEqualTo("{"
+                        + "  customer: 'kermit',"
+                        + "  name: 'Kermit the Frog'"
+                        + "}");
+            });
     }
 
     @Test

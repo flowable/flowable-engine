@@ -18,6 +18,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.springframework.jms.listener.adapter.AbstractAdaptableMessageListener;
 
 /**
@@ -26,17 +27,17 @@ import org.springframework.jms.listener.adapter.AbstractAdaptableMessageListener
 public class JmsChannelMessageListenerAdapter extends AbstractAdaptableMessageListener {
 
     protected EventRegistry eventRegistry;
-    protected String channelKey;
+    protected InboundChannelModel inboundChannelModel;
 
-    public JmsChannelMessageListenerAdapter(EventRegistry eventRegistry, String channelKey) {
+    public JmsChannelMessageListenerAdapter(EventRegistry eventRegistry, InboundChannelModel inboundChannelModel) {
         this.eventRegistry = eventRegistry;
-        this.channelKey = channelKey;
+        this.inboundChannelModel = inboundChannelModel;
     }
 
     @Override
     public void onMessage(Message message, Session session) throws JMSException {
         if (message instanceof TextMessage) {
-            eventRegistry.eventReceived(channelKey, ((TextMessage) message).getText());
+            eventRegistry.eventReceived(inboundChannelModel, ((TextMessage) message).getText());
         } else {
             //TODO what about other message types
             throw new UnsupportedOperationException("Can only received TextMessage. Received: " + message);
@@ -51,11 +52,11 @@ public class JmsChannelMessageListenerAdapter extends AbstractAdaptableMessageLi
         this.eventRegistry = eventRegistry;
     }
 
-    public String getChannelKey() {
-        return channelKey;
+    public InboundChannelModel getInboundChannelModel() {
+        return inboundChannelModel;
     }
 
-    public void setChannelKey(String channelKey) {
-        this.channelKey = channelKey;
+    public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
+        this.inboundChannelModel = inboundChannelModel;
     }
 }

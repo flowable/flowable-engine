@@ -36,7 +36,7 @@ import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
-import org.flowable.eventregistry.spring.jms.JmsChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
 import org.flowable.eventregistry.spring.rabbit.RabbitChannelDefinitionProcessor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
@@ -86,7 +86,7 @@ public class EventRegistryAutoConfigurationTest {
             assertAllServicesPresent(context, eventRegistryEngine);
 
             IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors());
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
                 .hasSize(2);
@@ -131,7 +131,7 @@ public class EventRegistryAutoConfigurationTest {
             assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration()).as("Event registry Configuration")
                 .isEqualTo(eventRegistryEngineConfiguration);
             IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors());
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
                 .hasSize(2);
@@ -183,7 +183,7 @@ public class EventRegistryAutoConfigurationTest {
             assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration()).as("Event registry Configuration")
                 .isEqualTo(eventRegistryEngineConfiguration);
             IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors());
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
                 .hasSize(2);
@@ -223,7 +223,7 @@ public class EventRegistryAutoConfigurationTest {
             ))
             .run(context -> {
                 assertThat(context)
-                    .hasSingleBean(JmsChannelDefinitionProcessor.class)
+                    .hasSingleBean(JmsChannelModelProcessor.class)
                     .hasBean("jmsChannelDefinitionProcessor");
                 EventRegistryEngine eventRegistryEngine = context.getBean(EventRegistryEngine.class);
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
@@ -231,7 +231,7 @@ public class EventRegistryAutoConfigurationTest {
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
 
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngineConfiguration.getChannelDefinitionProcessors());
+                    eventRegistryEngineConfiguration.getChannelModelProcessors());
 
                 channelModelProcessorAssert
                     .hasSize(3);
@@ -264,7 +264,7 @@ public class EventRegistryAutoConfigurationTest {
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngineConfiguration.getChannelDefinitionProcessors())
+                    eventRegistryEngineConfiguration.getChannelModelProcessors())
                     .hasSize(3);
 
                 channelModelProcessorAssert
@@ -295,7 +295,7 @@ public class EventRegistryAutoConfigurationTest {
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
 
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelDefinitionProcessors());
+                    eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
                 channelModelProcessorAssert
                     .hasSize(3);
@@ -325,7 +325,7 @@ public class EventRegistryAutoConfigurationTest {
             ))
             .run(context -> {
                 assertThat(context)
-                    .hasSingleBean(JmsChannelDefinitionProcessor.class)
+                    .hasSingleBean(JmsChannelModelProcessor.class)
                     .hasBean("jmsChannelDefinitionProcessor")
                     .hasSingleBean(RabbitChannelDefinitionProcessor.class)
                     .hasBean("rabbitChannelDefinitionProcessor")
@@ -336,11 +336,11 @@ public class EventRegistryAutoConfigurationTest {
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngineConfiguration.getChannelDefinitionProcessors());
+                    eventRegistryEngineConfiguration.getChannelModelProcessors());
                 channelModelProcessorAssert
                     .hasSize(5)
                     .contains(
-                        context.getBean("jmsChannelDefinitionProcessor", JmsChannelDefinitionProcessor.class),
+                        context.getBean("jmsChannelDefinitionProcessor", JmsChannelModelProcessor.class),
                         context.getBean("rabbitChannelDefinitionProcessor", RabbitChannelDefinitionProcessor.class),
                         context.getBean("kafkaChannelDefinitionProcessor", KafkaChannelDefinitionProcessor.class)
                     );
@@ -367,7 +367,7 @@ public class EventRegistryAutoConfigurationTest {
             .withUserConfiguration(CustomChannelDefinitionProcessorsConfiguration.class)
             .run(context -> {
                 assertThat(context)
-                    .doesNotHaveBean(JmsChannelDefinitionProcessor.class)
+                    .doesNotHaveBean(JmsChannelModelProcessor.class)
                     .hasBean("jmsChannelDefinitionProcessor")
                     .doesNotHaveBean(RabbitChannelDefinitionProcessor.class)
                     .hasBean("rabbitChannelDefinitionProcessor")
@@ -379,7 +379,7 @@ public class EventRegistryAutoConfigurationTest {
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngineConfiguration.getChannelDefinitionProcessors());
+                    eventRegistryEngineConfiguration.getChannelModelProcessors());
                 channelModelProcessorAssert
                     .hasSize(6);
 

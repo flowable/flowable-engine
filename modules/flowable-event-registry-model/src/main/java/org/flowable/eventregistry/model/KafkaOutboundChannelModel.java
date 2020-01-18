@@ -25,6 +25,7 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
     protected String recordKey;
     
     public KafkaOutboundChannelModel() {
+        super();
         setType("kafka");
     }
 

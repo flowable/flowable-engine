@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
@@ -30,11 +31,11 @@ public class RabbitChannelMessageListenerAdapter implements MessageListener {
     protected Collection<String> stringContentTypes;
 
     protected EventRegistry eventRegistry;
-    protected String channelKey;
+    protected InboundChannelModel inboundChannelModel;
 
-    public RabbitChannelMessageListenerAdapter(EventRegistry eventRegistry, String channelKey) {
+    public RabbitChannelMessageListenerAdapter(EventRegistry eventRegistry, InboundChannelModel inboundChannelModel) {
         this.eventRegistry = eventRegistry;
-        this.channelKey = channelKey;
+        this.inboundChannelModel = inboundChannelModel;
         this.stringContentTypes = new HashSet<>();
         this.stringContentTypes.add(MessageProperties.CONTENT_TYPE_JSON);
         this.stringContentTypes.add(MessageProperties.CONTENT_TYPE_JSON_ALT);
@@ -57,7 +58,7 @@ public class RabbitChannelMessageListenerAdapter implements MessageListener {
             rawEvent = Base64.getEncoder().encodeToString(body);
         }
 
-        eventRegistry.eventReceived(channelKey, rawEvent);
+        eventRegistry.eventReceived(inboundChannelModel, rawEvent);
     }
 
     public EventRegistry getEventRegistry() {
@@ -68,12 +69,12 @@ public class RabbitChannelMessageListenerAdapter implements MessageListener {
         this.eventRegistry = eventRegistry;
     }
 
-    public String getChannelKey() {
-        return channelKey;
+    public InboundChannelModel getInboundChannelModel() {
+        return inboundChannelModel;
     }
 
-    public void setChannelKey(String channelKey) {
-        this.channelKey = channelKey;
+    public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
+        this.inboundChannelModel = inboundChannelModel;
     }
 
     public Collection<String> getStringContentTypes() {

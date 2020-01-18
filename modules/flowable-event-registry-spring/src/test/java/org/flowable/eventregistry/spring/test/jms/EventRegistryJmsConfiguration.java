@@ -17,7 +17,7 @@ import java.time.Duration;
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.flowable.eventregistry.spring.jms.JmsChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.flowable.eventregistry.spring.test.config.EventRegistryEngineTestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -77,8 +77,8 @@ public class EventRegistryJmsConfiguration {
     }
 
     @Bean
-    public JmsChannelDefinitionProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, JmsOperations jmsOperations) {
-        JmsChannelDefinitionProcessor jmsChannelDeployer = new JmsChannelDefinitionProcessor();
+    public JmsChannelModelProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, JmsOperations jmsOperations) {
+        JmsChannelModelProcessor jmsChannelDeployer = new JmsChannelModelProcessor();
         jmsChannelDeployer.setEndpointRegistry(endpointRegistry);
         jmsChannelDeployer.setJmsOperations(jmsOperations);
 

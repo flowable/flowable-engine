@@ -16,22 +16,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
+import org.flowable.eventregistry.impl.keydetector.InboundEventStaticKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.JsonFieldBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.JsonPathBasedInboundEventKeyDetector;
-import org.flowable.eventregistry.impl.keydetector.InboundEventStaticKeyDetector;
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
-import org.flowable.eventregistry.impl.tenantdetector.JsonPathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
+import org.flowable.eventregistry.impl.tenantdetector.JsonPathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.transformer.DefaultInboundEventTransformer;
 import org.flowable.eventregistry.model.ChannelEventKeyDetection;
@@ -53,14 +54,16 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
     }
 
     @Override
-    public void registerChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
+    public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
+                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+        
         if (channelModel instanceof InboundChannelModel) {
-            registerChannelModel((InboundChannelModel) channelModel, eventRegistry);
+            registerChannelModel((InboundChannelModel) channelModel, eventRepositoryService, fallbackToDefaultTenant);
         }
 
     }
 
-    protected void registerChannelModel(InboundChannelModel inboundChannelModel, EventRegistry eventRegistry) {
+    protected void registerChannelModel(InboundChannelModel inboundChannelModel, EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
         if (inboundChannelModel.getInboundEventProcessingPipeline() == null) {
 
             InboundEventProcessingPipeline eventProcessingPipeline;
@@ -102,7 +105,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                     }
                 }
 
-                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRegistry, eventDeserializer,
+                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, fallbackToDefaultTenant, eventDeserializer,
                     eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
 
             } else if ("xml".equals(inboundChannelModel.getDeserializerType())) {
@@ -140,7 +143,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                     }
                 }
 
-                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRegistry, eventDeserializer,
+                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, fallbackToDefaultTenant, eventDeserializer,
                     eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
 
             } else {
@@ -155,7 +158,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
     }
 
     @Override
-    public void unregisterChannelModel(ChannelModel channelModel, EventRegistry eventRegistry) {
+    public void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService) {
         // nothing to do
     }
 }
