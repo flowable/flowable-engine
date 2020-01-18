@@ -15,6 +15,7 @@ package org.flowable.eventregistry.spring.management;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
@@ -65,7 +66,8 @@ public class DefaultSpringEventRegistryChangeDetectionExecutor implements EventR
         }
 
         Instant initialInstant = Instant.now().plus(initialDelayInMs, ChronoUnit.MILLIS);
-        taskScheduler.scheduleWithFixedDelay(createChangeDetectionRunnable(), initialInstant, Duration.ofMillis(delayInMs));
+        // Note we cannot use the method with the Instant since it was added in Spring 5.0, and we still want to support 4.3
+        taskScheduler.scheduleWithFixedDelay(createChangeDetectionRunnable(), Date.from(initialInstant), delayInMs);
     }
 
     protected Runnable createChangeDetectionRunnable() {
