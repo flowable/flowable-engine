@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,6 +55,7 @@ import net.javacrumbs.jsonunit.core.Option;
  * Test for all REST-operations related to a single task variable.
  * 
  * @author Frederik Heremans
+ * @author Filip Hrisafov
  */
 public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase {
 
@@ -110,6 +113,57 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
             .isEqualTo("{"
                 + "  name: 'variable',"
                 + "  type: 'instant',"
+                + "  value: '" + nowWithoutNanos.toString() + "'"
+                + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testGetProcessInstanceLocalDateVariable() throws Exception {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        LocalDate now = LocalDate.now();
+        runtimeService.setVariable(processInstance.getId(), "variable", now);
+
+        CloseableHttpResponse response = executeRequest(
+            new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "variable")),
+            HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  name: 'variable',"
+                + "  type: 'localDate',"
+                + "  value: '" + now.toString() + "'"
+                + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testGetProcessInstanceLocalDateTimeVariable() throws Exception {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nowWithoutNanos = now.truncatedTo(ChronoUnit.MILLIS);
+        runtimeService.setVariable(processInstance.getId(), "variable", now);
+
+        CloseableHttpResponse response = executeRequest(
+            new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "variable")),
+            HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  name: 'variable',"
+                + "  type: 'localDateTime',"
                 + "  value: '" + nowWithoutNanos.toString() + "'"
                 + "}");
     }
@@ -265,6 +319,66 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
             .when(Option.IGNORING_EXTRA_FIELDS)
             .isEqualTo("{"
                 + "  value: '2019-12-13T12:32:45.583345Z'"
+                + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testUpdateLocalDateProcessVariable() throws Exception {
+        LocalDate initial = LocalDate.parse("2020-01-18");
+        LocalDate tenDaysLater = initial.plusDays(10);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
+        runtimeService.setVariable(processInstance.getId(), "myVar", initial);
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "2020-01-28");
+        requestNode.put("type", "localDate");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo(tenDaysLater);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  value: '2020-01-28'"
+                + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testUpdateLocalDateTimeProcessVariable() throws Exception {
+        LocalDateTime initial = LocalDateTime.parse("2020-01-18T12:32:45");
+        LocalDateTime tenDaysLater = initial.plus(10, ChronoUnit.DAYS);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
+        runtimeService.setVariable(processInstance.getId(), "myVar", initial);
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "2020-01-28T12:32:45");
+        requestNode.put("type", "localDateTime");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo(tenDaysLater);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  value: '2020-01-28T12:32:45'"
                 + "}");
     }
 
