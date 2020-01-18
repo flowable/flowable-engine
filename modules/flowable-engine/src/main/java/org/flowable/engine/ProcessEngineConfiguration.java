@@ -581,6 +581,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     /**
      * @deprecated Use {@link #setEngineLifecycleListeners(List)}.
      */
+    @Deprecated
     public ProcessEngineConfiguration setProcessEngineLifecycleListener(ProcessEngineLifecycleListener processEngineLifecycleListener) {
         // Backwards compatibility (when there was only one typed engine listener)
         if (engineLifecycleListeners == null || engineLifecycleListeners.isEmpty()) {
@@ -613,6 +614,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     /**
      * @deprecated Use {@link #getEngineLifecycleListeners()}.
      */
+    @Deprecated
     public ProcessEngineLifecycleListener getProcessEngineLifecycleListener() {
         // Backwards compatibility (when there was only one typed engine listener)
         if (engineLifecycleListeners != null && !engineLifecycleListeners.isEmpty()) {

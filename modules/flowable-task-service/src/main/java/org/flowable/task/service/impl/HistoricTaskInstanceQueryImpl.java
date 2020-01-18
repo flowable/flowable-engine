@@ -1978,6 +1978,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return taskId;
     }
     
+    @Override
     public String getId() {
         return taskId;
     }

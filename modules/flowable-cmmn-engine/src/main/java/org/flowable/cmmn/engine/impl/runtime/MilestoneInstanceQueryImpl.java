@@ -131,6 +131,7 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
         return milestoneInstanceId;
     }
     
+    @Override
     public String getId() {
         return milestoneInstanceId;
     }

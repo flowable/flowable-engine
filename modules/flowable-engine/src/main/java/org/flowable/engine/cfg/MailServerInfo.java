@@ -18,6 +18,7 @@ package org.flowable.engine.cfg;
  *
  * @deprecated Use {@link org.flowable.common.engine.impl.cfg.mail.MailServerInfo}
  */
+@Deprecated
 public class MailServerInfo extends org.flowable.common.engine.impl.cfg.mail.MailServerInfo {
 
 }

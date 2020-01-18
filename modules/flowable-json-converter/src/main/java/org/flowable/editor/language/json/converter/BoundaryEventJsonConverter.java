@@ -276,6 +276,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         return null;
     }
     
+    @Override
     protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
         if (StringUtils.isNotEmpty(value)) {
             propertiesNode.put(name, value);

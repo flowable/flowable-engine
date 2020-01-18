@@ -21,6 +21,7 @@ package org.flowable.identitylink.service;
  * @author Joram Barrez
  * @deprecated use {@link org.flowable.identitylink.api.IdentityLinkType} instead
  */
+@Deprecated
 public class IdentityLinkType extends org.flowable.identitylink.api.IdentityLinkType {
 
 }

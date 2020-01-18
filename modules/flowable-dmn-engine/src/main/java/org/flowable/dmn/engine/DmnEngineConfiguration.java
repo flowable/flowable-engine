@@ -982,6 +982,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return customHitPolicyBehaviors;
     }
 
+    @Override
     public ObjectMapper getObjectMapper() {
         return dmnEngineObjectMapper;
     }

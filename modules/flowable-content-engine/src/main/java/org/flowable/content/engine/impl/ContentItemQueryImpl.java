@@ -334,6 +334,7 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
 
     // getters ////////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

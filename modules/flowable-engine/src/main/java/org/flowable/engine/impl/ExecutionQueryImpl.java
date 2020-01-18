@@ -957,6 +957,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return executionId;
     }
     
+    @Override
     public String getId() {
         return executionId;
     }

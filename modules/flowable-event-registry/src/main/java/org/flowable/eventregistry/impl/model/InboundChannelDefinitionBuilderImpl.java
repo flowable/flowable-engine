@@ -313,6 +313,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
             return channelDefinitionBuilder;
         }
 
+        @Override
         public InboundEventProcessingPipeline build() {
             if (customInboundEventProcessingPipeline != null) {
                 return customInboundEventProcessingPipeline;

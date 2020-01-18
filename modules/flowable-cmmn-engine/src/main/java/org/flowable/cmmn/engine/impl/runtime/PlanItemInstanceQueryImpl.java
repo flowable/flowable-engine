@@ -660,6 +660,7 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
     }
+    @Override
     public String getId() {
         return planItemInstanceId;
     }

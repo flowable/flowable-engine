@@ -86,6 +86,7 @@ public interface DelegateExecution extends VariableScope {
     /**
      * Returns the tenant id, if any is set before on the process definition or process instance.
      */
+    @Override
     String getTenantId();
 
     /**

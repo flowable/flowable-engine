@@ -769,6 +769,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         this.tenantId = tenantId;
     }
 
+    @Override
     public List<VariableInstanceEntity> getQueryVariables() {
         if (queryVariables == null && Context.getCommandContext() != null) {
             queryVariables = new VariableInitializingList();

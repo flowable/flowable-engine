@@ -71,6 +71,7 @@ public class ProcessDefinitionInfoCache implements DeploymentCache<ProcessDefini
         });
     }
 
+    @Override
     public ProcessDefinitionInfoCacheObject get(final String processDefinitionId) {
         ProcessDefinitionInfoCacheObject infoCacheObject = null;
         Command<ProcessDefinitionInfoCacheObject> cacheCommand = new Command<ProcessDefinitionInfoCacheObject>() {
@@ -95,14 +96,17 @@ public class ProcessDefinitionInfoCache implements DeploymentCache<ProcessDefini
         return cache.containsKey(id);
     }
 
+    @Override
     public void add(String id, ProcessDefinitionInfoCacheObject obj) {
         cache.put(id, obj);
     }
 
+    @Override
     public void remove(String id) {
         cache.remove(id);
     }
 
+    @Override
     public void clear() {
         cache.clear();
     }

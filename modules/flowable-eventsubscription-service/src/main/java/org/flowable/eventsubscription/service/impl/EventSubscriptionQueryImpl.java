@@ -262,6 +262,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
     // getters //////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }
