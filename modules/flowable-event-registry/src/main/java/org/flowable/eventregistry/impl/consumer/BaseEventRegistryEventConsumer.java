@@ -13,13 +13,13 @@
 package org.flowable.eventregistry.impl.consumer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +33,7 @@ import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 
@@ -134,13 +135,31 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
 
             }
 
-            // Note: the tenantId of the model, not the event instance.
-            // The event instance tenantId will always be the 'real' tenantId,
-            // but the event could have been deployed to the default tenant
-            // (which is reflected in the eventModel tenantId).
-            String eventModelTenantId = eventInstance.getEventModel().getTenantId();
-            if (eventModelTenantId != null && !Objects.equals(AbstractEngineConfiguration.NO_TENANT_ID, eventModelTenantId)) {
-                eventSubscriptionQuery.tenantId(eventModelTenantId);
+            String eventInstanceTenantId = eventInstance.getTenantId();
+            if (eventInstanceTenantId != null && !AbstractEngineConfiguration.NO_TENANT_ID.equals(eventInstanceTenantId)) {
+
+                EventRegistryEngineConfiguration eventRegistryConfiguration = CommandContextUtil.getEventRegistryConfiguration();
+
+                if (eventRegistryConfiguration.isFallbackToDefaultTenant()) {
+                    String defaultTenant = eventRegistryConfiguration.getDefaultTenantProvider()
+                        .getDefaultTenant(eventInstance.getTenantId(), scopeType, eventInstance.getEventModel().getKey());
+
+                    if (AbstractEngineConfiguration.NO_TENANT_ID.equals(defaultTenant)) {
+                        eventSubscriptionQuery.or()
+                            .tenantId(eventInstance.getTenantId())
+                            .withoutTenantId()
+                        .endOr();
+
+                    } else {
+                        eventSubscriptionQuery.tenantIds(Arrays.asList(eventInstanceTenantId, defaultTenant));
+
+                    }
+
+                } else {
+                    eventSubscriptionQuery.tenantId(eventInstanceTenantId);
+
+                }
+
             }
 
             return eventSubscriptionQuery.list();

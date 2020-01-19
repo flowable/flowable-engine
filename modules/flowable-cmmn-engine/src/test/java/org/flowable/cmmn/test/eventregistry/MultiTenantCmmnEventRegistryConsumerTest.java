@@ -332,6 +332,28 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
     }
 
     @Test
+    public void testCaseDefinitionInDefaultTenantAndEventListenerSubscriptionInSpecificTenant() {
+        // Case definition is in default tenant, event definition is in default tenant,
+        // yet the event subscription needs to have the specific tenant
+        deployCaseModel("eventListenerSameKey.cmmn", null);
+
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").fallbackToDefaultTenant().overrideCaseDefinitionTenantId(TENANT_A).tenantId(TENANT_A).start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").fallbackToDefaultTenant().overrideCaseDefinitionTenantId(TENANT_B).tenantId(TENANT_B).start();
+
+        // Event subscription should be for specific tenants
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_A, TENANT_B);
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_B);
+        assertThat(cmmnTaskService.createTaskQuery().list()).extracting(Task::getName).containsOnly("Task tenantA");
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list()).isEmpty();
+        assertThat(cmmnTaskService.createTaskQuery().list()).extracting(Task::getName).containsOnly("Task tenantA", "Task tenantB");
+
+    }
+
+    @Test
     public void testEventListenerForSpecificTenantEvent() {
         deployCaseModel("eventListenerTenantA.cmmn", TENANT_A);
         deployCaseModel("eventListenerTenantB.cmmn", TENANT_B);
