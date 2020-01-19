@@ -33,4 +33,4 @@ before_script:
   - echo MAVEN_OPTS=\"-Xmx2048m -Xms1024m -Djava.awt.headless=true\" > ~/.mavenrc
 
 script:
-  mvn test -Pdistro,errorLogging -DskipTests=false -B
+  mvn test -Pdistro,errorLogging -DskipTests=false -B -U
