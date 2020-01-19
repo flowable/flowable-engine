@@ -19,9 +19,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
@@ -29,6 +33,8 @@ import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 
 /**
  * @author Joram Barrez
@@ -37,9 +43,11 @@ import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventConsumer {
 
     protected AbstractEngineConfiguration engingeConfiguration;
+    protected CommandExecutor commandExecutor;
 
     public BaseEventRegistryEventConsumer(AbstractEngineConfiguration engingeConfiguration) {
         this.engingeConfiguration = engingeConfiguration;
+        this.commandExecutor = engingeConfiguration.getCommandExecutor();
     }
 
     @Override
@@ -104,5 +112,42 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         }
         return result;
     }
+
+    protected List<EventSubscription> findEventSubscriptions(String scopeType, EventInstance eventInstance,  Collection<CorrelationKey> correlationKeys) {
+        return commandExecutor.execute(commandContext -> {
+
+            EventSubscriptionQuery eventSubscriptionQuery = createEventSubscriptionQuery()
+                .eventType(eventInstance.getEventModel().getKey())
+                .scopeType(scopeType);
+
+            if (!correlationKeys.isEmpty()) {
+
+                Set<String> allCorrelationKeyValues = correlationKeys.stream().map(CorrelationKey::getValue).collect(Collectors.toSet());
+
+                eventSubscriptionQuery.or()
+                    .withoutConfiguration()
+                    .configurations(allCorrelationKeyValues)
+                    .endOr();
+
+            } else {
+                eventSubscriptionQuery.withoutConfiguration();
+
+            }
+
+            // Note: the tenantId of the model, not the event instance.
+            // The event instance tenantId will always be the 'real' tenantId,
+            // but the event could have been deployed to the default tenant
+            // (which is reflected in the eventModel tenantId).
+            String eventModelTenantId = eventInstance.getEventModel().getTenantId();
+            if (eventModelTenantId != null && !Objects.equals(AbstractEngineConfiguration.NO_TENANT_ID, eventModelTenantId)) {
+                eventSubscriptionQuery.tenantId(eventModelTenantId);
+            }
+
+            return eventSubscriptionQuery.list();
+
+        });
+    }
+
+    protected abstract EventSubscriptionQuery createEventSubscriptionQuery();
 
 }
