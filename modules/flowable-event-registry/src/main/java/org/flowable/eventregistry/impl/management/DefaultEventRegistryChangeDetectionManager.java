@@ -12,7 +12,7 @@
  */
 package org.flowable.eventregistry.impl.management;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +51,7 @@ public class DefaultEventRegistryChangeDetectionManager implements EventRegistry
         
         Set<String> channelDefinitionCacheIds = new HashSet<>();
         EventDeploymentManager deploymentManager = eventRegistryEngineConfiguration.getDeploymentManager();
-        Collection<ChannelDefinitionCacheEntry> cacheEntries = deploymentManager.getChannelDefinitionCache().getAll();
+        List<ChannelDefinitionCacheEntry> cacheEntries = new ArrayList<>(deploymentManager.getChannelDefinitionCache().getAll());
         for (ChannelDefinitionCacheEntry channelDefinitionCacheEntry : cacheEntries) {
             channelDefinitionCacheIds.add(channelDefinitionCacheEntry.getChannelDefinitionEntity().getId());
         }
