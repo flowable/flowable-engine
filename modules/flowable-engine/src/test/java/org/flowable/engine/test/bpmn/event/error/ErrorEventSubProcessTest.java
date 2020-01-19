@@ -18,6 +18,7 @@ import java.util.Map;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -80,6 +81,24 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
     public void testCatchErrorThrownByScriptTaskInTopLevelProcess() {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInTopLevelProcess").getId();
         assertThatErrorHasBeenCaught(procId);
+    }
+    
+    @Test
+    @Deployment
+    public void testMultipleCatchErrorInTopLevelProcess() {
+        String procId = runtimeService.startProcessInstanceByKey("MultipleCatchErrorInTopLevelProcess").getId();
+        Task task = taskService.createTaskQuery().processInstanceId(procId).singleResult();
+        assertNotNull(task);
+        assertEquals("taskAfterErrorCatch2", task.getTaskDefinitionKey());
+    }
+    
+    @Test
+    @Deployment
+    public void testMultipleCatchErrorInTopLevelProcessFirst() {
+        String procId = runtimeService.startProcessInstanceByKey("MultipleCatchErrorInTopLevelProcess").getId();
+        Task task = taskService.createTaskQuery().processInstanceId(procId).singleResult();
+        assertNotNull(task);
+        assertEquals("taskAfterErrorCatch", task.getTaskDefinitionKey());
     }
 
     @Test

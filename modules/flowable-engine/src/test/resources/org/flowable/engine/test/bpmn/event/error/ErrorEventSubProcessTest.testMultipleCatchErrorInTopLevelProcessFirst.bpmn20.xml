@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" 
+	targetNamespace="Examples">
+	
+	<process id="MultipleCatchErrorInTopLevelProcess">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="scriptTask" />
+
+	    <scriptTask id="scriptTask" scriptFormat="groovy">
+	      	<script>
+	        	throw new org.flowable.engine.delegate.BpmnError("myError");
+	      	</script>
+	    </scriptTask>
+
+    	<sequenceFlow id="flow3" sourceRef="scriptTask" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+    
+	    <subProcess id="eventSubProcess" triggeredByEvent="true">
+	      	<startEvent id="catchError">
+	        	<errorEventDefinition errorRef="myError" />
+	      	</startEvent>
+            <startEvent id="catchError2">
+                <errorEventDefinition errorRef="error123" />
+            </startEvent>
+	      	<sequenceFlow id="flow2" sourceRef="catchError" targetRef="taskAfterErrorCatch" />
+	      	<userTask id="taskAfterErrorCatch" name="Escalated Task" />
+            
+            <sequenceFlow id="flow4" sourceRef="catchError2" targetRef="taskAfterErrorCatch2" />
+            <userTask id="taskAfterErrorCatch2" name="Escalated Task2" />
+	    </subProcess>
+
+	</process>
+
+</definitions>

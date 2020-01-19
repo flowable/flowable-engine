@@ -230,8 +230,16 @@ public class ErrorPropagation {
             }
 
             ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
-            eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess() != null ? event.getSubProcess() : event);
-            CommandContextUtil.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
+            if (event.getSubProcess() != null) {
+                eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess());
+                ExecutionEntity subProcessStartEventExecution = executionEntityManager.createChildExecution(eventSubProcessExecution);
+                subProcessStartEventExecution.setCurrentFlowElement(event);
+                CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessStartEventExecution);
+                
+            } else {
+                eventSubProcessExecution.setCurrentFlowElement(event);
+                CommandContextUtil.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
+            }
 
         } else {
             ExecutionEntity boundaryExecution = null;
