@@ -1459,7 +1459,7 @@
         "ifpartconditionpackage",
         "triggermodepackage"],
       "hiddenPropertyPackages" : [ ],
-      "roles" : [ "association_start", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
+      "roles" : [ "association_start", "association_end", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
     }, {
       "type" : "edge",
       "id" : "Association",
