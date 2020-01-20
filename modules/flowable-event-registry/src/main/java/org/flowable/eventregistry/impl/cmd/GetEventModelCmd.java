@@ -47,14 +47,10 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
         this.eventDefinitionId = eventDefinitionId;
     }
 
-    public GetEventModelCmd(String eventDefinitionKey, String eventDefinitionId, String tenantId) {
-        this(eventDefinitionKey, eventDefinitionId);
-        this.tenantId = tenantId;
-    }
-
-    public GetEventModelCmd(String eventDefinitionKey, String eventDefinitionId, String tenantId, String parentDeploymentId) {
-        this(eventDefinitionKey, eventDefinitionId, tenantId);
+    public GetEventModelCmd(String eventDefinitionKey, String tenantId, String parentDeploymentId) {
+        this(eventDefinitionKey, null);
         this.parentDeploymentId = parentDeploymentId;
+        this.tenantId = tenantId;
     }
 
     @Override

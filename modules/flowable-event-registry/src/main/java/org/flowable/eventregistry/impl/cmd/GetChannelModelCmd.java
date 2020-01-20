@@ -47,13 +47,9 @@ public class GetChannelModelCmd implements Command<ChannelModel>, Serializable {
         this.channelDefinitionId = channelDefinitionId;
     }
 
-    public GetChannelModelCmd(String channelDefinitionKey, String channelDefinitionId, String tenantId) {
-        this(channelDefinitionKey, channelDefinitionId);
+    public GetChannelModelCmd(String channelDefinitionKey, String tenantId, String parentDeploymentId) {
+        this(channelDefinitionKey, null);
         this.tenantId = tenantId;
-    }
-
-    public GetChannelModelCmd(String channelDefinitionKey, String channelDefinitionId, String tenantId, String parentDeploymentId) {
-        this(channelDefinitionKey, channelDefinitionId, tenantId);
         this.parentDeploymentId = parentDeploymentId;
     }
 

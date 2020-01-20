@@ -165,17 +165,17 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
     
     @Override
     public EventModel getEventModelByKey(String eventDefinitionKey, String tenantId) {
-        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, tenantId));
+        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, tenantId, null));
     }
 
     @Override
     public EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId) {
-        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, null, parentDeploymentId));
+        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, parentDeploymentId));
     }
 
     @Override
     public EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId, String tenantId) {
-        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, tenantId, parentDeploymentId));
+        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, tenantId, parentDeploymentId));
     }
     
     @Override
@@ -190,17 +190,17 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
 
     @Override
     public ChannelModel getChannelModelByKey(String channelDefinitionKey, String tenantId) {
-        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null));
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, tenantId, null));
     }
 
     @Override
     public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId) {
-        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, null, parentDeploymentId));
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, parentDeploymentId));
     }
 
     @Override
     public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId, String tenantId) {
-        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, tenantId, parentDeploymentId));
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, tenantId, parentDeploymentId));
     }
 
     @Override
