@@ -396,54 +396,55 @@ class KafkaChannelDefinitionProcessorTest {
     void eventShouldBeSendAfterOutboundChannelDefinitionIsRegistered() throws Exception {
         createTopic("outbound-customer");
 
-        Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient");
-        consumer.subscribe(Collections.singleton("outbound-customer"));
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            consumer.subscribe(Collections.singleton("outbound-customer"));
 
-        eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("customer")
-            .outboundChannelKey("outboundCustomer")
-            .correlationParameter("customer", EventPayloadTypes.STRING)
-            .payload("name", EventPayloadTypes.STRING)
-            .deploy();
+            eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("customer")
+                .outboundChannelKey("outboundCustomer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
 
-        eventRepositoryService.createOutboundChannelModelBuilder()
-            .key("outboundCustomer")
-            .resourceName("outboundCustomer.channel")
-            .kafkaChannelAdapter("outbound-customer")
-            .recordKey("customer")
-            .eventProcessingPipeline()
-            .jsonSerializer()
-            .deploy();
+            eventRepositoryService.createOutboundChannelModelBuilder()
+                .key("outboundCustomer")
+                .resourceName("outboundCustomer.channel")
+                .kafkaChannelAdapter("outbound-customer")
+                .recordKey("customer")
+                .eventProcessingPipeline()
+                .jsonSerializer()
+                .deploy();
 
-        EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+            EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
 
-        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
-        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
-        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
 
-        ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
-        assertThat(records).isEmpty();
-        consumer.commitSync();
-        consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
 
-        eventRegistry.sendEventOutbound(kermitEvent);
+            eventRegistry.sendEventOutbound(kermitEvent);
 
-        records = consumer.poll(Duration.ofSeconds(2));
+            records = consumer.poll(Duration.ofSeconds(2));
 
-        assertThat(records)
-            .hasSize(1)
-            .first()
-            .isNotNull()
-            .satisfies(record -> {
-                assertThat(record.key()).isEqualTo("customer");
-                assertThatJson(record.value())
-                    .isEqualTo("{"
-                        + "  customer: 'kermit',"
-                        + "  name: 'Kermit the Frog'"
-                        + "}");
-            });
+            assertThat(records)
+                .hasSize(1)
+                .first()
+                .isNotNull()
+                .satisfies(record -> {
+                    assertThat(record.key()).isEqualTo("customer");
+                    assertThatJson(record.value())
+                        .isEqualTo("{"
+                            + "  customer: 'kermit',"
+                            + "  name: 'Kermit the Frog'"
+                            + "}");
+                });
+        }
     }
 
     @Test

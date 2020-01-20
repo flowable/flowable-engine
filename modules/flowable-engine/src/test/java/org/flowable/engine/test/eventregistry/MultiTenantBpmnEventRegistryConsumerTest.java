@@ -344,6 +344,31 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
     }
 
     @Test
+    public void testProcessDefinitionInDefaultTenantAndBoundaryEventSubscriptionInSpecificTenant() {
+        deployProcessModel("boundaryEventSameKey.bpmn20.xml", null);
+
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").fallbackToDefaultTenant().overrideProcessDefinitionTenantId(TENANT_A).start();
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").fallbackToDefaultTenant().overrideProcessDefinitionTenantId(TENANT_B).start();
+
+        // Event subscription should be for specific tenants
+        assertThat(runtimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_A, TENANT_B);
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("no_correlation", TENANT_A);
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("no_correlation", TENANT_B);
+        assertThat(runtimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_A, TENANT_B);
+        assertThat(taskService.createTaskQuery().list()).extracting(Task::getName).containsOnly("Task with boundary event", "Task with boundary event");
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("abc", TENANT_A); // abc = correlation
+        assertThat(runtimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_B);
+        assertThat(taskService.createTaskQuery().list()).extracting(Task::getName).containsOnly("Task with boundary event", "Task tenantA");
+
+        ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("abc", TENANT_B);
+        assertThat(runtimeService.createEventSubscriptionQuery().list()).isEmpty();
+        assertThat(taskService.createTaskQuery().list()).extracting(Task::getName).containsOnly("Task tenantA", "Task tenantB");
+
+    }
+
+    @Test
     public void testBoundaryEventWithSpecificTenantEvent() {
         // Note that both events correlate on 'customerId' being 'ABC'
         deployProcessModel("boundaryEventTenantA.bpmn20.xml", TENANT_A);

@@ -16,8 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
@@ -27,14 +25,13 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.impl.consumer.BaseEventRegistryEventConsumer;
 import org.flowable.eventregistry.impl.consumer.CorrelationKey;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
-import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +44,10 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     private static Logger LOGGER = LoggerFactory.getLogger(CmmnEventRegistryEventConsumer.class);
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    protected CommandExecutor commandExecutor;
 
     public CmmnEventRegistryEventConsumer(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
-        this.commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
     }
     
     @Override
@@ -69,66 +64,12 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         // should not influence (i.e. roll back) the handling of another.
 
         Collection<CorrelationKey> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
-
-        // Always execute the events without a correlation key
-        List<EventSubscription> eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(eventInstance);
+        List<EventSubscription> eventSubscriptions = findEventSubscriptions(ScopeTypes.CMMN, eventInstance, correlationKeys);
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
             handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys);
         }
 
-        if (!correlationKeys.isEmpty()) {
-            // If there are correlation keys then look for all event subscriptions matching them
-            eventSubscriptions = findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(eventInstance, correlationKeys);
-            for (EventSubscription eventSubscription : eventSubscriptions) {
-                handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys);
-            }
-        }
-
-    }
-
-    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndNoCorrelations(EventInstance eventInstance) {
-        return commandExecutor.execute(commandContext -> {
-            EventSubscriptionQueryImpl eventSubscriptionQuery = new EventSubscriptionQueryImpl(commandContext)
-                .eventType(eventInstance.getEventModel().getKey())
-                .withoutConfiguration()
-                .scopeType(ScopeTypes.CMMN);
-
-            // Note: the tenantId of the model, not the event instance.
-            // The event instance tenantId will always be the 'real' tenantId,
-            // but the event could have been deployed to the default tenant
-            // (which is reflected in the eventModel tenantId).
-            String eventModelTenantId = eventInstance.getEventModel().getTenantId();
-            if (eventModelTenantId != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventModelTenantId)) {
-                eventSubscriptionQuery.tenantId(eventModelTenantId);
-            }
-
-            return CommandContextUtil.getEventSubscriptionEntityManager(commandContext)
-                .findEventSubscriptionsByQueryCriteria(eventSubscriptionQuery);
-
-        });
-    }
-
-    protected List<EventSubscription> findEventSubscriptionsByEventDefinitionKeyAndCorrelationKeys(EventInstance eventInstance, Collection<CorrelationKey> correlationKeys) {
-        Set<String> correlationKeyValues = correlationKeys.stream().map(CorrelationKey::getValue).collect(Collectors.toSet());
-
-        return commandExecutor.execute(commandContext -> {
-            EventSubscriptionQueryImpl eventSubscriptionQuery = new EventSubscriptionQueryImpl(commandContext)
-                .eventType(eventInstance.getEventModel().getKey())
-                .configurations(correlationKeyValues)
-                .scopeType(ScopeTypes.CMMN);
-
-            // Note: the tenantId of the model, not the event instance.
-            // The event instance tenantId will always be the 'real' tenantId,
-            // but the event could have been deployed to the default tenant
-            // (which is reflected in the eventModel tenantId).
-            String eventModelTenantId = eventInstance.getEventModel().getTenantId();
-            if (eventModelTenantId != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventModelTenantId)) {
-                eventSubscriptionQuery.tenantId(eventModelTenantId);
-            }
-
-            return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(eventSubscriptionQuery);
-        });
     }
 
     protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
@@ -153,11 +94,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
             if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                caseInstanceBuilder.tenantId(eventInstance.getTenantId());
-
-                if (!Objects.equals(eventInstance.getTenantId(), eventInstance.getEventModel().getTenantId())) {
-                    caseInstanceBuilder.overrideCaseDefinitionTenantId(eventInstance.getTenantId());
-                }
+                caseInstanceBuilder.overrideCaseDefinitionTenantId(eventInstance.getTenantId());
             }
 
             if (correlationKeys != null) {
@@ -200,6 +137,11 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             }
         }
         return null;
+    }
+
+    @Override
+    protected EventSubscriptionQuery createEventSubscriptionQuery() {
+        return new EventSubscriptionQueryImpl(commandExecutor);
     }
 
 }

@@ -13,15 +13,19 @@
 package org.flowable.eventregistry.impl.consumer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
@@ -29,6 +33,9 @@ import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.util.CommandContextUtil;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 
 /**
  * @author Joram Barrez
@@ -37,9 +44,11 @@ import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventConsumer {
 
     protected AbstractEngineConfiguration engingeConfiguration;
+    protected CommandExecutor commandExecutor;
 
     public BaseEventRegistryEventConsumer(AbstractEngineConfiguration engingeConfiguration) {
         this.engingeConfiguration = engingeConfiguration;
+        this.commandExecutor = engingeConfiguration.getCommandExecutor();
     }
 
     @Override
@@ -104,5 +113,60 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         }
         return result;
     }
+
+    protected List<EventSubscription> findEventSubscriptions(String scopeType, EventInstance eventInstance,  Collection<CorrelationKey> correlationKeys) {
+        return commandExecutor.execute(commandContext -> {
+
+            EventSubscriptionQuery eventSubscriptionQuery = createEventSubscriptionQuery()
+                .eventType(eventInstance.getEventModel().getKey())
+                .scopeType(scopeType);
+
+            if (!correlationKeys.isEmpty()) {
+
+                Set<String> allCorrelationKeyValues = correlationKeys.stream().map(CorrelationKey::getValue).collect(Collectors.toSet());
+
+                eventSubscriptionQuery.or()
+                    .withoutConfiguration()
+                    .configurations(allCorrelationKeyValues)
+                    .endOr();
+
+            } else {
+                eventSubscriptionQuery.withoutConfiguration();
+
+            }
+
+            String eventInstanceTenantId = eventInstance.getTenantId();
+            if (eventInstanceTenantId != null && !AbstractEngineConfiguration.NO_TENANT_ID.equals(eventInstanceTenantId)) {
+
+                EventRegistryEngineConfiguration eventRegistryConfiguration = CommandContextUtil.getEventRegistryConfiguration();
+
+                if (eventRegistryConfiguration.isFallbackToDefaultTenant()) {
+                    String defaultTenant = eventRegistryConfiguration.getDefaultTenantProvider()
+                        .getDefaultTenant(eventInstance.getTenantId(), scopeType, eventInstance.getEventModel().getKey());
+
+                    if (AbstractEngineConfiguration.NO_TENANT_ID.equals(defaultTenant)) {
+                        eventSubscriptionQuery.or()
+                            .tenantId(eventInstance.getTenantId())
+                            .withoutTenantId()
+                        .endOr();
+
+                    } else {
+                        eventSubscriptionQuery.tenantIds(Arrays.asList(eventInstanceTenantId, defaultTenant));
+
+                    }
+
+                } else {
+                    eventSubscriptionQuery.tenantId(eventInstanceTenantId);
+
+                }
+
+            }
+
+            return eventSubscriptionQuery.list();
+
+        });
+    }
+
+    protected abstract EventSubscriptionQuery createEventSubscriptionQuery();
 
 }

@@ -27,7 +27,6 @@ public class EventModel {
     protected Collection<String> outboundChannelKeys = new ArrayList<>();
     protected Collection<EventCorrelationParameter> correlationParameters = new ArrayList<>();
     protected Collection<EventPayload> payload = new ArrayList<>();
-    protected String tenantId;
 
     public String getKey() {
         return key;
@@ -85,11 +84,4 @@ public class EventModel {
         this.payload = payload;
     }
 
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
 }

@@ -102,7 +102,13 @@
 	  </if> 
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
-      </if>  
+      </if>
+      <if test="tenantIds != null and !tenantIds.isEmpty()">
+        and RES.TENANT_ID_ in
+        <foreach item="item" index="index" collection="tenantIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+      </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>        
@@ -118,6 +124,74 @@
       <if test="withoutConfiguration">
           and RES.CONFIGURATION_ is null
       </if>
+      <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
+          and
+          <trim prefix="(" prefixOverrides="OR" suffix=")">
+              <if test="orQueryObject.id != null">
+                  RES.ID_ = #{orQueryObject.id}
+              </if>
+              <if test="orQueryObject.eventType != null">
+                  or RES.EVENT_TYPE_ = #{orQueryObject.eventType}
+              </if>
+              <if test="orQueryObject.eventName != null">
+                  or RES.EVENT_NAME_ = #{orQueryObject.eventName}
+              </if>
+              <if test="orQueryObject.executionId != null">
+                  or RES.EXECUTION_ID_ = #{orQueryObject.executionId}
+              </if>
+              <if test="orQueryObject.processInstanceId != null">
+                  or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId}
+              </if>
+              <if test="orQueryObject.processDefinitionId != null">
+                  or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}
+              </if>
+              <if test="orQueryObject.activityId != null">
+                  or RES.ACTIVITY_ID_ = #{orQueryObject.activityId}
+              </if>
+              <if test="orQueryObject.subScopeId != null">
+                  or RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId}
+              </if>
+              <if test="orQueryObject.scopeId != null">
+                  or RES.SCOPE_ID_ = #{orQueryObject.scopeId}
+              </if>
+              <if test="orQueryObject.scopeDefinitionId != null">
+                  or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+              </if>
+              <if test="orQueryObject.scopeType != null">
+                  or RES.SCOPE_TYPE_ = #{orQueryObject.scopeType}
+              </if>
+              <if test="orQueryObject.createdBefore != null">
+                  or RES.CREATED_ &lt; #{orQueryObject.createdBefore}
+              </if>
+              <if test="orQueryObject.createdAfter != null">
+                  or RES.CREATED_ &gt; #{orQueryObject.createdAfter}
+              </if>
+              <if test="orQueryObject.tenantId != null">
+                  or RES.TENANT_ID_ = #{orQueryObject.tenantId}
+              </if>
+              <if test="orQueryObject.tenantIds != null and !orQueryObject.tenantIds.isEmpty()">
+                  or RES.TENANT_ID_ in
+                  <foreach item="item" index="index" collection="orQueryObject.tenantIds" open="(" separator="," close=")">
+                      #{item}
+                  </foreach>
+              </if>
+              <if test="orQueryObject.withoutTenantId">
+                  or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+              </if>
+              <if test="orQueryObject.configuration != null">
+                  or RES.CONFIGURATION_ = #{orQueryObject.configuration}
+              </if>
+              <if test="orQueryObject.configurations != null and !orQueryObject.configurations.isEmpty()">
+                  or RES.CONFIGURATION_ in
+                  <foreach item="item" index="index" collection="orQueryObject.configurations" open="(" separator="," close=")">
+                      #{item}
+                  </foreach>
+              </if>
+              <if test="orQueryObject.withoutConfiguration">
+                  or RES.CONFIGURATION_ is null
+              </if>
+          </trim>  
+      </foreach>
     </where>
   </sql>
   
