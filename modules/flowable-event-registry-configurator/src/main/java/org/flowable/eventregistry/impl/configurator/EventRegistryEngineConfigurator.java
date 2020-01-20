@@ -66,7 +66,7 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
     }
 
     protected void initialiseEventRegistryEngineConfiguration(EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
-        // mean to be overridden
+        // meant to be overridden
     }
 
     @Override
