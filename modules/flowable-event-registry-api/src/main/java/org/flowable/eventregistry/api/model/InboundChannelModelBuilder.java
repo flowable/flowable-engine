@@ -97,7 +97,7 @@ public interface InboundChannelModelBuilder {
 
     /**
      * Creates the {@link InboundChannelModel} instance based on the configuration
-     * and registers it with the {@link org.flowable.eventregistry.api.EventRegistry}.
+     * and registers it with the {@link org.flowable.eventregistry.api.EventRepositoryService EventRepositoryService}.
      */
     EventDeployment deploy();
 

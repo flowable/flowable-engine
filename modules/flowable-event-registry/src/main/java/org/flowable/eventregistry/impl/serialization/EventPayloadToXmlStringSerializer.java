@@ -66,8 +66,4 @@ public class EventPayloadToXmlStringSerializer implements OutboundEventSerialize
         }
     }
 
-    @Override
-    public String getType() {
-        return "xml";
-    }
 }

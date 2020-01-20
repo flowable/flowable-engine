@@ -44,8 +44,6 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
     protected String parentDeploymentId;
     protected String deploymentTenantId;
     protected String key;
-    protected OutboundEventChannelAdapter outboundEventChannelAdapter;
-    protected OutboundEventProcessingPipelineBuilder outboundEventProcessingPipelineBuilder;
 
     public OutboundChannelDefinitionBuilderImpl(EventRepositoryService eventRepository) {
         this.eventRepository = eventRepository;
@@ -89,9 +87,10 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
     
     @Override
     public OutboundEventProcessingPipelineBuilder channelAdapter(OutboundEventChannelAdapter outboundEventChannelAdapter) {
-        this.outboundEventChannelAdapter = outboundEventChannelAdapter;
-        this.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRepository, this);
-        return this.outboundEventProcessingPipelineBuilder;
+        OutboundChannelModel channelDefinition = new OutboundChannelModel();
+        channelDefinition.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
+        this.channelDefinition = new OutboundChannelModel();
+        return new OutboundEventProcessingPipelineBuilderImpl(this, channelDefinition);
     }
 
     @Override
@@ -149,15 +148,6 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
         }
 
         outboundChannelModel.setKey(key);
-        outboundChannelModel.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
-
-        OutboundEventProcessingPipeline outboundEventProcessingPipeline = this.outboundEventProcessingPipelineBuilder.build();
-        outboundChannelModel.setOutboundEventProcessingPipeline(outboundEventProcessingPipeline);
-        
-        OutboundEventSerializer eventSerializer = outboundEventProcessingPipeline.getOutboundEventSerializer();
-        if (eventSerializer != null) {
-            outboundChannelModel.setSerializerType(eventSerializer.getType());
-        }
 
         return outboundChannelModel;
     }
@@ -179,8 +169,7 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
 
         @Override
         public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
-            outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRepositoryService, outboundChannelDefinitionBuilder);
-            return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
+            return new OutboundEventProcessingPipelineBuilderImpl(outboundChannelDefinitionBuilder, jmsChannel);
         }
     }
 
@@ -207,9 +196,7 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
 
         @Override
         public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
-            outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRepositoryService,
-                outboundChannelDefinitionBuilder);
-            return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
+            return new OutboundEventProcessingPipelineBuilderImpl(outboundChannelDefinitionBuilder, rabbitChannel);
         }
     }
 
@@ -236,58 +223,44 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
 
         @Override
         public OutboundEventProcessingPipelineBuilder eventProcessingPipeline() {
-            outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder = new OutboundEventProcessingPipelineBuilderImpl(eventRepositoryService,
-                outboundChannelDefinitionBuilder);
-            return outboundChannelDefinitionBuilder.outboundEventProcessingPipelineBuilder;
+            return new OutboundEventProcessingPipelineBuilderImpl(outboundChannelDefinitionBuilder, kafkaChannel);
         }
     }
 
     public static class OutboundEventProcessingPipelineBuilderImpl implements OutboundEventProcessingPipelineBuilder {
 
-        protected EventRepositoryService eventRepositoryService;
         protected OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder;
 
-        protected OutboundEventSerializer outboundEventSerializer;
-        protected OutboundEventProcessingPipeline customOutboundEventProcessingPipeline;
+        protected OutboundChannelModel outboundChannel;
 
-        public OutboundEventProcessingPipelineBuilderImpl(EventRepositoryService eventRepositoryService,
-                        OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder) {
-            
-            this.eventRepositoryService = eventRepositoryService;
+        public OutboundEventProcessingPipelineBuilderImpl(OutboundChannelDefinitionBuilderImpl outboundChannelDefinitionBuilder,
+            OutboundChannelModel outboundChannel) {
             this.outboundChannelDefinitionBuilder = outboundChannelDefinitionBuilder;
+            this.outboundChannel = outboundChannel;
         }
 
         @Override
         public OutboundChannelModelBuilder jsonSerializer() {
-            this.outboundEventSerializer = new EventPayloadToJsonStringSerializer();
-            return outboundChannelDefinitionBuilder;
+            this.outboundChannel.setSerializerType("json");
+            return serializer(new EventPayloadToJsonStringSerializer());
         }
 
         @Override
         public OutboundChannelModelBuilder xmlSerializer() {
-            this.outboundEventSerializer = new EventPayloadToXmlStringSerializer();
-            return outboundChannelDefinitionBuilder;
+            this.outboundChannel.setSerializerType("xml");
+            return serializer(new EventPayloadToXmlStringSerializer());
         }
 
         @Override
         public OutboundChannelModelBuilder serializer(OutboundEventSerializer serializer) {
-            this.outboundEventSerializer = serializer;
+            this.outboundChannel.setOutboundEventProcessingPipeline(new DefaultOutboundEventProcessingPipeline(serializer));
             return outboundChannelDefinitionBuilder;
         }
 
         @Override
         public OutboundChannelModelBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline) {
-            this.customOutboundEventProcessingPipeline = outboundEventProcessingPipeline;
+            outboundChannel.setOutboundEventProcessingPipeline(outboundEventProcessingPipeline);
             return outboundChannelDefinitionBuilder;
-        }
-
-        @Override
-        public OutboundEventProcessingPipeline build() {
-            if (customOutboundEventProcessingPipeline != null) {
-                return customOutboundEventProcessingPipeline;
-            } else {
-                return new DefaultOutboundEventProcessingPipeline(eventRepositoryService, outboundEventSerializer);
-            }
         }
 
     }

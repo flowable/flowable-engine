@@ -37,23 +37,23 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
                     EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof OutboundChannelModel) {
-            registerChannelModel((OutboundChannelModel) channelModel, eventRepositoryService);
+            registerChannelModel((OutboundChannelModel) channelModel);
         }
 
     }
 
-    protected void registerChannelModel(OutboundChannelModel inboundChannelModel, EventRepositoryService eventRepositoryService) {
+    protected void registerChannelModel(OutboundChannelModel inboundChannelModel) {
         if (inboundChannelModel.getOutboundEventProcessingPipeline() == null) {
 
             OutboundEventProcessingPipeline eventProcessingPipeline;
 
             if ("json".equals(inboundChannelModel.getSerializerType())) {
                 OutboundEventSerializer eventSerializer = new EventPayloadToJsonStringSerializer();
-                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventRepositoryService, eventSerializer);
+                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventSerializer);
                 
             } else if ("xml".equals(inboundChannelModel.getSerializerType())) {
                 OutboundEventSerializer eventSerializer = new EventPayloadToXmlStringSerializer();
-                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventRepositoryService, eventSerializer);
+                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventSerializer);
                 
             } else {
                 eventProcessingPipeline = null;

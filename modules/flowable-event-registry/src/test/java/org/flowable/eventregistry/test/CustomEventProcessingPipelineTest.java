@@ -166,10 +166,6 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             return rawEvent;
         }
 
-        @Override
-        public String getType() {
-            return "test";
-        }
     }
 
     private static class TestInboundEventKeyDetector implements InboundEventKeyDetector<String> {
@@ -256,10 +252,6 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             return "test";
         }
 
-        @Override
-        public String getType() {
-            return "test";
-        }
     }
 
 }

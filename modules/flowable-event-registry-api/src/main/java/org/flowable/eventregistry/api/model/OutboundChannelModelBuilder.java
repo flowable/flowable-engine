@@ -147,11 +147,6 @@ public interface OutboundChannelModelBuilder {
          */
         OutboundChannelModelBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline);
 
-        /**
-         * Finishes building the pipeline.
-         */
-        OutboundEventProcessingPipeline build();
-
     }
 
 }

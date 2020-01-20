@@ -22,9 +22,4 @@ public interface InboundEventProcessingPipeline {
 
     Collection<EventRegistryEvent> run(String channelKey, String rawEvent);
     
-    InboundEventDeserializer<?> getInboundEventDeserializer();
-    
-    InboundEventKeyDetector<?> getInboundEventKeyDetector();
-
-    InboundEventTenantDetector<?> getInboundEventTenantDetector();
 }

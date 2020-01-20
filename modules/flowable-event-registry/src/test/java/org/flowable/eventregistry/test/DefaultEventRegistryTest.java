@@ -192,11 +192,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                     throw new UncheckedIOException(e);
                 }
             }
-            
-            @Override
-            public String getType() {
-                return "test";
-            }
+
         });
         
         inboundEventProcessingPipeline.setInboundEventKeyDetector(Customer::getType);
