@@ -12,7 +12,6 @@
  */
 package org.flowable.eventregistry.impl.model;
 
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
@@ -123,7 +122,7 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
     @Override
     public EventDeployment deploy() {
         if (resourceName == null) {
-            throw new FlowableIllegalArgumentException("A resource name is mandatory");
+            resourceName = "outbound-" + key + ".channel";
         }
         
         ChannelModel channelModel = buildChannelModel();

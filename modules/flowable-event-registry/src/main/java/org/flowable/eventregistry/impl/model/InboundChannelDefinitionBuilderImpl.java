@@ -15,7 +15,6 @@ package org.flowable.eventregistry.impl.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
@@ -151,7 +150,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
     @Override
     public EventDeployment deploy() {
         if (resourceName == null) {
-            throw new FlowableIllegalArgumentException("A resource name is mandatory");
+            resourceName = "inbound-" + key + ".channel";
         }
         
         ChannelModel channelModel = buildChannelModel();
