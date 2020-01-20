@@ -14,15 +14,10 @@ package org.flowable.eventregistry.impl.model;
 
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
-import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
-import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
-import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.api.model.OutboundChannelModelBuilder;
-import org.flowable.eventregistry.impl.pipeline.DefaultOutboundEventProcessingPipeline;
-import org.flowable.eventregistry.impl.serialization.EventPayloadToJsonStringSerializer;
-import org.flowable.eventregistry.impl.serialization.EventPayloadToXmlStringSerializer;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.DelegateExpressionOutboundChannelModel;
 import org.flowable.eventregistry.model.JmsOutboundChannelModel;
 import org.flowable.eventregistry.model.KafkaOutboundChannelModel;
 import org.flowable.eventregistry.model.OutboundChannelModel;
@@ -85,10 +80,10 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
     }
     
     @Override
-    public OutboundEventProcessingPipelineBuilder channelAdapter(OutboundEventChannelAdapter outboundEventChannelAdapter) {
-        OutboundChannelModel channelDefinition = new OutboundChannelModel();
-        channelDefinition.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
-        this.channelDefinition = new OutboundChannelModel();
+    public OutboundEventProcessingPipelineBuilder channelAdapter(String delegateExpression) {
+        DelegateExpressionOutboundChannelModel channelDefinition = new DelegateExpressionOutboundChannelModel();
+        channelDefinition.setAdapterDelegateExpression(delegateExpression);
+        this.channelDefinition = channelDefinition;
         return new OutboundEventProcessingPipelineBuilderImpl(this, channelDefinition);
     }
 
@@ -241,24 +236,25 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
         @Override
         public OutboundChannelModelBuilder jsonSerializer() {
             this.outboundChannel.setSerializerType("json");
-            return serializer(new EventPayloadToJsonStringSerializer());
+            return outboundChannelDefinitionBuilder;
         }
 
         @Override
         public OutboundChannelModelBuilder xmlSerializer() {
             this.outboundChannel.setSerializerType("xml");
-            return serializer(new EventPayloadToXmlStringSerializer());
-        }
-
-        @Override
-        public OutboundChannelModelBuilder serializer(OutboundEventSerializer serializer) {
-            this.outboundChannel.setOutboundEventProcessingPipeline(new DefaultOutboundEventProcessingPipeline(serializer));
             return outboundChannelDefinitionBuilder;
         }
 
         @Override
-        public OutboundChannelModelBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline) {
-            outboundChannel.setOutboundEventProcessingPipeline(outboundEventProcessingPipeline);
+        public OutboundChannelModelBuilder delegateExpressionSerializer(String delegateExpression) {
+            this.outboundChannel.setSerializerType("expression");
+            this.outboundChannel.setSerializerDelegateExpression(delegateExpression);
+            return outboundChannelDefinitionBuilder;
+        }
+
+        @Override
+        public OutboundChannelModelBuilder eventProcessingPipeline(String delegateExpression) {
+            this.outboundChannel.setPipelineDelegateExpression(delegateExpression);
             return outboundChannelDefinitionBuilder;
         }
 

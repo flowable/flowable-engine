@@ -17,11 +17,11 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.eventregistry.api.EventDefinition;
@@ -46,7 +46,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Joram Barrez
  */
-public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableTestCase {
+public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTestCase {
 
     /**
      * Setup: two tenants: tenantA and tenantB.
@@ -78,25 +78,25 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
     @BeforeEach
     public void setup() {
         getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
+
+        Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
+        beans.put("testInboundChannelAdapter", new TestInboundChannelAdapter());
+        beans.put("testInboundChannelAdapter2", new TestInboundChannelAdapter());
+        beans.put("testInboundChannelAdapter3", new TestInboundChannelAdapter());
+        beans.put("testInboundChannelAdapter4", new TestInboundChannelAdapter());
         
         // Shared channel and event in default tenant
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("sharedDefaultChannel")
             .resourceName("sharedDefaultChannel.channel")
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
+            .channelAdapter("${testInboundChannelAdapter}")
             .jsonDeserializer()
             .fixedEventKey("defaultTenantSameKey")
             .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundChannelAdapter testInboundChannelAdapter = new TestInboundChannelAdapter();
         defaultSharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedDefaultChannel");
-        defaultSharedInboundChannelModel.setInboundEventChannelAdapter(testInboundChannelAdapter);
-        
-        testInboundChannelAdapter.setEventRegistry(getEventRegistry());
-        testInboundChannelAdapter.setInboundChannelModel(defaultSharedInboundChannelModel);
 
         deployEventDefinition(defaultSharedInboundChannelModel, "defaultTenantSameKey", null);
 
@@ -105,20 +105,14 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .key("sharedChannel")
             .resourceName("sharedChannel.channel")
             .deploymentTenantId(TENANT_A)
-            .jmsChannelAdapter("test2")
-            .eventProcessingPipeline()
+            .channelAdapter("${testInboundChannelAdapter2}")
             .jsonDeserializer()
             .fixedEventKey("sameKey")
             .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundChannelAdapter testInboundChannelAdapter2 = new TestInboundChannelAdapter();
         sharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedChannel", TENANT_A);
-        sharedInboundChannelModel.setInboundEventChannelAdapter(testInboundChannelAdapter2);
-        
-        testInboundChannelAdapter2.setEventRegistry(getEventRegistry());
-        testInboundChannelAdapter2.setInboundChannelModel(sharedInboundChannelModel);
 
         deployEventDefinition(sharedInboundChannelModel, "sameKey", TENANT_A, "tenantAData");
         deployEventDefinition(sharedInboundChannelModel, "sameKey", TENANT_B, "tenantBData", "someMoreTenantBData");
@@ -128,20 +122,14 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .key("tenantAChannel")
             .resourceName("tenantAChannel.channel")
             .deploymentTenantId(TENANT_A)
-            .jmsChannelAdapter("test3")
-            .eventProcessingPipeline()
+            .channelAdapter("${testInboundChannelAdapter3}")
             .jsonDeserializer()
             .fixedEventKey("tenantAKey")
             .fixedTenantId("tenantA")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundChannelAdapter testInboundChannelAdapter3 = new TestInboundChannelAdapter();
         tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A);
-        tenantAChannelModel.setInboundEventChannelAdapter(testInboundChannelAdapter3);
-        
-        testInboundChannelAdapter3.setEventRegistry(getEventRegistry());
-        testInboundChannelAdapter3.setInboundChannelModel(tenantAChannelModel);
         
         deployEventDefinition(tenantAChannelModel, "tenantAKey", TENANT_A);
 
@@ -150,20 +138,14 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .key("tenantBChannel")
             .resourceName("tenantBChannel.channel")
             .deploymentTenantId(TENANT_B)
-            .jmsChannelAdapter("test4")
-            .eventProcessingPipeline()
+            .channelAdapter("${testInboundChannelAdapter4}")
             .jsonDeserializer()
             .fixedEventKey("tenantBKey")
             .fixedTenantId("tenantB")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundChannelAdapter testInboundChannelAdapter4 = new TestInboundChannelAdapter();
         tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B);
-        tenantBChannelModel.setInboundEventChannelAdapter(testInboundChannelAdapter4);
-        
-        testInboundChannelAdapter4.setEventRegistry(getEventRegistry());
-        testInboundChannelAdapter4.setInboundChannelModel(tenantBChannelModel);
 
         deployEventDefinition(tenantBChannelModel, "tenantBKey", TENANT_B);
     }

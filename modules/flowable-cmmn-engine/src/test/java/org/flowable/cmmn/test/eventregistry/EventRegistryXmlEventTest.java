@@ -32,7 +32,7 @@ import org.junit.Test;
 /**
  * @author Joram Barrez
  */
-public class EventRegistryXmlEventTest extends FlowableCmmnTestCase {
+public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase {
 
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
@@ -50,22 +50,19 @@ public class EventRegistryXmlEventTest extends FlowableCmmnTestCase {
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
+            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
+
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
             .resourceName("test.channel")
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
+            .channelAdapter("${inboundEventChannelAdapter}")
             .xmlDeserializer()
             .fixedEventKey("myEvent")
             .xmlElementsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-        InboundChannelModel inboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
-        inboundChannelModel.setInboundEventChannelAdapter(inboundEventChannelAdapter);
-        
-        inboundEventChannelAdapter.setEventRegistry(getEventRegistry());
-        inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
 
         return inboundEventChannelAdapter;
     }

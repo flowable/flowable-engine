@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
@@ -43,7 +44,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Joram Barrez
  */
-public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestCase {
+public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableEventRegistryCmmnTestCase {
 
     /**
      * Setup: two tenants: tenantA and tenantB.
@@ -65,108 +66,76 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
 
     private static final String TENANT_B = "tenantB";
 
-    private InboundChannelModel defaultSharedInboundChannelModel;
-    private InboundChannelModel sharedInboundChannelModel;
-    private InboundChannelModel tenantAChannelModel;
-    private InboundChannelModel tenantBChannelModel;
-
     private Set<String> cleanupDeploymentIds = new HashSet<>();
 
     @Before
     public void setup() {
         getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
-        
+        Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
+        beans.put("inboundChannelAdapter", new TestInboundChannelAdapter());
+        beans.put("sharedInboundChannelAdapter", new TestInboundChannelAdapter());
+        beans.put("tenantAChannelAdapter", new TestInboundChannelAdapter());
+        beans.put("tenantBChannelAdapter", new TestInboundChannelAdapter());
+
         // Shared channel and event in default tenant
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("sharedDefaultChannel")
             .resourceName("sharedDefault.channel")
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
+            .channelAdapter("${inboundChannelAdapter}")
             .jsonDeserializer()
             .fixedEventKey("defaultTenantSameKey")
             .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundChannelAdapter inboundChannelAdapter = new TestInboundChannelAdapter();
-        defaultSharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedDefaultChannel");
-        defaultSharedInboundChannelModel.setInboundEventChannelAdapter(inboundChannelAdapter);
-    
-        inboundChannelAdapter.setEventRegistry(getEventRegistry());
-        inboundChannelAdapter.setInboundChannelModel(defaultSharedInboundChannelModel);
-
-        deployEventDefinition(defaultSharedInboundChannelModel, "defaultTenantSameKey", null);
+        deployEventDefinition("sharedDefaultChannel", "defaultTenantSameKey", null);
 
         // Shared channel with 'sameKey' event
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("sharedChannel")
             .resourceName("shared.channel")
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
+            .channelAdapter("${sharedInboundChannelAdapter}")
             .jsonDeserializer()
             .fixedEventKey("sameKey")
             .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundChannelAdapter sharedInboundChannelAdapter = new TestInboundChannelAdapter();
-        sharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedChannel");
-        sharedInboundChannelModel.setInboundEventChannelAdapter(sharedInboundChannelAdapter);
-    
-        sharedInboundChannelAdapter.setEventRegistry(getEventRegistry());
-        sharedInboundChannelAdapter.setInboundChannelModel(sharedInboundChannelModel);
-
-        deployEventDefinition(sharedInboundChannelModel, "sameKey", TENANT_A, "tenantAData");
-        deployEventDefinition(sharedInboundChannelModel, "sameKey", TENANT_B, "tenantBData", "someMoreTenantBData");
+        deployEventDefinition("sharedChannel", "sameKey", TENANT_A, "tenantAData");
+        deployEventDefinition("sharedChannel", "sameKey", TENANT_B, "tenantBData", "someMoreTenantBData");
 
         // Tenant A specific events
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("tenantAChannel")
             .resourceName("tenantA.channel")
             .deploymentTenantId(TENANT_A)
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
+            .channelAdapter("${tenantAChannelAdapter}")
             .jsonDeserializer()
             .fixedEventKey("tenantAKey")
             .fixedTenantId("tenantA")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundChannelAdapter tenantAChannelAdapter = new TestInboundChannelAdapter();
-        tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A);
-        tenantAChannelModel.setInboundEventChannelAdapter(tenantAChannelAdapter);
-    
-        tenantAChannelAdapter.setEventRegistry(getEventRegistry());
-        tenantAChannelAdapter.setInboundChannelModel(tenantAChannelModel);
-
-        deployEventDefinition(tenantAChannelModel, "tenantAKey", TENANT_A);
+        deployEventDefinition("tenantAChannel", "tenantAKey", TENANT_A);
 
         // Tenant B specific events
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("tenantBChannel")
             .resourceName("tenantB.channel")
             .deploymentTenantId(TENANT_B)
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
+            .channelAdapter("${tenantBChannelAdapter}")
             .jsonDeserializer()
             .fixedEventKey("tenantBKey")
             .fixedTenantId("tenantB")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        TestInboundChannelAdapter tenantBChannelAdapter = new TestInboundChannelAdapter();
-        tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B);
-        tenantBChannelModel.setInboundEventChannelAdapter(tenantBChannelAdapter);
-    
-        tenantBChannelAdapter.setEventRegistry(getEventRegistry());
-        tenantBChannelAdapter.setInboundChannelModel(tenantBChannelModel);
-
-        deployEventDefinition(tenantBChannelModel, "tenantBKey", TENANT_B);
+        deployEventDefinition("tenantBChannel", "tenantBKey", TENANT_B);
     }
 
-    private void deployEventDefinition(ChannelModel channelModel, String key, String tenantId, String ... optionalExtraPayload) {
+    private void deployEventDefinition(String channelKey, String key, String tenantId, String ... optionalExtraPayload) {
         EventModelBuilder eventModelBuilder = getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey(channelModel.getKey())
+            .inboundChannelKey(channelKey)
             .key(key)
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
@@ -255,6 +224,8 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             .extracting(EventSubscription::getEventType, EventSubscription::getTenantId)
             .containsOnly(tuple("tenantBKey", "tenantB"));
 
+        InboundChannelModel tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A);
+        InboundChannelModel tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B);
         // Note that #triggerEventWithoutTenantId doesn't have a tenantId set, but the channel has it hardcoded
 
         ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
@@ -272,6 +243,8 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
         deployCaseModel("startUniqueCaseInstanceTenantA.cmmn", TENANT_A);
         deployCaseModel("startUniqueCaseInstanceTenantB.cmmn", TENANT_B);
 
+        InboundChannelModel tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A);
+        InboundChannelModel tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B);
         ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
@@ -286,6 +259,8 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
     public void testStartCaseInstanceWithSameEventKeyDeployedInDifferentTenants() {
         deployCaseModel("startCaseInstanceSameKeyA.cmmn", TENANT_A);
         deployCaseModel("startCaseInstanceSameKeyB.cmmn", TENANT_B);
+
+        InboundChannelModel sharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedChannel");
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
@@ -316,6 +291,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().singleResult())
             .extracting(EventSubscription::getTenantId).isEqualTo(CmmnEngineConfiguration.NO_TENANT_ID);
 
+        InboundChannelModel defaultSharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedDefaultChannel");
         // The chanel has a tenant detector that will use the correct tenant to start the case instance
 
         ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
@@ -340,6 +316,8 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").fallbackToDefaultTenant().overrideCaseDefinitionTenantId(TENANT_A).tenantId(TENANT_A).start();
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").fallbackToDefaultTenant().overrideCaseDefinitionTenantId(TENANT_B).tenantId(TENANT_B).start();
 
+        InboundChannelModel defaultSharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedDefaultChannel");
+
         // Event subscription should be for specific tenants
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_A, TENANT_B);
 
@@ -362,6 +340,9 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId(TENANT_A).start();
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId(TENANT_B).start();
         assertThat(cmmnTaskService.createTaskQuery().list()).isEmpty();
+
+        InboundChannelModel tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A);
+        InboundChannelModel tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B);
 
         // Now trigger the event, which should only trigger tasks in the specific tenant
         ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
@@ -389,6 +370,8 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId(TENANT_A).start();
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId(TENANT_B).start();
         assertThat(cmmnTaskService.createTaskQuery().list()).isEmpty();
+
+        InboundChannelModel sharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedChannel");
 
         // Now trigger the event, which should only trigger tasks in the specific tenant
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);

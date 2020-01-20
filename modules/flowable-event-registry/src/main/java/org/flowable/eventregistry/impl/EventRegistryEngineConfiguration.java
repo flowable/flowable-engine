@@ -73,6 +73,8 @@ import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEvent
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventDeploymentDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.MybatisEventResourceDataManager;
 import org.flowable.eventregistry.impl.persistence.entity.data.impl.TableDataManagerImpl;
+import org.flowable.eventregistry.impl.pipeline.DelegateExpressionInboundChannelModelProcessor;
+import org.flowable.eventregistry.impl.pipeline.DelegateExpressionOutboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
@@ -252,7 +254,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new DefaultExpressionManager();
+            expressionManager = new DefaultExpressionManager(beans);
         }
     }
 
@@ -500,6 +502,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     }
 
     public void initChannelDefinitionProcessors() {
+        channelModelProcessors.add(new DelegateExpressionInboundChannelModelProcessor(this));
+        channelModelProcessors.add(new DelegateExpressionOutboundChannelModelProcessor(this));
         channelModelProcessors.add(new InboundChannelModelProcessor());
         channelModelProcessors.add(new OutboundChannelModelProcessor());
     }

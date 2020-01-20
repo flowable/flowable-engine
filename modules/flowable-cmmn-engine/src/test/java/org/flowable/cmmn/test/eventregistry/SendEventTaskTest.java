@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * @author Joram Barrez
  */
-public class SendEventTaskTest extends FlowableCmmnTestCase {
+public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
 
     protected TestOutboundEventChannelAdapter outboundEventChannelAdapter;
 
@@ -51,17 +51,16 @@ public class SendEventTaskTest extends FlowableCmmnTestCase {
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
+        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
+        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
+            .put("outboundEventChannelAdapter", outboundEventChannelAdapter);
+
         getEventRepositoryService().createOutboundChannelModelBuilder()
             .key("out-channel")
             .resourceName("out.channel")
-            .jmsChannelAdapter("out")
-            .eventProcessingPipeline()
+            .channelAdapter("${outboundEventChannelAdapter}")
             .jsonSerializer()
             .deploy();
-        
-        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
-        OutboundChannelModel outboundChannelModel = (OutboundChannelModel) getEventRepositoryService().getChannelModelByKey("out-channel");
-        outboundChannelModel.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
 
         return outboundEventChannelAdapter;
     }

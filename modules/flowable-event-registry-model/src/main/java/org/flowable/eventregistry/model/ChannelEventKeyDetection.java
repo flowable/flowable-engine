@@ -25,6 +25,7 @@ public class ChannelEventKeyDetection {
     protected String jsonField;
     protected String jsonPointerExpression;
     protected String xmlXPathExpression;
+    protected String delegateExpression;
     
     public String getFixedValue() {
         return fixedValue;
@@ -56,5 +57,13 @@ public class ChannelEventKeyDetection {
 
     public void setXmlXPathExpression(String xmlXPathExpression) {
         this.xmlXPathExpression = xmlXPathExpression;
+    }
+
+    public String getDelegateExpression() {
+        return delegateExpression;
+    }
+
+    public void setDelegateExpression(String delegateExpression) {
+        this.delegateExpression = delegateExpression;
     }
 }

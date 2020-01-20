@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.DelegateExpressionInboundChannelModel;
+import org.flowable.eventregistry.model.DelegateExpressionOutboundChannelModel;
 import org.flowable.eventregistry.model.JmsInboundChannelModel;
 import org.flowable.eventregistry.model.JmsOutboundChannelModel;
 import org.flowable.eventregistry.model.KafkaInboundChannelModel;
@@ -74,6 +76,8 @@ public class ChannelJsonConverter {
                 channelClass = RabbitOutboundChannelModel.class;
             } else if ("kafka".equals(type)) {
                 channelClass = KafkaOutboundChannelModel.class;
+            } else if ("expression".equals(type)) {
+                channelClass = DelegateExpressionOutboundChannelModel.class;
             } else {
                 throw new FlowableEventJsonException("Not supported outbound channel model type was found " + type);
             }
@@ -84,6 +88,8 @@ public class ChannelJsonConverter {
                 channelClass = RabbitInboundChannelModel.class;
             } else if ("kafka".equals(type)) {
                 channelClass = KafkaInboundChannelModel.class;
+            } else if ("expression".equals(type)) {
+                channelClass = DelegateExpressionInboundChannelModel.class;
             } else {
                 throw new FlowableEventJsonException("Not supported inbound channel model type was found " + type);
             }

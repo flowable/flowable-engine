@@ -34,6 +34,8 @@ import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionManager;
+import org.flowable.eventregistry.impl.pipeline.DelegateExpressionInboundChannelModelProcessor;
+import org.flowable.eventregistry.impl.pipeline.DelegateExpressionOutboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
@@ -93,14 +95,22 @@ public class EventRegistryAutoConfigurationTest {
                 eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
-                .hasSize(2);
+                .hasSize(4);
 
             channelModelProcessorAssert
                 .element(0)
-                .isInstanceOf(InboundChannelModelProcessor.class);
+                .isInstanceOf(DelegateExpressionInboundChannelModelProcessor.class);
 
             channelModelProcessorAssert
                 .element(1)
+                .isInstanceOf(DelegateExpressionOutboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(2)
+                .isInstanceOf(InboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(3)
                 .isInstanceOf(OutboundChannelModelProcessor.class);
 
             assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
@@ -139,14 +149,22 @@ public class EventRegistryAutoConfigurationTest {
                 eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
-                .hasSize(2);
+                .hasSize(4);
 
             channelModelProcessorAssert
                 .element(0)
-                .isInstanceOf(InboundChannelModelProcessor.class);
+                .isInstanceOf(DelegateExpressionInboundChannelModelProcessor.class);
 
             channelModelProcessorAssert
                 .element(1)
+                .isInstanceOf(DelegateExpressionOutboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(2)
+                .isInstanceOf(InboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(3)
                 .isInstanceOf(OutboundChannelModelProcessor.class);
 
             assertAllServicesPresent(context, eventRegistryEngine);
@@ -191,14 +209,22 @@ public class EventRegistryAutoConfigurationTest {
                 eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
-                .hasSize(2);
+                .hasSize(4);
 
             channelModelProcessorAssert
                 .element(0)
-                .isInstanceOf(InboundChannelModelProcessor.class);
+                .isInstanceOf(DelegateExpressionInboundChannelModelProcessor.class);
 
             channelModelProcessorAssert
                 .element(1)
+                .isInstanceOf(DelegateExpressionOutboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(2)
+                .isInstanceOf(InboundChannelModelProcessor.class);
+
+            channelModelProcessorAssert
+                .element(3)
                 .isInstanceOf(OutboundChannelModelProcessor.class);
 
             assertAllServicesPresent(context, eventRegistryEngine);
@@ -239,7 +265,7 @@ public class EventRegistryAutoConfigurationTest {
                     eventRegistryEngineConfiguration.getChannelModelProcessors());
 
                 channelModelProcessorAssert
-                    .hasSize(3);
+                    .hasSize(5);
 
                 channelModelProcessorAssert
                     .element(0)
@@ -247,10 +273,18 @@ public class EventRegistryAutoConfigurationTest {
 
                 channelModelProcessorAssert
                     .element(1)
-                    .isInstanceOf(InboundChannelModelProcessor.class);
+                    .isInstanceOf(DelegateExpressionInboundChannelModelProcessor.class);
 
                 channelModelProcessorAssert
                     .element(2)
+                    .isInstanceOf(DelegateExpressionOutboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(3)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(4)
                     .isInstanceOf(OutboundChannelModelProcessor.class);
 
             });
@@ -270,7 +304,7 @@ public class EventRegistryAutoConfigurationTest {
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
                     eventRegistryEngineConfiguration.getChannelModelProcessors())
-                    .hasSize(3);
+                    .hasSize(5);
 
                 channelModelProcessorAssert
                     .element(0)
@@ -278,10 +312,18 @@ public class EventRegistryAutoConfigurationTest {
 
                 channelModelProcessorAssert
                     .element(1)
-                    .isInstanceOf(InboundChannelModelProcessor.class);
+                    .isInstanceOf(DelegateExpressionInboundChannelModelProcessor.class);
 
                 channelModelProcessorAssert
                     .element(2)
+                    .isInstanceOf(DelegateExpressionOutboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(3)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(4)
                     .isInstanceOf(OutboundChannelModelProcessor.class);
             });
     }
@@ -303,7 +345,7 @@ public class EventRegistryAutoConfigurationTest {
                     eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
                 channelModelProcessorAssert
-                    .hasSize(3);
+                    .hasSize(5);
 
                 channelModelProcessorAssert
                     .element(0)
@@ -311,10 +353,18 @@ public class EventRegistryAutoConfigurationTest {
 
                 channelModelProcessorAssert
                     .element(1)
-                    .isInstanceOf(InboundChannelModelProcessor.class);
+                    .isInstanceOf(DelegateExpressionInboundChannelModelProcessor.class);
 
                 channelModelProcessorAssert
                     .element(2)
+                    .isInstanceOf(DelegateExpressionOutboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(3)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(4)
                     .isInstanceOf(OutboundChannelModelProcessor.class);
             });
     }
@@ -343,7 +393,7 @@ public class EventRegistryAutoConfigurationTest {
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
                     eventRegistryEngineConfiguration.getChannelModelProcessors());
                 channelModelProcessorAssert
-                    .hasSize(5)
+                    .hasSize(7)
                     .contains(
                         context.getBean("jmsChannelDefinitionProcessor", JmsChannelModelProcessor.class),
                         context.getBean("rabbitChannelDefinitionProcessor", RabbitChannelDefinitionProcessor.class),
@@ -352,10 +402,18 @@ public class EventRegistryAutoConfigurationTest {
 
                 channelModelProcessorAssert
                     .element(3)
-                    .isInstanceOf(InboundChannelModelProcessor.class);
+                    .isInstanceOf(DelegateExpressionInboundChannelModelProcessor.class);
 
                 channelModelProcessorAssert
                     .element(4)
+                    .isInstanceOf(DelegateExpressionOutboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(5)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(6)
                     .isInstanceOf(OutboundChannelModelProcessor.class);
             });
     }
@@ -386,7 +444,7 @@ public class EventRegistryAutoConfigurationTest {
                 IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
                     eventRegistryEngineConfiguration.getChannelModelProcessors());
                 channelModelProcessorAssert
-                    .hasSize(6);
+                    .hasSize(8);
 
                 channelModelProcessorAssert
                     .element(0)
@@ -406,10 +464,18 @@ public class EventRegistryAutoConfigurationTest {
 
                 channelModelProcessorAssert
                     .element(4)
-                    .isInstanceOf(InboundChannelModelProcessor.class);
+                    .isInstanceOf(DelegateExpressionInboundChannelModelProcessor.class);
 
                 channelModelProcessorAssert
                     .element(5)
+                    .isInstanceOf(DelegateExpressionOutboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(6)
+                    .isInstanceOf(InboundChannelModelProcessor.class);
+
+                channelModelProcessorAssert
+                    .element(7)
                     .isInstanceOf(OutboundChannelModelProcessor.class);
             });
     }

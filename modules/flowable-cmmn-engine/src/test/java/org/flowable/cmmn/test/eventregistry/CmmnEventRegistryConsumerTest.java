@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
+public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTestCase {
 
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
@@ -63,22 +63,18 @@ public class CmmnEventRegistryConsumerTest extends FlowableCmmnTestCase {
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
+            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
+
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
             .resourceName("test.channel")
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
+            .channelAdapter("${inboundEventChannelAdapter}")
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
-        
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-        InboundChannelModel inboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
-        inboundChannelModel.setInboundEventChannelAdapter(inboundEventChannelAdapter);
-        
-        inboundEventChannelAdapter.setEventRegistry(getEventRegistry());
-        inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
 
         return inboundEventChannelAdapter;
     }
