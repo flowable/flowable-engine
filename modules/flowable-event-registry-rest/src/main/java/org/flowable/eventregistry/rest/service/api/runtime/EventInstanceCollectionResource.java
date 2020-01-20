@@ -76,6 +76,10 @@ public class EventInstanceCollectionResource {
     @PostMapping(value = "/event-registry-runtime/event-instances")
     public void createEventInstance(@RequestBody EventInstanceCreateRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createEventInstance(request);
+        }
+        
         if (request.getEventDefinitionId() == null && request.getEventDefinitionKey() == null) {
             throw new FlowableIllegalArgumentException("Either eventDefinitionId or eventDefinitionKey is required.");
         }
@@ -108,7 +112,7 @@ public class EventInstanceCollectionResource {
         String channelKey = eventModel.getInboundChannelKeys().iterator().next();
         ChannelModel channelModel = null;
         if (StringUtils.isNotEmpty(request.getTenantId())) {
-            channelModel = repositoryService.getChannelModelByKey(channelKey, request.getTenantId(), eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+            channelModel = repositoryService.getChannelModelByKey(channelKey, request.getTenantId());
         } else {
             channelModel = repositoryService.getChannelModelByKey(channelKey);
         }

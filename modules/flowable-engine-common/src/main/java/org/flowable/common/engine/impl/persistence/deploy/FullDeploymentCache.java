@@ -15,7 +15,6 @@ package org.flowable.common.engine.impl.persistence.deploy;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -28,13 +27,6 @@ public class FullDeploymentCache<T> implements DeploymentCache<T> {
     /** Cache with no limit */
     public FullDeploymentCache() {
         this.cache = Collections.synchronizedMap(new HashMap<>());
-    }
-
-    /**
-     * Cache which has a hard limit: no more elements will be cached than the limit.
-     */
-    public FullDeploymentCache(final int limit) {
-        this.cache = Collections.synchronizedMap(new LinkedHashMap<String, T>());
     }
 
     @Override

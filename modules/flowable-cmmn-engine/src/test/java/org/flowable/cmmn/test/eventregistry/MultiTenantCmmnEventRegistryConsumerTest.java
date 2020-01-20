@@ -133,7 +133,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             .deploy();
         
         TestInboundChannelAdapter tenantAChannelAdapter = new TestInboundChannelAdapter();
-        tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A, false);
+        tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A);
         tenantAChannelModel.setInboundEventChannelAdapter(tenantAChannelAdapter);
     
         tenantAChannelAdapter.setEventRegistry(getEventRegistry());
@@ -155,7 +155,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableCmmnTestC
             .deploy();
         
         TestInboundChannelAdapter tenantBChannelAdapter = new TestInboundChannelAdapter();
-        tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B, false);
+        tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B);
         tenantBChannelModel.setInboundEventChannelAdapter(tenantBChannelAdapter);
     
         tenantBChannelAdapter.setEventRegistry(getEventRegistry());

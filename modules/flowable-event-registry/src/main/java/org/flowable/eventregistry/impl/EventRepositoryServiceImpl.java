@@ -164,18 +164,18 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
     }
     
     @Override
-    public EventModel getEventModelByKey(String eventDefinitionKey, String tenantId, boolean fallbackToDefaultTenant) {
-        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, tenantId, fallbackToDefaultTenant));
+    public EventModel getEventModelByKey(String eventDefinitionKey, String tenantId) {
+        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, tenantId));
     }
 
     @Override
     public EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId) {
-        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, null, parentDeploymentId, false));
+        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, null, parentDeploymentId));
     }
 
     @Override
-    public EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant) {
-        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, tenantId, parentDeploymentId, fallbackToDefaultTenant));
+    public EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId, String tenantId) {
+        return commandExecutor.execute(new GetEventModelCmd(eventDefinitionKey, null, tenantId, parentDeploymentId));
     }
     
     @Override
@@ -189,18 +189,18 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
     }
 
     @Override
-    public ChannelModel getChannelModelByKey(String channelDefinitionKey, String tenantId, boolean fallbackToDefaultTenant) {
-        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, tenantId, fallbackToDefaultTenant));
+    public ChannelModel getChannelModelByKey(String channelDefinitionKey, String tenantId) {
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null));
     }
 
     @Override
     public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId) {
-        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, null, parentDeploymentId, false));
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, null, parentDeploymentId));
     }
 
     @Override
-    public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant) {
-        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, tenantId, parentDeploymentId, fallbackToDefaultTenant));
+    public ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId, String tenantId) {
+        return commandExecutor.execute(new GetChannelModelCmd(channelDefinitionKey, null, tenantId, parentDeploymentId));
     }
 
     @Override
@@ -211,8 +211,7 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
     
     @Override
     public InboundChannelModelBuilder createInboundChannelModelBuilder() {
-        return new InboundChannelDefinitionBuilderImpl(eventRegistryEngineConfiguration.getEventRepositoryService(),
-                        eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+        return new InboundChannelDefinitionBuilderImpl(eventRegistryEngineConfiguration.getEventRepositoryService());
     }
 
     @Override

@@ -36,7 +36,6 @@ import org.flowable.eventregistry.model.EventModel;
 public class DefaultInboundEventProcessingPipeline<T> implements InboundEventProcessingPipeline {
 
     protected EventRepositoryService eventRepositoryService;
-    protected boolean fallbackToDefaultTenant;
     protected InboundEventDeserializer<T> inboundEventDeserializer;
     protected InboundEventKeyDetector<T> inboundEventKeyDetector;
     protected InboundEventTenantDetector<T> inboundEventTenantDetector;
@@ -44,7 +43,6 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     protected InboundEventTransformer inboundEventTransformer;
 
     public DefaultInboundEventProcessingPipeline(EventRepositoryService eventRepositoryService,
-            boolean fallbackToDefaultTenant,
             InboundEventDeserializer<T> inboundEventDeserializer,
             InboundEventKeyDetector<T> inboundEventKeyDetector,
             InboundEventTenantDetector<T> inboundEventTenantDetector,
@@ -52,7 +50,6 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
             InboundEventTransformer inboundEventTransformer) {
         
         this.eventRepositoryService = eventRepositoryService;
-        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
         this.inboundEventDeserializer = inboundEventDeserializer;
         this.inboundEventKeyDetector = inboundEventKeyDetector;
         this.inboundEventTenantDetector = inboundEventTenantDetector;
@@ -69,7 +66,7 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         EventModel eventModel = null;
         if (inboundEventTenantDetector != null) {
             tenantId = inboundEventTenantDetector.detectTenantId(event);
-            eventModel = eventRepositoryService.getEventModelByKey(eventKey, tenantId, fallbackToDefaultTenant);
+            eventModel = eventRepositoryService.getEventModelByKey(eventKey, tenantId);
 
         } else {
             eventModel = eventRepositoryService.getEventModelByKey(eventKey);

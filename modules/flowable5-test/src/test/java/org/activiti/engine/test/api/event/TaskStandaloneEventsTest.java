@@ -60,8 +60,8 @@ public class TaskStandaloneEventsTest extends PluggableFlowableTestCase {
 
             // Update task
             taskService.setOwner(task.getId(), "owner");
-            assertEquals(1, listener.getEventsReceived().size());
-            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
+            assertEquals(2, listener.getEventsReceived().size());
+            event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
             assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
             assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
             taskFromEvent = (org.flowable.task.api.Task) event.getEntity();

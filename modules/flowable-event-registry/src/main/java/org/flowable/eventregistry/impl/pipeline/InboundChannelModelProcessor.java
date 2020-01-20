@@ -105,8 +105,8 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                     }
                 }
 
-                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, fallbackToDefaultTenant, eventDeserializer,
-                    eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
+                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer,
+                                eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
 
             } else if ("xml".equals(inboundChannelModel.getDeserializerType())) {
 
@@ -120,6 +120,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                 if (keyDetection == null) {
                     throw new FlowableException("A channel key detection value is required");
                 }
+                
                 if (StringUtils.isNotEmpty(keyDetection.getFixedValue())) {
                     eventKeyDetector = new InboundEventStaticKeyDetector<>(keyDetection.getFixedValue());
                 } else if (StringUtils.isNotEmpty(keyDetection.getXmlXPathExpression())) {
@@ -143,8 +144,8 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
                     }
                 }
 
-                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, fallbackToDefaultTenant, eventDeserializer,
-                    eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
+                eventProcessingPipeline = new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer,
+                                eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
 
             } else {
                 eventProcessingPipeline = null;

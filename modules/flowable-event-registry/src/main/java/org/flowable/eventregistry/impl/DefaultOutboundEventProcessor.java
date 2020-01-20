@@ -46,7 +46,7 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
             if (Objects.equals(EventRegistryEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
                 channelModel = eventRepositoryService.getChannelModelByKey(outboundChannelKey);
             } else {
-                channelModel = eventRepositoryService.getChannelModelByKey(outboundChannelKey, eventInstance.getTenantId(), fallbackToDefaultTenant);
+                channelModel = eventRepositoryService.getChannelModelByKey(outboundChannelKey, eventInstance.getTenantId());
             }
             
             if (channelModel == null) {

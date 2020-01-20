@@ -1458,6 +1458,7 @@
                 <module>modules/flowable-idm-rest</module>
                 <module>modules/flowable-event-registry-spring</module>
                 <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-ldap</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-groovy-script-static-engine</module>

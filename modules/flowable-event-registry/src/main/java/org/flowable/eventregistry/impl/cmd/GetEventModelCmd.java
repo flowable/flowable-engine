@@ -41,21 +41,19 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
     protected String eventDefinitionId;
     protected String tenantId;
     protected String parentDeploymentId;
-    protected boolean fallbackToDefaultTenant;
 
     public GetEventModelCmd(String eventDefinitionKey, String eventDefinitionId) {
         this.eventDefinitionKey = eventDefinitionKey;
         this.eventDefinitionId = eventDefinitionId;
     }
 
-    public GetEventModelCmd(String eventDefinitionKey, String eventDefinitionId, String tenantId, boolean fallbackToDefaultTenant) {
+    public GetEventModelCmd(String eventDefinitionKey, String eventDefinitionId, String tenantId) {
         this(eventDefinitionKey, eventDefinitionId);
         this.tenantId = tenantId;
-        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
-    public GetEventModelCmd(String eventDefinitionKey, String eventDefinitionId, String tenantId, String parentDeploymentId, boolean fallbackToDefaultTenant) {
-        this(eventDefinitionKey, eventDefinitionId, tenantId, fallbackToDefaultTenant);
+    public GetEventModelCmd(String eventDefinitionKey, String eventDefinitionId, String tenantId, String parentDeploymentId) {
+        this(eventDefinitionKey, eventDefinitionId, tenantId);
         this.parentDeploymentId = parentDeploymentId;
     }
 
@@ -87,7 +85,7 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
 
             eventDefinitionEntity = eventDefinitionEntityManager.findLatestEventDefinitionByKeyAndTenantId(eventDefinitionKey, tenantId);
             
-            if (eventDefinitionEntity == null && (fallbackToDefaultTenant || eventEngineConfiguration.isFallbackToDefaultTenant())) {
+            if (eventDefinitionEntity == null && eventEngineConfiguration.isFallbackToDefaultTenant()) {
                 String defaultTenant = eventEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.EVENT_REGISTRY, eventDefinitionKey);
                 if (StringUtils.isNotEmpty(defaultTenant)) {
                     eventDefinitionEntity = eventDefinitionEntityManager.findLatestEventDefinitionByKeyAndTenantId(eventDefinitionKey, defaultTenant);
@@ -132,7 +130,7 @@ public class GetEventModelCmd implements Command<EventModel>, Serializable {
                 eventDefinitionEntity = eventDefinitionEntityManager.findLatestEventDefinitionByKeyAndTenantId(eventDefinitionKey, tenantId);
             }
             
-            if (eventDefinitionEntity == null && (fallbackToDefaultTenant || eventEngineConfiguration.isFallbackToDefaultTenant())) {
+            if (eventDefinitionEntity == null && eventEngineConfiguration.isFallbackToDefaultTenant()) {
                 String defaultTenant = eventEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.EVENT_REGISTRY, eventDefinitionKey);
                 if (StringUtils.isNotEmpty(defaultTenant)) {
                     eventDefinitionEntity = eventDefinitionEntityManager.findLatestEventDefinitionByKeyAndTenantId(eventDefinitionKey, defaultTenant);

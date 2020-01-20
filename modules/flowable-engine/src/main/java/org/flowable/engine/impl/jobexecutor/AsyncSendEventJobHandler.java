@@ -24,7 +24,6 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.job.service.JobHandler;
@@ -58,9 +57,7 @@ public class AsyncSendEventJobHandler implements JobHandler {
         if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, job.getTenantId())) {
             eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(sendEventServiceTask.getEventType());
         } else {
-            EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext);
-            eventModel = eventRegistryEngineConfiguration.getEventRepositoryService().getEventModelByKey(sendEventServiceTask.getEventType(), 
-                            job.getTenantId(), eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+            eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(sendEventServiceTask.getEventType(), job.getTenantId());
         }
 
         if (eventModel == null) {

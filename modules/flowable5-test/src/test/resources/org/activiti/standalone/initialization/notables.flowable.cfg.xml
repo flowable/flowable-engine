@@ -9,7 +9,7 @@
       <bean class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
         <constructor-arg>
           <bean class="com.zaxxer.hikari.HikariConfig">
-            <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
+            <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:ProcessEngineInitializationTest;DB_CLOSE_DELAY=1000;MVCC=TRUE}" />
             <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}" />
             <property name="username"  value="${jdbc.username:sa}" />
             <property name="password" value="${jdbc.password:}" />

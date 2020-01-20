@@ -114,7 +114,7 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .deploy();
         
         TestInboundChannelAdapter testInboundChannelAdapter2 = new TestInboundChannelAdapter();
-        sharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedChannel", TENANT_A, false);
+        sharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedChannel", TENANT_A);
         sharedInboundChannelModel.setInboundEventChannelAdapter(testInboundChannelAdapter2);
         
         testInboundChannelAdapter2.setEventRegistry(getEventRegistry());
@@ -137,7 +137,7 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .deploy();
         
         TestInboundChannelAdapter testInboundChannelAdapter3 = new TestInboundChannelAdapter();
-        tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A, false);
+        tenantAChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantAChannel", TENANT_A);
         tenantAChannelModel.setInboundEventChannelAdapter(testInboundChannelAdapter3);
         
         testInboundChannelAdapter3.setEventRegistry(getEventRegistry());
@@ -159,7 +159,7 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends PluggableFlowableT
             .deploy();
         
         TestInboundChannelAdapter testInboundChannelAdapter4 = new TestInboundChannelAdapter();
-        tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B, false);
+        tenantBChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("tenantBChannel", TENANT_B);
         tenantBChannelModel.setInboundEventChannelAdapter(testInboundChannelAdapter4);
         
         testInboundChannelAdapter4.setEventRegistry(getEventRegistry());

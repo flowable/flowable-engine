@@ -19,6 +19,7 @@ import org.flowable.eventregistry.api.EventDefinitionQuery;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventDeploymentBuilder;
 import org.flowable.eventregistry.api.EventDeploymentQuery;
+import org.flowable.eventregistry.rest.service.api.runtime.EventInstanceCreateRequest;
 
 public interface EventRegistryRestApiInterceptor {
 
@@ -39,6 +40,8 @@ public interface EventRegistryRestApiInterceptor {
     void enhanceDeployment(EventDeploymentBuilder eventDeploymentBuilder);
     
     void deleteDeployment(EventDeployment deployment);
+    
+    void createEventInstance(EventInstanceCreateRequest request);
     
     void accessManagementInfo();
     

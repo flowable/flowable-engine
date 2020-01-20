@@ -41,21 +41,19 @@ public class GetChannelModelCmd implements Command<ChannelModel>, Serializable {
     protected String channelDefinitionId;
     protected String tenantId;
     protected String parentDeploymentId;
-    protected boolean fallbackToDefaultTenant;
 
     public GetChannelModelCmd(String channelDefinitionKey, String channelDefinitionId) {
         this.channelDefinitionKey = channelDefinitionKey;
         this.channelDefinitionId = channelDefinitionId;
     }
 
-    public GetChannelModelCmd(String channelDefinitionKey, String channelDefinitionId, String tenantId, boolean fallbackToDefaultTenant) {
+    public GetChannelModelCmd(String channelDefinitionKey, String channelDefinitionId, String tenantId) {
         this(channelDefinitionKey, channelDefinitionId);
         this.tenantId = tenantId;
-        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
-    public GetChannelModelCmd(String channelDefinitionKey, String channelDefinitionId, String tenantId, String parentDeploymentId, boolean fallbackToDefaultTenant) {
-        this(channelDefinitionKey, channelDefinitionId, tenantId, fallbackToDefaultTenant);
+    public GetChannelModelCmd(String channelDefinitionKey, String channelDefinitionId, String tenantId, String parentDeploymentId) {
+        this(channelDefinitionKey, channelDefinitionId, tenantId);
         this.parentDeploymentId = parentDeploymentId;
     }
 
@@ -87,7 +85,7 @@ public class GetChannelModelCmd implements Command<ChannelModel>, Serializable {
 
             channelDefinitionEntity = channelDefinitionEntityManager.findLatestChannelDefinitionByKeyAndTenantId(channelDefinitionKey, tenantId);
             
-            if (channelDefinitionEntity == null && (fallbackToDefaultTenant || eventEngineConfiguration.isFallbackToDefaultTenant())) {
+            if (channelDefinitionEntity == null && eventEngineConfiguration.isFallbackToDefaultTenant()) {
                 String defaultTenant = eventEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.EVENT_REGISTRY, channelDefinitionKey);
                 if (StringUtils.isNotEmpty(defaultTenant)) {
                     channelDefinitionEntity = channelDefinitionEntityManager.findLatestChannelDefinitionByKeyAndTenantId(channelDefinitionKey, defaultTenant);
@@ -132,7 +130,7 @@ public class GetChannelModelCmd implements Command<ChannelModel>, Serializable {
                 channelDefinitionEntity = channelDefinitionEntityManager.findLatestChannelDefinitionByKeyAndTenantId(channelDefinitionKey, tenantId);
             }
             
-            if (channelDefinitionEntity == null && (fallbackToDefaultTenant || eventEngineConfiguration.isFallbackToDefaultTenant())) {
+            if (channelDefinitionEntity == null && eventEngineConfiguration.isFallbackToDefaultTenant()) {
                 String defaultTenant = eventEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.EVENT_REGISTRY, channelDefinitionKey);
                 if (StringUtils.isNotEmpty(defaultTenant)) {
                     channelDefinitionEntity = channelDefinitionEntityManager.findLatestChannelDefinitionByKeyAndTenantId(channelDefinitionKey, defaultTenant);

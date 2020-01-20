@@ -25,7 +25,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 
@@ -52,9 +51,7 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
         if (Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, planItemInstanceEntity.getTenantId())) {
             eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(key);
         } else {
-            EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext);
-            eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(key, planItemInstanceEntity.getTenantId(),
-                            eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+            eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(key, planItemInstanceEntity.getTenantId());
         }
 
         if (eventModel == null) {

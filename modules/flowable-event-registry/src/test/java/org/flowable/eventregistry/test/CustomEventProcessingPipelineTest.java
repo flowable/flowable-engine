@@ -127,7 +127,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             .resourceName("myEvent.event")
             .deploy();
         
-        EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId", false);
+        EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId");
 
         EventInstanceImpl eventInstance = new EventInstanceImpl();
         eventInstance.setEventModel(eventModel);

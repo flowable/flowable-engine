@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.FullDeploymentCache;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -132,8 +133,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     protected int eventDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache;
-    
-    protected int channelDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache;
 
     protected Collection<ChannelModelProcessor> channelModelProcessors = new ArrayList<>();
@@ -180,7 +179,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return new StandaloneInMemEventRegistryEngineConfiguration();
     }
 
-    // buildFormEngine
+    // buildEventRegistryEngine
     // ///////////////////////////////////////////////////////
 
     public EventRegistryEngine buildEventRegistryEngine() {
@@ -424,11 +423,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         }
         
         if (channelDefinitionCache == null) {
-            if (channelDefinitionCacheLimit <= 0) {
-                channelDefinitionCache = new DefaultDeploymentCache<>();
-            } else {
-                channelDefinitionCache = new DefaultDeploymentCache<>(channelDefinitionCacheLimit);
-            }
+            channelDefinitionCache = new FullDeploymentCache<>();
         }
 
         deploymentManager = new EventDeploymentManager(eventDefinitionCache, channelDefinitionCache, this);
@@ -676,15 +671,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setEventDefinitionCache(DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache) {
         this.eventDefinitionCache = eventDefinitionCache;
-        return this;
-    }
-
-    public int getChannelDefinitionCacheLimit() {
-        return channelDefinitionCacheLimit;
-    }
-
-    public EventRegistryEngineConfiguration setChannelDefinitionCacheLimit(int channelDefinitionCacheLimit) {
-        this.channelDefinitionCacheLimit = channelDefinitionCacheLimit;
         return this;
     }
 

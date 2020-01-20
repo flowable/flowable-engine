@@ -88,21 +88,21 @@ public interface EventRepositoryService {
 
     EventModel getEventModelByKey(String eventDefinitionKey);
     
-    EventModel getEventModelByKey(String eventDefinitionKey, String tenantId, boolean fallbackToDefaultTenant);
+    EventModel getEventModelByKey(String eventDefinitionKey, String tenantId);
 
     EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId);
 
-    EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant);
+    EventModel getEventModelByKeyAndParentDeploymentId(String eventDefinitionKey, String parentDeploymentId, String tenantId);
     
     ChannelModel getChannelModelById(String channelDefinitionId);
 
     ChannelModel getChannelModelByKey(String channelDefinitionKey);
     
-    ChannelModel getChannelModelByKey(String channelDefinitionKey, String tenantId, boolean fallbackToDefaultTenant);
+    ChannelModel getChannelModelByKey(String channelDefinitionKey, String tenantId);
 
     ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId);
 
-    ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant);
+    ChannelModel getChannelModelByKeyAndParentDeploymentId(String channelDefinitionKey, String parentDeploymentId, String tenantId);
     
     /**
      * Programmatically build and register a new {@link EventModel}.

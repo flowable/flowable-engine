@@ -36,6 +36,14 @@ flowable-dmn-xml-converter<version><.jar | -source.jar | -javadoc.jar>
 flowable-engine<version><.jar | -source.jar | -javadoc.jar>
 flowable-engine-common<version><.jar | -source.jar | -javadoc.jar>
 flowable-engine-common-api<version><.jar | -source.jar | -javadoc.jar>
+flowable-event-registry<version><.jar | -source.jar | -javadoc.jar>
+flowable-event-registry-api<version><.jar | -source.jar | -javadoc.jar>
+flowable-event-registry-configurator<version><.jar | -source.jar | -javadoc.jar>
+flowable-event-registry-json-converter<version><.jar | -source.jar | -javadoc.jar>
+flowable-event-registry-model<version><.jar | -source.jar | -javadoc.jar>
+flowable-event-registry-rest<version><.jar | -source.jar | -javadoc.jar>
+flowable-event-registry-spring<version><.jar | -source.jar | -javadoc.jar>
+flowable-event-registry-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-api<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-engine<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
