@@ -59,6 +59,8 @@ import org.springframework.util.StringValueResolver;
  */
 public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, ChannelModelProcessor {
 
+    public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.rabbit.ChannelRabbitListenerEndpointContainer#";
+
     protected RabbitListenerEndpointRegistry endpointRegistry;
 
     protected String containerFactoryBeanName = RabbitListenerAnnotationBeanPostProcessor.DEFAULT_RABBIT_LISTENER_CONTAINER_FACTORY_BEAN_NAME;
@@ -311,7 +313,10 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
 
     protected String getEndpointId(ChannelModel channelModel, String tenantId) {
         String channelDefinitionKey = channelModel.getKey();
-        return "org.flowable.eventregistry.rabbit.ChannelRabbitListenerEndpointContainer#" + tenantId + "#" + channelDefinitionKey;
+        if (!StringUtils.hasText(tenantId)) {
+            return CHANNEL_ID_PREFIX + channelDefinitionKey;
+        }
+        return CHANNEL_ID_PREFIX + tenantId + "#" + channelDefinitionKey;
     }
 
     protected String resolve(String value) {

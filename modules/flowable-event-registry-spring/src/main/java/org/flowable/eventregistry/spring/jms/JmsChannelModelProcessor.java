@@ -189,6 +189,9 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ChannelModelP
 
     protected String getEndpointId(ChannelModel channelModel, String tenantId) {
         String channelDefinitionKey = channelModel.getKey();
+        if (!StringUtils.hasText(tenantId)) {
+            return CHANNEL_ID_PREFIX + channelDefinitionKey;
+        }
         return CHANNEL_ID_PREFIX + tenantId + "#" + channelDefinitionKey;
     }
 

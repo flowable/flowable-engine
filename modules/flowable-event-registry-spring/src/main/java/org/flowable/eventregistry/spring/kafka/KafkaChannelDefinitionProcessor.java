@@ -55,6 +55,8 @@ import org.springframework.util.StringValueResolver;
  */
 public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, ChannelModelProcessor {
 
+    public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#";
+
     protected KafkaOperations<Object, Object> kafkaOperations;
 
     protected KafkaListenerEndpointRegistry endpointRegistry;
@@ -271,7 +273,10 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
 
     protected String getEndpointId(ChannelModel channelModel, String tenantId) {
         String channelDefinitionKey = channelModel.getKey();
-        return "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#" + tenantId + "#" + channelDefinitionKey;
+        if (!StringUtils.hasText(tenantId)) {
+            return CHANNEL_ID_PREFIX + channelDefinitionKey;
+        }
+        return CHANNEL_ID_PREFIX + tenantId + "#" + channelDefinitionKey;
     }
 
     protected String getEndpointGroupId(KafkaInboundChannelModel channelDefinition, String id) {
