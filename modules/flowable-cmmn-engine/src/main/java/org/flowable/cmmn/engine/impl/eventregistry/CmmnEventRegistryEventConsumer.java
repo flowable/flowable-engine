@@ -94,11 +94,9 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
             if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                caseInstanceBuilder.tenantId(eventInstance.getTenantId());
-
-                if (!Objects.equals(eventInstance.getTenantId(), eventInstance.getEventModel().getTenantId())) {
-                    caseInstanceBuilder.overrideCaseDefinitionTenantId(eventInstance.getTenantId());
-                }
+                // The case definition could have been deployed to a different tenant
+                caseInstanceBuilder.tenantId(eventInstance.getTenantId()); // the definition tenant id
+                caseInstanceBuilder.overrideCaseDefinitionTenantId(eventInstance.getTenantId()); // the instance tenant id
             }
 
             if (correlationKeys != null) {

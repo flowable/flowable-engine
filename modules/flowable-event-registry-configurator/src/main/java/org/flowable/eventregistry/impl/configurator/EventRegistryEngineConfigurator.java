@@ -59,9 +59,14 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
             eventEngineConfiguration = new StandaloneEventRegistryEngineConfiguration();
         }
 
+        initialiseEventRegistryEngineConfiguration(eventEngineConfiguration);
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
         this.eventRegistryEngine = initEventRegistryEngine();
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
+    }
+
+    protected void initialiseEventRegistryEngineConfiguration(EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
+        // mean to be overridden
     }
 
     @Override

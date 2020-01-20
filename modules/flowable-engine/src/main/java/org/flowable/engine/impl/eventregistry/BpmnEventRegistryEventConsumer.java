@@ -93,11 +93,9 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
             if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                processInstanceBuilder.tenantId(eventInstance.getTenantId());
-
-                if (!Objects.equals(eventInstance.getTenantId(), eventInstance.getEventModel().getTenantId())) {
-                    processInstanceBuilder.overrideProcessDefinitionTenantId(eventInstance.getTenantId());
-                }
+                // The process definition could have been deployed to a different tenant
+                processInstanceBuilder.tenantId(eventInstance.getTenantId()); // the definition tenant id
+                processInstanceBuilder.overrideProcessDefinitionTenantId(eventInstance.getTenantId()); // the instance tenant id
             }
 
             if (correlationKeys != null) {
