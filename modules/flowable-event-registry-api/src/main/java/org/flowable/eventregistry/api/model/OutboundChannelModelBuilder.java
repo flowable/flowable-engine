@@ -13,7 +13,6 @@
 package org.flowable.eventregistry.api.model;
 
 import org.flowable.eventregistry.api.EventDeployment;
-import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;

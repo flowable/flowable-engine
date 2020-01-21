@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;

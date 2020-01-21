@@ -152,4 +152,12 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         getDbSqlSession().update("updateProcessDefinitionTenantIdForDeploymentId", params);
     }
 
+    @Override
+    public void updateProcessDefinitionVersionForProcessDefinitionId(String processDefinitionId, int version) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("processDefinitionId", processDefinitionId);
+        params.put("version", version);
+        getDbSqlSession().update("updateProcessDefinitionVersionForProcessDefinitionId", params);
+    }
+
 }
