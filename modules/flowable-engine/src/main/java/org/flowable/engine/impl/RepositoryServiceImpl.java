@@ -61,10 +61,12 @@ import org.flowable.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.ValidateBpmnModelCmd;
 import org.flowable.engine.impl.persistence.entity.ModelEntity;
 import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
+import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
+import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.NativeDeploymentQuery;
@@ -150,6 +152,16 @@ public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public void changeDeploymentTenantId(String deploymentId, String newTenantId) {
         commandExecutor.execute(new ChangeDeploymentTenantIdCmd(deploymentId, newTenantId));
+    }
+
+    @Override
+    public void changeDeploymentTenantId(String deploymentId, String newTenantId, MergeMode mergeMode) {
+        commandExecutor.execute(new ChangeDeploymentTenantIdCmd(deploymentId, newTenantId, mergeMode));
+    }
+
+    @Override
+    public void changeDeploymentTenantId(String deploymentId, String newTenantId, DeploymentMergeStrategy deploymentMergeStrategy) {
+        commandExecutor.execute(new ChangeDeploymentTenantIdCmd(deploymentId, newTenantId, deploymentMergeStrategy));
     }
 
     @Override
