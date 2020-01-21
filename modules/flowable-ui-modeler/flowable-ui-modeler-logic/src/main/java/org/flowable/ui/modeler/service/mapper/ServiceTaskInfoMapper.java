@@ -40,5 +40,6 @@ public class ServiceTaskInfoMapper extends AbstractInfoMapper {
         createFieldPropertyNodes("Field extensions", serviceTask.getFieldExtensions());
         createListenerPropertyNodes("Execution listeners", serviceTask.getExecutionListeners());
         createPropertyNode("Use local scope for result variable", serviceTask.isUseLocalScopeForResultVariable());
+        createPropertyNode("Failed job retry time cycle", serviceTask.getFailedJobRetryTimeCycleValue());
     }
 }
