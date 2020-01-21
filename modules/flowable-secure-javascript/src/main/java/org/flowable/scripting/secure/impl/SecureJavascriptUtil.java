@@ -16,16 +16,22 @@ import org.flowable.variable.api.delegate.VariableScope;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
+import java.util.Map;
+
 /**
  * @author Joram Barrez
  */
 public class SecureJavascriptUtil {
 
     public static Object evaluateScript(VariableScope variableScope, String script) {
+        return evaluateScript(variableScope, script, null);
+    }
+
+    public static Object evaluateScript(VariableScope variableScope, String script, Map<Object, Object> beans) {
         Context context = Context.enter();
         try {
             Scriptable scope = context.initStandardObjects();
-            SecureScriptScope secureScriptScope = new SecureScriptScope(variableScope);
+            SecureScriptScope secureScriptScope = new SecureScriptScope(variableScope, beans);
             scope.setPrototype(secureScriptScope);
 
             return context.evaluateString(scope, script, "<script>", 0, null);
