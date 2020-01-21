@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,8 +25,10 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/activiti/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
 public class AsyncFailingJobTest extends SpringFlowableTestCase {
 
+    @Deployment(resources = "org/activiti/spring/test/async-failing-expression.bpmn20.xml")
     public void testFailingJobFromV5Process() {
-
+        runtimeService.startProcessInstanceByKey("asyncFailingExpression");
+        
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("asyncFailingExpression").singleResult();
         assertNotNull(processInstance);
 

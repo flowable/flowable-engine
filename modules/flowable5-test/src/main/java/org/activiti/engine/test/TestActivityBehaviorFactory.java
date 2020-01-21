@@ -188,13 +188,13 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask) {
-        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(serviceTask);
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel) {
+        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(serviceTask, bpmnModel);
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask) {
-        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(sendTask);
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel) {
+        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(sendTask, bpmnModel);
     }
 
     @Override

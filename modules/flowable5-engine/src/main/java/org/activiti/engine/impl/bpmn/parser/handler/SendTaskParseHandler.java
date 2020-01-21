@@ -18,12 +18,8 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.SendTask;
-import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
-import org.flowable.engine.impl.bpmn.data.IOSpecification;
-import org.flowable.engine.impl.bpmn.webservice.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,30 +56,9 @@ public class SendTaskParseHandler extends AbstractExternalInvocationBpmnParseHan
         } else if (ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(sendTask.getImplementationType()) &&
                 StringUtils.isNotEmpty(sendTask.getOperationRef())) {
 
-            if (!bpmnParse.getOperations().containsKey(sendTask.getOperationRef())) {
-                LOGGER.warn("{} does not exist for sendTask {}", sendTask.getOperationRef(), sendTask.getId());
-            } else {
-                WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(sendTask);
-                Operation operation = bpmnParse.getOperations().get(sendTask.getOperationRef());
-                webServiceActivityBehavior.setOperation(operation);
+            WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(sendTask, bpmnParse.getBpmnModel());
+            activity.setActivityBehavior(webServiceActivityBehavior);
 
-                if (sendTask.getIoSpecification() != null) {
-                    IOSpecification ioSpecification = createIOSpecification(bpmnParse, sendTask.getIoSpecification());
-                    webServiceActivityBehavior.setIoSpecification(ioSpecification);
-                }
-
-                for (DataAssociation dataAssociationElement : sendTask.getDataInputAssociations()) {
-                    AbstractDataAssociation dataAssociation = createDataInputAssociation(bpmnParse, dataAssociationElement);
-                    webServiceActivityBehavior.addDataInputAssociation(dataAssociation);
-                }
-
-                for (DataAssociation dataAssociationElement : sendTask.getDataOutputAssociations()) {
-                    AbstractDataAssociation dataAssociation = createDataOutputAssociation(bpmnParse, dataAssociationElement);
-                    webServiceActivityBehavior.addDataOutputAssociation(dataAssociation);
-                }
-
-                activity.setActivityBehavior(webServiceActivityBehavior);
-            }
         } else {
             LOGGER.warn("One of the attributes 'type' or 'operation' is mandatory on sendTask {}", sendTask.getId());
         }

@@ -174,13 +174,13 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask) {
-        return new WebServiceActivityBehavior();
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel) {
+        return new WebServiceActivityBehavior(bpmnModel);
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask) {
-        return new WebServiceActivityBehavior();
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel) {
+        return new WebServiceActivityBehavior(bpmnModel);
     }
 
     @Override

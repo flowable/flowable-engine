@@ -31,7 +31,6 @@ import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.DataSpec;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.FlowElement;
@@ -42,10 +41,6 @@ import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.impl.bpmn.data.Data;
-import org.flowable.engine.impl.bpmn.data.DataRef;
-import org.flowable.engine.impl.bpmn.data.IOSpecification;
-import org.flowable.engine.impl.bpmn.data.ItemDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,34 +166,6 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
             }
         }
         return eventBasedGatewayId;
-    }
-
-    protected IOSpecification createIOSpecification(BpmnParse bpmnParse, org.flowable.bpmn.model.IOSpecification specificationModel) {
-        IOSpecification ioSpecification = new IOSpecification();
-
-        for (DataSpec dataInputElement : specificationModel.getDataInputs()) {
-            ItemDefinition itemDefinition = bpmnParse.getItemDefinitions().get(dataInputElement.getItemSubjectRef());
-            Data dataInput = new Data(bpmnParse.getTargetNamespace() + ":" + dataInputElement.getId(), dataInputElement.getId(), itemDefinition);
-            ioSpecification.addInput(dataInput);
-        }
-
-        for (DataSpec dataOutputElement : specificationModel.getDataOutputs()) {
-            ItemDefinition itemDefinition = bpmnParse.getItemDefinitions().get(dataOutputElement.getItemSubjectRef());
-            Data dataOutput = new Data(bpmnParse.getTargetNamespace() + ":" + dataOutputElement.getId(), dataOutputElement.getId(), itemDefinition);
-            ioSpecification.addOutput(dataOutput);
-        }
-
-        for (String dataInputRef : specificationModel.getDataInputRefs()) {
-            DataRef dataRef = new DataRef(dataInputRef);
-            ioSpecification.addInputRef(dataRef);
-        }
-
-        for (String dataOutputRef : specificationModel.getDataOutputRefs()) {
-            DataRef dataRef = new DataRef(dataOutputRef);
-            ioSpecification.addOutputRef(dataRef);
-        }
-
-        return ioSpecification;
     }
 
     protected void processArtifacts(BpmnParse bpmnParse, Collection<Artifact> artifacts, ScopeImpl scope) {

@@ -12,7 +12,6 @@
  */
 package org.activiti.engine.impl.webservice;
 
-import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -20,7 +19,7 @@ import org.flowable.engine.test.Deployment;
  *
  * @author Christophe DENEUX
  */
-public class WebServiceImportTest extends PluggableFlowableTestCase {
+public class WebServiceImportTest extends AbstractWebServiceTaskTest {
 
     @Deployment
     public void testImport() throws Exception {

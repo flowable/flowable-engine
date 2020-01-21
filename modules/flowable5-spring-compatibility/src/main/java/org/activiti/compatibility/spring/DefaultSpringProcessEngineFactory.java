@@ -53,7 +53,7 @@ public class DefaultSpringProcessEngineFactory extends DefaultProcessEngineFacto
             v5Configuration.setBeans(new SpringBeanFactoryProxyMap(v6Configuration.getApplicationContext()));
         }
         if (v5Configuration.getExpressionManager() == null) {
-            v5Configuration.setExpressionManager(new SpringExpressionManager(v6Configuration.getApplicationContext(), null));
+            v5Configuration.setExpressionManager(new SpringExpressionManager(v6Configuration.getApplicationContext(), v6Configuration.getBeans()));
         }
     }
 

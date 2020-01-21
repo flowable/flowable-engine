@@ -35,9 +35,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.HasDIBounds;
 import org.activiti.engine.impl.pvm.process.ScopeImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
-import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.impl.util.io.ResourceStreamSource;
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.exceptions.XMLException;
@@ -47,9 +45,6 @@ import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.GraphicInfo;
-import org.flowable.bpmn.model.Import;
-import org.flowable.bpmn.model.Interface;
-import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
@@ -58,16 +53,6 @@ import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.flowable.common.engine.impl.util.io.StringStreamSource;
 import org.flowable.common.engine.impl.util.io.UrlStreamSource;
-import org.flowable.engine.impl.bpmn.data.ClassStructureDefinition;
-import org.flowable.engine.impl.bpmn.data.ItemDefinition;
-import org.flowable.engine.impl.bpmn.data.ItemKind;
-import org.flowable.engine.impl.bpmn.data.StructureDefinition;
-import org.flowable.engine.impl.bpmn.parser.XMLImporter;
-import org.flowable.engine.impl.bpmn.webservice.BpmnInterface;
-import org.flowable.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
-import org.flowable.engine.impl.bpmn.webservice.MessageDefinition;
-import org.flowable.engine.impl.bpmn.webservice.Operation;
-import org.flowable.engine.impl.bpmn.webservice.OperationImplementation;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ValidationError;
 import org.slf4j.Logger;
@@ -139,14 +124,6 @@ public class BpmnParse implements BpmnXMLConstants {
      * <p>
      * All the map's elements are defined outside the process definition(s), which means that this map doesn't need to be re-initialized for each new process definition.
      */
-    protected Map<String, MessageDefinition> messages = new HashMap<>();
-    protected Map<String, StructureDefinition> structures = new HashMap<>();
-    protected Map<String, BpmnInterfaceImplementation> interfaceImplementations = new HashMap<>();
-    protected Map<String, OperationImplementation> operationImplementations = new HashMap<>();
-    protected Map<String, ItemDefinition> itemDefinitions = new HashMap<>();
-    protected Map<String, BpmnInterface> bpmnInterfaces = new HashMap<>();
-    protected Map<String, Operation> operations = new HashMap<>();
-    protected Map<String, XMLImporter> importers = new HashMap<>();
     protected Map<String, String> prefixs = new HashMap<>();
 
     // Factories
@@ -162,12 +139,6 @@ public class BpmnParse implements BpmnXMLConstants {
         this.activityBehaviorFactory = parser.getActivityBehaviorFactory();
         this.listenerFactory = parser.getListenerFactory();
         this.bpmnParserHandlers = parser.getBpmnParserHandlers();
-        this.initializeXSDItemDefinitions();
-    }
-
-    protected void initializeXSDItemDefinitions() {
-        this.itemDefinitions.put("http://www.w3.org/2001/XMLSchema:string", new ItemDefinition("http://www.w3.org/2001/XMLSchema:string",
-                new ClassStructureDefinition(String.class)));
     }
 
     public BpmnParse deployment(DeploymentEntity deployment) {
@@ -230,13 +201,10 @@ public class BpmnParse implements BpmnXMLConstants {
                 }
             }
 
+            bpmnModel.setSourceSystemId(sourceSystemId);
             bpmnModel.setEventSupport(new FlowableEventSupport());
 
             // Validation successful (or no validation)
-            createImports();
-            createItemDefinitions();
-            createMessages();
-            createOperations();
             transformProcessDefinitions();
 
         } catch (Exception e) {
@@ -306,98 +274,6 @@ public class BpmnParse implements BpmnXMLConstants {
             throw new ActivitiIllegalArgumentException("invalid: multiple sources " + this.streamSource + " and " + streamSource);
         }
         this.streamSource = streamSource;
-    }
-
-    protected void createImports() {
-        for (Import theImport : bpmnModel.getImports()) {
-            XMLImporter importer = this.getImporter(theImport);
-            if (importer == null) {
-                throw new ActivitiException("Could not import item of type " + theImport.getImportType());
-            } else {
-                importer.importFrom(theImport, sourceSystemId);
-                this.structures.putAll(importer.getStructures());
-                this.interfaceImplementations.putAll(importer.getServices());
-                this.operationImplementations.putAll(importer.getOperations());
-            }
-        }
-    }
-
-    protected XMLImporter getImporter(Import theImport) {
-        if (this.importers.containsKey(theImport.getImportType())) {
-            return this.importers.get(theImport.getImportType());
-        } else {
-            if (theImport.getImportType().equals("http://schemas.xmlsoap.org/wsdl/")) {
-                Class<?> wsdlImporterClass;
-                try {
-                    wsdlImporterClass = Class.forName("org.flowable.engine.impl.webservice.CxfWSDLImporter", true, Thread.currentThread().getContextClassLoader());
-                    XMLImporter newInstance = (XMLImporter) wsdlImporterClass.newInstance();
-                    this.importers.put(theImport.getImportType(), newInstance);
-                    return newInstance;
-                } catch (Exception e) {
-                    throw new ActivitiException("Could not find importer for type " + theImport.getImportType(), e);
-                }
-            }
-            return null;
-        }
-    }
-
-    public void createMessages() {
-        for (Message messageElement : bpmnModel.getMessages()) {
-            MessageDefinition messageDefinition = new MessageDefinition(messageElement.getId());
-            if (StringUtils.isNotEmpty(messageElement.getItemRef())) {
-                if (this.itemDefinitions.containsKey(messageElement.getItemRef())) {
-                    ItemDefinition itemDefinition = this.itemDefinitions.get(messageElement.getItemRef());
-                    messageDefinition.setItemDefinition(itemDefinition);
-                }
-            }
-            this.messages.put(messageDefinition.getId(), messageDefinition);
-
-        }
-    }
-
-    protected void createItemDefinitions() {
-        for (org.flowable.bpmn.model.ItemDefinition itemDefinitionElement : bpmnModel.getItemDefinitions().values()) {
-            StructureDefinition structure = null;
-
-            try {
-                // it is a class
-                Class<?> classStructure = ReflectUtil.loadClass(itemDefinitionElement.getStructureRef());
-                structure = new ClassStructureDefinition(classStructure);
-            } catch (ActivitiException e) {
-                // it is a reference to a different structure
-                structure = this.structures.get(itemDefinitionElement.getStructureRef());
-            }
-
-            ItemDefinition itemDefinition = new ItemDefinition(itemDefinitionElement.getId(), structure);
-            if (StringUtils.isNotEmpty(itemDefinitionElement.getItemKind())) {
-                itemDefinition.setItemKind(ItemKind.valueOf(itemDefinitionElement.getItemKind()));
-            }
-            itemDefinitions.put(itemDefinition.getId(), itemDefinition);
-        }
-    }
-
-    protected void createOperations() {
-        for (Interface interfaceObject : bpmnModel.getInterfaces()) {
-            BpmnInterface bpmnInterface = new BpmnInterface(interfaceObject.getId(), interfaceObject.getName());
-            bpmnInterface.setImplementation(this.interfaceImplementations.get(interfaceObject.getImplementationRef()));
-
-            for (org.flowable.bpmn.model.Operation operationObject : interfaceObject.getOperations()) {
-                if (this.messages.containsKey(operationObject.getInMessageRef())) {
-                    MessageDefinition inMessage = this.messages.get(operationObject.getInMessageRef());
-                    Operation operation = new Operation(operationObject.getId(), operationObject.getName(), bpmnInterface, inMessage);
-                    operation.setImplementation(this.operationImplementations.get(operationObject.getImplementationRef()));
-
-                    if (StringUtils.isNotEmpty(operationObject.getOutMessageRef())) {
-                        if (this.messages.containsKey(operationObject.getOutMessageRef())) {
-                            MessageDefinition outMessage = this.messages.get(operationObject.getOutMessageRef());
-                            operation.setOutMessage(outMessage);
-                        }
-                    }
-
-                    operations.put(operation.getId(), operation);
-                }
-            }
-        }
     }
 
     /**
@@ -644,30 +520,6 @@ public class BpmnParse implements BpmnXMLConstants {
 
     public Map<String, TransitionImpl> getSequenceFlows() {
         return sequenceFlows;
-    }
-
-    public Map<String, MessageDefinition> getMessages() {
-        return messages;
-    }
-
-    public Map<String, BpmnInterfaceImplementation> getInterfaceImplementations() {
-        return interfaceImplementations;
-    }
-
-    public Map<String, ItemDefinition> getItemDefinitions() {
-        return itemDefinitions;
-    }
-
-    public Map<String, XMLImporter> getImporters() {
-        return importers;
-    }
-
-    public Map<String, Operation> getOperations() {
-        return operations;
-    }
-
-    public void setOperations(Map<String, Operation> operations) {
-        this.operations = operations;
     }
 
     public ProcessDefinitionEntity getCurrentProcessDefinition() {

@@ -12,19 +12,51 @@
  */
 package org.activiti.engine.impl.bpmn.behavior;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.DataAssociation;
+import org.flowable.bpmn.model.DataSpec;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IOSpecification;
+import org.flowable.bpmn.model.Import;
+import org.flowable.bpmn.model.Interface;
+import org.flowable.bpmn.model.Message;
+import org.flowable.bpmn.model.SendTask;
+import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
-import org.flowable.engine.impl.bpmn.data.IOSpecification;
+import org.flowable.engine.impl.bpmn.data.Assignment;
+import org.flowable.engine.impl.bpmn.data.ClassStructureDefinition;
+import org.flowable.engine.impl.bpmn.data.ItemDefinition;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
+import org.flowable.engine.impl.bpmn.data.ItemKind;
+import org.flowable.engine.impl.bpmn.data.SimpleDataInputAssociation;
+import org.flowable.engine.impl.bpmn.data.StructureDefinition;
+import org.flowable.engine.impl.bpmn.data.TransformationDataOutputAssociation;
+import org.flowable.engine.impl.bpmn.parser.XMLImporter;
+import org.flowable.engine.impl.bpmn.webservice.BpmnInterface;
+import org.flowable.engine.impl.bpmn.webservice.MessageDefinition;
+import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataInputAssociation;
+import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
 import org.flowable.engine.impl.bpmn.webservice.Operation;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.impl.webservice.WSOperation;
+import org.flowable.engine.impl.webservice.WSService;
 
 /**
  * An activity behavior that allows calling Web services
@@ -35,63 +67,90 @@ import org.flowable.engine.impl.bpmn.webservice.Operation;
  */
 public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
 
-    public static final String CURRENT_MESSAGE = "org.activiti.engine.impl.bpmn.CURRENT_MESSAGE";
+    public static final String CURRENT_MESSAGE = "org.flowable.engine.impl.bpmn.CURRENT_MESSAGE";
 
-    protected Operation operation;
+    protected Map<String, XMLImporter> xmlImporterMap = new HashMap<>();
+    protected Map<String, WSOperation> wsOperationMap = new HashMap<>();
+    protected Map<String, StructureDefinition> structureDefinitionMap = new HashMap<>();
+    protected Map<String, WSService> wsServiceMap = new HashMap<>();
+    protected Map<String, Operation> operationMap = new HashMap<>();
+    protected Map<String, ItemDefinition> itemDefinitionMap = new HashMap<>();
+    protected Map<String, MessageDefinition> messageDefinitionMap = new HashMap<>();
 
-    protected IOSpecification ioSpecification;
-
-    protected List<AbstractDataAssociation> dataInputAssociations;
-
-    protected List<AbstractDataAssociation> dataOutputAssociations;
-
-    public WebServiceActivityBehavior() {
-        this.dataInputAssociations = new ArrayList<>();
-        this.dataOutputAssociations = new ArrayList<>();
+    public WebServiceActivityBehavior(BpmnModel bpmnModel) {
+        itemDefinitionMap.put("http://www.w3.org/2001/XMLSchema:string", new ItemDefinition("http://www.w3.org/2001/XMLSchema:string", new ClassStructureDefinition(String.class)));
+        fillDefinitionMaps(bpmnModel);
     }
 
-    public void addDataInputAssociation(AbstractDataAssociation dataAssociation) {
-        this.dataInputAssociations.add(dataAssociation);
-    }
+    public void execute(DelegateExecution execution) {
+        ActivityExecution activityExecution = (ActivityExecution) execution;
+        
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId());
+        FlowElement flowElement = execution.getCurrentFlowElement();
 
-    public void addDataOutputAssociation(AbstractDataAssociation dataAssociation) {
-        this.dataOutputAssociations.add(dataAssociation);
-    }
+        IOSpecification ioSpecification = null;
+        String operationRef = null;
+        List<DataAssociation> dataInputAssociations = null;
+        List<DataAssociation> dataOutputAssociations = null;
 
-    public void execute(ActivityExecution execution) throws Exception {
-        MessageInstance message;
+        if (flowElement instanceof SendTask) {
+            SendTask sendTask = (SendTask) flowElement;
+            ioSpecification = sendTask.getIoSpecification();
+            operationRef = sendTask.getOperationRef();
+            dataInputAssociations = sendTask.getDataInputAssociations();
+            dataOutputAssociations = sendTask.getDataOutputAssociations();
 
+        } else if (flowElement instanceof ServiceTask) {
+            ServiceTask serviceTask = (ServiceTask) flowElement;
+            ioSpecification = serviceTask.getIoSpecification();
+            operationRef = serviceTask.getOperationRef();
+            dataInputAssociations = serviceTask.getDataInputAssociations();
+            dataOutputAssociations = serviceTask.getDataOutputAssociations();
+
+        } else {
+            throw new FlowableException("Unsupported flow element type " + flowElement);
+        }
+
+        MessageInstance message = null;
+
+        Operation operation = operationMap.get(operationRef);
         try {
             if (ioSpecification != null) {
-                this.ioSpecification.initialize(execution);
-                ItemInstance inputItem = (ItemInstance) execution.getTransientVariable(this.ioSpecification.getFirstDataInputName());
-                message = new MessageInstance(this.operation.getInMessage(), inputItem);
+                initializeIoSpecification(ioSpecification, execution, bpmnModel);
+                if (ioSpecification.getDataInputRefs().size() > 0) {
+                    String firstDataInputName = ioSpecification.getDataInputRefs().get(0);
+                    ItemInstance inputItem = (ItemInstance) execution.getTransientVariable(firstDataInputName);
+                    message = new MessageInstance(operation.getInMessage(), inputItem);
+                }
+
             } else {
-                message = this.operation.getInMessage().createInstance();
+                message = operation.getInMessage().createInstance();
             }
 
             execution.setTransientVariable(CURRENT_MESSAGE, message);
 
-            this.fillMessage(message, execution);
+            fillMessage(dataInputAssociations, execution);
 
             ProcessEngineConfigurationImpl processEngineConfig = Context.getProcessEngineConfiguration();
-            MessageInstance receivedMessage = this.operation.sendMessage(message,
+            MessageInstance receivedMessage = operation.sendMessage(message,
                     processEngineConfig.getWsOverridenEndpointAddresses());
 
             execution.setTransientVariable(CURRENT_MESSAGE, receivedMessage);
 
-            if (ioSpecification != null) {
-                String firstDataOutputName = this.ioSpecification.getFirstDataOutputName();
+            if (ioSpecification != null && ioSpecification.getDataOutputRefs().size() > 0) {
+                String firstDataOutputName = ioSpecification.getDataOutputRefs().get(0);
                 if (firstDataOutputName != null) {
                     ItemInstance outputItem = (ItemInstance) execution.getTransientVariable(firstDataOutputName);
                     outputItem.getStructureInstance().loadFrom(receivedMessage.getStructureInstance().toArray());
                 }
             }
 
-            this.returnMessage(receivedMessage, execution);
+            returnMessage(dataOutputAssociations, execution);
 
             execution.setTransientVariable(CURRENT_MESSAGE, null);
-            leave(execution);
+            
+            leave(activityExecution);
+            
         } catch (Exception exc) {
 
             Throwable cause = exc;
@@ -100,36 +159,185 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
                 if (cause instanceof BpmnError) {
                     error = (BpmnError) cause;
                     break;
+                    
+                } else if (cause instanceof org.flowable.engine.delegate.BpmnError) {
+                    org.flowable.engine.delegate.BpmnError flowableError = (org.flowable.engine.delegate.BpmnError) cause;
+                    error = new BpmnError(flowableError.getErrorCode(), flowableError.getMessage());
+                    break;
                 }
                 cause = cause.getCause();
             }
 
             if (error != null) {
-                ErrorPropagation.propagateError(error, execution);
+                ErrorPropagation.propagateError(error, activityExecution);
             } else {
-                throw exc;
+                throw (RuntimeException) exc;
+            }
+        }
+    }
+    
+    protected void initializeIoSpecification(IOSpecification activityIoSpecification, DelegateExecution execution, BpmnModel bpmnModel) {
+
+        for (DataSpec dataSpec : activityIoSpecification.getDataInputs()) {
+            ItemDefinition itemDefinition = itemDefinitionMap.get(dataSpec.getItemSubjectRef());
+            execution.setTransientVariable(dataSpec.getId(), itemDefinition.createInstance());
+        }
+
+        for (DataSpec dataSpec : activityIoSpecification.getDataOutputs()) {
+            ItemDefinition itemDefinition = itemDefinitionMap.get(dataSpec.getItemSubjectRef());
+            execution.setTransientVariable(dataSpec.getId(), itemDefinition.createInstance());
+        }
+    }
+
+    protected void fillDefinitionMaps(BpmnModel bpmnModel) {
+
+        for (Import theImport : bpmnModel.getImports()) {
+            fillImporterInfo(theImport, bpmnModel.getSourceSystemId());
+        }
+
+        createItemDefinitions(bpmnModel);
+        createMessages(bpmnModel);
+        createOperations(bpmnModel);
+    }
+
+    protected void createItemDefinitions(BpmnModel bpmnModel) {
+
+        for (org.flowable.bpmn.model.ItemDefinition itemDefinitionElement : bpmnModel.getItemDefinitions().values()) {
+
+            if (!itemDefinitionMap.containsKey(itemDefinitionElement.getId())) {
+                StructureDefinition structure = null;
+
+                try {
+                    // it is a class
+                    Class<?> classStructure = ReflectUtil.loadClass(itemDefinitionElement.getStructureRef());
+                    structure = new ClassStructureDefinition(classStructure);
+                } catch (FlowableException e) {
+                    // it is a reference to a different structure
+                    structure = structureDefinitionMap.get(itemDefinitionElement.getStructureRef());
+                }
+
+                ItemDefinition itemDefinition = new ItemDefinition(itemDefinitionElement.getId(), structure);
+                if (StringUtils.isNotEmpty(itemDefinitionElement.getItemKind())) {
+                    itemDefinition.setItemKind(ItemKind.valueOf(itemDefinitionElement.getItemKind()));
+                }
+
+                itemDefinitionMap.put(itemDefinition.getId(), itemDefinition);
             }
         }
     }
 
-    private void returnMessage(MessageInstance message, ActivityExecution execution) {
-        for (AbstractDataAssociation dataAssociation : this.dataOutputAssociations) {
+    public void createMessages(BpmnModel bpmnModel) {
+        for (Message messageElement : bpmnModel.getMessages()) {
+            if (!messageDefinitionMap.containsKey(messageElement.getId())) {
+                MessageDefinition messageDefinition = new MessageDefinition(messageElement.getId());
+                if (StringUtils.isNotEmpty(messageElement.getItemRef())) {
+                    if (itemDefinitionMap.containsKey(messageElement.getItemRef())) {
+                        ItemDefinition itemDefinition = itemDefinitionMap.get(messageElement.getItemRef());
+                        messageDefinition.setItemDefinition(itemDefinition);
+                    }
+                }
+
+                messageDefinitionMap.put(messageDefinition.getId(), messageDefinition);
+            }
+        }
+    }
+
+    protected void createOperations(BpmnModel bpmnModel) {
+        for (Interface interfaceObject : bpmnModel.getInterfaces()) {
+            BpmnInterface bpmnInterface = new BpmnInterface(interfaceObject.getId(), interfaceObject.getName());
+            bpmnInterface.setImplementation(wsServiceMap.get(interfaceObject.getImplementationRef()));
+
+            for (org.flowable.bpmn.model.Operation operationObject : interfaceObject.getOperations()) {
+
+                if (!operationMap.containsKey(operationObject.getId())) {
+                    MessageDefinition inMessage = messageDefinitionMap.get(operationObject.getInMessageRef());
+                    Operation operation = new Operation(operationObject.getId(), operationObject.getName(), bpmnInterface, inMessage);
+                    operation.setImplementation(wsOperationMap.get(operationObject.getImplementationRef()));
+
+                    if (StringUtils.isNotEmpty(operationObject.getOutMessageRef())) {
+                        if (messageDefinitionMap.containsKey(operationObject.getOutMessageRef())) {
+                            MessageDefinition outMessage = messageDefinitionMap.get(operationObject.getOutMessageRef());
+                            operation.setOutMessage(outMessage);
+                        }
+                    }
+
+                    operationMap.put(operation.getId(), operation);
+                }
+            }
+        }
+    }
+
+    protected void fillImporterInfo(Import theImport, String sourceSystemId) {
+        if (!xmlImporterMap.containsKey(theImport.getNamespace())) {
+
+            if (theImport.getImportType().equals("http://schemas.xmlsoap.org/wsdl/")) {
+                try {
+                    ProcessEngineConfigurationImpl processEngineConfig = Context.getProcessEngineConfiguration();
+                    XMLImporter importerInstance = processEngineConfig.getWsdlImporterFactory()
+                            .createXMLImporter(theImport);
+
+                    xmlImporterMap.put(theImport.getNamespace(), importerInstance);
+                    importerInstance.importFrom(theImport, sourceSystemId);
+
+                    structureDefinitionMap.putAll(importerInstance.getStructures());
+                    wsServiceMap.putAll(importerInstance.getServices());
+                    wsOperationMap.putAll(importerInstance.getOperations());
+
+                } catch (FlowableException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new FlowableException(String.format("Error importing '%s' as '%s'", theImport.getLocation(),
+                            theImport.getImportType()), e);
+                }
+
+            } else {
+                throw new FlowableException(String.format("Unsupported import type '%s'", theImport.getImportType()));
+            }
+        }
+    }
+
+    protected void returnMessage(List<DataAssociation> dataOutputAssociations, DelegateExecution execution) {
+        for (DataAssociation dataAssociationElement : dataOutputAssociations) {
+            AbstractDataAssociation dataAssociation = createDataOutputAssociation(dataAssociationElement);
             dataAssociation.evaluate(execution);
         }
     }
 
-    private void fillMessage(MessageInstance message, ActivityExecution execution) {
-        for (AbstractDataAssociation dataAssociation : this.dataInputAssociations) {
+    protected void fillMessage(List<DataAssociation> dataInputAssociations, DelegateExecution execution) {
+        for (DataAssociation dataAssociationElement : dataInputAssociations) {
+            AbstractDataAssociation dataAssociation = createDataInputAssociation(dataAssociationElement);
             dataAssociation.evaluate(execution);
         }
     }
 
-    public void setIoSpecification(IOSpecification ioSpecification) {
-        this.ioSpecification = ioSpecification;
+    protected AbstractDataAssociation createDataInputAssociation(DataAssociation dataAssociationElement) {
+        if (dataAssociationElement.getAssignments().isEmpty()) {
+            return new MessageImplicitDataInputAssociation(dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
+        } else {
+            SimpleDataInputAssociation dataAssociation = new SimpleDataInputAssociation(dataAssociationElement.getSourceRef(), dataAssociationElement.getTargetRef());
+            ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
+
+            for (org.flowable.bpmn.model.Assignment assignmentElement : dataAssociationElement.getAssignments()) {
+                if (StringUtils.isNotEmpty(assignmentElement.getFrom()) && StringUtils.isNotEmpty(assignmentElement.getTo())) {
+                    Expression from = expressionManager.createExpression(assignmentElement.getFrom());
+                    Expression to = expressionManager.createExpression(assignmentElement.getTo());
+                    Assignment assignment = new Assignment(from, to);
+                    dataAssociation.addAssignment(assignment);
+                }
+            }
+            return dataAssociation;
+        }
     }
 
-    public void setOperation(Operation operation) {
-        this.operation = operation;
+    protected AbstractDataAssociation createDataOutputAssociation(DataAssociation dataAssociationElement) {
+        if (StringUtils.isNotEmpty(dataAssociationElement.getSourceRef())) {
+            return new MessageImplicitDataOutputAssociation(dataAssociationElement.getTargetRef(), dataAssociationElement.getSourceRef());
+        } else {
+            ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
+            Expression transformation = expressionManager.createExpression(dataAssociationElement.getTransformation());
+            AbstractDataAssociation dataOutputAssociation = new TransformationDataOutputAssociation(null, dataAssociationElement.getTargetRef(), transformation);
+            return dataOutputAssociation;
+        }
     }
 
 }
