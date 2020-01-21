@@ -12,6 +12,11 @@
  */
 package org.flowable.eventregistry.impl.pipeline;
 
+import java.util.Collections;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -19,6 +24,7 @@ import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToJsonStringSerializer;
 import org.flowable.eventregistry.impl.serialization.EventPayloadToXmlStringSerializer;
+import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.OutboundChannelModel;
 
@@ -37,25 +43,37 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
                     EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof OutboundChannelModel) {
-            registerChannelModel((OutboundChannelModel) channelModel, eventRepositoryService);
+            registerChannelModel((OutboundChannelModel) channelModel);
         }
 
     }
 
-    protected void registerChannelModel(OutboundChannelModel inboundChannelModel, EventRepositoryService eventRepositoryService) {
+    protected void registerChannelModel(OutboundChannelModel inboundChannelModel) {
         if (inboundChannelModel.getOutboundEventProcessingPipeline() == null) {
 
             OutboundEventProcessingPipeline eventProcessingPipeline;
 
-            if ("json".equals(inboundChannelModel.getSerializerType())) {
+            if (StringUtils.isNotEmpty(inboundChannelModel.getPipelineDelegateExpression())) {
+                eventProcessingPipeline = resolveExpression(inboundChannelModel.getPipelineDelegateExpression(), OutboundEventProcessingPipeline.class);
+            } else if ("json".equals(inboundChannelModel.getSerializerType())) {
                 OutboundEventSerializer eventSerializer = new EventPayloadToJsonStringSerializer();
-                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventRepositoryService, eventSerializer);
+                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventSerializer);
                 
             } else if ("xml".equals(inboundChannelModel.getSerializerType())) {
                 OutboundEventSerializer eventSerializer = new EventPayloadToXmlStringSerializer();
-                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventRepositoryService, eventSerializer);
+                eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventSerializer);
                 
-            } else {
+            } else if ("expression".equals(inboundChannelModel.getSerializerType())) {
+                if (StringUtils.isNotEmpty(inboundChannelModel.getSerializerDelegateExpression())) {
+                    OutboundEventSerializer outboundEventSerializer = resolveExpression(inboundChannelModel.getSerializerDelegateExpression(),
+                        OutboundEventSerializer.class);
+                    eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(outboundEventSerializer);
+                } else {
+                    throw new FlowableException(
+                        "The channel key " + inboundChannelModel.getKey()
+                            + " is using expression deserialization, but pipelineDelegateExpression was not set.");
+                }
+            }  else {
                 eventProcessingPipeline = null;
             }
 
@@ -64,6 +82,18 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
             }
 
         }
+    }
+
+    protected <T> T resolveExpression(String expression, Class<T> type) {
+        Object value = CommandContextUtil.getEventRegistryConfiguration().getExpressionManager()
+            .createExpression(expression)
+            .getValue(new VariableContainerWrapper(Collections.emptyMap()));
+
+        if (type.isInstance(value)) {
+            return type.cast(value);
+        }
+
+        throw new FlowableException("expected expression " + expression + " to resolve to " + type + " but it did not. Resolved value is " + value);
     }
 
     @Override

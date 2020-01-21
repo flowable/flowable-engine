@@ -22,10 +22,5 @@ public interface InboundEventDeserializer<T> {
      * The actual deserialization.
      */
     T deserialize(String rawEvent);
-    
-    /**
-     * Type of the event deserializer
-     */
-    String getType();
 
 }

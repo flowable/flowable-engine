@@ -25,8 +25,4 @@ public interface OutboundEventSerializer {
      */
     String serialize(EventInstance eventInstance);
 
-    /**
-     * The serializer type.
-     */
-    String getType();
 }

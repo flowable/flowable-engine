@@ -24,6 +24,7 @@ public class ChannelEventTenantIdDetection {
     protected String fixedValue;
     protected String jsonPointerExpression;
     protected String xPathExpression;
+    protected String delegateExpression;
 
     public String getFixedValue() {
         return fixedValue;
@@ -42,5 +43,13 @@ public class ChannelEventTenantIdDetection {
     }
     public void setxPathExpression(String xPathExpression) {
         this.xPathExpression = xPathExpression;
+    }
+
+    public String getDelegateExpression() {
+        return delegateExpression;
+    }
+
+    public void setDelegateExpression(String delegateExpression) {
+        this.delegateExpression = delegateExpression;
     }
 }

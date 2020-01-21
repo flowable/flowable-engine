@@ -20,7 +20,9 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.eventregistry.api.EventDeployment;
@@ -59,9 +61,14 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
 
     protected TestEventConsumer testEventConsumer;
 
+    protected Map<Object, Object> initialBeans;
+
     @BeforeEach
     public void setup() {
         testEventConsumer = new TestEventConsumer();
+        initialBeans = eventEngineConfiguration.getExpressionManager().getBeans();
+        eventEngineConfiguration.getExpressionManager().setBeans(new HashMap<>());
+
         EventRegistry eventRegistry = eventEngineConfiguration.getEventRegistry();
         eventRegistry.registerEventRegistryEventConsumer(this.testEventConsumer);
         eventRegistry.setInboundEventProcessor(new DefaultInboundEventProcessor(eventRegistry));
@@ -69,6 +76,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     
     @AfterEach
     public void tearDown() {
+        eventEngineConfiguration.getExpressionManager().setBeans(initialBeans);
         List<EventDeployment> eventDeployments = repositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : eventDeployments) {
             repositoryService.deleteDeployment(eventDeployment.getId());
@@ -147,22 +155,19 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        eventEngineConfiguration.getExpressionManager().getBeans()
+            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
+        
         eventEngineConfiguration.getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
             .resourceName("test.channel")
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
+            .channelAdapter("${inboundEventChannelAdapter}")
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
-        
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-        InboundChannelModel inboundChannelModel = (InboundChannelModel) eventEngineConfiguration.getEventRepositoryService().getChannelModelByKey("test-channel");
-        inboundChannelModel.setInboundEventChannelAdapter(inboundEventChannelAdapter);
-        
-        inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
-        inboundEventChannelAdapter.setEventRegistry(eventEngineConfiguration.getEventRegistry());
+
 
         return inboundEventChannelAdapter;
     }
@@ -192,11 +197,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                     throw new UncheckedIOException(e);
                 }
             }
-            
-            @Override
-            public String getType() {
-                return "test";
-            }
+
         });
         
         inboundEventProcessingPipeline.setInboundEventKeyDetector(Customer::getType);

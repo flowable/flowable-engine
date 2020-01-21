@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.api.model;
 
 import org.flowable.eventregistry.api.EventDeployment;
+import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
@@ -63,9 +64,9 @@ public interface OutboundChannelModelBuilder {
     OutboundChannelModelBuilder parentDeploymentId(String parentDeploymentId);
 
     /**
-     * Sets a custom {@link OutboundEventChannelAdapter} adapter instance which will send the events.
+     * Sets a custom {@link OutboundEventChannelAdapter} via a delegate expression.
      */
-    OutboundEventProcessingPipelineBuilder channelAdapter(OutboundEventChannelAdapter outboundEventChannelAdapter);
+    OutboundEventProcessingPipelineBuilder channelAdapter(String delegateExpression);
 
     /**
      * Configures an adapter which will send events using JMS.
@@ -138,19 +139,15 @@ public interface OutboundChannelModelBuilder {
         OutboundChannelModelBuilder xmlSerializer();
 
         /**
-         * Serializes the event using a custom {@link OutboundEventSerializer} instance.
+         * Uses a delegate expression to serialize the event.
+         * The expression should resolve to an instance of {@link OutboundEventSerializer}.
          */
-        OutboundChannelModelBuilder serializer(OutboundEventSerializer serializer);
+        OutboundChannelModelBuilder delegateExpressionSerializer(String delegateExpression);
 
         /**
-         * Sets a fully custom {@link OutboundEventProcessingPipeline} instance.
+         * Uses a delegate expression to determine the custom {@link OutboundEventProcessingPipeline} instance.
          */
-        OutboundChannelModelBuilder eventProcessingPipeline(OutboundEventProcessingPipeline outboundEventProcessingPipeline);
-
-        /**
-         * Finishes building the pipeline.
-         */
-        OutboundEventProcessingPipeline build();
+        OutboundChannelModelBuilder eventProcessingPipeline(String delegateExpression);
 
     }
 

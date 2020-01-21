@@ -40,9 +40,5 @@ public class StringToXmlDocumentDeserializer implements InboundEventDeserializer
             throw new FlowableException("Could not deserialize event to xml", e);
         }
     }
-    
-    @Override
-    public String getType() {
-        return "xml";
-    }
+
 }

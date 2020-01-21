@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.OutboundChannelModel;
 
@@ -30,6 +31,7 @@ public class OutboundChannelModelValidator implements ChannelValidator {
         supportedSerializers = new HashSet<>();
         supportedSerializers.add("json");
         supportedSerializers.add("xml");
+        supportedSerializers.add("expression");
     }
 
     public OutboundChannelModelValidator(Collection<String> supportedSerializers) {
@@ -47,7 +49,9 @@ public class OutboundChannelModelValidator implements ChannelValidator {
 
     protected void validateChannel(OutboundChannelModel outboundChannelModel) {
         String serializerType = outboundChannelModel.getSerializerType();
-        if (!supportedSerializers.contains(serializerType)) {
+        if (StringUtils.isEmpty(outboundChannelModel.getPipelineDelegateExpression()) &&
+            !supportedSerializers.contains(serializerType)) {
+            // Serializer is only needed if there is no pipeline delegate expression
             throw new FlowableEventJsonException(
                 "The serializer type is not supported " + serializerType + " for the channel model with key " + outboundChannelModel.getKey());
         }

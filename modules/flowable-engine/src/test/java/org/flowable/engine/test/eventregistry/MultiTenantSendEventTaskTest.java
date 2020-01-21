@@ -22,7 +22,6 @@ import java.util.Set;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.test.JobTestHelper;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -32,7 +31,6 @@ import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.model.InboundChannelModel;
-import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
@@ -45,7 +43,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
+public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
 
     private static final String TENANT_A = "tenantA";
 
@@ -101,39 +99,35 @@ public class MultiTenantSendEventTaskTest extends PluggableFlowableTestCase {
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
+        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
+
+        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
+            .put("outboundEventChannelAdapter", outboundEventChannelAdapter);
+
         getEventRepositoryService().createOutboundChannelModelBuilder()
             .key("out-channel")
             .resourceName("testOut.channel")
-            .jmsChannelAdapter("testOut")
-            .eventProcessingPipeline()
+            .channelAdapter("${outboundEventChannelAdapter}")
             .jsonSerializer()
             .deploy();
-        
-        TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
-        OutboundChannelModel outboundChannel = (OutboundChannelModel) getEventRepositoryService().getChannelModelByKey("out-channel");
-        outboundChannel.setOutboundEventChannelAdapter(outboundEventChannelAdapter);
 
         return outboundEventChannelAdapter;
     }
 
     protected TestInboundEventChannelAdapter setupTestInboundChannel() {
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
+            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
+
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
             .resourceName("testIn.channel")
-            .jmsChannelAdapter("testIn")
-            .eventProcessingPipeline()
+            .channelAdapter("${inboundEventChannelAdapter}")
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
             .detectEventTenantUsingJsonPointerExpression("/tenantId")
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
-        
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-        InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
-        inboundChannel.setInboundEventChannelAdapter(inboundEventChannelAdapter);
-        
-        inboundEventChannelAdapter.setEventRegistry(getEventRegistry());
-        inboundEventChannelAdapter.setInboundChannelModel(inboundChannel);
 
         return inboundEventChannelAdapter;
     }

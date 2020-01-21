@@ -21,6 +21,9 @@ public class OutboundChannelModel extends ChannelModel {
 
     protected String serializerType;
 
+    protected String serializerDelegateExpression;
+    protected String pipelineDelegateExpression;
+
     @JsonIgnore
     protected Object outboundEventChannelAdapter;
 
@@ -37,6 +40,22 @@ public class OutboundChannelModel extends ChannelModel {
 
     public void setSerializerType(String serializerType) {
         this.serializerType = serializerType;
+    }
+
+    public String getSerializerDelegateExpression() {
+        return serializerDelegateExpression;
+    }
+
+    public void setSerializerDelegateExpression(String serializerDelegateExpression) {
+        this.serializerDelegateExpression = serializerDelegateExpression;
+    }
+
+    public String getPipelineDelegateExpression() {
+        return pipelineDelegateExpression;
+    }
+
+    public void setPipelineDelegateExpression(String pipelineDelegateExpression) {
+        this.pipelineDelegateExpression = pipelineDelegateExpression;
     }
 
     public Object getOutboundEventChannelAdapter() {

@@ -20,6 +20,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class InboundChannelModel extends ChannelModel {
 
     protected String deserializerType;
+
+    protected String deserializerDelegateExpression;
+    protected String payloadExtractorDelegateExpression;
+    protected String eventTransformerDelegateExpression;
+    protected String pipelineDelegateExpression;
     protected ChannelEventKeyDetection channelEventKeyDetection;
     protected ChannelEventTenantIdDetection channelEventTenantIdDetection;
 
@@ -39,6 +44,38 @@ public class InboundChannelModel extends ChannelModel {
 
     public void setDeserializerType(String deserializerType) {
         this.deserializerType = deserializerType;
+    }
+
+    public String getDeserializerDelegateExpression() {
+        return deserializerDelegateExpression;
+    }
+
+    public void setDeserializerDelegateExpression(String deserializerDelegateExpression) {
+        this.deserializerDelegateExpression = deserializerDelegateExpression;
+    }
+
+    public String getPayloadExtractorDelegateExpression() {
+        return payloadExtractorDelegateExpression;
+    }
+
+    public void setPayloadExtractorDelegateExpression(String payloadExtractorDelegateExpression) {
+        this.payloadExtractorDelegateExpression = payloadExtractorDelegateExpression;
+    }
+
+    public String getEventTransformerDelegateExpression() {
+        return eventTransformerDelegateExpression;
+    }
+
+    public void setEventTransformerDelegateExpression(String eventTransformerDelegateExpression) {
+        this.eventTransformerDelegateExpression = eventTransformerDelegateExpression;
+    }
+
+    public String getPipelineDelegateExpression() {
+        return pipelineDelegateExpression;
+    }
+
+    public void setPipelineDelegateExpression(String pipelineDelegateExpression) {
+        this.pipelineDelegateExpression = pipelineDelegateExpression;
     }
 
     public ChannelEventKeyDetection getChannelEventKeyDetection() {

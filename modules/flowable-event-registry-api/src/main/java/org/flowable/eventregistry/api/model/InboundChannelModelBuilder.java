@@ -14,12 +14,10 @@ package org.flowable.eventregistry.api.model;
 
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
-import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
-import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.model.InboundChannelModel;
 
 /**
@@ -75,10 +73,9 @@ public interface InboundChannelModelBuilder {
     InboundChannelModelBuilder parentDeploymentId(String parentDeploymentId);
 
     /**
-     * Sets a custom {@link InboundEventChannelAdapter} adapter instance which will receive
-     * the events and pass them to the {@link org.flowable.eventregistry.api.EventRegistry}.
+     * Sets a custom {@link InboundEventChannelAdapter} via a delegate expression.
      */
-    InboundEventProcessingPipelineBuilder channelAdapter(InboundEventChannelAdapter inboundEventChannelAdapter);
+    InboundEventProcessingPipelineBuilder channelAdapter(String delegateExpression);
 
     /**
      * Configures an adapter which will receive events using JMS.
@@ -97,7 +94,7 @@ public interface InboundChannelModelBuilder {
 
     /**
      * Creates the {@link InboundChannelModel} instance based on the configuration
-     * and registers it with the {@link org.flowable.eventregistry.api.EventRegistry}.
+     * and registers it with the {@link org.flowable.eventregistry.api.EventRepositoryService EventRepositoryService}.
      */
     EventDeployment deploy();
 
@@ -218,19 +215,14 @@ public interface InboundChannelModelBuilder {
         InboundEventKeyXmlDetectorBuilder xmlDeserializer();
 
         /**
-         * Deserializes the event using a custom {@link InboundEventDeserializer}.
+         * Uses a delegate expression to deserialize the event.
          */
-        <T> InboundEventKeyDetectorBuilder<T> deserializer(InboundEventDeserializer<T> deserializer);
+        InboundEventKeyDetectorBuilder delegateExpressionDeserializer(String delegateExpression);
 
         /**
-         * Continue configuring the event processing pipeline.
+         * Uses a delegate expression to determine the custom {@link InboundEventProcessingPipeline} instance.
          */
-        InboundChannelModelBuilder eventProcessingPipeline(InboundEventProcessingPipeline inboundEventProcessingPipeline);
-
-        /**
-         * Finish configuring the event processing pipeline.
-         */
-        InboundEventProcessingPipeline build();
+        InboundChannelModelBuilder eventProcessingPipeline(String delegateExpression);
 
     }
 
@@ -310,29 +302,29 @@ public interface InboundChannelModelBuilder {
     /**
      * Builder for the 'key detection' part of the {@link InboundChannelModel}.
      */
-    interface InboundEventKeyDetectorBuilder<T> {
+    interface InboundEventKeyDetectorBuilder {
 
         /**
-         * Determines the key of the event using a custom {@link InboundEventKeyDetector}.
+         * Uses delegate expression to determine the custom {@link InboundEventKeyDetector}.
          */
-        InboundEventTenantDetectorBuilder<T> detectEventKeyUsingKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector);
+        InboundEventTenantDetectorBuilder delegateExpressionKeyDetector(String delegateExpression);
 
     }
 
     /**
      * Builder for the 'tenant ID detection' part of the {@link InboundChannelModel}.
      */
-    interface InboundEventTenantDetectorBuilder<T> extends InboundEventPayloadExtractorBuilder<T> {  // Extends because using tenant extraction is optional
+    interface InboundEventTenantDetectorBuilder extends InboundEventPayloadExtractorBuilder {  // Extends because using tenant extraction is optional
 
         /**
          * Sets the tenant to a hardcoded value. Useful for when the channel only receives events for a given tenant.
          */
-        InboundEventPayloadExtractorBuilder<T> fixedTenantId(String tenantId);
+        InboundEventPayloadExtractorBuilder fixedTenantId(String tenantId);
 
         /**
-         * Detect the tenant using a custom {@link InboundEventTenantDetector} instance.
+         * Uses delegate expression to determine the custom {@link InboundEventTenantDetector} instance.
          */
-        InboundEventPayloadExtractorBuilder<T> detectTenantUsingTenantDetector(InboundEventTenantDetector<T>inboundEventTenantDetector);
+        InboundEventPayloadExtractorBuilder delegateExpressionTenantDetector(String delegateExpression);
 
     }
 
@@ -363,18 +355,18 @@ public interface InboundChannelModelBuilder {
     /**
      * Builder for the 'payload extraction' part of the {@link InboundChannelModel}.
      */
-    interface InboundEventPayloadExtractorBuilder<T> {
+    interface InboundEventPayloadExtractorBuilder {
 
         /**
-         * Extracts the payload with a custom {@link InboundEventPayloadExtractor} instance.
+         * Uses delegate expression to determine the custom {@link InboundEventPayloadExtractor} instance.
          */
-        InboundEventTransformerBuilder payloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor);
+        InboundEventTransformerBuilder payloadExtractor(String delegateExpression);
 
     }
 
     interface InboundEventTransformerBuilder {
 
-        InboundChannelModelBuilder transformer(InboundEventTransformer inboundEventTransformer);
+        InboundChannelModelBuilder transformer(String delegateExpression);
 
         EventDeployment deploy();
 

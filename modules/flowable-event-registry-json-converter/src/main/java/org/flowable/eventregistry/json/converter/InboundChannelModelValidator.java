@@ -32,34 +32,47 @@ public class InboundChannelModelValidator implements ChannelValidator {
     }
 
     protected void validateChannel(InboundChannelModel inboundChannelModel) {
-        if (inboundChannelModel.getChannelEventKeyDetection() == null) {
-            throw new FlowableEventJsonException("A channel key detection value is required for the channel model with key " + inboundChannelModel.getKey());
+        if (StringUtils.isEmpty(inboundChannelModel.getPipelineDelegateExpression())) {
+            // Deserializer is only needed if there is no pipeline delegate expression
+            validateDeserializer(inboundChannelModel);
         }
-
-        validateDeserializer(inboundChannelModel);
     }
 
     protected void validateDeserializer(InboundChannelModel inboundChannelModel) {
         String deserializerType = inboundChannelModel.getDeserializerType();
         ChannelEventKeyDetection channelEventKeyDetection = inboundChannelModel.getChannelEventKeyDetection();
         if ("json".equalsIgnoreCase(deserializerType)) {
+            if (channelEventKeyDetection == null) {
+                throw new FlowableEventJsonException("A channel key detection value is required for the channel model with key " + inboundChannelModel.getKey());
+            }
+
             if (StringUtils.isEmpty(channelEventKeyDetection.getFixedValue()) &&
                 StringUtils.isEmpty(channelEventKeyDetection.getJsonField()) &&
-                StringUtils.isEmpty(channelEventKeyDetection.getJsonPointerExpression())) {
+                StringUtils.isEmpty(channelEventKeyDetection.getJsonPointerExpression()) &&
+                StringUtils.isEmpty(channelEventKeyDetection.getDelegateExpression())) {
                 throw new FlowableEventJsonException(
                     "The channel json key detection value was not found for the channel model with key " + inboundChannelModel.getKey()
-                        + ". One of fixedValue, jsonField or jsonPointerExpression should be set.");
+                        + ". One of fixedValue, jsonField, jsonPointerExpression, delegateExpression should be set.");
             }
 
         } else if ("xml".equalsIgnoreCase(deserializerType)) {
-
-            if (StringUtils.isEmpty(channelEventKeyDetection.getFixedValue()) &&
-                StringUtils.isEmpty(channelEventKeyDetection.getXmlXPathExpression())) {
-                throw new FlowableEventJsonException(
-                    "The channel xml key detection value was not found for the channel model with key " + inboundChannelModel.getKey()
-                        + ". One of fixedValue, xmlPathExpression should be set.");
+            if (channelEventKeyDetection == null) {
+                throw new FlowableEventJsonException("A channel key detection value is required for the channel model with key " + inboundChannelModel.getKey());
             }
 
+            if (StringUtils.isEmpty(channelEventKeyDetection.getFixedValue()) &&
+                StringUtils.isEmpty(channelEventKeyDetection.getXmlXPathExpression()) &&
+                StringUtils.isEmpty(channelEventKeyDetection.getDelegateExpression())) {
+                throw new FlowableEventJsonException(
+                    "The channel xml key detection value was not found for the channel model with key " + inboundChannelModel.getKey()
+                        + ". One of fixedValue, xmlPathExpression, delegateExpression should be set.");
+            }
+
+        } else if ("expression".equalsIgnoreCase(deserializerType)) {
+            if (StringUtils.isEmpty(inboundChannelModel.getDeserializerDelegateExpression())) {
+                throw new FlowableEventJsonException(
+                    "The channel deserializer delegate expression was not set for the channel model with key " + inboundChannelModel);
+            }
         } else {
             throw new FlowableEventJsonException(
                 "The deserializer type is not supported " + deserializerType + " for the channel model with key " + inboundChannelModel.getKey());
