@@ -20,10 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
