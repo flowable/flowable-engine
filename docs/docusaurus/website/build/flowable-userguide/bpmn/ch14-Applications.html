@@ -1,0 +1,1081 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Flowable applications · Flowable Open Source Documentation</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Flowable provides several ui web applications to demonstrate and leverage the functionality provided by the Flowable project:"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Flowable applications · Flowable Open Source Documentation"/><meta property="og:type" content="website"/><meta property="og:url" content="https://flowable.com/open-source/docs/"/><meta property="og:description" content="Flowable provides several ui web applications to demonstrate and leverage the functionality provided by the Flowable project:"/><meta property="og:image" content="https://flowable.com/open-source/docs/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://flowable.com/open-source/docs/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/open-source/docs/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><script src="/open-source/docs/js/scrollSpy.js"></script><link rel="stylesheet" href="/open-source/docs/css/main.css"/><script src="/open-source/docs/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/open-source/docs/"><img class="logo" src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/><h2 class="headerTitleWithLogo">Flowable Open Source Documentation</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/open-source/docs/oss-introduction" target="_self">Guides</a></li><li class=""><a href="/open-source/docs/all-javadocs" target="_self">Javadocs</a></li><li class=""><a href="https://flowable.com/open-source/" target="_self">Open source home</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>BPMN User Guide</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Flowable Open Source<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/oss-introduction">Open Source Details</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">BPMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch02-GettingStarted">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch03-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch04-API">The Flowable API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05a-Spring-Boot">Spring Boot</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch06-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07a-BPMN-Introduction">BPMN 2.0 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07b-BPMN-Constructs">BPMN 2.0 Constructs</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch08-Forms">Forms</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch09-ProcessInstanceMigration">Process Instance Migration (Experimental)</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch10-JPA">JPA</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch11-History">History</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch12-IDM">Identity management</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch13-Designer">Eclipse Designer</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/open-source/docs/bpmn/ch14-Applications">Flowable applications</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch15-REST">REST API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch16-Cdi">CDI integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch17-Ldap">LDAP integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch18-Advanced">Advanced</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch19-tooling">Tooling</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">CMMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch03-API">The Flowable CMMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch06-cmmn">CMMN 1.1</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch07-architecture">Architecture</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">DMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch03-API">The Flowable DMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch06-DMN-Introduction">DMN 1.1 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Forms User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch03-API">The Flowable Form API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch06-Form-Introduction">Form Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Migration from v5<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/migration">Flowable Migration Guide : Flowable or Activiti v5 to Flowable V6</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Disclaimer<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/disclaimer">Disclaimer</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Flowable applications</h1></header><article><div><span><p>Flowable provides several ui web applications to demonstrate and leverage the functionality provided by the Flowable project:</p>
+<ul>
+<li><p>Flowable IDM: an Identity Management application that provides single sign-on authentication functionality for all the Flowable UI applications, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.</p></li>
+<li><p>Flowable Modeler: an application that allows users with modeler privileges to model processes, forms, decision tables and application definitions.</p></li>
+<li><p>Flowable Task: a runtime task application that provides functionality to start process instances, edit task forms, complete tasks and query on tasks and process instances.</p></li>
+<li><p>Flowable Admin: an administrative application that allows users with admin privilege to query the BPMN, DMN, form and content engines and provides several options to change process instances, tasks, jobs and so on. The admin application connects to the engines through the REST API that is deployed together with the Flowable Task app and the Flowable REST app.</p></li>
+</ul>
+<p>The Flowable IDM is required for all other apps to enable authentication. The WAR files for each app can be deployed to the same servlet container (such as Apache Tomcat), but can also be deployed on different servlet containers. Because the same cookie is used for authentication with each app, the apps need to run on the same domain.</p>
+<p>Flowable also provides the <code>flowable-rest.war</code> which contains the Flowable REST API. More about this can be read in the <a href="/open-source/docs/bpmn/ch15-REST">REST API</a> chapter.</p>
+<p>The apps are Spring Boot 2.0 based, which means that that the WAR files are actually executable and can be run as a normal standalone applications.
+See <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-maven-packaging">The Executable Jar Format</a> in the Spring Boot reference documentation.</p>
+<h2><a class="anchor" aria-hidden="true" id="flowable-ui-applications-installation"></a><a href="#flowable-ui-applications-installation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flowable UI Applications installation</h2>
+<p>As mentioned before, all four UI apps can be deployed together on the same Tomcat server, and to get started this is probably the easiest approach. You can choose to only install the Modeler app, for example, but make sure the Flowable IDM app is always running/deployed as well. For this installation guide we’ll describe the installation of all four apps to a Tomcat server.</p>
+<ol>
+<li><p>Download a recent stable version of <a href="http://tomcat.apache.org">Apache Tomcat</a>.</p></li>
+<li><p>Download the latest stable <a href="http://www.flowable.org/downloads.html">Flowable 6 version</a>.</p></li>
+<li><p>Copy the flowable-admin.war, flowable-idm.war, flowable-modeler.war and flowable-task.war files from the Flowable distribution <em>wars</em> folder to the Tomcat webapps folder.</p></li>
+<li><p>Startup the Tomcat server by running the bin/startup.sh (Mac OS and Linux) or bin/startup.bat (Windows) script.</p></li>
+<li><p>Open a web browser and go to <a href="http://localhost:8080/flowable-modeler"><a href="http://localhost:8080/flowable-modeler">http://localhost:8080/flowable-modeler</a></a>.</p></li>
+</ol>
+<p>All Flowable UI apps should now be running with an H2 in-memory database and the following login screen should be shown in your web browser:</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_idm_login_screen.png" alt="flowable idm login screen"></p>
+<p>By default, the Flowable IDM application will create an admin user that has privileges to all the Flowable UI apps. You can login with admin/test and the browser should redirect to the Flowable Modeler application:</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_startup_screen.png" alt="flowable modeler startup screen"></p>
+<p>Since the UI apps are Spring Boot executable apps it is possible to run them as standalone applications without the need of an application server.
+Starting single application looks like:</p>
+<pre><code class="hljs">java -jar flowable-idm.war
+</code></pre>
+<p>Usually, you will want to change the default H2 in-memory database configuration to a MySQL or Postgres (or other persistent database) configuration.
+You can do this per app by changing the application.properties file in the <em>WEB-INF/classes/</em> directory of each app.
+However, it is easier to use the Spring Boot <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html">Externalized Configuration</a>.
+An example configuration can be found on <a href="https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/flowable-default.properties">Github</a>
+To change the default configuration to MySQL the following changes are needed to the properties file:</p>
+<pre><code class="hljs">spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8
+spring.datasource.username=flowable
+spring.datasource.password=flowable
+</code></pre>
+<p>This configuration will expect a flowable database to be present in the MySQL server and the UI apps will automatically generate the necessary database tables. For Postgres the following changes are necessary:</p>
+<pre><code class="hljs">spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.url=jdbc:postgresql://localhost:5432/flowable
+spring.datasource.username=flowable
+spring.datasource.password=flowable
+</code></pre>
+<p>In addition to changing the configuration, make sure the database driver is available on the classpath. Again, you could do this for every web application separately by adding the driver JAR file to the WEB-INF/lib folder, but you can also copy the JAR file once to the Tomcat lib folder. For MySQL and Postgres the database drivers can be downloaded from:</p>
+<ul>
+<li><p>MySQL: <a href="https://dev.mysql.com/downloads/connector/j"><a href="https://dev.mysql.com/downloads/connector/j">https://dev.mysql.com/downloads/connector/j</a></a></p></li>
+<li><p>Postgres: <a href="https://jdbc.postgresql.org/"><a href="https://jdbc.postgresql.org/">https://jdbc.postgresql.org/</a></a></p></li>
+</ul>
+<p>When running the apps as standalone applications the database driver can be added by using the <code>loader.path</code> property.</p>
+<pre><code class="hljs">java -Dloader.path=/location/to/your/driverfolder -jar flowable-idm.war
+</code></pre>
+<p>See the <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar-property-launcher-features"><code>PropertiesLauncher</code> Features</a> in the Spring Boot reference documentation for more information.</p>
+<h2><a class="anchor" aria-hidden="true" id="flowable-ui-applications-configurations"></a><a href="#flowable-ui-applications-configurations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flowable UI Applications Configurations</h2>
+<p>As the Flowable UI apps are Spring Boot applications you can use all the properties Spring Boot provides.
+In order to provide custom configuration for the apps have a look at the <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html">Externalized Configuration</a> section of the Spring Boot documentation.</p>
+<pre><code class="hljs">You can also use YAML based properties.
+</code></pre>
+<table>
+<caption>Common UI App Properties</caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property name</th>
+<th>Old Property</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>flowable.common.app.idm-url</p></td>
+<td><p>idm.app.url</p></td>
+<td><p>-</p></td>
+<td><p>The URL to the IDM application, used for the user info and token info REST GET calls. It’s also used as a fallback for the redirect url to the login page in the UI apps.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.common.app.idm-redirect-url</p></td>
+<td><p>idm.app.redirect.url</p></td>
+<td><p>-</p></td>
+<td><p>The redirect URL to the IDM application, used for the login redirect when the cookie isn’t set or is invalid.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.common.app.redirect-on-auth-success</p></td>
+<td><p>app.redirect.url.on.authsuccess</p></td>
+<td><p>-</p></td>
+<td><p>The URL to which the redirect should occur after a successful authentication.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.common.app.role-prefix</p></td>
+<td><p>-</p></td>
+<td><p>ROLE_</p></td>
+<td><p>The default role prefix that needs to be used by Spring Security.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.common.app.tenant-id</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>The static tenant id used for the DefaultTenantProvider. The modeler app uses this to determine under which tenant id to store and publish models.
+When not provided, empty or only contains whitespace it defaults to the user’s tenant id if available otherwise it uses no tenant id.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.common.app.cache-login-tokens.max-age</p></td>
+<td><p>cache.login-tokens.max.age</p></td>
+<td><p>30</p></td>
+<td><p>The max age in seconds after which the entry should be invalidated.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.common.app.cache-login-tokens.max-size</p></td>
+<td><p>cache.login-tokens.max.size</p></td>
+<td><p>2048</p></td>
+<td><p>The maximum number of entries that the cache should contain.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.common.app.cache-login-users.max-age</p></td>
+<td><p>cache.login-users.max.age</p></td>
+<td><p>30</p></td>
+<td><p>The max age in seconds after which the entry should be invalidated.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.common.app.cache-login-users.max-size</p></td>
+<td><p>cache.login-users.max.size</p></td>
+<td><p>2048</p></td>
+<td><p>The maximum number of entries that the cache should contain.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.common.app.cache-users.max-age</p></td>
+<td><p>cache.users.max.age</p></td>
+<td><p>30</p></td>
+<td><p>The max age in seconds after which the entry should be invalidated.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.common.app.cache-users.max-size</p></td>
+<td><p>cache.users.max.size</p></td>
+<td><p>2048</p></td>
+<td><p>The maximum number of entries that the cache should contain.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.common.app.idm-admin.password</p></td>
+<td><p>idm.admin.password</p></td>
+<td><p>-</p></td>
+<td><p>The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.common.app.idm-admin.user</p></td>
+<td><p>idm.admin.user</p></td>
+<td><p>admin</p></td>
+<td><p>The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.rest.app.authentication-mode</p></td>
+<td><p>rest.authentication.mode</p></td>
+<td><p>verify-privilege</p></td>
+<td><p>Configures the way user credentials are verified when doing a REST API call:
+'any-user' : the user needs to exist and the password need to match. Any user is allowed to do the call (this is the pre 6.3.0 behavior)
+'verify-privilege' : the user needs to exist, the password needs to match and the user needs to have the 'rest-api' privilege
+If nothing set, defaults to 'verify-privilege'</p></td>
+</tr>
+</tbody>
+</table>
+<p>Some of the old properties have been moved to be managed by the Flowable Spring Boot starter (or Spring Boot itself)</p>
+<table>
+<caption>Old properties managed by the Flowable Spring Boot Starter</caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property name</th>
+<th>Old Property</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>flowable.async-executor-activate</p></td>
+<td><p>engine.process.asyncexecutor.activate</p></td>
+<td><p>true</p></td>
+<td><p>Whether the async executor should be activated.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.database-schema-update</p></td>
+<td><p>engine.process.schema.update</p></td>
+<td><p>true</p></td>
+<td><p>The strategy that should be used for the database schema.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.history-level</p></td>
+<td><p>engine.process.history.level</p></td>
+<td><p>-</p></td>
+<td><p>The history level that needs to be used.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.process.servlet.name</p></td>
+<td><p>flowable.rest-api-servlet-name</p></td>
+<td><p>Flowable BPMN Rest API</p></td>
+<td><p>The name of the Process servlet.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.process.servlet.path</p></td>
+<td><p>flowable.rest-api-mapping</p></td>
+<td><p>/process-api</p></td>
+<td><p>The context path for the Process rest servlet.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.content.storage.create-root</p></td>
+<td><p>contentstorage.fs.create-root</p></td>
+<td><p>true</p></td>
+<td><p>If the root folder doesn’t exist, should it be created?</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.content.storage.root-folder</p></td>
+<td><p>contentstorage.fs.root-folder</p></td>
+<td><p>-</p></td>
+<td><p>Root folder location where content files will be stored, for example, task attachments or form file uploads.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.enabled</p></td>
+<td><p>flowable.db-identity-used</p></td>
+<td><p>true</p></td>
+<td><p>Whether the idm engine needs to be started.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.password-encoder</p></td>
+<td><p>security.passwordencoder</p></td>
+<td><p>-</p></td>
+<td><p>The type of the password encoder that needs to be used.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.base-dn</p></td>
+<td><p>ldap.basedn</p></td>
+<td><p>-</p></td>
+<td><p>The base 'distinguished name' (DN) from which the searches for users and groups are started. Use 'user-base-dn' or 'group-base-dn' when needing to differentiate between user and group base DN.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.enabled</p></td>
+<td><p>ldap.enabled</p></td>
+<td><p>false</p></td>
+<td><p>Whether to enable LDAP IDM Service.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.password</p></td>
+<td><p>ldap.password</p></td>
+<td><p>-</p></td>
+<td><p>The password that is used to connect to the LDAP system.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.port</p></td>
+<td><p>ldap.port</p></td>
+<td><p>-1</p></td>
+<td><p>The port on which the LDAP system is running.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.server</p></td>
+<td><p>ldap.server</p></td>
+<td><p>-</p></td>
+<td><p>The server host on which the LDAP system can be reached. For example 'ldap://localhost'.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.user</p></td>
+<td><p>ldap.user</p></td>
+<td><p>-</p></td>
+<td><p>The user id that is used to connect to the LDAP system.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.attribute.email</p></td>
+<td><p>ldap.attribute.email</p></td>
+<td><p>-</p></td>
+<td><p>Name of the attribute that matches the user email.
+This property is used when looking for an 'org.flowable.idm.api.User' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.User' object is done.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.attribute.first-name</p></td>
+<td><p>ldap.attribute.firstname</p></td>
+<td><p>-</p></td>
+<td><p>Name of the attribute that matches the user first name.
+This property is used when looking for a 'org.flowable.idm.api.User' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.User' object is done.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.attribute.group-id</p></td>
+<td><p>ldap.attribute.groupid</p></td>
+<td><p>-</p></td>
+<td><p>Name of the attribute that matches the group id.
+This property is used when looking for a 'org.flowable.idm.api.Group' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.Group' object is done.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.attribute.group-name</p></td>
+<td><p>ldap.attribute.groupname</p></td>
+<td><p>-</p></td>
+<td><p>Name of the attribute that matches the group name.
+This property is used when looking for a 'org.flowable.idm.api.Group' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.Group' object is done.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.attribute.last-name</p></td>
+<td><p>ldap.attribute.lastname</p></td>
+<td><p>-</p></td>
+<td><p>Name of the attribute that matches the user last name.
+This property is used when looking for a 'org.flowable.idm.api.User' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.User' object is done.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.attribute.user-id</p></td>
+<td><p>ldap.attribute.userid</p></td>
+<td><p>-</p></td>
+<td><p>Name of the attribute that matches the user id.
+This property is used when looking for a 'org.flowable.idm.api.User' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.User' object is done. This property is optional and is only needed if searching for 'org.flowable.idm.api.User' objects using the Flowable API.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.cache.group-size</p></td>
+<td><p>ldap.cache.groupsize</p></td>
+<td><p>-1</p></td>
+<td><p>Allows to set the size of the 'org.flowable.ldap.LDAPGroupCache'.
+This is an LRU cache that caches groups for users and thus avoids hitting the LDAP system each time the groups of a user needs to be known.
+The cache will not be instantiated if the value is less then zero. By default set to -1, so no caching is done.
+Note that the group cache is instantiated on the 'org.flowable.ldap.LDAPIdentityServiceImpl'.
+As such, if you have a custom implementation of the 'org.flowable.ldap.LDAPIdentityServiceImpl', do not forget to add the group cache functionality.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.query.all-groups</p></td>
+<td><p>ldap.query.groupall</p></td>
+<td><p>-</p></td>
+<td><p>The query that is executed when searching for all groups.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.query.all-users</p></td>
+<td><p>ldap.query.userall</p></td>
+<td><p>-</p></td>
+<td><p>The query that is executed when searching for all users.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.query.groups-for-user</p></td>
+<td><p>ldap.query.groupsforuser</p></td>
+<td><p>-</p></td>
+<td><p>The query that is executed when searching for the groups of a specific user.
+For example: <code>(&amp;(objectClass=groupOfUniqueNames)(uniqueMember={0}))</code>
+Here, all the objects in LDAP with the class 'groupOfUniqueNames' and where the provided DN is a 'uniqueMember' are returned.
+As shown in the example, the user id is injected by the typical {@link java.text.MessageFormat}, ie by using <em>{0}</em>
+If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different
+<code>org.flowable.ldap.LDAPQueryBuilder</code>, which allows for more customization than only the query.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.ldap.query.user-by-full-name-like</p></td>
+<td><p>ldap.query.userbyname</p></td>
+<td><p>-</p></td>
+<td><p>The query that is executed when searching for a user by full name.
+For example: <code>(&amp;(objectClass=inetOrgPerson)(|({0}={1})({2}={3})))</code>
+Here, all the objects in LDAP with the class 'inetOrgPerson' and who have the matching first name or last name will be returned
+Several things will be injected in the expression: {0} : the first name attribute {1} : the search text {2} : the last name attribute {3} : the search text
+If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different
+'org.flowable.ldap.LDAPQueryBuilder', which allows for more customization than only the query.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.ldap.query.user-by-id</p></td>
+<td><p>ldap.query.userbyid</p></td>
+<td><p>-</p></td>
+<td><p>The query that is executed when searching for a user by userId.
+For example: <code>(&amp;(objectClass=inetOrgPerson)(uid={0}))</code>
+Here, all the objects in LDAP with the class 'inetOrgPerson' and who have the matching 'uid' attribute value will be returned.
+As shown in the example, the user id is injected by the typical {@link java.text.MessageFormat}, ie by using <em>{0}</em>
+If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different
+'org.flowable.ldap.LDAPQueryBuilder', which allows for more customization than only the query.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.mail.server.host</p></td>
+<td><p>email.host</p></td>
+<td><p>localhost</p></td>
+<td><p>The host of the mail server.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.mail.server.password</p></td>
+<td><p>email.password</p></td>
+<td><p>-</p></td>
+<td><p>The password for the mail server authentication.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.mail.server.port</p></td>
+<td><p>email.port</p></td>
+<td><p>1025</p></td>
+<td><p>The port of the mail server.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.mail.server.use-ssl</p></td>
+<td><p>email.use-ssl</p></td>
+<td><p>false</p></td>
+<td><p>Sets whether SSL/TLS encryption should be enabled for the SMTP transport upon connection (SMTPS/POPS).</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.mail.server.use-tls</p></td>
+<td><p>email.use-tls</p></td>
+<td><p>false</p></td>
+<td><p>Set or disable the STARTTLS encryption.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.mail.server.username</p></td>
+<td><p>email.username</p></td>
+<td><p>-</p></td>
+<td><p>The username that needs to be used for the mail server authentication.
+If empty no authentication would be used.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.process.definition-cache-limit</p></td>
+<td><p>flowable.process-definitions.cache.max</p></td>
+<td><p>-1</p></td>
+<td><p>The maximum amount of process definitions available in the process definition cache.
+Per default it is -1 (all process definitions).</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Old properties managed by Spring Boot</caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property name</th>
+<th>Old Property</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>spring.datasource.driver-class-name</p></td>
+<td><p>datasource.driver</p></td>
+<td><p>-</p></td>
+<td><p>Fully qualified name of the JDBC driver. Auto-detected based on the URL by default.</p></td>
+</tr>
+<tr class="even">
+<td><p>spring.datasource.jndi-name</p></td>
+<td><p>datasource.jndi.name</p></td>
+<td><p>-</p></td>
+<td><p>JNDI location of the datasource. Class, url, username &amp; password are ignored when
+set.</p></td>
+</tr>
+<tr class="odd">
+<td><p>spring.datasource.password</p></td>
+<td><p>datasource.password</p></td>
+<td><p>-</p></td>
+<td><p>Login password of the database.</p></td>
+</tr>
+<tr class="even">
+<td><p>spring.datasource.url</p></td>
+<td><p>datasource.url</p></td>
+<td><p>-</p></td>
+<td><p>JDBC URL of the database.</p></td>
+</tr>
+<tr class="odd">
+<td><p>spring.datasource.username</p></td>
+<td><p>datasource.username</p></td>
+<td><p>-</p></td>
+<td><p>Login username of the database.</p></td>
+</tr>
+<tr class="even">
+<td><p>spring.datasource.hikari.connection-test-query</p></td>
+<td><p>datasource.preferred-test-query</p></td>
+<td><p>-</p></td>
+<td><p>The SQL query to be executed to test the validity of connections.</p></td>
+</tr>
+<tr class="odd">
+<td><p>spring.datasource.hikari.connection-timeout</p></td>
+<td><p>datasource.connection.timeout</p></td>
+<td><p>-</p></td>
+<td><p>The maximum number of milliseconds that a client will wait for a connection from the pool. If this time is exceeded without a connection becoming available, a SQLException will be thrown when getting a connection.</p></td>
+</tr>
+<tr class="even">
+<td><p>spring.datasource.hikari.idle-timeout</p></td>
+<td><p>datasource.connection.idletimeout</p></td>
+<td><p>-</p></td>
+<td><p>The maximum amount of time (in milliseconds) that a connection is allowed to sit idle in the pool.
+Whether a connection is retired as idle or not is subject to a maximum variation of +30 seconds, and average variation of +15 seconds.
+A connection will never be retired as idle before this timeout.
+A value of 0 means that idle connections are never removed from the pool.</p></td>
+</tr>
+<tr class="odd">
+<td><p>spring.datasource.hikari.max-lifetime</p></td>
+<td><p>datasource.connection.maxlifetime</p></td>
+<td><p>-</p></td>
+<td><p>This property controls the maximum lifetime of a connection in the pool. When a connection reaches this
+timeout, even if recently used, it will be retired from the pool. An in-use connection will never be
+retired, only when it is idle will it be removed.</p></td>
+</tr>
+<tr class="even">
+<td><p>spring.datasource.hikari.maximum-pool-size</p></td>
+<td><p>datasource.connection.maxpoolsize</p></td>
+<td><p>-</p></td>
+<td><p>The property controls the maximum size that the pool is allowed to reach, including both idle and in-use
+connections. Basically this value will determine the maximum number of actual connections to the database
+backend.
+When the pool reaches this size, and no idle connections are available, calls to getConnection() will
+block for up to connectionTimeout milliseconds before timing out.</p></td>
+</tr>
+<tr class="odd">
+<td><p>spring.datasource.hikari.minimum-idle</p></td>
+<td><p>datasource.connection.minidle</p></td>
+<td><p>-</p></td>
+<td><p>The property controls the minimum number of idle connections that HikariCP tries to maintain in the pool,
+including both idle and in-use connections. If the idle connections dip below this value, HikariCP will
+make a best effort to restore them quickly and efficiently.</p></td>
+</tr>
+<tr class="even">
+<td><p>spring.servlet.multipart.max-file-size</p></td>
+<td><p>file.upload.max.size</p></td>
+<td><p>10MB</p></td>
+<td><p>Max file size. Values can use the suffixes "MB" or "KB" to indicate megabytes or kilobytes, respectively.</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Not used old properties</caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Old property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>datasource.jndi.resource-ref</p></td>
+<td><p>Spring Boot does not support configuring JNDI resourceRef. Use entire resource reference in the name.</p></td>
+</tr>
+<tr class="even">
+<td><p>email.use-credentials</p></td>
+<td><p>In case you don’t want to use credentials, set the password and user to empty.</p></td>
+</tr>
+</tbody>
+</table>
+<h2><a class="anchor" aria-hidden="true" id="flowable-idm-application"></a><a href="#flowable-idm-application" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flowable IDM application</h2>
+<p>The Flowable IDM application is used by all other three Flowable web applications for authentication and authorization and is therefore required to be available when you want to run the Modeler, Task or Admin application. The Flowable IDM application is a simple identity management application and is targeted at providing single sign-on capabilities to the Flowable web applications, including providing a central place to define users, groups and privileges.</p>
+<p>The IDM application boots the IDM engine at startup and will create the identity tables as defined in the IDM engine in the datasource defined in the properties configuration.</p>
+<p>When the Flowable IDM application is deployed and started, it will check if there’s a user available in the ACT_ID_USER table, and if not it will use the <code>flowable.common.app.idm-admin.user</code> property to create a new default admin user in this table.
+It will also add all available privileges in the Flowable project to the newly created admin user:</p>
+<ul>
+<li><p>access-idm: provides the privilege to manage users, groups and privileges</p></li>
+<li><p>access-admin: allows the user to login to the Flowable Admin application, manage the Flowable engines and access the Actuator endpoints of all the applications</p></li>
+<li><p>access-modeler: enables access to the Flowable Modeler application</p></li>
+<li><p>access-task: provides the privilege to login to the Flowable Task application</p></li>
+<li><p>access-rest-api: allows the user to do call the REST API. Otherwise a 403 (forbidden) http status will be returned. Note that <em>flowable.rest.app.authentication-mode</em> needs to be set to <em>verify-privilege</em>, which is the default.</p></li>
+</ul>
+<p>When logging in to <a href="http://localhost:8080/flowable-idm"><a href="http://localhost:8080/flowable-idm">http://localhost:8080/flowable-idm</a></a> with admin/test for the first time the following user overview screen is shown:</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_idm_startup_screen.png" alt="flowable idm startup screen"></p>
+<p>In this screen users can be added, removed and updated. The groups section can be used to create, delete and update groups. In the group details view you can also add and remove users to and from the group. The privilege screen allows you to add and remove privileges from users and groups:</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_idm_privilege_screen.png" alt="flowable idm privilege screen"></p>
+<p>There’s no option to define new privileges yet, but you can add and remove users and groups for the existing four privileges.</p>
+<p>This are the IDM UI App specific properties.</p>
+<table>
+<caption>IDM UI App Properties</caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property name</th>
+<th>Old Property</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>flowable.idm.app.bootstrap</p></td>
+<td><p>idm.bootstrap.enabled</p></td>
+<td><p>true</p></td>
+<td><p>Whether the IDM App needs to be bootstrapped.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.app.rest-enabled</p></td>
+<td><p>rest.idm-app.enabled</p></td>
+<td><p>true</p></td>
+<td><p>Enables the REST API (this is not the REST api used by the UI, but an api that’s available over basic auth authentication).</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.app.admin.email</p></td>
+<td><p>admin.email</p></td>
+<td><p>-</p></td>
+<td><p>The email of the admin user.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.app.admin.first-name</p></td>
+<td><p>admin.firstname</p></td>
+<td><p>-</p></td>
+<td><p>The first name of the admin user.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.app.admin.last-name</p></td>
+<td><p>admin.lastname</p></td>
+<td><p>-</p></td>
+<td><p>The last name of the admin user.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.app.admin.password</p></td>
+<td><p>admin.password</p></td>
+<td><p>-</p></td>
+<td><p>The password for the admin user.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.app.admin.user-id</p></td>
+<td><p>admin.userid</p></td>
+<td><p>-</p></td>
+<td><p>The id of the admin user.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.app.security.remember-me-key</p></td>
+<td><p>security.rememberme.key</p></td>
+<td><p>testKey</p></td>
+<td><p>The hash key that is used by Spring Security to hash the password values in the applications. Make sure that you change the value of this property.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.app.security.user-validity-period</p></td>
+<td><p>cache.users.recheck.period</p></td>
+<td><p>30000</p></td>
+<td><p>How long should a user be cached before invalidating it in the cache for the cacheable CustomUserDetailsService.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.app.security.cookie.domain</p></td>
+<td><p>security.cookie.domain</p></td>
+<td><p>-</p></td>
+<td><p>The domain for the cookie.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.idm.app.security.cookie.max-age</p></td>
+<td><p>security.cookie.max-age</p></td>
+<td><p>2678400</p></td>
+<td><p>The max age of the security cookie in seconds. Default is 31 days.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.idm.app.security.cookie.refresh-age</p></td>
+<td><p>security.cookie.refresh-age</p></td>
+<td><p>86400</p></td>
+<td><p>The refresh age of the cookie in seconds. Default is 1 day.</p></td>
+</tr>
+</tbody>
+</table>
+<p>In addition to the default identity tables, the IDM application can also be configured to use an LDAP server.
+To connect to a LDAP server, additional properties in the application.properties file (or any other way of configuring the application) are needed:</p>
+<pre><code class="hljs">#
+# LDAP
+#
+flowable.idm.ldap.enabled=true
+flowable.idm.ldap.server=ldap://localhost
+flowable.idm.ldap.port=10389
+flowable.idm.ldap.user=uid=admin, ou=system
+flowable.idm.ldap.password=secret
+flowable.idm.ldap.base-dn=o=flowable
+flowable.idm.ldap.query.user-by-id=(&amp;(objectClass=inetOrgPerson)(uid={0}))
+flowable.idm.ldap.query.user-by-full-name-like=(&amp;(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))
+flowable.idm.ldap.query.all-users=(objectClass=inetOrgPerson)
+flowable.idm.ldap.query.groups-for-user=(&amp;(objectClass=groupOfUniqueNames)(uniqueMember={0}))
+flowable.idm.ldap.query.all-groups=(objectClass=groupOfUniqueNames)
+flowable.idm.ldap.query.group-by-id=(&amp;(objectClass=groupOfUniqueNames)(uniqueId={0}))
+flowable.idm.ldap.attribute.user-id=uid
+flowable.idm.ldap.attribute.first-name=cn
+flowable.idm.ldap.attribute.last-name=sn
+flowable.idm.ldap.attribute.group-id=cn
+flowable.idm.ldap.attribute.group-name=cn
+flowable.idm.ldap.cache.group-size=10000
+flowable.idm.ldap.cache.group-expiration=180000
+</code></pre>
+<p>When the <code>flowable.idm.ldap.enabled</code> property is set to true, the IDM app will expect the other LDAP properties to have been filled-in.
+In this example configuration the server configuration + LDAP queries for the Apache Directory Server are provided.
+For other LDAP servers, like Active Directory, other configuration values are needed.</p>
+<p>When LDAP is configured, authentication and group retrieval for a user will be done through the LDAP server. Only privileges will still be retrieved from the Flowable identity tables. So make sure each LDAP user has the correct privileges defined in the IDM application.</p>
+<p>If the IDM application is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables.
+If there are no privileges (only when booting the first time), the 4 default privileges will be created and the <code>flowable.idm.app.admin.user-id</code> property value (from application.properties or configured in the environment) will be used as the user id to get all 4 privileges.
+So make sure that the <code>flowable.idm.app.admin.user-id</code> property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.</p>
+<h2><a class="anchor" aria-hidden="true" id="flowable-modeler-application"></a><a href="#flowable-modeler-application" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flowable Modeler application</h2>
+<p>The Flowable Modeler application can be used to model BPMN processes, DMN decision table, Form definitions and create app definitions. The BPMN modeler uses the same Oryx and Angular foundation as in Flowable 5, but the functionality has now been moved into a separate Modeler application. When using the Flowable Modeler application, make sure the Flowable IDM application is deployed and running as well (for authentication and authorization purposes).</p>
+<p>When you login to the Modeler application (<a href="http://localhost:8080/flowable-modeler"><a href="http://localhost:8080/flowable-modeler">http://localhost:8080/flowable-modeler</a></a>) with your user (or the default admin/test user), you will see the process overview screen. From here you can start creating new BPMN process models by clicking on the Create Process or Import Process button.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_createmodel_popup.png" alt="flowable modeler createmodel popup"></p>
+<p>When creating a process model (but also any other model), it’s important to think carefully about the model key value. The model key is a unique identifier for the model across the full model repository. If you choose a model key that already exists in the model repository, an error message is shown and the model is not saved.</p>
+<p>After creating the model with the popup, the BPMN modeling canvas is shown. The BPMN editor is very similar to the Flowable 5 BPMN editor that was part of the Explorer application. All BPMN elements supported by the Flowable engine are available to be used in the design of a process model.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_design_screen.png" alt="flowable modeler design screen"></p>
+<p>The BPMN editor is divided into 4 parts:</p>
+<ul>
+<li><p>Palette: the palette of BPMN elements available to design a process model</p></li>
+<li><p>Toolbar: actions to change the model canvas, such as zooming, layout and saving a model</p></li>
+<li><p>Model canvas: the modeling canvas on which to drag and drop BPMN elements and design the process model</p></li>
+<li><p>Properties panel: the properties for the main process model if no element is select and otherwise the properties of the selected BPMN element</p></li>
+</ul>
+<p>For a User task element there’s a <em>Referenced form</em> property in the properties panel. If you select this property, a popup is opened where you can select a form definition from the repository or create a new form. When creating a new form, a similar create dialog to the process model create dialog is presented. After filling in the name and form model key, the form editor is opened.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_formdesign_screen.png" alt="flowable modeler formdesign screen"></p>
+<p>Form fields can be dragged from the form palette on to the form canvas. In this example, a name textfield, two date fields and a remarks multiline textfield are added to the form canvas. When editing a form field, the label, id, required status and placeholder can be filled in.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_editfield_popup.png" alt="flowable modeler editfield popup"></p>
+<p>The id field is an important value, because a process variable will be created with the form field value using the id property value. When filling in the label property, the id property is automatically filled. If needed, you can also provide the id property value yourself by checking the override id checkbox.</p>
+<p>After saving the form model and closing the form editor, you are automatically navigated back to the process model (when the form editor was opened via the BPMN editor). When selecting the User task element again and clicking on the <em>Referenced form</em> property you will see that the newly created form definition is now attached to the User task. When clicking on the <em>Form</em> tab in the header of the Modeler application, all form definitions available in the model repository are shown.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_formoverview_screen.png" alt="flowable modeler formoverview screen"></p>
+<p>You can preview every form definition by opening the details view of a form definition. In the details view, the form name, key and description can be edited and the history of form models is available. You can also duplicate the form definition to create a new form definition with the same form fields.</p>
+<p>Now let’s open the vacation request process model in the BPMN editor again and add a Script task to the process model, that will calculate the number of days between the vacation start and end dates. Click on the <em>Script format</em> property and fill in a value of <em>groovy</em> to instruct the Flowable engine to use the Groovy scripting engine. Now click on the <em>Script</em> property and fill in the script that calculates the number of days.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_script_popup.png" alt="flowable modeler script popup"></p>
+<p>Now we have a <em>amountOfVacationDays</em> process variable we can add a Decision task to the process model. A decision task can be used to execute a DMN decision table in the Flowable DMN engine. Through the <em>Decision table reference</em> property, a new decision table model can be created and the DMN editor is opened.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_dmneditor_screen.png" alt="flowable modeler dmneditor screen"></p>
+<p>The DMN editor provides a table editor with input columns, where input conditions can be defined with the process variables available in the process context, and output columns, where output variable values can be defined. In this very simple example there’s one input column using the <em>amountOfVacationDays</em> variable that checks if it’s less than 10 or higher or equal to 10. When the amount of days is less than 10, an output variable <em>managerApprovalNeeded</em> is returned with value false, and otherwise a value of true is returned. You can define multiple input columns and have multiple input conditions per rule. It’s also possible to leave an input column empty, which means that it’s evaluated to true for that part of the rule. You can define one or multiple output variables.</p>
+<p>Another important part of the DMN decision table definition is the hit policy. Currently, Flowable supports the First and Any hit policy. With the First hit policy, when the first rule is found that evaluates to true the DMN execution will stop and its output variables are returned. For the Any hit policy, all rules will be executed and the output variables for the last rule that evaluates to true are returned.</p>
+<p>When the DMN editor is saved and closed, the Modeler application navigates back to the BPMN editor and the newly created DMN decision table is now attached to the Decision task. The decision task will be generated in the BPMN XML like;</p>
+<pre><code class="hljs">&lt;serviceTask id=&quot;decisionTask&quot; name=&quot;Is manager approval needed?&quot; flowable:type=&quot;dmn&quot;&gt;
+    &lt;extensionElements&gt;
+        &lt;flowable:field name=&quot;decisionTableReferenceKey&quot;&gt;
+            &lt;flowable:string&gt;&lt;![CDATA[managerApprovalNeeded]]&gt;&lt;/flowable:string&gt;
+        &lt;/flowable:field&gt;
+    &lt;/extensionElements&gt;
+&lt;/serviceTask&gt;
+</code></pre>
+<p>With the <em>managerApprovalNeeded</em> variable available in the process instance context, we can now create an exclusive gateway with a sequence flow condition that evaluates the calculated value of the DMN Engine.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_sequenceflowcondition_popup.png" alt="flowable modeler sequenceflowcondition popup"></p>
+<p>The full BPMN process model now looks like this:</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_vacationrequest_screen.png" alt="flowable modeler vacationrequest screen"></p>
+<p>With the process model completed, we can now create an app definition that combines one or more process models with all their associated models (for example, decision tables and form definitions) into a single artifact. An app definition can be exported as a BAR file (zip format) that can be deployed on the Flowable engine. When creating a vacation request app definition, the app editor will look something like the screen below.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_appeditor_screen.png" alt="flowable modeler appeditor screen"></p>
+<p>In the app editor, an icon and a theme color can be selected that will be used in the Flowable Task application to show the application in the dashboard. The important step is to add the vacation request process model, and by selecting the process model, automatically include any form definitions and DMN decision tables.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_modelselection_popup.png" alt="flowable modeler modelselection popup"></p>
+<p>A process model can be selected by clicking on the model thumbnail. When one or more models are selected, you can close the popup, save the app definition and close it. When navigating to the details view of the newly created vacation request app definition, the following details screen is shown:</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_modeler_appdetails_screen.png" alt="flowable modeler appdetails screen"></p>
+<p>From this view, you can download the app definition in two different formats. The first download button (with the arrow pointing downwards) can be used to
+download the app definition with the JSON model files for each included model. This makes it easy to share app definitions between different Flowable Modeler applications. The second download button (with the arrow point to upper right) will provide a BAR file of the app definition models, which can be deployed on the Flowable engine. In the BAR file, only the deployable artifacts are included, such as the BPMN 2.0 XML file and the DMN XML file, and not the JSON model files. All files in a BAR file deployed on a Flowable engine are stored in the database, so therefore only the deployable files are included.</p>
+<p>From the app definition details view, you can also <em>Publish</em> the app definition directly to the Flowable engine. The Flowable Modeler uses the URL defined in the application.properties file with the <em>flowable.modeler.app.deployment-api-url</em> property key. By default, the deployment URL is configured so the app definition will be deployed on the Flowable Task application when it’s running. However, this can be changed to use the Flowable REST application, for example. Make sure the Flowable Task application is running and click on the <em>Publish</em> button. The app definition is now deployed as a BAR file to the Flowable Task application.</p>
+<p>This are the Modeler UI App specific properties.</p>
+<table>
+<caption>Modeler UI App Properties</caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property name</th>
+<th>Old Property</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>flowable.modeler.app.data-source-prefix</p></td>
+<td><p>datasource.prefix</p></td>
+<td><p>-</p></td>
+<td><p>The prefix for the database tables.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.modeler.app.deployment-api-url</p></td>
+<td><p>deployment.api.url</p></td>
+<td><p><a href="http://localhost:8080/flowable-task/app-api">http://localhost:8080/flowable-task/app-api</a></p></td>
+<td><p>The root URI to the REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine.
+Default url for the Flowable Task application is <a href="http://localhost:8080/flowable-task/app-api">http://localhost:8080/flowable-task/app-api</a></p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.modeler.app.rest-enabled</p></td>
+<td><p>rest.modeler-app.enabled</p></td>
+<td><p>true</p></td>
+<td><p>Enables the REST API (this is not the REST api used by the UI, but an api that’s available over basic auth authentication).</p></td>
+</tr>
+</tbody>
+</table>
+<h2><a class="anchor" aria-hidden="true" id="flowable-task-application"></a><a href="#flowable-task-application" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flowable Task application</h2>
+<p>The Flowable Task application is the runtime application of the Flowable project and includes the Flowable BPMN, DMN, Form and Content engines by default. With the Flowable Task application, new process instances can be started, tasks can be completed, task forms can be rendered and so on. In the previous section, the vacation request app definition was deployed on the Flowable Task application REST API, and through that deployed on the Flowable engine. If you look in the Flowable database, you can see a new deployment entry has been added to the ACT_RE_DEPLOYMENT table for the BPMN Engine. Also, new entries haven been created in the ACT_DMN_DEPLOYMENT and ACT_FO_FORM_DEPLOYMENT tables for the DMN and Form engines.</p>
+<p>On the dashboard on <a href="http://localhost:8080/flowable-task"><a href="http://localhost:8080/flowable-task">http://localhost:8080/flowable-task</a></a>, you can see a vacation request app in addition to the default Task app, and any other apps that have been deployed to the Flowable engine already.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_task_dashboard_screen.png" alt="flowable task dashboard screen"></p>
+<p>When clicking on the vacation request app, the task list for the logged-in user is shown (which is probably empty for now).</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_task_tasklist_screen.png" alt="flowable task tasklist screen"></p>
+<p>When clicking on the <em>Processes</em> tab you can choose to start a new process instance by clicking on the <em>Start a process</em> button. The list of available process definitions within the context of this app definition is now displayed. In the general Task app this works in a similar way, but in the Task app, all process definitions deployed on the Flowable engine are shown. After selecting the vacation request process definition, the <em>Start process</em> button can be clicked to start a new vacation request process instance.</p>
+<p>The Flowable Task application automatically navigates to the process instance details view. You can see the <em>Provide vacation information</em> task is active and, for example, comments can be added and the process instance state can be shown diagrammatically using the <em>Show diagram</em> button.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_task_processdetails_screen.png" alt="flowable task processdetails screen"></p>
+<p>When navigating to the task list, you can also see the <em>Provide vacation information</em> task listed there as well. The task details are shown in this view, with the vacation info form being rendered. You can also switch to the details view by clicking on the <em>Show details</em> button. In the details view, comments can be added, users can involved in the task and attachments can be added to the task. You can also change the due date and the assignee of a task.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_task_taskdetails_screen.png" alt="flowable task taskdetails screen"></p>
+<p>Let’s fill in the form and complete the task. First, select a start date and end date that have more than 10 days in between, so we can validate that a
+<em>Manager approval</em> task is being generated. After filling in the vacation info form and clicking the <em>Complete</em> button, the Flowable task app navigates directly to the <em>Manager approval</em> task view. When you also complete this task (without a task form), the process instance is completed.</p>
+<p>When navigating to the <em>Processes</em> tab and clicking on the <em>Showing running processes</em> section, you can select an option to show completed process instances. The list of completed process instances is now shown and when clicking on the just completed vacation request process you can see the two completed tasks.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_task_processhistory_screen.png" alt="flowable task processhistory screen"></p>
+<p>The completed form of each task is stored in the ACT_FO_FORM_INSTANCE table of the Flowable Form engine. So it’s possible to look at the values of each completed form when you navigate to the completed task.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_task_completedform_screen.png" alt="flowable task completedform screen"></p>
+<p>Make sure to switch back to showing running processes instead of the completed ones, otherwise you won’t see newly started process instances. You can also filter tasks in the task list view. There are options to search on the name of a task, the task state, only tasks for a specific process definition and change the assignment filter.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_task_taskfilter_screen.png" alt="flowable task taskfilter screen"></p>
+<p>By default, the assignment filter is set to <em>Tasks where I am involved</em>. This doesn’t show the tasks where you are a candidate, such as tasks that are available to a specific candidate group before they are assigned to a specific person. To show candidate tasks you can select the <em>Tasks where I am one of the candidates</em> assignment filter option.</p>
+<p>This are the Task UI App specific properties.</p>
+<table>
+<caption>Task UI App Properties</caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property name</th>
+<th>Old Property</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>flowable.experimental.debugger.enabled</p></td>
+<td><p>debugger.enabled</p></td>
+<td><p>false</p></td>
+<td><p>Whether the process debugger should be enabled.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.task.app.rest-enabled</p></td>
+<td><p>rest.task-app.enabled</p></td>
+<td><p>true</p></td>
+<td><p>Enables the REST API (this is not the REST api used by the UI, but an api that’s available over basic auth authentication).</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.form-field-validation-enabled</p></td>
+<td></td>
+<td><p>false</p></td>
+<td><p>Enable form field validation after form submission on the engine side.</p></td>
+</tr>
+</tbody>
+</table>
+<h2><a class="anchor" aria-hidden="true" id="flowable-admin-application"></a><a href="#flowable-admin-application" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flowable Admin application</h2>
+<p>The fourth UI application the Flowable project provides is the Flowable Admin application. This application provides ways to, for example, query deployments in the BPMN, DMN and Form Engines, but also shows the active state of a process instance with its active tasks and process variables. It also provides actions to assign a task to a different assignee and to complete an active task. The Flowable Admin application uses the REST API to communicate with the Flowable engines. By default, it is configured to connect to the Flowable Task REST API, but you can easily change this to use the Flowable REST app REST API instead. When going to <a href="http://localhost:8080/flowable-admin"><a href="http://localhost:8080/flowable-admin">http://localhost:8080/flowable-admin</a></a>, the configuration screen is shown (which is also available by clicking on the arrow at the top right near the Flowable logo).</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_admin_configuration_screen.png" alt="flowable admin configuration screen"></p>
+<p>For each engine, the REST endpoint can be configured with the basic authentication values. The configuration is done per engine, because it’s possible to, for example, deploy the DMN Engine on a separate server from the BPMN Engine.</p>
+<p>When the configuration is defined with the correct values, the <em>Process Engine</em> can be selected to administer the Flowable BPMN engine. By default, the deployments of the Flowable BPMN engine are shown.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_admin_deployments_screen.png" alt="flowable admin deployments screen"></p>
+<p>You can filter the deployments based on name and tenant identifier. In this view, it’s also possible to deploy a new BPMN XML file or BAR file to the Flowable engine. When clicking on one of the deployments, the deployment details view is shown.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_admin_deploymentdetails_screen.png" alt="flowable admin deploymentdetails screen"></p>
+<p>More details of a deployment are shown here and also the process definitions that are part of this deployment on which you click to get more details. It’s also possible to delete a deployment here. When you want to delete a deployed app definition, this is also the way to delete the app definition from the Flowable Task app dashboard. When clicking on one of the process definitions, the process definition details view is shown.</p>
+<p><img src="/open-source/docs/assets/bpmn/flowable_admin_processdefinitiondetails_screen.png" alt="flowable admin processdefinitiondetails screen"></p>
+<p>In the process definition details view, the first page of process instances is shown, together with optional decision table definitions and form definitions that are used in the process definition. For the vacation request process definition, there’s one connected decision table and one connected form definition. Clicking on the decision table definition navigates the Flowable Admin application to the DMN engine. You can always navigate back to the Process engine by clicking on the <em>Parent Deployment ID</em> link.</p>
+<p>In addition to the deployments and definitions, you can also query on process instances, tasks, jobs and event subscriptions in the Process engine. The views all work in a similar way to what’s already been described.</p>
+<p>This are the Admin UI App specific properties</p>
+<table>
+<caption>Admin UI App Properties</caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property name</th>
+<th>Old Property</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>flowable.admin.app.data-source-prefix</p></td>
+<td><p>datasource.prefix</p></td>
+<td></td>
+<td><p>The prefix for the database tables.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.admin.app.security.encryption.credentials-i-v-spec</p></td>
+<td><p>security.encryption.credentials-i-v-spec</p></td>
+<td><p>-</p></td>
+<td><p>The string that needs to be used to create an IvParameterSpec object using it’s the bytes.</p></td>
+</tr>
+<tr class="odd">
+<td><p>flowable.admin.app.security.encryption.credentials-secret-spec</p></td>
+<td><p>security.encryption.credentials-secret-spec</p></td>
+<td><p>-</p></td>
+<td><p>The string that needs to be used to create a SecretKeySpec using it’s bytes.</p></td>
+</tr>
+<tr class="even">
+<td><p>flowable.admin.app.security.preemptive-basic-authentication</p></td>
+<td></td>
+<td><p>false</p></td>
+<td><p>Perform a preemptive basic authentication when issuing requests to the flowable REST API.
+<strong>NB:</strong> This is an experimental property and might be removed without notice.</p></td>
+</tr>
+</tbody>
+</table>
+<p>In addition to these properties, the Flowable admin application has a few more properties. The full
+content of the properties file can be viewed on {sc-flowable-ui-admin}/flowable-ui-admin-app/src/main/resources/application.properties[Github].
+The additional properties are mainly used for defining the initial values for the REST endpoints for the different engines.
+The Admin application uses the initial values to make a connection to the Flowable engines, but the values can be overridden in the Admin application configuration view and these values are stored in the <em>ACT\_ADM\_SERVER\_CONFIG</em> table.
+An example of the BPMN Engine REST properties is shown below:</p>
+<pre><code class="hljs">flowable.admin.app.server-config.process.name=Flowable Process app
+flowable.admin.app.server-config.process.description=Flowable Process REST config
+flowable.admin.app.server-config.process.server-address=http://localhost
+flowable.admin.app.server-config.process.port=8080
+flowable.admin.app.server-config.process.context-root=flowable-task
+flowable.admin.app.server-config.process.rest-root=process-api
+flowable.admin.app.server-config.process.user-name=admin
+flowable.admin.app.server-config.process.password=test
+</code></pre>
+<p>These values can be used when the Flowable Task app (with all the Flowable engines included) is managed by the Flowable Admin application.</p>
+<table>
+<caption>Admin UI App Properties managed by Spring Boot</caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Old property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>message.reloading.enabled</p></td>
+<td><p>Using Spring Boot MessageSourceAutoConfiguration. Set the duration with <code>spring.messages.cache-duration</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<h2><a class="anchor" aria-hidden="true" id="internationalization"></a><a href="#internationalization" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Internationalization</h2>
+<p>The Flowable UI apps support internationalization (i18n). The project maintains the English translations. It is however possible to provide your own translation files in order to support other languages.</p>
+<p>The <a href="$$https://github.com/angular-translate/angular-translate">Angular Translate</a> library tries to load a specific translation file based on the browser’s locale located in the <em>i18n</em> folder (present in each UI module). When a matching translation file cannot be loaded the framework will fallback to the English translation.</p>
+<p>Mapping multiple browser locale keys to specific translations additional configuration can be provided (located in the Angular app config);</p>
+<pre><code class="hljs">// Initialize angular-translate
+$translateProvider.useStaticFilesLoader({
+    prefix: './i18n/',
+    suffix: '.json'
+})
+/*
+    This can be used to map multiple browser language keys to a
+    angular translate language key.
+*/
+// .registerAvailableLanguageKeys(['en'], {
+//     'en-*': 'en'
+// })
+.useCookieStorage()
+.useSanitizeValueStrategy('sanitizeParameters')
+.uniformLanguageTag('bcp47')
+.determinePreferredLanguage();
+</code></pre>
+<p>For example; your browser is configured for English (United States) and provides the language key <em>en-US</em>. Without the mapping Angular Translate will try to fetch the corresponding translation file <em>en-US.json</em>. (If this is not available it will fallback to 'en' and load the <em>en.json</em> translation file)</p>
+<p>By uncommenting the <em>.registerAvailableLanguageKeys</em> block you can map <em>en-US</em> (and all other <em>en</em> language keys) to the <em>en.json</em> language file.</p>
+<h2><a class="anchor" aria-hidden="true" id="production-ready-endpoints"></a><a href="#production-ready-endpoints" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Production ready endpoints</h2>
+<p>The <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html">Production ready endpoints</a> from Spring Boot are present for all applications.
+To have an overview of all the available Endpoints have a look at the <a href="https://docs.spring.io/spring-boot/docs/current/actuator-api/html/">Actuator Web API Documentation</a>.</p>
+<p>This properties are set per default:</p>
+<pre><code class="hljs"># Expose all actuator endpoints to the web
+# They are exposed, but only authenticated users can see /info and /health abd users with access-admin can see the others
+management.endpoints.web.exposure.include=*
+# Full health details should only be displayed when a user is authorized
+management.endpoint.health.show-details=when_authorized
+# Only users with role access-admin can access full health details
+management.endpoint.health.roles=access-admin
+</code></pre>
+<p>The security is configured in such way that the <code>info</code> and <code>health</code> endpoint are exposed to all authenticated users.
+Full details of the <code>health</code> endpoint can only be seen by users with the privilege <code>access-admin</code>.
+In case you want to change that you need to configure <code>management.endpoint.health.show-details</code>.
+All the rest of the endpoints are accessing only to users with the <code>access-admin</code> privilege.</p>
+<h2><a class="anchor" aria-hidden="true" id="custom-bean-deployment"></a><a href="#custom-bean-deployment" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Custom bean deployment</h2>
+<p>There are multiple ways of providing custom beans to the Flowable applications.</p>
+<h3><a class="anchor" aria-hidden="true" id="using-spring-boot-auto-configuration"></a><a href="#using-spring-boot-auto-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using Spring Boot auto configuration</h3>
+<p>The Flowable applications are Spring Boot 2 applications.
+Which means that normal Spring Boot auto configuration can be used to make the beans to Flowable.
+This can be done in the following manner</p>
+<pre><code class="hljs">package com.your.own.package.configuration;
+
+@Configuration
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE) // Makes sure that this configuration will be processed last by Spring Boot
+@ConditionalOnBean(type = &quot;org.flowable.engine.ProcessEngine&quot;) // The configuration will only be used when the ProcessEngine bean is present
+public class YourOwnConfiguration {
+
+    @Configuration
+    @ComponentScan (&quot;com.your.own.package.beans&quot;)
+    public static class ComponentScanConfiguration {
+        // This class is needed in order to conditionally perform the component scan (i.e. when the ProcessEngine bean is present)
+        // It is an optional class, in case you don't need component scanning then you don't need to do this
+    }
+
+    @Bean
+    public CustomBean customBean() {
+        // create your bean
+    }
+
+    @Bean
+    public EngineConfigurationConfigurer&lt;SpringProcessEngineConfiguration&gt; customProcessEngineConfigurationConfigurer() {
+        return engineConfiguration -&gt; {
+            // You can use this to add extra configuration to the process engine
+        }
+    }
+}
+</code></pre>
+<p>Note that when using Spring Boot the configuration class can be under your own package and not under some Flowable package.</p>
+<p>In order to make this class an auto configuration class a file named <code>spring.factories</code> should be created in the <code>META-INF</code> folder of your jar.
+In this file you should add</p>
+<pre><code class="hljs">org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.your.own.package.configuration.YourOwnCustomConfiguration
+</code></pre>
+<p>In order to use this approach you would need to include your jar in the <code>WEB-INF/lib</code> folder of the exploded war.
+Placing this jar in the lib folder of the servlet container (e.g. Tomcat) is not going to work due to the way Spring proxies the <code>@Configuration</code> classes.</p>
+<h3><a class="anchor" aria-hidden="true" id="component-scan"></a><a href="#component-scan" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Component scan</h3>
+<p>Another way to provide custom Spring beans to the Flowable engine is to put them under a certain package and have the Flowable application component scan that package.
+Based on the used application this package is different:</p>
+<ul>
+<li><p><code>org.flowable.rest.app</code> for the <code>flowable-rest.war</code></p></li>
+<li><p><code>org.flowable.ui.task.application</code> for the <code>flowable-task.war</code></p></li>
+</ul>
+<p>The custom beans can be located in a single JAR and this jar should be present on the classpath when the applications are starting up.
+Depending where there JAR is placed, the lib folder of the servlet container (e.g. Tomcat) or the <code>WEB-INF/lib</code> folder of the exploded war, there are different possibilities.</p>
+<p>When using the lib folder of the servlet container then the created classes should be self contained, i.e. they should only use classes from within the jar.
+You can use any of the Spring <code>@Component</code> annotations (with the exception of <code>@Configuration</code>).
+The reason for not being able to use <code>@Configuration</code> classes is the fact that each configuration class is proxied by Spring with the help of the <code>ConfigurationClassPostProcessor</code>.
+However, the classloader loading the <code>@Configuration</code> class does not have access to the needed classes by Spring.</p>
+<p>When including the jar in the <code>WEB-INF/lib</code> folder of the exploded war then <code>@Configuration</code> classes and dependencies to other jars is possible.</p>
+<h3><a class="anchor" aria-hidden="true" id="creating-your-own-spring-boot-application"></a><a href="#creating-your-own-spring-boot-application" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating your own Spring Boot application</h3>
+<p>This approach is the most flexible and most powerful approach of all.
+In order to follow this approach have a look at the <a href="/open-source/docs/bpmn/ch05a-Spring-Boot#getting-started">Getting Started with Spring Boot</a> section of this documentation.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/open-source/docs/bpmn/ch13-Designer"><span class="arrow-prev">← </span><span>Eclipse Designer</span></a><a class="docs-next button" href="/open-source/docs/bpmn/ch15-REST"><span>REST API</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#flowable-ui-applications-installation">Flowable UI Applications installation</a></li><li><a href="#flowable-ui-applications-configurations">Flowable UI Applications Configurations</a></li><li><a href="#flowable-idm-application">Flowable IDM application</a></li><li><a href="#flowable-modeler-application">Flowable Modeler application</a></li><li><a href="#flowable-task-application">Flowable Task application</a></li><li><a href="#flowable-admin-application">Flowable Admin application</a></li><li><a href="#internationalization">Internationalization</a></li><li><a href="#production-ready-endpoints">Production ready endpoints</a></li><li><a href="#custom-bean-deployment">Custom bean deployment</a><ul class="toc-headings"><li><a href="#using-spring-boot-auto-configuration">Using Spring Boot auto configuration</a></li><li><a href="#component-scan">Component scan</a></li><li><a href="#creating-your-own-spring-boot-application">Creating your own Spring Boot application</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/open-source/docs/" class="nav-home"><img src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/></a><div><h5>Documentation</h5><a href="/open-source/docs/oss-introduction">Guides</a><a href="/open-source/docs/javadocs">Javadocs</a></div><div><h5>Legal</h5><a href="/open-source/docs/disclaimer">Disclaimer</a><a href="https://flowable.com/disclaimer/">Policies</a></div></section><section class="copyright">Copyright © 2020 Flowable AG</section></footer></div></body></html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>History · Flowable Open Source Documentation</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="History is the component that captures what happened during process execution and stores it permanently. In contrast to the runtime data, the history data will remain present in the DB also after process instances have completed."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="History · Flowable Open Source Documentation"/><meta property="og:type" content="website"/><meta property="og:url" content="https://flowable.com/open-source/docs/"/><meta property="og:description" content="History is the component that captures what happened during process execution and stores it permanently. In contrast to the runtime data, the history data will remain present in the DB also after process instances have completed."/><meta property="og:image" content="https://flowable.com/open-source/docs/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://flowable.com/open-source/docs/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/open-source/docs/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><script src="/open-source/docs/js/scrollSpy.js"></script><link rel="stylesheet" href="/open-source/docs/css/main.css"/><script src="/open-source/docs/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/open-source/docs/"><img class="logo" src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/><h2 class="headerTitleWithLogo">Flowable Open Source Documentation</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/open-source/docs/oss-introduction" target="_self">Guides</a></li><li class=""><a href="/open-source/docs/all-javadocs" target="_self">Javadocs</a></li><li class=""><a href="https://flowable.com/open-source/" target="_self">Open source home</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>BPMN User Guide</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Flowable Open Source<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/oss-introduction">Open Source Details</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">BPMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch02-GettingStarted">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch03-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch04-API">The Flowable API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05a-Spring-Boot">Spring Boot</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch06-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07a-BPMN-Introduction">BPMN 2.0 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07b-BPMN-Constructs">BPMN 2.0 Constructs</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch08-Forms">Forms</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch09-ProcessInstanceMigration">Process Instance Migration (Experimental)</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch10-JPA">JPA</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/open-source/docs/bpmn/ch11-History">History</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch12-IDM">Identity management</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch13-Designer">Eclipse Designer</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch14-Applications">Flowable applications</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch15-REST">REST API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch16-Cdi">CDI integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch17-Ldap">LDAP integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch18-Advanced">Advanced</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch19-tooling">Tooling</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">CMMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch03-API">The Flowable CMMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch06-cmmn">CMMN 1.1</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch07-architecture">Architecture</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">DMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch03-API">The Flowable DMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch06-DMN-Introduction">DMN 1.1 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Forms User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch03-API">The Flowable Form API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch06-Form-Introduction">Form Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Migration from v5<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/migration">Flowable Migration Guide : Flowable or Activiti v5 to Flowable V6</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Disclaimer<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/disclaimer">Disclaimer</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">History</h1></header><article><div><span><p>History is the component that captures what happened during process execution and stores it permanently. In contrast to the runtime data, the history data will remain present in the DB also after process instances have completed.</p>
+<p>There are 6 history entities:</p>
+<ul>
+<li><p>HistoricProcessInstances containing information about current and past process instances.</p></li>
+<li><p>HistoricVariableInstances containing the latest value of a process variable or task variable.</p></li>
+<li><p>HistoricActivityInstances containing information about a single execution of an activity (node in the process).</p></li>
+<li><p>HistoricTaskInstances containing information about current and past (completed and deleted) task instances.</p></li>
+<li><p>HistoricIdentityLinks containing information about current and past identity links on tasks and process instances.</p></li>
+<li><p>HistoricDetails containing various kinds of information related to either a historic process instances, an activity instance or a task instance.</p></li>
+</ul>
+<p>Since the DB contains historic entities for past as well as ongoing instances, you might want to consider querying these tables in order to minimize access to the runtime process instance data and that way keeping the runtime execution performant.</p>
+<h2><a class="anchor" aria-hidden="true" id="querying-history"></a><a href="#querying-history" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Querying history</h2>
+<p>In the API, it’s possible to query all 6 of the History entities. The HistoryService exposes the methods createHistoricProcessInstanceQuery(), createHistoricVariableInstanceQuery(), createHistoricActivityInstanceQuery(), getHistoricIdentityLinksForTask(), getHistoricIdentityLinksForProcessInstance(), createHistoricDetailQuery() and createHistoricTaskInstanceQuery().</p>
+<p>Below are a couple of examples that show some of the possibilities of the query API for history. Full description of the possibilities can be found in the <a href="http://www.flowable.org/docs/javadocs/index.html">javadocs</a>, in the org.flowable.engine.history package.</p>
+<h3><a class="anchor" aria-hidden="true" id="historicprocessinstancequery"></a><a href="#historicprocessinstancequery" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>HistoricProcessInstanceQuery</h3>
+<p>Get 10 HistoricProcessInstances that are finished and which took the most time to complete (the longest duration) of all finished processes with definition 'XXX'.</p>
+<pre><code class="hljs">historyService.createHistoricProcessInstanceQuery()
+  .finished()
+  .processDefinitionId(&quot;XXX&quot;)
+  .orderByProcessInstanceDuration().desc()
+  .listPage(0, 10);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="historicvariableinstancequery"></a><a href="#historicvariableinstancequery" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>HistoricVariableInstanceQuery</h3>
+<p>Get all HistoricVariableInstances from a finished process instance with id 'xxx' ordered by variable name.</p>
+<pre><code class="hljs">historyService.createHistoricVariableInstanceQuery()
+  .processInstanceId(&quot;XXX&quot;)
+  .orderByVariableName.desc()
+  .list();
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="historicactivityinstancequery"></a><a href="#historicactivityinstancequery" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>HistoricActivityInstanceQuery</h3>
+<p>Get the last HistoricActivityInstance of type 'serviceTask' that has been finished in any process that uses the processDefinition with id XXX.</p>
+<pre><code class="hljs">historyService.createHistoricActivityInstanceQuery()
+  .activityType(&quot;serviceTask&quot;)
+  .processDefinitionId(&quot;XXX&quot;)
+  .finished()
+  .orderByHistoricActivityInstanceEndTime().desc()
+  .listPage(0, 1);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="historicdetailquery"></a><a href="#historicdetailquery" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>HistoricDetailQuery</h3>
+<p>The next example, gets all variable-updates that have been done in process with id 123. Only HistoricVariableUpdates will be returned by this query. Note that it’s possible that a certain variable name has multiple HistoricVariableUpdate entries, for each time the variable was updated in the process. You can use orderByTime (the time the variable update was done) or orderByVariableRevision (revision of runtime variable at the time of updating) to find out in what order they occurred.</p>
+<pre><code class="hljs">historyService.createHistoricDetailQuery()
+  .variableUpdates()
+  .processInstanceId(&quot;123&quot;)
+  .orderByVariableName().asc()
+  .list()
+</code></pre>
+<p>This example gets all <a href="/open-source/docs/bpmn/ch08-Forms#form-properties">form-properties</a> that were submitted in any task or when starting the process with id &quot;123&quot;. Only HistoricFormProperties will be returned by this query.</p>
+<pre><code class="hljs">historyService.createHistoricDetailQuery()
+  .formProperties()
+  .processInstanceId(&quot;123&quot;)
+  .orderByVariableName().asc()
+  .list()
+</code></pre>
+<p>The last example gets all variable updates that were performed on the task with id &quot;123&quot;. This returns all HistoricVariableUpdates for variables that were set on the task (task local variables), and NOT on the process instance.</p>
+<pre><code class="hljs">historyService.createHistoricDetailQuery()
+  .variableUpdates()
+  .taskId(&quot;123&quot;)
+  .orderByVariableName().asc()
+  .list()
+</code></pre>
+<p>Task local variables can be set using the TaskService or on a DelegateTask, inside TaskListener:</p>
+<pre><code class="hljs">taskService.setVariableLocal(&quot;123&quot;, &quot;myVariable&quot;, &quot;Variable value&quot;);
+
+public void notify(DelegateTask delegateTask) {
+  delegateTask.setVariableLocal(&quot;myVariable&quot;, &quot;Variable value&quot;);
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="historictaskinstancequery"></a><a href="#historictaskinstancequery" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>HistoricTaskInstanceQuery</h3>
+<p>Get 10 HistoricTaskInstances that are finished and which took the most time to complete (the longest duration) of all tasks.</p>
+<pre><code class="hljs">historyService.createHistoricTaskInstanceQuery()
+  .finished()
+  .orderByHistoricTaskInstanceDuration().desc()
+  .listPage(0, 10);
+</code></pre>
+<p>Get HistoricTaskInstances that are deleted with a delete reason that contains &quot;invalid&quot;, which were last assigned to user 'kermit'.</p>
+<pre><code class="hljs">historyService.createHistoricTaskInstanceQuery()
+  .finished()
+  .taskDeleteReasonLike(&quot;%invalid%&quot;)
+  .taskAssignee(&quot;kermit&quot;)
+  .listPage(0, 10);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="history-configuration"></a><a href="#history-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>History configuration</h2>
+<p>The history level can be configured programmatically, using the enum org.flowable.engine.impl.history.HistoryLevel (or <em>HISTORY</em> constants defined on ProcessEngineConfiguration for versions prior to 5.11):</p>
+<pre><code class="hljs">ProcessEngine processEngine = ProcessEngineConfiguration
+  .createProcessEngineConfigurationFromResourceDefault()
+  .setHistory(HistoryLevel.AUDIT.getKey())
+  .buildProcessEngine();
+</code></pre>
+<p>The level can also be configured in flowable.cfg.xml or in a spring-context:</p>
+<pre><code class="hljs">&lt;bean id=&quot;processEngineConfiguration&quot; class=&quot;org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration&quot;&gt;
+  &lt;property name=&quot;history&quot; value=&quot;audit&quot; /&gt;
+  ...
+&lt;/bean&gt;
+</code></pre>
+<p>Following history levels can be configured:</p>
+<ul>
+<li><p>none: skips all history archiving. This is the most performant for runtime process execution, but no historical information will be available.</p></li>
+<li><p>activity: archives all process instances and activity instances. At the end of the process instance, the latest values of the top level process instance variables will be copied to historic variable instances. No details will be archived.</p></li>
+<li><p>audit: This is the default. It archives all process instances, activity instances, keeps variable values continuously in sync and all form properties that are submitted so that all user interaction through forms is traceable and can be audited.</p></li>
+<li><p>full: This is the highest level of history archiving and hence the slowest. This level stores all information as in the audit level plus all other possible details, mostly this are process variable updates.</p></li>
+</ul>
+<p><strong>In older releases, the history level was stored in the database (table ACT_GE_PROPERTY, property with name historyLevel). Starting from 5.11, this value is not used anymore and is ignored/deleted from the database. The history can now be changed between 2 boots of the engine, without an exception being thrown in case the level changed from the previous engine-boot.</strong></p>
+<h2><a class="anchor" aria-hidden="true" id="async-history-configuration"></a><a href="#async-history-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Async History configuration</h2>
+<p>[Experimental] Async History has been introduced with Flowable 6.1.0 and allows historic data to be persisted asynchronously using a history job executor.</p>
+<pre><code class="hljs">&lt;bean id=&quot;processEngineConfiguration&quot; class=&quot;org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration&quot;&gt;
+  &lt;property name=&quot;asyncHistoryEnabled&quot; value=&quot;true&quot; /&gt;
+  &lt;property name=&quot;asyncHistoryExecutorNumberOfRetries&quot; value=&quot;10&quot; /&gt;
+  &lt;property name=&quot;asyncHistoryExecutorActivate&quot; value=&quot;true&quot; /&gt;
+  ...
+&lt;/bean&gt;
+</code></pre>
+<p>With the asyncHistoryExecutorActivate property, the history job executor can be started automatically when booting the Process Engine. This would be only set to false for test cases (or if Async History is not enabled of course).
+The asyncHistoryExecutorNumberOfRetries property configures the number of retries for an Async History job. This property is a bit different than that for a normal async job, because a history job may need more cycles before it can be handled successfully. For example, a historic task first has to be created in the ACT_HI_TASK_ table before the assignee can be updated by another history job. The default value for this property is set to 10 in the Process Engine configuration. When the number of retries has been reached, the history job will be ignored (and not written to a deadletter job table).</p>
+<p>In addition to these properties, the asyncHistoryExecutor property can be used to configure an AsyncExecutor in a similar way that you can do for the normal async job executor.</p>
+<p>When the history data is not to be persisted in the default history tables, but for example, is required in a NoSQL database (such as Elasticsearch, MongoDb, Cassandra and so on), or something completely different is to be done with it, the handler that is responsible for handling the job can be overridden:</p>
+<ul>
+<li><p>Using the historyJobHandlers property, which is a map of all the custom history job handlers</p></li>
+<li><p>Or, configure the customHistoryJobHandlers list with all instances will be added to the historyJobHandlers map at boot time.</p></li>
+</ul>
+<p>Alternatively, it is also possible to use a Message Queue and configure the engine in such a way that a message will be sent when a new history job is available. This way, the historical data can be processed on different servers to where the engines are run. It’s also possible to configure the engine and Message Queue using JTA (when using JMS) and not store the historical data in a job, but send it all data to a Message Queue that participates in a global transaction.</p>
+<p>See <a href="https://github.com/flowable/flowable-examples/tree/master/async-history">the Flowable Async History Examples</a> for various examples on how to configure the Async History, including the default way, using a JMS queue, using JTA or using a Message Queue and a Spring Boot application that acts as a message listener.</p>
+<h2><a class="anchor" aria-hidden="true" id="history-for-audit-purposes"></a><a href="#history-for-audit-purposes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>History for audit purposes</h2>
+<p>When <a href="/open-source/docs/bpmn/ch11-History#history-configuration">configuring</a> at least audit level for configuration. Then all properties submitted through methods FormService.submitStartFormData(String processDefinitionId, Map&lt;String, String&gt; properties) and FormService.submitTaskFormData(String taskId, Map&lt;String, String&gt; properties) are recorded.</p>
+<p>Form properties can be retrieved with the query API like this:</p>
+<pre><code class="hljs">historyService
+      .createHistoricDetailQuery()
+      .formProperties()
+      ...
+      .list();
+</code></pre>
+<p>In that case only historic details of type HistoricFormProperty are returned.</p>
+<p>If you’ve set the authenticated user before calling the submit methods with IdentityService.setAuthenticatedUserId(String) then that authenticated user who submitted the form will be accessible in the history as well with HistoricProcessInstance.getStartUserId() for start forms and HistoricActivityInstance.getAssignee() for task forms.</p>
+<h2><a class="anchor" aria-hidden="true" id="history-cleaning"></a><a href="#history-cleaning" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>History Cleaning</h2>
+<p>By default history data is stored forever, this can cause the history tables to grow very large and impact the performance of the HistoryService.  History Cleaning has been introduced with 6.5.0 and allows the deletion of HistoricProcessInstances and their associated data.  Once process data no longer needs to be retained it can be deleted to reduce the history database's size.</p>
+<h3><a class="anchor" aria-hidden="true" id="automatic-history-cleaning-configuration"></a><a href="#automatic-history-cleaning-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Automatic History Cleaning Configuration</h3>
+<p>Automatic cleanup of HistoricProcessInstances is disabled by default but can be enabled and configured programmatically.  Once enabled the default is to run a cleanup job at 1 AM to delete all HistoricProcessInstances and associated data that have ended 365 days prior or older.</p>
+<pre><code class="hljs">ProcessEngine processEngine = ProcessEngineConfiguration
+    .createProcessEngineConfigurationFromResourceDefault()
+    .setEnableHistoryCleaning(true)
+    .setHistoryCleaningTimeCycleConfig(&quot;0 0 1 * * ?&quot;)
+    .setCleanInstancesEndedAfterNumberOfDays(365)
+    .buildProcessEngine();
+</code></pre>
+<p>Spring properties set in an application.properties or externalized configuration are also available:</p>
+<pre><code class="hljs">     flowable.enable-history-cleaning=true
+     flowable.history-cleaning-after-days=365
+     flowable.history-cleaning-cycle=0 0 1 * * ?
+</code></pre>
+<p>Additionally, History Cleanup can also be configured in flowable.cfg.xml or in a spring-context:</p>
+<pre><code class="hljs"> &lt;bean id=&quot;processEngineConfiguration&quot; class=&quot;org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration&quot;&gt;
+   &lt;property name=&quot;enableHistoryCleaning&quot; value=&quot;true&quot;/&gt;
+   &lt;property name=&quot;historyCleaningTimeCycleConfig&quot; value=&quot;0 0 1 * * ?&quot;/&gt;
+   &lt;property name=&quot;cleanInstancesEndedAfterNumberOfDays&quot; value=&quot;365&quot;/&gt;
+   ...
+ &lt;/bean&gt;
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="manually-deleting-history"></a><a href="#manually-deleting-history" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Manually Deleting History</h3>
+<p>Manually cleaning history can accomplished by executing methods on the HistoryService query builders.</p>
+<p>Delete all HistoricProcessInstances and their related data that are older than one year.</p>
+<pre><code class="hljs"> Calendar cal = new GregorianCalendar();
+ cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+ historyService.createHistoricProcessInstanceQuery()
+   .finishedBefore(cal.getTime())
+   .deleteWithRelatedData();
+</code></pre>
+<p>Delete just HistoricProcessInstances older than one year.</p>
+<pre><code class="hljs">Calendar cal = new GregorianCalendar();
+cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+historyService.createHistoricProcessInstanceQuery()
+  .finishedBefore(cal.getTime())
+  .delete();
+</code></pre>
+<p>Delete just HistoricActivityInstances older than one year.</p>
+<pre><code class="hljs">Calendar cal = new GregorianCalendar();
+cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+historyService.createHistoricActivityInstanceQuery()
+  .finishedBefore(cal.getTime())
+  .delete();
+</code></pre>
+<p>Delete the task and activity data for deleted HistoricProcessInstances.</p>
+<pre><code class="hljs">historyService.deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/open-source/docs/bpmn/ch10-JPA"><span class="arrow-prev">← </span><span>JPA</span></a><a class="docs-next button" href="/open-source/docs/bpmn/ch12-IDM"><span>Identity management</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#querying-history">Querying history</a><ul class="toc-headings"><li><a href="#historicprocessinstancequery">HistoricProcessInstanceQuery</a></li><li><a href="#historicvariableinstancequery">HistoricVariableInstanceQuery</a></li><li><a href="#historicactivityinstancequery">HistoricActivityInstanceQuery</a></li><li><a href="#historicdetailquery">HistoricDetailQuery</a></li><li><a href="#historictaskinstancequery">HistoricTaskInstanceQuery</a></li></ul></li><li><a href="#history-configuration">History configuration</a></li><li><a href="#async-history-configuration">Async History configuration</a></li><li><a href="#history-for-audit-purposes">History for audit purposes</a></li><li><a href="#history-cleaning">History Cleaning</a><ul class="toc-headings"><li><a href="#automatic-history-cleaning-configuration">Automatic History Cleaning Configuration</a></li><li><a href="#manually-deleting-history">Manually Deleting History</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/open-source/docs/" class="nav-home"><img src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/></a><div><h5>Documentation</h5><a href="/open-source/docs/oss-introduction">Guides</a><a href="/open-source/docs/javadocs">Javadocs</a></div><div><h5>Legal</h5><a href="/open-source/docs/disclaimer">Disclaimer</a><a href="https://flowable.com/disclaimer/">Policies</a></div></section><section class="copyright">Copyright © 2020 Flowable AG</section></footer></div></body></html>

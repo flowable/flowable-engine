@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Forms · Flowable Open Source Documentation</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Flowable provides a convenient and flexible way to add forms for the manual steps of your business processes."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Forms · Flowable Open Source Documentation"/><meta property="og:type" content="website"/><meta property="og:url" content="https://flowable.com/open-source/docs/"/><meta property="og:description" content="Flowable provides a convenient and flexible way to add forms for the manual steps of your business processes."/><meta property="og:image" content="https://flowable.com/open-source/docs/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://flowable.com/open-source/docs/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/open-source/docs/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><script src="/open-source/docs/js/scrollSpy.js"></script><link rel="stylesheet" href="/open-source/docs/css/main.css"/><script src="/open-source/docs/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/open-source/docs/"><img class="logo" src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/><h2 class="headerTitleWithLogo">Flowable Open Source Documentation</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/open-source/docs/oss-introduction" target="_self">Guides</a></li><li class=""><a href="/open-source/docs/all-javadocs" target="_self">Javadocs</a></li><li class=""><a href="https://flowable.com/open-source/" target="_self">Open source home</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>BPMN User Guide</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Flowable Open Source<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/oss-introduction">Open Source Details</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">BPMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch02-GettingStarted">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch03-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch04-API">The Flowable API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05a-Spring-Boot">Spring Boot</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch06-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07a-BPMN-Introduction">BPMN 2.0 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07b-BPMN-Constructs">BPMN 2.0 Constructs</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/open-source/docs/bpmn/ch08-Forms">Forms</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch09-ProcessInstanceMigration">Process Instance Migration (Experimental)</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch10-JPA">JPA</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch11-History">History</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch12-IDM">Identity management</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch13-Designer">Eclipse Designer</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch14-Applications">Flowable applications</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch15-REST">REST API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch16-Cdi">CDI integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch17-Ldap">LDAP integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch18-Advanced">Advanced</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch19-tooling">Tooling</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">CMMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch03-API">The Flowable CMMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch06-cmmn">CMMN 1.1</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch07-architecture">Architecture</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">DMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch03-API">The Flowable DMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch06-DMN-Introduction">DMN 1.1 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Forms User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch03-API">The Flowable Form API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch06-Form-Introduction">Form Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Migration from v5<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/migration">Flowable Migration Guide : Flowable or Activiti v5 to Flowable V6</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Disclaimer<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/disclaimer">Disclaimer</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Forms</h1></header><article><div><span><p>Flowable provides a convenient and flexible way to add forms for the manual steps of your business processes.
+We support two strategies to work with forms: Built-in form rendering with a form definition (created with the form designer) and external form rendering.
+For the external form rendering strategy form properties can be used (that was supported in the Explorer web application in version 5), or a form key definition that points to an external form reference that can be resolved with custom coding.</p>
+<h2><a class="anchor" aria-hidden="true" id="form-definition"></a><a href="#form-definition" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Form definition</h2>
+<p>Full information about the form definitions and Flowable form engine can be found in the <a href="http://www.flowable.org/docs/userguide-form/">Form Engine user guide</a>.
+Form definitions can be created with the Flowable Form Designer that’s part of the Flowable Modeler web application, or created by hand with a JSON editor.
+The Form Engine user guide describes the structure of the form definition JSON in full length. The following form field types are supported:</p>
+<ul>
+<li><p>Text: rendered as a text field</p></li>
+<li><p>Multiline text: rendered as a text area field</p></li>
+<li><p>Number: rendered as a text field, but only allows numeric values</p></li>
+<li><p>Checkbox: rendered as a checkbox field</p></li>
+<li><p>Date: rendered as a date field</p></li>
+<li><p>Dropdown: rendered as a select field with the option values configured in the field definition</p></li>
+<li><p>Radio buttons: rendered as a radio field with the option values configured in the field definition</p></li>
+<li><p>People: rendered as a select field where a person from the Identity user table can be selected</p></li>
+<li><p>Group of people: rendered as a select field where a group from the Identity group table can be selected</p></li>
+<li><p>Upload: rendered as an upload field</p></li>
+<li><p>Expression: rendered as a label and allows you to use JUEL expressions to use variables and/or other dynamic values in the label text</p></li>
+</ul>
+<p>The Flowable task application is able to render an html form from the form definition JSON.
+You can also use the Flowable API to get the form definition JSON yourself.</p>
+<pre><code class="hljs">FormModel RuntimeService.getStartFormModel(String processDefinitionId, String processInstanceId)
+</code></pre>
+<p>or</p>
+<pre><code class="hljs">FormModel TaskService.getTaskFormModel(String taskId)
+</code></pre>
+<p>The FormModel object is a Java object representation of the form definition JSON.</p>
+<p>To start a process instance with a start form definition you can use the following API call:</p>
+<pre><code class="hljs">ProcessInstance RuntimeService.startProcessInstanceWithForm(String processDefinitionId, String outcome,
+    Map&lt;String, Object&gt; variables, String processInstanceName)
+</code></pre>
+<p>When a form definition is defined on (one of) the start event(s) of a process definition, this method can be used to start a process instance with the values filled-in in the start form.
+The Flowable task application uses this method to start a process instance with a form as well.
+All form values need to be passed in the variables map and an optional form outcome string and process instance name can be provided.</p>
+<p>In a similar way, a user task can be completed with a form using the following API call:</p>
+<pre><code class="hljs">void TaskService.completeTaskWithForm(String taskId, String formDefinitionId,
+    String outcome, Map&lt;String, Object&gt; variables)
+</code></pre>
+<p>Again, for more information about form definitions have a look at the <a href="http://www.flowable.org/docs/userguide-form">Form Engine user guide</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="form-properties"></a><a href="#form-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Form properties</h2>
+<p>All information relevant to a business process is either included in the process variables themselves or referenced through the process variables. Flowable supports complex Java objects to be stored as process variables like Serializable objects, JPA entities or whole XML documents as Strings.</p>
+<p>Starting a process and completing user tasks is where people are involved into a process. Communicating with people requires forms to be rendered in some UI technology. In order to facilitate multiple UI technologies easy, the process definition can include the logic of transforming of the complex Java typed objects in the process variables to a Map&lt;String,String&gt; of <strong>'properties'</strong>.</p>
+<p>Any UI technology can then build a form on top of those properties, using the Flowable API methods that expose the property information. The properties can provide a dedicated (and more limited) view on the process variables. The properties needed to display a form are available in the <strong>FormData</strong> return values of for example</p>
+<pre><code class="hljs">StartFormData FormService.getStartFormData(String processDefinitionId)
+</code></pre>
+<p>or</p>
+<pre><code class="hljs">TaskFormdata FormService.getTaskFormData(String taskId)
+</code></pre>
+<p>By default, the built-in form engine 'sees' the properties as well as the process variables. So there is no need to declare task form properties if they match 1-1 with the process variables. For example, with the following declaration:</p>
+<pre><code class="hljs">&lt;startEvent id=&quot;start&quot; /&gt;
+</code></pre>
+<p>All process variables are available when execution arrives in the startEvent, but</p>
+<pre><code class="hljs">formService.getStartFormData(String processDefinitionId).getFormProperties()
+</code></pre>
+<p>will be empty since no specific mapping was defined.</p>
+<p>In the above case, all the submitted properties will be stored as process variables. This means that by simply adding a new input field in the form, a new variable can be stored.</p>
+<p>Properties are derived from process variables, but they don’t have to be stored as process variables. For example, a process variable could be a JPA entity of class Address. And a form property StreetName used by the UI technology could be linked with an expression #{address.street}</p>
+<p>Analogue, the properties that a user is supposed to submit in a form can be stored as a process variable or as a nested property in one of the process variables with a UEL value expression like e.g. #{address.street} .</p>
+<p>Analogue the default behavior of properties that are submitted is that they will be stored as process variables unless a formProperty declaration specifies otherwise.</p>
+<p>Also type conversions can be applied as part of the processing between form properties and process variables.</p>
+<p>For example:</p>
+<pre><code class="hljs">&lt;userTask id=&quot;task&quot;&gt;
+  &lt;extensionElements&gt;
+    &lt;flowable:formProperty id=&quot;room&quot; /&gt;
+    &lt;flowable:formProperty id=&quot;duration&quot; type=&quot;long&quot;/&gt;
+    &lt;flowable:formProperty id=&quot;speaker&quot; variable=&quot;SpeakerName&quot; writable=&quot;false&quot; /&gt;
+    &lt;flowable:formProperty id=&quot;street&quot; expression=&quot;#{address.street}&quot; required=&quot;true&quot; /&gt;
+  &lt;/extensionElements&gt;
+&lt;/userTask&gt;
+</code></pre>
+<ul>
+<li><p>Form property room will be mapped to process variable room as a String</p></li>
+<li><p>Form property duration will be mapped to process variable duration as a java.lang.Long</p></li>
+<li><p>Form property speaker will be mapped to process variable SpeakerName. It will only be available in the TaskFormData object. If property speaker is submitted, an FlowableException will be thrown. Analogue, with attribute readable=&quot;false&quot;, a property can be excluded from the FormData, but still be processed in the submit.</p></li>
+<li><p>Form property street will be mapped to Java bean property street in process variable address as a String. And required=&quot;true&quot; will throw an exception during the submit if the property is not provided.</p></li>
+</ul>
+<p>It’s also possible to provide type metadata as part of the FormData that is returned from methods StartFormData FormService.getStartFormData(String processDefinitionId) and TaskFormdata FormService.getTaskFormData(String taskId)</p>
+<p>We support the following form property types:</p>
+<ul>
+<li><p>string (org.flowable.engine.impl.form.StringFormType</p></li>
+<li><p>long (org.flowable.engine.impl.form.LongFormType)</p></li>
+<li><p>double (org.flowable.engine.impl.form.DoubleFormType)</p></li>
+<li><p>enum (org.flowable.engine.impl.form.EnumFormType)</p></li>
+<li><p>date (org.flowable.engine.impl.form.DateFormType)</p></li>
+<li><p>boolean (org.flowable.engine.impl.form.BooleanFormType)</p></li>
+</ul>
+<p>For each form property declared, the following FormProperty information will be made available through List&lt;FormProperty&gt; formService.getStartFormData(String processDefinitionId).getFormProperties() and List&lt;FormProperty&gt; formService.getTaskFormData(String taskId).getFormProperties()</p>
+<pre><code class="hljs">public interface FormProperty {
+  /** the key used to submit the property in {@link FormService#submitStartFormData(String, java.util.Map)}
+   * or {@link FormService#submitTaskFormData(String, java.util.Map)} */
+  String getId();
+  /** the display label */
+  String getName();
+  /** one of the types defined in this interface like e.g. {@link #TYPE_STRING} */
+  FormType getType();
+  /** optional value that should be used to display in this property */
+  String getValue();
+  /** is this property read to be displayed in the form and made accessible with the methods
+   * {@link FormService#getStartFormData(String)} and {@link FormService#getTaskFormData(String)}. */
+  boolean isReadable();
+  /** is this property expected when a user submits the form? */
+  boolean isWritable();
+  /** is this property a required input field */
+  boolean isRequired();
+}
+</code></pre>
+<p>For example:</p>
+<pre><code class="hljs">&lt;startEvent id=&quot;start&quot;&gt;
+  &lt;extensionElements&gt;
+    &lt;flowable:formProperty id=&quot;speaker&quot;
+      name=&quot;Speaker&quot;
+      variable=&quot;SpeakerName&quot;
+      type=&quot;string&quot; /&gt;
+
+    &lt;flowable:formProperty id=&quot;start&quot;
+      type=&quot;date&quot;
+      datePattern=&quot;dd-MMM-yyyy&quot; /&gt;
+
+    &lt;flowable:formProperty id=&quot;direction&quot; type=&quot;enum&quot;&gt;
+      &lt;flowable:value id=&quot;left&quot; name=&quot;Go Left&quot; /&gt;
+      &lt;flowable:value id=&quot;right&quot; name=&quot;Go Right&quot; /&gt;
+      &lt;flowable:value id=&quot;up&quot; name=&quot;Go Up&quot; /&gt;
+      &lt;flowable:value id=&quot;down&quot; name=&quot;Go Down&quot; /&gt;
+    &lt;/flowable:formProperty&gt;
+
+  &lt;/extensionElements&gt;
+&lt;/startEvent&gt;
+</code></pre>
+<p>All that information is accessible through the API. The type names can be obtained with formProperty.getType().getName(). And even the date pattern is available with formProperty.getType().getInformation(&quot;datePattern&quot;) and the enumeration values are accessible with formProperty.getType().getInformation(&quot;values&quot;)</p>
+<p>The following XML snippet</p>
+<pre><code class="hljs">&lt;startEvent&gt;
+  &lt;extensionElements&gt;
+    &lt;flowable:formProperty id=&quot;numberOfDays&quot; name=&quot;Number of days&quot; value=&quot;${numberOfDays}&quot; type=&quot;long&quot; required=&quot;true&quot;/&gt;
+    &lt;flowable:formProperty id=&quot;startDate&quot; name=&quot;First day of holiday (dd-MM-yyy)&quot; value=&quot;${startDate}&quot; datePattern=&quot;dd-MM-yyyy hh:mm&quot; type=&quot;date&quot; required=&quot;true&quot; /&gt;
+    &lt;flowable:formProperty id=&quot;vacationMotivation&quot; name=&quot;Motivation&quot; value=&quot;${vacationMotivation}&quot; type=&quot;string&quot; /&gt;
+  &lt;/extensionElements&gt;
+&lt;/userTask&gt;
+</code></pre>
+<p>could be used to render to a process start form in a custom app.</p>
+<h2><a class="anchor" aria-hidden="true" id="external-form-rendering"></a><a href="#external-form-rendering" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>External form rendering</h2>
+<p>The API also allows for you to perform your own task form rendering outside of the Flowable Engine. These steps explain the hooks that you can use to render your task forms yourself.</p>
+<p>Essentially, all the data that’s needed to render a form is assembled in one of these two service methods: StartFormData FormService.getStartFormData(String processDefinitionId) and TaskFormdata FormService.getTaskFormData(String taskId).</p>
+<p>Submitting form properties can be done with ProcessInstance FormService.submitStartFormData(String processDefinitionId, Map&lt;String,String&gt; properties) and void FormService.submitTaskFormData(String taskId, Map&lt;String,String&gt; properties)</p>
+<p>To learn about how form properties map to process variables, see <a href="/open-source/docs/bpmn/ch08-Forms#form-properties">Form properties</a></p>
+<p>You can place any form template resource inside the business archives that you deploy (in case you want to store them versioned with the process). It will be available as a resource in the deployment, which you can retrieve using: String ProcessDefinition.getDeploymentId() and InputStream RepositoryService.getResourceAsStream(String deploymentId, String resourceName); This could be your template definition file, which you can use to render/show the form in your own application.</p>
+<p>You can use this capability of accessing the deployment resources beyond task forms for any other purposes as well.</p>
+<p>The attribute &lt;userTask flowable:formKey=&quot;...&quot; is exposed by the API through String FormService.getStartFormData(String processDefinitionId).getFormKey() and String FormService.getTaskFormData(String taskId).getFormKey(). You could use this to store the full name of the template within your deployment (e.g. org/flowable/example/form/my-custom-form.xml), but this is not required at all. For instance, you could also store a generic key in the form attribute and apply an algorithm or transformation to get to the actual template that needs to be used. This might be handy when you want to render different forms for different UI technologies like e.g. one form for usage in a web app of normal screen size, one form for mobile phone’s small screens and maybe even a template for an IM form or an email form.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/open-source/docs/bpmn/ch07b-BPMN-Constructs"><span class="arrow-prev">← </span><span>BPMN 2.0 Constructs</span></a><a class="docs-next button" href="/open-source/docs/bpmn/ch09-ProcessInstanceMigration"><span>Process Instance Migration (Experimental)</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#form-definition">Form definition</a></li><li><a href="#form-properties">Form properties</a></li><li><a href="#external-form-rendering">External form rendering</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/open-source/docs/" class="nav-home"><img src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/></a><div><h5>Documentation</h5><a href="/open-source/docs/oss-introduction">Guides</a><a href="/open-source/docs/javadocs">Javadocs</a></div><div><h5>Legal</h5><a href="/open-source/docs/disclaimer">Disclaimer</a><a href="https://flowable.com/disclaimer/">Policies</a></div></section><section class="copyright">Copyright © 2020 Flowable AG</section></footer></div></body></html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Configuration · Flowable Open Source Documentation</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Creating a CmmnEngine"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Configuration · Flowable Open Source Documentation"/><meta property="og:type" content="website"/><meta property="og:url" content="https://flowable.com/open-source/docs/"/><meta property="og:description" content="## Creating a CmmnEngine"/><meta property="og:image" content="https://flowable.com/open-source/docs/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://flowable.com/open-source/docs/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/open-source/docs/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><script src="/open-source/docs/js/scrollSpy.js"></script><link rel="stylesheet" href="/open-source/docs/css/main.css"/><script src="/open-source/docs/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/open-source/docs/"><img class="logo" src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/><h2 class="headerTitleWithLogo">Flowable Open Source Documentation</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/open-source/docs/oss-introduction" target="_self">Guides</a></li><li class=""><a href="/open-source/docs/all-javadocs" target="_self">Javadocs</a></li><li class=""><a href="https://flowable.com/open-source/" target="_self">Open source home</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>CMMN User Guide</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Flowable Open Source<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/oss-introduction">Open Source Details</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">BPMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch02-GettingStarted">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch03-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch04-API">The Flowable API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05a-Spring-Boot">Spring Boot</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch06-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07a-BPMN-Introduction">BPMN 2.0 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07b-BPMN-Constructs">BPMN 2.0 Constructs</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch08-Forms">Forms</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch09-ProcessInstanceMigration">Process Instance Migration (Experimental)</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch10-JPA">JPA</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch11-History">History</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch12-IDM">Identity management</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch13-Designer">Eclipse Designer</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch14-Applications">Flowable applications</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch15-REST">REST API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch16-Cdi">CDI integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch17-Ldap">LDAP integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch18-Advanced">Advanced</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch19-tooling">Tooling</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">CMMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem navListItemActive"><a class="navItem" href="/open-source/docs/cmmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch03-API">The Flowable CMMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch06-cmmn">CMMN 1.1</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch07-architecture">Architecture</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">DMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch03-API">The Flowable DMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch06-DMN-Introduction">DMN 1.1 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Forms User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch03-API">The Flowable Form API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch06-Form-Introduction">Form Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Migration from v5<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/migration">Flowable Migration Guide : Flowable or Activiti v5 to Flowable V6</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Disclaimer<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/disclaimer">Disclaimer</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Configuration</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="creating-a-cmmnengine"></a><a href="#creating-a-cmmnengine" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating a CmmnEngine</h2>
+<p>The Flowable CMMN engine is configured through an XML file called flowable.cmmn.cfg.xml. Note that this is <strong>not</strong> applicable if you’re using <a href="/open-source/docs/cmmn/ch04-Spring#spring-integration">the Spring style of building a process engine</a>.</p>
+<p>The easiest way to obtain a CmmnEngine is to use the org.flowable.cmmn.engine.CmmnEngineConfiguration class:</p>
+<pre><code class="hljs">CmmnEngine cmmnEngine = CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration();
+</code></pre>
+<p>This will look for a flowable.cmmn.cfg.xml file on the classpath and construct an engine based on the configuration in that file. The following snippet shows an example configuration. The following sections will give a detailed overview of the configuration properties.</p>
+<pre><code class="hljs">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+
+  &lt;bean id=&quot;cmmnEngineConfiguration&quot; class=&quot;org.flowable.cmmn.engine.CmmnEngineConfiguration&quot;&gt;
+
+    &lt;property name=&quot;jdbcUrl&quot; value=&quot;jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000&quot; /&gt;
+    &lt;property name=&quot;jdbcDriver&quot; value=&quot;org.h2.Driver&quot; /&gt;
+    &lt;property name=&quot;jdbcUsername&quot; value=&quot;sa&quot; /&gt;
+    &lt;property name=&quot;jdbcPassword&quot; value=&quot;&quot; /&gt;
+
+    &lt;property name=&quot;databaseSchemaUpdate&quot; value=&quot;true&quot; /&gt;
+  &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<p>Note that the configuration XML is in fact a Spring configuration. <strong>This does not mean that Flowable can only be used in a Spring environment!</strong> We are simply leveraging the parsing and dependency injection capabilities of Spring internally for building up the engine.</p>
+<p>The CmmnEngineConfiguration object can also be created programmatically using the configuration file. It is also possible to use a different bean id (for example, see line 3).</p>
+<pre><code class="hljs">CmmnEngineConfiguration.
+  createCmmnEngineConfigurationFromResourceDefault();
+  createCmmnEngineConfigurationFromResource(String resource);
+  createCmmnEngineConfigurationFromResource(String resource, String beanName);
+  createCmmnEngineConfigurationFromInputStream(InputStream inputStream);
+  createCmmnEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
+</code></pre>
+<p>It is also possible not to use a configuration file, and create a configuration based on
+defaults (see <a href="#configurationClasses">the different supported classes</a> for more information).</p>
+<pre><code class="hljs">CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration();
+CmmnEngineConfiguration.createStandaloneInMemCmmnEngineConfiguration();
+</code></pre>
+<p>All these CmmnEngineConfiguration.createXXX() methods return a CmmnEngineConfiguration that can be tweaked further if needed. After calling the buildCmmnEngine() operation, a CmmnEngine is created:</p>
+<pre><code class="hljs">CmmnEngine cmmnEngine = CmmnEngineConfiguration.createStandaloneInMemCmmnEngineConfiguration()
+  .setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE)
+  .setJdbcUrl(&quot;jdbc:h2:mem:my-own-db;DB_CLOSE_DELAY=1000&quot;)
+  .buildCmmnEngine();
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="cmmnengineconfiguration-bean"></a><a href="#cmmnengineconfiguration-bean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>CmmnEngineConfiguration bean</h2>
+<p>The flowable.cmmn.cfg.xml must contain a bean that has the id 'cmmnEngineConfiguration'.</p>
+<pre><code class="hljs"> &lt;bean id=&quot;cmmnEngineConfiguration&quot; class=&quot;org.flowable.cmmn.engine.CmmnEngineConfiguration&quot;&gt;
+</code></pre>
+<p>This bean is then used to construct the CmmnEngine. There are multiple classes available that can be used to define the cmmnEngineConfiguration. These classes represent different environments, and set defaults accordingly. It is a best practice to select the class that best matches your environment, to minimize the number of properties needed to configure the engine. The following classes are currently available:
+<a name="configurationClasses"></a></p>
+<ul>
+<li><p><strong>org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration</strong>: this is a convenience class for unit testing purposes. Flowable will take care of all transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, no additional configuration is probably needed.</p></li>
+<li><p><strong>org.flowable.cmmn.spring.SpringCmmnEngineConfiguration</strong>: To be used when the CMMN engine is used in a Spring environment. See <a href="/open-source/docs/cmmn/ch04-Spring#spring-integration">the Spring integration section</a> for more information.</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="database-configuration"></a><a href="#database-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Database configuration</h2>
+<p>There are two ways to configure the database that the Flowable CMMN engine will use. The first option is to define the JDBC properties of the database:</p>
+<ul>
+<li><p><strong>jdbcUrl</strong>: JDBC URL of the database.</p></li>
+<li><p><strong>jdbcDriver</strong>: implementation of the driver for the specific database type.</p></li>
+<li><p><strong>jdbcUsername</strong>: username to connect to the database.</p></li>
+<li><p><strong>jdbcPassword</strong>: password to connect to the database.</p></li>
+</ul>
+<p>The data source that is constructed based on the provided JDBC properties will have the default <a href="http://www.mybatis.org/">MyBatis</a> connection pool settings. The following attributes can optionally be set to tweak that connection pool (taken from the MyBatis documentation):</p>
+<ul>
+<li><p><strong>jdbcMaxActiveConnections</strong>: The number of active (i.e., in use) connections that the exist at any given time. Default is 10.</p></li>
+<li><p><strong>jdbcMaxIdleConnections</strong>: The number of idle connections that the exist at any given time.</p></li>
+<li><p><strong>jdbcMaxCheckoutTime</strong>: The amount of time in milliseconds that a connection can be 'checked out' of the connection pool before it is forcefully returned. Default is 20000. (20 seconds).</p></li>
+<li><p><strong>jdbcMaxWaitTime</strong>: This is a low level setting that gives the pool a chance to print a log status and re-attempt the acquisition of a connection in the case that it is taking unusually long (to avoid failing silently forever if the pool is misconfigured). Default is 20000. (20 seconds).</p></li>
+</ul>
+<p>Example database configuration:</p>
+<pre><code class="hljs">&lt;property name=&quot;jdbcUrl&quot; value=&quot;jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000&quot; /&gt;
+&lt;property name=&quot;jdbcDriver&quot; value=&quot;org.h2.Driver&quot; /&gt;
+&lt;property name=&quot;jdbcUsername&quot; value=&quot;sa&quot; /&gt;
+&lt;property name=&quot;jdbcPassword&quot; value=&quot;&quot; /&gt;
+</code></pre>
+<p>Our benchmarks have shown that the MyBatis connection pool is not the most efficient or resilient when dealing with a lot of concurrent requests. As such, it is advised to use a javax.sql.DataSource implementation and inject it into the process engine configuration (For example HikariCP, Tomcat JDBC Connection Pool, etc.):</p>
+<pre><code class="hljs">&lt;bean id=&quot;dataSource&quot; class=&quot;org.apache.commons.dbcp.BasicDataSource&quot; &gt;
+  &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot; /&gt;
+  &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://localhost:3306/flowable&quot; /&gt;
+  &lt;property name=&quot;username&quot; value=&quot;flowable&quot; /&gt;
+  &lt;property name=&quot;password&quot; value=&quot;flowable&quot; /&gt;
+  &lt;property name=&quot;defaultAutoCommit&quot; value=&quot;false&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;cmmnEngineConfiguration&quot; class=&quot;org.flowable.cmmn.engine.CmmnEngineConfiguration&quot;&gt;
+
+  &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot; /&gt;
+  ...
+</code></pre>
+<p>Note that Flowable does not ship with a library that allows you to define such a data source. So you need to make sure that the libraries are on your classpath.</p>
+<p>The following properties can be set, regardless of whether you are using the JDBC or data source approach:</p>
+<ul>
+<li><p><strong>databaseType</strong>: it’s normally not necessary to specify this property, as it is automatically detected from the database connection metadata. Should only be specified when automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See <a href="/open-source/docs/cmmn/ch02-Configuration#supported-databases">the 'supported databases' section</a> for an overview of which types are supported.</p></li>
+<li><p><strong>databaseSchemaUpdate</strong>: sets the strategy to handle the database schema on process engine boot and shutdown.</p>
+<ul>
+<li><p>false (default): Checks the version of the DB schema against the library when the process engine is being created and throws an exception if the versions don’t match.</p></li>
+<li><p>true: Upon building the process engine, a check is performed and an update of the schema is performed if it is necessary. If the schema doesn’t exist, it is created.</p></li>
+<li><p>create-drop: Creates the schema when the process engine is being created and drops the schema when the process engine is being closed.</p></li>
+</ul></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="jndi-datasource-configuration"></a><a href="#jndi-datasource-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>JNDI Datasource Configuration</h2>
+<p>By default, the database configuration for Flowable is contained within the db.properties files in the WEB-INF/classes of each web application. This isn’t always ideal because it
+requires users to either modify the db.properties in the Flowable source and recompile the WAR file, or explode the WAR and modify the db.properties on every deployment.</p>
+<p>By using JNDI (Java Naming and Directory Interface) to obtain the database connection, the connection is fully managed by the Servlet Container and the configuration can be managed outside the WAR deployment. This also allows more control over the connection parameters than what is provided by the db.properties file.</p>
+<h3><a class="anchor" aria-hidden="true" id="configuration"></a><a href="#configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configuration</h3>
+<p>Configuration of the JNDI data source will differ depending on what servlet container application you are using. The instructions below will work for Tomcat, but for other container applications, please refer to the documentation for your container app.</p>
+<p>If using Tomcat, the JNDI resource is configured within $CATALINA_BASE/conf/[enginename]/[hostname]/[warname].xml (for the Flowable UI this will usually be $CATALINA_BASE/conf/Catalina/localhost/flowable-app.xml). The default context is copied from the Flowable WAR file when the application is first deployed, so if it already exists, you will need to replace it. To change the JNDI resource so that the application connects to MySQL instead of H2, for example, change the file to the following:</p>
+<pre><code class="hljs">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;Context antiJARLocking=&quot;true&quot; path=&quot;/flowable-app&quot;&gt;
+        &lt;Resource auth=&quot;Container&quot;
+            name=&quot;jdbc/flowableDB&quot;
+            type=&quot;javax.sql.DataSource&quot;
+            description=&quot;JDBC DataSource&quot;
+            url=&quot;jdbc:mysql://localhost:3306/flowable&quot;
+            driverClassName=&quot;com.mysql.jdbc.Driver&quot;
+            username=&quot;sa&quot;
+            password=&quot;&quot;
+            defaultAutoCommit=&quot;false&quot;
+            initialSize=&quot;5&quot;
+            maxWait=&quot;5000&quot;
+            maxActive=&quot;120&quot;
+            maxIdle=&quot;5&quot;/&gt;
+        &lt;/Context&gt;
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="jndi-properties"></a><a href="#jndi-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>JNDI properties</h3>
+<p>To configure a JNDI data source, use the following properties in the properties file for the Flowable UI:</p>
+<ul>
+<li><p>spring.datasource.jndi-name=: the JNDI name of the data source.</p></li>
+<li><p>datasource.jndi.resourceRef: Set whether the lookup occurs in a J2EE container, for example, the prefix &quot;java:comp/env/&quot; needs to be added if the JNDI name doesn’t already contain it. Default is &quot;true&quot;.</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="custom-properties"></a><a href="#custom-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Custom properties</h3>
+<p>System properties can also be used in the flowable.cmmn.cfg.xml by using them in the format <code>${propertyName:defaultValue}</code>.</p>
+<pre><code class="hljs">&lt;property name=&quot;jdbcUrl&quot; value=&quot;${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}&quot; /&gt;
+&lt;property name=&quot;jdbcDriver&quot; value=&quot;${jdbc.driver:org.h2.Driver}&quot; /&gt;
+&lt;property name=&quot;jdbcUsername&quot; value=&quot;${jdbc.username:sa}&quot; /&gt;
+&lt;property name=&quot;jdbcPassword&quot; value=&quot;${jdbc.password:}&quot; /&gt;
+</code></pre>
+<p>Using this configuration if the property <code>jdbc.url</code> is available then it would be used for the <code>jdbcUrl</code> of the <code>CmmnEngineConfiguration</code>.
+Otherwise the value after the first <code>:</code> would be used.</p>
+<p>It is also possible to define locations from where properties can be picked up from the system by using a bean of type org.springframework.beans.factory.config.PropertyPlaceholderConfigurer.</p>
+<p>Example configuration with custom location for properties</p>
+<pre><code class="hljs">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+
+  &lt;bean class=&quot;org.springframework.beans.factory.config.PropertyPlaceholderConfigurer&quot;&gt;
+    &lt;property name=&quot;location&quot; value=&quot;file:/opt/conf/flowable.properties&quot; /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id=&quot;cmmnEngineConfiguration&quot; class=&quot;org.flowable.cmmn.engine.CmmnEngineConfiguration&quot;&gt;
+
+    &lt;property name=&quot;jdbcUrl&quot; value=&quot;${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}&quot; /&gt;
+    &lt;property name=&quot;jdbcDriver&quot; value=&quot;${jdbc.driver:org.h2.Driver}&quot; /&gt;
+    &lt;property name=&quot;jdbcUsername&quot; value=&quot;${jdbc.username:sa}&quot; /&gt;
+    &lt;property name=&quot;jdbcPassword&quot; value=&quot;${jdbc.password:}&quot; /&gt;
+
+    &lt;property name=&quot;databaseSchemaUpdate&quot; value=&quot;true&quot; /&gt;
+  &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<p>With this configuration the properties would be first looked up in the /opt/conf/flowable.properties file.</p>
+<h2><a class="anchor" aria-hidden="true" id="supported-databases"></a><a href="#supported-databases" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Supported databases</h2>
+<p>Listed below are the types (case sensitive!) that Flowable uses to refer to databases.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Flowable database type</th>
+<th>Example JDBC URL</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>h2</p></td>
+<td><p>jdbc:h2:tcp://localhost/flowable</p></td>
+<td><p>Default configured database</p></td>
+</tr>
+<tr class="even">
+<td><p>mysql</p></td>
+<td><p>jdbc:mysql://localhost:3306/flowable?autoReconnect=true</p></td>
+<td><p>Tested using mysql-connector-java database driver</p></td>
+</tr>
+<tr class="odd">
+<td><p>oracle</p></td>
+<td><p>jdbc:oracle:thin:@localhost:1521:xe</p></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><p>postgres</p></td>
+<td><p>jdbc:postgresql://localhost:5432/flowable</p></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><p>db2</p></td>
+<td><p>jdbc:db2://localhost:50000/flowable</p></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><p>mssql</p></td>
+<td><p>jdbc:sqlserver://localhost:1433;databaseName=flowable (jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver) <em>OR</em> jdbc:jtds:sqlserver://localhost:1433/flowable (jdbc.driver=net.sourceforge.jtds.jdbc.Driver)</p></td>
+<td><p>Tested using Microsoft JDBC Driver 4.0 (sqljdbc4.jar) and JTDS Driver</p></td>
+</tr>
+</tbody>
+</table>
+<h2><a class="anchor" aria-hidden="true" id="creating-the-database-tables"></a><a href="#creating-the-database-tables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating the database tables</h2>
+<p>The easiest way to create the database tables for your database is to:</p>
+<ul>
+<li><p>Add the flowable-cmmn-engine JARs to your classpath</p></li>
+<li><p>Add a suitable database driver</p></li>
+<li><p>Add a Flowable configuration file (<em>flowable.cmmn.cfg.xml</em>) to your classpath, pointing to your database (see <a href="/open-source/docs/cmmn/ch02-Configuration#database-configuration">database configuration section</a>)</p></li>
+<li><p>Execute the main method of the <em>DbSchemaCreate</em> class</p></li>
+</ul>
+<p>However, often only database administrators can execute DDL statements on a database. On a production system, this is also the wisest of choices. The SQL DDL statements can be found on the Flowable downloads page or inside the Flowable distribution folder, in the database subdirectory. The scripts are also in the engine JAR (<em>flowable-cmmn-engine-x.jar</em>), in the package <em>org/flowable/cmmn/db/create</em>. The SQL files are of the form</p>
+<pre><code class="hljs">flowable.{db}.cmmn.create.sql
+</code></pre>
+<p>Where <em>db</em> is any of the <a href="/open-source/docs/cmmn/ch02-Configuration#supported-databases">supported databases</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="database-table-names-explained"></a><a href="#database-table-names-explained" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Database table names explained</h2>
+<p>The database names of the Flowable CMMN Engine all start with <strong>ACT_CMMN_</strong>. The second part is a two-character identification of the use case of the table. This use case will also roughly match the service API.</p>
+<ul>
+<li><p><strong>ACT_CMMN_</strong>*: Tables without an additional prefix contain 'static' information such as case definitions and case resources (images, rules, etc.).</p></li>
+<li><p><strong>ACT_CMMN_RU_</strong>*: 'RU' stands for runtime. These are the runtime tables that contain the runtime data of case instances, plan items, and so on. Flowable only stores the runtime data during case instance execution and removes the records when a case instance ends. This keeps the runtime tables small and fast.</p></li>
+<li><p><strong>ACT_CMMN_HI_</strong>*: 'HI' stands for history. These are the tables that contain historical data, such as past case instances, plan items, and so on.</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="database-upgrade"></a><a href="#database-upgrade" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Database upgrade</h2>
+<p>Make sure you make a backup of your database (using your database backup capabilities) before you run an upgrade.</p>
+<p>By default, a version check will be performed each time a process engine is created. This typically happens once at boot time of your application or of the Flowable webapps. If the Flowable library notices a difference between the library version and the version of the Flowable database tables, then an exception is thrown.</p>
+<p>To upgrade, you have to start by putting the following configuration property in your flowable.cmmn.cfg.xml configuration file:</p>
+<pre><code class="hljs">&lt;beans &gt;
+
+  &lt;bean id=&quot;cmmnEngineConfiguration&quot;
+      class=&quot;org.flowable.cmmn.engine.CmmnEngineConfiguration&quot;&gt;
+    &lt;!-- ... --&gt;
+    &lt;property name=&quot;databaseSchemaUpdate&quot; value=&quot;true&quot; /&gt;
+    &lt;!-- ... --&gt;
+  &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<p><strong>Also, include a suitable database driver for your database to the classpath.</strong> Upgrade the Flowable libraries in your application. Or start up a new version of Flowable and point it to a database that contains data from an older version. With databaseSchemaUpdate set to true, Flowable will automatically upgrade the DB schema to the newest version the first time when it notices that libraries and DB schema are out of sync.</p>
+<p><strong>As an alternative, you can also run the upgrade DDL statements.</strong> It’s also possible to run the upgrade database scripts available on the Flowable downloads page.</p>
+<h2><a class="anchor" aria-hidden="true" id="history-configuration"></a><a href="#history-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>History configuration</h2>
+<p>Customizing the configuration of history storage is optional. This allows you to tweak settings that influence the <a href="#history">history capabilities</a> of the engine. See <a href="#historyConfig">history configuration</a> for more details.</p>
+<pre><code class="hljs">&lt;property name=&quot;history&quot; value=&quot;audit&quot; /&gt;
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="exposing-configuration-beans-in-expressions-and-scripts"></a><a href="#exposing-configuration-beans-in-expressions-and-scripts" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Exposing configuration beans in expressions and scripts</h2>
+<p>By default, all beans that you specify in the flowable.cmmn.cfg.xml configuration or in your own Spring configuration file are available to expressions and scripts. If you want to limit the visibility of beans in your configuration file, you can configure a property called beans in your process engine configuration. The beans property in CmmnEngineConfiguration is a map. When you specify that property, only beans specified in that map will be visible to expressions and scripts. The exposed beans will be exposed with the names as you specify in the map.</p>
+<h2><a class="anchor" aria-hidden="true" id="deployment-cache-configuration"></a><a href="#deployment-cache-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Deployment cache configuration</h2>
+<p>All case definitions are cached (after they’re parsed) to avoid hitting the database every time a case definition is needed and because case definition data doesn’t change. By default, there is no limit on this cache. To limit the case definition cache, add the following property:</p>
+<pre><code class="hljs">&lt;property name=&quot;caseDefinitionCacheLimit&quot; value=&quot;10&quot; /&gt;
+</code></pre>
+<p>Setting this property will swap the default hashmap cache with a LRU cache that has the provided hard limit. Of course, the 'best' value for this property depends on the total amount of case definitions stored and the number of case definitions actually used at runtime by all the runtime case instances.</p>
+<p>You can also inject your own cache implementation. This must be a bean that implements the org.flowable.engine.common.impl.persistence.deploy.DeploymentCache interface:</p>
+<pre><code class="hljs">&lt;property name=&quot;caseDefinitionCache&quot;&gt;
+  &lt;bean class=&quot;org.flowable.MyCache&quot; /&gt;
+&lt;/property&gt;
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="logging"></a><a href="#logging" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Logging</h2>
+<p>All logging (flowable, spring, mybatis, …​) is routed through SLF4J and allows for selecting the logging-implementation of your choice.</p>
+<p><strong>By default no SFL4J-binding JAR is present in the flowable-cmmn-engine dependencies, this should be added in your project in order to use the logging framework of your choice.</strong> If no implementation JAR is added, SLF4J will use a NOP-logger, not logging anything at all, other than a warning that nothing will be logged. For more info on these bindings <a href="http://www.slf4j.org/codes.html#StaticLoggerBinder"><a href="http://www.slf4j.org/codes.html#StaticLoggerBinder">http://www.slf4j.org/codes.html#StaticLoggerBinder</a></a>.</p>
+<p>With Maven, add for example a dependency like this (here using log4j), note that you still need to add a version:</p>
+<pre><code class="hljs">&lt;dependency&gt;
+  &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+  &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>The flowable-ui and flowable-rest webapps are configured to use Log4j-binding. Log4j is also used when running the tests for all the flowable-* modules.</p>
+<p><strong>Important note when using a container with commons-logging in the classpath:</strong> In order to route the spring-logging through SLF4J, a bridge is used (see <a href="http://www.slf4j.org/legacy.html#jclOverSLF4J"><a href="http://www.slf4j.org/legacy.html#jclOverSLF4J">http://www.slf4j.org/legacy.html#jclOverSLF4J</a></a>). If your container provides a commons-logging implementation, please follow directions on this page: <a href="http://www.slf4j.org/codes.html#release"><a href="http://www.slf4j.org/codes.html#release">http://www.slf4j.org/codes.html#release</a></a> to ensure stability.</p>
+<p>Example when using Maven (version omitted):</p>
+<pre><code class="hljs">&lt;dependency&gt;
+  &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+  &lt;artifactId&gt;jcl-over-slf4j&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/open-source/docs/bpmn/ch19-tooling"><span class="arrow-prev">← </span><span>Tooling</span></a><a class="docs-next button" href="/open-source/docs/cmmn/ch03-API"><span>The Flowable CMMN API</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#creating-a-cmmnengine">Creating a CmmnEngine</a></li><li><a href="#cmmnengineconfiguration-bean">CmmnEngineConfiguration bean</a></li><li><a href="#database-configuration">Database configuration</a></li><li><a href="#jndi-datasource-configuration">JNDI Datasource Configuration</a><ul class="toc-headings"><li><a href="#configuration">Configuration</a></li><li><a href="#jndi-properties">JNDI properties</a></li><li><a href="#custom-properties">Custom properties</a></li></ul></li><li><a href="#supported-databases">Supported databases</a></li><li><a href="#creating-the-database-tables">Creating the database tables</a></li><li><a href="#database-table-names-explained">Database table names explained</a></li><li><a href="#database-upgrade">Database upgrade</a></li><li><a href="#history-configuration">History configuration</a></li><li><a href="#exposing-configuration-beans-in-expressions-and-scripts">Exposing configuration beans in expressions and scripts</a></li><li><a href="#deployment-cache-configuration">Deployment cache configuration</a></li><li><a href="#logging">Logging</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/open-source/docs/" class="nav-home"><img src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/></a><div><h5>Documentation</h5><a href="/open-source/docs/oss-introduction">Guides</a><a href="/open-source/docs/javadocs">Javadocs</a></div><div><h5>Legal</h5><a href="/open-source/docs/disclaimer">Disclaimer</a><a href="https://flowable.com/disclaimer/">Policies</a></div></section><section class="copyright">Copyright © 2020 Flowable AG</section></footer></div></body></html>

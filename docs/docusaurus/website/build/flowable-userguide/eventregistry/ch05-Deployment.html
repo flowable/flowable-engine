@@ -1,0 +1,169 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Deployment · Flowable Open Source Documentation</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## DMN Definitions"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Deployment · Flowable Open Source Documentation"/><meta property="og:type" content="website"/><meta property="og:url" content="https://flowable.com/open-source/docs/"/><meta property="og:description" content="## DMN Definitions"/><meta property="og:image" content="https://flowable.com/open-source/docs/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://flowable.com/open-source/docs/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/open-source/docs/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><script src="/open-source/docs/js/scrollSpy.js"></script><link rel="stylesheet" href="/open-source/docs/css/main.css"/><script src="/open-source/docs/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/open-source/docs/"><img class="logo" src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/><h2 class="headerTitleWithLogo">Flowable Open Source Documentation</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/open-source/docs/oss-introduction" target="_self">Guides</a></li><li class=""><a href="/open-source/docs/all-javadocs" target="_self">Javadocs</a></li><li class=""><a href="https://flowable.com/open-source/" target="_self">Open source home</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Deployment</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="dmn-definitions"></a><a href="#dmn-definitions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>DMN Definitions</h2>
+<p>DMN Definitions with .dmn extension can be deployed to the DMN engine.</p>
+<p>When the DMN engine is plugged into the Process engine, the DMN definitions can be packed into a business archive (BAR) together with other process related resources. The Process engine deployment service will take care of deploying the DMN resources to the DMN engine.</p>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>Java classes used for custom expression functions present in the business archive <strong>will not be added to the classpath</strong>. All custom classes used in expressions in decisions in the business archive should be present on the Flowable (DMN) Engine classpath in order to run the decisions.</p>
+</blockquote>
+<h3><a class="anchor" aria-hidden="true" id="dmn-definitions-decisions-and-decision-tables"></a><a href="#dmn-definitions-decisions-and-decision-tables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>DMN Definitions, decisions and decision tables</h3>
+<p>A DMN definition consists, amongst other things, of decisions. A decision has one expression. The DMN spec describes several types of expressions. Currently in Flowable DMN we support the decision table type of expression.
+When deploying a DMN definition, every decision, which can contain one <strong>decision table</strong>, is inserted separately into the ACT_DMN_DECISION table.</p>
+<h3><a class="anchor" aria-hidden="true" id="deploying-programmatically"></a><a href="#deploying-programmatically" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Deploying programmatically</h3>
+<p>Deploying a DMN definition can be done like this:</p>
+<pre><code class="hljs">String dmnDefinition = &quot;path/to/definition-one.dmn&quot;; //Don't forget the .dmn extension!
+
+repositoryService.createDeployment()
+    .name(&quot;Deployment of DMN definition-one&quot;)
+    .addClasspathResource(dmnDefinition)
+    .deploy();
+</code></pre>
+<p>You can use other methods to add the DMN definitions to the deployment like <code>addInputStream</code>. This is an example to deploy a DMN definition from an external file:</p>
+<pre><code class="hljs">File dmnFile = new File(&quot;/path/to/definition-two.dmn&quot;); //Don't forget the .dmn extension!
+
+repositoryService.createDeployment()
+    .name(&quot;Deployment of DMN definition-two&quot;)
+    .addInputStream(dmnFile.getName(), new FileInputStream(dmnFile))
+    .deploy();
+</code></pre>
+<p>The name of the deployment can be any text but the resource name must always contain a valid DMN resource name suffix (&quot;.dmn&quot;).</p>
+<h3><a class="anchor" aria-hidden="true" id="java-classes"></a><a href="#java-classes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Java classes</h3>
+<p>All classes that contain the custom expression functions that are used in your decisions should be present on the engine’s classpath when a decision is executed.</p>
+<p>During deployment of a DMN definition, however, these classes don’t have to be present on the classpath.</p>
+<p>When you are using the demo setup and you want to add your custom classes, you should add a JAR containing your classes to the flowable-ui-app or flowable-app-rest webapp lib. Don’t forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, ${tomcat.home}/lib.</p>
+<h3><a class="anchor" aria-hidden="true" id="creating-a-single-app"></a><a href="#creating-a-single-app" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating a single app</h3>
+<p>Instead of making sure that all DMN engines have all the delegation classes on their classpath and use the right Spring configuration, you may consider including the flowable-rest webapp inside your own webapp so that there is only a single DmnEngine.</p>
+<h2><a class="anchor" aria-hidden="true" id="versioning-of-dmn-decisions"></a><a href="#versioning-of-dmn-decisions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Versioning of DMN decisions</h2>
+<p>DMN doesn’t have a notion of versioning. That is actually good, because the executable DMN definition file will probably live in a version control system repository (such as Subversion, Git or Mercurial) as part of your development project. Versions of DMN decisions are created during deployment. During deployment, Flowable will assign a version to the decision before it’s stored in the Flowable DB.</p>
+<p>For each DMN decision in a DMN definition, the following steps are performed to initialize the properties key, version, name and id:</p>
+<ul>
+<li><p>The decision id attribute in the definition XML file is used as the decision table key property.</p></li>
+<li><p>The decision name attribute in the XML file is used as the decision table name property.</p></li>
+<li><p>The first time a decision with a particular key is deployed, version 1 is assigned. For all subsequent deployments of decisions with the same key, the version will be set 1 higher than the maximum currently deployed version. The key property is used to distinguish decisions.</p></li>
+<li><p>The id property is a unique number to guarantee uniqueness of the decision table identifier for the decision table caches in a clustered environment.</p></li>
+</ul>
+<p>Take for example the following process:</p>
+<pre><code class="hljs">&lt;definitions id=&quot;myDefinitions&quot; &gt;
+  &lt;decision id=&quot;myDecision&quot; name=&quot;My important decision&quot; &gt;
+    &lt;decisionTable id=&quot;decisionTable1&quot; hitPolicy=&quot;FIRST&quot; &gt;
+    ...
+</code></pre>
+<p>When deploying this decision, the decision table in the database will look like this:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>id</th>
+<th>key</th>
+<th>name</th>
+<th>version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>e29d4126-ed4d-11e6-9e00-7282cbd6ce64</p></td>
+<td><p>myDecision</p></td>
+<td><p>My important decision</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+<p>Suppose we now deploy an updated version of the same process (for example, changing some user tasks), but the id of the process definition remains the same. The process definition table will now contain the following entries:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>id</th>
+<th>key</th>
+<th>name</th>
+<th>version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>e29d4126-ed4d-11e6-9e00-7282cbd6ce64</p></td>
+<td><p>myDecision</p></td>
+<td><p>My important decision</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="even">
+<td><p>e9c2a6c0-c085-11e6-9096-6ab56fad108a</p></td>
+<td><p>myDecision</p></td>
+<td><p>My important decision</p></td>
+<td><p>2</p></td>
+</tr>
+</tbody>
+</table>
+<p>When the dmnRuleService.executeDecisionByKey(&quot;myDecision&quot;) is called, it will now use the decision definition with version 2, as this is the latest version of the decision definition.</p>
+<p>If we create a second decision, as defined below and deploy this to Flowable DMN, a third row will be added to the table.</p>
+<pre><code class="hljs">&lt;definitions id=&quot;myNewDefinitions&quot; &gt;
+  &lt;decision id=&quot;myNewDecision&quot; name=&quot;My important decision&quot; &gt;
+    &lt;decisionTable id=&quot;decisionTable1&quot; hitPolicy=&quot;FIRST&quot; &gt;
+      ...
+</code></pre>
+<p>The table will look like this:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>id</th>
+<th>key</th>
+<th>name</th>
+<th>version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>e29d4126-ed4d-11e6-9e00-7282cbd6ce64</p></td>
+<td><p>myDecision</p></td>
+<td><p>My important decision</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="even">
+<td><p>e9c2a6c0-c085-11e6-9096-6ab56fad108a</p></td>
+<td><p>myDecision</p></td>
+<td><p>My important decision</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="odd">
+<td><p>d317d3f7-e948-11e6-9ce6-b28c070b517d</p></td>
+<td><p>myNewDecision</p></td>
+<td><p>My important decision</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+<p>Note how the key for the new decision is different from our first decision. Even though the name is the same (we should probably have changed that too), Flowable DMN only considers the id attribute when distinguishing decisions. The new decision is therefore deployed with version 1.</p>
+<h2><a class="anchor" aria-hidden="true" id="category"></a><a href="#category" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Category</h2>
+<p>Both DMN deployments and decision tables can have user defined categories.
+The deployment category can be specified in the API like this:</p>
+<pre><code class="hljs">dmnRepository
+    .createDeployment()
+    .category(&quot;yourCategory&quot;)
+    ...
+    .deploy();
+</code></pre>
+<p>The decision table category can be specified in the API like this:</p>
+<pre><code class="hljs">dmnRepository.setDecisionTableCategory(&quot;e9c2a6c0-c085-11e6-9096-6ab56fad108a&quot;, &quot;yourCategory&quot;);
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#dmn-definitions">DMN Definitions</a><ul class="toc-headings"><li><a href="#dmn-definitions-decisions-and-decision-tables">DMN Definitions, decisions and decision tables</a></li><li><a href="#deploying-programmatically">Deploying programmatically</a></li><li><a href="#java-classes">Java classes</a></li><li><a href="#creating-a-single-app">Creating a single app</a></li></ul></li><li><a href="#versioning-of-dmn-decisions">Versioning of DMN decisions</a></li><li><a href="#category">Category</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/open-source/docs/" class="nav-home"><img src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/></a><div><h5>Documentation</h5><a href="/open-source/docs/oss-introduction">Guides</a><a href="/open-source/docs/javadocs">Javadocs</a></div><div><h5>Legal</h5><a href="/open-source/docs/disclaimer">Disclaimer</a><a href="https://flowable.com/disclaimer/">Policies</a></div></section><section class="copyright">Copyright © 2020 Flowable AG</section></footer></div></body></html>

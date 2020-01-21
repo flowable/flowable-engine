@@ -1,0 +1,461 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>The Flowable CMMN API · Flowable Open Source Documentation</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## The Process CMMN Engine API and services"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="The Flowable CMMN API · Flowable Open Source Documentation"/><meta property="og:type" content="website"/><meta property="og:url" content="https://flowable.com/open-source/docs/"/><meta property="og:description" content="## The Process CMMN Engine API and services"/><meta property="og:image" content="https://flowable.com/open-source/docs/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://flowable.com/open-source/docs/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/open-source/docs/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><script src="/open-source/docs/js/scrollSpy.js"></script><link rel="stylesheet" href="/open-source/docs/css/main.css"/><script src="/open-source/docs/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/open-source/docs/"><img class="logo" src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/><h2 class="headerTitleWithLogo">Flowable Open Source Documentation</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/open-source/docs/oss-introduction" target="_self">Guides</a></li><li class=""><a href="/open-source/docs/all-javadocs" target="_self">Javadocs</a></li><li class=""><a href="https://flowable.com/open-source/" target="_self">Open source home</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>CMMN User Guide</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Flowable Open Source<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/oss-introduction">Open Source Details</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">BPMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch02-GettingStarted">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch03-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch04-API">The Flowable API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05a-Spring-Boot">Spring Boot</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch06-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07a-BPMN-Introduction">BPMN 2.0 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07b-BPMN-Constructs">BPMN 2.0 Constructs</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch08-Forms">Forms</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch09-ProcessInstanceMigration">Process Instance Migration (Experimental)</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch10-JPA">JPA</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch11-History">History</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch12-IDM">Identity management</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch13-Designer">Eclipse Designer</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch14-Applications">Flowable applications</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch15-REST">REST API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch16-Cdi">CDI integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch17-Ldap">LDAP integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch18-Advanced">Advanced</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch19-tooling">Tooling</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">CMMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch02-Configuration">Configuration</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/open-source/docs/cmmn/ch03-API">The Flowable CMMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch06-cmmn">CMMN 1.1</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch07-architecture">Architecture</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">DMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch03-API">The Flowable DMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch06-DMN-Introduction">DMN 1.1 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Forms User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch03-API">The Flowable Form API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch06-Form-Introduction">Form Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Migration from v5<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/migration">Flowable Migration Guide : Flowable or Activiti v5 to Flowable V6</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Disclaimer<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/disclaimer">Disclaimer</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">The Flowable CMMN API</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="the-process-cmmn-engine-api-and-services"></a><a href="#the-process-cmmn-engine-api-and-services" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The Process CMMN Engine API and services</h2>
+<p>The engine API is the most common way of interacting with Flowable. The main starting point is the CmmnEngine, which can be created in several ways as described in the <a href="/open-source/docs/cmmn/ch02-Configuration#creating-a-cmmnengine">configuration section</a>. From the CmmnEngine, you can obtain the various services that contain the case/CMMN methods. CmmnEngine and the services objects are thread safe, so you can keep a reference to one of those for a whole server.</p>
+<pre><code class="hljs">CmmnEngine cmmnEngine = CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration();
+
+CmmnRuntimeService runtimeService = cmmnEngine.getCmmnRuntimeService();
+CmmnRepositoryService repositoryService = cmmnEngine.getCmmnRepositoryService();
+CmmnTaskService taskService = cmmnEngine.getCmmnTaskService();
+CmmnManagementService managementService = cmmnEngine.getCmmnManagementService();
+CmmnHistoryService historyService = cmmnEngine.getCmmnHistoryService();
+</code></pre>
+<p>CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration() will initialize and build a CMMN engine and afterwards always return the CMMN engine.</p>
+<p>The CmmnEngineConfiguration class will scan for all flowable.cmmn.cfg.xml and flowable-cmmn-context.xml files. For all flowable.cmmn.cfg.xml files, the CMMN engine will be built in the typical Flowable way: CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine(). For all flowable-cmmn-context.xml files, the CMMN engine will be built in the Spring way: first the Spring application context is created and then the CMMN engine is obtained from that application context.</p>
+<p>All services are stateless. This means that you can easily run Flowable on multiple nodes in a cluster, each going to the same database, without having to worry about which machine actually executed previous calls. Any call to any service is idempotent regardless of where it is executed.</p>
+<p>The <strong>CmmnRepositoryService</strong> is probably the first service needed when working with the Flowable CMMN engine. This service offers operations for managing and manipulating deployments and case definitions. Without going into much detail here, a case definition is a Java counterpart of the CMMN 1.1 case. It is a representation of the structure and behavior of each of the steps of a case. A deployment is the unit of packaging within the Flowable CMMN engine. A deployment can contain multiple CMMN 1.1 XML files and any other resource. The choice of what is included in one deployment is up to the developer. It can range from a single process CMMN 1.1 XML file to a whole package of cases and relevant resources (for example, the deployment 'hr-cases' could contain everything related to HR cases). The CmmnRepositoryService can deploy such packages. Deploying a deployment means it is uploaded to the engine, where all cases are inspected and parsed before being stored in the database. From that point on, the deployment is known to the system and any process included in the deployment can now be started.</p>
+<p>Furthermore, this service allows you to:</p>
+<ul>
+<li><p>Query on deployments and case definitions known to the engine.</p></li>
+<li><p>Retrieve various resources, such as files contained within the deployment or case diagrams that were auto-generated by the engine.</p></li>
+<li><p>Retrieve a POJO version of the case definition, which can be used to introspect the case using Java rather than XML.</p></li>
+</ul>
+<p>While the CmmnRepositoryService is mostly about static information (data that doesn’t change, or at least not a lot), the <strong>CmmnRuntimeService</strong> is quite the opposite. It deals with starting new case instances of case definitions. As said above, a case definition defines the structure and behavior of the different steps in a case. A case instance is one execution of such a case definition. For each case definition there typically are many instances running at the same time. The CmmnRuntimeService also is the service that is used to retrieve and store case variables. This is data that is specific to the given case instance and can be used by various constructs in the case (for example, a plan transition condition often uses process variables to determine which path is chosen to continue the case). The CmmnRuntimeservice also allows you to query on case instances and plan items. Plan items are a representation of the enabled plan items of CMMN 1.1. Lastly, the CmmnRuntimeService is used whenever a case instance is waiting for an external trigger and the case needs to be continued. A case instance can have various wait states and this service contains various operations to 'signal' to the instance that the external trigger is received and the case instance can be continued.</p>
+<p>Tasks that need to be performed by human users of the system are core to a CMMN engine such as Flowable. Everything around tasks is grouped in the <strong>CmmnTaskService</strong>, such as:</p>
+<ul>
+<li><p>Querying tasks assigned to users or groups</p></li>
+<li><p>Creating new <em>standalone</em> tasks. These are tasks that are not related to a process instance.</p></li>
+<li><p>Manipulating to which user a task is assigned or which users are in some way involved with the task.</p></li>
+<li><p>Claiming and completing a task. Claiming means that someone decided to be the assignee for the task, meaning that this user will complete the task. Completing means 'doing the work of the tasks'. Typically this is filling in a form of sorts.</p></li>
+</ul>
+<p>The <strong>CmmnHistoryService</strong> exposes all historical data gathered by the Flowable CMMN engine. When executing cases, a lot of data can be kept by the engine (this is configurable), such as case instance start times, who did which tasks, how long it took to complete the tasks, which path was followed in each case instance, and so on. This service exposes mainly query capabilities to access this data.</p>
+<p>The <strong>CmmnManagementService</strong> gives access to low-level information about the database tables, allows to query for the different types of jobs and to execute them.</p>
+<p>For more detailed information on the service operations and the engine API, see <a href="http://www.flowable.org/docs/javadocs/index.html">the javadocs</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="exception-strategy"></a><a href="#exception-strategy" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Exception strategy</h2>
+<p>The base exception in Flowable is the org.flowable.engine.common.api.FlowableException, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in <a href="http://www.flowable.org/docs/javadocs/index.html">the javadocs</a>. For example, an extract from CmmnTaskService:</p>
+<pre><code class="hljs">/**
+ * Called when the task is successfully executed.
+ * @param taskId the id of the task to complete, cannot be null.
+ * @throws FlowableObjectNotFoundException when no task exists with the given id.
+ */
+ void complete(String taskId);
+</code></pre>
+<p>In the example above, when an id is passed for which no task exists, an exception will be thrown. Also, since the javadoc <strong>explicitly states that taskId cannot be null, an FlowableIllegalArgumentException will be thrown when null is passed</strong>.</p>
+<p>Even though we want to avoid a big exception hierarchy, the following subclasses are thrown in specific cases. All other errors that occur during process-execution or API-invocation that don’t fit into the possible exceptions below are thrown as regular FlowableExceptions.</p>
+<ul>
+<li><p>FlowableWrongDbException: Thrown when the Flowable engine discovers a mismatch between the database schema version and the engine version.</p></li>
+<li><p>FlowableOptimisticLockingException: Thrown when an optimistic locking occurs in the data store caused by concurrent access of the same data entry.</p></li>
+<li><p>FlowableClassLoadingException: Thrown when a class requested to load was not found or when an error occurred while loading it (e.g., JavaDelegates, TaskListeners, …​).</p></li>
+<li><p>FlowableObjectNotFoundException: Thrown when an object that is requested or actioned does not exist.</p></li>
+<li><p>FlowableIllegalArgumentException: An exception indicating that an illegal argument has been supplied in a Flowable API-call, an illegal value was configured in the engine’s configuration or an illegal value has been supplied or an illegal value is used in a process definition.</p></li>
+<li><p>FlowableTaskAlreadyClaimedException: Thrown when a task is already claimed, when the taskService.claim(...) is called.</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="query-api"></a><a href="#query-api" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Query API</h2>
+<p>There are two ways of querying data from the engine: the query API and native queries. The Query API allows you to program completely typesafe queries with a fluent API. You can add various conditions to your queries (all of which are applied together as a logical AND) and precisely one ordering. The following code shows an example:</p>
+<pre><code class="hljs">List&lt;Task&gt; tasks = taskService.createTaskQuery()
+    .taskAssignee(&quot;kermit&quot;)
+    .orderByDueDate().asc()
+    .list();
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="variables"></a><a href="#variables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Variables</h2>
+<p>Every case instance needs and uses data to execute the steps it’s made up of. In Flowable, this data is called <em>variables</em>, which are stored in the database. Variables can be used in expressions (for example, in the condition of a sentry), in Java service tasks when calling external services (for example to provide the input or store the result of the service call), and so on.</p>
+<p>A case instance can have variables (called <em>case variables</em>), but also <em>plan item instances</em> and human tasks can have variables. A case instance can have any number of variables. Each variable is stored in a row in the <em>ACT_RU_VARIABLE</em> database table.</p>
+<p>The <em>createCaseInstanceBuilder</em> method has optional methods to provide the variables when the case instance is created and started through the <em>CmmnRuntimeService</em>:</p>
+<pre><code class="hljs">CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().variable(&quot;var1&quot;, &quot;test&quot;).start();
+</code></pre>
+<p>Variables can be added during case execution. For example, (<em>CmmnRuntimeService</em>):</p>
+<pre><code class="hljs">void setVariables(String caseInstanceId, Map&lt;String, ? extends Object&gt; variables);
+</code></pre>
+<p>Variables can also be retrieved, as shown below. Note that similar methods exist on the <em>CmmnTaskService</em>.</p>
+<pre><code class="hljs">Map&lt;String, Object&gt; getVariables(String caseInstanceId);
+Object getVariable(String caseInstanceId, String variableName);
+</code></pre>
+<p>Variables are often used in Java service tasks, expressions, scripts, and so on.</p>
+<h2><a class="anchor" aria-hidden="true" id="transient-variables"></a><a href="#transient-variables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Transient variables</h2>
+<p>Transient variables are variables that behave like regular variables but are not persisted. Typically, transient variables are used for advanced use cases. When in doubt, use a regular case variable.</p>
+<p>The following applies for transient variables:</p>
+<ul>
+<li><p>There is no history stored at all for transient variables.</p></li>
+<li><p>Like <em>regular</em> variables, transient variables are put on the <em>highest parent</em> when set. This means that when setting a variable on a plan item, the transient variable is actually stored on the case instance execution. Like regular variables, a <em>local</em> variant of the method exists if the variable is set on the specific plan item or task.</p></li>
+<li><p>A transient variable can only be accessed before the next 'wait state' in the case definition. After that, they are gone. Here, the wait state means the point in the case instance where it is persisted to the data store.</p></li>
+<li><p>Transient variables can only be set by the <em>setTransientVariable(name, value)</em>, but transient variables are also returned when calling <em>getVariable(name)</em> (a <em>getTransientVariable(name)</em> also exists, that only checks the transient variables). The reason for this is to make the writing of expressions easy and existing logic using variables works for both types.</p></li>
+<li><p>A transient variable <em>shadows</em> a persistent variable with the same name. This means that when both a persistent and transient variable is set on a case instance and <em>getVariable(&quot;someVariable&quot;)</em> is called, the transient variable value will be returned.</p></li>
+</ul>
+<p>You can set and get transient variables in most places where regular variables are exposed:</p>
+<ul>
+<li><p>On <em>DelegatePlanItemInstance</em> in <em>PlanItemJavaDelegate</em> implementations</p></li>
+<li><p>When starting a case instance through the runtime service</p></li>
+<li><p>When completing a task</p></li>
+</ul>
+<p>The methods follow the naming convention of the regular case variables:</p>
+<pre><code class="hljs">CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().transientVariable(&quot;var1&quot;, &quot;test&quot;).start();
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="expressions"></a><a href="#expressions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Expressions</h2>
+<p>Flowable uses UEL for expression-resolving. UEL stands for <em>Unified Expression Language</em> and is part of the EE6 specification (see <a href="http://docs.oracle.com/javaee/6/tutorial/doc/gjddd.html">the EE6 specification</a> for detailed information).</p>
+<p>Expressions can be used in, for example, Java Service tasks, sentry conditions and plan item listeners. Although there are two types of expressions, value-expression and method-expression, Flowable abstracts this so they can both be used where an expression is expected.</p>
+<ul>
+<li><strong>Value expression</strong>: resolves to a value. By default, all case variables are available to use. Also, all spring-beans (if using Spring) are available to use in expressions. In non-Spring environments the beans available to expressions can be set through the setBeans method of the CmmnEngineConfiguration. Some examples:</li>
+</ul>
+<!-- -->
+<pre><code class="hljs">${myVariable}
+${myBean.myProperty}
+</code></pre>
+<ul>
+<li><strong>Method expression</strong>: invokes a method with or without parameters. <strong>When invoking a method without parameters, be sure to add empty parentheses after the method-name (as this distinguishes the expression from a value expression).</strong> The passed parameters can be literal values or expressions that are resolved themselves. Examples:</li>
+</ul>
+<!-- -->
+<pre><code class="hljs">${printer.print()}
+${myBean.addNewOrder('orderName')}
+${myBean.doSomething(myVar, planItemInstance)}
+</code></pre>
+<p>These expressions support resolving primitives (including comparing them), beans, lists, arrays, and maps.</p>
+<p>On top of all case instance variables, there are default objects available that can be used in expressions:</p>
+<ul>
+<li><p>caseInstance: Holds additional information about the ongoing case instance. The caseInstance keyword is available in all expressions.</p></li>
+<li><p>planItemInstance: The DelegatePlanItemInstance holds additional information about the current plan item instance. The planItemInstance keyword is available in all plan item related expressions (e.g. sentry conditions, plan item lifecycle listeners, service task expression, etc.).</p></li>
+<li><p>planItemInstances: Exposes information about all current plan item instance. See the examples below on how to use it.</p></li>
+<li><p>variableContainer: The VariableContainer for which the expression is being resolved for. A variable container is an abstraction on top of case instances, plan item instances, process instances and executions. The +variableContainer keyword allows to write expressions that are not bound to a specific implementation.</p></li>
+<li><p>authenticatedUserId: The id of the user that is currently authenticated. If no user is authenticated, the variable is not available.</p></li>
+</ul>
+<p>For example:</p>
+<pre><code class="hljs">${caseInstance.id}
+${caseInstance.getVariable('myVariable') == 'test'}
+${caseInstance.setVariable('myVariable', 'test')}
+
+${planItemInstance.getPlanItem().getPlanItemDefinition().getName()}
+${planItemInstance.getVariable('myVariable') == 123}
+${planItemInstance.setVariable('myVariable', 123)}
+
+${variableContainer.getVariable('myVariable')}
+${variableContainer.setVariable('myVariable', 'true')}
+</code></pre>
+<p>The keyword <strong>planItemInstances</strong> deserves some more explanation. Using this keyword it is possible to retrieve all the current plan item instances, but it also acts like a sort of API to retrieve more information about the current plan item instance.</p>
+<p>For example, the following expression</p>
+<pre><code class="hljs">${planItemInstances.active().count()}
+</code></pre>
+<p>Will return a count of all plan item instances that are currently in the 'active' state. If we’re only interested in a certain plan item, it can be filtered down:</p>
+<pre><code class="hljs">${planItemInstances.definitionId('a').active().count()}
+</code></pre>
+<p>As the example shows, the planItemInstances keyword allows to chain together various filter methods. Such chaining will use AND semantics. The following methods are supported.</p>
+<p>Methods that filter on plan item instance state:</p>
+<ul>
+<li><p>active()</p></li>
+<li><p>available()</p></li>
+<li><p>enabled()</p></li>
+<li><p>disabled()</p></li>
+<li><p>completed()</p></li>
+<li><p>terminated()</p></li>
+</ul>
+<p>The following state filters are also supported, but do note these reflect non-spec compliant internal states:</p>
+<ul>
+<li><p>unavailable()</p></li>
+<li><p>waitingForRepetition()</p></li>
+<li><p>asyncActive()</p></li>
+</ul>
+<p>To get all plan item instances that are in a terminal (i.e. terminated or completed) or non-terminal state:</p>
+<ul>
+<li><p>onlyTerminal()</p></li>
+<li><p>onlyNonTerminal()</p></li>
+</ul>
+<p>To filter based on the identifier that is set in the CMMN model:</p>
+<ul>
+<li><p>definitionId('id1')</p></li>
+<li><p>definitionIds('id1', 'id2')</p></li>
+</ul>
+<p>To filter based on the name:</p>
+<ul>
+<li><p>name('name1')</p></li>
+<li><p>names('name1', 'name2', 'name3')</p></li>
+</ul>
+<p>For some use cases, the plan item instances that should be filtered should only be part of the current stage. The 'current stage' is either the parent stage of a plan item or the case instance when there’s no parent stage.</p>
+<ul>
+<li>currentStage()</li>
+</ul>
+<p>Lastly, there is a set of methods that cannot be chained, as they return a result.</p>
+<ul>
+<li><p>count(): returns a count of plan item instances, after applying all filters.</p></li>
+<li><p>getDefinitionIds(): returns a list of strings with all the ids as defined in the CMMN model of the matching plan item instances.</p></li>
+<li><p>getDefinitionNames(): returns a list of names with all the names as defined in the CMMN model of the matching plan item instances.</p></li>
+<li><p>getList(): returns the 'raw' list of <em>org.flowable.cmmn.api.runtime.PlanItemInstance</em> instances.</p></li>
+</ul>
+<p>Let’s look at some examples where the above methods are used in expressions:</p>
+<p>To count all active plan item instances in a case instance:</p>
+<pre><code class="hljs">${planItemInstances.active().count()}
+</code></pre>
+<p>To do a count of all active plan item instances with an id 'a' or 'b':</p>
+<pre><code class="hljs">${planItemInstances.active().definitionIds('a', 'b').count()}
+</code></pre>
+<p>To get all the ids of the plan item instances which are in a terminal state in the current stage:</p>
+<pre><code class="hljs">${planItemInstances.currentStage().onlyTerminal().getDefinitionIds()()}
+</code></pre>
+<p>To store the result of the above expression in a transient variable</p>
+<pre><code class="hljs">${caseInstance.setTransientVariable('myVar', planItemInstances.currentStage().onlyTerminal().getDefinitionIds()}}
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="expression-functions"></a><a href="#expression-functions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Expression functions</h2>
+<p>[Experimental] Expression functions have been added in version 6.4.0.</p>
+<p>To make working with case variables easier, a set of out-of-the-box functions is available, under the <em>variables</em> namespace.</p>
+<ul>
+<li><p><strong>variables:get(varName)</strong>: Retrieves the value of a variable. The main difference with writing the variable name directly in the expression is that using this function won’t throw an exception when the variable doesn’t exist. For example <em>${myVariable == &quot;hello&quot;}</em> would throw an exception if <em>myVariable</em> doesn’t exist, but <em>${var:get(myVariable) == 'hello'}</em> will just work.</p></li>
+<li><p><strong>variables:getOrDefault(varName, defaultValue)</strong>: similar to <em>get</em>, but with the option of providing a default value which is returned when the variable isn’t set or the value is <em>null</em>.</p></li>
+<li><p><strong>variables:exists(varName)</strong>: Returns <em>true</em> if the variable has a non-null value.</p></li>
+<li><p><strong>variables:isEmpty(varName)</strong> (alias <em>:empty</em>) : Checks if the variable value is not empty. Depending on the variable type, the behavior is the following:</p>
+<ul>
+<li><p>For String variables, the variable is deemed empty if it’s the empty string.</p></li>
+<li><p>For java.util.Collection variables, <em>true</em> is returned if the collection has no elements.</p></li>
+<li><p>For ArrayNode variables, <em>true</em> is returned if there are no elements.</p></li>
+<li><p>In case the variable is <em>null</em>, <em>true</em> is always returned.</p></li>
+</ul></li>
+<li><p><strong>variables:isNotEmpty(varName)</strong> (alias <em>:notEmpty</em>) : the reverse operation of <em>isEmpty</em>.</p></li>
+<li><p><strong>variables:equals(varName, value)</strong> (alias <em>:eq</em>) : checks if a variable is equal to a given value. This is a shorthand function for an expression that would otherwise be written as <em>${execution.getVariable(&quot;varName&quot;) != null &amp;&amp; execution.getVariable(&quot;varName&quot;) == value}</em>.</p>
+<ul>
+<li>If the variable value is null, false is returned (unless compared to null).</li>
+</ul></li>
+<li><p><strong>variables:notEquals(varName, value)</strong> (alias <em>:ne</em>) : the reverse comparison of <em>equals</em>.</p></li>
+<li><p><strong>variables:contains(varName, value1, value2, …​)</strong>: checks if <strong>all</strong> values provided are contained within a variable. Depending on the variable type, the behavior is the following:</p>
+<ul>
+<li><p>For String variables, the passed values are used as substrings that need to be part of the variable.</p></li>
+<li><p>For java.util.Collection variables, all the passed values need to be an element of the collection (regular <em>contains</em> semantics).</p></li>
+<li><p>For ArrayNode variables: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type.</p></li>
+<li><p>When the variable value is null, false is returned in all cases. When the variable value is not null, and the instance type is not one of the types above, false will be returned.</p></li>
+</ul></li>
+<li><p><strong>variables:containsAny(varName, value1, value2, …​)</strong> : similar to the <em>contains</em> function, but <em>true</em> will be returned if <strong>any</strong> (and not all) the passed values is contained in the variable.</p></li>
+<li><p>*variables:base64(varName): converts a Binary or String Variable in Base64 String</p></li>
+<li><p>Comparator functions:</p>
+<ul>
+<li><p><strong>variables:lowerThan(varName, value)</strong> (alias <em>:lessThan</em> or <em>:lt</em>) : shorthand for <em>${execution.getVariable(&quot;varName&quot;) != null &amp;&amp; execution.getVariable(&quot;varName&quot;) &lt; value}</em>.</p></li>
+<li><p><strong>variables:lowerThanOrEquals(varName, value)</strong> (alias <em>:lessThanOrEquals</em> or <em>:lte</em>) : similar, but now for <em>&lt; =</em>.</p></li>
+<li><p><strong>variables:greaterThan(varName, value)</strong> (alias <em>:gt</em>) : similar, but now for <em>&gt;</em>.</p></li>
+<li><p><strong>variables:greaterThanOrEquals(varName, value)</strong> (alias <em>:gte</em>) : similar, but now for <em>&gt; =</em>.</p></li>
+</ul></li>
+</ul>
+<p>The <em>variables</em> namespace is aliased to <em>vars</em> or <em>var</em>. So <em>variables:get(varName)</em> is equivalent to writing <em>vars:get(varName)</em> or <em>var:get(varName)</em>. Note that it’s not needed to put quotes around the variable name: <em>var:get(varName)</em> is equivalent to <em>var:get(\'varName')</em> or <em>var:get(&quot;varName&quot;)</em>.</p>
+<p>Also note that in none of the functions above the <em>planItemInstance</em> or <em>caseInstance</em> needs to be passed into the function (as would be needed when not using a function). The engine will inject the appropriate variable scope when invoking the function. This also means that these functions can be used in exactly the same way when writing expressions in BPMN process definitions.</p>
+<p>The use of these variable functions is especially useful in CMMN, for example when it comes to writing the condition of an if-part of sentry. Take the following CMMN case definition:</p>
+<p><img src="/open-source/docs/assets/cmmn/cmmn.expression-functions.png" alt="cmmn.expression functions"></p>
+<p>Assume the sentry has an if-part besides the completion event. Right after a case instance is started, this if-part condition will be evaluated (as the stage becomes available). If the condition is of the form <em>${someVariable == someValue}</em>, this means the variable needs to be available when starting the case instance. In many cases, this is not possible or the variable comes later (e.g., from a form), which leads to a low-level <em>PropertyNotFoundException</em>. Taking the potential nullability into account, the correct expression would have to be:</p>
+<pre><code class="hljs">${planItemInstance.getVariable('someVariable') != null &amp;&amp; planItemInstance.getVariable('someVariable') == someValue}
+</code></pre>
+<p>Which is quite long. Using the functions above however, this can be simplified to</p>
+<pre><code class="hljs">${var:eq(someVariable, someValue)}
+</code></pre>
+<p>or</p>
+<pre><code class="hljs">${var:get(someVariable) == someValue}
+</code></pre>
+<p>The function implementations take into account the nullability of the variable (and not throw an exception in case the variable is null) and will handle the equality correctly.</p>
+<p>Additionally, it’s possible to register custom functions that can be used in expressions. See the org.flowable.common.engine.api.delegate.FlowableFunctionDelegate interface for more information.</p>
+<h2><a class="anchor" aria-hidden="true" id="history-cleaning"></a><a href="#history-cleaning" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>History Cleaning</h2>
+<p>By default history data is stored forever, this can cause the history tables to grow very large and impact the performance of the HistoryService.  History Cleaning has been introduced with 6.5.0 and allows the deletion of HistoricProcessInstances and their associated data.  Once process data no longer needs to be retained it can be deleted to reduce the history database's size.</p>
+<h3><a class="anchor" aria-hidden="true" id="automatic-history-cleaning-configuration"></a><a href="#automatic-history-cleaning-configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Automatic History Cleaning Configuration</h3>
+<p>Automatic cleanup of HistoricCaseInstances is disabled by default but can be enabled and configured programmatically.  Once enabled the default is to run a cleanup job at 1 AM to delete all HistoricCaseInstances and associated data that have ended 365 days prior or older.</p>
+<pre><code class="hljs">CmmnEngine cmmnEngine = CmmnEngineConfiguration.
+    .createProcessEngineConfigurationFromResourceDefault()
+    .setEnableHistoryCleaning(true)
+    .setHistoryCleaningTimeCycleConfig(&quot;0 0 1 * * ?&quot;)
+    .setCleanInstancesEndedAfterNumberOfDays(365)
+    .buildCmmnEngine();
+</code></pre>
+<p>Spring properties set in an application.properties or externalized configuration are also available:</p>
+<pre><code class="hljs"> flowable.enable-history-cleaning=true
+ flowable.history-cleaning-after-days=365
+ flowable.history-cleaning-cycle=0 0 1 * * ?
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="manually-deleting-history"></a><a href="#manually-deleting-history" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Manually Deleting History</h3>
+<p>Manually cleaning history can accomplished by executing methods on the CmmnHistoryService query builders.</p>
+<p>Delete all HistoricCaseInstances and their related data that are older than one year.</p>
+<pre><code class="hljs"> Calendar cal = new GregorianCalendar();
+ cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+ cmmnHistoryService.createHistoricCaseInstanceQuery()
+   .finishedBefore(cal.getTime())
+   .deleteWithRelatedData();
+</code></pre>
+<p>Delete just HistoricCaseInstances older than one year.</p>
+<pre><code class="hljs">Calendar cal = new GregorianCalendar();
+cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+cmmnHistoryService.createHistoricCaseInstanceQuery()
+  .finishedBefore(cal.getTime())
+  .delete();
+</code></pre>
+<p>Delete just HistoricTaskInstances older than one year.</p>
+<pre><code class="hljs">Calendar cal = new GregorianCalendar();
+cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+cmmnHistoryService.createHistoricTaskInstanceQuery()
+  .finishedBefore(cal.getTime())
+  .delete();
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="unit-testing"></a><a href="#unit-testing" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unit testing</h2>
+<p>Cases are an integral part of software projects and they should be tested in the same way normal application logic is tested: with unit tests.
+Since Flowable is an embeddable Java engine, writing unit tests for business cases is as simple as writing regular unit tests.</p>
+<p>Flowable supports JUnit versions 4 and 5 styles of unit testing.</p>
+<p>In the JUnit 5 style one needs to use the org.flowable.cmmn.engine.test.FlowableCmmnTest annotation or register the org.flowable.cmmn.engine.test.FlowableCmmnExtension manually.
+The FlowableCmmnTest annotation is just a meta annotation and the does the registration of the FlowableCmmnExtension (i.e. it does @ExtendWith(FlowableCmmnExtension.class)).
+This will make the CmmnEngine and the services available as parameters into the test and lifecycle methods (@BeforeAll, @BeforeEach, @AfterEach, @AfterAll).
+Before each test the cmmnEngine will be initialized by default with the flowable.cmmn.cfg.xml resource on the classpath.
+In order to specify a different configuration file the org.flowable.cmmn.engine.test.CmmnConfigurationResource annotation needs to be used (see the second example).
+Cmmn engines are cached statically over multiple unit tests when the configuration resource is the same.</p>
+<p>By using FlowableCmmnExtension, you can annotate test methods with org.flowable.cmmn.engine.test.CmmnDeployment.
+When a test method is annotated with @CmmnDeployment, before each test the cmmn files defined in CmmnDeployment#resources will be deployed.
+In case there are no resources defined, a resource file of the form testClassName.testMethod.cmmn in the same package as the test class, will be deployed.
+At the end of the test, the deployment will be deleted, including all related case instances, tasks, and so on.
+See the CmmnDeployment class for more information.</p>
+<p>Taking all that into account, a JUnit 5 test looks as follows:</p>
+<p><strong>Junit 5 test with the default resource.</strong></p>
+<pre><code class="hljs">@FlowableCmmnTest
+class MyTest {
+
+  private CmmnEngine cmmnEngine;
+  private CmmnRuntimeService cmmnRuntimeService;
+  private CmmnTaskService cmmnTaskService;
+
+  @BeforeEach
+  void setUp(CmmnEngine cmmnEngine) {
+    this.cmmnEngine = cmmnEngine;
+    this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
+    this.cmmnTaskService = cmmnEngine.getTaskRuntimeService();
+  }
+
+  @Test
+  @CmmnDeployment
+  void testSingleHumanTask() {
+    CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey(&quot;myCase&quot;)
+                    .start();
+    assertNotNull(caseInstance);
+
+    Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+    assertEquals(&quot;Task 1&quot;, task.getName());
+    assertEquals(&quot;JohnDoe&quot;, task.getAssignee());
+
+    cmmnTaskService.complete(task.getId());
+    assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+  }
+}
+
+With JUnit 5 you can also inject the id of the deployment (with +org.flowable.cmmn.engine.test.CmmnDeploymentId+_) into your test and lifecycle methods.
+</code></pre>
+<p><strong>Junit 5 test with custom resource.</strong></p>
+<pre><code class="hljs">@FlowableCmmnTest
+@CmmnConfigurationResource(&quot;flowable.custom.cmmn.cfg.xml&quot;)
+class MyTest {
+
+  private CmmnEngine cmmnEngine;
+  private CmmnRuntimeService cmmnRuntimeService;
+  private CmmnTaskService cmmnTaskService;
+
+  @BeforeEach
+  void setUp(CmmnEngine cmmnEngine) {
+    this.cmmnEngine = cmmnEngine;
+    this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
+    this.cmmnTaskService = cmmnEngine.getTaskRuntimeService();
+  }
+  @Test
+  @CmmnDeployment
+  void testSingleHumanTask() {
+    CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey(&quot;myCase&quot;)
+                    .start();
+    assertNotNull(caseInstance);
+
+    Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+    assertEquals(&quot;Task 1&quot;, task.getName());
+    assertEquals(&quot;JohnDoe&quot;, task.getAssignee());
+
+    cmmnTaskService.complete(task.getId());
+    assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+  }
+}
+</code></pre>
+<p>In the JUnit 4 style, the <em>org.flowable.cmmn.engine.test.FlowableCmmnTestCase</em> is available as parent class. It uses a configuration file <em>flowable.cmmn.cfg.xml</em> by default or uses a standard CmmnEngine using an H2 in-memory database if such file is missing.
+Behind the scenes, a CmmnTestRunner is used to initialise the CMMN engine. Note in the example below how the <em>@CmmnDeployment</em> annotation is used to automatically deploy the case definition (it will look for a .cmmn file in the same folder as the test class and expects the file to be named &lt;Test class name&gt;.&lt;test method name&gt;.cmmn.</p>
+<pre><code class="hljs">public class MyTest extends FlowableCmmnTestCase {
+
+  @Test
+  @CmmnDeployment
+  public void testSingleHumanTask() {
+    CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey(&quot;myCase&quot;)
+                    .start();
+    assertNotNull(caseInstance);
+
+    Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+    assertEquals(&quot;Task 1&quot;, task.getName());
+    assertEquals(&quot;JohnDoe&quot;, task.getAssignee());
+
+    cmmnTaskService.complete(task.getId());
+    assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+  }
+}
+</code></pre>
+<p>Alternatively, the <em>FlowableCmmnRule</em> is available and allows to set a custom configuration:</p>
+<p><strong>JUnit 4 test with a Rule.</strong></p>
+<pre><code class="hljs">@Rule
+public FlowableCmmnRule cmmnRule = new FlowableCmmnRule(&quot;org/flowable/custom.cfg.xml&quot;)
+
+@Test
+@CmmnDeployment
+public void testSomething() {
+    // ...
+    assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), &quot;test&quot;), containsString(&quot;John&quot;));
+    // ...
+}
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/open-source/docs/cmmn/ch02-Configuration"><span class="arrow-prev">← </span><span>Configuration</span></a><a class="docs-next button" href="/open-source/docs/cmmn/ch04-Spring"><span>Spring integration</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#the-process-cmmn-engine-api-and-services">The Process CMMN Engine API and services</a></li><li><a href="#exception-strategy">Exception strategy</a></li><li><a href="#query-api">Query API</a></li><li><a href="#variables">Variables</a></li><li><a href="#transient-variables">Transient variables</a></li><li><a href="#expressions">Expressions</a></li><li><a href="#expression-functions">Expression functions</a></li><li><a href="#history-cleaning">History Cleaning</a><ul class="toc-headings"><li><a href="#automatic-history-cleaning-configuration">Automatic History Cleaning Configuration</a></li><li><a href="#manually-deleting-history">Manually Deleting History</a></li></ul></li><li><a href="#unit-testing">Unit testing</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/open-source/docs/" class="nav-home"><img src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/></a><div><h5>Documentation</h5><a href="/open-source/docs/oss-introduction">Guides</a><a href="/open-source/docs/javadocs">Javadocs</a></div><div><h5>Legal</h5><a href="/open-source/docs/disclaimer">Disclaimer</a><a href="https://flowable.com/disclaimer/">Policies</a></div></section><section class="copyright">Copyright © 2020 Flowable AG</section></footer></div></body></html>

@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -89,7 +90,8 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
     private static final Set<Class<?>> SUPPORTED_PARAMETERS = new HashSet<>(Arrays.asList(
         EventRegistryEngineConfiguration.class,
         EventRegistryEngine.class,
-        EventRepositoryService.class
+        EventRepositoryService.class,
+        EventRegistry.class
     ));
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());

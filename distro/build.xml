@@ -213,6 +213,30 @@
 			<fileset dir="../modules/flowable-dmn-rest/target">
 				<include name="flowable-dmn-rest-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-event-registry/target">
+                <include name="flowable-event-registry-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-event-registry-api/target">
+                <include name="flowable-event-registry-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-event-registry-configurator/target">
+                <include name="flowable-event-registry-configurator-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-event-registry-json-converter/target">
+                <include name="flowable-event-registry-json-converter-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-event-registry-model/target">
+                <include name="flowable-event-registry-model-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-event-registry-rest/target">
+                <include name="flowable-event-registry-rest-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-event-registry-spring/target">
+                <include name="flowable-event-registry-spring-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-event-registry-spring-configurator/target">
+                <include name="flowable-event-registry-spring-configurator*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-form-model/target">
 				<include name="flowable-form-model-*.jar" />
 			</fileset>

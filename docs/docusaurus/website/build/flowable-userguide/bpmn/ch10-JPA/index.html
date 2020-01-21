@@ -1,0 +1,242 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>JPA · Flowable Open Source Documentation</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="You can use JPA-Entities as process variables, allowing you to:"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="JPA · Flowable Open Source Documentation"/><meta property="og:type" content="website"/><meta property="og:url" content="https://flowable.com/open-source/docs/"/><meta property="og:description" content="You can use JPA-Entities as process variables, allowing you to:"/><meta property="og:image" content="https://flowable.com/open-source/docs/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://flowable.com/open-source/docs/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/open-source/docs/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><script src="/open-source/docs/js/scrollSpy.js"></script><link rel="stylesheet" href="/open-source/docs/css/main.css"/><script src="/open-source/docs/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/open-source/docs/"><img class="logo" src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/><h2 class="headerTitleWithLogo">Flowable Open Source Documentation</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/open-source/docs/oss-introduction" target="_self">Guides</a></li><li class=""><a href="/open-source/docs/all-javadocs" target="_self">Javadocs</a></li><li class=""><a href="https://flowable.com/open-source/" target="_self">Open source home</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>BPMN User Guide</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Flowable Open Source<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/oss-introduction">Open Source Details</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">BPMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch02-GettingStarted">Getting Started</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch03-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch04-API">The Flowable API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch05a-Spring-Boot">Spring Boot</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch06-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07a-BPMN-Introduction">BPMN 2.0 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch07b-BPMN-Constructs">BPMN 2.0 Constructs</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch08-Forms">Forms</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch09-ProcessInstanceMigration">Process Instance Migration (Experimental)</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/open-source/docs/bpmn/ch10-JPA">JPA</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch11-History">History</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch12-IDM">Identity management</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch13-Designer">Eclipse Designer</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch14-Applications">Flowable applications</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch15-REST">REST API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch16-Cdi">CDI integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch17-Ldap">LDAP integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch18-Advanced">Advanced</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/bpmn/ch19-tooling">Tooling</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">CMMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch03-API">The Flowable CMMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch06-cmmn">CMMN 1.1</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/cmmn/ch07-architecture">Architecture</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">DMN User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch03-API">The Flowable DMN API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch06-DMN-Introduction">DMN 1.1 Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/dmn/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Forms User Guide<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch02-Configuration">Configuration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch03-API">The Flowable Form API</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch04-Spring">Spring integration</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch05-Deployment">Deployment</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch06-Form-Introduction">Form Introduction</a></li><li class="navListItem"><a class="navItem" href="/open-source/docs/form/ch07-REST">REST API</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Migration from v5<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/migration">Flowable Migration Guide : Flowable or Activiti v5 to Flowable V6</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Disclaimer<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/open-source/docs/disclaimer">Disclaimer</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">JPA</h1></header><article><div><span><p>You can use JPA-Entities as process variables, allowing you to:</p>
+<ul>
+<li><p>Updating existing JPA-entities based on process variables that can be filled in on a form in a userTask or generated in a serviceTask.</p></li>
+<li><p>Reusing existing domain model without having to write explicit services to fetch the entities and update the values</p></li>
+<li><p>Make decisions (gateways) based on properties of existing entities.</p></li>
+<li><p>…​</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="requirements"></a><a href="#requirements" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Requirements</h2>
+<p>Only entities that comply with the following are supported:</p>
+<ul>
+<li><p>Entities should be configured using JPA-annotations, we support both field and property-access. Mapped super classes can also be used.</p></li>
+<li><p>Entity should have a primary key annotated with @Id, compound primary keys are not supported (@EmbeddedId and @IdClass). The Id field/property can be of any type supported in the JPA-spec: Primitive types and their wrappers (excluding boolean), String, BigInteger, BigDecimal, <a href="http://java.util.Date">java.util.Date</a> and <a href="http://java.sql.Date">java.sql.Date</a>.</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="configuration"></a><a href="#configuration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configuration</h2>
+<p>To be able to use JPA-entities, the engine must have a reference to an EntityManagerFactory. This can be done by configuring a reference or by supplying a persistence-unit name. JPA-entities used as variables will be detected automatically and will be handled accordingly.</p>
+<p>The example configuration below uses the jpaPersistenceUnitName:</p>
+<pre><code class="hljs">&lt;bean id=&quot;processEngineConfiguration&quot;
+  class=&quot;org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration&quot;&gt;
+
+&lt;!-- Database configurations --&gt;
+&lt;property name=&quot;databaseSchemaUpdate&quot; value=&quot;true&quot; /&gt;
+&lt;property name=&quot;jdbcUrl&quot; value=&quot;jdbc:h2:mem:JpaVariableTest;DB_CLOSE_DELAY=1000&quot; /&gt;
+
+&lt;property name=&quot;jpaPersistenceUnitName&quot; value=&quot;flowable-jpa-pu&quot; /&gt;
+&lt;property name=&quot;jpaHandleTransaction&quot; value=&quot;true&quot; /&gt;
+&lt;property name=&quot;jpaCloseEntityManager&quot; value=&quot;true&quot; /&gt;
+
+&lt;!-- job executor configurations --&gt;
+&lt;property name=&quot;asyncExecutorActivate&quot; value=&quot;false&quot; /&gt;
+
+&lt;!-- mail server configurations --&gt;
+&lt;property name=&quot;mailServerPort&quot; value=&quot;5025&quot; /&gt;
+&lt;/bean&gt;
+</code></pre>
+<p>The next example configuration below provides a EntityManagerFactory which we define ourselves (in this case, an open-jpa entity manager). Note that the snippet only contains the beans that are relevant for the example, the others are omitted. Full working example with open-jpa entity manager can be found in the flowable-spring-examples (/flowable-spring/src/test/java/org/flowable/spring/test/jpa/JPASpringTest.java)</p>
+<pre><code class="hljs">&lt;bean id=&quot;entityManagerFactory&quot; class=&quot;org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean&quot;&gt;
+  &lt;property name=&quot;persistenceUnitManager&quot; ref=&quot;pum&quot;/&gt;
+  &lt;property name=&quot;jpaVendorAdapter&quot;&gt;
+    &lt;bean class=&quot;org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter&quot;&gt;
+      &lt;property name=&quot;databasePlatform&quot; value=&quot;org.apache.openjpa.jdbc.sql.H2Dictionary&quot; /&gt;
+    &lt;/bean&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;processEngineConfiguration&quot; class=&quot;org.flowable.spring.SpringProcessEngineConfiguration&quot;&gt;
+  &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot; /&gt;
+  &lt;property name=&quot;transactionManager&quot; ref=&quot;transactionManager&quot; /&gt;
+  &lt;property name=&quot;databaseSchemaUpdate&quot; value=&quot;true&quot; /&gt;
+  &lt;property name=&quot;jpaEntityManagerFactory&quot; ref=&quot;entityManagerFactory&quot; /&gt;
+  &lt;property name=&quot;jpaHandleTransaction&quot; value=&quot;true&quot; /&gt;
+  &lt;property name=&quot;jpaCloseEntityManager&quot; value=&quot;true&quot; /&gt;
+  &lt;property name=&quot;asyncExecutorActivate&quot; value=&quot;false&quot; /&gt;
+&lt;/bean&gt;
+</code></pre>
+<p>The same configurations can also be done when building an engine programmatically, example:</p>
+<pre><code class="hljs">ProcessEngine processEngine = ProcessEngineConfiguration
+    .createProcessEngineConfigurationFromResourceDefault()
+    .setJpaPersistenceUnitName(&quot;flowable-pu&quot;)
+    .buildProcessEngine();
+</code></pre>
+<p>Configuration properties:</p>
+<ul>
+<li><p>jpaPersistenceUnitName: The name of the persistence-unit to use. (Make sure the persistence-unit is available on the classpath. According to the spec, the default location is /META-INF/persistence.xml). Use either jpaEntityManagerFactory or jpaPersistenceUnitName.</p></li>
+<li><p>jpaEntityManagerFactory: An reference to a bean implementing javax.persistence.EntityManagerFactory that will be used to load the Entities and flushing the updates. Use either <em>jpaEntityManagerFactory</em> or <em>jpaPersistenceUnitName</em>.</p></li>
+<li><p>jpaHandleTransaction: Flag indicating that the engine should begin and commit/rollback the transaction on the used <em>EntityManager</em> instances. Set to false when <em>Java Transaction API (JTA)</em> is used.</p></li>
+<li><p>jpaCloseEntityManager: Flag indicating that the engine should close the EntityManager instance that was obtained from the EntityManagerFactory. Set to false when the <em>EntityManager</em> is container-managed (e.g. when using an Extended Persistence Context which isn’t scoped to a single transaction').</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="usage"></a><a href="#usage" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Usage</h2>
+<h3><a class="anchor" aria-hidden="true" id="simple-example"></a><a href="#simple-example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Simple Example</h3>
+<p>Examples for using JPA variables can be found in JPAVariableTest in the Flowable source code. We’ll explain JPAVariableTest.testUpdateJPAEntityValues step by step.</p>
+<p>First of all, we create an <em>EntityManagerFactory</em> for our persistence-unit, which is based on META-INF/persistence.xml. This contains classes which should be included in the persistence unit and some vendor-specific configuration.</p>
+<p>We are using a simple entity in the test, having an id and String value property, which is also persisted. Before running the test, we create an entity and save this.</p>
+<pre><code class="hljs">@Entity(name = &quot;JPA_ENTITY_FIELD&quot;)
+public class FieldAccessJPAEntity {
+
+  @Id
+  @Column(name = &quot;ID_&quot;)
+  private Long id;
+
+  private String value;
+
+  public FieldAccessJPAEntity() {
+    // Empty constructor needed for JPA
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
+}
+</code></pre>
+<p>We start a new process instance, adding the entity as a variable. As with other variables, they are stored in the persistent storage of the engine. When the variable is requested the next time, it will be loaded from the EntityManager based on the class and Id stored.</p>
+<pre><code class="hljs">Map&lt;String, Object&gt; variables = new HashMap&lt;String, Object&gt;();
+variables.put(&quot;entityToUpdate&quot;, entityToUpdate);
+
+ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+    &quot;UpdateJPAValuesProcess&quot;, variables);
+</code></pre>
+<p>The first node in our process definition contains a serviceTask that will invoke the method setValue on entityToUpdate, which resolves to the JPA variable we set earlier when starting the process instance and will be loaded from the EntityManager associated with the current engine’s context.</p>
+<pre><code class="hljs">&lt;serviceTask id='theTask' name='updateJPAEntityTask'
+  flowable:expression=&quot;${entityToUpdate.setValue('updatedValue')}&quot; /&gt;
+</code></pre>
+<p>When the service-task is finished, the process instance waits in a userTask defined in the process definition, which allows us to inspect the process instance. At this point, the EntityManager has been flushed and the changes to the entity have been pushed to the database. When we get the value of the variable entityToUpdate, it’s loaded again and we get the entity with its value property set to updatedValue.</p>
+<pre><code class="hljs">// Servicetask in process 'UpdateJPAValuesProcess' should have set value on entityToUpdate.
+Object updatedEntity = runtimeService.getVariable(processInstance.getId(), &quot;entityToUpdate&quot;);
+assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
+assertEquals(&quot;updatedValue&quot;, ((FieldAccessJPAEntity)updatedEntity).getValue());
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="query-jpa-process-variables"></a><a href="#query-jpa-process-variables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Query JPA process variables</h3>
+<p>You can query for ProcessInstances and Executions that have a certain JPA-entity as variable value. <strong>Note that only variableValueEquals(name, entity) is supported for JPA-Entities on ProcessInstanceQuery and ExecutionQuery</strong>. Methods variableValueNotEquals, variableValueGreaterThan, variableValueGreaterThanOrEqual, variableValueLessThan and variableValueLessThanOrEqual are unsupported and will throw an FlowableException when a JPA-Entity is passed as value.</p>
+<pre><code class="hljs"> ProcessInstance result = runtimeService.createProcessInstanceQuery()
+    .variableValueEquals(&quot;entityToQuery&quot;, entityToQuery).singleResult();
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="advanced-example-using-spring-beans-and-jpa"></a><a href="#advanced-example-using-spring-beans-and-jpa" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Advanced example using Spring beans and JPA</h3>
+<p>A more advanced example, JPASpringTest, can be found in flowable-spring-examples. It describes the following simple use case:</p>
+<ul>
+<li><p>An existing Spring-bean which uses JPA entities already exists which allows for Loan Requests to be stored.</p></li>
+<li><p>Using Flowable, we can use the existing entities, obtained through the existing bean, and use them as variable in our process. Process is defined in the following steps:</p>
+<ul>
+<li><p>Service task that creates a new LoanRequest, using the existing LoanRequestBean using variables received when starting the process (e.g. could come from a start form). The created entity is stored as a variable, using flowable:resultVariable which stores the expression result as a variable.</p></li>
+<li><p>UserTask that allows a manager to review the request and approve/disapprove, which is stored as a boolean variable approvedByManager</p></li>
+<li><p>ServiceTask that updates the loan request entity so the entity is in sync with the process.</p></li>
+<li><p>Depending on the value of the entity property approved, an exclusive gateway is used to make a decision about what path to take next: When the request is approved, process ends, otherwise, an extra task will become available (Send rejection letter), so the customer can be notified manually by a rejection letter.</p></li>
+</ul></li>
+</ul>
+<p>Please note that the process doesn’t contain any forms, since it is only used in a unit test.</p>
+<p><img src="/open-source/docs/assets/bpmn/jpa.spring.example.process.png" alt="jpa.spring.example.process"></p>
+<pre><code class="hljs">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;definitions id=&quot;taskAssigneeExample&quot;
+  xmlns=&quot;http://www.omg.org/spec/BPMN/20100524/MODEL&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xmlns:flowable=&quot;http://flowable.org/bpmn&quot;
+  targetNamespace=&quot;org.flowable.examples&quot;&gt;
+
+  &lt;process id=&quot;LoanRequestProcess&quot; name=&quot;Process creating and handling loan request&quot;&gt;
+    &lt;startEvent id='theStart' /&gt;
+    &lt;sequenceFlow id='flow1' sourceRef='theStart' targetRef='createLoanRequest' /&gt;
+
+    &lt;serviceTask id='createLoanRequest' name='Create loan request'
+      flowable:expression=&quot;${loanRequestBean.newLoanRequest(customerName, amount)}&quot;
+      flowable:resultVariable=&quot;loanRequest&quot;/&gt;
+    &lt;sequenceFlow id='flow2' sourceRef='createLoanRequest' targetRef='approveTask' /&gt;
+
+    &lt;userTask id=&quot;approveTask&quot; name=&quot;Approve request&quot; /&gt;
+    &lt;sequenceFlow id='flow3' sourceRef='approveTask' targetRef='approveOrDissaprove' /&gt;
+
+    &lt;serviceTask id='approveOrDissaprove' name='Store decision'
+      flowable:expression=&quot;${loanRequest.setApproved(approvedByManager)}&quot; /&gt;
+    &lt;sequenceFlow id='flow4' sourceRef='approveOrDissaprove' targetRef='exclusiveGw' /&gt;
+
+    &lt;exclusiveGateway id=&quot;exclusiveGw&quot; name=&quot;Exclusive Gateway approval&quot; /&gt;
+    &lt;sequenceFlow id=&quot;endFlow1&quot; sourceRef=&quot;exclusiveGw&quot; targetRef=&quot;theEnd&quot;&gt;
+      &lt;conditionExpression xsi:type=&quot;tFormalExpression&quot;&gt;${loanRequest.approved}&lt;/conditionExpression&gt;
+    &lt;/sequenceFlow&gt;
+    &lt;sequenceFlow id=&quot;endFlow2&quot; sourceRef=&quot;exclusiveGw&quot; targetRef=&quot;sendRejectionLetter&quot;&gt;
+      &lt;conditionExpression xsi:type=&quot;tFormalExpression&quot;&gt;${!loanRequest.approved}&lt;/conditionExpression&gt;
+    &lt;/sequenceFlow&gt;
+
+    &lt;userTask id=&quot;sendRejectionLetter&quot; name=&quot;Send rejection letter&quot; /&gt;
+    &lt;sequenceFlow id='flow5' sourceRef='sendRejectionLetter' targetRef='theOtherEnd' /&gt;
+
+    &lt;endEvent id='theEnd' /&gt;
+    &lt;endEvent id='theOtherEnd' /&gt;
+  &lt;/process&gt;
+
+&lt;/definitions&gt;
+</code></pre>
+<p>Although the example above is quite simple, it shows the power of using JPA combined with Spring and parametrized method-expressions. The process requires no custom Java code at all (except for the Spring-bean off course) and speeds up development drastically.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/open-source/docs/bpmn/ch09-ProcessInstanceMigration"><span class="arrow-prev">← </span><span>Process Instance Migration (Experimental)</span></a><a class="docs-next button" href="/open-source/docs/bpmn/ch11-History"><span>History</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#requirements">Requirements</a></li><li><a href="#configuration">Configuration</a></li><li><a href="#usage">Usage</a><ul class="toc-headings"><li><a href="#simple-example">Simple Example</a></li><li><a href="#query-jpa-process-variables">Query JPA process variables</a></li><li><a href="#advanced-example-using-spring-beans-and-jpa">Advanced example using Spring beans and JPA</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/open-source/docs/" class="nav-home"><img src="/open-source/docs/img/flowable-oss-icon@2.png" alt="Flowable Open Source Documentation"/></a><div><h5>Documentation</h5><a href="/open-source/docs/oss-introduction">Guides</a><a href="/open-source/docs/javadocs">Javadocs</a></div><div><h5>Legal</h5><a href="/open-source/docs/disclaimer">Disclaimer</a><a href="https://flowable.com/disclaimer/">Policies</a></div></section><section class="copyright">Copyright © 2020 Flowable AG</section></footer></div></body></html>

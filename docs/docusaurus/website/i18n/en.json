@@ -104,6 +104,24 @@
       "dmn/ch07-REST": {
         "title": "REST API"
       },
+      "eventregistry/ch02-Configuration": {
+        "title": "Configuration"
+      },
+      "eventregistry/ch03-API": {
+        "title": "The Flowable Event Registry API"
+      },
+      "eventregistry/ch04-Spring": {
+        "title": "Spring integration"
+      },
+      "eventregistry/ch05-Deployment": {
+        "title": "Deployment"
+      },
+      "eventregistry/ch06-EventRegistry-Introduction": {
+        "title": "Event Registry Introduction"
+      },
+      "eventregistry/ch07-REST": {
+        "title": "REST API"
+      },
       "form/ch02-Configuration": {
         "title": "Configuration"
       },
@@ -142,6 +160,7 @@
       "Flowable Open Source": "Flowable Open Source",
       "BPMN User Guide": "BPMN User Guide",
       "CMMN User Guide": "CMMN User Guide",
+      "Event Registry User Guide": "Event Registry User Guide",
       "DMN User Guide": "DMN User Guide",
       "Forms User Guide": "Forms User Guide",
       "Migration from v5": "Migration from v5",

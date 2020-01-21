@@ -245,7 +245,7 @@
                   <host>${swagger.host}</host>
                   <basePath>/flowable-rest/event-registry-api</basePath>
                   <info>
-                    <title>Flowable FORM REST API</title>
+                    <title>Flowable Event Registry REST API</title>
                     <version>v1</version>
                     <contact>
                       <email></email>

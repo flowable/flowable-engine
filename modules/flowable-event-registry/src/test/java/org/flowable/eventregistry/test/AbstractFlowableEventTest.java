@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.test;
 
 import org.flowable.common.engine.impl.test.LoggingExtension;
+import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -34,12 +35,16 @@ public class AbstractFlowableEventTest {
     protected EventRegistryEngine eventRegistryEngine;
     protected EventRegistryEngineConfiguration eventEngineConfiguration;
     protected EventRepositoryService repositoryService;
+    protected EventRegistry eventRegistry;
 
     @BeforeEach
-    public void initEventRegistryEngine(EventRegistryEngine eventRegistryEngine) {
+    public void initEventRegistryEngine(EventRegistryEngine eventRegistryEngine, EventRegistryEngineConfiguration eventRegistryEngineConfiguration,
+                    EventRepositoryService eventRepositoryService, EventRegistry eventRegistry) {
+        
         this.eventRegistryEngine = eventRegistryEngine;
-        this.eventEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-        this.repositoryService = eventRegistryEngine.getEventRepositoryService();
+        this.eventEngineConfiguration = eventRegistryEngineConfiguration;
+        this.repositoryService = eventRepositoryService;
+        this.eventRegistry = eventRegistry;
     }
 
 }

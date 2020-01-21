@@ -57,7 +57,7 @@ public abstract class EventRegistryEngines {
             ClassLoader classLoader = EventRegistryEngines.class.getClassLoader();
             Enumeration<URL> resources = null;
             try {
-                resources = classLoader.getResources("flowable.registry.cfg.xml");
+                resources = classLoader.getResources("flowable.eventregistry.cfg.xml");
             } catch (IOException e) {
                 throw new FlowableException("problem retrieving flowable.registry.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
             }
@@ -74,7 +74,7 @@ public abstract class EventRegistryEngines {
             }
 
             try {
-                resources = classLoader.getResources("flowable-registry-context.xml");
+                resources = classLoader.getResources("flowable-eventregistry-context.xml");
             } catch (IOException e) {
                 throw new FlowableException("problem retrieving flowable-registry-context.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
             }
