@@ -103,7 +103,7 @@
         </div><!-- /.navbar -->
 
 		<div class="alert-wrapper" ng-cloak>
-			<div class="alert fadein {{alerts.current.type}}" ng-show="alerts.current" ng-click="dismissAlert()">
+			<div class="alert fadein {{alerts.current.type}}" ng-if="alerts.current" ng-click="dismissAlert()">
 				<i class="glyphicon" ng-class="{'glyphicon-ok': alerts.current.type == 'info', 'glyphicon-remove': alerts.current.type == 'error'}"></i>
 				<span>{{alerts.current.message}}</span>
 				<div class="pull-right" ng-show="alerts.queue.length > 0">
