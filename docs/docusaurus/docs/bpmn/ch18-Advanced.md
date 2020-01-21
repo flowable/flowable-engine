@@ -806,3 +806,45 @@ It’s used as follows:
     </flowable:executionListener>
 
 For examples that demonstrate unsecure scripts and how they are made secure by the *secure scripting* feature, please check the [unit tests on Github](https://github.com/Flowable/Flowable/tree/master/modules/flowable-secure-javascript/src/test/resources)
+
+## Logging Sessions \[Experimental\]
+
+Added in 6.5.0, Logging sessions allow you to collect information about process execution even if an exception causes the transaction to be rolled back.  This is enabled by providing a LoggingListener implementation to the engine configuration.  The loggingListener contains a single method called `loggingGenerated` that takes a list of Jackson ObjectNodes.  
+
+
+In this simple implementation, each ObjectNode is sent to the logger:
+
+```
+class MyLoggingListener implements LoggingListener{
+    static Logger logger = LoggerFactory.getLogger(MyLoggingListener.class);
+    
+    @Override
+    public void loggingGenerated(List<ObjectNode> loggingNodes) {
+        loggingNodes.forEach(jsonNodes -> logger.info(jsonNodes.toString()));
+    }
+}
+```
+
+During process engine configuration, an instance of the LoggingListener is passed 
+
+```
+ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration()
+      .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+      .setJdbcUrl("jdbc:h2:mem:my-own-db;DB_CLOSE_DELAY=1000")
+      .setLoggingListener(new MyLoggingListener())
+      .buildProcessEngine();
+
+```
+
+### LoggingSession ObjectNodes
+ 
+ The list of ObjectNodes passed to loggingGenerated method Are JSON objects, with at least the following attributes:
+ - `message` - a human readable message
+ - `scopeId` - a correlation ID to group all messages from the same transaction 
+ - `scopeType` - the type of the scope
+ 
+ Additional fields will also be present based on the type of event they describe:
+ 
+```
+2020-01-21 10:46:54.852  INFO 4985 --- [  restartedMain] c.e.f.MyLoggingListener                : {"message":"Variable 'initiator' created","scopeId":"a193efb3-3c6d-11ea-a01d-bed6c476b3ed","scopeType":"bpmn","variableName":"initiator","variableType":"null","variableRawValue":null,"variableValue":null,"scopeDefinitionId":"loggingSessionProcess:1:a18d38ef-3c6d-11ea-a01d-bed6c476b3ed","scopeDefinitionKey":"loggingSessionProcess","scopeDefinitionName":"Logging Session Process","__id":"a1948bf5-3c6d-11ea-a01d-bed6c476b3ed","__timeStamp":"2020-01-21T16:46:54.819Z","type":"variableCreate","__transactionId":"a1948bf5-3c6d-11ea-a01d-bed6c476b3ed","__logNumber":1}
+``` 
