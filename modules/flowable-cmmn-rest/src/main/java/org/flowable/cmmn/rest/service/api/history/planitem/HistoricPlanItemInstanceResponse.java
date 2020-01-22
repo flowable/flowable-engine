@@ -21,6 +21,7 @@ import java.util.Date;
 
 /**
  * @author Dennis Federico
+ * @author Filip Hrisafov
  */
 public class HistoricPlanItemInstanceResponse {
 
@@ -28,9 +29,10 @@ public class HistoricPlanItemInstanceResponse {
     protected String name;
     protected String state;
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
-    protected boolean isStage;
+    protected boolean stage;
     protected String elementId;
     protected String planItemDefinitionId;
     protected String planItemDefinitionType;
@@ -56,13 +58,22 @@ public class HistoricPlanItemInstanceResponse {
     protected Date exitTime;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date endedTime;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date lastUpdatedTime;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
+    protected String entryCriterionId;
+    protected String exitCriterionId;
+    protected String formKey;
+    protected String extraValue;
+    protected boolean showInOverview;
     protected String tenantId;
     protected String url;
-    protected String historicCaseInstanceUrl;
+    protected String caseInstanceUrl;
     protected String caseDefinitionUrl;
+    protected String derivedCaseDefinitionUrl;
+    protected String stageInstanceUrl;
 
     @ApiModelProperty(example = "5")
     public String getId() {
@@ -100,6 +111,14 @@ public class HistoricPlanItemInstanceResponse {
         this.caseDefinitionId = caseDefinitionId;
     }
 
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
+    }
+
+    public void setDerivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
+    }
+
     @ApiModelProperty(example = "12345")
     public String getCaseInstanceId() {
         return caseInstanceId;
@@ -120,11 +139,11 @@ public class HistoricPlanItemInstanceResponse {
 
     @ApiModelProperty(example = "true")
     public boolean isStage() {
-        return isStage;
+        return stage;
     }
 
     public void setStage(boolean stage) {
-        isStage = stage;
+        this.stage = stage;
     }
 
     @ApiModelProperty(example = "someElementId")
@@ -253,6 +272,14 @@ public class HistoricPlanItemInstanceResponse {
         this.endedTime = endedTime;
     }
 
+    public Date getLastUpdatedTime() {
+        return lastUpdatedTime;
+    }
+
+    public void setLastUpdatedTime(Date lastUpdatedTime) {
+        this.lastUpdatedTime = lastUpdatedTime;
+    }
+
     @ApiModelProperty(example = "kermit")
     public String getStartUserId() {
         return startUserId;
@@ -280,6 +307,46 @@ public class HistoricPlanItemInstanceResponse {
         this.referenceType = referenceType;
     }
 
+    public String getEntryCriterionId() {
+        return entryCriterionId;
+    }
+
+    public void setEntryCriterionId(String entryCriterionId) {
+        this.entryCriterionId = entryCriterionId;
+    }
+
+    public String getExitCriterionId() {
+        return exitCriterionId;
+    }
+
+    public void setExitCriterionId(String exitCriterionId) {
+        this.exitCriterionId = exitCriterionId;
+    }
+
+    public String getFormKey() {
+        return formKey;
+    }
+
+    public void setFormKey(String formKey) {
+        this.formKey = formKey;
+    }
+
+    public String getExtraValue() {
+        return extraValue;
+    }
+
+    public void setExtraValue(String extraValue) {
+        this.extraValue = extraValue;
+    }
+
+    public boolean isShowInOverview() {
+        return showInOverview;
+    }
+
+    public void setShowInOverview(boolean showInOverview) {
+        this.showInOverview = showInOverview;
+    }
+
     @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
@@ -299,12 +366,12 @@ public class HistoricPlanItemInstanceResponse {
     }
 
     @ApiModelProperty(example = "http://localhost:8182/cmmn-history/historic-case-instances/12345")
-    public String getHistoricCaseInstanceUrl() {
-        return historicCaseInstanceUrl;
+    public String getCaseInstanceUrl() {
+        return caseInstanceUrl;
     }
 
-    public void setHistoricCaseInstanceUrl(String historicCaseInstanceUrl) {
-        this.historicCaseInstanceUrl = historicCaseInstanceUrl;
+    public void setCaseInstanceUrl(String caseInstanceUrl) {
+        this.caseInstanceUrl = caseInstanceUrl;
     }
 
     @ApiModelProperty(example = "http://localhost:8182/cmmn-repository/case-definitions/myCaseId%3A1%3A4")
@@ -316,5 +383,19 @@ public class HistoricPlanItemInstanceResponse {
         this.caseDefinitionUrl = caseDefinitionUrl;
     }
 
+    public String getDerivedCaseDefinitionUrl() {
+        return derivedCaseDefinitionUrl;
+    }
 
+    public void setDerivedCaseDefinitionUrl(String derivedCaseDefinitionUrl) {
+        this.derivedCaseDefinitionUrl = derivedCaseDefinitionUrl;
+    }
+
+    public String getStageInstanceUrl() {
+        return stageInstanceUrl;
+    }
+
+    public void setStageInstanceUrl(String stageInstanceUrl) {
+        this.stageInstanceUrl = stageInstanceUrl;
+    }
 }
