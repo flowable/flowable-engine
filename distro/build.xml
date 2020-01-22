@@ -421,12 +421,28 @@
 			<fileset dir="../modules/flowable-engine/target/site/apidocs" />
 		</copy>
 		
-		<exec executable="${mvn.executable}" dir="../modules/flowable-cmmn-engine">
+		<exec executable="${mvn.executable}" dir="../modules/flowable-cmmn-api">
             <arg line="-DexcludePackageNames=org.flowable.cmmn.engine.impl* javadoc:javadoc" />
         </exec>
         <mkdir dir="${target.docs.root}/cmmn-javadocs" />
         <copy todir="${target.docs.root}/cmmn-javadocs">
-            <fileset dir="../modules/flowable-cmmn-engine/target/site/apidocs" />
+            <fileset dir="../modules/flowable-cmmn-api/target/site/apidocs" />
+        </copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-dmn-api">
+            <arg line="-DexcludePackageNames=org.flowable.dmn.engine.impl* javadoc:javadoc" />
+        </exec>
+        <mkdir dir="${target.docs.root}/dmn-javadocs" />
+        <copy todir="${target.docs.root}/dmn-javadocs">
+            <fileset dir="../modules/flowable-dmn-api/target/site/apidocs" />
+        </copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-event-registry-api">
+            <arg line="-DexcludePackageNames=org.flowable.eventregistry.impl* javadoc:javadoc" />
+        </exec>
+        <mkdir dir="${target.docs.root}/eventregistry-javadocs" />
+        <copy todir="${target.docs.root}/eventregistry-javadocs">
+            <fileset dir="../modules/flowable-event-registry-api/target/site/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-task-service-api">
@@ -453,15 +469,44 @@
             <fileset dir="../modules/flowable-job-service-api/target/site/apidocs" />
         </copy>
 		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-identitylink-service-api">
+            <arg line="javadoc:javadoc" />
+        </exec>
+        <mkdir dir="${target.docs.root}/identitylink-javadocs" />
+        <copy todir="${target.docs.root}/identitylink-javadocs">
+            <fileset dir="../modules/flowable-identitylink-service-api/target/site/apidocs" />
+        </copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-entitylink-service-api">
+            <arg line="javadoc:javadoc" />
+        </exec>
+        <mkdir dir="${target.docs.root}/entitylink-javadocs" />
+        <copy todir="${target.docs.root}/entitylink-javadocs">
+            <fileset dir="../modules/flowable-entitylink-service-api/target/site/apidocs" />
+        </copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-eventsubscription-service-api">
+            <arg line="javadoc:javadoc" />
+        </exec>
+        <mkdir dir="${target.docs.root}/eventsubscription-javadocs" />
+        <copy todir="${target.docs.root}/eventsubscription-javadocs">
+            <fileset dir="../modules/flowable-eventsubscription-service-api/target/site/apidocs" />
+        </copy>
+		
+		<exec executable="${mvn.executable}" dir="../modules/flowable-batch-service-api">
+            <arg line="javadoc:javadoc" />
+        </exec>
+        <mkdir dir="${target.docs.root}/batch-javadocs" />
+        <copy todir="${target.docs.root}/batch-javadocs">
+            <fileset dir="../modules/flowable-batch-service-api/target/site/apidocs" />
+        </copy>
+		
 		<!-- USERGUIDE -->
 		<exec executable="yarn" dir="../docs/docusaurus/website">
 			<arg line="run build" />
 		</exec>
-		<copy todir="${target.docs.root}">
-			<fileset dir="../docs/docusaurus/website/build/flowable-userguide" />
-		</copy>
 		<move todir="${target.newsite.root}">
-			<fileset dir="${target.docs.root}/assets/static" />
+			<fileset dir="../docs/docusaurus/website/build/flowable-userguide/assets/static" />
 		</move>
 	</target>
 
