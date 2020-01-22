@@ -28,7 +28,7 @@ Basic HTTP access authentication is used, so you should always include a *Author
 
 ### Configuration
 
-The Flowable REST web application uses Spring Boot Configuration for starting the Flowable CMMN engine, defining the basic authentication security using Spring security, and to define the variable converters for specific variable handling.
+The Flowable REST web application uses the Spring Boot Flowable starter for starting the Flowable CMMN engine, defining the basic authentication security using Spring security, and to define the variable converters for specific variable handling.
 A small number of properties can be defined by changing the flowable-app.properties file .
 
 
@@ -714,9 +714,9 @@ The response body will contain the binary resource-content for the requested res
 ```
 
 
-* ++graphicalNotationDefined++: Indicates the case definition contains graphical information (BPMN DI).
-* ++resource++: Contains the actual deployed CMMN 1.1 xml.
-* ++diagramResource++: Contains a graphical representation of the case definition, null when no diagram is available.
+* `graphicalNotationDefined`: Indicates the case definition contains graphical information (BPMN DI).
+* `resource`: Contains the actual deployed CMMN 1.1 xml.
+* `diagramResource`: Contains a graphical representation of the case definition, null when no diagram is available.
 
 
 ### Get a case definition
@@ -753,9 +753,9 @@ The response body will contain the binary resource-content for the requested res
 }
 ```
 
-* ++graphicalNotationDefined++: Indicates the case definition contains graphical information (BPMN DI).
-* ++resource++: Contains the actual deployed BPMN 2.0 xml.
-* ++diagramResource++: Contains a graphical representation of the case, null when no diagram is available.
+* `graphicalNotationDefined`: Indicates the case definition contains graphical information (BPMN DI).
+* `resource`: Contains the actual deployed BPMN 2.0 xml.
+* `diagramResource`: Contains a graphical representation of the case, null when no diagram is available.
 
 
 ### Update category for a case definition
@@ -1354,8 +1354,8 @@ In case the variable is a binary variable or serializable, the +valueUrl+ points
 
 The request should be of type +multipart/form-data+. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:
 
-* ++name++: Required name of the variable.
-* ++type++: Type of variable that is created. If omitted, +binary+ is assumed and the binary data in the request will be stored as an array of bytes.
+* `name`: Required name of the variable.
+* `type`: Type of variable that is created. If omitted, +binary+ is assumed and the binary data in the request will be stored as an array of bytes.
 
 
 *Success response body:*
@@ -1389,8 +1389,8 @@ The request should be of type +multipart/form-data+. There should be a single fi
 *Request body:*
 The request should be of type +multipart/form-data+. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:
 
-* ++name++: Required name of the variable.
-* ++type++: Type of variable that is created. If omitted, +binary+ is assumed and the binary data in the request will be stored as an array of bytes.
+* `name`: Required name of the variable.
+* `type`: Type of variable that is created. If omitted, +binary+ is assumed and the binary data in the request will be stored as an array of bytes.
 
 
 |Response code|Description|
@@ -1469,48 +1469,42 @@ The request should be of type +multipart/form-data+. There should be a single fi
         {
             "id": "09618702-3c78-11ea-8548-38c986587585",
             "url": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/plan-item-instances/09618702-3c78-11ea-8548-38c986587585",
+            "name": null,
             "caseInstanceId": "095fd94e-3c78-11ea-8548-38c986587585",
             "caseInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/case-instances/095fd94e-3c78-11ea-8548-38c986587585",
             "caseDefinitionId": "59fd213c-3c6b-11ea-8548-38c986587585",
             "caseDefinitionUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-repository/case-definitions/59fd213c-3c6b-11ea-8548-38c986587585",
+            "derivedCaseDefinitionId": null,
+            "derivedCaseDefinitionUrl": null,
             "stageInstanceId": null,
-            "stageInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/plan-item-instances/null",
+            "stageInstanceUrl": null,
             "planItemDefinitionId": "expandedStage1",
             "planItemDefinitionType": "stage",
             "state": "active",
             "stage": true,
             "elementId": "planItem2",
-            "createTime": "2020-01-21T18:01:23.934+0000",
+            "createTime": "2020-01-21T19:01:23.934+01:00",
+            "lastAvailableTime": "2020-01-21T19:01:23.942+01:00",
+            "lastEnabledTime": null,
+            "lastDisabledTime": null,
+            "lastStartedTime": "2020-01-21T19:01:23.974+01:00",
+            "lastSuspendedTime": null,
+            "completedTime": null,
+            "occurredTime": null,
+            "terminatedTime": null,
+            "exitTime": null,
+            "endedTime": null,
             "startUserId": null,
             "referenceId": null,
             "referenceType": null,
-            "completeable": false,
+            "completable": false,
+            "entryCriterionId": null,
+            "exitCriterionId": null,
+            "formKey": null,
+            "extraValue": null,
             "tenantId": ""
         },
-        {
-            "id": "096382d4-3c78-11ea-8548-38c986587585",
-            "url": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/plan-item-instances/096382d4-3c78-11ea-8548-38c986587585",
-            "caseInstanceId": "095fd94e-3c78-11ea-8548-38c986587585",
-            "caseInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/case-instances/095fd94e-3c78-11ea-8548-38c986587585",
-            "caseDefinitionId": "59fd213c-3c6b-11ea-8548-38c986587585",
-            "caseDefinitionUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-repository/case-definitions/59fd213c-3c6b-11ea-8548-38c986587585",
-            "stageInstanceId": "09618702-3c78-11ea-8548-38c986587585",
-            "stageInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/plan-item-instances/09618702-3c78-11ea-8548-38c986587585",
-            "planItemDefinitionId": "humanTask1",
-            "planItemDefinitionType": "humantask",
-            "state": "active",
-            "stage": false,
-            "elementId": "planItem1",
-            "createTime": "2020-01-21T18:01:23.948+0000",
-            "startUserId": null,
-            "referenceId": null,
-            "referenceType": null,
-            "completeable": false,
-            "tenantId": ""
-        },
-        {
-            ...
-        }
+        ...
     ],
     "total": 3,
     "start": 0,
@@ -1537,25 +1531,41 @@ The request should be of type +multipart/form-data+. There should be a single fi
 
 ```
 {
-    "id": "096382d4-3c78-11ea-8548-38c986587585",
-    "url": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/plan-item-instances/096382d4-3c78-11ea-8548-38c986587585",
-    "name": "My task",
+    "id": "09618702-3c78-11ea-8548-38c986587585",
+    "url": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/plan-item-instances/09618702-3c78-11ea-8548-38c986587585",
+    "name": null,
     "caseInstanceId": "095fd94e-3c78-11ea-8548-38c986587585",
     "caseInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/case-instances/095fd94e-3c78-11ea-8548-38c986587585",
     "caseDefinitionId": "59fd213c-3c6b-11ea-8548-38c986587585",
     "caseDefinitionUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-repository/case-definitions/59fd213c-3c6b-11ea-8548-38c986587585",
-    "stageInstanceId": "09618702-3c78-11ea-8548-38c986587585",
-    "stageInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-runtime/plan-item-instances/09618702-3c78-11ea-8548-38c986587585",
-    "planItemDefinitionId": "humanTask1",
-    "planItemDefinitionType": "humantask",
+    "derivedCaseDefinitionId": null,
+    "derivedCaseDefinitionUrl": null,
+    "stageInstanceId": null,
+    "stageInstanceUrl": null,
+    "planItemDefinitionId": "expandedStage1",
+    "planItemDefinitionType": "stage",
     "state": "active",
-    "stage": false,
-    "elementId": "planItem1",
-    "createTime": "2020-01-21T18:01:23.948+0000",
+    "stage": true,
+    "elementId": "planItem2",
+    "createTime": "2020-01-21T19:01:23.934+01:00",
+    "lastAvailableTime": "2020-01-21T19:01:23.942+01:00",
+    "lastEnabledTime": null,
+    "lastDisabledTime": null,
+    "lastStartedTime": "2020-01-21T19:01:23.974+01:00",
+    "lastSuspendedTime": null,
+    "completedTime": null,
+    "occurredTime": null,
+    "terminatedTime": null,
+    "exitTime": null,
+    "endedTime": null,
     "startUserId": null,
     "referenceId": null,
     "referenceType": null,
-    "completeable": false,
+    "completable": false,
+    "entryCriterionId": null,
+    "exitCriterionId": null,
+    "formKey": null,
+    "extraValue": null,
     "tenantId": ""
 }
 ```
@@ -1797,7 +1807,7 @@ Claims the task by the given assignee. If the assignee is +null+, the task is as
 |200|Indicates the action was executed.|
 |400|When the body contains an invalid value or when the assignee is missing when the action requires it.|
 |404|Indicates the requested task was not found.|
-|409|Indicates the action cannot be performed due to a conflict. Either the task was updates simultaneously or the task was claimed by another user, in case of the '++claim++' action.|
+|409|Indicates the action cannot be performed due to a conflict. Either the task was updates simultaneously or the task was claimed by another user, in case of the '`claim`' action.|
 
 ### Delete a task
 
@@ -1824,7 +1834,7 @@ Claims the task by the given assignee. If the assignee is +null+, the task is as
 |Parameter|Required|Value|Description|
 |-|-|-|-|
 |taskId|Yes|String|The id of the task to get variables for.|
-|scope|False|String|Scope of variables to be returned. When '++local++', only task-local variables are returned. When '++global++', only variables from the task's parent execution-hierarchy are returned. When the parameter is omitted, both local and global variables are returned.|
+|scope|False|String|Scope of variables to be returned. When '`local`', only task-local variables are returned. When '`global`', only variables from the task's parent execution-hierarchy are returned. When the parameter is omitted, both local and global variables are returned.|
 
 |Response code|Description|
 |-|-|
@@ -1866,7 +1876,7 @@ Claims the task by the given assignee. If the assignee is +null+, the task is as
 |-|-|-|-|
 |taskId|Yes|String|The id of the task to get a variable for.|
 |variableName|Yes|String|The name of the variable to get.|
-|scope|False|String|Scope of variable to be returned. When '++local++', only task-local variable value is returned. When '++global++', only variable value from the task's parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.|
+|scope|False|String|Scope of variable to be returned. When '`local`', only task-local variable value is returned. When '`global`', only variable value from the task's parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.|
 
 |Response code|Description|
 |-|-|
@@ -1895,7 +1905,7 @@ Claims the task by the given assignee. If the assignee is +null+, the task is as
 |-|-|-|-|
 |taskId|Yes|String|The id of the task to get a variable data for.|
 |variableName|Yes|String|The name of the variable to get data for. Only variables of type +binary+ and +serializable+ can be used. If any other type of variable is used, a +404+ is returned.|
-|scope|False|String|Scope of variable to be returned. When '++local++', only task-local variable value is returned. When '++global++', only variable value from the task's parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.|
+|scope|False|String|Scope of variable to be returned. When '`local`', only task-local variable value is returned. When '`global`', only variable value from the task's parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.|
 
 |Response code|Description|
 |-|-|
@@ -1935,10 +1945,10 @@ The response body contains the binary value of the variable. When the variable i
 
 The request body should be an array containing one or more JSON-objects representing the variables that should be created.
 
-* ++name++: Required name of the variable
-* ++scope++: Scope of variable that is created. If omitted, +local+ is assumed.
-* ++type++: Type of variable that is created. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).
-* ++value++: Variable value.
+* `name`: Required name of the variable
+* `scope`: Scope of variable that is created. If omitted, +local+ is assumed.
+* `type`: Type of variable that is created. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).
+* `value`: Variable value.
 
 |Response code|Description|
 |-|-|
@@ -1961,9 +1971,9 @@ The request body should be an array containing one or more JSON-objects represen
 
 The request should be of type +multipart/form-data+. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:
 
-* ++name++: Required name of the variable.
-* ++scope++: Scope of variable that is created. If omitted, +local+ is assumed.
-* ++type++: Type of variable that is created. If omitted, +binary+ is assumed and the binary data in the request will be stored as an array of bytes.
+* `name`: Required name of the variable.
+* `scope`: Scope of variable that is created. If omitted, +local+ is assumed.
+* `type`: Type of variable that is created. If omitted, +binary+ is assumed and the binary data in the request will be stored as an array of bytes.
 
 |Response code|Description|
 |-|-|
@@ -1993,10 +2003,10 @@ The request should be of type +multipart/form-data+. There should be a single fi
 }
 ```
 
-* ++name++: Required name of the variable
-* ++scope++: Scope of variable that is updated. If omitted, +local+ is assumed.
-* ++type++: Type of variable that is updated. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).
-* ++value++: Variable value.
+* `name`: Required name of the variable
+* `scope`: Scope of variable that is updated. If omitted, +local+ is assumed.
+* `type`: Type of variable that is updated. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).
+* `value`: Variable value.
 
 |Response code|Description|
 |-|-|
@@ -2017,9 +2027,9 @@ The request should be of type +multipart/form-data+. There should be a single fi
 
 The request should be of type +multipart/form-data+. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:
 
-* ++name++: Required name of the variable.
-* ++scope++: Scope of variable that is updated. If omitted, +local+ is assumed.
-* ++type++: Type of variable that is updated. If omitted, +binary+ is assumed and the binary data in the request will be stored as an array of bytes.
+* `name`: Required name of the variable.
+* `scope`: Scope of variable that is updated. If omitted, +local+ is assumed.
+* `type`: Type of variable that is updated. If omitted, +binary+ is assumed and the binary data in the request will be stored as an array of bytes.
 
 |Response code|Description|
 |-|-|
@@ -2540,8 +2550,10 @@ Due to the fact a plan item instance can move between different states, followin
             "name": null,
             "state": "active",
             "caseDefinitionId": "59fd213c-3c6b-11ea-8548-38c986587585",
+            "derivedCaseDefinitionId": null,
             "caseInstanceId": "095fd94e-3c78-11ea-8548-38c986587585",
             "stageInstanceId": null,
+            "stage": true,
             "elementId": "planItem2",
             "planItemDefinitionId": "expandedStage1",
             "planItemDefinitionType": "stage",
@@ -2556,44 +2568,21 @@ Due to the fact a plan item instance can move between different states, followin
             "terminatedTime": null,
             "exitTime": null,
             "endedTime": null,
+            "lastUpdatedTime": "2020-01-21T19:01:23.974+01:00",
             "startUserId": null,
             "referenceId": null,
             "referenceType": null,
+            "entryCriterionId": null,
+            "exitCriterionId": null,
+            "formKey": null,
+            "extraValue": null,
+            "showInOverview": true,
             "tenantId": "",
             "url": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-history/historic-planitem-instances/09618702-3c78-11ea-8548-38c986587585",
-            "historicCaseInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-history/historic-case-instances/095fd94e-3c78-11ea-8548-38c986587585",
+            "caseInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-history/historic-case-instances/095fd94e-3c78-11ea-8548-38c986587585",
             "caseDefinitionUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-repository/case-definitions/59fd213c-3c6b-11ea-8548-38c986587585",
-            "stage": true
-        },
-        {
-            "id": "0961ae13-3c78-11ea-8548-38c986587585",
-            "name": null,
-            "state": "available",
-            "caseDefinitionId": "59fd213c-3c6b-11ea-8548-38c986587585",
-            "caseInstanceId": "095fd94e-3c78-11ea-8548-38c986587585",
-            "stageInstanceId": null,
-            "elementId": "planItem3",
-            "planItemDefinitionId": "expandedStage2",
-            "planItemDefinitionType": "stage",
-            "createTime": "2020-01-21T19:01:23.936+01:00",
-            "lastAvailableTime": "2020-01-21T19:01:23.942+01:00",
-            "lastEnabledTime": null,
-            "lastDisabledTime": null,
-            "lastStartedTime": null,
-            "lastSuspendedTime": null,
-            "completedTime": null,
-            "occurredTime": null,
-            "terminatedTime": null,
-            "exitTime": null,
-            "endedTime": null,
-            "startUserId": null,
-            "referenceId": null,
-            "referenceType": null,
-            "tenantId": "",
-            "url": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-history/historic-planitem-instances/0961ae13-3c78-11ea-8548-38c986587585",
-            "historicCaseInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-history/historic-case-instances/095fd94e-3c78-11ea-8548-38c986587585",
-            "caseDefinitionUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-repository/case-definitions/59fd213c-3c6b-11ea-8548-38c986587585",
-            "stage": true
+            "derivedCaseDefinitionUrl": null,
+            "stageInstanceUrl": null
         },
         ...
     ],
@@ -2623,11 +2612,13 @@ Due to the fact a plan item instance can move between different states, followin
 ```
 {
     "id": "09618702-3c78-11ea-8548-38c986587585",
-    "name": "First Stage",
+    "name": "My Stage",
     "state": "active",
     "caseDefinitionId": "59fd213c-3c6b-11ea-8548-38c986587585",
+    "derivedCaseDefinitionId": null,
     "caseInstanceId": "095fd94e-3c78-11ea-8548-38c986587585",
     "stageInstanceId": null,
+    "stage": true,
     "elementId": "planItem2",
     "planItemDefinitionId": "expandedStage1",
     "planItemDefinitionType": "stage",
@@ -2642,14 +2633,21 @@ Due to the fact a plan item instance can move between different states, followin
     "terminatedTime": null,
     "exitTime": null,
     "endedTime": null,
+    "lastUpdatedTime": "2020-01-21T19:01:23.974+01:00",
     "startUserId": null,
     "referenceId": null,
     "referenceType": null,
+    "entryCriterionId": null,
+    "exitCriterionId": null,
+    "formKey": null,
+    "extraValue": null,
+    "showInOverview": true,
     "tenantId": "",
     "url": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-history/historic-planitem-instances/09618702-3c78-11ea-8548-38c986587585",
-    "historicCaseInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-history/historic-case-instances/095fd94e-3c78-11ea-8548-38c986587585",
+    "caseInstanceUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-history/historic-case-instances/095fd94e-3c78-11ea-8548-38c986587585",
     "caseDefinitionUrl": "http://localhost:8080/flowable-rest/cmmn-api/cmmn-repository/case-definitions/59fd213c-3c6b-11ea-8548-38c986587585",
-    "stage": true
+    "derivedCaseDefinitionUrl": null,
+    "stageInstanceUrl": null
 }
 ```
 
