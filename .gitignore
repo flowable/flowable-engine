@@ -24,3 +24,4 @@ userguide-cmmn/src/en/output
 docker/all-in-one/assets
 k8s/flowable/charts
 requirements.lock
+docs/docusaurus/website/build/

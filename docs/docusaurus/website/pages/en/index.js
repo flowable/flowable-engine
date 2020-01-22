@@ -117,6 +117,7 @@ class Index extends React.Component {
 In addition we’ve added Swagger in Flowable v6. Boot up the Flowable REST app to try it out by accessing http://localhost:8080/flowable-rest/docs</MarkdownBlock>
           <PromoSection>
             <Button href={docUrl('bpmn/ch15-REST')}>BPMN</Button>
+            <Button href={docUrl('cmmn/ch08-REST')}>CMMN</Button>
             <Button href={docUrl('dmn/ch07-REST')}>DMN</Button>
             <Button href={docUrl('eventregistry/ch07-REST')}>Event Registry</Button>
             <Button href={docUrl('form/ch07-REST')}>Form</Button>
