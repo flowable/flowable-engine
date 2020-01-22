@@ -23,7 +23,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.assertj.core.api.Assertions;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -31,8 +30,6 @@ import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 
 /**
  * Test for all REST-operations related to a single plan item instance resource.
