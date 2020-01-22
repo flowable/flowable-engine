@@ -83,6 +83,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         ServiceTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         DecisionTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         HttpTaskJsonConverter.fillTypes(convertersToCmmnMap);
+        MailTaskJsonConverter.fillTypes(convertersToCmmnMap);
         SendEventTaskJsonConverter.fillTypes(convertersToCmmnMap);
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);

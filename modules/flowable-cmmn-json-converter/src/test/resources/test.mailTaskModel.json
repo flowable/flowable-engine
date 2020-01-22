@@ -1,0 +1,121 @@
+{
+  "modelId": "64e9c20b-3d15-11ea-b0c9-acde48001122",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "case_id": "mailTaskCase",
+    "name": "Mail Task Case",
+    "documentation": "",
+    "case_initiatorvariablename": "",
+    "case_author": "",
+    "case_version": "",
+    "case_namespace": "http://www.flowable.org/casedef",
+    "eventkey": "",
+    "eventname": "",
+    "eventoutparameters": "",
+    "eventcorrelationparameters": "",
+    "channelkey": "",
+    "channelname": "",
+    "channeltype": "",
+    "channeldestination": "",
+    "keydetectionfixedvalue": "",
+    "keydetectionjsonfield": "",
+    "keydetectionjsonpointer": "",
+    "process_id": "mailTaskCase"
+  },
+  "childShapes": [
+    {
+      "resourceId": "casePlanModel",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "formfieldvalidation": true,
+        "autocompleteenabled": "",
+        "autocompletecondition": ""
+      },
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "childShapes": [
+        {
+          "resourceId": "sid-5D72F02D-4EE3-48D2-9CED-F98E3D7B55BD",
+          "properties": {
+            "overrideid": "mailTask",
+            "name": "Mail Task",
+            "documentation": "",
+            "servicetaskclass": "",
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": "",
+            "completionneutralenabled": "",
+            "completionneutralrulecondition": "",
+            "mailtaskheaders": "X-Test: test",
+            "mailtaskto": "test-to@test.com",
+            "mailtaskfrom": "test-from@test.com",
+            "mailtasksubject": "Test Subject",
+            "mailtaskcc": "test-cc@test.com",
+            "mailtaskbcc": "test-bcc@test.com",
+            "mailtasktext": "Test Text",
+            "mailtasktextvar": "testTextVar",
+            "mailtaskhtml": "Test HTML",
+            "mailtaskhtmlvar": "testHtmlVar",
+            "mailtaskcharset": "UTF-8",
+            "planitemlifecyclelisteners": ""
+          },
+          "stencil": {
+            "id": "MailTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 323.5,
+              "y": 327
+            },
+            "upperLeft": {
+              "x": 223.5,
+              "y": 247
+            }
+          },
+          "dockers": []
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 758,
+          "y": 754
+        },
+        "upperLeft": {
+          "x": 40,
+          "y": 40
+        }
+      },
+      "dockers": []
+    }
+  ],
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  }
+}

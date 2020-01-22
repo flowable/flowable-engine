@@ -1369,12 +1369,20 @@
           "MAILTASKTEXT": {
             "TITLE": "Text",
             "DESCRIPTION": "The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
+          },
+          "MAILTASKTEXTVAR" : {
+            "TITLE" : "TextVar",
+            "DESCRIPTION" : "The name of a case variable that holds the text that is the content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
           }
         },
         "MAILTASKHTMLPACKAGE": {
           "MAILTASKHTML": {
             "TITLE": "Html",
             "DESCRIPTION": "A piece of HTML that is the content of the e-mail."
+          },
+          "MAILTASKHTMLVAR" : {
+            "TITLE" : "HtmlVar",
+            "DESCRIPTION" : "The name of a case variable that holds the HTML that is the content of the e-mail."
           }
         },
         "MAILTASKCHARSETPACKAGE": {
@@ -1766,6 +1774,10 @@
         "HTTPTASK" : {
           "TITLE" : "Http task",
           "DESCRIPTION" : "A HTTP task"
+        },
+        "MAILTASK" : {
+          "TITLE" : "Mail task",
+          "DESCRIPTION" : "A mail task"
         },
         "SCRIPTTASK" : {
           "TITLE" : "Script task",
