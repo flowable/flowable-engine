@@ -83,6 +83,9 @@
       "cmmn/ch07-architecture": {
         "title": "Architecture"
       },
+      "cmmn/ch08-REST": {
+        "title": "REST API"
+      },
       "disclaimer": {
         "title": "Disclaimer"
       },

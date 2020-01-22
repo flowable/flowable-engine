@@ -29,7 +29,8 @@
     	"cmmn/ch04-Spring",
     	"cmmn/ch05-Deployment",
     	"cmmn/ch06-cmmn",
-    	"cmmn/ch07-architecture"
+    	"cmmn/ch07-architecture",
+		"cmmn/ch08-REST"
     ],
     "Event Registry User Guide": [
 		"eventregistry/ch02-Configuration",
