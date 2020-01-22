@@ -13,6 +13,9 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -20,6 +23,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.assertj.core.api.Assertions;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -28,10 +32,13 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
+
 /**
  * Test for all REST-operations related to a single plan item instance resource.
  * 
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
 
@@ -52,17 +59,46 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
         // Check resulting instance
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(planItem.getId(), responseNode.get("id").asText());
-        assertNull(responseNode.get("name"));
-        assertEquals("", responseNode.get("tenantId").asText());
-
-        assertEquals(url, responseNode.get("url").asText());
-        assertEquals(planItem.getCaseInstanceId(), responseNode.get("caseInstanceId").asText());
-        assertEquals(buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, planItem.getCaseInstanceId()), responseNode.get("caseInstanceUrl").asText());
-        assertEquals(planItem.getCaseDefinitionId(), responseNode.get("caseDefinitionId").asText());
-        assertEquals(buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()), responseNode.get("caseDefinitionUrl").asText());
-        assertEquals(planItem.getState(), responseNode.get("state").asText());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+            .isEqualTo("{"
+                + "  id: '" + planItem.getId() + "',"
+                + "  url: '" + buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItem.getId()) + "',"
+                + "  name: 'The Task',"
+                + "  caseInstanceId: '" + caseInstance.getId() + "',"
+                + "  caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, planItem.getCaseInstanceId()) + "',"
+                + "  caseDefinitionId: '" + caseInstance.getCaseDefinitionId() + "',"
+                + "  caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, planItem.getCaseDefinitionId()) + "',"
+                + "  derivedCaseDefinitionId: null,"
+                + "  derivedCaseDefinitionUrl: null,"
+                + "  stageInstanceId: null,"
+                + "  stageInstanceUrl: null,"
+                + "  planItemDefinitionId: 'theTask',"
+                + "  planItemDefinitionType: 'humantask',"
+                + "  state: 'active',"
+                + "  stage: false,"
+                + "  elementId: 'planItem1',"
+                + "  createTime: '${json-unit.any-string}',"
+                + "  lastAvailableTime: '${json-unit.any-string}',"
+                + "  lastEnabledTime: null,"
+                + "  lastDisabledTime: null,"
+                + "  lastStartedTime: '${json-unit.any-string}',"
+                + "  lastSuspendedTime: null,"
+                + "  completedTime: null,"
+                + "  occurredTime: null,"
+                + "  terminatedTime: null,"
+                + "  exitTime: null,"
+                + "  endedTime: null,"
+                + "  startUserId: null,"
+                + "  referenceId: null,"
+                + "  referenceType: null,"
+                + "  completable: false,"
+                + "  entryCriterionId: null,"
+                + "  exitCriterionId: null,"
+                + "  formKey: null,"
+                + "  extraValue: null,"
+                + "  tenantId: ''"
+                + "}");
     }
 
     /**
