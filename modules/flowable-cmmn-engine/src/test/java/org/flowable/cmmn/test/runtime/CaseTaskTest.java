@@ -169,7 +169,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
             Task taskBeforeSubTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("The Task", taskBeforeSubTask.getName());
+            assertEquals("Task One", taskBeforeSubTask.getName());
             Task childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             assertEquals(taskBeforeSubTask.getId(), childTask.getId());
 
@@ -192,7 +192,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
             cmmnTaskService.complete(taskInSubTask.getId());
 
             Task taskAfterSubTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("The Task2", taskAfterSubTask.getName());
+            assertEquals("Task Two", taskAfterSubTask.getName());
             childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             assertEquals(taskAfterSubTask.getId(), childTask.getId());
 

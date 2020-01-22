@@ -269,6 +269,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
     // getters //////////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

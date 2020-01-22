@@ -26,6 +26,67 @@
 </ul>
 
 <h1>Flowable Release Notes</h1>
+
+<h3>Release Notes - Flowable - 6.5.0</h3>
+    
+<h4>GENERAL</h4>
+
+<ul>
+    <li>Added a new Event Registry engine which provides functionality to use Flowable in event driven architectures and has out-of-the-box support for JMS, Apache Kafka and RabbitMQ.
+    Events can be received by BPMN start events, boundary events and triggerable send event tasks. In CMMN receiving events is supported by event listeners and for starting new case instances.
+    Both engines also provide a send event task to send out an event to the event adapter implementation.</li>
+    <li>A new Batch service was added to support executing multiple jobs in one batch, where each job is a batch part. The first usage of the Batch service is the support for batch
+    process instance migration, but the Batch service is designed to support many use cases.</li>
+    <li>A first version of the Logging Session support has been added, which provides a full insight in the execution of case and process instances with all its child entities like tasks,
+    variables, event subscriptions etc. This can be useful for debugging purpose, problem detection in production environments or for audit purposes.</li>
+    <li>Various small bugfixes and improvements all around.</li>
+</ul>
+
+<h4>BPMN</h4>
+    
+<ul>
+    <li>Added support for Event Registry start events to trigger starting a process instance with an incoming event.</li>
+    <li>An Event Registry boundary event has been added to support triggering a running process instance with an incoming event, with correlation and tenant detection support.</li>
+    <li>Added an Event Registry send event task to support sending events from a process instance and optionally listening for a response event using the triggerable task support.</li>
+    <li>The process instance migration support has been enhanced with supporting batch migration. Migrating a process definition with all its running instances to a new process definition
+    is now possible with one batch, where each instance migration will be a batch part of a parent batch.</li>
+    <li>With historic information growing bigger over time, a way to cleaning this historic information was necessary. For this purpose a history cleaning job was added
+    that can be configured to clean historic information older than a configured time period.</li>
+    <li>To support the history clean job, delete methods have been added to the history query interfaces to also allow to delete historic data with other criteria
+    than just time period based parameters.</li>  
+</ul>
+    
+<h4>CMMN</h4>
+    
+<ul>
+    <li>Added support on a Case definition root level to listen for incoming events to start a new case instance.</li>
+    <li>An Event Registry event listener has been added to support triggering a running case instance with an incoming event, with correlation and tenant detection support.</li>
+    <li>Added an Event Registry send event task to support sending events from a case instance.</li>
+    <li>Added support to inject a Stage or a specific Task in a Stage instance of a running case instance. In this way a CMMN model can be enriched with
+    new Stage or Task logic for a specific case instance.</li>
+    <li>Java Collection support has been added to repetition rules for plan items. This is similar to the Java Collection support for BPMN multi-instance constructs.
+    A Java Collection variable or an expression can be used to define a repetition rule.</li>
+    <li>Enriched the support for evaluating if a Stage can be completed. On a plan item a parent completion rule can be defined with a type that matches the desired evaluation logic.</li> 
+</ul>
+
+<h4>EVENT REGISTRY</h4>
+    
+<ul>
+    <li>A new engine was added with the regular deployment and deployment resources support to follow the pattern of the other engines.</li>
+    <li>Support for Event definitions which define the event payload, the channel definition to use, and the optional correlation parameters of an incoming or outgoing event. The BPMN start event,
+    boundary event or send task or the CMMN Case element or event listener are linked to an Event definition based on a logical key, like it's also the case for, for example,
+    BPMN call activities and CMMN case tasks.</li>
+    <li>Support for Channel definitions which define the source or target destination, with a specific adapter type (JMS, Kafka or RabbitMQ by default). Also an event key detection
+    and an optional tenant id detection configuration can be provided. An Event definition links to a Channel definition based on the Channel logical key.</li>
+    <li>When using the Event Registry Spring module, there are 3 out-of-the-box adapters supported, JMS, Kafka and RabbitMQ.</li>
+</ul>
+
+<h4>DMN</h4>
+    
+<ul>
+    <li>Added support for DMN 1.2, which is the revision of the DMN 1.1 specification. The Collect hit policy logic was changed to not only consider unique outcome values
+    but every outcome value for which the rule was hit. This was changed in the DMN 1.2 specification version.</li>
+</ul>
 	
 <h3>Release Notes - Flowable - 6.4.2</h3>
 	
@@ -53,8 +114,6 @@
     <li>Added support to listen to signal events in a CMMN case model. This enables more options to interact from a BPMN process instance with a CMMN case instance.</li>
     <li>Added 'available condition' to CMMN event listeners (e.g. user or timer event listener) to guard precisely when an event listener becomes available. See the documentation for examples.</li>
 </ul>
-
-<h4>Highlights</h4>
 	
 <h3>Release Notes - Flowable - 6.4.1</h3>
 

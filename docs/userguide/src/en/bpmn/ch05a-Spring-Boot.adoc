@@ -44,7 +44,7 @@ You can now run your Spring Boot application:
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class MyApplication {
 
     public static void main(String[] args) {
@@ -178,7 +178,7 @@ Also, add following code lines to test if the deployment actually worked. The _C
 
 [source,java,linenums]
 ----
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class MyApplication {
 
     public static void main(String[] args) {
@@ -625,7 +625,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 ----
 {
   "flowable": {
-    "version": "6.5.0-SNAPSHOT"
+    "version": "6.5.0.event-SNAPSHOT"
   }
 }
 ----

@@ -37,7 +37,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
     SecurityConfiguration.class,
     DevelopmentConfiguration.class
 })
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class FlowableRestApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

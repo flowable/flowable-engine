@@ -1,0 +1,23 @@
+{
+  "key": "customer",
+  "name": "My event",
+  "outboundChannelKeys": [
+    "outboundCustomer"
+  ],
+  "correlationParameters": [
+    {
+      "name": "customer",
+      "type": "string"
+    }
+  ],
+  "payload": [
+    {
+      "name": "customer",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    }
+  ]
+}

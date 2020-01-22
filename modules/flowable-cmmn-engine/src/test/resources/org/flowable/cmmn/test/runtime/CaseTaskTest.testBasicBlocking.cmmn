@@ -9,11 +9,11 @@
     <case id="myCase">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
 
-            <planItem id="planItem1" name="Task One" definitionRef="theTask" />
+            <planItem id="planItem1" name="Task One" definitionRef="task1" />
             <planItem id="planItem2" name="The Case" definitionRef="theCase">
                 <entryCriterion sentryRef="sentry1" />
             </planItem>
-            <planItem id="planItem3" name="Task Two" definitionRef="theTask">
+            <planItem id="planItem3" name="Task Two" definitionRef="task2">
                 <entryCriterion sentryRef="sentry2" />
             </planItem>
 
@@ -28,7 +28,8 @@
                 </planItemOnPart>
             </sentry>
 
-            <task id="theTask" name="The Task" isBlocking="true" />
+            <task id="task1" name="Task One" isBlocking="true" />
+            <task id="task2" name="Task Two" isBlocking="true" />
             <caseTask id="theCase" caseRef="oneTaskCase" />
 
         </casePlanModel>

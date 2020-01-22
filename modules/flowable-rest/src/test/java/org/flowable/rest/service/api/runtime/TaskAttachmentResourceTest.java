@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -24,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -196,8 +196,9 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
                     HttpStatus.SC_OK);
 
             // Check response body
-            String responseBodyString = IOUtils.toString(response.getEntity().getContent());
-            assertEquals("This is binary content", responseBodyString);
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
 
             // Check response headers
             assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
@@ -343,7 +344,9 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             assertEquals(1, attachments.size());
 
             Attachment binaryAttachment = attachments.get(0);
-            assertEquals("This is binary content", IOUtils.toString(taskService.getAttachmentContent(binaryAttachment.getId())));
+            try (InputStream contentStream = taskService.getAttachmentContent(binaryAttachment.getId())) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);

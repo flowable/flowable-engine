@@ -232,6 +232,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
 
     // getters ////////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

@@ -154,6 +154,7 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
 
     // getters ////////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

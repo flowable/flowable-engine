@@ -14,7 +14,7 @@
 
 package org.activiti.standalone.calendar;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -114,7 +114,7 @@ public class DurationHelperTest {
         DurationHelper dh = new DurationHelper("R2/2013-11-03T00:45:00-04:00/PT1H", testingClock);
         Calendar expected = parseCalendarWithOffset("20131103-01:45:00-04:00", TimeZone.getTimeZone("US/Eastern"));
 
-        assertEquals(expected, dh.getCalendarAfter());
+        assertEquals(0, expected.compareTo(dh.getCalendarAfter()));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class DurationHelperTest {
         DurationHelper dh = new DurationHelper("R2/2013-11-03T00:45:00-04:00/PT2H", testingClock);
         Calendar expected = parseCalendarWithOffset("20131103-01:45:00-05:00", TimeZone.getTimeZone("US/Eastern"));
 
-        assertEquals(expected, dh.getCalendarAfter());
+        assertEquals(0, expected.compareTo(dh.getCalendarAfter()));
     }
 
     @Test

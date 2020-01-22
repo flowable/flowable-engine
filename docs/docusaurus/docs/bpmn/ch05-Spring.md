@@ -7,7 +7,7 @@ While you can definitely use Flowable without Spring, we’ve provided some very
 
 ## ProcessEngineFactoryBean
 
-The ProcessEngine can be configured as a regular Spring bean. The starting point of the integration is the class org.flowable.spring.ProcessEngineFactoryBean. That bean takes a process engine configuration and creates the process engine. This means that the creation and configuration of properties for Spring is the same as documented in the [configuration section](#configuration). For Spring integration, the configuration and engine beans will look like this:
+The ProcessEngine can be configured as a regular Spring bean. The starting point of the integration is the class org.flowable.spring.ProcessEngineFactoryBean. That bean takes a process engine configuration and creates the process engine. This means that the creation and configuration of properties for Spring is the same as documented in the [configuration section](bpmn/ch03-Configuration.md#creating-a-processengine). For Spring integration, the configuration and engine beans will look like this:
 
     <bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
         ...
@@ -129,7 +129,7 @@ The UserBean looks like this. Remember, from above in the Spring bean configurat
 
 ## Expressions
 
-When using the ProcessEngineFactoryBean, all [expressions](#apiExpressions) in the BPMN processes will also 'see' all the Spring beans, by default. It’s possible to limit the beans (even none) you want to expose in expressions using a map that you can configure. The example below exposes a single bean (printer), available to use under the key "printer". **To have NO beans exposed at all, just pass an empty list as 'beans' property on the SpringProcessEngineConfiguration. When no 'beans' property is set, all Spring beans in the context will be available.**
+When using the ProcessEngineFactoryBean, all [expressions](bpmn/ch04-API.md#expressions) in the BPMN processes will also 'see' all the Spring beans, by default. It’s possible to limit the beans (even none) you want to expose in expressions using a map that you can configure. The example below exposes a single bean (printer), available to use under the key "printer". **To have NO beans exposed at all, just pass an empty list as 'beans' property on the SpringProcessEngineConfiguration. When no 'beans' property is set, all Spring beans in the context will be available.**
 
     <bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
       ...
@@ -217,7 +217,7 @@ In addition to using the values listed above for deploymentMode, you may require
 
 ## Unit testing
 
-When integrating with Spring, business processes can be tested very easily using the standard [Flowable testing facilities](#apiUnitTesting).
+When integrating with Spring, business processes can be tested very easily using the standard [Flowable testing facilities](bpmn/ch04-API.md#unit-testing).
 The following examples show how a business process is tested in typical Spring-based JUnit 4 and 5 test:
 
 **JUnit 5 test.**

@@ -32,6 +32,12 @@
                             {{'MODEL.SAVE.NEWVERSION' | translate}}
                         </label>
                     </div>
+                    <div class="checkbox" ng-show="!error && !error.isConflict">
+                        <label>
+                            <input type="checkbox" ng-disabled="status.loading" ng-model="saveDialog.forceDMN11">
+                            {{'DECISION-TABLE.POPUP.FORCE-DMN-11' | translate}}
+                        </label>
+                    </div>
                     <div class="form-group" ng-if="saveDialog.newVersion">
                         <label for="commentTextArea">{{'MODEL.SAVE.COMMENT' | translate}}</label>
                         <textarea id="commentTextArea" class="form-control" ng-model="saveDialog.comment" ng-disabled="status.loading"></textarea>

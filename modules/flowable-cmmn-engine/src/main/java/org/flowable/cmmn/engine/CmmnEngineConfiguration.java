@@ -36,6 +36,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.DecisionTableVariableManager;
+import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
@@ -62,6 +63,7 @@ import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventRegistryEventConsumer;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
@@ -126,6 +128,7 @@ import org.flowable.cmmn.engine.impl.parser.handler.MilestoneParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.PlanFragmentParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ProcessTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ScriptTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.SendEventServiceTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ServiceTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.SignalEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.StageParseHandler;
@@ -181,6 +184,7 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.runtime.DefaultCmmnDynamicStateManager;
+import org.flowable.cmmn.engine.impl.runtime.DynamicCmmnServiceImpl;
 import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
@@ -237,6 +241,8 @@ import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
+import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
@@ -285,10 +291,13 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JodaDateTimeType;
 import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.LocalDateTimeType;
+import org.flowable.variable.service.impl.types.LocalDateType;
 import org.flowable.variable.service.impl.types.LongJsonType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
@@ -297,8 +306,6 @@ import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
         ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes {
@@ -311,6 +318,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 
     protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl(this);
+    protected DynamicCmmnService dynamicCmmnService = new DynamicCmmnServiceImpl(this);
     protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl(this);
     protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl(this);
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl(this);
@@ -340,6 +348,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager;
 
     protected boolean disableIdmEngine;
+    
+    protected boolean disableEventRegistry;
     
     protected CandidateManager candidateManager;
     
@@ -449,7 +459,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
@@ -740,6 +749,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected FormFieldHandler formFieldHandler;
     protected boolean isFormFieldValidationEnabled;
+    
+    protected EventRegistryEventConsumer eventRegistryEventConsumer;
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -788,7 +799,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         CmmnEngineImpl cmmnEngine = new CmmnEngineImpl(this);
 
         if (handleCmmnEngineExecutorsAfterEngineCreate) {
-            cmmnEngine.handleExecutors();
+            cmmnEngine.startExecutors();
         }
 
         return cmmnEngine;
@@ -860,6 +871,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initAsyncHistoryExecutor();
         initScriptingEngines();
         configuratorsAfterInit();
+        afterInitEventRegistryEventBusConsumer();
         
         initHistoryCleaningManager();
     }
@@ -1053,6 +1065,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initServices() {
         initService(cmmnRuntimeService);
+        initService(dynamicCmmnService);
         initService(cmmnTaskService);
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
@@ -1246,6 +1259,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnParseHandlers.add(new ProcessTaskParseHandler());
         cmmnParseHandlers.add(new ScriptTaskParseHandler());
         cmmnParseHandlers.add(new ServiceTaskParseHandler());
+        cmmnParseHandlers.add(new SendEventServiceTaskParseHandler());
         cmmnParseHandlers.add(new StageParseHandler());
         cmmnParseHandlers.add(new HttpTaskParseHandler());
         cmmnParseHandlers.add(new CasePageTaskParseHandler());
@@ -1360,6 +1374,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
     
+    public void afterInitEventRegistryEventBusConsumer() {
+        EventRegistryEventConsumer cmmnEventRegistryEventConsumer = null;
+        if (eventRegistryEventConsumer != null) {
+            cmmnEventRegistryEventConsumer = eventRegistryEventConsumer;
+        } else {
+            cmmnEventRegistryEventConsumer = new CmmnEventRegistryEventConsumer(this);
+        }
+        
+        addEventRegistryEventConsumer(cmmnEventRegistryEventConsumer.getConsumerKey(), cmmnEventRegistryEventConsumer);
+    }
+    
     public void initHistoryCleaningManager() {
         if (cmmnHistoryCleaningManager == null) {
             cmmnHistoryCleaningManager = new DefaultCmmnHistoryCleaningManager(this);
@@ -1402,6 +1427,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             variableTypes.addType(new IntegerType());
             variableTypes.addType(new LongType());
             variableTypes.addType(new DateType());
+            variableTypes.addType(new InstantType());
+            variableTypes.addType(new LocalDateType());
+            variableTypes.addType(new LocalDateTimeType());
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
@@ -1436,6 +1464,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+        this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
 
         this.variableServiceConfiguration.init();
 
@@ -1867,16 +1896,28 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
         }
     }
-    
+
     @Override
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
-        if (!disableIdmEngine) {
+        if (!disableIdmEngine || !disableEventRegistry) {
             List<EngineConfigurator> specificConfigurators = new ArrayList<>();
-            if (idmEngineConfigurator != null) {
-                specificConfigurators.add(idmEngineConfigurator);
-            } else {
-                specificConfigurators.add(new IdmEngineConfigurator());
+            
+            if (!disableIdmEngine) {
+                if (idmEngineConfigurator != null) {
+                    specificConfigurators.add(idmEngineConfigurator);
+                } else {
+                    specificConfigurators.add(new IdmEngineConfigurator());
+                }
             }
+            
+            if (!disableEventRegistry) {
+                if (eventRegistryConfigurator != null) {
+                    specificConfigurators.add(eventRegistryConfigurator);
+                } else {
+                    specificConfigurators.add(new EventRegistryEngineConfigurator());
+                }
+            }
+            
             return specificConfigurators;
         }
         return Collections.emptyList();
@@ -1903,6 +1944,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCmmnRuntimeService(CmmnRuntimeService cmmnRuntimeService) {
         this.cmmnRuntimeService = cmmnRuntimeService;
+        return this;
+    }
+
+    @Override
+    public DynamicCmmnService getDynamicCmmnService() {
+        return dynamicCmmnService;
+    }
+
+    public CmmnEngineConfiguration setDynamicCmmnService(DynamicCmmnService dynamicCmmnService) {
+        this.dynamicCmmnService = dynamicCmmnService;
         return this;
     }
 
@@ -2755,21 +2806,21 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public CmmnEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-        return this;
-    }
-
     public boolean isDisableIdmEngine() {
         return disableIdmEngine;
     }
 
     public CmmnEngineConfiguration setDisableIdmEngine(boolean disableIdmEngine) {
         this.disableIdmEngine = disableIdmEngine;
+        return this;
+    }
+    
+    public boolean isDisableEventRegistry() {
+        return disableEventRegistry;
+    }
+
+    public CmmnEngineConfiguration setDisableEventRegistry(boolean disableEventRegistry) {
+        this.disableEventRegistry = disableEventRegistry;
         return this;
     }
 
@@ -2852,6 +2903,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setBusinessCalendarManager(BusinessCalendarManager businessCalendarManager) {
         this.businessCalendarManager = businessCalendarManager;
+        return this;
+    }
+    
+    public EventRegistryEventConsumer getEventRegistryEventConsumer() {
+        return eventRegistryEventConsumer;
+    }
+
+    public CmmnEngineConfiguration setEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventConsumer) {
+        this.eventRegistryEventConsumer = eventRegistryEventConsumer;
         return this;
     }
 
@@ -3378,6 +3438,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
+        return eventSubscriptionServiceConfiguration;
+    }
+
+    public CmmnEngineConfiguration setEventSubscriptionServiceConfiguration(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
+        this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
+        return this;
+    }
+
     public Map<String, HistoryJobHandler> getHistoryJobHandlers() {
         return historyJobHandlers;
     }
@@ -3604,39 +3673,46 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return enableHistoryCleaning;
     }
 
-    public void setEnableHistoryCleaning(boolean enableHistoryCleaning) {
+    public CmmnEngineConfiguration setEnableHistoryCleaning(boolean enableHistoryCleaning) {
         this.enableHistoryCleaning = enableHistoryCleaning;
+        return this;
     }
 
     public String getHistoryCleaningTimeCycleConfig() {
         return historyCleaningTimeCycleConfig;
     }
 
-    public void setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
+    public CmmnEngineConfiguration setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
         this.historyCleaningTimeCycleConfig = historyCleaningTimeCycleConfig;
+        return this;
     }
 
     public int getCleanInstancesEndedAfterNumberOfDays() {
         return cleanInstancesEndedAfterNumberOfDays;
     }
 
-    public void setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
+    public CmmnEngineConfiguration setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
         this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+        return this;
     }
 
     public CmmnHistoryCleaningManager getCmmnHistoryCleaningManager() {
         return cmmnHistoryCleaningManager;
     }
 
-    public void setCmmnHistoryCleaningManager(CmmnHistoryCleaningManager cmmnHistoryCleaningManager) {
+    public CmmnEngineConfiguration setCmmnHistoryCleaningManager(CmmnHistoryCleaningManager cmmnHistoryCleaningManager) {
         this.cmmnHistoryCleaningManager = cmmnHistoryCleaningManager;
+        return this;
     }
 
     public boolean isHandleCmmnEngineExecutorsAfterEngineCreate() {
         return handleCmmnEngineExecutorsAfterEngineCreate;
     }
 
-    public void setHandleCmmnEngineExecutorsAfterEngineCreate(boolean handleCmmnEngineExecutorsAfterEngineCreate) {
+    public CmmnEngineConfiguration setHandleCmmnEngineExecutorsAfterEngineCreate(boolean handleCmmnEngineExecutorsAfterEngineCreate) {
         this.handleCmmnEngineExecutorsAfterEngineCreate = handleCmmnEngineExecutorsAfterEngineCreate;
+        return this;
     }
+
+
 }

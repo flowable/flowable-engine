@@ -9,7 +9,7 @@
     <case id="oneTaskCase" name="oneTaskCaseName">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
             <planItem id="planItem1" name="The Task" definitionRef="theTask" />
-            <task id="theTask" isBlocking="true" />
+            <task id="theTask" name="The Task" isBlocking="true" />
         </casePlanModel>
     </case>
 

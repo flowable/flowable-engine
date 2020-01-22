@@ -70,6 +70,10 @@
             <artifactId>flowable-engine</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <scope>provided</scope>
@@ -165,6 +169,11 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

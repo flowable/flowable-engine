@@ -27,6 +27,7 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ExecutionQueryImpl;
@@ -73,7 +74,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             Execution caseTaskExecution = processEngineRuntimeService.createExecutionQuery()
                 .executionReferenceId(caseInstance.getId())
-                .executionReferenceType(CallbackTypes.EXECUTION_CHILD_CASE)
+                .executionReferenceType(ReferenceTypes.EXECUTION_CHILD_CASE)
                 .singleResult();
             assertThat(caseTaskExecution).isNotNull();
 
@@ -381,7 +382,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
             assertThat(caseTask1Execution.getReferenceId()).isNotNull();
-            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(ReferenceTypes.EXECUTION_CHILD_CASE);
 
             // Act
             processEngineTaskService.complete(task.getId());
@@ -417,7 +418,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
             assertThat(caseTask1Execution.getReferenceId()).isNotNull();
-            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(ReferenceTypes.EXECUTION_CHILD_CASE);
 
             // Act
             processEngineTaskService.complete(task.getId());
@@ -489,7 +490,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
             assertThat(caseTask1Execution.getReferenceId()).isNotNull();
-            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(ReferenceTypes.EXECUTION_CHILD_CASE);
 
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
             assertThat(caseInstance.getId()).isEqualTo(caseTask1Execution.getReferenceId());
@@ -566,7 +567,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
             assertThat(caseTask1Execution.getReferenceId()).isNotNull();
-            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(ReferenceTypes.EXECUTION_CHILD_CASE);
 
             // Act
             processEngineRuntimeService.signalEventReceived("myExternalSignal", myExternalSignalExecution.getId());
@@ -640,7 +641,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();
             assertThat(caseTask1Execution.getReferenceId()).isNotNull();
-            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+            assertThat(caseTask1Execution.getReferenceType()).isEqualTo(ReferenceTypes.EXECUTION_CHILD_CASE);
 
             // Act
             processEngineRuntimeService.signalEventReceived("myExternalSignal", myExternalSignalExecution.getId());

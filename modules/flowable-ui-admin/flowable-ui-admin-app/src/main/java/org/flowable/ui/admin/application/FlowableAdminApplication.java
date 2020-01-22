@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import;
     ApplicationConfiguration.class,
     DispatcherServletConfiguration.class
 })
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class FlowableAdminApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

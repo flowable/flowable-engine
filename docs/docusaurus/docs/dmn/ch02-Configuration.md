@@ -7,7 +7,7 @@ title: Configuration
 
 *The Flowable DMN engine is structured in a very similar way to the Flowable process engine. As a result, parts of the documentation are very similar to their process engine counterpart.*
 
-The Flowable DMN engine is configured through an XML file named flowable.dmn.cfg.xml. Note that this is **not** applicable if you’re using [the Spring style of building a DMN engine](#springintegration).
+The Flowable DMN engine is configured through an XML file named flowable.dmn.cfg.xml. Note that this is **not** applicable if you’re using [the Spring style of building a DMN engine](dmn/ch04-Spring.md#spring-integration).
 
 The easiest way to obtain a DmnEngine, is to use the org.flowable.dmn.engine.DmnEngines class:
 
@@ -46,7 +46,7 @@ The DMNEngineConfiguration object can also be created programmatically using the
       createDmnEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
 
 It is also possible to not use a configuration file and create a configuration based on
-defaults (see [the different supported classes](#configurationClasses) for more information).
+defaults (see [the different supported classes](dmn/ch02-Configuration.md#plug-into-process-engine) for more information).
 
     DmnEngineConfiguration.createStandaloneDmnEngineConfiguration();
     DmnEngineConfiguration.createStandaloneInMemDmnEngineConfiguration();
@@ -70,7 +70,7 @@ This bean is then used to construct the DmnEngine. There are multiple classes av
 
 -   **org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration**: this is a convenience class for unit testing purposes. Flowable DMN will take care of the transactions. An H2 in-memory database is used by default. The database will be created and dropped when the engine boots and shuts down. When using this, probably no additional configuration is needed).
 
--   **org.flowable.dmn.spring.SpringDmnEngineConfiguration**: To be used when the DMN engine is used in a Spring environment. See [the Spring integration section](#springintegration) for more information.
+-   **org.flowable.dmn.spring.SpringDmnEngineConfiguration**: To be used when the DMN engine is used in a Spring environment. See [the Spring integration section](dmn/ch04-Spring.md#spring-integration) for more information.
 
 ## Plug into Process Engine
 
@@ -147,7 +147,7 @@ Note that Flowable DMN does not ship with a library that allows you to define su
 
 The following properties can be set, regardless of whether you are using the JDBC or data source approach:
 
--   **databaseType**: it’s normally not necessary to specify this property as it is automatically detected from the database connection metadata. Should only be specified in case automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See [the 'supported databases' section](#supporteddatabases) for an overview of which types are supported.
+-   **databaseType**: it’s normally not necessary to specify this property as it is automatically detected from the database connection metadata. Should only be specified in case automatic detection fails. Possible values: {h2, mysql, oracle, postgres, mssql, db2}. This setting will determine which create/drop scripts and queries will be used. See [the 'supported databases' section](dmn/ch02-Configuration.md#supported-databases) for an overview of which types are supported.
 
 -   **databaseSchemaUpdate**: allows you to set the strategy to handle the database schema on process engine boot and shutdown.
 
@@ -297,7 +297,7 @@ The easiest way to create the database tables for your database is to:
 
 -   Add a suitable database driver
 
--   Add a Flowable configuration file (*flowable.dmn.cfg.xml*) to your classpath, pointing to your database (see [database configuration section](#databaseConfiguration))
+-   Add a Flowable configuration file (*flowable.dmn.cfg.xml*) to your classpath, pointing to your database (see [database configuration section](dmn/ch02-Configuration.md#database-configuration))
 
 -   Execute the main method of the *DbSchemaCreate* class
 

@@ -40,15 +40,15 @@
                 <li ng-repeat="caseInstance in model.caseInstances" ng-class="{'active': selectedCaseInstance.id == caseInstance.id}" ng-click="selectCaseInstance(caseInstance)">
                     <div>
                         <div class="pull-right">
-                            <span class="badge" ng-if="!processInstance.ended">
+                            <span class="badge" ng-if="!caseInstance.ended">
                                 {{'CASE.FIELD.STARTED' | translate}} {{(caseInstance.started | dateformat:'fromNow')}}
                             </span>
-                            <span class="badge" ng-if="processInstance.ended">
+                            <span class="badge" ng-if="caseInstance.ended">
                                 {{'CASE.FIELD.ENDED' | translate}} {{(caseInstance.ended | dateformat:'fromNow')}}
                             </span>
                         </div>
                         <div class="title">
-                            {{caseInstance.name && caseInstance.name || caseInstance.processDefinitionName}}
+                            {{caseInstance.name && caseInstance.name || caseInstance.caseDefinitionName}}
                         </div>
                         <div class="summary">
                              <span ng-if="caseInstance.startedBy">
@@ -56,7 +56,7 @@
                             </span>
                         </div>
                         <div class="detail">
-                            {{caseInstance.description && caseInstance.description || caseInstance.processDefinitionName}}
+                            {{caseInstance.description && caseInstance.description || caseInstance.caseDefinitionName}}
                         </div>
                     </div>
                 </li>
@@ -64,7 +64,7 @@
                     <i class="icon icon-caret-right"></i> {{'GENERAL.ACTION.SHOW-MORE' | translate}}
                 </li>
             </ul>
-            <div class="nothing-to-see" ng-show="model.processInstances.length == 0">
+            <div class="nothing-to-see" ng-show="model.caseInstances.length == 0">
                 <span  translate="CASE.MESSAGE.NO-INSTANCES"></span>
             </div>
         </div>

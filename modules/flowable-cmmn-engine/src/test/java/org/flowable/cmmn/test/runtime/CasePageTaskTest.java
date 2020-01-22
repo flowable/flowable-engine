@@ -187,10 +187,22 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedGroups(groups).singleResult();
         assertEquals("Case Page Task One", planItemInstance.getName());
         
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe").involvedGroups(groups).singleResult();
+        assertEquals("Case Page Task One", planItemInstance.getName());
+        
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("nonexisting").involvedGroups(groups).singleResult();
+        assertEquals("Case Page Task One", planItemInstance.getName());
+        
         List<String> nonMatchingGroups = new ArrayList<>();
         nonMatchingGroups.add("management");
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedGroups(nonMatchingGroups).singleResult();
         assertNull(planItemInstance);
+        
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("nonexisting").involvedGroups(nonMatchingGroups).singleResult();
+        assertNull(planItemInstance);
+        
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe").involvedGroups(nonMatchingGroups).singleResult();
+        assertEquals("Case Page Task One", planItemInstance.getName());
         
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                         .caseInstanceId(caseInstance.getId())

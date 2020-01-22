@@ -7,7 +7,7 @@ While you can definitely use Flowable without Spring, we’ve provided some very
 
 ## CmmnEngineFactoryBean
 
-The CmmnEngine can be configured as a regular Spring bean. The starting point of the integration is the class org.flowable.cmmn.spring.CmmnEngineFactoryBean. That bean takes a CMMN engine configuration and creates the CMMN engine. This means that the creation and configuration of properties for Spring is the same as documented in the [configuration section](#configuration). For Spring integration, the configuration and engine beans will look like this:
+The CmmnEngine can be configured as a regular Spring bean. The starting point of the integration is the class org.flowable.cmmn.spring.CmmnEngineFactoryBean. That bean takes a CMMN engine configuration and creates the CMMN engine. This means that the creation and configuration of properties for Spring is the same as documented in the [configuration section](cmmn/ch02-Configuration.md#creating-a-cmmnengine). For Spring integration, the configuration and engine beans will look like this:
 
     <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.spring.SpringCmmnEngineConfiguration">
         ...
@@ -172,7 +172,7 @@ In addition to using the values listed above for deploymentMode, you may require
 
 ## Unit testing
 
-When integrating with Spring, business cases can be tested very easily using the standard standard [Flowable testing facilities](#apiUnitTesting).
+When integrating with Spring, business cases can be tested very easily using the standard standard [Flowable testing facilities](cmmn/ch03-API.md#unit-testing).
 The following examples show how a case definition is tested in typical Spring-based JUnit 4 and 5 test:
 
 **JUnit 5 test.**

@@ -21,7 +21,7 @@ To get started, you would need to create a Spring Boot project.
 The easiest way to do this would be to create a project via [start.spring.io](https://start.spring.io/).
 For example create a project with web and h2 dependencies.
 Then in the created project simply add the *flowable-spring-boot-starter* or *flowable-spring-boot-starter-rest* dependency.
-In case you don’t need all the engines see the other [Flowable starters](#springBootFlowableStarter).
+In case you don’t need all the engines see the other [Flowable starters](bpmn/ch05a-Spring-Boot.md#flowable-starters).
 For example for Maven:
 
     <dependency>
@@ -36,7 +36,7 @@ You can now run your Spring Boot application:
     import org.springframework.boot.SpringApplication;
     import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-    @SpringBootApplication
+    @SpringBootApplication(proxyBeanMethods = false)
     public class MyApplication {
 
         public static void main(String[] args) {
@@ -167,7 +167,7 @@ The XML content of the process definition is shown below. Notice that, for the m
 
 Also, add following code lines to test if the deployment actually worked. The *CommandLineRunner* is a special kind of Spring bean that is executed when the application boots:
 
-    @SpringBootApplication
+    @SpringBootApplication(proxyBeanMethods = false)
     public class MyApplication {
 
         public static void main(String[] args) {
@@ -561,7 +561,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 
     {
       "flowable": {
-        "version": "6.5.0-SNAPSHOT"
+        "version": "6.5.0.event-SNAPSHOT"
       }
     }
 

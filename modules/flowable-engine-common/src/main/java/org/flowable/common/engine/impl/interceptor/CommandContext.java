@@ -88,6 +88,7 @@ public class CommandContext {
                 // Sessions need to be closed, regardless of exceptions/commit/rollback
                 closeSessions();
             }
+            
         } catch (Throwable exception) {
             // Catch exceptions during session closing
             exception(exception);

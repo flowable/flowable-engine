@@ -37,6 +37,7 @@
         "properties" : { "asynchronousdefinition" : "Yes",
             "documentation" : "This is a test documentation field",
             "duedatedefinition" : "2012-11-01",
+            "calendarname" : "myCalendarName",
             "exclusivedefinition" : "No",
             "formkeydefinition" : "testKey",
             "formfieldvalidation":"formFieldValidationValue",

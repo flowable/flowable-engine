@@ -14,7 +14,9 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
 import static org.junit.Assert.assertEquals;
 
@@ -559,4 +561,54 @@ public class PlanItemExitSentryTest extends FlowableCmmnTestCase {
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertPlanItemInstanceState(planItemInstances, "Task F", WAITING_FOR_REPETITION);
     }
+
+    @Test
+    @CmmnDeployment
+    public void testEntryAndExitSentryUsingSameVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myExample").start();
+
+        // State after start
+        assertPlanItemInstanceState(caseInstance, "Set true", ENABLED);
+        assertPlanItemInstanceState(caseInstance, "Set false", ENABLED);
+        assertPlanItemInstanceState(caseInstance, "Event deferred task", AVAILABLE);
+        assertPlanItemInstanceState(caseInstance, "On Event Task", AVAILABLE);
+
+        // Starting 'set true' will activate both user tasks
+        PlanItemInstance setTruePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Set true").singleResult();
+        cmmnRuntimeService.startPlanItemInstance(setTruePlanItemInstance.getId());
+
+        assertPlanItemInstanceState(caseInstance, "Set true", ENABLED, COMPLETED);
+        assertPlanItemInstanceState(caseInstance, "Set false", ENABLED);
+        assertPlanItemInstanceState(caseInstance, "Event deferred task", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(caseInstance, "On Event Task", ACTIVE, WAITING_FOR_REPETITION);
+
+        // Starting again shouldn't make a difference as maxInstanceCount is 1
+        setTruePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Set true").singleResult();
+        cmmnRuntimeService.startPlanItemInstance(setTruePlanItemInstance.getId());
+
+        assertPlanItemInstanceState(caseInstance, "Set true", ENABLED, COMPLETED, COMPLETED);
+        assertPlanItemInstanceState(caseInstance, "Set false", ENABLED);
+        assertPlanItemInstanceState(caseInstance, "Event deferred task", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(caseInstance, "On Event Task", ACTIVE, WAITING_FOR_REPETITION);
+
+        // Starting 'set false' should terminate the user tasks
+        PlanItemInstance setFalsePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Set false").singleResult();
+        cmmnRuntimeService.startPlanItemInstance(setFalsePlanItemInstance.getId());
+
+        assertPlanItemInstanceState(caseInstance, "Set true", ENABLED, COMPLETED, COMPLETED);
+        assertPlanItemInstanceState(caseInstance, "Set false", ENABLED, COMPLETED);
+        assertPlanItemInstanceState(caseInstance, "Event deferred task", TERMINATED, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(caseInstance, "On Event Task", TERMINATED, WAITING_FOR_REPETITION);
+
+        // Starting again 'set true'
+        setTruePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Set true").singleResult();
+        cmmnRuntimeService.startPlanItemInstance(setTruePlanItemInstance.getId());
+
+        assertPlanItemInstanceState(caseInstance, "Set true", ENABLED, COMPLETED, COMPLETED, COMPLETED);
+        assertPlanItemInstanceState(caseInstance, "Set false", ENABLED, COMPLETED);
+        assertPlanItemInstanceState(caseInstance, "Event deferred task", ACTIVE, TERMINATED, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(caseInstance, "On Event Task", ACTIVE, TERMINATED, WAITING_FOR_REPETITION);
+
+    }
+
 }

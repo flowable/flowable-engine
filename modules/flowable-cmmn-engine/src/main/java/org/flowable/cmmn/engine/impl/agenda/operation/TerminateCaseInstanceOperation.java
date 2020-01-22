@@ -60,7 +60,7 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
         if (!getCaseInstanceEntity().isCompletable()) {
             // we can't complete the case as it is currently not completable, so we need to throw an exception
             throw new FlowableIllegalArgumentException(
-                "Cannot exit case with 'complete' event type as the case '" + getCaseInstanceEntityId() + "' is not yet completable.");
+                "Cannot exit case with 'complete' event type as the case '" + getCaseInstanceId() + "' is not yet completable.");
         }
     }
 

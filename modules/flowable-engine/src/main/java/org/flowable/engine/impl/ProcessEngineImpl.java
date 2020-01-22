@@ -15,6 +15,7 @@ package org.flowable.engine.impl;
 import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
@@ -89,15 +90,17 @@ public class ProcessEngineImpl implements ProcessEngine {
 
         ProcessEngines.registerProcessEngine(this);
 
-        if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-            processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
+        if (processEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : processEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
         }
 
         processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
     }
 
     @Override
-    public void handleExecutors() {
+    public void startExecutors() {
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
         }
@@ -128,10 +131,11 @@ public class ProcessEngineImpl implements ProcessEngine {
 
         processEngineConfiguration.close();
 
-        if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-            processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineClosed(this);
+        if (processEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : processEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
         }
-
 
         processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
     }

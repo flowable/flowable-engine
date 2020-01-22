@@ -20,7 +20,7 @@ import org.springframework.context.annotation.PropertySources;
 /**
  * @author Joram Barrez
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = {
         "org.flowable.cmmn.rest.conf.common",
         "org.flowable.cmmn.rest.conf.engine"

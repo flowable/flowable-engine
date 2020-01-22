@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnContentEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -54,7 +54,7 @@ public class ContentEngineServicesAutoConfiguration {
      * If a process engine is present that means that the ContentEngine was created as part of it.
      * Therefore extract it from the ContentEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.content.engine.ContentEngine",
         "org.flowable.app.engine.AppEngine"
@@ -78,7 +78,7 @@ public class ContentEngineServicesAutoConfiguration {
      * If an app engine is present that means that the ContentEngine was created as part of it.
      * Therefore extract it from the ContentEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.content.engine.ContentEngine",
     })
@@ -100,7 +100,7 @@ public class ContentEngineServicesAutoConfiguration {
     /**
      * If there is no process engine configuration, then trigger a creation of the content engine.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.content.engine.ContentEngine",
         "org.flowable.engine.ProcessEngine",

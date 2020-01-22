@@ -83,12 +83,12 @@ public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
         cache.clear();
     }
 
-    // For testing purposes only
+    @Override
     public Collection<T> getAll() {
         return cache.values();
     }
 
-    // For testing purposes only
+    @Override
     public int size() {
         return cache.size();
     }

@@ -67,7 +67,7 @@ The next example, gets all variable-updates that have been done in process with 
       .orderByVariableName().asc()
       .list()
 
-This example gets all [form-properties](#formProperties) that were submitted in any task or when starting the process with id "123". Only HistoricFormProperties will be returned by this query.
+This example gets all [form-properties](bpmn/ch08-Forms.md#form-properties) that were submitted in any task or when starting the process with id "123". Only HistoricFormProperties will be returned by this query.
 
     historyService.createHistoricDetailQuery()
       .formProperties()
@@ -164,7 +164,7 @@ See [the Flowable Async History Examples](https://github.com/flowable/flowable-e
 
 ## History for audit purposes
 
-When [configuring](#historyConfig) at least audit level for configuration. Then all properties submitted through methods FormService.submitStartFormData(String processDefinitionId, Map&lt;String, String&gt; properties) and FormService.submitTaskFormData(String taskId, Map&lt;String, String&gt; properties) are recorded.
+When [configuring](bpmn/ch11-History.md#history-configuration) at least audit level for configuration. Then all properties submitted through methods FormService.submitStartFormData(String processDefinitionId, Map&lt;String, String&gt; properties) and FormService.submitTaskFormData(String taskId, Map&lt;String, String&gt; properties) are recorded.
 
 Form properties can be retrieved with the query API like this:
 
@@ -177,3 +177,65 @@ Form properties can be retrieved with the query API like this:
 In that case only historic details of type HistoricFormProperty are returned.
 
 If you’ve set the authenticated user before calling the submit methods with IdentityService.setAuthenticatedUserId(String) then that authenticated user who submitted the form will be accessible in the history as well with HistoricProcessInstance.getStartUserId() for start forms and HistoricActivityInstance.getAssignee() for task forms.
+
+## History Cleaning
+
+By default history data is stored forever, this can cause the history tables to grow very large and impact the performance of the HistoryService.  History Cleaning has been introduced with 6.5.0 and allows the deletion of HistoricProcessInstances and their associated data.  Once process data no longer needs to be retained it can be deleted to reduce the history database's size. 
+
+### Automatic History Cleaning Configuration
+
+Automatic cleanup of HistoricProcessInstances is disabled by default but can be enabled and configured programmatically.  Once enabled the default is to run a cleanup job at 1 AM to delete all HistoricProcessInstances and associated data that have ended 365 days prior or older. 
+
+    ProcessEngine processEngine = ProcessEngineConfiguration
+        .createProcessEngineConfigurationFromResourceDefault()
+        .setEnableHistoryCleaning(true)
+        .setHistoryCleaningTimeCycleConfig("0 0 1 * * ?")
+        .setCleanInstancesEndedAfterNumberOfDays(365)
+        .buildProcessEngine();
+ 
+Spring properties set in an application.properties or externalized configuration are also available:
+ 
+         flowable.enable-history-cleaning=true
+         flowable.history-cleaning-after-days=365
+         flowable.history-cleaning-cycle=0 0 1 * * ?
+ 
+Additionally, History Cleanup can also be configured in flowable.cfg.xml or in a spring-context:
+ 
+     <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+       <property name="enableHistoryCleaning" value="true"/>
+       <property name="historyCleaningTimeCycleConfig" value="0 0 1 * * ?"/>
+       <property name="cleanInstancesEndedAfterNumberOfDays" value="365"/>
+       ...
+     </bean>
+
+### Manually Deleting History
+
+Manually cleaning history can accomplished by executing methods on the HistoryService query builders.
+
+Delete all HistoricProcessInstances and their related data that are older than one year.
+
+     Calendar cal = new GregorianCalendar();
+     cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+     historyService.createHistoricProcessInstanceQuery()
+       .finishedBefore(cal.getTime())
+       .deleteWithRelatedData();
+
+Delete just HistoricProcessInstances older than one year.
+
+    Calendar cal = new GregorianCalendar();
+    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+    historyService.createHistoricProcessInstanceQuery()
+      .finishedBefore(cal.getTime())
+      .delete();
+      
+Delete just HistoricActivityInstances older than one year.
+
+    Calendar cal = new GregorianCalendar();
+    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
+    historyService.createHistoricActivityInstanceQuery()
+      .finishedBefore(cal.getTime())
+      .delete();
+          
+Delete the task and activity data for deleted HistoricProcessInstances.
+    
+    historyService.deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();

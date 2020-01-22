@@ -709,7 +709,7 @@ Entry criteria form a sentry for a given plan item instance. They consist of two
 A sentry is satisfied when all its criteria are resolved to *true*. When a criterion evaluates to true, this is stored and remembered for future evaluations. Note that entry criteria of all plan item instances in the *available* state are evaluated whenever something changes in the case instance.
 Multiple sentries are possible on a plan item. However, when one is satisfied, the plan item moves from state *available* to *active*.
 
-See [the section on sentry evaluation](#cmmn_sentry_evaluation) for more information.
+See [the section on sentry evaluation](cmmn/ch06-cmmn.md#sentry-evaluation) for more information.
 
 An entry criterion is visualized as a diamond shape (white color inside) on the border of a plan item:
 
@@ -726,7 +726,7 @@ Exit criteria form a sentry for a given plan item instance. They consist of two 
 A sentry is satisfied when all its criteria are resolved to *true*. When a criterion evaluates to true, this is stored and remembered for future evaluations. Note that exit criteria of all plan item instances in the *active* state are evaluated whenever something changes in the case instance.
 Multiple sentries are possible on a plan item. However, when one is satisfied, the plan item moves from state *active* to *exit*.
 
-See [the section on sentry evaluation](#cmmn_sentry_evaluation) for more information.
+See [the section on sentry evaluation](cmmn/ch06-cmmn.md#sentry-evaluation) for more information.
 
 An exit criterion is visualized as a diamond shape (white color inside) on the border of a plan item:
 
@@ -1056,14 +1056,14 @@ The *required rule* works in conjunction with the *autoComplete* attribute on th
 
 -   If *autoComplete* resolves to *true* for the stage, all child plan item instances for **which the required rule evaluates to true** need to be in an end state. If there are also no other active child plan item instances, the stage completes automatically
 
-A *stage plan item instance* has a **completeable** property that can be used to see whether or not the conditions for completion are satisfied.
+A *stage plan item instance* has a **completable** property that can be used to see whether or not the conditions for completion are satisfied.
 Take, for example, the following simple stage and assume that the sentry for the *required task* evaluates to true and the other one to false. This means that the left plan item instance will be active while the right one will be in the *available* state.
 
 ![cmmn.completeable stage](assets/cmmn/cmmn.completeable-stage.png)
 
 Calling *cmmnRuntimeService.completeStagePlanItemInstance(String stagePlanItemInstanceId)* will not be possible for the stage (an exception will be thrown) as it has one active child plan item instance. When this user task on the left is completed, the *completeStagePlanItemInstance* can now be called, as no child plan item instances are currently active. However, by itself, the stage will not automatically complete as the right user task is in the available state.
 
-If the previous stage is changed to be **autoCompleteable** (this is visualised by a black rectangle at the bottom of the stage) and the plan item on the left is changed to be required (this is visualised using an exclamation mark), the behavior will be different:
+If the previous stage is changed to be **autocompletable** (this is visualised by a black rectangle at the bottom of the stage) and the plan item on the left is changed to be required (this is visualised using an exclamation mark), the behavior will be different:
 
 ![cmmn.completeable stage02](assets/cmmn/cmmn.completeable-stage02.png)
 
@@ -1224,7 +1224,7 @@ To solve this:
 
 -   do a null check in the expression, like *${planItemInstance.getVariable('myVar') != null && planItemInstance.getVariable('myVar') == 'hello world'}*
 
--   or (and probably easiest), check [expression functions](#cmmnExpressionsFunctions) to use a function such as *${var:eq(myVar, 'hello world')}* which takes in account the fact the variable might not exist.
+-   or (and probably easiest), check [expression functions](cmmn/ch03-API.md#expression-functions) to use a function such as *${var:eq(myVar, 'hello world')}* which takes in account the fact the variable might not exist.
 
 **The default evaluation logic has "memory", which means that when a part of a sentry is satisfied the engine will store and "remember" this in subsequent evaluations.**
 

@@ -41,12 +41,19 @@
             <param name="project.name" value="dmn"/>
         </antcall>
     </target>
+	
+	<target name="build.docs.eventregistry">
+        <antcall target="build.docs">
+            <param name="project.name" value="dmn"/>
+        </antcall>
+    </target>
 
     <!-- Only Distro Docs -->
     <target name="build.docs.distro" depends="clean.all">
         <antcall target="build.docs.bpmn"/>
         <antcall target="build.docs.cmmn"/>
         <antcall target="build.docs.dmn"/>
+    	<antcall target="build.docs.eventregistry"/>
         <antcall target="build.docs.form"/>
     </target>
 
@@ -56,6 +63,7 @@
         <antcall target="build.docs.bpmn"/>
         <antcall target="build.docs.cmmn"/>
         <antcall target="build.docs.dmn"/>
+    	<antcall target="build.docs.eventregistry"/>
         <antcall target="build.docs.form"/>
     </target>
 

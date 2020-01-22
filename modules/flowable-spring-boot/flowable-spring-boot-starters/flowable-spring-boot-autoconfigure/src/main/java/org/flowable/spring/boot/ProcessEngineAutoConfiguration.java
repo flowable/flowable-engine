@@ -33,6 +33,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
+import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.Process;
@@ -67,7 +68,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Javier Casal
  * @author Joram Barrez
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnProcessEngine
 @EnableConfigurationProperties({
     FlowableAutoDeploymentProperties.class,
@@ -76,7 +77,8 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableHttpProperties.class,
     FlowableProcessProperties.class,
     FlowableAppProperties.class,
-    FlowableIdmProperties.class
+    FlowableIdmProperties.class,
+    FlowableEventRegistryProperties.class
 })
 @AutoConfigureAfter(value = {
     FlowableJpaAutoConfiguration.class,
@@ -95,18 +97,21 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     protected final FlowableProcessProperties processProperties;
     protected final FlowableAppProperties appProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableEventRegistryProperties eventProperties;
     protected final FlowableMailProperties mailProperties;
     protected final FlowableHttpProperties httpProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
-        FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties,
+        FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, 
+        FlowableEventRegistryProperties eventProperties, FlowableMailProperties mailProperties,
         FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
         
         super(flowableProperties);
         this.processProperties = processProperties;
         this.appProperties = appProperties;
         this.idmProperties = idmProperties;
+        this.eventProperties = eventProperties;
         this.mailProperties = mailProperties;
         this.httpProperties = httpProperties;
         this.autoDeploymentProperties = autoDeploymentProperties;
@@ -188,6 +193,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setDeploymentName(defaultText(flowableProperties.getDeploymentName(), conf.getDeploymentName()));
 
         conf.setDisableIdmEngine(!(flowableProperties.isDbIdentityUsed() && idmProperties.isEnabled()));
+        conf.setDisableEventRegistry(!eventProperties.isEnabled());
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
         conf.setAsyncHistoryExecutorActivate(flowableProperties.isAsyncHistoryExecutorActivate());
@@ -220,6 +226,10 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
 
+        conf.setEnableHistoryCleaning(flowableProperties.isEnableHistoryCleaning());
+        conf.setHistoryCleaningTimeCycleConfig(flowableProperties.getHistoryCleaningCycle());
+        conf.setCleanInstancesEndedAfterNumberOfDays(flowableProperties.getHistoryCleaningAfterDays());
+
         IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
         if (idGenerator == null) {
             idGenerator = new StrongUuidGenerator();
@@ -242,7 +252,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         return conf;
     }
     
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
@@ -261,6 +271,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             processEngineConfigurator.setProcessEngineConfiguration(processEngineConfiguration);
             
             processEngineConfiguration.setDisableIdmEngine(true);
+            processEngineConfiguration.setDisableEventRegistry(true);
             
             invokeConfigurers(processEngineConfiguration);
             

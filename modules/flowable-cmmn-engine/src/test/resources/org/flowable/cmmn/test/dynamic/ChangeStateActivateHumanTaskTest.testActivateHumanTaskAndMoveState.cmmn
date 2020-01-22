@@ -38,9 +38,9 @@
                 </planItemOnPart>
             </sentry>
 
-            <humanTask id="task1" name="Task 1" flowable:assignee="kermit" />
-            <humanTask id="task2" name="Task 2" flowable:candidateGroups="test" />
-            <humanTask id="task3" name="Task 3" />
+            <humanTask id="task1" name="Task One" flowable:assignee="kermit" />
+            <humanTask id="task2" name="Task Two" flowable:candidateGroups="test" />
+            <humanTask id="task3" name="Task Three" />
 
         </casePlanModel>
     </case>

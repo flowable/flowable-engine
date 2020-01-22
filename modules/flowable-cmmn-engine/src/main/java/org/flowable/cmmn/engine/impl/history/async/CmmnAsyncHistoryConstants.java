@@ -88,6 +88,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_CASE_DEFINITION_DEPLOYMENT_ID = "caseDefinitionDeploymentId";
     String FIELD_CASE_DEFINITION_DESCRIPTION = "caseDefinitionDescription";
     String FIELD_CASE_DEFINITION_ID = "caseDefinitionId";
+    String FIELD_DERIVED_CASE_DEFINITION_ID = "derivedCaseDefinitionId";
     String FIELD_CASE_DEFINITION_KEY = "caseDefinitionKey";
     String FIELD_CASE_DEFINITION_NAME = "caseDefinitionName";
     String FIELD_CASE_DEFINITION_VERSION = "caseDefinitionVersion";

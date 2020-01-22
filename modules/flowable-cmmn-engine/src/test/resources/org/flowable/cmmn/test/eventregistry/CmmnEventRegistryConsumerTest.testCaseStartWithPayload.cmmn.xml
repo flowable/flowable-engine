@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+    <case id="testCaseStartEventWithPayload" name="Event Case">
+        <extensionElements>
+            <flowable:eventType>myEvent</flowable:eventType>
+            <flowable:eventOutParameter source="customerId" target="customerIdVar"/>
+            <flowable:eventOutParameter source="payload1" target="anotherVarName"/>
+        </extensionElements>
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItem2" name="Human task" definitionRef="humanTask1">
+            </planItem>
+            <humanTask id="humanTask1" name="Human task"/>
+        </casePlanModel>
+    </case>
+</definitions>

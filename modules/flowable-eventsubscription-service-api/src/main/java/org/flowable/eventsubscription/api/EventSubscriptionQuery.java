@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.api;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.flowable.common.engine.api.query.Query;
@@ -64,6 +65,31 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
 
     /** Only select event subscriptions with the given tenant id. **/
     EventSubscriptionQuery tenantId(String tenantId);
+
+    /** Only select event subscriptions with the given tenant id. **/
+    EventSubscriptionQuery tenantIds(Collection<String> tenantIds);
+
+    /** Only select event subscriptions without a tenant id. */
+    EventSubscriptionQuery withoutTenantId();
+
+    /** Only select event subscriptions with the given configuration. **/
+    EventSubscriptionQuery configuration(String configuration);
+
+    /** Only select event subscriptions with the given configurations. **/
+    EventSubscriptionQuery configurations(Collection<String> configurations);
+
+    /** Only select event subscriptions that have no configuration. **/
+    EventSubscriptionQuery withoutConfiguration();
+
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr() method at the end of your OR statement.
+     */
+    EventSubscriptionQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    EventSubscriptionQuery endOr();
 
     // ordering //////////////////////////////////////////////////////////////
 

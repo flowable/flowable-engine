@@ -43,6 +43,11 @@ public class InParameterParser extends BaseChildElementParser {
             }
 
             parameter.setTarget(target);
+            
+            String transientValue = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
+            if ("true".equalsIgnoreCase(transientValue)) {
+                parameter.setTransient(true);
+            }
 
             if (parentElement instanceof CallActivity) {
                 ((CallActivity) parentElement).getInParameters().add(parameter);

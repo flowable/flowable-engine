@@ -33,10 +33,11 @@ public abstract class AbstractCaseInstanceOperation extends CmmnOperation {
     @Override
     public void run() {
         getCaseInstanceEntity();
-        getCaseInstanceEntityId();
+        getCaseInstanceId();
     }
 
-    public String getCaseInstanceEntityId() {
+    @Override
+    public String getCaseInstanceId() {
         if (caseInstanceEntityId == null) {
             caseInstanceEntityId = caseInstanceEntity.getId();
         }

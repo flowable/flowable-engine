@@ -33,6 +33,8 @@ public interface CaseInstanceEntity extends Entity, EntityWithSentryPartInstance
     void setStartUserId(String startUserId);
     void setCallbackId(String callbackId);
     void setCallbackType(String callbackType);
+    void setReferenceId(String referenceId);
+    void setReferenceType(String referenceType);
     void setCompletable(boolean completable);
     void setTenantId(String tenantId);
 }

@@ -31,6 +31,14 @@
     	"cmmn/ch06-cmmn",
     	"cmmn/ch07-architecture"
     ],
+    "Event Registry User Guide": [
+		"eventregistry/ch02-Configuration",
+		"eventregistry/ch03-API",
+		"eventregistry/ch04-Spring",
+		"eventregistry/ch05-Deployment",
+		"eventregistry/ch06-EventRegistry-Introduction",
+		"eventregistry/ch07-REST"
+    ],
     "DMN User Guide": [
 		"dmn/ch02-Configuration",
 		"dmn/ch03-API",
@@ -47,6 +55,7 @@
 		"form/ch06-Form-Introduction",
 		"form/ch07-REST"
 	],
-    "Migration from v5": ["migration"]
+    "Migration from v5": ["migration"],
+    "Disclaimer": ["disclaimer"]
   }
 }

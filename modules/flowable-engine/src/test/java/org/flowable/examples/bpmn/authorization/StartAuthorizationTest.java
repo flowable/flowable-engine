@@ -15,12 +15,9 @@ package org.flowable.examples.bpmn.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;

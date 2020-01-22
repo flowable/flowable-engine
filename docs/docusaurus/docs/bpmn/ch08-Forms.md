@@ -197,7 +197,7 @@ Essentially, all the data that’s needed to render a form is assembled in one o
 
 Submitting form properties can be done with ProcessInstance FormService.submitStartFormData(String processDefinitionId, Map&lt;String,String&gt; properties) and void FormService.submitTaskFormData(String taskId, Map&lt;String,String&gt; properties)
 
-To learn about how form properties map to process variables, see [Form properties](#formProperties)
+To learn about how form properties map to process variables, see [Form properties](bpmn/ch08-Forms.md#form-properties)
 
 You can place any form template resource inside the business archives that you deploy (in case you want to store them versioned with the process). It will be available as a resource in the deployment, which you can retrieve using: String ProcessDefinition.getDeploymentId() and InputStream RepositoryService.getResourceAsStream(String deploymentId, String resourceName); This could be your template definition file, which you can use to render/show the form in your own application.
 

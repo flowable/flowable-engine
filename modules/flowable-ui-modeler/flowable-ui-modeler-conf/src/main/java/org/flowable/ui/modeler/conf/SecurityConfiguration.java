@@ -49,7 +49,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * @author Tijs Rademakers
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 public class SecurityConfiguration {
     

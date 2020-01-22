@@ -27,14 +27,15 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
@@ -47,6 +48,7 @@ import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
+import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventUtil;
@@ -231,8 +233,9 @@ public class ExecutionEntityManagerImpl
 
     @Override
     public ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId, 
-                    String businessKey, String processInstanceName, String callbackId, String callbackType,
-                    String tenantId, String initiatorVariableName, String startActivityId) {
+            String businessKey, String processInstanceName,
+            String callbackId, String callbackType, String referenceId, String referenceType,
+            String propagatedStageInstanceId, String tenantId, String initiatorVariableName, String startActivityId) {
 
         ExecutionEntity processInstanceExecution = dataManager.create();
 
@@ -258,7 +261,16 @@ public class ExecutionEntityManagerImpl
         }
         if (callbackType != null) {
             processInstanceExecution.setCallbackType(callbackType);
-        }   
+        }
+        if (referenceId != null) {
+            processInstanceExecution.setReferenceId(referenceId);
+        }
+        if (referenceType != null) {
+            processInstanceExecution.setReferenceType(referenceType);
+        }
+        if (propagatedStageInstanceId != null) {
+            processInstanceExecution.setPropagatedStageInstanceId(propagatedStageInstanceId);
+        }
         
         processInstanceExecution.setScope(true); // process instance is always a scope for all child executions
 
@@ -381,6 +393,9 @@ public class ExecutionEntityManagerImpl
             CountingExecutionEntity countingParentExecutionEntity = (CountingExecutionEntity) parentExecutionEntity;
             ((CountingExecutionEntity) childExecution).setCountEnabled(countingParentExecutionEntity.isCountEnabled());
         }
+
+        // inherit the stage instance id, if present
+        childExecution.setPropagatedStageInstanceId(parentExecutionEntity.getPropagatedStageInstanceId());
 
         childExecution.setRootProcessInstanceId(parentExecutionEntity.getRootProcessInstanceId());
         childExecution.setActive(true);
@@ -596,6 +611,10 @@ public class ExecutionEntityManagerImpl
                         processInstanceEntity.getId(), processInstanceEntity.getProcessDefinitionId(), deleteReason));
             }
         }
+        
+        if (engineConfiguration.isLoggingSessionEnabled()) {
+            BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_PROCESS_COMPLETED, "Completed process instance with id " + processInstanceEntity.getId(), processInstanceEntity);
+        }
 
         getHistoryManager().recordProcessInstanceEnd(processInstanceEntity, deleteReason, currentFlowElementId, getClock().getCurrentTime());
         processInstanceEntity.setDeleted(true);
@@ -793,7 +812,7 @@ public class ExecutionEntityManagerImpl
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         CaseInstanceService caseInstanceService = processEngineConfiguration.getCaseInstanceService();
         if (caseInstanceService != null) {
-            if (executionEntity.getReferenceId() != null && CallbackTypes.EXECUTION_CHILD_CASE.equals(executionEntity.getReferenceType())) {
+            if (executionEntity.getReferenceId() != null && ReferenceTypes.EXECUTION_CHILD_CASE.equals(executionEntity.getReferenceType())) {
                 caseInstanceService.deleteCaseInstance(executionEntity.getReferenceId());
             } else if (executionEntity.getCurrentFlowElement() instanceof CaseServiceTask) {
                 // backwards compatibility in case there is no reference

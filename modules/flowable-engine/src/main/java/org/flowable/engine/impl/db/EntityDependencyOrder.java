@@ -43,6 +43,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityI
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
@@ -149,6 +150,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(SignalEventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(MessageEventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(CompensateEventSubscriptionEntityImpl.class);
+        DELETE_ORDER.add(GenericEventSubscriptionEntityImpl.class);
         DELETE_ORDER.add(EventSubscriptionEntityImpl.class);
 
         /*

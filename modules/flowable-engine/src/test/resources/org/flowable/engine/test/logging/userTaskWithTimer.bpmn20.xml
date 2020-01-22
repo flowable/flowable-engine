@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="userTaskWithTimer" name="User task with timer">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask1" />
+    <userTask id="userTask1" name="User task 1" flowable:priority="60" flowable:dueDate="2020-01-04" />
+    <sequenceFlow id="flow2" sourceRef="userTask1" targetRef="userTask2" />
+    <boundaryEvent id="timerBoundaryEvent" cancelActivity="true" attachedToRef="userTask1">
+        <timerEventDefinition>
+            <timeDuration>P1D</timeDuration>
+        </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="userTask2" name="User task 2" />
+    <sequenceFlow id="flow3" sourceRef="userTask2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

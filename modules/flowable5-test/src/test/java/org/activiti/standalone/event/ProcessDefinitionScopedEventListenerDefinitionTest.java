@@ -99,9 +99,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
             fail("Exception expected");
 
         } catch (FlowableException ae) {
-            assertEquals("Exception while executing event-listener", ae.getMessage());
-            assertTrue(ae.getCause() instanceof org.activiti.engine.ActivitiException);
-            assertEquals("couldn't instantiate class org.activiti.engine.test.api.event.UnexistingClass", ae.getCause().getMessage());
+            assertEquals("couldn't instantiate class org.activiti.engine.test.api.event.UnexistingClass", ae.getMessage());
         }
     }
 

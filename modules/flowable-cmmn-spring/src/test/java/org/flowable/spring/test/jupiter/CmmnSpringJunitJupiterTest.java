@@ -77,7 +77,7 @@ public class CmmnSpringJunitJupiterTest {
         assertThat(deployedCaseDefinition).isNotNull();
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @EnableTransactionManagement
     static class TestConfiguration {
 

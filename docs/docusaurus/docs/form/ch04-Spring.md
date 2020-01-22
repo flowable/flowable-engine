@@ -7,7 +7,7 @@ While you can definitely use Flowable Form without Spring, we’ve provided some
 
 ## FormEngineFactoryBean
 
-The FormEngine can be configured as a regular Spring bean. The starting point of the integration is the class org.flowable.form.spring.FormEngineFactoryBean. This bean takes a Form engine configuration and creates the Form engine. This means that the creation and configuration of properties for Spring is the same as documented in the [configuration section](#configuration). For Spring integration, the configuration and engine beans will look like this:
+The FormEngine can be configured as a regular Spring bean. The starting point of the integration is the class org.flowable.form.spring.FormEngineFactoryBean. This bean takes a Form engine configuration and creates the Form engine. This means that the creation and configuration of properties for Spring is the same as documented in the [configuration section](form/ch02-Configuration.md#creating-a-form-engine). For Spring integration, the configuration and engine beans will look like this:
 
     <bean id="formEngineConfiguration" class="org.flowable.form.spring.SpringFormEngineConfiguration">
         ...
@@ -58,7 +58,7 @@ In addition to using the values listed above for deploymentMode, you may require
 
 ## Unit testing
 
-When integrating with Spring, forms can be tested very easily using the standard [Flowable testing facilities](#apiUnitTesting).
+When integrating with Spring, forms can be tested very easily using the standard [Flowable testing facilities](form/ch03-API.md#unit-testing).
 The following examples show how a form is tested in a typical Spring-based JUnit 4 and 5 tests:
 
 **JUnit 5 test.**

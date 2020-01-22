@@ -8,7 +8,7 @@
     targetNamespace="http://flowable.org/cmmn">
     <case id="oneTaskCase">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
-            <planItem id="planItem1" name="The task" definitionRef="theTask" />
+            <planItem id="planItem1" name="The Task" definitionRef="theTask" />
             <humanTask id="theTask" name="The Task" flowable:assignee="johnDoe" />
         </casePlanModel>
     </case>

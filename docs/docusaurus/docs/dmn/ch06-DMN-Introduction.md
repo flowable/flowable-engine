@@ -58,10 +58,10 @@ There are 7 hit policies available;
 
 -   **U**NIQUE: no overlap is possible and all rules are disjoint. Only a single rule can be matched.
 
--   **A**NY: there may be overlap, but all of the matching rules show equal output entries for each output, so any match can be used. If the output entries are non-equal, the hit policy is incorrect and the result will be empty and marked as failed. When [strict mode](#strictMode) is disabled the last valid rule be the result. (The violation will be present as a validation message)
+-   **A**NY: there may be overlap, but all of the matching rules show equal output entries for each output, so any match can be used. If the output entries are non-equal, the hit policy is incorrect and the result will be empty and marked as failed. When [strict mode](dmn/ch02-Configuration.md#strict-mode) is disabled the last valid rule be the result. (The violation will be present as a validation message)
 
 -   **P**RIORITY: multiple rules can match, with different output entries. This policy returns the matching rule with the highest output priority. Output priorities are specified in the ordered list of output values, in decreasing order of priority.
-    When [strict mode](#strictMode) is disabled and there are no output values defined the first valid rule be the result. (The violation will be present as a validation message)
+    When [strict mode](dmn/ch02-Configuration.md#strict-mode) is disabled and there are no output values defined the first valid rule be the result. (The violation will be present as a validation message)
 
 **multiple hit**
 

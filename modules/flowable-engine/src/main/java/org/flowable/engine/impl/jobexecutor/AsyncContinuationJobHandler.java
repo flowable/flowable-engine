@@ -12,8 +12,11 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -35,6 +38,12 @@ public class AsyncContinuationJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) variableScope;
+        
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+            FlowElement flowElement = executionEntity.getCurrentFlowElement();
+            BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Executing async job for " + flowElement.getId() + ", with job id " + job.getId(),
+                            LoggingSessionConstants.TYPE_SERVICE_TASK_EXECUTE_ASYNC_JOB, job, flowElement, executionEntity);
+        }
 
         CommandContextUtil.getAgenda(commandContext).planContinueProcessSynchronousOperation(executionEntity);
     }

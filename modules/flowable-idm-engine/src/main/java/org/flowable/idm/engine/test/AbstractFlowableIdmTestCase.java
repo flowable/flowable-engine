@@ -25,7 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
  * @author Joram Barrez
  */
 @EnsureCleanDb(excludeTables = {
-    "ACT_ID_PROPERTY"
+    "ACT_ID_PROPERTY",
+    "ACT_GE_PROPERTY"
 })
 public abstract class AbstractFlowableIdmTestCase extends AbstractTestCase {
 

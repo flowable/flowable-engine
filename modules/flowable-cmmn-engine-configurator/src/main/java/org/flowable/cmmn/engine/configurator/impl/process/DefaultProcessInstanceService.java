@@ -55,15 +55,15 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId,
+    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
         String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey) {
         
-        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, tenantId, fallbackToDefaultTenant, inParametersMap, businessKey);
+        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, stageInstanceId, tenantId, fallbackToDefaultTenant, inParametersMap, businessKey);
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId,
-                    String planItemInstanceId, String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey) {
+    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
+        String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey) {
         
         ProcessInstanceBuilder processInstanceBuilder = processEngineConfiguration.getRuntimeService().createProcessInstanceBuilder();
         processInstanceBuilder.processDefinitionKey(processDefinitionKey);
@@ -89,6 +89,10 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
         if (businessKey != null) {
             processInstanceBuilder.businessKey(businessKey);
+        }
+
+        if (stageInstanceId != null) {
+            processInstanceBuilder.stageInstanceId(stageInstanceId);
         }
 
         ProcessInstance processInstance = processInstanceBuilder.start();

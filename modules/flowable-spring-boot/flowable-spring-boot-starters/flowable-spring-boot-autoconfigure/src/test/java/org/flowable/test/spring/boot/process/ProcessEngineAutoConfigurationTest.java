@@ -511,7 +511,7 @@ public class ProcessEngineAutoConfigurationTest {
         return (ProcessEngineConfiguration) appEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomIdGeneratorConfiguration {
 
         @Bean
@@ -520,7 +520,7 @@ public class ProcessEngineAutoConfigurationTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomBeanIdGeneratorConfiguration {
 
         @Bean
@@ -529,7 +529,7 @@ public class ProcessEngineAutoConfigurationTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class SecondCustomBeanIdGeneratorConfiguration {
 
         @Bean
@@ -538,7 +538,7 @@ public class ProcessEngineAutoConfigurationTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class ProcessQualifiedCustomBeanIdGeneratorConfiguration {
 
         @Bean
@@ -548,7 +548,7 @@ public class ProcessEngineAutoConfigurationTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomAutoDeploymentStrategyConfiguration {
 
         @Bean

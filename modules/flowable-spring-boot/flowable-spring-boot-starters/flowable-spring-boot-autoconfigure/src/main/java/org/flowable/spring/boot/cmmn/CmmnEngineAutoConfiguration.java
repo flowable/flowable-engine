@@ -44,6 +44,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
+import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
@@ -66,12 +67,13 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnCmmnEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableAutoDeploymentProperties.class,
     FlowableIdmProperties.class,
+    FlowableEventRegistryProperties.class,
     FlowableCmmnProperties.class,
     FlowableAppProperties.class,
     FlowableHttpProperties.class
@@ -93,14 +95,17 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableEventRegistryProperties eventProperties;
     protected final FlowableHttpProperties httpProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties,
-        FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
+                    FlowableEventRegistryProperties eventProperties, FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
+        
         super(flowableProperties);
         this.cmmnProperties = cmmnProperties;
         this.idmProperties = idmProperties;
+        this.eventProperties = eventProperties;
         this.httpProperties = httpProperties;
         this.autoDeploymentProperties = autoDeploymentProperties;
     }
@@ -156,6 +161,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setDeploymentName(defaultText(cmmnProperties.getDeploymentName(), configuration.getDeploymentName()));
 
         configuration.setDisableIdmEngine(!idmProperties.isEnabled());
+        configuration.setDisableEventRegistry(!eventProperties.isEnabled());
 
         configuration.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
 
@@ -185,10 +191,14 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         configuration.setDeploymentStrategies(deploymentStrategies);
 
+        configuration.setEnableHistoryCleaning(flowableProperties.isEnableHistoryCleaning());
+        configuration.setHistoryCleaningTimeCycleConfig(flowableProperties.getHistoryCleaningCycle());
+        configuration.setCleanInstancesEndedAfterNumberOfDays(flowableProperties.getHistoryCleaningAfterDays());
+
         return configuration;
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.spring.SpringProcessEngineConfiguration"
     })
@@ -211,6 +221,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
 
             cmmnEngineConfiguration.setDisableIdmEngine(true);
+            cmmnEngineConfiguration.setDisableEventRegistry(true);
             
             invokeConfigurers(cmmnEngineConfiguration);
             
@@ -218,7 +229,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         }
     }
     
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
@@ -237,6 +248,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
 
             cmmnEngineConfiguration.setDisableIdmEngine(true);
+            cmmnEngineConfiguration.setDisableEventRegistry(true);
             
             invokeConfigurers(cmmnEngineConfiguration);
             

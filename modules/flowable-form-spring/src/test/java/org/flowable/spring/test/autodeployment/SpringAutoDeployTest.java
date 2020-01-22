@@ -316,7 +316,7 @@ public class SpringAutoDeployTest {
         }
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class SpringFormAutoDeployTestConfiguration {
 
         @Bean

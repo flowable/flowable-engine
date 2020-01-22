@@ -339,7 +339,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         return true;
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class SpringAutoDeployTestConfiguration {
 
         @Bean

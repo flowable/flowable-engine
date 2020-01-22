@@ -43,7 +43,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnContentEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -81,7 +81,7 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
         return configuration;
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.spring.SpringProcessEngineConfiguration"
     })
@@ -109,7 +109,7 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
         }
     }
     
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnAppEngine
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"

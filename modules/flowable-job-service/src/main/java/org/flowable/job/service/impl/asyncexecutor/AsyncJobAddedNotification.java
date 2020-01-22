@@ -12,14 +12,9 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import org.flowable.common.engine.impl.cfg.TransactionPropagation;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,18 +39,7 @@ public class AsyncJobAddedNotification implements CommandContextCloseListener {
     }
 
     public void execute(CommandContext commandContext) {
-        CommandExecutor commandExecutor = CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor();
-        CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
-        commandExecutor.execute(commandConfig, new Command<Void>() {
-            @Override
-            public Void execute(CommandContext commandContext) {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("notifying job executor of new job");
-                }
-                asyncExecutor.executeAsyncJob(job);
-                return null;
-            }
-        });
+        asyncExecutor.executeAsyncJob(job);
     }
 
     @Override

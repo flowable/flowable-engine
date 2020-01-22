@@ -44,7 +44,14 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetCaseInstance() throws Exception {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .businessKey("myBusinessKey")
+            .referenceId("testReferenceId")
+            .referenceType("testReferenceType")
+            .callbackId("testCallbackId")
+            .callbackType("testCallbackType")
+            .start();
 
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
                         CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_OK);
@@ -55,6 +62,11 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         assertNotNull(responseNode);
         assertEquals(caseInstance.getId(), responseNode.get("id").textValue());
+        assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
+        assertEquals("testReferenceId", responseNode.get("referenceId").textValue());
+        assertEquals("testReferenceType", responseNode.get("referenceType").textValue());
+        assertEquals("testCallbackId", responseNode.get("callbackId").textValue());
+        assertEquals("testCallbackType", responseNode.get("callbackType").textValue());
 
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertNotNull(task);

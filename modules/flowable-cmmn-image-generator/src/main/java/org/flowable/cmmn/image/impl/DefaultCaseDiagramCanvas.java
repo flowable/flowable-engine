@@ -109,6 +109,7 @@ public class DefaultCaseDiagramCanvas {
     protected static BufferedImage CASETASK_IMAGE;
     protected static BufferedImage PROCESSTASK_IMAGE;
     protected static BufferedImage DECISIONTASK_IMAGE;
+    protected static BufferedImage SENDEVENTTASK_IMAGE;
 
     protected int canvasWidth = -1;
     protected int canvasHeight = -1;
@@ -202,6 +203,7 @@ public class DefaultCaseDiagramCanvas {
             CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
             PROCESSTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/processTask.png", customClassLoader));
             DECISIONTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/decisionTask.png", customClassLoader));
+            SENDEVENTTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/sendEventTask.png", customClassLoader));
 
         } catch (IOException e) {
             LOGGER.warn("Could not load image for case diagram creation: {}", e.getMessage());
@@ -277,10 +279,10 @@ public class DefaultCaseDiagramCanvas {
         }
 
         for (int i = 1; i < xPoints.length; i++) {
-            Integer sourceX = xPoints[i - 1];
-            Integer sourceY = yPoints[i - 1];
-            Integer targetX = xPoints[i];
-            Integer targetY = yPoints[i];
+            int sourceX = xPoints[i - 1];
+            int sourceY = yPoints[i - 1];
+            int targetX = xPoints[i];
+            int targetY = yPoints[i];
             Line2D.Double line = new Line2D.Double(sourceX, sourceY, targetX, targetY);
             g.draw(line);
         }
@@ -555,6 +557,10 @@ public class DefaultCaseDiagramCanvas {
 
     public void drawServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(SERVICETASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+    
+    public void drawSendEventTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SENDEVENTTASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawCaseTask(String name, GraphicInfo graphicInfo, double scaleFactor) {

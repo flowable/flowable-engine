@@ -22,6 +22,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 /**
@@ -406,5 +407,20 @@ public class AutoCompleteEvaluationTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testStageNotCompletedUntilChildrenStable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("mandatory task 1", task.getName());
+
+        cmmnTaskService.complete(task.getId());
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("mandatory task 3", task.getName());
+
+        cmmnTaskService.complete(task.getId());
+        assertCaseInstanceEnded(caseInstance);
     }
 }

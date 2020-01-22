@@ -1,0 +1,119 @@
+<html>
+<head>
+<title>Flowable DOCS</title>
+<script type="text/javascript">
+// Closure-wrapped for security.
+(function () {
+    var anchorMap = {
+"_automatic_resource_deployment": "../form/ch04-Spring#automatic-resource-deployment",
+"_configuration": "../form/ch02-Configuration#configuration",
+"_configuration_2": "../form/ch07-REST#configuration",
+"_create_a_new_deployment": "../form/ch07-REST#create-a-new-deployment",
+"_custom_properties": "../form/ch02-Configuration#custom-properties",
+"_delete_a_deployment": "../form/ch07-REST#delete-a-deployment",
+"_deploying_programmatically": "../form/ch05-Deployment#deploying-programmatically",
+"_deployment": "../form/ch07-REST#deployment",
+"_download": "../oss-introduction#download",
+"_error_response_body": "../form/ch07-REST#error-response-body",
+"_exception_strategy": "../form/ch03-API#exception-strategy",
+"_experimental_features": "../oss-introduction#experimental-features",
+"_form_definitions_2": "../form/ch05-Deployment#form-definitions-1",
+"_form_definitions_3": "../form/ch07-REST#form-definitions",
+"_form_definitions": "../form/ch05-Deployment#form-definitions",
+"_form_engine": "../form/ch07-REST#form-engine",
+"_form_instances": "../form/ch07-REST#form-instances",
+"_formenginefactorybean": "../form/ch04-Spring#formenginefactorybean",
+"_general_flowable_rest_principles": "../form/ch07-REST#general-flowable-rest-principles",
+"_get_a_deployment_resource_content": "../form/ch07-REST#get-a-deployment-resource-content",
+"_get_a_deployment": "../form/ch07-REST#get-a-deployment",
+"_get_a_form_definition_form_model": "../form/ch07-REST#get-a-form-definition-form-model",
+"_get_a_form_definition_resource_content": "../form/ch07-REST#get-a-form-definition-resource-content",
+"_get_a_form_definition": "../form/ch07-REST#get-a-form-definition",
+"_get_a_form_instance": "../form/ch07-REST#get-a-form-instance",
+"_get_form_engine_info": "../form/ch07-REST#get-form-engine-info",
+"_ide": "../oss-introduction#ide",
+"_installation_and_authentication": "../form/ch07-REST#installation-and-authentication",
+"_internal_implementation_classes": "../oss-introduction#internal-implementation-classes",
+"_introduction": "../oss-introduction",
+"_jdk_8": "../oss-introduction#jdk-8",
+"_jndi_properties": "../form/ch02-Configuration#jndi-properties",
+"_json_body_parameters": "../form/ch07-REST#json-body-parameters",
+"_json_query_variable_format": "../form/ch07-REST#json-query-variable-format",
+"_license": "../oss-introduction#license",
+"_list_of_deployments": "../form/ch07-REST#list-of-deployments",
+"_list_of_form_definitions": "../form/ch07-REST#list-of-form-definitions",
+"_methods_and_return_codes": "../form/ch07-REST#methods-and-return-codes",
+"_paging_and_sorting": "../form/ch07-REST#paging-and-sorting",
+"_query_form_instances": "../form/ch07-REST#query-form-instances",
+"_reporting_problems": "../oss-introduction#reporting-problems",
+"_request_parameters": "../form/ch07-REST#request-parameters",
+"_required_software": "../oss-introduction#required-software",
+"_rest_url_query_parameters": "../form/ch07-REST#rest-url-query-parameters",
+"_sources": "../oss-introduction#sources",
+"_store_a_form_instance": "../form/ch07-REST#store-a-form-instance",
+"_url_fragments": "../form/ch07-REST#url-fragments",
+"_usage_in_tomcat": "../form/ch07-REST#usage-in-tomcat",
+"_variable_representation": "../form/ch07-REST#variable-representation",
+"_versioning_strategy": "../oss-introduction#versioning-strategy",
+"apiEngine": "../form/ch03-API#the-form-engine-api-and-services",
+"apiFormEngineInWebApp": "../form/ch03-API#the-form-engine-in-a-web-application",
+"apiUnitTesting": "../form/ch03-API#unit-testing",
+"chapterApi": "../form/ch03-API#the-flowable-form-api",
+"chDeployment": "../form/ch05-Deployment#deployment",
+"configuration": "../form/ch02-Configuration#configuration",
+"configurationClasses": "../form/ch02-Configuration#plug-into-process-engine",
+"configurationRoot": "../form/ch02-Configuration#formengineconfiguration-bean",
+"creatingDatabaseTable": "../form/ch02-Configuration#creating-the-database-tables",
+"database.tables.explained": "../form/ch02-Configuration#database-table-names-explained",
+"databaseConfiguration": "../form/ch02-Configuration#database-configuration",
+"databaseTypes": "../form/ch02-Configuration#supported-databases",
+"databaseUpgrade": "../form/ch02-Configuration#database-upgrade",
+"deploymentCategory": "../form/ch05-Deployment#category",
+"download": "../oss-introduction#download",
+"experimental": "../oss-introduction#experimental-features",
+"formDefining": "../form/ch06-Form-Introduction#defining-a-form",
+"formDefinitionCacheConfiguration": "../form/ch02-Configuration#deployment-cache-configuration",
+"formIntroduction": "../form/ch06-Form-Introduction#form-introduction",
+"internal": "../oss-introduction#internal-implementation-classes",
+"jndi_configuration": "../form/ch02-Configuration#configuration",
+"jndiDatasourceConfig": "../form/ch02-Configuration#jndi-datasource-configuration",
+"license": "../oss-introduction#license",
+"loggingConfiguration": "../form/ch02-Configuration#logging",
+"queryAPI": "../form/ch03-API#query-api",
+"reporting.problems": "../oss-introduction#reporting-problems",
+"required.software": "../oss-introduction#required-software",
+"restApiChapter": "../form/ch07-REST#rest-api",
+"restJsonBody": "../form/ch07-REST#json-body-parameters",
+"restPagingAndSort": "../form/ch07-REST#paging-and-sorting",
+"restQueryVariable": "../form/ch07-REST#json-query-variable-format",
+"restUsageInTomcat": "../form/ch07-REST-rest#usage-in-tomcat",
+"restVariables": "../form/ch07-REST#variable-representation",
+"sources": "../oss-introduction#sources",
+"springintegration": "../form/ch04-Spring#spring-integration",
+"springUnitTest": "../form/ch04-Spring#unit-testing",
+"supporteddatabases": "../form/ch02-Configuration#supported-databases",
+"versioningOfFormDefinitions": "../form/ch05-Deployment#versioning-of-form-definitions",
+"whatIsFormDefinition": "../form/ch06-Form-Introduction#what-is-a-form-definition"
+    }
+    /*
+    * Best practice for extracting hashes:
+    * https://stackoverflow.com/a/10076097/151365
+    */
+    var hash = window.location.hash.substring(1);
+    if (hash) {
+        /*
+        * Best practice for javascript redirects: 
+        * https://stackoverflow.com/a/506004/151365
+        */
+        window.location.replace(anchorMap[hash]);
+    }
+    else {
+        window.location.replace("../form/ch02-Configuration/");
+    }
+})();
+</script>
+</head>
+<body>
+<h2>Redirecting...</h2>
+</body>
+</html>

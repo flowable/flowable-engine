@@ -29,7 +29,7 @@ import flowable.mappers.CustomMybatisMapper;
 /**
  * @author Dominik Bartos
  */
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);

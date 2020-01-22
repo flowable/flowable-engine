@@ -35,7 +35,7 @@ public class ChangeStateEventListenerTest extends FlowableCmmnTestCase {
     public void testChangeHumanTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         
         cmmnRuntimeService.createChangePlanItemStateBuilder()
             .caseInstanceId(caseInstance.getId())
@@ -68,7 +68,7 @@ public class ChangeStateEventListenerTest extends FlowableCmmnTestCase {
         assertTrue(planItem3Found);
         
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
@@ -79,7 +79,7 @@ public class ChangeStateEventListenerTest extends FlowableCmmnTestCase {
     public void testChangeHumanTaskAndListener() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         
         PlanItemInstance singlePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("eventListener").singleResult();
         assertNotNull(singlePlanItemInstance);

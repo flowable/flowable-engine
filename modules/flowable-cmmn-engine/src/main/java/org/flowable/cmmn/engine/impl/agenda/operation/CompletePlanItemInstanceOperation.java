@@ -55,5 +55,11 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
         planItemInstanceEntity.setCompletedTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCompleted(planItemInstanceEntity);
     }
+
+    @Override
+    protected String getOperationName() {
+        return "[Complete plan item]";
+    }
+
     
 }

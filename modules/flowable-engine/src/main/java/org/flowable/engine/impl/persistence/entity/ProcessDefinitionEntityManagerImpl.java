@@ -105,4 +105,9 @@ public class ProcessDefinitionEntityManagerImpl
         dataManager.updateProcessDefinitionTenantIdForDeployment(deploymentId, newTenantId);
     }
 
+    @Override
+    public void updateProcessDefinitionVersionForProcessDefinitionId(String processDefinitionId, int version) {
+        dataManager.updateProcessDefinitionVersionForProcessDefinitionId(processDefinitionId, version);
+    }
+
 }

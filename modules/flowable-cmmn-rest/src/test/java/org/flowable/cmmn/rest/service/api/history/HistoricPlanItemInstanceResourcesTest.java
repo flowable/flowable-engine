@@ -13,6 +13,9 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.HttpStatus;
@@ -39,10 +42,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for REST-operation related to get historic plan item instances
  *
  * @author DennisFederico
+ * @author Filip Hrisafov
  */
 public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCase {
 
@@ -113,48 +119,229 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
     public void testHistoricPlanItemInstanceResource() {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithStage").start();
 
-        //There are 3 planItems... check them by Id
-        List<HistoricPlanItemInstance> historicPlanItems = historyService.createHistoricPlanItemInstanceQuery().list();
-        assertEquals(3, historicPlanItems.size());
-        historicPlanItems.forEach(p -> {
-            try {
-                HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, p.getId()));
-                CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-                assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
-                JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertHistoricPlanItemValues(p, responseNode);
-                String state = responseNode.get("state").asText();
-                assertTrue(PlanItemInstanceState.ACTIVE.equals(state) || PlanItemInstanceState.AVAILABLE.equals(state));
-            } catch (IOException e) {
-                fail(e.getMessage());
-            }
-        });
+        HistoricPlanItemInstance abortStageEvent = historyService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDefinitionId("abortStageEvent")
+            .singleResult();
+
+        assertThat(abortStageEvent).isNotNull();
+
+        String abortStagePlanItemInstanceId = abortStageEvent.getId();
+        JsonNode responseNode = getHistoricPlanItemInstanceResponse(abortStagePlanItemInstanceId);
+
+        assertThatJson(responseNode)
+            .isEqualTo("{"
+                + "  id: '" + abortStagePlanItemInstanceId + "',"
+                + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, abortStagePlanItemInstanceId) + "',"
+                + "  name: null,"
+                + "  caseInstanceId: '" + caseInstance.getId() + "',"
+                + "  caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()) + "',"
+                + "  caseDefinitionId: '" + caseInstance.getCaseDefinitionId() + "',"
+                + "  caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()) + "',"
+                + "  derivedCaseDefinitionId: null,"
+                + "  derivedCaseDefinitionUrl: null,"
+                + "  stageInstanceId: null,"
+                + "  stageInstanceUrl: null,"
+                + "  planItemDefinitionId: 'abortStageEvent',"
+                + "  planItemDefinitionType: 'usereventlistener',"
+                + "  state: 'available',"
+                + "  stage: false,"
+                + "  elementId: 'planItemAbortStage',"
+                + "  createTime: '${json-unit.any-string}',"
+                + "  lastAvailableTime: '${json-unit.any-string}',"
+                + "  lastEnabledTime: null,"
+                + "  lastDisabledTime: null,"
+                + "  lastStartedTime: null,"
+                + "  lastSuspendedTime: null,"
+                + "  completedTime: null,"
+                + "  occurredTime: null,"
+                + "  terminatedTime: null,"
+                + "  exitTime: null,"
+                + "  endedTime: null,"
+                + "  lastUpdatedTime: '${json-unit.any-string}',"
+                + "  startUserId: null,"
+                + "  referenceId: null,"
+                + "  referenceType: null,"
+                + "  entryCriterionId: null,"
+                + "  exitCriterionId: null,"
+                + "  formKey: null,"
+                + "  extraValue: null,"
+                + "  showInOverview: false,"
+                + "  tenantId: ''"
+                + "}");
+
+        HistoricPlanItemInstance stageOne = historyService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDefinitionId("stageOne")
+            .singleResult();
+
+        assertThat(stageOne).isNotNull();
+
+        String stageOnePlanItemInstanceId = stageOne.getId();
+        responseNode = getHistoricPlanItemInstanceResponse(stageOnePlanItemInstanceId);
+
+        assertThatJson(responseNode)
+            .isEqualTo("{"
+                + "  id: '" + stageOnePlanItemInstanceId + "',"
+                + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, stageOnePlanItemInstanceId) + "',"
+                + "  name: null,"
+                + "  caseInstanceId: '" + caseInstance.getId() + "',"
+                + "  caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()) + "',"
+                + "  caseDefinitionId: '" + caseInstance.getCaseDefinitionId() + "',"
+                + "  caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()) + "',"
+                + "  derivedCaseDefinitionId: null,"
+                + "  derivedCaseDefinitionUrl: null,"
+                + "  stageInstanceId: null,"
+                + "  stageInstanceUrl: null,"
+                + "  planItemDefinitionId: 'stageOne',"
+                + "  planItemDefinitionType: 'stage',"
+                + "  state: 'active',"
+                + "  stage: true,"
+                + "  elementId: 'planItemStageOne',"
+                + "  createTime: '${json-unit.any-string}',"
+                + "  lastAvailableTime: '${json-unit.any-string}',"
+                + "  lastEnabledTime: null,"
+                + "  lastDisabledTime: null,"
+                + "  lastStartedTime: '${json-unit.any-string}',"
+                + "  lastSuspendedTime: null,"
+                + "  completedTime: null,"
+                + "  occurredTime: null,"
+                + "  terminatedTime: null,"
+                + "  exitTime: null,"
+                + "  endedTime: null,"
+                + "  lastUpdatedTime: '${json-unit.any-string}',"
+                + "  startUserId: null,"
+                + "  referenceId: null,"
+                + "  referenceType: null,"
+                + "  entryCriterionId: null,"
+                + "  exitCriterionId: null,"
+                + "  formKey: null,"
+                + "  extraValue: null,"
+                + "  showInOverview: true,"
+                + "  tenantId: ''"
+                + "}");
+
+        HistoricPlanItemInstance manualTask = historyService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceDefinitionId("myManualTask")
+            .singleResult();
+
+        assertThat(manualTask).isNotNull();
+
+        String manualTaskPlanItemInstanceId = manualTask.getId();
+        responseNode = getHistoricPlanItemInstanceResponse(manualTaskPlanItemInstanceId);
+
+        assertThatJson(responseNode)
+            .isEqualTo("{"
+                + "  id: '" + manualTaskPlanItemInstanceId + "',"
+                + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, manualTaskPlanItemInstanceId) + "',"
+                + "  name: null,"
+                + "  caseInstanceId: '" + caseInstance.getId() + "',"
+                + "  caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()) + "',"
+                + "  caseDefinitionId: '" + caseInstance.getCaseDefinitionId() + "',"
+                + "  caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()) + "',"
+                + "  derivedCaseDefinitionId: null,"
+                + "  derivedCaseDefinitionUrl: null,"
+                + "  stageInstanceId: '" + stageOnePlanItemInstanceId + "',"
+                + "  stageInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, stageOnePlanItemInstanceId) + "',"
+                + "  planItemDefinitionId: 'myManualTask',"
+                + "  planItemDefinitionType: 'humantask',"
+                + "  state: 'active',"
+                + "  stage: false,"
+                + "  elementId: 'planItemTask',"
+                + "  createTime: '${json-unit.any-string}',"
+                + "  lastAvailableTime: '${json-unit.any-string}',"
+                + "  lastEnabledTime: null,"
+                + "  lastDisabledTime: null,"
+                + "  lastStartedTime: '${json-unit.any-string}',"
+                + "  lastSuspendedTime: null,"
+                + "  completedTime: null,"
+                + "  occurredTime: null,"
+                + "  terminatedTime: null,"
+                + "  exitTime: null,"
+                + "  endedTime: null,"
+                + "  lastUpdatedTime: '${json-unit.any-string}',"
+                + "  startUserId: null,"
+                + "  referenceId: null,"
+                + "  referenceType: null,"
+                + "  entryCriterionId: null,"
+                + "  exitCriterionId: null,"
+                + "  formKey: null,"
+                + "  extraValue: null,"
+                + "  showInOverview: false,"
+                + "  tenantId: ''"
+                + "}");
 
         //Complete the task
         taskService.complete(taskService.createTaskQuery().active().singleResult().getId());
 
-        //Check that plan item in history are completed
-        historicPlanItems = historyService.createHistoricPlanItemInstanceQuery().list();
-        assertEquals(3, historicPlanItems.size());
-        historicPlanItems.forEach(p -> {
-            try {
-                HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, p.getId()));
-                CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-                assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
-                JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertHistoricPlanItemValues(p, responseNode);
+        //Check that plan items in history are completed
+        responseNode = getHistoricPlanItemInstanceResponse(abortStagePlanItemInstanceId);
 
-                if ("usereventlistener".equals(responseNode.get("planItemDefinitionType").asText())) {
-                    assertEquals(PlanItemInstanceState.TERMINATED, responseNode.get("state").asText());
-                } else {
-                    assertEquals(PlanItemInstanceState.COMPLETED, responseNode.get("state").asText());
-                }
-            } catch (IOException e) {
-                fail(e.getMessage());
-            }
-        });
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  id: '" + abortStagePlanItemInstanceId + "',"
+                + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, abortStagePlanItemInstanceId) + "',"
+                + "  state: 'terminated',"
+                + "  elementId: 'planItemAbortStage',"
+                + "  createTime: '${json-unit.any-string}',"
+                + "  lastAvailableTime: '${json-unit.any-string}',"
+                + "  lastEnabledTime: null,"
+                + "  lastDisabledTime: null,"
+                + "  lastStartedTime: null,"
+                + "  lastSuspendedTime: null,"
+                + "  completedTime: null,"
+                + "  occurredTime: null,"
+                + "  terminatedTime: '${json-unit.any-string}',"
+                + "  exitTime: null,"
+                + "  endedTime: '${json-unit.any-string}',"
+                + "  lastUpdatedTime: '${json-unit.any-string}'"
+                + "}");
+
+        responseNode = getHistoricPlanItemInstanceResponse(stageOnePlanItemInstanceId);
+
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  id: '" + stageOnePlanItemInstanceId + "',"
+                + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, stageOnePlanItemInstanceId) + "',"
+                + "  state: 'completed',"
+                + "  elementId: 'planItemStageOne',"
+                + "  createTime: '${json-unit.any-string}',"
+                + "  lastAvailableTime: '${json-unit.any-string}',"
+                + "  lastEnabledTime: null,"
+                + "  lastDisabledTime: null,"
+                + "  lastStartedTime: '${json-unit.any-string}',"
+                + "  lastSuspendedTime: null,"
+                + "  completedTime: '${json-unit.any-string}',"
+                + "  occurredTime: null,"
+                + "  terminatedTime: null,"
+                + "  exitTime: null,"
+                + "  endedTime: '${json-unit.any-string}',"
+                + "  lastUpdatedTime: '${json-unit.any-string}'"
+                + "}");
+
+        responseNode = getHistoricPlanItemInstanceResponse(manualTaskPlanItemInstanceId);
+
+        assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                + "  id: '" + manualTaskPlanItemInstanceId + "',"
+                + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, manualTaskPlanItemInstanceId) + "',"
+                + "  state: 'completed',"
+                + "  elementId: 'planItemTask',"
+                + "  createTime: '${json-unit.any-string}',"
+                + "  lastAvailableTime: '${json-unit.any-string}',"
+                + "  lastEnabledTime: null,"
+                + "  lastDisabledTime: null,"
+                + "  lastStartedTime: '${json-unit.any-string}',"
+                + "  lastSuspendedTime: null,"
+                + "  completedTime: '${json-unit.any-string}',"
+                + "  occurredTime: null,"
+                + "  terminatedTime: null,"
+                + "  exitTime: null,"
+                + "  endedTime: '${json-unit.any-string}',"
+                + "  lastUpdatedTime: '${json-unit.any-string}'"
+                + "}");
+
         assertCaseEnded(caseInstance.getId());
     }
 
@@ -396,6 +583,19 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
     private Map<String, JsonNode> mapNodesBy(String attribute, JsonNode array) {
         return StreamSupport.stream(array.spliterator(), false)
                 .collect(Collectors.toMap(o -> o.get(attribute).asText(), o -> o));
+    }
+
+    protected JsonNode getHistoricPlanItemInstanceResponse(String planItemInstanceId) {
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, planItemInstanceId));
+        try (CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK)) {
+
+            assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            assertThat(response).isNotNull();
+            return responseNode;
+        } catch (IOException e) {
+            throw new AssertionError("IO Exception for HTTP Connection", e);
+        }
     }
 
     private void assertHistoricPlanItemValues(List<HistoricPlanItemInstance> expected, JsonNode actual) {

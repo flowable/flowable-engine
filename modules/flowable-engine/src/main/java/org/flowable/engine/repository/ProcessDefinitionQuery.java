@@ -166,6 +166,16 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
      */
     ProcessDefinitionQuery messageEventSubscriptionName(String messageName);
 
+    /**
+     * Localize process definition name and description to specified locale.
+     */
+    ProcessDefinitionQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    ProcessDefinitionQuery withLocalizationFallback();
+
     // ordering ////////////////////////////////////////////////////////////
 
     /**

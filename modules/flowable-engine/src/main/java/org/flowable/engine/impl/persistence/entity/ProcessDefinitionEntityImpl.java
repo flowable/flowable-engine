@@ -33,7 +33,9 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
     private static final long serialVersionUID = 1L;
 
     protected String name;
+    protected String localizedName;
     protected String description;
+    protected String localizedDescription;
     protected String key;
     protected int version;
     protected String category;
@@ -89,12 +91,24 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
 
     @Override
     public String getName() {
+        if(localizedName != null && localizedName.length() > 0) {
+            return localizedName;
+        }
         return name;
     }
 
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLocalizedName() {
+        return localizedName;
+    }
+
+    @Override
+    public void setLocalizedName(String localizedName) {
+        this.localizedName = localizedName;
     }
 
     @Override
@@ -104,7 +118,19 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
 
     @Override
     public String getDescription() {
+        if(localizedDescription != null && localizedDescription.length() > 0) {
+            return localizedDescription;
+        }
         return description;
+    }
+
+    public String getLocalizedDescription() {
+        return localizedDescription;
+    }
+
+    @Override
+    public void setLocalizedDescription(String localizedDescription) {
+        this.localizedDescription = localizedDescription;
     }
 
     @Override

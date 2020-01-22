@@ -18,20 +18,25 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<spring.framework.version>5.1.11.RELEASE</spring.framework.version>
-		<spring.security.version>5.1.7.RELEASE</spring.security.version>
-		<jackson.version>2.10.1</jackson.version>
+		<spring.framework.version>5.2.2.RELEASE</spring.framework.version>
+		<spring.security.version>5.2.1.RELEASE</spring.security.version>
+		<spring.amqp.version>2.2.2.RELEASE</spring.amqp.version>
+		<spring.kafka.version>2.3.4.RELEASE</spring.kafka.version>
+		<jackson.version>2.10.2</jackson.version>
+		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.24.0</camel.version>
-		<cxf.version>3.3.4</cxf.version>
-		<slf4j.version>1.7.29</slf4j.version>
-		<spring.boot.version>2.1.10.RELEASE</spring.boot.version>
+		<cxf.version>3.3.5</cxf.version>
+		<slf4j.version>1.7.30</slf4j.version>
+		<spring.boot.version>2.2.2.RELEASE</spring.boot.version>
 
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13</junit.version>
 		<junit.jupiter.version>5.5.2</junit.jupiter.version>
+		<hikari.version>3.4.2</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-		<mockito.version>3.1.0</mockito.version>
+		<mockito.version>3.2.4</mockito.version>
+		<testcontainers.version>1.12.4</testcontainers.version>
 
 		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
@@ -123,22 +128,22 @@
 			<dependency>
 			    <groupId>commons-codec</groupId>
 			    <artifactId>commons-codec</artifactId>
-			    <version>1.13</version>
+			    <version>1.14</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.5.10</version>
+				<version>4.5.11</version>
 			</dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>4.4.12</version>
+                <version>4.4.13</version>
             </dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.5.10</version>
+				<version>4.5.11</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.jdbc</groupId>
@@ -207,6 +212,19 @@
 				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>com.zaxxer</groupId>
+				<artifactId>HikariCP</artifactId>
+				<version>${hikari.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
@@ -548,6 +566,46 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-json-converter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-spring-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-eventsubscription-service</artifactId>
 				<version>${project.version}</version>
@@ -718,7 +776,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-jsr223</artifactId>
-				<version>2.5.8</version>
+				<version>2.5.9</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -749,11 +807,6 @@
               <groupId>org.mybatis</groupId>
               <artifactId>mybatis-spring</artifactId>
               <version>2.0.3</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>3.4.1</version>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
@@ -823,6 +876,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
+				<artifactId>spring-jms</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
 				<artifactId>spring-orm</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
@@ -855,6 +913,16 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.amqp</groupId>
+				<artifactId>spring-rabbit</artifactId>
+				<version>${spring.amqp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.kafka</groupId>
+				<artifactId>spring-kafka</artifactId>
+				<version>${spring.kafka.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
@@ -928,7 +996,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>28.1-jre</version>
+				<version>28.2-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
@@ -959,6 +1027,12 @@
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-joda</artifactId>
 				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>jakarta.jms</groupId>
+				<artifactId>jakarta.jms-api</artifactId>
+				<version>${jakarta-jms.version}</version>
 			</dependency>
 			<!-- Camel integration -->
 			<dependency>
@@ -1020,6 +1094,11 @@
 		<module>modules/flowable-variable-service</module>
         <module>modules/flowable-identitylink-service-api</module>
 		<module>modules/flowable-identitylink-service</module>
+		<module>modules/flowable-event-registry-api</module>
+		<module>modules/flowable-event-registry-model</module>
+		<module>modules/flowable-event-registry-json-converter</module>
+		<module>modules/flowable-event-registry</module>
+		<module>modules/flowable-event-registry-configurator</module>
 		<module>modules/flowable-eventsubscription-service-api</module>
 		<module>modules/flowable-eventsubscription-service</module>
         <module>modules/flowable-task-service-api</module>
@@ -1253,6 +1332,9 @@
                 <module>modules/flowable-spring-common</module>
                 <module>modules/flowable-engine-configurator</module>
                 <module>modules/flowable-spring-configurator</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-app-engine-spring</module>
                 <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
@@ -1374,6 +1456,9 @@
 				<module>modules/flowable-idm-spring</module>
 				<module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-ldap</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
@@ -1510,6 +1595,9 @@
                 <module>modules/flowable-idm-spring</module>
                 <module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-content-engine</module>
                 <module>modules/flowable-content-engine-configurator</module>
                 <module>modules/flowable-content-spring</module>
@@ -1701,6 +1789,10 @@
 				<module>modules/flowable-idm-engine-configurator</module>
 				<module>modules/flowable-idm-spring</module>
 				<module>modules/flowable-idm-spring-configurator</module>
+                <module>modules/flowable-event-registry-configurator</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>

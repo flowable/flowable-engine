@@ -57,7 +57,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Filip Hrisafov
  * @author Javier Casal
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnFormEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -115,7 +115,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         }
 
         CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.FORM);
-        // Always add the out of the box auto deployment strategies as last
+        // Always add the out of the box auto deyment strategies as last
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(deploymentProperties));
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
@@ -124,7 +124,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         return configuration;
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.spring.SpringProcessEngineConfiguration"
     })
@@ -152,7 +152,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         }
     }
     
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })

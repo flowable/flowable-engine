@@ -1,0 +1,23 @@
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:flowable="http://flowable.org/bpmn" 
+    targetNamespace="http://www.flowable.org/test">
+    
+  <process id="process" name="process1" isExecutable="true">
+    <serviceTask id="sendEventServiceTask" flowable:type="send-event" name="Send event task" flowable:triggerable="true">
+      <extensionElements>
+        <flowable:eventType>myEvent</flowable:eventType>
+        <flowable:triggerEventType>triggerMyEvent</flowable:triggerEventType>
+        <flowable:eventInParameter source="${myVariable}" target="customerId" />
+        <flowable:eventInParameter source="anotherProperty" target="anotherCustomerId" targetType="string"/>
+        <flowable:eventOutParameter source="eventProperty" sourceType="integer" target="newVariable" />
+        <flowable:triggerEventCorrelationParameter name="customerId" value="${customerIdVar}" />
+        <flowable:triggerEventCorrelationParameter name="orderId" value="${orderIdVar}" />
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow sourceRef="sid-4D8B3541-C9E5-45BB-8BB1-F6C94B9A4C11" targetRef="sendEventServiceTask"></sequenceFlow>
+    <endEvent id="sid-DC3F9E0D-7CE0-4A8E-847E-823110F71807"></endEvent>
+    <startEvent id="sid-4D8B3541-C9E5-45BB-8BB1-F6C94B9A4C11"></startEvent>
+    <sequenceFlow sourceRef="sendEventServiceTask" targetRef="sid-DC3F9E0D-7CE0-4A8E-847E-823110F71807"></sequenceFlow>
+  </process>
+</definitions>

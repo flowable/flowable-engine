@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.parser.handler;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.model.BaseElement;
@@ -33,7 +34,11 @@ public class GenericEventListenerParseHandler extends AbstractPlanItemParseHandl
 
     @Override
     protected void executePlanItemParse(CmmnParserImpl cmmnParser, CmmnParseResult cmmnParseResult, PlanItem planItem, GenericEventListener genericEventListener) {
-        planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createGenericEventListenerActivityBehavior(planItem, genericEventListener));
+        if (StringUtils.isEmpty(genericEventListener.getEventType())) {
+            planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createGenericEventListenerActivityBehavior(planItem, genericEventListener));
+        } else {
+            planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createEventRegistryEventListenerActivityBehaviour(planItem, genericEventListener));
+        }
     }
 
 }

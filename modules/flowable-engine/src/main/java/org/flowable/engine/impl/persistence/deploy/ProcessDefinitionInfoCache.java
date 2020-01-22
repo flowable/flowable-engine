@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.deploy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -22,6 +23,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -36,7 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  * @author Tijs Rademakers
  */
-public class ProcessDefinitionInfoCache {
+public class ProcessDefinitionInfoCache implements DeploymentCache<ProcessDefinitionInfoCacheObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDefinitionInfoCache.class);
 
@@ -70,6 +72,7 @@ public class ProcessDefinitionInfoCache {
         });
     }
 
+    @Override
     public ProcessDefinitionInfoCacheObject get(final String processDefinitionId) {
         ProcessDefinitionInfoCacheObject infoCacheObject = null;
         Command<ProcessDefinitionInfoCacheObject> cacheCommand = new Command<ProcessDefinitionInfoCacheObject>() {
@@ -89,19 +92,32 @@ public class ProcessDefinitionInfoCache {
         return infoCacheObject;
     }
 
+    @Override
+    public boolean contains(String id) {
+        return cache.containsKey(id);
+    }
+
+    @Override
     public void add(String id, ProcessDefinitionInfoCacheObject obj) {
         cache.put(id, obj);
     }
 
+    @Override
     public void remove(String id) {
         cache.remove(id);
     }
 
+    @Override
     public void clear() {
         cache.clear();
     }
 
-    // For testing purposes only
+    @Override
+    public Collection<ProcessDefinitionInfoCacheObject> getAll() {
+        return cache.values();
+    }
+
+    @Override
     public int size() {
         return cache.size();
     }

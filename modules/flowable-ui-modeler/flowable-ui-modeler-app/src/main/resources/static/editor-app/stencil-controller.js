@@ -90,7 +90,9 @@ angular.module('flowableModeler')
             
                 // Check if the root group is the 'diagram' group. If so, this item should not be shown.
                 var currentGroupName = data.stencils[stencilIndex].groups[0];
-                if (currentGroupName === 'Diagram' || currentGroupName === 'Form') {
+                if (currentGroupName === 'Diagram' || currentGroupName === 'BPMN.STENCILS.GROUPS.DIAGRAM' || 
+                        currentGroupName === 'CMMN.STENCILS.GROUPS.DIAGRAM') {
+                        
                     continue;  // go to next item
                 }
                 

@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableDebuggerProperties.class)
 @ConditionalOnProperty(prefix = "flowable.experimental.debugger", name = "enabled", havingValue = "true")
 @AutoConfigureBefore(ProcessEngineAutoConfiguration.class)

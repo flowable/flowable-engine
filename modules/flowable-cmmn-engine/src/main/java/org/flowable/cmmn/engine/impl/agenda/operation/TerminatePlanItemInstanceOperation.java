@@ -53,5 +53,10 @@ public class TerminatePlanItemInstanceOperation extends AbstractMovePlanItemInst
         planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
     }
+
+    @Override
+    protected String getOperationName() {
+        return "[Terminate plan item]";
+    }
     
 }

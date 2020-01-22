@@ -27,6 +27,8 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
+import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -35,6 +37,9 @@ import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
+import org.flowable.variable.service.impl.util.VariableLoggingSessionUtil;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -61,6 +66,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     protected abstract VariableScopeImpl getParentVariableScope();
 
     protected abstract void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance);
+    
+    protected abstract void addLoggingSessionInfo(ObjectNode loggingNode);
 
     protected void ensureVariableInstancesInitialized() {
         if (variableInstances == null) {
@@ -828,12 +835,19 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance) {
         CommandContextUtil.getVariableInstanceEntityManager().delete(variableInstance);
+        
+        VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
+        if (variableServiceConfiguration.isLoggingSessionEnabled()) {
+            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + variableInstance.getName() + "' deleted", variableInstance);
+            addLoggingSessionInfo(loggingNode);
+            LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_DELETE, loggingNode);
+        }
+        
         variableInstance.setValue(null);
 
         initializeVariableInstanceBackPointer(variableInstance);
 
         if (isPropagateToHistoricVariable()) {
-            VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
                 variableServiceConfiguration.getInternalHistoryVariableManager()
                     .recordVariableRemoved(variableInstance, variableServiceConfiguration.getClock().getCurrentTime());
@@ -850,6 +864,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
 
         VariableType newType = variableTypes.findVariableType(value);
+        
+        Object oldVariableValue = variableInstance.getValue();
+        String oldVariableType = variableInstance.getTypeName();
 
         if (newType != null && !newType.equals(variableInstance.getType())) {
             variableInstance.setValue(null);
@@ -871,23 +888,33 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
 
         // Dispatch event, if needed
-        if (variableServiceConfiguration.getEventDispatcher() != null && variableServiceConfiguration.getEventDispatcher().isEnabled()) {
+        if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
                             FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value,
                                             variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
                                             variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
                                             variableInstance.getScopeId(), variableInstance.getScopeType()));
         }
+        
+        if (variableServiceConfiguration.isLoggingSessionEnabled()) {
+            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + variableInstance.getName() + "' updated", variableInstance);
+            addLoggingSessionInfo(loggingNode);
+            loggingNode.put("oldVariableType", oldVariableType);
+            VariableLoggingSessionUtil.addVariableValue(oldVariableValue, oldVariableType, "oldVariableRawValue", "oldVariableValue", loggingNode);
+            LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_UPDATE, loggingNode);
+        }
     }
 
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
-        VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
+        VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
+        VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
 
         VariableType type = variableTypes.findVariableType(value);
 
         VariableInstanceEntityManager variableInstanceEntityManager = CommandContextUtil.getVariableInstanceEntityManager();
         VariableInstanceEntity variableInstance = variableInstanceEntityManager.create(variableName, type);
         initializeVariableInstanceBackPointer(variableInstance);
+        
         // Set the value after initializing the back pointer
         variableInstance.setValue(value);
         variableInstanceEntityManager.insert(variableInstance);
@@ -896,7 +923,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             variableInstances.put(variableName, variableInstance);
         }
 
-        VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
                 variableServiceConfiguration.getInternalHistoryVariableManager()
@@ -904,12 +930,18 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             }
         }
 
-        if (variableServiceConfiguration.getEventDispatcher() != null && variableServiceConfiguration.getEventDispatcher().isEnabled()) {
+        if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
                             FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value,
                                             variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
                                             variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
                                             variableInstance.getScopeId(), variableInstance.getScopeType()));
+        }
+        
+        if (variableServiceConfiguration.isLoggingSessionEnabled()) {
+            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + variableInstance.getName() + "' created", variableInstance);
+            addLoggingSessionInfo(loggingNode);
+            LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_CREATE, loggingNode);
         }
 
         return variableInstance;

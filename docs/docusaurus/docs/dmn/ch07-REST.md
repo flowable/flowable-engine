@@ -463,7 +463,7 @@ It’s possible to support additional variable-types with a custom JSON represen
 
 ## Deployment
 
-**When using tomcat, please read [Usage in Tomcat](#restUsageInTomcat).**
+**When using tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
 
 ### List of DMN Deployments
 
@@ -1261,7 +1261,7 @@ Returns a read-only view of the DMN engine that is used in this REST-service.
 
     {
        "name":"default",
-       "version":"6.5.0-SNAPSHOT",
+       "version":"6.5.0.event-SNAPSHOT",
        "resourceUrl":"file://flowable-dmn/flowable.dmn.cfg.xml",
        "exception":null
     }

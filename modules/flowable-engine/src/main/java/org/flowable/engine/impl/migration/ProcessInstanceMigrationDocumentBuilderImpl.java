@@ -22,9 +22,11 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
+import org.flowable.engine.migration.Script;
 
 /**
  * @author Dennis Federico
+ * @author martin.grofcik
  */
 public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInstanceMigrationDocumentBuilder {
 
@@ -34,6 +36,12 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     protected String migrateToProcessDefinitionTenantId;
     protected List<ActivityMigrationMapping> activityMigrationMappings = new ArrayList<>();
     protected Map<String, Object> processInstanceVariables = new HashMap<>();
+    protected Script preUpgradeScript;
+    protected String preUpgradeJavaDelegate;
+    protected String preUpgradeJavaDelegateExpression;
+    protected Script postUpgradeScript;
+    protected String postUpgradeJavaDelegate;
+    protected String postUpgradeJavaDelegateExpression;
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId) {
@@ -51,6 +59,42 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     @Override
     public ProcessInstanceMigrationDocumentBuilder setTenantId(String processDefinitionTenantId) {
         this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPreUpgradeScript(Script script) {
+        this.preUpgradeScript = script;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPreUpgradeJavaDelegate(String preUpgradeJavaDelegate) {
+        this.preUpgradeJavaDelegate = preUpgradeJavaDelegate;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPreUpgradeJavaDelegateExpression(String expression) {
+        this.preUpgradeJavaDelegateExpression = expression;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPostUpgradeScript(Script script) {
+        this.postUpgradeScript = script;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPostUpgradeJavaDelegate(String preUpgradeJavaDelegate) {
+        this.postUpgradeJavaDelegate = preUpgradeJavaDelegate;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setPostUpgradeJavaDelegateExpression(String expression) {
+        this.postUpgradeJavaDelegateExpression = expression;
         return this;
     }
 
@@ -93,6 +137,24 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
         ProcessInstanceMigrationDocumentImpl document = new ProcessInstanceMigrationDocumentImpl();
         document.setMigrateToProcessDefinitionId(migrateToProcessDefinitionId);
         document.setMigrateToProcessDefinition(migrateToProcessDefinitionKey, migrateToProcessDefinitionVersion, migrateToProcessDefinitionTenantId);
+        if (preUpgradeScript != null) {
+            document.setPreUpgradeScript(preUpgradeScript);
+        }
+        if (preUpgradeJavaDelegate != null) {
+            document.setPreUpgradeJavaDelegate(preUpgradeJavaDelegate);
+        }
+        if (preUpgradeJavaDelegateExpression != null) {
+            document.setPreUpgradeJavaDelegateExpression(preUpgradeJavaDelegateExpression);
+        }
+        if (postUpgradeScript != null) {
+            document.setPostUpgradeScript(postUpgradeScript);
+        }
+        if (postUpgradeJavaDelegate != null) {
+            document.setPostUpgradeJavaDelegate(postUpgradeJavaDelegate);
+        }
+        if (postUpgradeJavaDelegateExpression != null) {
+            document.setPostUpgradeJavaDelegateExpression(postUpgradeJavaDelegateExpression);
+        }
         document.setActivityMigrationMappings(activityMigrationMappings);
         document.setProcessInstanceVariables(processInstanceVariables);
 

@@ -31,12 +31,14 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
+import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.runner.RunWith;
 
@@ -52,6 +54,7 @@ public abstract class AbstractFlowableCmmnTestCase {
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected DynamicCmmnService dynamicCmmnService;
     protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
 
@@ -136,6 +139,16 @@ public abstract class AbstractFlowableCmmnTestCase {
         assertNull("Historical case instance is already marked as ended", cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getEndTime());
     }
 
+    protected void assertSingleTaskExists(List<Task> tasks, String name) {
+        List<String> taskIds = tasks.stream()
+            .filter(task -> Objects.equals(name, task.getName()))
+            .map(Task::getId)
+            .collect(Collectors.toList());
+
+        assertNotNull(taskIds);
+        assertEquals(1, taskIds.size());
+    }
+
     protected void assertPlanItemInstanceState(CaseInstance caseInstance, String name, String ... states) {
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(caseInstance.getId())
@@ -156,7 +169,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             fail("No plan item instances found with name " + name);
         }
 
-        assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
+        assertEquals("Incorrect number of states found: " + planItemInstanceStates + "", states.length, planItemInstanceStates.size());
         List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
             assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));

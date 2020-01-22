@@ -77,7 +77,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testElFunction").start();
         
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("The Task", task.getName());
+        assertEquals("Unguarded Task", task.getName());
         
         // Setting the variable to 123 should NOT satisfy the sentry of the second task, as the notEquals is with 123
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", 123);
@@ -88,7 +88,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
         assertEquals("Guarded Task", tasks.get(0).getName());
-        assertEquals("The Task", tasks.get(1).getName());
+        assertEquals("Unguarded Task", tasks.get(1).getName());
     }
     
     @Test

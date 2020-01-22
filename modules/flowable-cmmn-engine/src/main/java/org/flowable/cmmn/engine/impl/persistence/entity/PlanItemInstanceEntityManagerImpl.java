@@ -61,17 +61,18 @@ public class PlanItemInstanceEntityManagerImpl
     }
 
     @Override
-    public PlanItemInstanceBuilder createPlanItemInstanceBuilder() {
-        return new PlanItemInstanceBuilderImpl(this);
+    public PlanItemInstanceEntityBuilder createPlanItemInstanceEntityBuilder() {
+        return new PlanItemInstanceEntityBuilderImpl(this);
     }
 
-    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItemInstanceBuilderImpl builder) {
-        
+    public PlanItemInstanceEntity createChildPlanItemInstance(PlanItemInstanceEntityBuilderImpl builder) {
+
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
 
         PlanItemInstanceEntity planItemInstanceEntity = create();
         planItemInstanceEntity.setCaseDefinitionId(builder.getCaseDefinitionId());
+        planItemInstanceEntity.setDerivedCaseDefinitionId(builder.getDerivedCaseDefinitionId());
         planItemInstanceEntity.setCaseInstanceId(builder.getCaseInstanceId());
 
         planItemInstanceEntity.setCreateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
@@ -86,9 +87,19 @@ public class PlanItemInstanceEntityManagerImpl
         } else {
             planItemInstanceEntity.setStage(false);
         }
-        planItemInstanceEntity.setStageInstanceId(builder.getStagePlanItemInstanceId());
+
+        PlanItemInstance stagePlanItemInstance = builder.getStagePlanItemInstance();
+        if (stagePlanItemInstance != null) {
+            planItemInstanceEntity.setStageInstanceId(stagePlanItemInstance.getId());
+
+            // if the stage has a derived case definition id (e.g. was dynamically injected, we need to pass it on to child plan items, otherwise they cannot
+            // load the plan item model
+            if (stagePlanItemInstance.getDerivedCaseDefinitionId() != null && builder.getDerivedCaseDefinitionId() == null) {
+                planItemInstanceEntity.setDerivedCaseDefinitionId(stagePlanItemInstance.getDerivedCaseDefinitionId());
+            }
+        }
         planItemInstanceEntity.setTenantId(builder.getTenantId());
-       
+
         insert(planItemInstanceEntity);
 
 
@@ -97,24 +108,29 @@ public class PlanItemInstanceEntityManagerImpl
             planItemInstanceEntity.setVariablesLocal(builder.getLocalVariables());
         }
 
-        // the name might have an expression being based on local variables, so we can only set the name after insertion
-        if (builder.getPlanItem().getName() != null) {
-            Expression nameExpression = expressionManager.createExpression(builder.getPlanItem().getName());
-            String name;
-            if (builder.isSilentNameExpressionEvaluation()) {
-                try {
+        // check for an explicitly set name for the plan item instance
+        if (builder.getName() != null) {
+            planItemInstanceEntity.setName(builder.getName());
+        } else {
+            // the name might have an expression being based on local variables, so we can only set the name after insertion
+            if (builder.getPlanItem().getName() != null) {
+                Expression nameExpression = expressionManager.createExpression(builder.getPlanItem().getName());
+                String name;
+                if (builder.isSilentNameExpressionEvaluation()) {
+                    try {
+                        name = nameExpression.getValue(planItemInstanceEntity).toString();
+                    } catch (Exception e) {
+                        // we silently catch this exception as it is expected to a possible failure due to the state of the name evaluation
+                        // we use the expression itself as a fallback in this case
+                        name = builder.getPlanItem().getName();
+                    }
+                } else {
                     name = nameExpression.getValue(planItemInstanceEntity).toString();
-                } catch (Exception e) {
-                    // we silently catch this exception as it is expected to a possible failure due to the state of the name evaluation
-                    // we use the expression itself as a fallback in this case
-                    name = builder.getPlanItem().getName();
                 }
-            } else {
-                name = nameExpression.getValue(planItemInstanceEntity).toString();
+                planItemInstanceEntity.setName(name);
             }
-            planItemInstanceEntity.setName(name);
         }
-        
+
         if (builder.addToParent) {
             addPlanItemInstanceToParent(commandContext, planItemInstanceEntity);
         }

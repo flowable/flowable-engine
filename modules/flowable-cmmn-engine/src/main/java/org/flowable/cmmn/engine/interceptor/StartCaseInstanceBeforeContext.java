@@ -22,6 +22,8 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
 
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String parentId;
     protected Map<String, Object> transientVariables;
     protected String tenantId;
@@ -33,8 +35,9 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
         
     }
     
-    public StartCaseInstanceBeforeContext(String businessKey, String caseInstanceName, String callbackId, String callbackType, 
-                    String parentId, Map<String, Object> variables, Map<String, Object> transientVariables, String tenantId, 
+    public StartCaseInstanceBeforeContext(String businessKey, String caseInstanceName, String callbackId, String callbackType,
+                    String referenceId, String referenceType, String parentId, Map<String, Object> variables,
+                    Map<String, Object> transientVariables, String tenantId,
                     String initiatorVariableName, Case caseModel, CaseDefinition caseDefinition, CmmnModel cmmnModel,
                     String overrideDefinitionTenantId, String predefinedCaseInstanceId) {
         
@@ -42,6 +45,8 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
         
         this.callbackId = callbackId;
         this.callbackType = callbackType;
+        this.referenceId = referenceId;
+        this.referenceType = referenceType;
         this.parentId = parentId;
         this.transientVariables = transientVariables;
         this.tenantId = tenantId;
@@ -64,6 +69,22 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
 
     public String getParentId() {

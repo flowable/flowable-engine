@@ -30,7 +30,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database
@@ -50,7 +50,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -PcleanDb,mssql
           -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
           -Djdbc.username=flowable
@@ -80,7 +80,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database
@@ -100,7 +100,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pdmn,mssql
           -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
           -Djdbc.username=flowable
@@ -131,7 +131,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
       - name: Prepare Database
@@ -151,7 +151,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V
+          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
           -Pcontent,mssql
           -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
           -Djdbc.username=flowable

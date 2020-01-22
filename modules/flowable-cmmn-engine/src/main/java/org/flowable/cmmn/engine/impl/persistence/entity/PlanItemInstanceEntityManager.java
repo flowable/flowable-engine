@@ -27,7 +27,7 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
      * Returns a builder to create a new plan item instance.
      * @return the plan item instance builder
      */
-    PlanItemInstanceBuilder createPlanItemInstanceBuilder();
+    PlanItemInstanceEntityBuilder createPlanItemInstanceEntityBuilder();
 
     PlanItemInstanceQuery createPlanItemInstanceQuery();
 

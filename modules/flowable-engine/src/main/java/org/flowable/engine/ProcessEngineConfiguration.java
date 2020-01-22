@@ -14,15 +14,18 @@
 package org.flowable.engine;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
@@ -139,9 +142,14 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected String labelFontName = "Arial";
     protected String annotationFontName = "Arial";
 
-    protected ProcessEngineLifecycleListener processEngineLifecycleListener;
-
     protected boolean enableProcessDefinitionInfoCache;
+
+    // History Cleanup
+    protected boolean enableHistoryCleaning = false;
+    protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
+    protected int cleanInstancesEndedAfterNumberOfDays = 365;
+    protected HistoryCleaningManager historyCleaningManager;
+
 
     /** postprocessor for a task builder */
     protected TaskPostProcessor taskPostProcessor = null;
@@ -570,13 +578,49 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #setEngineLifecycleListeners(List)}.
+     */
+    @Deprecated
     public ProcessEngineConfiguration setProcessEngineLifecycleListener(ProcessEngineLifecycleListener processEngineLifecycleListener) {
-        this.processEngineLifecycleListener = processEngineLifecycleListener;
+        // Backwards compatibility (when there was only one typed engine listener)
+        if (engineLifecycleListeners == null || engineLifecycleListeners.isEmpty()) {
+            List<EngineLifecycleListener> engineLifecycleListeners = new ArrayList<>(1);
+            engineLifecycleListeners.add(processEngineLifecycleListener);
+            super.setEngineLifecycleListeners(engineLifecycleListeners);
+
+        } else {
+            ProcessEngineLifecycleListener originalEngineLifecycleListener = (ProcessEngineLifecycleListener) engineLifecycleListeners.get(0);
+
+            ProcessEngineLifecycleListener wrappingEngineLifecycleListener = new ProcessEngineLifecycleListener() {
+
+                @Override
+                public void onProcessEngineBuilt(ProcessEngine processEngine) {
+                    originalEngineLifecycleListener.onProcessEngineBuilt(processEngine);
+                }
+                @Override
+                public void onProcessEngineClosed(ProcessEngine processEngine) {
+                    originalEngineLifecycleListener.onProcessEngineClosed(processEngine);
+                }
+            };
+
+            engineLifecycleListeners.set(0, wrappingEngineLifecycleListener);
+
+        }
+
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #getEngineLifecycleListeners()}.
+     */
+    @Deprecated
     public ProcessEngineLifecycleListener getProcessEngineLifecycleListener() {
-        return processEngineLifecycleListener;
+        // Backwards compatibility (when there was only one typed engine listener)
+        if (engineLifecycleListeners != null && !engineLifecycleListeners.isEmpty()) {
+            return (ProcessEngineLifecycleListener) engineLifecycleListeners.get(0);
+        }
+        return null;
     }
 
     public String getLabelFontName() {
@@ -708,5 +752,42 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public void setTaskPostProcessor(TaskPostProcessor processor) {
         this.taskPostProcessor = processor;
+    }
+
+
+    public boolean isEnableHistoryCleaning() {
+        return enableHistoryCleaning;
+    }
+
+    public ProcessEngineConfiguration setEnableHistoryCleaning(boolean enableHistoryCleaning) {
+        this.enableHistoryCleaning = enableHistoryCleaning;
+        return this;
+    }
+
+    public String getHistoryCleaningTimeCycleConfig() {
+        return historyCleaningTimeCycleConfig;
+    }
+
+    public ProcessEngineConfiguration setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
+        this.historyCleaningTimeCycleConfig = historyCleaningTimeCycleConfig;
+        return this;
+    }
+
+    public int getCleanInstancesEndedAfterNumberOfDays() {
+        return cleanInstancesEndedAfterNumberOfDays;
+    }
+
+    public ProcessEngineConfiguration setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
+        this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+        return this;
+    }
+
+    public HistoryCleaningManager getHistoryCleaningManager() {
+        return historyCleaningManager;
+    }
+
+    public ProcessEngineConfiguration setHistoryCleaningManager(HistoryCleaningManager historyCleaningManager) {
+        this.historyCleaningManager = historyCleaningManager;
+        return this;
     }
 }

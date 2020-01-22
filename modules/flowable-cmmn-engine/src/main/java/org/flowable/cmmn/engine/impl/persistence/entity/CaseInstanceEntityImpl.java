@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -28,6 +29,8 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -43,6 +46,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected boolean completable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
@@ -66,6 +71,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         persistentState.put("startUserId", startUserId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
         persistentState.put("completeable", completable);
         persistentState.put("tenantId", tenantId);
         persistentState.put("lockTime", lockTime);
@@ -165,6 +172,22 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         this.callbackType = callbackType;
     }
     @Override
+    public String getReferenceId() {
+        return referenceId;
+    }
+    @Override
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+    @Override
+    public String getReferenceType() {
+        return referenceType;
+    }
+    @Override
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
+    @Override
     public String getTenantId() {
         return tenantId;
     }
@@ -231,6 +254,11 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         variableInstance.setScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
+    }
+    
+    @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        CmmnLoggingSessionUtil.fillLoggingData(loggingNode, this);
     }
 
     @Override

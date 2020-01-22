@@ -139,4 +139,10 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
         }
         return isStage;
     }
+
+    @Override
+    protected String getOperationName() {
+        return "[Exit plan item]";
+    }
+
 }

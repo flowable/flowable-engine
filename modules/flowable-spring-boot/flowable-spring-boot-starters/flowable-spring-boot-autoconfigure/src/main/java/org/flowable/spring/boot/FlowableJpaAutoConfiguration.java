@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Filip Hrisafov
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnBean(type = "javax.persistence.EntityManagerFactory")
 @ConditionalOnClass(SpringProcessEngineConfiguration.class)
 @AutoConfigureAfter({

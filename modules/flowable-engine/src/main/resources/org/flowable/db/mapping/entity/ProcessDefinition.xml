@@ -104,6 +104,13 @@
       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateProcessDefinitionVersionForProcessDefinitionId" parameterType="java.util.Map">
+    update ${prefix}ACT_RE_PROCDEF set
+      VERSION_ = #{version, jdbcType=INTEGER}
+    where
+      ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+  </update>
+
   <!-- PROCESSDEFINITION DELETE -->
 
   <delete id="deleteProcessDefinitionsByDeploymentId" parameterType="string">

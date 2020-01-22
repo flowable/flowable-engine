@@ -23,7 +23,7 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class DatabaseInititializer {
 
     @Value("classpath:org/flowable/rest/api/jpa/schema.sql")

@@ -21,7 +21,8 @@ public interface ScopeTypes {
     String BPMN = "bpmn";
     String CMMN = "cmmn";
     String DMN = "dmn";
+    String EVENT_REGISTRY = "eventRegistry";
     String FORM = "form";
-    String TASK = "task";
     String PLAN_ITEM = "planItem";
+    String TASK = "task";
 }

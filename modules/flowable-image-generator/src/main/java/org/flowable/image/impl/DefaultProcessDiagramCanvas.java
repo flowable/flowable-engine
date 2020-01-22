@@ -322,6 +322,10 @@ public class DefaultProcessDiagramCanvas {
     public void drawMessageStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
         drawStartEvent(graphicInfo, MESSAGE_CATCH_IMAGE, scaleFactor);
     }
+    
+    public void drawEventRegistryStartEvent(GraphicInfo graphicInfo, double scaleFactor) {
+        drawStartEvent(graphicInfo, MESSAGE_CATCH_IMAGE, scaleFactor);
+    }
 
     public void drawStartEvent(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
         Paint originalPaint = g.getPaint();
@@ -513,8 +517,17 @@ public class DefaultProcessDiagramCanvas {
     public void drawCatchingMessageEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
     }
+    
+    public void drawCatchingEventRegistryEvent(GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
+    }
 
     public void drawCatchingMessageEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
+        drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
+        drawLabel(name, graphicInfo);
+    }
+    
+    public void drawCatchingEventRegistryEvent(String name, GraphicInfo graphicInfo, boolean isInterrupting, double scaleFactor) {
         drawCatchingEvent(graphicInfo, isInterrupting, MESSAGE_CATCH_IMAGE, "message", scaleFactor);
         drawLabel(name, graphicInfo);
     }
@@ -581,10 +594,10 @@ public class DefaultProcessDiagramCanvas {
         }
 
         for (int i = 1; i < xPoints.length; i++) {
-            Integer sourceX = xPoints[i - 1];
-            Integer sourceY = yPoints[i - 1];
-            Integer targetX = xPoints[i];
-            Integer targetY = yPoints[i];
+            int sourceX = xPoints[i - 1];
+            int sourceY = yPoints[i - 1];
+            int targetX = xPoints[i];
+            int targetY = yPoints[i];
             Line2D.Double line = new Line2D.Double(sourceX, sourceY, targetX, targetY);
             g.draw(line);
         }
@@ -907,6 +920,10 @@ public class DefaultProcessDiagramCanvas {
 
     public void drawManualTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(MANUALTASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+    
+    public void drawSendEventServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SENDTASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawBusinessRuleTask(String name, GraphicInfo graphicInfo, double scaleFactor) {

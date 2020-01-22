@@ -27,7 +27,7 @@ Flowable runs on a JDK higher than or equal to version 8. Go to [Oracle Java SE 
 
 Flowable development can be done with the IDE of your choice. If you would like to use the Flowable Designer then you need Eclipse Mars or Neon.
 Download the Eclipse distribution of your choice from [the Eclipse download page](http://www.eclipse.org/downloads/). Unzip the downloaded file and then you should be able to start it with the Eclipse file in the directory eclipse.
-Further on in this guide, there is a section on [installing our eclipse designer plugin](#eclipseDesignerInstallation).
+Further on in this guide, there is a section on [installing our eclipse designer plugin](bpmn/ch13-Designer.md#installation).
 
 ## Reporting problems
 

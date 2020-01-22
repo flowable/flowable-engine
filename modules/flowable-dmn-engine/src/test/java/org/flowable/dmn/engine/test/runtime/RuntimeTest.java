@@ -146,6 +146,37 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/empty_outcome.dmn")
+    public void emptyOutcome() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        processVariablesInput.put("input1", "NOT TEST");
+
+        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+            .decisionKey("EmptyOutcome")
+            .variables(processVariablesInput)
+            .executeWithSingleResult();
+
+        Assert.assertNull(result);
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/empty_outcomes.dmn")
+    public void emptyOneEmptyOutcome() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        processVariablesInput.put("input1", 11D);
+
+        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+            .decisionKey("decision")
+            .variables(processVariablesInput)
+            .executeWithSingleResult();
+
+        Assert.assertEquals(1, result.keySet().size());
+        Assert.assertEquals(11d, result.get("output2"));
+    }
+
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/outcome_expression_1.dmn")
     public void conlusionExpressionDouble() {
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()

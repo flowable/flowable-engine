@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
 
     <insert id="insertHistoricCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -19,12 +19,14 @@
             #{startUserId ,jdbcType=VARCHAR},
             #{callbackId, jdbcType=VARCHAR},
             #{callbackType, jdbcType=VARCHAR},
+            #{referenceId, jdbcType=VARCHAR},
+            #{referenceType, jdbcType=VARCHAR},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertHistoricCaseInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
         values
         <foreach collection="list" item="historicCaseInstance" index="index" separator=",">
             (
@@ -40,6 +42,8 @@
                 #{historicCaseInstance.startUserId ,jdbcType=VARCHAR},
                 #{historicCaseInstance.callbackId, jdbcType=VARCHAR},
                 #{historicCaseInstance.callbackType, jdbcType=VARCHAR},
+                #{historicCaseInstance.referenceId, jdbcType=VARCHAR},
+                #{historicCaseInstance.referenceType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -48,7 +52,7 @@
     <insert id="bulkInsertHistoricCaseInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="historicCaseInstance" index="index">
-            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_) VALUES
+            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) VALUES
             (
                 #{historicCaseInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -62,6 +66,8 @@
                 #{historicCaseInstance.startUserId ,jdbcType=VARCHAR},
                 #{historicCaseInstance.callbackId, jdbcType=VARCHAR},
                 #{historicCaseInstance.callbackType, jdbcType=VARCHAR},
+                #{historicCaseInstance.referenceId, jdbcType=VARCHAR},
+                #{historicCaseInstance.referenceType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -102,6 +108,12 @@
             <if test="originalPersistentState.callbackType != callbackType">
                 CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.referenceId != referenceId">
+                REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.referenceType != referenceType">
+                REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
             </if>
@@ -130,6 +142,8 @@
         <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
         <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
         <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+        <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
+        <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
 
@@ -222,6 +236,8 @@
             TEMPRES_START_USER_ID_ as START_USER_ID_,
             TEMPRES_CALLBACK_ID_ as CALLBACK_ID_,
             TEMPRES_CALLBACK_TYPE_ as CALLBACK_TYPE_,
+            TEMPRES_REFERENCE_ID_ as REFERENCE_ID_,
+            TEMPRES_REFERENCE_TYPE_ as REFERENCE_TYPE,
             TEMPRES_TENANT_ID_ as TENANT_ID_,
             TEMPVAR_ID_ as VAR_ID_,
             TEMPVAR_NAME_ as VAR_NAME_,
@@ -252,6 +268,8 @@
             RES.START_USER_ID_ as TEMPRES_START_USER_ID_,
             RES.CALLBACK_ID_ as TEMPRES_CALLBACK_ID_,
             RES.CALLBACK_TYPE_ as TEMPRES_CALLBACK_TYPE_,
+            RES.REFERENCE_ID_ as TEMPRES_REFERENCE_ID_,
+            RES.REFERENCE_TYPE_ as TEMPRES_REFERENCE_TYPE_,
             RES.TENANT_ID_ as TEMPRES_TENANT_ID_,
             VAR.ID_ as TEMPVAR_ID_,
             VAR.NAME_ as TEMPVAR_NAME_,
@@ -604,6 +622,12 @@
         <if test="callbackType != null">
             and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType}
         </if>
+        <if test="referenceId != null">
+            and ${queryTablePrefix}REFERENCE_ID_ = #{referenceId}
+        </if>
+        <if test="referenceType != null">
+            and ${queryTablePrefix}REFERENCE_TYPE_ = #{referenceType}
+        </if>
         <if test="tenantId != null">
             and ${queryTablePrefix}TENANT_ID_ = #{tenantId}
         </if>
@@ -676,6 +700,12 @@
         </if>
         <if test="orQueryObject.callbackType != null">
             or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType}
+        </if>
+        <if test="orQueryObject.referenceId != null">
+            or ${queryTablePrefix}REFERENCE_ID_ = #{orQueryObject.referenceId}
+        </if>
+        <if test="orQueryObject.referenceType != null">
+            or ${queryTablePrefix}REFERENCE_TYPE_ = #{orQueryObject.referenceType}
         </if>
         <if test="orQueryObject.tenantId != null">
             or ${queryTablePrefix}TENANT_ID_ = #{orQueryObject.tenantId}

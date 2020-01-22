@@ -70,6 +70,8 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicCaseInstanceEntity.setTenantId(caseInstanceEntity.getTenantId());
             historicCaseInstanceEntity.setCallbackId(caseInstanceEntity.getCallbackId());
             historicCaseInstanceEntity.setCallbackType(caseInstanceEntity.getCallbackType());
+            historicCaseInstanceEntity.setReferenceId(caseInstanceEntity.getReferenceId());
+            historicCaseInstanceEntity.setReferenceType(caseInstanceEntity.getReferenceType());
             historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
         }
     }
@@ -235,6 +237,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntity.setName(planItemInstanceEntity.getName());
             historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
             historicPlanItemInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
+            historicPlanItemInstanceEntity.setDerivedCaseDefinitionId(planItemInstanceEntity.getDerivedCaseDefinitionId());
             historicPlanItemInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
             historicPlanItemInstanceEntity.setStageInstanceId(planItemInstanceEntity.getStageInstanceId());
             historicPlanItemInstanceEntity.setStage(planItemInstanceEntity.isStage());

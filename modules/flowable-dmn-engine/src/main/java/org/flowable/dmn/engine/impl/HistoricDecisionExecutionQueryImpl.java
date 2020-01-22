@@ -210,6 +210,7 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
 
     // getters ////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }

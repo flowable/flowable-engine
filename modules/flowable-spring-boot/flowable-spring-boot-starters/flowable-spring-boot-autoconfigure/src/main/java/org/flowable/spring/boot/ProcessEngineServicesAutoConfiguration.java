@@ -44,7 +44,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Filip Hrisafov
  * @author Javier Casal
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnProcessEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -60,7 +60,7 @@ public class ProcessEngineServicesAutoConfiguration {
      * If an app engine is present that means that the ProcessEngine was created as part of the app engine.
      * Therefore extract it from the ProcessEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.engine.ProcessEngine"
     })
@@ -82,7 +82,7 @@ public class ProcessEngineServicesAutoConfiguration {
     /**
      * If there is no app engine configuration, then trigger a creation of the process engine.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.engine.ProcessEngine",
         "org.flowable.app.engine.AppEngine",

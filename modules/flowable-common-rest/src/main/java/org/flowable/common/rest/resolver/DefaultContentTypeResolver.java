@@ -34,6 +34,9 @@ public class DefaultContentTypeResolver implements ContentTypeResolver {
                     || lowerResourceName.endsWith("dmn")
                     || lowerResourceName.endsWith("form")) {
                 contentType = "text/xml";
+            } else if (lowerResourceName.endsWith(".event")
+                || lowerResourceName.endsWith(".channel")) {
+                contentType = "application/json";
             }
         }
         return contentType;

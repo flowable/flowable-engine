@@ -5,7 +5,7 @@ title: The Flowable DMN API
 
 ## The DMN Engine API and services
 
-The DMN engine API is the most common way of interacting with Flowable DMN. The central starting point is the DmnEngine, which can be created in several ways as described in the [configuration section](#configuration). From the DmnEngine, you can obtain the various other services.
+The DMN engine API is the most common way of interacting with Flowable DMN. The central starting point is the DmnEngine, which can be created in several ways as described in the [configuration section](dmn/ch02-Configuration.md#creating-a-dmn-engine). From the DmnEngine, you can obtain the various other services.
 DmnEngine and the services objects are thread safe. So you can keep a reference to one of those for a whole server.
 
     DmnEngine dmnEngine = DmnEngines.getDefaultDmnEngine();
@@ -210,6 +210,6 @@ or:
     DmnEngines.getDmnEngine("myName");
 
 Of course, it’s also possible to use any of the variants of creating a DMN engine,
-as described in the [configuration section](#configuration).
+as described in the [configuration section](dmn/ch02-Configuration.md#creating-a-dmn-engine).
 
 The contextDestroyed method of the context-listener delegates to DmnEngines.destroy(). That will properly close all initialized DMN engines.

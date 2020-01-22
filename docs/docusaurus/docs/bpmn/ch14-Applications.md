@@ -15,7 +15,7 @@ Flowable provides several ui web applications to demonstrate and leverage the fu
 
 The Flowable IDM is required for all other apps to enable authentication. The WAR files for each app can be deployed to the same servlet container (such as Apache Tomcat), but can also be deployed on different servlet containers. Because the same cookie is used for authentication with each app, the apps need to run on the same domain.
 
-Flowable also provides the `flowable-rest.war` which contains the Flowable REST API. More about this can be read in the [REST API](#restApiChapter) chapter.
+Flowable also provides the `flowable-rest.war` which contains the Flowable REST API. More about this can be read in the [REST API](bpmn/ch15-REST.md) chapter.
 
 The apps are Spring Boot 2.0 based, which means that that the WAR files are actually executable and can be run as a normal standalone applications.
 See [The Executable Jar Format](https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-maven-packaging) in the Spring Boot reference documentation.
@@ -1166,4 +1166,4 @@ When including the jar in the `WEB-INF/lib` folder of the exploded war then `@Co
 ### Creating your own Spring Boot application
 
 This approach is the most flexible and most powerful approach of all.
-In order to follow this approach have a look at the [Getting Started with Spring Boot](#springSpringBootGettingStarted) section of this documentation.
+In order to follow this approach have a look at the [Getting Started with Spring Boot](bpmn/ch05a-Spring-Boot.md#getting-started) section of this documentation.

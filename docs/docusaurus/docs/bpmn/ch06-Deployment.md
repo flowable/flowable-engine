@@ -42,7 +42,7 @@ When you are using the demo setup and you want to add your custom classes, you s
 
 ### Using Spring beans from a process
 
-When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your process engine in your context as described in [the spring integration section](#springintegration), that is straightforward. But bear in mind that you also should update the Flowable task and rest webapps with that context if you use it.
+When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your process engine in your context as described in [the spring integration section](bpmn/ch05-Spring.md#spring-integration), that is straightforward. But bear in mind that you also should update the Flowable task and rest webapps with that context if you use it.
 
 ### Creating a single app
 
@@ -207,9 +207,9 @@ The image resource can be retrieved through the API afterwards:
 
 ## Generating a process diagram
 
-If no image is provided in the deployment, as described in the [previous section](#providingProcessDiagram), the Flowable engine will generate a process diagram image if the process definition contains the necessary 'diagram interchange' information.
+If no image is provided in the deployment, as described in the [previous section](bpmn/ch06-Deployment.md#providing-a-process-diagram), the Flowable engine will generate a process diagram image if the process definition contains the necessary 'diagram interchange' information.
 
-The resource can be retrieved in exactly the same way as when [an image is provided](#providingProcessDiagram) in the deployment.
+The resource can be retrieved in exactly the same way as when [an image is provided](bpmn/ch06-Deployment.md#providing-a-process-diagram) in the deployment.
 
 ![deployment.image.generation](assets/bpmn/deployment.image.generation.png)
 

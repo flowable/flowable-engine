@@ -71,6 +71,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
@@ -86,10 +87,13 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JodaDateTimeType;
 import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.LocalDateTimeType;
+import org.flowable.variable.service.impl.types.LocalDateType;
 import org.flowable.variable.service.impl.types.LongJsonType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
@@ -99,15 +103,13 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class AppEngineConfiguration extends AbstractEngineConfiguration implements
         AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_APP_";
 
-    protected String cmmnEngineName = AppEngines.NAME_DEFAULT;
+    protected String appEngineName = AppEngines.NAME_DEFAULT;
 
     protected AppManagementService appManagementService = new AppManagementServiceImpl(this);
     protected AppRepositoryService appRepositoryService = new AppRepositoryServiceImpl(this);
@@ -122,6 +124,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected AppDefinitionEntityManager appDefinitionEntityManager;
 
     protected boolean disableIdmEngine;
+    protected boolean disableEventRegistry;
 
     protected boolean executeServiceSchemaManagers = true;
     
@@ -145,7 +148,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected List<VariableType> customPostVariableTypes;
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -402,6 +404,9 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             variableTypes.addType(new IntegerType());
             variableTypes.addType(new LongType());
             variableTypes.addType(new DateType());
+            variableTypes.addType(new InstantType());
+            variableTypes.addType(new LocalDateType());
+            variableTypes.addType(new LocalDateTimeType());
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
@@ -459,13 +464,25 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     
     @Override
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
-        if (!disableIdmEngine) {
+        if (!disableIdmEngine || !disableEventRegistry) {
             List<EngineConfigurator> specificConfigurators = new ArrayList<>();
-            if (idmEngineConfigurator != null) {
-                specificConfigurators.add(idmEngineConfigurator);
-            } else {
-                specificConfigurators.add(new IdmEngineConfigurator());
+            
+            if (!disableIdmEngine) {
+                if (idmEngineConfigurator != null) {
+                    specificConfigurators.add(idmEngineConfigurator);
+                } else {
+                    specificConfigurators.add(new IdmEngineConfigurator());
+                }
             }
+            
+            if (!disableEventRegistry) {
+                if (eventRegistryConfigurator != null) {
+                    specificConfigurators.add(eventRegistryConfigurator);
+                } else {
+                    specificConfigurators.add(new EventRegistryEngineConfigurator());
+                }
+            }
+            
             return specificConfigurators;
         }
         return Collections.emptyList();
@@ -473,15 +490,15 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     @Override
     public String getEngineName() {
-        return cmmnEngineName;
+        return appEngineName;
     }
 
-    public String getCmmnEngineName() {
-        return cmmnEngineName;
+    public String getAppEngineName() {
+        return appEngineName;
     }
 
-    public AppEngineConfiguration setCmmnEngineName(String cmmnEngineName) {
-        this.cmmnEngineName = cmmnEngineName;
+    public AppEngineConfiguration setAppEngineName(String appEngineName) {
+        this.appEngineName = appEngineName;
         return this;
     }
 
@@ -716,21 +733,21 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public AppEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-        return this;
-    }
-
     public boolean isDisableIdmEngine() {
         return disableIdmEngine;
     }
 
     public AppEngineConfiguration setDisableIdmEngine(boolean disableIdmEngine) {
         this.disableIdmEngine = disableIdmEngine;
+        return this;
+    }
+
+    public boolean isDisableEventRegistry() {
+        return disableEventRegistry;
+    }
+
+    public AppEngineConfiguration setDisableEventRegistry(boolean disableEventRegistry) {
+        this.disableEventRegistry = disableEventRegistry;
         return this;
     }
 

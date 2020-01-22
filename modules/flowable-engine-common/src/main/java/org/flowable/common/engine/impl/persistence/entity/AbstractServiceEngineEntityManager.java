@@ -35,6 +35,7 @@ public abstract class AbstractServiceEngineEntityManager<T extends AbstractServi
         return serviceConfiguration;
     }
 
+    @Override
     protected FlowableEventDispatcher getEventDispatcher() {
         return serviceConfiguration.getEventDispatcher();
     }

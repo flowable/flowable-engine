@@ -138,6 +138,13 @@ function _drawScriptServiceTask(element)
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
+function _drawSendEventServiceTask(element)
+{
+    _drawTask(element);
+    _drawSendTaskIcon(paper, element.x + 4, element.y + 4);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
 function _drawDecisionTask(element)
 {
     _drawTask(element);
@@ -188,6 +195,19 @@ function _drawTimerEventListener(element)
 {
     _drawEventListener(element);
     _drawTimerEventListenerIcon(paper, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
+function _drawUserEventListener(element)
+{
+    _drawEventListener(element);
+    _drawUserEventListenerIcon(paper, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
+function _drawGenericEventListener(element)
+{
+    _drawEventListener(element);
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 

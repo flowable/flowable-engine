@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -36,6 +37,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public abstract class CmmnOperation implements Runnable {
     
     protected CommandContext commandContext;
+    protected boolean isNoop = false; // flag indicating whether this operation did something. False by default, as all operation should typically do something.
     
     public CmmnOperation() {
     }
@@ -43,7 +45,12 @@ public abstract class CmmnOperation implements Runnable {
     public CmmnOperation(CommandContext commandContext) {
         this.commandContext = commandContext;
     }
-    
+
+    /**
+     * @return The id of the case instance related to this operation.
+     */
+    public abstract String getCaseInstanceId();
+
     protected Stage getStage(PlanItemInstanceEntity planItemInstanceEntity) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition instanceof Stage) {
@@ -83,11 +90,11 @@ public abstract class CmmnOperation implements Runnable {
                 }
 
                 PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                    .createPlanItemInstanceBuilder()
+                    .createPlanItemInstanceEntityBuilder()
                     .planItem(planItem)
                     .caseDefinitionId(caseDefinitionId)
                     .caseInstanceId(caseInstanceId)
-                    .stagePlanItemInstanceId(stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null)
+                    .stagePlanItemInstance(stagePlanItemInstanceEntity)
                     .tenantId(tenantId)
                     .addToParent(true)
                     // we silently ignore any exceptions evaluating the name for the new plan item, if it has repetition on a collection, as the item / itemIndex
@@ -139,12 +146,17 @@ public abstract class CmmnOperation implements Runnable {
             localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
         }
 
+        PlanItemInstance stagePlanItem = planItemInstanceEntityToCopy.getStagePlanItemInstanceEntity();
+        if (stagePlanItem == null && planItemInstanceEntityToCopy.getStageInstanceId() != null) {
+            stagePlanItem = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceEntityToCopy.getStageInstanceId());
+        }
+
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-            .createPlanItemInstanceBuilder()
+            .createPlanItemInstanceEntityBuilder()
             .planItem(planItemInstanceEntityToCopy.getPlanItem())
             .caseDefinitionId(planItemInstanceEntityToCopy.getCaseDefinitionId())
             .caseInstanceId(planItemInstanceEntityToCopy.getCaseInstanceId())
-            .stagePlanItemInstanceId(planItemInstanceEntityToCopy.getStageInstanceId())
+            .stagePlanItemInstance(stagePlanItem)
             .tenantId(planItemInstanceEntityToCopy.getTenantId())
             .localVariables(localVariables)
             .addToParent(addToParent)
@@ -171,4 +183,13 @@ public abstract class CmmnOperation implements Runnable {
         String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
         return repetitionCounterVariableName;
     }
+
+    public void markAsNoop() {
+        isNoop = true;
+    }
+
+    public boolean isNoop() {
+        return isNoop;
+    }
+
 }

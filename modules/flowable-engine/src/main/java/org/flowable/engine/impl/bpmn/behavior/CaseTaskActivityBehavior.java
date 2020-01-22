@@ -19,8 +19,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.IOParameter;
-import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -136,7 +136,7 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
 
         // Bidirectional storing of reference to avoid queries later on
         executionEntity.setReferenceId(caseInstanceId);
-        executionEntity.setReferenceType(CallbackTypes.EXECUTION_CHILD_CASE);
+        executionEntity.setReferenceType(ReferenceTypes.EXECUTION_CHILD_CASE);
     }
 
     protected String getCaseDefinitionKey(String caseDefinitionKeyExpression, VariableContainer variableContainer, ExpressionManager expressionManager) {

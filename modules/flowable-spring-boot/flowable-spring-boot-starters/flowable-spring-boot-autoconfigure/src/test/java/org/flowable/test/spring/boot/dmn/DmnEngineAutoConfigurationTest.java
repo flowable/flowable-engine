@@ -401,7 +401,7 @@ public class DmnEngineAutoConfigurationTest {
         return EngineServiceUtil.getDmnEngineConfiguration(appEngineConfiguration);
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class CustomAutoDeploymentStrategyConfiguration {
 
         @Bean
