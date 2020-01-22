@@ -111,7 +111,7 @@ public class BPMNLayout extends mxGraphLayout {
     }
 
     /**
-     * Returns a boolean indicating if the given <mxCell> should be ignored as a vertex. This returns true if the cell has no connections.
+     * Returns a boolean indicating if the given mxCell should be ignored as a vertex. This returns true if the cell has no connections.
      * 
      * @param vertex
      *            Object that represents the vertex to be tested.
