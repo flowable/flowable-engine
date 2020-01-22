@@ -67,8 +67,16 @@ class HomeSplash extends React.Component {
             <Button href={'https://flowable.com/open-source/docs/javadocs/index.html'} target="_blank">BPMN</Button>
             <Button href={'https://flowable.com/open-source/docs/cmmn-javadocs/index.html'} target="_blank">CMMN</Button>
             <Button href={'https://flowable.com/open-source/docs/task-javadocs/index.html'} target="_blank">Task</Button>
+          </PromoSection>
+          <PromoSection>
             <Button href={'https://flowable.com/open-source/docs/variable-javadocs/index.html'} target="_blank">Variable</Button>
             <Button href={'https://flowable.com/open-source/docs/job-javadocs/index.html'} target="_blank">Job</Button>
+            <Button href={'https://flowable.com/open-source/docs/batch-javadocs/index.html'} target="_blank">Batch</Button>
+            <Button href={'https://flowable.com/open-source/docs/entitylink-javadocs/index.html'} target="_blank">Entity Link</Button>
+          </PromoSection>
+          <PromoSection>
+            <Button href={'https://flowable.com/open-source/docs/eventregistry-javadocs/index.html'} target="_blank">Event Registry</Button>
+            <Button href={'https://flowable.com/open-source/docs/eventsubscription-javadocs/index.html'} target="_blank">Event Subscription</Button>
           </PromoSection>
         </div>
       </SplashContainer>
