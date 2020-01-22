@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '6.5.0.6', 1);
+values ('common.schema.version', '6.5.1.0', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -40,7 +40,7 @@ create table ACT_RU_ENTITYLINK (
 create index ACT_IDX_ENT_LNK_SCOPE on ACT_RU_ENTITYLINK(SCOPE_ID_, SCOPE_TYPE_, LINK_TYPE_);
 create index ACT_IDX_ENT_LNK_SCOPE_DEF on ACT_RU_ENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_, LINK_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('entitylink.schema.version', '6.5.0.6', 1);
+insert into ACT_GE_PROPERTY values ('entitylink.schema.version', '6.5.1.0', 1);
 
 create table ACT_HI_ENTITYLINK (
     ID_ varchar(64),
@@ -82,7 +82,7 @@ create index ACT_IDX_IDENT_LNK_SCOPE on ACT_RU_IDENTITYLINK(SCOPE_ID_, SCOPE_TYP
 create index ACT_IDX_IDENT_LNK_SUB_SCOPE on ACT_RU_IDENTITYLINK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_IDENT_LNK_SCOPE_DEF on ACT_RU_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.5.0.6', 1);
+insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.5.1.0', 1);
 
 create table ACT_HI_IDENTITYLINK (
     ID_ varchar(64),
@@ -302,7 +302,7 @@ create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_)
 create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.0.6', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.5.1.0', 1);
 
 create table FLW_RU_BATCH (
     ID_ varchar(64) not null,
@@ -343,7 +343,7 @@ alter table FLW_RU_BATCH_PART
     foreign key (BATCH_ID_)
     references FLW_RU_BATCH (ID_);
 
-insert into ACT_GE_PROPERTY values ('batch.schema.version', '6.5.0.6', 1);
+insert into ACT_GE_PROPERTY values ('batch.schema.version', '6.5.1.0', 1);
 
 
 create table ACT_RU_TASK (
@@ -385,7 +385,7 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.5.0.6', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.5.1.0', 1);
 
 create table ACT_HI_TASKINST (
     ID_ varchar(64) not null,
@@ -468,7 +468,7 @@ alter table ACT_RU_VARIABLE
     foreign key (BYTEARRAY_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.5.0.6', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.5.1.0', 1);
 
 
 create table ACT_HI_VARINST (
@@ -519,7 +519,7 @@ create table ACT_RU_EVENT_SUBSCR (
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_EVENT_SUBSCR on ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
 
-insert into ACT_GE_PROPERTY values ('eventsubscription.schema.version', '6.5.0.6', 1);
+insert into ACT_GE_PROPERTY values ('eventsubscription.schema.version', '6.5.1.0', 1);
 
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
@@ -865,10 +865,10 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.5.0.6', 1);
+values ('schema.version', '6.5.1.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.5.0.6)', 1);
+values ('schema.history', 'create(6.5.1.0)', 1);
 
 create table ACT_HI_PROCINST (
     ID_ varchar(64) not null,
@@ -986,7 +986,7 @@ create table ACT_ID_PROPERTY (
 );
 
 insert into ACT_ID_PROPERTY
-values ('schema.version', '6.5.0.6', 1);
+values ('schema.version', '6.5.1.0', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ varchar(64),
