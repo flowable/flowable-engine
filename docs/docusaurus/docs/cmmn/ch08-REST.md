@@ -2958,5 +2958,5 @@ The response body contains the binary value of the variable. When the variable i
 ## Job management
 
 The CMMN REST API allows full access to manage async jobs, timer jobs, suspended jobs and deadletter jobs.
-The API is exactly the same as the one [for the BPMN engine](../bpmn/ch15-REST#jobs)., except `management` is replaced with `cmmn-management`.
+The API is exactly the same as the one [for the BPMN engine](../bpmn/ch15-REST#jobs), except `management` is replaced with `cmmn-management`.
 
