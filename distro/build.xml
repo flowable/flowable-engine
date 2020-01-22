@@ -506,8 +506,8 @@
 			<arg line="run build" />
 		</exec>
 		<move todir="${target.newsite.root}">
-			<fileset dir="../docs/docusaurus/website/build/flowable-userguide/assets/static" />
-		</move>
+            <fileset dir="../docs/docusaurus/website/build/flowable-userguide" />
+        </move>
 	</target>
 
 	<target name="copy.docs" depends="build.docs" unless="nodocs">

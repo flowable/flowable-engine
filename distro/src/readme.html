@@ -52,6 +52,8 @@
     is now possible with one batch, where each instance migration will be a batch part of a parent batch.</li>
     <li>With historic information growing bigger over time, a way to cleaning this historic information was necessary. For this purpose a history cleaning job was added
     that can be configured to clean historic information older than a configured time period.</li>
+    <li>To support the history clean job, delete methods have been added to the history query interfaces to also allow to delete historic data with other criteria
+    than just time period based parameters.</li>  
 </ul>
     
 <h4>CMMN</h4>
