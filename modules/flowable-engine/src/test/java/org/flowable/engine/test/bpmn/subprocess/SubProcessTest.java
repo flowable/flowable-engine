@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.subprocess;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -26,6 +29,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
@@ -48,6 +52,17 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
         org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "theStart"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("subProcess", "subProcess"),
+                tuple("startEvent", "subProcessStart"),
+                tuple("sequenceFlow", "flow2"),
+                tuple("userTask", "subProcessTask")
+            );
 
         // After completing the task in the subprocess,
         // the subprocess scope is destroyed and the complete process ends

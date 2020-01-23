@@ -108,6 +108,8 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
         newSubProcessExecution.setEventScope(false);
         newSubProcessExecution.setScope(true);
 
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newSubProcessExecution);
+
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
 
