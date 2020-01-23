@@ -56,6 +56,12 @@ public class ClassStructureDefinition implements FieldBaseStructureDefinition {
     }
 
     @Override
+    public Class<?> getFieldParameterTypeAt(int index) {
+        // TODO
+        return null;
+    }
+
+    @Override
     public StructureInstance createInstance() {
         return new FieldBaseStructureInstance(this);
     }
