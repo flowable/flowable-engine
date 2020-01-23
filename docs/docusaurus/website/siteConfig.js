@@ -48,6 +48,12 @@ const siteConfig = {
     secondaryColor: '#a0cc47',
   },
 
+  algolia: {
+    apiKey: 'f0c2bdc4f694cbc6509b436055f1dc8d',
+    indexName: 'flowable_open-source',
+    algoliaOptions: {} // Optional, if provided by Algolia
+  },
+
   /* Custom fonts for website */
   /*
   fonts: {
