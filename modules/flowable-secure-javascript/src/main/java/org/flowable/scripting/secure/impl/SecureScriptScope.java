@@ -12,12 +12,12 @@
  */
 package org.flowable.scripting.secure.impl;
 
+import java.util.Map;
+
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.mozilla.javascript.Scriptable;
-
-import java.util.Map;
 
 /**
  * @author Joram Barrez

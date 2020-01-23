@@ -12,11 +12,11 @@
  */
 package org.flowable.scripting.secure.impl;
 
+import java.util.Map;
+
 import org.flowable.variable.api.delegate.VariableScope;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-
-import java.util.Map;
 
 /**
  * @author Joram Barrez
