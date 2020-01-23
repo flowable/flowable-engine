@@ -19,8 +19,9 @@ cloudSql:
 ingress:
   enabled: true
   sslRedirect: false
+  useHost: false
   # To enable LetsEncrypt signed certificates rather than self-signed ones
-  # you must deploy a ClusterIssuer object and specify the provateKeySecretRef's
+  # you must deploy a ClusterIssuer object and specify the privateKeySecretRef's
   # name here
   #clusterIssuer: "letsencrypt-prod"
 

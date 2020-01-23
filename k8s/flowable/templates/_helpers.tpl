@@ -54,3 +54,40 @@ Template default labels
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
+{{/*
+Template default Ingress rules
+*/}}
+{{- define "flowable.ingressRules" -}}
+    paths:
+    {{- if .Values.idm.enabled  }}
+      - path: /{{ .Values.idm.ingressPath }}/?(.*)
+        backend:
+          serviceName: {{ .Values.idm.service.name }}
+          servicePort: 8080
+    {{- end }}
+    {{- if .Values.modeler.enabled }}
+      - path: /{{ .Values.modeler.ingressPath }}/?(.*)
+        backend:
+          serviceName: {{ .Values.modeler.service.name }}
+          servicePort: 8888
+    {{- end }}
+    {{- if .Values.task.enabled }}
+      - path: /{{ .Values.task.ingressPath }}/?(.*)
+        backend:
+          serviceName: {{ .Values.task.service.name }}
+          servicePort: 9999
+    {{- end }}
+    {{- if .Values.admin.enabled }}
+      - path: /{{ .Values.admin.ingressPath }}/?(.*)
+        backend:
+          serviceName: {{ .Values.admin.service.name }}
+          servicePort: 9988
+    {{- end }}
+    {{- if .Values.rest.enabled }}
+      - path: /{{ .Values.rest.ingressPath }}/?(.*)
+        backend:
+          serviceName: {{ .Values.rest.service.name }}
+          servicePort: 8080
+    {{- end }}
+{{- end -}}

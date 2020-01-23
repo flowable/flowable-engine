@@ -37,9 +37,10 @@ The following tables lists the configurable parameters of the Unifi chart and th
 | `database.username`                           | Database user                                                                                                         | `flowable`                    |
 | `database.password`                           | Database password                                                                                                     | `flowable`                    |
 | `cloudSql.enabled`                            | Enables Google Cloud SQL for database                                                                                 | `false`                       |
-| `cloudSql.credentials`                        | Google Cloud SQLcredentials secret reference                                                                          | `cloudsql-credentials.json`   |
+| `cloudSql.credentials`                        | Google Cloud SQL credentials secret reference                                                                         | `cloudsql-credentials.json`   |
 | `ingress.enabled`                             | Enables Ingres                                                                                                        | `true`                        |
 | `ingress.sslRedirect`                         | Enables SSL redirect                                                                                                  | `false`                       |
+| `ingress.useHost`                             | Enables host based routing using external `host.external` ( this must be a FQDN)                                      | `false`                       |
 |<br/>|
 | `idm.enabled`                                 | Enables Flowable IDM                                                                                                  | `true`                        |
 | `idm.replicas`                                | Number of replicated pods                                                                                             | `1`                           |
