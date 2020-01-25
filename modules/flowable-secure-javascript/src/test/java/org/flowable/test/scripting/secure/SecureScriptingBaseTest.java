@@ -53,7 +53,8 @@ public abstract class SecureScriptingBaseTest {
         SecureJavascriptConfigurator configurator = new SecureJavascriptConfigurator()
                 .setWhiteListedClasses(new HashSet<>(Collections.singletonList("java.util.ArrayList")))
                 .setMaxStackDepth(10).setMaxScriptExecutionTime(3000L)
-                .setMaxMemoryUsed(3145728L);
+                .setMaxMemoryUsed(3145728L)
+                .setEnableAccessToBeans(true);
 
         Map<Object, Object> beans = new HashMap<>();
         beans.put("exposedBean", exposedBean);
