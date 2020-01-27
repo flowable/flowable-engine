@@ -13,11 +13,18 @@
 
 package org.flowable.engine.test.eventregistry;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventregistry.api.EventDeployment;
@@ -27,6 +34,7 @@ import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +45,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnTestCase {
     
@@ -132,6 +141,91 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/EventRegistryEventSubprocessTest.testNonInterruptingSubProcess.bpmn20.xml")
+    public void testActivitiesForNonInterruptingSubProcess() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("customerIdVar", "kermit");
+        runtimeService.startProcessInstanceByKey("process", variableMap);
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "theStart"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task")
+            );
+
+        inboundEventChannelAdapter.triggerTestEvent("kermit");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "theStart"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "eventRegistryEventSubProcess"),
+                tuple("startEvent", "eventProcessStart"),
+                tuple("sequenceFlow", "eventFlow1"),
+                tuple("subProcess", "subProcess"),
+                tuple("startEvent", "nestedStart"),
+                tuple("sequenceFlow", "nestedFlow1"),
+                tuple("userTask", "eventSubProcessTask")
+            );
+
+        // Complete the user task in the event sub process
+        Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
+        assertThat(eventSubProcessTask).isNotNull();
+        taskService.complete(eventSubProcessTask.getId());
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "theStart"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "eventRegistryEventSubProcess"),
+                tuple("startEvent", "eventProcessStart"),
+                tuple("sequenceFlow", "eventFlow1"),
+                tuple("subProcess", "subProcess"),
+                tuple("startEvent", "nestedStart"),
+                tuple("sequenceFlow", "nestedFlow1"),
+                tuple("userTask", "eventSubProcessTask"),
+                tuple("sequenceFlow", "nestedFlow2"),
+                tuple("endEvent", "nestedEnd"),
+                tuple("sequenceFlow", "eventFlow2"),
+                tuple("endEvent", "eventSubProcessEnd")
+            );
+
+        ActivityInstance eventSubProcessActivity = runtimeService.createActivityInstanceQuery()
+            .activityType("eventSubProcess")
+            .activityId("eventRegistryEventSubProcess")
+            .singleResult();
+        assertThat(eventSubProcessActivity).isNotNull();
+        assertThat(eventSubProcessActivity.getEndTime()).isNotNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                    tuple("startEvent", "theStart"),
+                    tuple("sequenceFlow", "flow1"),
+                    tuple("userTask", "task"),
+                    tuple("eventSubProcess", "eventRegistryEventSubProcess"),
+                    tuple("startEvent", "eventProcessStart"),
+                    tuple("sequenceFlow", "eventFlow1"),
+                    tuple("subProcess", "subProcess"),
+                    tuple("startEvent", "nestedStart"),
+                    tuple("sequenceFlow", "nestedFlow1"),
+                    tuple("userTask", "eventSubProcessTask"),
+                    tuple("sequenceFlow", "nestedFlow2"),
+                    tuple("endEvent", "nestedEnd"),
+                    tuple("sequenceFlow", "eventFlow2"),
+                    tuple("endEvent", "eventSubProcessEnd")
+                );
+        }
+    }
+
+    @Test
     @Deployment
     public void testInterruptingSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -154,6 +248,67 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
 
         // done!
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/EventRegistryEventSubprocessTest.testInterruptingSubProcess.bpmn20.xml")
+    public void testActivitiesForInterruptingSubProcess() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("customerIdVar", "kermit");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "theStart"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task")
+            );
+
+        inboundEventChannelAdapter.triggerTestEvent("kermit");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "theStart"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "eventRegistryEventSubProcess"),
+                tuple("startEvent", "eventProcessStart"),
+                tuple("sequenceFlow", "eventFlow1"),
+                tuple("subProcess", "subProcess"),
+                tuple("startEvent", "nestedStart"),
+                tuple("sequenceFlow", "nestedFlow1"),
+                tuple("userTask", "eventSubProcessTask")
+            );
+
+        // Complete the user task in the event sub process
+        Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
+        assertThat(eventSubProcessTask).isNotNull();
+        taskService.complete(eventSubProcessTask.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                    tuple("startEvent", "theStart"),
+                    tuple("sequenceFlow", "flow1"),
+                    tuple("userTask", "task"),
+                    tuple("eventSubProcess", "eventRegistryEventSubProcess"),
+                    tuple("startEvent", "eventProcessStart"),
+                    tuple("sequenceFlow", "eventFlow1"),
+                    tuple("subProcess", "subProcess"),
+                    tuple("startEvent", "nestedStart"),
+                    tuple("sequenceFlow", "nestedFlow1"),
+                    tuple("userTask", "eventSubProcessTask"),
+                    tuple("sequenceFlow", "nestedFlow2"),
+                    tuple("endEvent", "nestedEnd"),
+                    tuple("sequenceFlow", "eventFlow2"),
+                    tuple("endEvent", "eventSubProcessEnd")
+                );
+        }
+
+        assertProcessEnded(processInstance.getId());
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

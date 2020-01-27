@@ -27,6 +27,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_SERVICE = "ServiceTask";
     String STENCIL_TASK_DECISION = "DecisionTask";
     String STENCIL_TASK_HTTP = "HttpTask";
+    String STENCIL_TASK_MAIL = "MailTask";
     String STENCIL_TASK_SEND_EVENT = "SendEventTask";
     String STENCIL_TASK_CASE = "CaseTask";
     String STENCIL_TASK_PROCESS = "ProcessTask";
@@ -173,6 +174,18 @@ public interface CmmnStencilConstants {
     String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
     String PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT = "httptasksaveresponseparameterstransient";
     String PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON = "httptasksaveresponseasjson";
+
+    String PROPERTY_MAILTASK_HEADERS = "mailtaskheaders";
+    String PROPERTY_MAILTASK_TO = "mailtaskto";
+    String PROPERTY_MAILTASK_FROM = "mailtaskfrom";
+    String PROPERTY_MAILTASK_SUBJECT = "mailtasksubject";
+    String PROPERTY_MAILTASK_CC = "mailtaskcc";
+    String PROPERTY_MAILTASK_BCC = "mailtaskbcc";
+    String PROPERTY_MAILTASK_TEXT = "mailtasktext";
+    String PROPERTY_MAILTASK_HTML = "mailtaskhtml";
+    String PROPERTY_MAILTASK_HTML_VAR = "mailtaskhtmlvar";
+    String PROPERTY_MAILTASK_TEXT_VAR = "mailtasktextvar";
+    String PROPERTY_MAILTASK_CHARSET = "mailtaskcharset";
 
     String PROPERTY_TIMER_EXPRESSION = "timerexpression";
     String PROPERTY_TIMER_START_TRIGGER_SOURCE_REF = "timerstarttriggersourceref";

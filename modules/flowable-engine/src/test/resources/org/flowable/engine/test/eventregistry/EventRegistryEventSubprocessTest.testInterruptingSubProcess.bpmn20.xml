@@ -6,27 +6,27 @@
 	<process id="process">
 
 		<startEvent id="theStart" />
-		<sequenceFlow sourceRef="theStart" targetRef="task" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
 		<userTask id="task" name="Task" />
-		<sequenceFlow sourceRef="task" targetRef="theEnd" />
+		<sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd" />
 		<endEvent id="theEnd" />
 
-		<subProcess triggeredByEvent="true">
+		<subProcess id="eventRegistryEventSubProcess" triggeredByEvent="true">
 			<startEvent id="eventProcessStart" isInterrupting="true">
 				<extensionElements>
                     <flowable:eventType>myEvent</flowable:eventType>
                     <flowable:eventCorrelationParameter name="customerId" value="${customerIdVar}" />
                 </extensionElements>
 			</startEvent>
-			<sequenceFlow sourceRef="eventProcessStart" targetRef="subProcess" />
+			<sequenceFlow id="eventFlow1" sourceRef="eventProcessStart" targetRef="subProcess" />
 			<subProcess id="subProcess">
 				<startEvent id="nestedStart" />
-				<sequenceFlow sourceRef="nestedStart" targetRef="eventSubProcessTask" />
+				<sequenceFlow id="nestedFlow1" sourceRef="nestedStart" targetRef="eventSubProcessTask" />
 				<userTask id="eventSubProcessTask" name="Task" />
-				<sequenceFlow sourceRef="eventSubProcessTask" targetRef="nestedEnd" />
+				<sequenceFlow id="nestedFlow2" sourceRef="eventSubProcessTask" targetRef="nestedEnd" />
 				<endEvent id="nestedEnd" />
 			</subProcess>
-			<sequenceFlow sourceRef="subProcess" targetRef="eventSubProcessEnd" />
+			<sequenceFlow id="eventFlow2" sourceRef="subProcess" targetRef="eventSubProcessEnd" />
 			<endEvent id="eventSubProcessEnd" />
 		</subProcess>
 

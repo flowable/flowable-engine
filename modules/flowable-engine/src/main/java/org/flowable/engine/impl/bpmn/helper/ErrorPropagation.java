@@ -232,6 +232,7 @@ public class ErrorPropagation {
             ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
             if (event.getSubProcess() != null) {
                 eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess());
+                CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(eventSubProcessExecution);
                 ExecutionEntity subProcessStartEventExecution = executionEntityManager.createChildExecution(eventSubProcessExecution);
                 subProcessStartEventExecution.setCurrentFlowElement(event);
                 CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessStartEventExecution);

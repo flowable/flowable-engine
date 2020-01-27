@@ -45,6 +45,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
         TYPE_TO_STENCILSET.put(HttpServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
         TYPE_TO_STENCILSET.put(ScriptServiceTask.SCRIPT_TASK, STENCIL_TASK_SCRIPT);
         TYPE_TO_STENCILSET.put(SendEventServiceTask.SEND_EVENT, STENCIL_TASK_SEND_EVENT);
+        TYPE_TO_STENCILSET.put(ServiceTask.MAIL_TASK, STENCIL_TASK_MAIL);
     }
 
     protected Map<String, CmmnModelInfo> decisionTableKeyMap;
@@ -98,6 +99,8 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
         } else if (SendEventServiceTask.SEND_EVENT.equalsIgnoreCase(serviceTask.getType())) {
             fillSendEventJsonPropertyValues(serviceTask, propertiesNode);
             
+        } else if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
+            fillMailJsonPropertyValues(serviceTask, propertiesNode);
         } else {
 
             if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
@@ -212,6 +215,20 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
             setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE, getExtensionValue("channelType", sendEventServiceTask), propertiesNode);
             setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_DESTINATION, getExtensionValue("channelDestination", sendEventServiceTask), propertiesNode);
         }
+    }
+
+    protected void fillMailJsonPropertyValues(ServiceTask serviceTask, ObjectNode propertiesNode) {
+        setPropertyFieldValue(PROPERTY_MAILTASK_HEADERS, "headers", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_TO, "to", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_FROM, "from", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_SUBJECT, "subject", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_CC, "cc", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_BCC, "bcc", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_TEXT, "text", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_HTML, "html", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_HTML_VAR, "htmlVar", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_TEXT_VAR, "textVar", serviceTask, propertiesNode);
+        setPropertyFieldValue(PROPERTY_MAILTASK_CHARSET, "charset", serviceTask, propertiesNode);
     }
 
     protected void setPropertyFieldValue(String propertyName, String fieldName, ServiceTask task, ObjectNode propertiesNode) {
