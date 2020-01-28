@@ -17,7 +17,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.Association;
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.EventDefinition;
 import org.junit.Test;
 
 public class AssociationLinkConverterTest extends AbstractConverterTest {
