@@ -13,20 +13,31 @@
 
 package org.flowable.engine.test.json;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,6 +45,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  * @author Tim Stephenson
+ * @author Filip Hrisafov
  */
 public class JsonTest extends PluggableFlowableTestCase {
 
@@ -41,6 +53,175 @@ public class JsonTest extends PluggableFlowableTestCase {
     public static final String BIG_JSON_OBJ = "bigJsonObj";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test
+    @Deployment
+    public void testUpdateJsonValueDuringExecution() {
+        ObjectNode customer = objectMapper.createObjectNode();
+        customer.put("name", "Kermit");
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+                execution.getVariable("customer", ObjectNode.class)
+                    .putObject("address")
+                    .put("street", "Sesame Street");
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("updateJsonValue")
+            .variable("customer", customer)
+            .transientVariable("jsonBean", javaDelegate)
+            .start();
+
+        assertThatJson(customer)
+            .isEqualTo("{"
+                + "  name: 'Kermit',"
+                + "  address: {"
+                + "    street: 'Sesame Street'"
+                + "  }"
+                + "}");
+
+        VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+        JsonNode customerVar = (JsonNode) customerVarInstance.getValue();
+        assertThatJson(customerVar)
+            .isEqualTo("{"
+                + "  name: 'Kermit',"
+                + "  address: {"
+                + "    street: 'Sesame Street'"
+                + "  }"
+                + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("customer")
+                .singleResult();
+            assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+            customerVar = (JsonNode) customerHistoricVarInstance.getValue();
+            assertThatJson(customerVar)
+                .isEqualTo("{"
+                    + "  name: 'Kermit',"
+                    + "  address: {"
+                    + "    street: 'Sesame Street'"
+                    + "  }"
+                    + "}");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
+    public void testUpdateJsonValueToLongValueDuringExecution() {
+        ObjectNode customer = objectMapper.createObjectNode();
+        customer.put("name", "Kermit");
+        String randomLongStreetName = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+                execution.getVariable("customer", ObjectNode.class)
+                    .putObject("address")
+                    .put("street", randomLongStreetName);
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("updateJsonValue")
+            .variable("customer", customer)
+            .transientVariable("jsonBean", javaDelegate)
+            .start();
+
+        assertThatJson(customer)
+            .isEqualTo("{"
+                + "  name: 'Kermit',"
+                + "  address: {"
+                + "    street: '" + randomLongStreetName + "'"
+                + "  }"
+                + "}");
+
+        VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+        JsonNode customerVar = (JsonNode) managementService.executeCommand(commandContext -> customerVarInstance.getValue());
+        assertThatJson(customerVar)
+            .isEqualTo("{"
+                + "  name: 'Kermit',"
+                + "  address: {"
+                + "    street: '" + randomLongStreetName + "'"
+                + "  }"
+                + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("customer")
+                .singleResult();
+            assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+            customerVar = (JsonNode) managementService.executeCommand(commandContext -> customerHistoricVarInstance.getValue());
+            assertThatJson(customerVar)
+                .isEqualTo("{"
+                    + "  name: 'Kermit',"
+                    + "  address: {"
+                    + "    street: '" + randomLongStreetName + "'"
+                    + "  }"
+                    + "}");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
+    public void testUpdateLongJsonValueDuringExecution() {
+        ObjectNode customer = objectMapper.createObjectNode();
+
+        String randomLongStreetName = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
+        customer.put("name", "Kermit");
+        customer.putObject("address")
+            .put("address", randomLongStreetName);
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+                execution.getVariable("customer", ObjectNode.class)
+                    .remove("address");
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("updateJsonValue")
+            .variable("customer", customer)
+            .transientVariable("jsonBean", javaDelegate)
+            .start();
+
+        assertThatJson(customer)
+            .isEqualTo("{"
+                + "  name: 'Kermit'"
+                + "}");
+
+        VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+        JsonNode customerVar = (JsonNode) managementService.executeCommand(commandContext -> customerVarInstance.getValue());
+        assertThatJson(customerVar)
+            .isEqualTo("{"
+                + "  name: 'Kermit'"
+                + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("customer")
+                .singleResult();
+            assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+            customerVar = (JsonNode) managementService.executeCommand(commandContext -> customerHistoricVarInstance.getValue());
+            assertThatJson(customerVar)
+                .isEqualTo("{"
+                    + "  name: 'Kermit'"
+                    + "}");
+        }
+    }
 
     @Test
     @Deployment
@@ -253,6 +434,222 @@ public class JsonTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().active().singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("userTaskSuccess");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testSetNestedJsonNodeValue() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .variable("customer", objectMapper.createObjectNode())
+            .start();
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+            .isEqualTo("{}");
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.address.street}");
+            expression.setValue("Sesame Street", CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return null;
+        });
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+            .isEqualTo("{"
+                + "  address: {"
+                + "    street: 'Sesame Street'"
+                + "  }"
+                + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThatJson(historyService.createHistoricVariableInstanceQuery().variableName("customer").singleResult().getValue())
+                .isEqualTo("{"
+                    + "  address: {"
+                    + "    street: 'Sesame Street'"
+                    + "  }"
+                    + "}");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testGetNestedJsonNodeValue() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .variable("customer", objectMapper.createObjectNode())
+            .start();
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+            .isEqualTo("{}");
+
+        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.address.street}");
+            return expression.getValue(CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+        })).hasCauseInstanceOf(PropertyNotFoundException.class);
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+            .isEqualTo("{}");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testSetArrayNestedJsonNodeValue() {
+        ArrayNode customers = objectMapper.createArrayNode();
+        customers.addObject();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .variable("customers", customers)
+            .start();
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("[{}]");
+
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].address.street}");
+            expression.setValue("Sesame Street", CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return null;
+        });
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("["
+                + "  {"
+                + "    address: {"
+                + "      street: 'Sesame Street'"
+                + "    }"
+                + "  }"
+                + "]");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testGetArrayNestedJsonNodeValue() {
+        ArrayNode customers = objectMapper.createArrayNode();
+        customers.addObject()
+            .put("name", "Kermit the Frog");
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .variable("customers", customers)
+            .start();
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("["
+                + "  {"
+                + "    name: 'Kermit the Frog'"
+                + "  }"
+                + "]");
+
+        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].address.street}");
+            return expression.getValue(CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+        })).hasCauseInstanceOf(PropertyNotFoundException.class);
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("["
+                + "  {"
+                + "    name: 'Kermit the Frog'"
+                + "  }"
+                + "]");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testSetNestedArrayNestedJsonNodeValue() {
+        ArrayNode customers = objectMapper.createArrayNode();
+        customers.addObject()
+            .putArray("addresses")
+            .addObject();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .variable("customers", customers)
+            .start();
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("[{"
+                + "  addresses: [{}]"
+                + "}]");
+
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].addresses[0].street}");
+            expression.setValue("Sesame Street", CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return null;
+        });
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("[{"
+                + "  addresses: [{"
+                + "    street: 'Sesame Street'"
+                + "  }]"
+                + "}]");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testSetNestedArrayNestedJsonNodeValueWhenNestedArrayIsMissing() {
+        ArrayNode customers = objectMapper.createArrayNode();
+        customers.addObject();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .variable("customers", customers)
+            .start();
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("[{}]");
+
+        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].addresses[0].street}");
+            expression.setValue("Sesame Street", CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return null;
+        }))
+        .hasCauseInstanceOf(PropertyNotFoundException.class);
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("[{}]");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testArrayNodeJsonNodeValue() {
+        ArrayNode customers = objectMapper.createArrayNode();
+        customers.add("Initial value");
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("oneTaskProcess")
+            .variable("customers", customers)
+            .start();
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("['Initial value']");
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0]}");
+            expression.setValue("Flowable", CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return customers;
+        });
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("['Flowable']");
+
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0]}");
+            expression.setValue(10L, CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return customers;
+        });
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("[10]");
+
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0]}");
+            ObjectNode value = objectMapper.createObjectNode();
+            value.putObject("address")
+                .put("street", "Sesame Street");
+            expression.setValue(value, CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return customers;
+        });
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
+            .isEqualTo("[{"
+                + "  address: {"
+                + "    street: 'Sesame Street'"
+                + "  }"
+                + "}]");
     }
 
     protected ObjectNode createBigJsonObject() {
