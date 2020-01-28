@@ -480,12 +480,11 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
             .isEqualTo("{}");
 
-        Object value = managementService.executeCommand(commandContext -> {
+        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.address.street}");
             return expression.getValue(CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
-        });
+        })).hasCauseInstanceOf(PropertyNotFoundException.class);
 
-        assertThat(value).isNull();
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
             .isEqualTo("{}");
     }
@@ -539,12 +538,11 @@ public class JsonTest extends PluggableFlowableTestCase {
                 + "  }"
                 + "]");
 
-        Object value = managementService.executeCommand(commandContext -> {
+        assertThatThrownBy(() -> managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customers[0].address.street}");
             return expression.getValue(CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
-        });
+        })).hasCauseInstanceOf(PropertyNotFoundException.class);
 
-        assertThat(value).isNull();
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "customers"))
             .isEqualTo("["
                 + "  {"

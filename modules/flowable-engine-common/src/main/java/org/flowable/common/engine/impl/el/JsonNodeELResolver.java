@@ -187,14 +187,17 @@ public class JsonNodeELResolver extends ELResolver {
                     result = resultNode.asDouble();
                 } else if (resultNode.isTextual()) {
                     result = resultNode.asText();
+                } else if (resultNode.isNull()) {
+                    result = null;
                 } else {
                     result = resultNode.toString();
                 }
+                context.setPropertyResolved(true);
 
-            } else {
+            } else if (resultNode != null) {
                 result = resultNode;
+                context.setPropertyResolved(true);
             }
-            context.setPropertyResolved(true);
         }
         return result;
     }
