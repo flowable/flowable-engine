@@ -38,7 +38,15 @@ public interface DmnXMLConstants {
 
     public static final String ELEMENT_DEFINITIONS = "definitions";
     public static final String ELEMENT_DECISION = "decision";
+    public static final String ELEMENT_INPUT_DATA = "inputData";
+    public static final String ELEMENT_VARIABLE = "variable";
     public static final String ELEMENT_DECISION_TABLE = "decisionTable";
+
+    public static final String ELEMENT_INFORMATION_REQUIREMENT = "informationRequirement";
+    public static final String ELEMENT_AUTHORITY_REQUIREMENT = "authorityRequirement";
+    public static final String ELEMENT_REQUIRED_DECISION = "requiredDecision";
+    public static final String ELEMENT_REQUIRED_INPUT = "requiredInput";
+    public static final String ELEMENT_REQUIRED_AUTHORITY = "requiredAuthority";
 
     public static final String ELEMENT_ITEM_DEFINITION = "itemDefinition";
     public static final String ELEMENT_TYPE_DEFINITION = "typeDefinition";

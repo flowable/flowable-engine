@@ -15,32 +15,28 @@ package org.flowable.dmn.converter.child;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnElement;
-import org.flowable.dmn.model.OutputClause;
+import org.flowable.dmn.model.DmnElementReference;
+import org.flowable.dmn.model.InformationRequirement;
 
 /**
- * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class OutputClauseParser extends BaseChildElementParser {
+public class RequiredInputParser extends BaseChildElementParser {
 
     @Override
     public String getElementName() {
-        return ELEMENT_OUTPUT_CLAUSE;
+        return ELEMENT_REQUIRED_INPUT;
     }
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof DecisionTable))
+        if (!(parentElement instanceof InformationRequirement))
             return;
 
-        OutputClause output = new OutputClause();
-        output.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
-        output.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
-        output.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-        output.setTypeRef(xtr.getAttributeValue(null, ATTRIBUTE_TYPE_REF));
+        DmnElementReference requiredInput = new DmnElementReference();
+        requiredInput.setHref(xtr.getAttributeValue(null, ATTRIBUTE_HREF));
 
-        ((DecisionTable) parentElement).addOutput(output);
+        ((InformationRequirement) parentElement).setRequiredInput(requiredInput);
     }
 }

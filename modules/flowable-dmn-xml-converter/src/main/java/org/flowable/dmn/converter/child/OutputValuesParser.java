@@ -13,7 +13,7 @@
 package org.flowable.dmn.converter.child;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.dmn.model.DecisionTable;
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.UnaryTests;
@@ -33,7 +33,7 @@ public class OutputValuesParser extends BaseChildElementParser {
     }
 
     @Override
-    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
+    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
         if (!(parentElement instanceof OutputClause))
             return;
 

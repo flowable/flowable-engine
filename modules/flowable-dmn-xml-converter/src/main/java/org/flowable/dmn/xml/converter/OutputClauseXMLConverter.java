@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.xml.converter;
 
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
@@ -37,13 +38,13 @@ public class OutputClauseXMLConverter extends BaseDmnXMLConverter {
     }
 
     @Override
-    protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, DecisionTable decisionTable) throws Exception {
+    protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
         OutputClause clause = new OutputClause();
         clause.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
         clause.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
         clause.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
         clause.setTypeRef(xtr.getAttributeValue(null, ATTRIBUTE_TYPE_REF));
-        parseChildElements(getXMLElementName(), clause, decisionTable, xtr);
+        parseChildElements(getXMLElementName(), clause, decision, xtr);
         return clause;
     }
 

@@ -14,7 +14,7 @@ package org.flowable.dmn.converter.child;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.flowable.dmn.model.DecisionTable;
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
 import org.slf4j.Logger;
@@ -30,15 +30,15 @@ public abstract class BaseChildElementParser implements DmnXMLConstants {
 
     public abstract String getElementName();
 
-    public abstract void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception;
+    public abstract void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception;
 
-    protected void parseChildElements(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable, BaseChildElementParser parser) throws Exception {
+    protected void parseChildElements(XMLStreamReader xtr, DmnElement parentElement, Decision decision, BaseChildElementParser parser) throws Exception {
         boolean readyWithChildElements = false;
         while (!readyWithChildElements && xtr.hasNext()) {
             xtr.next();
             if (xtr.isStartElement()) {
                 if (parser.getElementName().equals(xtr.getLocalName())) {
-                    parser.parseChildElement(xtr, parentElement, decisionTable);
+                    parser.parseChildElement(xtr, parentElement, decision);
                 }
 
             } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {

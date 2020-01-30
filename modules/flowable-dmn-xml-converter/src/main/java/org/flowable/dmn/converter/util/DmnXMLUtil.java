@@ -27,7 +27,11 @@ import org.flowable.dmn.converter.child.InputExpressionParser;
 import org.flowable.dmn.converter.child.OutputClauseParser;
 import org.flowable.dmn.converter.child.OutputEntryParser;
 import org.flowable.dmn.converter.child.OutputValuesParser;
-import org.flowable.dmn.model.DecisionTable;
+import org.flowable.dmn.converter.child.RequiredAuthorityParser;
+import org.flowable.dmn.converter.child.RequiredDecisionParser;
+import org.flowable.dmn.converter.child.RequiredInputParser;
+import org.flowable.dmn.converter.child.VariableParser;
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.DmnExtensionAttribute;
 import org.flowable.dmn.model.DmnExtensionElement;
@@ -49,6 +53,10 @@ public class DmnXMLUtil implements DmnXMLConstants {
         addGenericParser(new OutputEntryParser());
         addGenericParser(new InputExpressionParser());
         addGenericParser(new OutputValuesParser());
+        addGenericParser(new VariableParser());
+        addGenericParser(new RequiredAuthorityParser());
+        addGenericParser(new RequiredDecisionParser());
+        addGenericParser(new RequiredInputParser());
     }
 
     private static void addGenericParser(BaseChildElementParser parser) {
@@ -56,7 +64,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
     }
 
     public static void parseChildElements(String elementName, DmnElement parentElement, XMLStreamReader xtr,
-            Map<String, BaseChildElementParser> childParsers, DecisionTable decisionTable) throws Exception {
+            Map<String, BaseChildElementParser> childParsers, Decision decision) throws Exception {
 
         Map<String, BaseChildElementParser> localParserMap = new HashMap<>(genericChildParserMap);
         if (childParsers != null) {
@@ -80,7 +88,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
                         parentElement.addExtensionElement(extensionElement);
                         continue;
                     }
-                    localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, decisionTable);
+                    localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, decision);
                 } else if (inExtensionElements) {
                     DmnExtensionElement extensionElement = parseExtensionElement(xtr);
                     parentElement.addExtensionElement(extensionElement);

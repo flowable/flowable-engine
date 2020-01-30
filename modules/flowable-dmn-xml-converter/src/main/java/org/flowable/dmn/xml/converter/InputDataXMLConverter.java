@@ -16,32 +16,33 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.InputData;
 
 /**
- * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class DecisionRuleXMLConverter extends BaseDmnXMLConverter {
+public class InputDataXMLConverter extends BaseDmnXMLConverter {
 
     @Override
     public Class<? extends DmnElement> getDmnElementType() {
-        return DecisionRule.class;
+        return InputData.class;
     }
 
     @Override
     protected String getXMLElementName() {
-        return ELEMENT_RULE;
+        return ELEMENT_INPUT_DATA;
     }
 
     @Override
     protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
-        DecisionRule rule = new DecisionRule();
-        parseChildElements(getXMLElementName(), rule, decision, xtr);
-        return rule;
+        InputData clause = new InputData();
+        clause.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
+        clause.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+        parseChildElements(getXMLElementName(), clause, decision, xtr);
+        return clause;
     }
 
     @Override
