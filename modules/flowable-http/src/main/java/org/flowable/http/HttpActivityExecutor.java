@@ -53,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
  * An executor behavior for HTTP requests.
@@ -116,6 +117,9 @@ public class HttpActivityExecutor {
                 if (!response.isBodyResponseHandled()) {
                     String varName = StringUtils.isNotEmpty(responseVariableName) ? responseVariableName : request.getPrefix() + "ResponseBody";
                     Object varValue = request.isSaveResponseAsJson() && response.getBody() != null ? objectMapper.readTree(response.getBody()) : response.getBody();
+                    if (varValue instanceof MissingNode) {
+                        varValue = null;
+                    }
                     if (request.isSaveResponseTransient()) {
                         variableContainer.setTransientVariable(varName, varValue);
                     } else {

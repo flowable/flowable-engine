@@ -98,7 +98,7 @@ public class FlowableDefaultPropertiesEnvironmentPostProcessorTest {
         assertThat(environment.getProperty("qux")).isEqualTo("from-application-yaml");
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     static class Config {
 
     }

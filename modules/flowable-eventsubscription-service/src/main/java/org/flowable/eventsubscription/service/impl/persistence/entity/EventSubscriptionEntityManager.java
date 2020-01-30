@@ -32,6 +32,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     CompensateEventSubscriptionEntity createCompensateEventSubscription();
 
+    GenericEventSubscriptionEntity createGenericEventSubscription();
+
     /* Create and insert */
 
     EventSubscription createEventSubscription(EventSubscriptionBuilder eventSubscriptionBuilder);
@@ -47,6 +49,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     void deleteEventSubscriptionsByExecutionId(String executionId);
     
     void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType);
+
+    void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
 
     /* Find (generic) */
 

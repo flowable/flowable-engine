@@ -172,7 +172,7 @@ public class PrivilegeCollectionResource {
             restApiInterceptor.deleteGroupPrivilege(privilege, groupId);
         }
         
-        identityService.deleteUserPrivilegeMapping(privilegeId, groupId);
+        identityService.deleteGroupPrivilegeMapping(privilegeId, groupId);
     }
     
     @ApiOperation(value = "Adds a privilege for a group", nickname = "addGroupPrivilege", tags = { "Privileges" })

@@ -213,7 +213,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
 
         for (ProcessInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
             assertThat(part.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_WAITING);
-            assertThat(part.getResult()).isNull();;
+            assertThat(part.getResult()).isNull();
         }
 
         // Start async executor to process the batches

@@ -92,7 +92,7 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
         // Completing the human task A should mark the stage as completable
         cmmnTaskService.complete(taskA.getId());
         PlanItemInstance stage1PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 1").singleResult();
-        assertThat(stage1PlanItemInstance.isCompleteable()).isTrue();
+        assertThat(stage1PlanItemInstance.isCompletable()).isTrue();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().stageInstanceId(stage1PlanItemInstance.getId()).list()).isNotEmpty();
 
         // The stage being completable, this should make the user event listener available

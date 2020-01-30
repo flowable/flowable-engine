@@ -221,6 +221,7 @@ flowableAdminApp.controller('CmmnTasksController', ['$scope', '$rootScope', '$ht
           $scope.gridDefinitions = {
               data: 'taskData.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               enableSorting: false,

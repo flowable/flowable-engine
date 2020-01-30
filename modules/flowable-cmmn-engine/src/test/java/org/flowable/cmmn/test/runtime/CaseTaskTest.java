@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -72,6 +73,16 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testBasicBlocking() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        assertBlockingCaseTaskFlow(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseReferenceExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .variable("myVar", "oneTaskCase")
+            .start();
         assertBlockingCaseTaskFlow(caseInstance);
     }
 
@@ -158,7 +169,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
             Task taskBeforeSubTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("The Task", taskBeforeSubTask.getName());
+            assertEquals("Task One", taskBeforeSubTask.getName());
             Task childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             assertEquals(taskBeforeSubTask.getId(), childTask.getId());
 
@@ -181,7 +192,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
             cmmnTaskService.complete(taskInSubTask.getId());
 
             Task taskAfterSubTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("The Task2", taskAfterSubTask.getName());
+            assertEquals("Task Two", taskAfterSubTask.getName());
             childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             assertEquals(taskAfterSubTask.getId(), childTask.getId());
 
@@ -434,6 +445,29 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = {
+        "org/flowable/cmmn/test/runtime/CaseTaskTest.terminateAvailableCaseTask.cmmn",
+        "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testTerminateAvailableCaseTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("terminateAvailableCaseTask").start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionType(PlanItemDefinitionType.CASE_TASK)
+            .planItemInstanceStateAvailable().singleResult();
+        assertEquals("myCase", planItemInstance.getName());
+
+        // When the event listener now occurs, the stage should be exited, also exiting the case task plan item
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceWithNestedCaseTasks() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -587,6 +621,129 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
                 .isNotNull()
                 .containsEntry("testContentOuterTaskOut", outVariableContent);
         cmmnRepositoryService.deleteDeployment(innerCaseDeploymentId, true);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testWithSpecifiedBusinessKey() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+
+        assertThat(subCase)
+                .isNotNull()
+                .extracting(CaseInstance::getBusinessKey)
+                .isEqualTo("myBusinessKey");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(subCase.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testWithSpecifiedBusinessKeyAndInheritBusinessKey() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .businessKey("dummyBusinessKey")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+
+        assertThat(subCase)
+                .isNotNull()
+                .extracting(CaseInstance::getBusinessKey)
+                .isEqualTo("myBusinessKey");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(subCase.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testWithInheritBusinessKey() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .businessKey("myBusinessKey")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+
+        assertThat(subCase)
+                .isNotNull()
+                .extracting(CaseInstance::getBusinessKey)
+                .isEqualTo("myBusinessKey");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(subCase.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/CaseTaskTest.testWithInheritBusinessKey.cmmn")
+    public void testWithInheritBusinessKeyButWithoutBusinessKey() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+
+        assertThat(subCase)
+                .isNotNull()
+                .extracting(CaseInstance::getBusinessKey)
+                .isNull();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(subCase.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testIdVariableName() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testIdVariableName")
+            .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+            .caseDefinitionKey("oneTaskCase")
+            .singleResult();
+
+        assertEquals(subCase.getId(), cmmnRuntimeService.getVariable(caseInstance.getId(), "caseIdVariable"));
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testIdVariableNameExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testIdVariableName")
+            .variable("idVariableName", "test")
+            .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+            .caseDefinitionKey("oneTaskCase")
+            .singleResult();
+
+        assertEquals(subCase.getId(), cmmnRuntimeService.getVariable(caseInstance.getId(), "test"));
     }
 
 }

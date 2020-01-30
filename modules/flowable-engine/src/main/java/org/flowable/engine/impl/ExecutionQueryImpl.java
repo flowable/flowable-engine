@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryCacheValues;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -41,7 +42,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Frederik Heremans
  * @author Daniel Meyer
  */
-public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution> implements ExecutionQuery {
+public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution> implements ExecutionQuery, QueryCacheValues {
 
     private static final long serialVersionUID = 1L;
     protected String processDefinitionId;
@@ -76,6 +77,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected boolean excludeSubprocesses;
     protected SuspensionState suspensionState;
     protected String businessKey;
+    protected String businessKeyLike;
     protected boolean includeChildExecutionsWithBusinessKeyQuery;
     protected boolean isActive;
     protected String involvedUser;
@@ -93,6 +95,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected List<String> deploymentIds;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     
     protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
     protected ExecutionQueryImpl currentOrQueryObject;
@@ -373,6 +377,26 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             this.withoutTenantId = true;
         }
         
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery executionReferenceId(String referenceId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery executionReferenceType(String referenceType) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
+        }
         return this;
     }
 
@@ -924,8 +948,17 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public String getBusinessKey() {
         return businessKey;
     }
+    
+    public String getBusinessKeyLike() {
+        return businessKeyLike;
+    }
 
     public String getExecutionId() {
+        return executionId;
+    }
+    
+    @Override
+    public String getId() {
         return executionId;
     }
 
@@ -1015,6 +1048,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public String getName() {

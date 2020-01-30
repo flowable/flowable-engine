@@ -128,7 +128,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
         assertThat(caseInstance, is(notNullValue()));
         assertThat("Plan items are created asynchronously", this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count(), is(0l));
 
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 1000, 100, true);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200, true);
         assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count(), is(1l));
     }
 

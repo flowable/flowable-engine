@@ -35,7 +35,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  *
  * @author Josh Long
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({
     AuthenticationManager.class,
     IdmIdentityService.class,
@@ -50,7 +50,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 })
 public class FlowableSecurityAutoConfiguration {
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(AuthenticationContext.class)
     public static class SpringSecurityAuthenticationContextConfiguration {
 

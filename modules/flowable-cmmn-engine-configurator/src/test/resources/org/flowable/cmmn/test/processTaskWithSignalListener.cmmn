@@ -12,7 +12,7 @@
 
             <planItem id="planItem1" name="The Process" definitionRef="theProcess" />
             <planItem id="eventListenerPlanItem" definitionRef="eventListener"/>
-            <planItem id="planItem2" name="The Task" definitionRef="theTask">
+            <planItem id="planItem2" name="Test task" definitionRef="theTask">
                 <entryCriterion id="entryTaskB" sentryRef="sentryOnEventListener"/>
             </planItem>
             

@@ -7,7 +7,7 @@
   <!-- INSERT IDENTITY LINK -->
   
   <insert id="insertIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
-    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_)
+    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_)
     values (#{id, jdbcType=VARCHAR},
             1,
             #{type, jdbcType=VARCHAR},
@@ -17,13 +17,14 @@
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR})
             
   </insert>
   
   <insert id="bulkInsertIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
-    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_)
+    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_)
     values 
     <foreach collection="list" item="identityLink" index="index" separator=","> 
       (#{identityLink.id, jdbcType=VARCHAR},
@@ -35,6 +36,7 @@
         #{identityLink.processInstanceId, jdbcType=VARCHAR},
         #{identityLink.processDefId, jdbcType=VARCHAR},
         #{identityLink.scopeId, jdbcType=VARCHAR},
+        #{identityLink.subScopeId, jdbcType=VARCHAR},
         #{identityLink.scopeType, jdbcType=VARCHAR},
         #{identityLink.scopeDefinitionId, jdbcType=VARCHAR})
     </foreach>
@@ -43,7 +45,7 @@
   <insert id="bulkInsertIdentityLink" databaseId="oracle" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
     INSERT ALL
       <foreach collection="list" item="identityLink" index="index">
-        into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_) VALUES
+        into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_) VALUES
            (#{identityLink.id, jdbcType=VARCHAR},
             1,
             #{identityLink.type, jdbcType=VARCHAR},
@@ -53,6 +55,7 @@
             #{identityLink.processInstanceId, jdbcType=VARCHAR},
             #{identityLink.processDefId, jdbcType=VARCHAR},
             #{identityLink.scopeId, jdbcType=VARCHAR},
+            #{identityLink.subScopeId, jdbcType=VARCHAR},
             #{identityLink.scopeType, jdbcType=VARCHAR},
             #{identityLink.scopeDefinitionId, jdbcType=VARCHAR})
       </foreach>
@@ -84,6 +87,9 @@
         </if>
         <if test="originalPersistentState.scopeId != scopeId">
             SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.subScopeId != subScopeId">
+            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.scopeType != scopeType">
             SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
@@ -140,6 +146,7 @@
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />    
     <result property="processDefId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
   </resultMap>
@@ -160,6 +167,10 @@
   
   <select id="selectIdentityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
     select * from ${prefix}ACT_RU_IDENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+  </select>
+  
+  <select id="selectIdentityLinksBySubScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+    select * from ${prefix}ACT_RU_IDENTITYLINK where SUB_SCOPE_ID_ = #{parameter.subScopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
   </select>
   
   <select id="selectIdentityLinksByProcessDefinition" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">

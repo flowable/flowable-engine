@@ -80,6 +80,7 @@ flowableAdminApp.controller('DecisionTableExecutionsController', ['$rootScope', 
                 $scope.gridDecisionTableExecutions = {
                     data: 'decisionTableExecutionsData.data',
                     enableRowReordering: true,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     rowHeight: 36,

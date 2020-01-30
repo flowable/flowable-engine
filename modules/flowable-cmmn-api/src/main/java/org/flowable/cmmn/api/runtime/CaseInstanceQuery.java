@@ -39,6 +39,8 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceStartedBy(String userId);
     CaseInstanceQuery caseInstanceCallbackId(String callbackId);
     CaseInstanceQuery caseInstanceCallbackType(String callbackType);
+    CaseInstanceQuery caseInstanceReferenceId(String referenceId);
+    CaseInstanceQuery caseInstanceReferenceType(String referenceType);
     CaseInstanceQuery caseInstanceIsCompleteable();
     CaseInstanceQuery caseInstanceTenantId(String tenantId);
     CaseInstanceQuery caseInstanceTenantIdLike(String tenantIdLike);

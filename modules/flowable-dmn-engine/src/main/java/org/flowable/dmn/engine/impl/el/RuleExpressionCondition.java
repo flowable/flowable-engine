@@ -33,8 +33,13 @@ public class RuleExpressionCondition {
         this.expression = expression;
     }
 
-    public boolean evaluate(Map<String, Object> variables) {
-        Object result = expression.getValue(new VariableContainerWrapper(variables));
+    public boolean evaluate(Map<String, Object> variables, ELExecutionContext executionContext) {
+        VariableContainerWrapper variableContainer = new VariableContainerWrapper(variables);
+        variableContainer.setInstanceId(executionContext.getInstanceId());
+        variableContainer.setScopeType(executionContext.getScopeType());
+        variableContainer.setTenantId(executionContext.getTenantId());
+
+        Object result = expression.getValue(variableContainer);
 
         if (result == null) {
             throw new FlowableException("condition expression returns null");

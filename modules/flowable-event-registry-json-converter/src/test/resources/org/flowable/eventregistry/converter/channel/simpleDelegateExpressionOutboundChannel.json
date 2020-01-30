@@ -1,0 +1,11 @@
+{
+  "key": "expressionChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test Expression channel",
+  "channelType": "outbound",
+  "type": "expression",
+  "adapterDelegateExpression": "${outboundAdapter}",
+  "serializerType": "expression",
+  "serializerDelegateExpression": "${serializer}"
+}

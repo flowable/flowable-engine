@@ -12,6 +12,10 @@
  */
 package org.activiti.standalone.deploy;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 
@@ -64,4 +68,21 @@ public class CustomDeploymentCache implements DeploymentCache<ProcessDefinitionC
         return id.equals(this.id);
     }
 
+    @Override
+    public Collection<ProcessDefinitionCacheEntry> getAll() {
+        if (processDefinition != null) {
+            return Collections.singletonList(processDefinition);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public int size() {
+        if (processDefinition != null) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }

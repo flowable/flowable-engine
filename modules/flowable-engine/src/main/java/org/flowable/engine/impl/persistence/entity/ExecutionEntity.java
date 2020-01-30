@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.AlwaysUpdatedPersistentObject;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -140,7 +141,16 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     void setCallbackType(String callbackType);
     
     void setVariable(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
+
+    void setReferenceId(String referenceId);
+
+    void setReferenceType(String referenceType);
+
+    void setPropagatedStageInstanceId(String propagatedStageInstanceId);
     
     Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
 
+    FlowElement getOriginatingCurrentFlowElement();
+    
+    void setOriginatingCurrentFlowElement(FlowElement flowElement);
 }

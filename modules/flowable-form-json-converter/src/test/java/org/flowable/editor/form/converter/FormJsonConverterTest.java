@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.form.model.FormField;
@@ -62,7 +63,7 @@ public class FormJsonConverterTest {
     /* Helper methods */
     protected String readJsonToString(String resource) {
         try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(resource)) {
-            return IOUtils.toString(is, "utf-8");
+            return IOUtils.toString(is, StandardCharsets.UTF_8);
         } catch (IOException e) {
             fail("Could not read " + resource + " : " + e.getMessage());
             return null;

@@ -57,7 +57,7 @@ public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploy
     @Test
     public void testDeployResources() {
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, formEngineMock);
 
         verify(repositoryServiceMock, times(3)).createDeployment();
         verify(deploymentBuilderMock, times(3)).enableDuplicateFiltering();
@@ -72,7 +72,7 @@ public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploy
     @Test
     public void testDeployResourcesNoResources() {
         final Resource[] resources = new Resource[] {};
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, formEngineMock);
 
         verify(repositoryServiceMock, never()).createDeployment();
         verify(deploymentBuilderMock, never()).enableDuplicateFiltering();

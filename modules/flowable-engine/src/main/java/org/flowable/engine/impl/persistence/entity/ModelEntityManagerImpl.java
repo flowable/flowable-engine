@@ -16,7 +16,6 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ModelDataManager;
@@ -26,23 +25,17 @@ import org.flowable.engine.repository.Model;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class ModelEntityManagerImpl extends AbstractEntityManager<ModelEntity> implements ModelEntityManager {
-
-    protected ModelDataManager modelDataManager;
+public class ModelEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<ModelEntity, ModelDataManager>
+    implements ModelEntityManager {
 
     public ModelEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, ModelDataManager modelDataManager) {
-        super(processEngineConfiguration);
-        this.modelDataManager = modelDataManager;
-    }
-
-    @Override
-    protected DataManager<ModelEntity> getDataManager() {
-        return modelDataManager;
+        super(processEngineConfiguration, modelDataManager);
     }
 
     @Override
     public ModelEntity findById(String entityId) {
-        return modelDataManager.findById(entityId);
+        return dataManager.findById(entityId);
     }
 
     @Override
@@ -113,12 +106,12 @@ public class ModelEntityManagerImpl extends AbstractEntityManager<ModelEntity> i
 
     @Override
     public List<Model> findModelsByQueryCriteria(ModelQueryImpl query) {
-        return modelDataManager.findModelsByQueryCriteria(query);
+        return dataManager.findModelsByQueryCriteria(query);
     }
 
     @Override
     public long findModelCountByQueryCriteria(ModelQueryImpl query) {
-        return modelDataManager.findModelCountByQueryCriteria(query);
+        return dataManager.findModelCountByQueryCriteria(query);
     }
 
     @Override
@@ -145,20 +138,12 @@ public class ModelEntityManagerImpl extends AbstractEntityManager<ModelEntity> i
 
     @Override
     public List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap) {
-        return modelDataManager.findModelsByNativeQuery(parameterMap);
+        return dataManager.findModelsByNativeQuery(parameterMap);
     }
 
     @Override
     public long findModelCountByNativeQuery(Map<String, Object> parameterMap) {
-        return modelDataManager.findModelCountByNativeQuery(parameterMap);
-    }
-
-    public ModelDataManager getModelDataManager() {
-        return modelDataManager;
-    }
-
-    public void setModelDataManager(ModelDataManager modelDataManager) {
-        this.modelDataManager = modelDataManager;
+        return dataManager.findModelCountByNativeQuery(parameterMap);
     }
 
 }

@@ -20,6 +20,7 @@ public class ProcessTask extends ChildTask {
     protected String processRefExpression;
     protected String processRef;
     protected Boolean fallbackToDefaultTenant;
+    protected String processInstanceIdVariableName;
 
     protected Process process;
 
@@ -55,4 +56,10 @@ public class ProcessTask extends ChildTask {
         return fallbackToDefaultTenant;
     }
 
+    public String getProcessInstanceIdVariableName() {
+        return processInstanceIdVariableName;
+    }
+    public void setProcessInstanceIdVariableName(String processInstanceIdVariableName) {
+        this.processInstanceIdVariableName = processInstanceIdVariableName;
+    }
 }

@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Tijs Rademakers
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class RestConfiguration {
 
     @Bean()

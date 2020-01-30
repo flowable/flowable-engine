@@ -13,16 +13,25 @@
 
 package org.flowable.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.List;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
@@ -435,5 +444,79 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
         // done!
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+
+    @Test
+    @Deployment
+    public void testInterruptingSimpleActivities() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSimpleTimerEventSubProcess");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task")
+            );
+
+        // Trigger the Event sub process
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "timerEventSubProcess"),
+                tuple("startEvent", "eventSubProcessTimerStart"),
+                tuple("sequenceFlow", "eventSubProcessFlow1"),
+                tuple("userTask", "eventSubProcessTask1")
+            );
+
+        // Complete the user task in the event sub process
+        Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask1").singleResult();
+        assertThat(eventSubProcessTask).isNotNull();
+        taskService.complete(eventSubProcessTask.getId());
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "timerEventSubProcess"),
+                tuple("startEvent", "eventSubProcessTimerStart"),
+                tuple("sequenceFlow", "eventSubProcessFlow1"),
+                tuple("userTask", "eventSubProcessTask1"),
+                tuple("sequenceFlow", "eventSubProcessFlow2"),
+                tuple("endEvent", "eventSubProcessEnd")
+            );
+
+        ActivityInstance eventSubProcessActivity = runtimeService.createActivityInstanceQuery()
+            .activityType("eventSubProcess")
+            .activityId("timerEventSubProcess")
+            .singleResult();
+        assertThat(eventSubProcessActivity).isNotNull();
+        assertThat(eventSubProcessActivity.getEndTime()).isNotNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                    tuple("startEvent", "start"),
+                    tuple("sequenceFlow", "flow1"),
+                    tuple("userTask", "task"),
+                    tuple("eventSubProcess", "timerEventSubProcess"),
+                    tuple("startEvent", "eventSubProcessTimerStart"),
+                    tuple("sequenceFlow", "eventSubProcessFlow1"),
+                    tuple("userTask", "eventSubProcessTask1"),
+                    tuple("sequenceFlow", "eventSubProcessFlow2"),
+                    tuple("endEvent", "eventSubProcessEnd")
+                );
+        }
     }
 }

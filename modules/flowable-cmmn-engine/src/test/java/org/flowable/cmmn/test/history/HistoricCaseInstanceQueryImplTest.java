@@ -460,6 +460,86 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void getCaseInstanceByReferenceId() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .referenceId("testReferenceId")
+            .start();
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").count(), is(1L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").list().get(0).getId(),
+            is(caseInstance.getId()));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId").singleResult().getId(),
+            is(caseInstance.getId()));
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
+            or().
+            caseInstanceReferenceId("testReferenceId").
+            caseDefinitionName("undefined").
+            endOr().
+            count(), is(1L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
+            or().
+            caseInstanceReferenceId("testReferenceId").
+            caseDefinitionName("undefined").
+            endOr().
+            list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
+            or().
+            caseInstanceReferenceId("testReferenceId").
+            caseDefinitionId("undefined").
+            endOr().
+            singleResult().getId(), is(caseInstance.getId()));
+    }
+
+    @Test
+    public void getCaseInstanceByReferenceType() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .referenceType("testReferenceType")
+            .start();
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").count(), is(1L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").list().get(0).getId(),
+            is(caseInstance.getId()));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceType("testReferenceType").singleResult().getId(),
+            is(caseInstance.getId()));
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
+            or().
+            caseInstanceReferenceType("testReferenceType").
+            caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(1L));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
+            or().
+            caseInstanceReferenceType("testReferenceType").
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().
+            or().
+            caseInstanceReferenceType("testReferenceType").
+            caseDefinitionId("undefined").
+            endOr().
+            singleResult().getId(), is(caseInstance.getId()));
+    }
+
+    @Test
+    public void getCaseInstanceByReferenceIdAndType() {
+        for (int i = 0; i < 5; i++) {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .referenceId("testReferenceId")
+                .referenceType("testReferenceType")
+                .start();
+        }
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceReferenceId("testReferenceId")
+            .caseInstanceReferenceType("testReferenceType").count(), is(5L));
+    }
+
+    @Test
     public void getCaseInstanceByTenantId() {
         String tempDeploymentId = cmmnRepositoryService.createDeployment().
             addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn").

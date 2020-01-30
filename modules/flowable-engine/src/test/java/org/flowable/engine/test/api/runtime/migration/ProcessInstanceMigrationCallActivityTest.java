@@ -482,9 +482,9 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
 
         Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
         Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
-        assertThat(miRootVars).extracting("nrOfActiveInstances").containsOnly(3);
-        assertThat(miRootVars).extracting("nrOfCompletedInstances").containsOnly(0);
-        assertThat(miRootVars).extracting("nrOfLoops").containsOnly(3);
+        assertThat(miRootVars).extracting("nrOfActiveInstances").isEqualTo(3);
+        assertThat(miRootVars).extracting("nrOfCompletedInstances").isEqualTo(0);
+        assertThat(miRootVars).extracting("nrOfLoops").isEqualTo(3);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertThat(tasks).isEmpty();

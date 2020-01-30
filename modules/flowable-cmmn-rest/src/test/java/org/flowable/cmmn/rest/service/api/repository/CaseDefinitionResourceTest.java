@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -111,7 +112,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
-        String content = IOUtils.toString(response.getEntity().getContent(), "utf-8");
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertNotNull(content);
         assertTrue(content.contains("This is a test documentation"));

@@ -21,11 +21,139 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverterUtil;
+import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.ExtensionAttribute;
+import org.flowable.cmmn.model.ExtensionElement;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnStencilConstants {
+    
+    public static void addEventOutParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode, ObjectMapper objectMapper) {
+        if (CollectionUtils.isEmpty(eventParameterElements)) {
+            return;
+        }
+
+        ObjectNode valueNode = objectMapper.createObjectNode();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        for (ExtensionElement element : eventParameterElements) {
+            ObjectNode itemNode = objectMapper.createObjectNode();
+            itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME, element.getAttributeValue(null, "source"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE, element.getAttributeValue(null, "sourceType"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME, element.getAttributeValue(null, "target"));
+
+            arrayNode.add(itemNode);
+        }
+
+        valueNode.set("outParameters", arrayNode);
+        propertiesNode.set(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, valueNode);
+    }
+    
+    public static void addEventInParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode, ObjectMapper objectMapper) {
+        if (CollectionUtils.isEmpty(eventParameterElements)) {
+            return;
+        }
+
+        ObjectNode valueNode = objectMapper.createObjectNode();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        for (ExtensionElement element : eventParameterElements) {
+            ObjectNode itemNode = objectMapper.createObjectNode();
+            itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME, element.getAttributeValue(null, "source"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME, element.getAttributeValue(null, "target"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE, element.getAttributeValue(null, "targetType"));
+
+            arrayNode.add(itemNode);
+        }
+
+        valueNode.set("inParameters", arrayNode);
+        propertiesNode.set(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, valueNode);
+    }
+    
+    public static void addEventCorrelationParameters(List<ExtensionElement> eventParameterElements, ObjectNode propertiesNode, ObjectMapper objectMapper) {
+        if (CollectionUtils.isEmpty(eventParameterElements)) {
+            return;
+        }
+
+        ObjectNode valueNode = objectMapper.createObjectNode();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        for (ExtensionElement element : eventParameterElements) {
+            ObjectNode itemNode = objectMapper.createObjectNode();
+            itemNode.put(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME, element.getAttributeValue(null, "name"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE, element.getAttributeValue(null, "nameType"));
+            itemNode.put(PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE, element.getAttributeValue(null, "value"));
+
+            arrayNode.add(itemNode);
+        }
+
+        valueNode.set("correlationParameters", arrayNode);
+        propertiesNode.set(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS, valueNode);
+    }
+    
+    public static void convertJsonToOutParameters(JsonNode objectNode, BaseElement baseElement) {
+        JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS, objectNode);
+        parametersNode = CmmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
+        if (parametersNode != null && parametersNode.get("outParameters") != null) {
+            parametersNode = CmmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
+            JsonNode parameterArray = parametersNode.get("outParameters");
+            for (JsonNode parameterNode : parameterArray) {
+                if (parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).isNull()) {
+                    ExtensionElement extensionElement = addFlowableExtensionElement("eventOutParameter", baseElement);
+                    String eventName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).asText();
+                    String eventType = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE).asText();
+                    String variableName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).asText();
+                    
+                    addExtensionAttribute("source", eventName, extensionElement);
+                    addExtensionAttribute("sourceType", eventType, extensionElement);
+                    addExtensionAttribute("target", variableName, extensionElement);
+                }
+            }
+        }
+    }
+    
+    public static void convertJsonToInParameters(JsonNode objectNode, BaseElement baseElement) {
+        JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_IN_PARAMETERS, objectNode);
+        parametersNode = CmmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
+        if (parametersNode != null && parametersNode.get("inParameters") != null) {
+            parametersNode = CmmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
+            JsonNode parameterArray = parametersNode.get("inParameters");
+            for (JsonNode parameterNode : parameterArray) {
+                if (parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).isNull()) {
+                    ExtensionElement extensionElement = addFlowableExtensionElement("eventInParameter", baseElement);
+                    String variableName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME).asText();
+                    String eventName = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME).asText();
+                    String eventType = parameterNode.get(PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE).asText();
+                    
+                    addExtensionAttribute("source", variableName, extensionElement);
+                    addExtensionAttribute("target", eventName, extensionElement);
+                    addExtensionAttribute("targetType", eventType, extensionElement);
+                }
+            }
+        }
+    }
+    
+    public static void convertJsonToCorrelationParameters(JsonNode objectNode, String correlationPropertyName, BaseElement baseElement) {
+        JsonNode parametersNode = getProperty(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS, objectNode);
+        parametersNode = CmmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
+        if (parametersNode != null && parametersNode.get("correlationParameters") != null) {
+            parametersNode = CmmnJsonConverterUtil.validateIfNodeIsTextual(parametersNode);
+            JsonNode parameterArray = parametersNode.get("correlationParameters");
+            for (JsonNode parameterNode : parameterArray) {
+                if (parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME) != null && !parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME).isNull()) {
+                    ExtensionElement extensionElement = addFlowableExtensionElement(correlationPropertyName, baseElement);
+                    String name = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONNAME).asText();
+                    String type = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE).asText();
+                    String value = parameterNode.get(PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE).asText();
+                    
+                    addExtensionAttribute("name", name, extensionElement);
+                    addExtensionAttribute("type", type, extensionElement);
+                    addExtensionAttribute("value", value, extensionElement);
+                }
+            }
+        }
+    }
 
     public static String getPropertyValueAsString(String name, JsonNode objectNode) {
         String propertyValue = null;
@@ -89,6 +217,21 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
             }
         }
         return null;
+    }
+    
+    public static ExtensionElement addFlowableExtensionElement(String name, BaseElement baseElement) {
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setName(name);
+        extensionElement.setNamespace("http://flowable.org/cmmn");
+        extensionElement.setNamespacePrefix("flowable");
+        baseElement.addExtensionElement(extensionElement);
+        return extensionElement;
+    }
+    
+    public static void addExtensionAttribute(String name, String value, ExtensionElement extensionElement) {
+        ExtensionAttribute attribute = new ExtensionAttribute(name);
+        attribute.setValue(value);
+        extensionElement.addAttribute(attribute);
     }
 
     /**

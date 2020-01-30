@@ -29,7 +29,7 @@ import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 /**
  * @author Filip Hrisafov
  */
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class SampleLdapApplication {
 
     public static void main(String[] args) {

@@ -63,6 +63,8 @@ public class CaseInstanceStartHistoryJsonTransformer extends AbstractHistoryJson
                historicCaseInstanceEntity.setStartTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_START_TIME));
                historicCaseInstanceEntity.setCallbackId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CALLBACK_ID));
                historicCaseInstanceEntity.setCallbackType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CALLBACK_TYPE));
+               historicCaseInstanceEntity.setReferenceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REFERENCE_ID));
+               historicCaseInstanceEntity.setReferenceType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_REFERENCE_TYPE));
                historicCaseInstanceEntity.setTenantId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_TENANT_ID));
                historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
            }

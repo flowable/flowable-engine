@@ -21,5 +21,6 @@ package org.flowable.spring;
  * @author Tijs Rademakers
  * @deprecated use {@link org.flowable.spring.job.service.SpringRejectedJobsHandler}
  */
+@Deprecated
 public interface SpringRejectedJobsHandler extends org.flowable.spring.job.service.SpringRejectedJobsHandler {
 }

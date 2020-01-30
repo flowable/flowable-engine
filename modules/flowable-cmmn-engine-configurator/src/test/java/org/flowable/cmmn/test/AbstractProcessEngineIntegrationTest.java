@@ -12,13 +12,20 @@
  */
 package org.flowable.cmmn.test;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -91,6 +98,10 @@ public abstract class AbstractProcessEngineIntegrationTest {
         for (Deployment deployment : processEngineRepositoryService.createDeploymentQuery().list()) {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
+
+        for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
+            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
     
     protected Date setCmmnClockFixedToCurrentTime() {
@@ -99,4 +110,22 @@ public abstract class AbstractProcessEngineIntegrationTest {
         return date;
     }
 
+    protected void assertCaseInstanceEnded(CaseInstance caseInstance) {
+        long count = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count();
+        assertEquals(createCaseInstanceEndedErrorMessage(caseInstance, count), 0, count);
+        assertEquals("Runtime case instance found", 0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+    }
+
+    protected String createCaseInstanceEndedErrorMessage(CaseInstance caseInstance, long count) {
+        String errorMessage = "Plan item instances found for case instance: ";
+        if (count != 0) {
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            String names = planItemInstances.stream()
+                .map(planItemInstance -> planItemInstance.getName() + "(" + planItemInstance.getPlanItemDefinitionType() + ")")
+                .collect(Collectors.joining(", "));
+            errorMessage += names;
+        }
+        return errorMessage;
+    }
 }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.flowable.org/processdef">
+
+    <process id="testGetWithVariableNameAndSkipExpression">
+
+        <startEvent id="theStart"/>
+
+        <sequenceFlow sourceRef="theStart"
+                      targetRef="getHttpTask"/>
+
+        <serviceTask id="getHttpTask"
+                     flowable:skipExpression="${execution.getVariable('skip')}"
+                     flowable:type="http">
+            <extensionElements>
+                <flowable:field name="requestMethod">
+                    <flowable:string><![CDATA[GET]]></flowable:string>
+                </flowable:field>
+                <flowable:field name="requestUrl">
+                    <flowable:string><![CDATA[http://localhost:9798/test]]></flowable:string>
+                </flowable:field>
+                <flowable:field name="responseVariableName">
+                    <flowable:string><![CDATA[result]]></flowable:string>
+                </flowable:field>
+            </extensionElements>
+        </serviceTask>
+
+        <sequenceFlow sourceRef="getHttpTask"
+                      targetRef="getHttpTask2"/>
+
+        <serviceTask id="getHttpTask2"
+                     flowable:type="http">
+            <extensionElements>
+                <flowable:field name="requestMethod">
+                    <flowable:string><![CDATA[GET]]></flowable:string>
+                </flowable:field>
+                <flowable:field name="requestUrl">
+                    <flowable:string><![CDATA[http://localhost:9798/test]]></flowable:string>
+                </flowable:field>
+                <flowable:field name="responseVariableName">
+                    <flowable:string><![CDATA[result2]]></flowable:string>
+                </flowable:field>
+            </extensionElements>
+        </serviceTask>
+
+        <sequenceFlow sourceRef="getHttpTask2"
+                      targetRef="waitState"/>
+
+        <userTask id="waitState"/>
+
+        <sequenceFlow sourceRef="waitState" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

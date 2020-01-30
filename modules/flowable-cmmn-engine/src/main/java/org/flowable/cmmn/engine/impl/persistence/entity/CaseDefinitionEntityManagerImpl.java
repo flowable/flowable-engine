@@ -30,7 +30,7 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
@@ -40,46 +40,40 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 /**
  * @author Joram Barrez
  */
-public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<CaseDefinitionEntity> implements CaseDefinitionEntityManager {
-
-    protected CaseDefinitionDataManager caseDefinitionDataManager;
+public class CaseDefinitionEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, CaseDefinitionEntity, CaseDefinitionDataManager>
+    implements CaseDefinitionEntityManager {
 
     public CaseDefinitionEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, CaseDefinitionDataManager caseDefinitionDataManager) {
-        super(cmmnEngineConfiguration);
-        this.caseDefinitionDataManager = caseDefinitionDataManager;
-    }
-
-    @Override
-    protected DataManager<CaseDefinitionEntity> getDataManager() {
-        return caseDefinitionDataManager;
+        super(cmmnEngineConfiguration, caseDefinitionDataManager);
     }
 
     @Override
     public CaseDefinitionEntity findLatestCaseDefinitionByKey(String caseDefinitionKey) {
-        return caseDefinitionDataManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+        return dataManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
     }
 
     @Override
     public CaseDefinitionEntity findLatestCaseDefinitionByKeyAndTenantId(String caseDefinitionKey, String tenantId) {
-        return caseDefinitionDataManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+        return dataManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
     }
 
     @Override
     public CaseDefinitionEntity findCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
-        return caseDefinitionDataManager.findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
+        return dataManager.findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
     }
 
     @Override
     public CaseDefinitionEntity findCaseDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String caseDefinitionKey, String tenantId) {
-        return caseDefinitionDataManager.findCaseDefinitionByDeploymentAndKeyAndTenantId(deploymentId, caseDefinitionKey, tenantId);
+        return dataManager.findCaseDefinitionByDeploymentAndKeyAndTenantId(deploymentId, caseDefinitionKey, tenantId);
     }
 
     @Override
     public CaseDefinition findCaseDefinitionByKeyAndVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
         if (tenantId == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-            return caseDefinitionDataManager.findCaseDefinitionByKeyAndVersion(caseDefinitionKey, caseDefinitionVersion);
+            return dataManager.findCaseDefinitionByKeyAndVersion(caseDefinitionKey, caseDefinitionVersion);
         } else {
-            return caseDefinitionDataManager.findCaseDefinitionByKeyAndVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
+            return dataManager.findCaseDefinitionByKeyAndVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
         }
     }
     
@@ -124,7 +118,7 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             List<HistoricCaseInstance> historicCaseInstanceEntities = historicCaseInstanceEntityManager
                     .findByCriteria(new HistoricCaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
             for (HistoricCaseInstance historicCaseInstanceEntity : historicCaseInstanceEntities) {
-                CmmnHistoryHelper.deleteHistoricCaseInstance(cmmnEngineConfiguration, historicCaseInstanceEntity.getId());
+                CmmnHistoryHelper.deleteHistoricCaseInstance(engineConfiguration, historicCaseInstanceEntity.getId());
             }
         }
         
@@ -134,25 +128,41 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
     
     @Override
     public CaseDefinitionQuery createCaseDefinitionQuery() {
-        return new CaseDefinitionQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new CaseDefinitionQueryImpl(engineConfiguration.getCommandExecutor());
     }
 
     @Override
     public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery) {
-        return caseDefinitionDataManager.findCaseDefinitionsByQueryCriteria((CaseDefinitionQueryImpl) caseDefinitionQuery);
+        return dataManager.findCaseDefinitionsByQueryCriteria((CaseDefinitionQueryImpl) caseDefinitionQuery);
     }
 
     @Override
     public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery) {
-        return caseDefinitionDataManager.findCaseDefinitionCountByQueryCriteria((CaseDefinitionQueryImpl) caseDefinitionQuery);
+        return dataManager.findCaseDefinitionCountByQueryCriteria((CaseDefinitionQueryImpl) caseDefinitionQuery);
     }
 
-    public CaseDefinitionDataManager getCaseDefinitionDataManager() {
-        return caseDefinitionDataManager;
+    protected CaseInstanceEntityManager getCaseInstanceEntityManager() {
+        return engineConfiguration.getCaseInstanceEntityManager();
     }
 
-    public void setCaseDefinitionDataManager(CaseDefinitionDataManager caseDefinitionDataManager) {
-        this.caseDefinitionDataManager = caseDefinitionDataManager;
+    protected HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
+        return engineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkEntityManager();
+    }
+
+    protected HistoricMilestoneInstanceEntityManager getHistoricMilestoneInstanceEntityManager() {
+        return engineConfiguration.getHistoricMilestoneInstanceEntityManager();
+    }
+
+    protected HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
+        return engineConfiguration.getTaskServiceConfiguration().getHistoricTaskInstanceEntityManager();
+    }
+
+    protected HistoricPlanItemInstanceEntityManager getHistoricPlanItemInstanceEntityManager() {
+        return engineConfiguration.getHistoricPlanItemInstanceEntityManager();
+    }
+
+    protected HistoricCaseInstanceEntityManager getHistoricCaseInstanceEntityManager() {
+        return engineConfiguration.getHistoricCaseInstanceEntityManager();
     }
 
 }

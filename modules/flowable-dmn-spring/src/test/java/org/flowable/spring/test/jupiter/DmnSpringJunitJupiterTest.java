@@ -82,7 +82,7 @@ class DmnSpringJunitJupiterTest {
         assertThat(deployment).isNotNull();
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @EnableTransactionManagement
     static class TestConfiguration {
 

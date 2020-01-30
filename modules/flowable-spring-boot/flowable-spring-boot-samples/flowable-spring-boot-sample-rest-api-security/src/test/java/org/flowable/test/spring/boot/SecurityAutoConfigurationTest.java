@@ -57,7 +57,7 @@ public class SecurityAutoConfigurationTest {
         Assert.assertEquals("there should be 2 authorities", 2, userDetailsService.loadUserByUsername("jbarrez2").getAuthorities().size());
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @Import({ DataSourceAutoConfiguration.class,
             DataSourceTransactionManagerAutoConfiguration.class,
             IdmEngineAutoConfiguration.class,

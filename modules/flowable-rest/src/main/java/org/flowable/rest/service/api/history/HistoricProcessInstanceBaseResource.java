@@ -115,6 +115,9 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getProcessBusinessKey() != null) {
             query.processInstanceBusinessKey(queryRequest.getProcessBusinessKey());
         }
+        if (queryRequest.getProcessBusinessKeyLike() != null) {
+            query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
+        }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());
         }

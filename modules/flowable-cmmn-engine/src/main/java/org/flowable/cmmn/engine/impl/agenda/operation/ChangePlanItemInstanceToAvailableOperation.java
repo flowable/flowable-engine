@@ -54,5 +54,10 @@ public class ChangePlanItemInstanceToAvailableOperation extends AbstractChangePl
         planItemInstanceEntity.setLastAvailableTime(getCurrentTime(commandContext));
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceAvailable(planItemInstanceEntity);
     }
+
+    @Override
+    protected String getOperationName() {
+        return null; // Default one is ok.
+    }
     
 }

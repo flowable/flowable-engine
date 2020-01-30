@@ -1193,6 +1193,11 @@ public class ExecutionImpl implements
 
     }
 
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return null;
+    }
+
     // No support for transient variables in v5
 
     @Override

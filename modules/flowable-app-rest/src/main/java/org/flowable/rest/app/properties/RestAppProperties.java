@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.app.properties;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
@@ -19,6 +22,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
  * Properties for the rest app.
  *
  * @author Filip Hrisafov
+ * @author Tim Stephenson
  */
 @ConfigurationProperties(prefix = "flowable.rest.app")
 public class RestAppProperties {
@@ -40,6 +44,9 @@ public class RestAppProperties {
      * Enable/disable whether the docs are available on /docs
      */
     private boolean swaggerDocsEnabled = true;
+
+    @NestedConfigurationProperty
+    private final Cors cors = new Cors();
 
     @NestedConfigurationProperty
     private final Admin admin = new Admin();
@@ -71,6 +78,10 @@ public class RestAppProperties {
 
     public void setSwaggerDocsEnabled(boolean swaggerDocsEnabled) {
         this.swaggerDocsEnabled = swaggerDocsEnabled;
+    }
+
+    public Cors getCors() {
+        return cors;
     }
 
     public Admin getAdmin() {
@@ -125,6 +136,86 @@ public class RestAppProperties {
 
         public void setLastName(String lastName) {
             this.lastName = lastName;
+        }
+    }
+
+    public static class Cors {
+        /**
+         * Enable/disable CORS filter.
+         */
+        private boolean enabled = false;
+
+        /**
+         * Allow/disallow CORS credentials.
+         */
+        private boolean allowCredentials = false;
+
+        /**
+         * Allowed CORS origins, use * for all, but not in production. Default empty.
+         */
+        private Set<String> allowedOrigins;
+
+        /**
+         * Allowed CORS headers, use * for all, but not in production. Default empty.
+         */
+        private Set<String> allowedHeaders;
+
+        /**
+         * Exposed CORS headers, use * for all, but not in production. Default empty.
+         */
+        private Set<String> exposedHeaders;
+
+        /**
+         * Allowed CORS methods, use * for all, but not in production. Default empty.
+         */
+        private Set<String> allowedMethods;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public boolean isAllowCredentials() {
+            return allowCredentials;
+        }
+
+        public void setAllowCredentials(boolean allowCredentials) {
+            this.allowCredentials = allowCredentials;
+        }
+
+        public Set<String> getAllowedOrigins() {
+            return allowedOrigins == null ? Collections.emptySet() : allowedOrigins;
+        }
+
+        public void setAllowedOrigins(Set<String> allowedOrigins) {
+            this.allowedOrigins = allowedOrigins;
+        }
+
+        public Set<String> getAllowedHeaders() {
+            return allowedHeaders == null ? Collections.emptySet() : allowedHeaders;
+        }
+
+        public void setAllowedHeaders(Set<String> allowedHeaders) {
+            this.allowedHeaders = allowedHeaders;
+        }
+
+        public Set<String> getExposedHeaders() {
+            return exposedHeaders == null ? Collections.emptySet() : exposedHeaders;
+        }
+
+        public void setExposedHeaders(Set<String> exposedHeaders) {
+            this.exposedHeaders = exposedHeaders;
+        }
+
+        public Set<String> getAllowedMethods() {
+            return allowedMethods == null ? Collections.emptySet() : allowedMethods;
+        }
+
+        public void setAllowedMethods(Set<String> allowedMethods) {
+            this.allowedMethods = allowedMethods;
         }
     }
 }

@@ -12,7 +12,7 @@
  */
 package org.flowable.app.engine.test.repository;
 
-import org.flowable.app.api.repository.BaseAppModel;
+import org.flowable.app.engine.impl.deployer.BaseAppModel;
 
 public class CustomAppModel extends BaseAppModel {
 

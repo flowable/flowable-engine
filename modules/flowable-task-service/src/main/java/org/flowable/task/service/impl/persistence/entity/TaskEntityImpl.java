@@ -42,6 +42,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInitializin
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -85,6 +87,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String propagatedStageInstanceId;
 
     protected String taskDefinitionKey;
     protected String formKey;
@@ -148,6 +151,9 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         if (scopeDefinitionId != null) {
             persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
         }
+        if (propagatedStageInstanceId != null) {
+            persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
+        }
         if (createTime != null) {
             persistentState.put("createTime", this.createTime);
         }
@@ -207,6 +213,11 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
             variableInstance.setProcessInstanceId(this.processInstanceId);
             variableInstance.setProcessDefinitionId(this.processDefinitionId);
         }
+    }
+    
+    @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        // TODO
     }
 
     @Override
@@ -531,6 +542,16 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     }
 
     @Override
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    @Override
     public String getAssignee() {
         return assignee;
     }
@@ -748,6 +769,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         this.tenantId = tenantId;
     }
 
+    @Override
     public List<VariableInstanceEntity> getQueryVariables() {
         if (queryVariables == null && Context.getCommandContext() != null) {
             queryVariables = new VariableInitializingList();

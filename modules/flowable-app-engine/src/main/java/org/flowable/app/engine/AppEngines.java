@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,8 +68,7 @@ public abstract class AppEngines {
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
-                URL resource = iterator.next();
+            for (URL resource : configUrls) {
                 LOGGER.info("Initializing app engine using configuration '{}'", resource);
                 initAppEngineFromResource(resource);
             }

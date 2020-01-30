@@ -13,7 +13,7 @@
 package org.flowable.cmmn.test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Java6Assertions.tuple;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -40,6 +40,7 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -238,7 +239,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(1, planItemInstances.size());
         assertEquals("The Process", planItemInstances.get(0).getName());
         assertNotNull(planItemInstances.get(0).getReferenceId());
-        assertEquals(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
+        assertEquals(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
 
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().singleResult();
@@ -1116,6 +1117,110 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals("processValue", processInstanceVariables.get("processVar1"));
         assertEquals(123, processInstanceVariables.get("processVar2"));
         assertEquals(456, processInstanceVariables.get("processVar3"));
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testExitAvailableProcessTaskThroughExitSentryOnStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testExitAvailableProcessTaskThroughExitSentryOnStage")
+            .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemInstanceStateAvailable()
+            .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+            .singleResult();
+        assertEquals("theProcess", planItemInstance.getName());
+
+        assertNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+
+        // When the event listener now occurs, the stage should be exited, also exiting the process task plan item
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertNotNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testExitActiveProcessTaskThroughExitSentryOnStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testExitActiveProcessTaskThroughExitSentryOnStage")
+            .variable("myVar", "test")
+            .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemInstanceStateActive()
+            .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+            .singleResult();
+        assertEquals("theProcess", planItemInstance.getName());
+
+        assertNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+        assertNotNull(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(planItemInstance.getReferenceId()).singleResult());
+
+        // When the event listener now occurs, the stage should be exited, also exiting the process task plan item
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertNotNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult());
+        assertNull(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(planItemInstance.getReferenceId()).singleResult());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testExitCaseInstanceOnProcessInstanceComplete() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testExitCaseInstanceOnProcessInstanceComplete")
+            .start();
+
+        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertEquals(1, cmmnTaskService.createTaskQuery().count());
+
+        // Process task is manually activated
+        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult().getId());
+        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertEquals(2, cmmnTaskService.createTaskQuery().count());
+
+        // Completing the task from the process should terminate the case
+        Task userTaskFromProcess = processEngineTaskService.createTaskQuery()
+            .processInstanceId(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId())
+            .singleResult();
+        processEngineTaskService.complete(userTaskFromProcess.getId());
+
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testIdVariableName() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testIdVariableName")
+            .start();
+
+        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+        String processIdVariable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "processIdVariable");
+        assertEquals(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId(), processIdVariable);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testIdVariableNameExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testIdVariableName")
+            .variable("testVar", "A")
+            .start();
+
+        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+        String processIdVariable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "variableA");
+        assertEquals(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId(), processIdVariable);
     }
 
 }

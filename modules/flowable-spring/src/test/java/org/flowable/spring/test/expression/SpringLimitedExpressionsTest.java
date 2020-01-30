@@ -32,18 +32,15 @@ public class SpringLimitedExpressionsTest extends SpringFlowableTestCase {
     @Test
     @Deployment
     public void testLimitedBeansExposed() throws Exception {
-        // Start process, which has a service-task which calls 'bean1', which is
-        // exposed
+        // Start process, which has a service-task which calls 'bean1', which is exposed
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("limitedExpressionProcess");
 
         String beanOutput = (String) runtimeService.getVariable(processInstance.getId(), "beanOutput");
         assertNotNull(beanOutput);
         assertEquals("Activiti BPMN 2.0 process engine", beanOutput);
 
-        // Finish the task, should continue to serviceTask which uses a bean
-        // that is present
-        // in application-context, but not exposed explicitly in "beans", should
-        // throw error!
+        // Finish the task, should continue to serviceTask which uses a bean that is present
+        // in application-context, but not exposed explicitly in "beans", should throw error!
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 

@@ -62,7 +62,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(nowCal.getTime());
         
         try {
-            waitForJobExecutorToProcessAllJobs(10000L, 25L);
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 25L);
             assertEquals(0L, jobQuery.count());
             
             assertProcessEnded(pi.getId());
@@ -85,7 +85,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(nowCal.getTime());
         
         try {
-            waitForJobExecutorToProcessAllJobs(10000L, 25L);
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 25L);
             assertEquals(0L, jobQuery.count());
             
             assertProcessEnded(pi.getId());

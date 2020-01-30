@@ -1,0 +1,23 @@
+{
+    "key": "myEvent3",
+    "name": "My event3",
+    "inboundChannelKeys": [
+        "test-channel3"
+    ],
+    "correlationParameters": [
+        {
+            "name": "customerId3",
+            "type": "string"
+        }
+    ],
+    "payload": [
+        {
+            "name": "payload5",
+            "type": "string"
+        },
+        {
+            "name": "payload6",
+            "type": "integer"
+        }
+    ]
+}

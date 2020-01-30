@@ -14,7 +14,7 @@ package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
 
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * Returns whether or not a variable with the given name exists when fetched through the provided variable scope.
@@ -23,8 +23,8 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableExistsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableExistsExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("exists", "exist"), "exists");
+    public VariableExistsExpressionFunction() {
+        super(Arrays.asList("exists", "exist"), "exists");
     }
     
     @Override
@@ -32,8 +32,8 @@ public class VariableExistsExpressionFunction extends AbstractFlowableVariableEx
         return false;
     }
     
-    public static boolean exists(VariableScope variableScope, String variableName) {
-        return getVariableValue(variableScope, variableName) != null;
+    public static boolean exists(VariableContainer variableContainer, String variableName) {
+        return getVariableValue(variableContainer, variableName) != null;
     }
 
 }

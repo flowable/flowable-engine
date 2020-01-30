@@ -80,6 +80,7 @@ flowableAdminApp.controller('DeploymentsController', ['$rootScope', '$scope', '$
           $scope.gridDeployments = {
               data: 'deploymentsData.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               rowHeight: 36,

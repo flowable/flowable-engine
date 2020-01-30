@@ -22,50 +22,50 @@ import org.junit.Test;
  */
 public class VariableEqualsExpressionEnhancerTest {
     
-    private VariableEqualsExpressionFunction expressionFunction = new VariableEqualsExpressionFunction("planItemInstance");
+    private VariableEqualsExpressionFunction expressionFunction = new VariableEqualsExpressionFunction();
     
     @Test
     public void testRegexDefault() {
-        assertRegexCorrect("${variables:equals(myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect("${variables:equals(myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
     }
         
     @Test
     public void testRegexAlternativeNameHandling() {
-        assertRegexCorrect("${variables:eq(myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${vars:equals(myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${vars:eq(myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${var:equals(myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${var:eq(myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect("${variables:eq(myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${vars:equals(myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${vars:eq(myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${var:equals(myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${var:eq(myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
     }
     
     @Test
     public void testRegexQuoteHandling() {
-        assertRegexCorrect("${variables:equals('myVar',123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals(\"myVar\",123)}", "${variables:equals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect("${variables:equals('myVar',123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals(\"myVar\",123)}", "${variables:equals(variableContainer,'myVar',123)}");
     }
     
     @Test
     public void testRegexSpaceHandling() {
-        assertRegexCorrect("${variables:equals (myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals    (myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals( myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals(      myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals(myVar ,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals(myVar     ,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals ( myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals    (     myVar,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals    (     myVar   ,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect("${variables:equals (myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals    (myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals( myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals(      myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals(myVar ,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals(myVar     ,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals ( myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals    (     myVar,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals    (     myVar   ,123)}", "${variables:equals(variableContainer,'myVar',123)}");
         
         // Spaces and quotes
-        assertRegexCorrect("${variables:equals    (     'myVar'   ,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${variables:equals    (     \"myVar\"   ,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect("${variables:equals    (     'myVar'   ,123)}", "${variables:equals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${variables:equals    (     \"myVar\"   ,123)}", "${variables:equals(variableContainer,'myVar',123)}");
     }
     
     @Test
     public void testRegexMultipleUsages() {
-        assertRegexCorrect("${variables:equals(myVar,123) && var:eq ( otherVar , 456)}", "${variables:equals(planItemInstance,'myVar',123) && variables:equals(planItemInstance,'otherVar', 456)}");
+        assertRegexCorrect("${variables:equals(myVar,123) && var:eq ( otherVar , 456)}", "${variables:equals(variableContainer,'myVar',123) && variables:equals(variableContainer,'otherVar', 456)}");
         assertRegexCorrect("${(var:eq(myVar,123) && var:eq(otherVar,456)) || var:eq(myVar,789)}", 
-                "${(variables:equals(planItemInstance,'myVar',123) && variables:equals(planItemInstance,'otherVar',456)) || variables:equals(planItemInstance,'myVar',789)}");
+                "${(variables:equals(variableContainer,'myVar',123) && variables:equals(variableContainer,'otherVar',456)) || variables:equals(variableContainer,'myVar',789)}");
     }
     
     public void assertRegexCorrect(String in, String out) {

@@ -474,22 +474,16 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
             
             if (newPlanItemInstance == null) {
-                newPlanItemInstance = planItemInstanceEntityManager.createChildPlanItemInstance(newPlanItem, 
-                                movePlanItemInstanceEntityContainer.getCaseDefinitionId(), movePlanItemInstanceEntityContainer.getCaseInstanceId(), 
-                                parentPlanItemInstance != null ? parentPlanItemInstance.getId() : null, 
-                                movePlanItemInstanceEntityContainer.getTenantId(), true);
-                
-                if (newPlanItem.getParentStage() != null) {
-                    for (PlanItem stagePlanItem : newPlanItem.getParentStage().getPlanItems()) {
-                        if (!stagePlanItem.getId().equals(newPlanItem.getId())) {
-                            PlanItemInstanceEntity childStagePlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                                .createChildPlanItemInstance(stagePlanItem, newPlanItemInstance.getCaseDefinitionId(), newPlanItemInstance.getCaseInstanceId(), 
-                                                newPlanItemInstance.getStageInstanceId(), newPlanItemInstance.getTenantId(), true);
-                            
-                            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childStagePlanItemInstance);
-                        }
-                    }
-                }
+                newPlanItemInstance = planItemInstanceEntityManager.createPlanItemInstanceEntityBuilder()
+                    .planItem(newPlanItem)
+                    .caseDefinitionId(movePlanItemInstanceEntityContainer.getCaseDefinitionId())
+                    .caseInstanceId(movePlanItemInstanceEntityContainer.getCaseInstanceId())
+                    .stagePlanItemInstance(parentPlanItemInstance)
+                    .tenantId(movePlanItemInstanceEntityContainer.getTenantId())
+                    .addToParent(true)
+                    .create();
+
+                createChildPlanItemInstancesForStage(newPlanItem, commandContext, newPlanItemInstance);
             }
 
             if (movePlanItemInstanceEntityContainer.getNewAssigneeId() != null && newPlanItemDefinition instanceof HumanTask) {
@@ -549,25 +543,44 @@ public abstract class AbstractCmmnDynamicStateManager {
         }
             
         if (newPlanItemInstance == null) {
-            newPlanItemInstance = planItemInstanceEntityManager.createChildPlanItemInstance(planItem, 
-                            caseInstance.getCaseDefinitionId(), caseInstance.getId(), 
-                            parentPlanItemInstance != null ? parentPlanItemInstance.getId() : null, 
-                                            caseInstance.getTenantId(), true);
-            
-            if (planItem.getParentStage() != null) {
-                for (PlanItem stagePlanItem : planItem.getParentStage().getPlanItems()) {
-                    if (!stagePlanItem.getId().equals(planItem.getId())) {
-                        PlanItemInstanceEntity childStagePlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                            .createChildPlanItemInstance(stagePlanItem, newPlanItemInstance.getCaseDefinitionId(), newPlanItemInstance.getCaseInstanceId(), 
-                                            newPlanItemInstance.getStageInstanceId(), newPlanItemInstance.getTenantId(), true);
-                        
-                        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childStagePlanItemInstance);
-                    }
-                }
-            }
+            newPlanItemInstance = planItemInstanceEntityManager.createPlanItemInstanceEntityBuilder()
+                .planItem(planItem)
+                .caseDefinitionId(caseInstance.getCaseDefinitionId())
+                .caseInstanceId(caseInstance.getId())
+                .stagePlanItemInstance(parentPlanItemInstance)
+                .tenantId(caseInstance.getTenantId())
+                .addToParent(true)
+                .create();
+
+            createChildPlanItemInstancesForStage(planItem, commandContext, newPlanItemInstance);
         }
 
         return newPlanItemInstance;
+    }
+
+    protected void createChildPlanItemInstancesForStage(PlanItem planItem, CommandContext commandContext, PlanItemInstanceEntity newPlanItemInstance) {
+        if (planItem.getParentStage() != null) {
+            for (PlanItem stagePlanItem : planItem.getParentStage().getPlanItems()) {
+                if (!stagePlanItem.getId().equals(planItem.getId())) {
+                    PlanItemInstance parentStagePlanItem = newPlanItemInstance.getStagePlanItemInstanceEntity();
+                    if (parentStagePlanItem == null && newPlanItemInstance.getStageInstanceId() != null) {
+                        parentStagePlanItem = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(newPlanItemInstance.getStageInstanceId());
+                    }
+
+                    PlanItemInstanceEntity childStagePlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                        .createPlanItemInstanceEntityBuilder()
+                        .planItem(stagePlanItem)
+                        .caseDefinitionId(newPlanItemInstance.getCaseDefinitionId())
+                        .caseInstanceId(newPlanItemInstance.getCaseInstanceId())
+                        .stagePlanItemInstance(parentStagePlanItem)
+                        .tenantId(newPlanItemInstance.getTenantId())
+                        .addToParent(true)
+                        .create();
+
+                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childStagePlanItemInstance);
+                }
+            }
+        }
     }
 
     protected boolean isStageAncestorOfAnyPlanItemInstance(String stageId, Collection<PlanItemInstanceEntity> planItemInstances) {
@@ -634,9 +647,14 @@ public abstract class AbstractCmmnDynamicStateManager {
         }
         
         if (newPlanItemInstance == null) {
-            newPlanItemInstance = planItemInstanceEntityManager.createChildPlanItemInstance(stage.getPlanItem(), caseInstance.getCaseDefinitionId(), 
-                            caseInstance.getId(), parentStageInstance != null ? parentStageInstance.getId() : null, 
-                                            caseInstance.getTenantId(), true);
+            newPlanItemInstance = planItemInstanceEntityManager.createPlanItemInstanceEntityBuilder()
+                .planItem(stage.getPlanItem())
+                .caseDefinitionId(caseInstance.getCaseDefinitionId())
+                .caseInstanceId(caseInstance.getId())
+                .stagePlanItemInstance(parentStageInstance)
+                .tenantId(caseInstance.getTenantId())
+                .addToParent(true)
+                .create();
         }
         
         // Special care needed in case the plan item instance is repeating
@@ -736,13 +754,19 @@ public abstract class AbstractCmmnDynamicStateManager {
     }
     
     protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance(
-                planItemInstanceEntityToCopy.getPlanItem(),
-                planItemInstanceEntityToCopy.getCaseDefinitionId(),
-                planItemInstanceEntityToCopy.getCaseInstanceId(),
-                planItemInstanceEntityToCopy.getStageInstanceId(),
-                planItemInstanceEntityToCopy.getTenantId(),
-                addToParent);
+        PlanItemInstance stagePlanItem = planItemInstanceEntityToCopy.getStagePlanItemInstanceEntity();
+        if (stagePlanItem == null && planItemInstanceEntityToCopy.getStageInstanceId() != null) {
+            stagePlanItem = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceEntityToCopy.getStageInstanceId());
+        }
+
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createPlanItemInstanceEntityBuilder()
+            .planItem(planItemInstanceEntityToCopy.getPlanItem())
+            .caseDefinitionId(planItemInstanceEntityToCopy.getCaseDefinitionId())
+            .caseInstanceId(planItemInstanceEntityToCopy.getCaseInstanceId())
+            .stagePlanItemInstance(stagePlanItem)
+            .tenantId(planItemInstanceEntityToCopy.getTenantId())
+            .addToParent(addToParent)
+            .create();
 
         if (hasRepetitionRule(planItemInstanceEntityToCopy)) {
             int counter = getRepetitionCounter(planItemInstanceEntityToCopy);

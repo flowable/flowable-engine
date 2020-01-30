@@ -79,6 +79,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             @ApiImplicitParam(name = "processDefinitionVersion", dataType = "integer", value = "Only return process instances with the given process definition version.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionEngineVersion", dataType = "string", value = "Only return process instances with the given process definition engine version.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return process instances with the given businessKey.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return process instancess with the businessKey like the given key.", paramType = "query"),
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Only return process instances started by the given user.", paramType = "query"),
             @ApiImplicitParam(name = "startedBefore", dataType = "string", format = "date-time", value = "Only return process instances started before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "startedAfter", dataType = "string", format = "date-time", value = "Only return process instances started after the given date.", paramType = "query"),
@@ -142,6 +143,10 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
         if (allRequestParams.containsKey("businessKey")) {
             queryRequest.setProcessBusinessKey(allRequestParams.get("businessKey"));
+        }
+        
+        if (allRequestParams.containsKey("businessKeyLike")) {
+            queryRequest.setProcessBusinessKeyLike(allRequestParams.get("businessKeyLike"));
         }
         
         if (allRequestParams.containsKey("startedBy")) {

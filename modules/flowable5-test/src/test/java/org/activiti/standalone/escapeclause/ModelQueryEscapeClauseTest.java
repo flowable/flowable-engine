@@ -53,7 +53,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByNameLike() throws Exception {
-        ModelQuery query = repositoryService.createModelQuery().modelNameLike("%\\%%");
+        ModelQuery query = repositoryService.createModelQuery().modelNameLike("%|%%");
         Model model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey1", model.getKey());
@@ -61,7 +61,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
 
-        query = repositoryService.createModelQuery().modelNameLike("%\\_%");
+        query = repositoryService.createModelQuery().modelNameLike("%|_%");
         model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey2", model.getKey());
@@ -71,7 +71,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByCategoryLike() throws Exception {
-        ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%\\%%");
+        ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%|%%");
         Model model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey1", model.getKey());
@@ -79,7 +79,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
 
-        query = repositoryService.createModelQuery().modelCategoryLike("%\\_%");
+        query = repositoryService.createModelQuery().modelCategoryLike("%|_%");
         model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey2", model.getKey());
@@ -89,7 +89,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     }
 
     public void testQueryByTenantIdLike() throws Exception {
-        ModelQuery query = repositoryService.createModelQuery().modelTenantIdLike("%\\%%");
+        ModelQuery query = repositoryService.createModelQuery().modelTenantIdLike("%|%%");
         Model model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey1", model.getKey());
@@ -97,7 +97,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
 
-        query = repositoryService.createModelQuery().modelTenantIdLike("%\\_%");
+        query = repositoryService.createModelQuery().modelTenantIdLike("%|_%");
         model = query.singleResult();
         assertNotNull(model);
         assertEquals("someKey2", model.getKey());

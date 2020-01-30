@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples"
+             xmlns:tns="Examples">
+
+    <process id="process">
+
+        <startEvent id="theStart">
+            <extensionElements>
+                <flowable:eventType>defaultTenantSameKey</flowable:eventType>
+            </extensionElements>
+        </startEvent>
+
+        <sequenceFlow sourceRef="theStart" targetRef="task" />
+
+        <userTask id="task" name="${execution.getTenantId()} Task" />
+
+        <sequenceFlow sourceRef="task" targetRef="theEnd" />
+
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>

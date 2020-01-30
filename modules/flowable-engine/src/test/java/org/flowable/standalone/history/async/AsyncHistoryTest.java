@@ -88,7 +88,16 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
     public void testOneTaskProcess() {
         deployOneTaskTestProcess();
         for (int i = 0; i < 10; i++) { // Run this multiple times, as order of jobs processing can be different each run
-            String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+            String processInstanceId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("testName")
+                .businessKey("testBusinessKey")
+                .callbackId("testCallbackId")
+                .callbackType("testCallbackType")
+                .referenceId("testReferenceId")
+                .referenceType("testReferenceType")
+                .start()
+                .getId();
             taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
             List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
@@ -109,15 +118,21 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                 assertNotNull(((HistoryJobEntity) job).getAdvancedJobHandlerConfigurationByteArrayRef());
             }
 
-            assertEquals(0l, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count());
+            assertEquals(0L, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count());
 
             waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
 
-            assertEquals(2l, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count());
+            assertEquals(2L, historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count());
 
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
             assertNotNull(historicProcessInstance);
             assertNotNull(historicProcessInstance.getEndTime());
+
+            assertEquals("testBusinessKey", historicProcessInstance.getBusinessKey());
+            assertEquals("testReferenceId", historicProcessInstance.getReferenceId());
+            assertEquals("testReferenceType", historicProcessInstance.getReferenceType());
+            assertEquals("testCallbackId", historicProcessInstance.getCallbackId());
+            assertEquals("testCallbackType", historicProcessInstance.getCallbackType());
 
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).singleResult();
             assertNotNull(historicTaskInstance.getName());

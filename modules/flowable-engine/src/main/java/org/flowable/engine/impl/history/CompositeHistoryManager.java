@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.history;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class CompositeHistoryManager implements HistoryManager {
     protected final Collection<HistoryManager> historyManagers;
 
     public CompositeHistoryManager(Collection<HistoryManager> historyManagers) {
-        this.historyManagers = historyManagers;
+        this.historyManagers = new ArrayList<>(historyManagers);
     }
 
     @Override
@@ -105,9 +106,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId) {
+    public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId, String processTenantId) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordProcessInstanceDeleted(processInstanceId, processDefinitionId);
+            historyManager.recordProcessInstanceDeleted(processInstanceId, processDefinitionId, processTenantId);
         }
     }
 
@@ -347,5 +348,9 @@ public class CompositeHistoryManager implements HistoryManager {
         for (HistoryManager historyManager : historyManagers) {
             historyManager.deleteHistoryUserTaskLog(logNumber);
         }
+    }
+
+    public void addHistoryManager(HistoryManager historyManager) {
+        historyManagers.add(historyManager);
     }
 }

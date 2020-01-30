@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnElement;
 
@@ -33,9 +34,24 @@ public class CaseTaskXmlConverter extends TaskXmlConverter {
         convertCommonTaskAttributes(xtr, caseTask);
         caseTask.setCaseRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_CASE_REF));
         
+        String businessKey = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_BUSINESS_KEY);
+        if (businessKey != null) {
+            caseTask.setBusinessKey(businessKey);
+        }
+
+        String inheritBusinessKey = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_INHERIT_BUSINESS_KEY);
+        if (inheritBusinessKey != null) {
+            caseTask.setInheritBusinessKey(Boolean.parseBoolean(inheritBusinessKey));
+        }
+
         String fallbackToDefaultTenantValue = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT);
         if (fallbackToDefaultTenantValue != null) {
             caseTask.setFallbackToDefaultTenant(Boolean.valueOf(fallbackToDefaultTenantValue));
+        }
+
+        String idVariableName = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ID_VARIABLE_NAME);
+        if (StringUtils.isNotEmpty(idVariableName)) {
+            caseTask.setCaseInstanceIdVariableName(idVariableName);
         }
         
         return caseTask;

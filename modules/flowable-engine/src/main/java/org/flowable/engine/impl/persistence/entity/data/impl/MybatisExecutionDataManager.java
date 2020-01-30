@@ -218,7 +218,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     @SuppressWarnings("unchecked")
     @Override
     public List<String> findProcessInstanceIdsByProcessDefinitionId(String processDefinitionId) {
-        return getDbSqlSession().selectListNoCacheCheck("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
     }
 
     @Override
@@ -232,9 +232,9 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         // False -> executions should not be cached if using executionTreeFetching
         boolean useCache = !performanceSettings.isEnableEagerExecutionTreeFetching();
         if (useCache) {
-            return getDbSqlSession().selectList("selectExecutionsByQueryCriteria", executionQuery);
+            return getDbSqlSession().selectList("selectExecutionsByQueryCriteria", executionQuery, getManagedEntityClass());
         } else {
-            return getDbSqlSession().selectListNoCacheCheck("selectExecutionsByQueryCriteria", executionQuery);
+            return getDbSqlSession().selectListNoCacheLoadAndStore("selectExecutionsByQueryCriteria", executionQuery);
         }
     }
 
@@ -249,9 +249,9 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         // False -> executions should not be cached if using executionTreeFetching
         boolean useCache = !performanceSettings.isEnableEagerExecutionTreeFetching();
         if (useCache) {
-            return getDbSqlSession().selectList("selectProcessInstanceByQueryCriteria", executionQuery);
+            return getDbSqlSession().selectList("selectProcessInstanceByQueryCriteria", executionQuery, getManagedEntityClass());
         } else {
-            return getDbSqlSession().selectListNoCacheCheck("selectProcessInstanceByQueryCriteria", executionQuery);
+            return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceByQueryCriteria", executionQuery, getManagedEntityClass());
         }
     }
 
@@ -272,7 +272,8 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         }
         executionQuery.setFirstResult(0);
 
-        List<ProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectProcessInstanceWithVariablesByQueryCriteria", executionQuery);
+        List<ProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(
+                        "selectProcessInstanceWithVariablesByQueryCriteria", executionQuery, getManagedEntityClass());
 
         if (instanceList != null && !instanceList.isEmpty()) {
             if (firstResult > 0) {

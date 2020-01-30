@@ -14,11 +14,14 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.ChildTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -119,6 +122,23 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
             }
 
         }
+    }
+
+    protected String getBusinessKey(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceEntity planItemInstanceEntity, ChildTask childTask) {
+        String businessKey = null;
+        ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+        if (!StringUtils.isEmpty(childTask.getBusinessKey())) {
+            Expression expression = expressionManager.createExpression(childTask.getBusinessKey());
+            businessKey = expression.getValue(planItemInstanceEntity).toString();
+
+        } else if (childTask.isInheritBusinessKey()) {
+            String caseInstanceId = planItemInstanceEntity.getCaseInstanceId();
+
+            CaseInstance caseInstance = caseInstanceEntityManager.findById(caseInstanceId);
+            businessKey = caseInstance.getBusinessKey();
+        }
+        return businessKey;
     }
 
     /**

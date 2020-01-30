@@ -20,56 +20,42 @@ import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Joram Barrez
  */
-public class MilestoneInstanceEntityManagerImpl extends AbstractCmmnEntityManager<MilestoneInstanceEntity> implements MilestoneInstanceEntityManager {
-
-    protected MilestoneInstanceDataManager milestoneInstanceDataManager;
+public class MilestoneInstanceEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, MilestoneInstanceEntity, MilestoneInstanceDataManager>
+    implements MilestoneInstanceEntityManager {
 
     public MilestoneInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, MilestoneInstanceDataManager milestoneInstanceDataManager) {
-        super(cmmnEngineConfiguration);
-        this.milestoneInstanceDataManager = milestoneInstanceDataManager;
+        super(cmmnEngineConfiguration, milestoneInstanceDataManager);
     }
 
     @Override
-    protected DataManager<MilestoneInstanceEntity> getDataManager() {
-        return milestoneInstanceDataManager;
-    }
-    
-    @Override
     public MilestoneInstanceQuery createMilestoneInstanceQuery() {
-        return new MilestoneInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new MilestoneInstanceQueryImpl(engineConfiguration.getCommandExecutor());
     }
 
     @Override
     public List<MilestoneInstance> findMilestoneInstancesByQueryCriteria(MilestoneInstanceQuery query) {
-        return milestoneInstanceDataManager.findMilestoneInstancesByQueryCriteria((MilestoneInstanceQueryImpl) query);
+        return dataManager.findMilestoneInstancesByQueryCriteria((MilestoneInstanceQueryImpl) query);
     }
 
     @Override
     public long findMilestoneInstanceCountByQueryCriteria(MilestoneInstanceQuery query) {
-        return milestoneInstanceDataManager.findMilestoneInstancesCountByQueryCriteria((MilestoneInstanceQueryImpl) query);
+        return dataManager.findMilestoneInstancesCountByQueryCriteria((MilestoneInstanceQueryImpl) query);
     }
     
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
-        milestoneInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
+        dataManager.deleteByCaseDefinitionId(caseDefinitionId);
     }
     
     @Override
     public void deleteByCaseInstanceId(String caseInstanceId) {
-        milestoneInstanceDataManager.deleteByCaseInstanceId(caseInstanceId);
+        dataManager.deleteByCaseInstanceId(caseInstanceId);
     }
     
-    public MilestoneInstanceDataManager getMilestoneInstanceDataManager() {
-        return milestoneInstanceDataManager;
-    }
-
-    public void setMilestoneInstanceDataManager(MilestoneInstanceDataManager milestoneInstanceDataManager) {
-        this.milestoneInstanceDataManager = milestoneInstanceDataManager;
-    }
-
 }

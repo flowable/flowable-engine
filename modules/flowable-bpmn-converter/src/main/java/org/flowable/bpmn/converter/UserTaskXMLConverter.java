@@ -53,6 +53,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_CANDIDATEUSERS),
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_CANDIDATEGROUPS),
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_CATEGORY),
+            new ExtensionAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION));
 

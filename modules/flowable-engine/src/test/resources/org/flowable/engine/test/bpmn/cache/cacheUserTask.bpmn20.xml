@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="oneTask">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
+    <userTask id="task">
+        <extensionElements>
+            <flowable:taskListener event="create" class="org.flowable.engine.test.bpmn.cache.TestCacheTaskListener" />
+        </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

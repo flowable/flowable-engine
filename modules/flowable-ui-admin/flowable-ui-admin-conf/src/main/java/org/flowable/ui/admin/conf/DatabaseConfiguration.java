@@ -38,7 +38,7 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class DatabaseConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConfiguration.class);

@@ -51,6 +51,8 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         putIfNotNull(data, HistoryJsonConstants.SUPER_PROCESS_INSTANCE_ID, processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null);
         putIfNotNull(data, HistoryJsonConstants.CALLBACK_ID, processInstance.getCallbackId());
         putIfNotNull(data, HistoryJsonConstants.CALLBACK_TYPE, processInstance.getCallbackType());
+        putIfNotNull(data, HistoryJsonConstants.REFERENCE_ID, processInstance.getReferenceId());
+        putIfNotNull(data, HistoryJsonConstants.REFERENCE_TYPE, processInstance.getReferenceType());
         putIfNotNull(data, HistoryJsonConstants.TENANT_ID, processInstance.getTenantId());
 
         addProcessDefinitionFields(data, processInstance.getProcessDefinitionId());
@@ -59,17 +61,21 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
     protected void addProcessDefinitionFields(ObjectNode data, String processDefinitionId) {
         if (processDefinitionId != null) {
             ProcessDefinition processDefinition = processEngineConfiguration.getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
-            if (processDefinition != null) {
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, processDefinition.getId());
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_KEY, processDefinition.getKey());
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_NAME, processDefinition.getName());
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_VERSION, processDefinition.getVersion());
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_CATEGORY, processDefinition.getCategory());
-                putIfNotNull(data, HistoryJsonConstants.DEPLOYMENT_ID, processDefinition.getDeploymentId());
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITIN_DERIVED_FROM, processDefinition.getDerivedFrom());
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITIN_DERIVED_FROM_ROOT, processDefinition.getDerivedFromRoot());
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITIN_DERIVED_VERSION, processDefinition.getDerivedVersion());
-            }
+            addProcessDefinitionFields(data, processDefinition);
+        }
+    }
+
+    protected void addProcessDefinitionFields(ObjectNode data, ProcessDefinition processDefinition) {
+        if (processDefinition != null) {
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, processDefinition.getId());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_KEY, processDefinition.getKey());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_NAME, processDefinition.getName());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_VERSION, processDefinition.getVersion());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_CATEGORY, processDefinition.getCategory());
+            putIfNotNull(data, HistoryJsonConstants.DEPLOYMENT_ID, processDefinition.getDeploymentId());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITIN_DERIVED_FROM, processDefinition.getDerivedFrom());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITIN_DERIVED_FROM_ROOT, processDefinition.getDerivedFromRoot());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITIN_DERIVED_VERSION, processDefinition.getDerivedVersion());
         }
     }
 
@@ -136,6 +142,7 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         putIfNotNull(data, HistoryJsonConstants.TASK_ID, identityLink.getTaskId());
         putIfNotNull(data, HistoryJsonConstants.SCOPE_DEFINITION_ID, identityLink.getScopeDefinitionId());
         putIfNotNull(data, HistoryJsonConstants.SCOPE_ID, identityLink.getScopeId());
+        putIfNotNull(data, HistoryJsonConstants.SUB_SCOPE_ID, identityLink.getSubScopeId());
         putIfNotNull(data, HistoryJsonConstants.SCOPE_TYPE, identityLink.getScopeType());
         putIfNotNull(data, HistoryJsonConstants.IDENTITY_LINK_TYPE, identityLink.getType());
         putIfNotNull(data, HistoryJsonConstants.USER_ID, identityLink.getUserId());

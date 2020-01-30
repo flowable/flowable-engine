@@ -217,6 +217,12 @@
             "DESCRIPTION" : "Service task logic defined with a delegate expression."
           }
         },
+        "SERVICETASKFAILEDJOBRETRYTIMECYCLEPACKAGE" : {
+          "SERVICETASKFAILEDJOBRETRYTIMECYCLE" : {
+            "TITLE" : "Failed job retry time cycle",
+            "DESCRIPTION" : "Service task logic defined with a failed job retry time cycle."
+          }
+        },
         "SERVICETASKFIELDSPACKAGE" : {
           "SERVICETASKFIELDS" : {
             "TITLE" : "Class fields",
@@ -399,12 +405,20 @@
           "MAILTASKTEXT" : {
             "TITLE" : "Text",
             "DESCRIPTION" : "The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
+          },
+          "MAILTASKTEXTVAR" : {
+            "TITLE" : "TextVar",
+            "DESCRIPTION" : "The name of a process variable that holds the text that is the content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
           }
         },
         "MAILTASKHTMLPACKAGE" : {
           "MAILTASKHTML" : {
             "TITLE" : "Html",
             "DESCRIPTION" : "A piece of HTML that is the content of the e-mail."
+          },
+          "MAILTASKHTMLVAR" : {
+            "TITLE" : "HtmlVar",
+            "DESCRIPTION" : "The name of a process variable that holds the HTML that is the content of the e-mail."
           }
         },
         "MAILTASKCHARSETPACKAGE" : {
@@ -555,6 +569,12 @@
           "CALLACTIVITYFALLBACKTODEFAULTTENANT" : {
             "TITLE" : "Fallback to default tenant",
             "DESCRIPTION" : "Look for the definition by key in the default tenant when current tenant search fails."
+          }
+        },
+        "CALLACTIVITYIDVARIABLENAMEPACKAGE": {
+          "CALLACTIVITYIDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the instance id of the started instance will be stored in this variable"
           }
         },
         "CALLACTIVITYPROCESSINSTANCENAMEPACKAGE" : {
@@ -767,6 +787,80 @@
             "DESCRIPTION" : "Escalation definitions"
           }
         },
+        "EVENTREGISTRYPACKAGE" : {
+          "EVENTKEY" : {
+            "TITLE" : "Event key",
+            "DESCRIPTION" : "Definition of the event key"
+          },
+          "EVENTNAME" : {
+            "TITLE" : "Event name",
+            "DESCRIPTION" : "Definition of the event name"
+          },
+          "EVENTINPARAMETERS" : {
+            "TITLE" : "Mapping to event payload",
+            "DESCRIPTION" : "Mapping of the process variables to event payload properties"
+          },
+          "EVENTOUTPARAMETERS" : {
+            "TITLE" : "Mapping from event payload",
+            "DESCRIPTION" : "Mapping of the event payload properties to process variables"
+          },
+          "EVENTCORRELATIONPARAMETERS" : {
+            "TITLE" : "Correlation parameters",
+            "DESCRIPTION" : "Definition of the correlation parameters"
+          },
+          "CHANNELKEY" : {
+            "TITLE" : "Channel key",
+            "DESCRIPTION" : "Definition of the channel key"
+          },
+          "CHANNELNAME" : {
+            "TITLE" : "Channel name",
+            "DESCRIPTION" : "Definition of the channel name"
+          },
+          "CHANNELTYPE" : {
+            "TITLE" : "Channel type",
+            "DESCRIPTION" : "Definition of the channel type"
+          },
+          "CHANNELDESTINATION" : {
+            "TITLE" : "Channel destination",
+            "DESCRIPTION" : "Definition of the channel destination"
+          },
+          "TRIGGEREVENTKEY" : {
+            "TITLE" : "Trigger event key",
+            "DESCRIPTION" : "Definition of the trigger event key"
+          },
+          "TRIGGEREVENTNAME" : {
+            "TITLE" : "Trigger event name",
+            "DESCRIPTION" : "Definition of the trigger event name"
+          },
+          "TRIGGERCHANNELKEY" : {
+            "TITLE" : "Trigger channel key",
+            "DESCRIPTION" : "Definition of the trigger channel key"
+          },
+          "TRIGGERCHANNELNAME" : {
+            "TITLE" : "Trigger channel name",
+            "DESCRIPTION" : "Definition of the trigger channel name"
+          },
+          "TRIGGERCHANNELTYPE" : {
+            "TITLE" : "Trigger channel type",
+            "DESCRIPTION" : "Definition of the trigger channel type"
+          },
+          "TRIGGERCHANNELDESTINATION" : {
+            "TITLE" : "Trigger channel destination",
+            "DESCRIPTION" : "Definition of the trigger channel destination"
+          },
+          "KEYDETECTIONFIXEDVALUE" : {
+            "TITLE" : "Event key fixed value",
+            "DESCRIPTION" : "Definition of the event key fixed value"
+          },
+          "KEYDETECTIONJSONFIELD" : {
+            "TITLE" : "Event key json field",
+            "DESCRIPTION" : "Definition of the event key detection with a json field"
+          },
+          "KEYDETECTIONJSONPOINTER" : {
+            "TITLE" : "Event key json pointer",
+            "DESCRIPTION" : "Definition of the event key detection with a json pointer expression"
+          }
+        },
         "ISTRANSACTIONPACKAGE" : {
           "ISTRANSACTION" : {
             "TITLE" : "Is a transaction sub process",
@@ -864,6 +958,10 @@
           "TITLE" : "Start message event",
           "DESCRIPTION" : "A start event with a message trigger"
         },
+        "STARTEVENTREGISTRYEVENT" : {
+          "TITLE" : "Start event registry event",
+          "DESCRIPTION" : "A start event with an event registry trigger"
+        },
         "STARTCONDITIONALEVENT" : {
           "TITLE" : "Start conditional event",
           "DESCRIPTION" : "A start event that evaluates a conditional event"
@@ -923,6 +1021,10 @@
         "DECISIONTASK" : {
           "TITLE" : "Decision task",
           "DESCRIPTION" : "Task to use the Flowable DMN rule engine"
+        },
+        "SENDEVENTTASK" : {
+          "TITLE" : "Send event task",
+          "DESCRIPTION" : "An task that sends an event to the event registry"
         },
         "SHELLTASK" : {
           "TITLE" : "Shell task",
@@ -987,6 +1089,10 @@
         "BOUNDARYCANCELEVENT" : {
           "TITLE" : "Boundary cancel event",
           "DESCRIPTION" : "A boundary cancel event"
+        },
+        "BOUNDARYEVENTREGISTRYEVENT" : {
+          "TITLE" : "Boundary event registry event",
+          "DESCRIPTION" : "A boundary event registry event"
         },
         "BOUNDARYCOMPENSATIONEVENT" : {
           "TITLE" : "Boundary compensation event",
@@ -1263,12 +1369,20 @@
           "MAILTASKTEXT": {
             "TITLE": "Text",
             "DESCRIPTION": "The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
+          },
+          "MAILTASKTEXTVAR" : {
+            "TITLE" : "TextVar",
+            "DESCRIPTION" : "The name of a case variable that holds the text that is the content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative."
           }
         },
         "MAILTASKHTMLPACKAGE": {
           "MAILTASKHTML": {
             "TITLE": "Html",
             "DESCRIPTION": "A piece of HTML that is the content of the e-mail."
+          },
+          "MAILTASKHTMLVAR" : {
+            "TITLE" : "HtmlVar",
+            "DESCRIPTION" : "The name of a case variable that holds the HTML that is the content of the e-mail."
           }
         },
         "MAILTASKCHARSETPACKAGE": {
@@ -1403,6 +1517,56 @@
             "DESCRIPTION": "Flag indicating to store the response variable as a JSON variable instead of a String"
           }
         },
+        "EVENTREGISTRYPACKAGE" : {
+          "EVENTKEY" : {
+            "TITLE" : "Event key",
+            "DESCRIPTION" : "Definition of the event key"
+          },
+          "EVENTNAME" : {
+            "TITLE" : "Event name",
+            "DESCRIPTION" : "Definition of the event name"
+          },
+          "EVENTINPARAMETERS" : {
+            "TITLE" : "Mapping to event payload",
+            "DESCRIPTION" : "Mapping of the process variables to event payload properties"
+          },
+          "EVENTOUTPARAMETERS" : {
+            "TITLE" : "Mapping from event payload",
+            "DESCRIPTION" : "Mapping of the event payload properties to process variables"
+          },
+          "EVENTCORRELATIONPARAMETERS" : {
+            "TITLE" : "Correlation parameters",
+            "DESCRIPTION" : "Definition of the correlation parameters"
+          },
+          "CHANNELKEY" : {
+            "TITLE" : "Channel key",
+            "DESCRIPTION" : "Definition of the channel key"
+          },
+          "CHANNELNAME" : {
+            "TITLE" : "Channel name",
+            "DESCRIPTION" : "Definition of the channel name"
+          },
+          "CHANNELTYPE" : {
+            "TITLE" : "Channel type",
+            "DESCRIPTION" : "Definition of the channel type"
+          },
+          "CHANNELDESTINATION" : {
+            "TITLE" : "Channel destination",
+            "DESCRIPTION" : "Definition of the channel destination"
+          },
+          "KEYDETECTIONFIXEDVALUE" : {
+            "TITLE" : "Event key fixed value",
+            "DESCRIPTION" : "Definition of the event key fixed value"
+          },
+          "KEYDETECTIONJSONFIELD" : {
+            "TITLE" : "Event key json field",
+            "DESCRIPTION" : "Definition of the event key detection with a json field"
+          },
+          "KEYDETECTIONJSONPOINTER" : {
+            "TITLE" : "Event key json pointer",
+            "DESCRIPTION" : "Definition of the event key detection with a json pointer value"
+          }
+        },
         "CASETASKCASEREFERENCEPACKAGE": {
           "CASETASKCASEREFERENCE": {
             "TITLE": "Case reference",
@@ -1431,6 +1595,12 @@
           "PROCESSTASKOUTPARAMETERS": {
             "TITLE": "Out parameters",
             "DESCRIPTION": "Definition of the output parameters"
+          }
+        },
+        "IDVARIABLENAMEPACKAGE": {
+          "IDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the instance id of the started instance will be stored in this variable"
           }
         },
         "TIMEREXPRESSIONPACKAGE": {
@@ -1605,9 +1775,17 @@
           "TITLE" : "Http task",
           "DESCRIPTION" : "A HTTP task"
         },
+        "MAILTASK" : {
+          "TITLE" : "Mail task",
+          "DESCRIPTION" : "A mail task"
+        },
         "SCRIPTTASK" : {
           "TITLE" : "Script task",
           "DESCRIPTION" : "An automatic task with script logic"
+        },
+        "SENDEVENTTASK" : {
+          "TITLE" : "Send event task",
+          "DESCRIPTION" : "A send event task"
         },
         "MILESTONE" : {
           "TITLE" : "Milestone",
@@ -2052,7 +2230,8 @@
             "USE-AS-NEW-VERSION": "Use as new version",
             "USE-AS-NEW-DESCRIPTION": "Are you sure you want to use version {{version}} to create a new version of \"{{name}}\"?",
             "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "Could not fully restore the app model to the chosen version: some referenced models are missing due to being deleted in the past. Please update the app model accordingly. Missing models:",
-            "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}"
+            "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}",
+            "FORCE-DMN-11": "Force DMN 1.1"
         },
         "ALERT": {
             "FAVORITE-CONFIRM": "This decision table is now favorited",
@@ -2581,6 +2760,36 @@
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.EXPRESSION" : "Expression definition",
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.STATIC" : "Fixed duration after task creation",
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "Based on field",
+    
+    "PROPERTY.EVENTINPARAMETERS.VALUE" : "{{length}} event in parameter items",
+    "PROPERTY.EVENTINPARAMETERS.EMPTY" : "No in parameter configured",
+
+    "PROPERTY.EVENTINPARAMETERS.EVENTNAME" : "Event property name",
+    "PROPERTY.EVENTINPARAMETERS.EVENTNAME.PLACEHOLDER" : "Enter an event property name",
+    "PROPERTY.EVENTINPARAMETERS.EVENTTYPE" : "Type",
+    "PROPERTY.EVENTINPARAMETERS.VARIABLENAME" : "Variable name",
+    "PROPERTY.EVENTINPARAMETERS.VARIABLENAME.PLACEHOLDER" : "Enter a variable name",
+    "PROPERTY.EVENTINPARAMETERS.NOSELECTION" : "No parameter selected",
+    
+    "PROPERTY.EVENTOUTPARAMETERS.VALUE" : "{{length}} event out parameter items",
+    "PROPERTY.EVENTOUTPARAMETERS.EMPTY" : "No out parameter configured",
+
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTNAME" : "Event property name",
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTNAME.PLACEHOLDER" : "Enter an event property name",
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTTYPE" : "Type",
+    "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME" : "Variable name",
+    "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME.PLACEHOLDER" : "Enter a variable name",
+    "PROPERTY.EVENTOUTPARAMETERS.NOSELECTION" : "No parameter selected",
+    
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUE" : "{{length}} correlation parameters",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.EMPTY" : "No correlation parameters configured",
+
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NAME" : "Name",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NAME.PLACEHOLDER" : "Enter a name",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.TYPE" : "Type",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NOSELECTION" : "No parameter selected",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP" : "Value",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP.PLACEHOLDER" : "Enter a value / expression",
 
     "MODEL.SAVE.TITLE" : "Save model",
     "MODEL.VALIDATE.TITLE" : "Validation results",

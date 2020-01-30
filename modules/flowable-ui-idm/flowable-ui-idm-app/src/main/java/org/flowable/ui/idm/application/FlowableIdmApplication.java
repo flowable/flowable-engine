@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import;
     ApplicationConfiguration.class,
     AppDispatcherServletConfiguration.class
 })
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class FlowableIdmApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

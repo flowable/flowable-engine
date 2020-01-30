@@ -61,7 +61,6 @@ public class FlowableIdmApplicationSecurityTest {
     private static final Set<String> ACTUATOR_LINKS = new HashSet<>(
         Arrays.asList(
             "self",
-            "auditevents",
             "beans",
             "health",
             "conditions",
@@ -76,12 +75,10 @@ public class FlowableIdmApplicationSecurityTest {
             "metrics",
             "metrics-requiredMetricName",
             "scheduledtasks",
-            "httptrace",
             "mappings",
             "caches",
             "caches-cache",
-            "health-component",
-            "health-component-instance"
+            "health-path"
         )
     );
 

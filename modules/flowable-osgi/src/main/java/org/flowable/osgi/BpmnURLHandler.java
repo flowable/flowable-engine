@@ -33,7 +33,7 @@ public class BpmnURLHandler extends AbstractURLStreamHandlerService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BpmnURLHandler.class);
 
-    private static String SYNTAX = "bpmn: bpmn-xml-uri";
+    private static final String SYNTAX = "bpmn: bpmn-xml-uri";
 
     private URL bpmnXmlURL;
 

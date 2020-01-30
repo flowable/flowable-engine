@@ -13,9 +13,12 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -26,7 +29,6 @@ import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -35,6 +37,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public abstract class CmmnOperation implements Runnable {
     
     protected CommandContext commandContext;
+    protected boolean isNoop = false; // flag indicating whether this operation did something. False by default, as all operation should typically do something.
     
     public CmmnOperation() {
     }
@@ -42,7 +45,12 @@ public abstract class CmmnOperation implements Runnable {
     public CmmnOperation(CommandContext commandContext) {
         this.commandContext = commandContext;
     }
-    
+
+    /**
+     * @return The id of the case instance related to this operation.
+     */
+    public abstract String getCaseInstanceId();
+
     protected Stage getStage(PlanItemInstanceEntity planItemInstanceEntity) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition instanceof Stage) {
@@ -82,12 +90,18 @@ public abstract class CmmnOperation implements Runnable {
                 }
 
                 PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                    .createChildPlanItemInstance(planItem,
-                        caseDefinitionId,
-                        caseInstanceId,
-                        stagePlanItemInstanceEntity != null ? stagePlanItemInstanceEntity.getId() : null,
-                        tenantId,
-                        true);
+                    .createPlanItemInstanceEntityBuilder()
+                    .planItem(planItem)
+                    .caseDefinitionId(caseDefinitionId)
+                    .caseInstanceId(caseInstanceId)
+                    .stagePlanItemInstance(stagePlanItemInstanceEntity)
+                    .tenantId(tenantId)
+                    .addToParent(true)
+                    // we silently ignore any exceptions evaluating the name for the new plan item, if it has repetition on a collection, as the item / itemIndex
+                    // local variables might not yet be available
+                    .silentNameExpressionEvaluation(ExpressionUtil.hasRepetitionOnCollection(planItem))
+                    .create();
+
                 planItemInstances.add(childPlanItemInstance);
                 CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
 
@@ -116,19 +130,38 @@ public abstract class CmmnOperation implements Runnable {
         return false;
     }
 
-    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance(
-                planItemInstanceEntityToCopy.getPlanItem(),
-                planItemInstanceEntityToCopy.getCaseDefinitionId(),
-                planItemInstanceEntityToCopy.getCaseInstanceId(),
-                planItemInstanceEntityToCopy.getStageInstanceId(),
-                planItemInstanceEntityToCopy.getTenantId(),
-                addToParent);
+    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
+        boolean addToParent, boolean silentNameExpressionEvaluation) {
+        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntityToCopy, null, addToParent, silentNameExpressionEvaluation);
+    }
 
-        if (hasRepetitionRule(planItemInstanceEntityToCopy)) {
+    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
+        Map<String, Object> localVariables, boolean addToParent, boolean silentNameExpressionEvaluation) {
+
+        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntityToCopy)) {
             int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
-            setRepetitionCounter(planItemInstanceEntity, counter);
+            if (localVariables == null) {
+                localVariables = new HashMap<>(0);
+            }
+            localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
         }
+
+        PlanItemInstance stagePlanItem = planItemInstanceEntityToCopy.getStagePlanItemInstanceEntity();
+        if (stagePlanItem == null && planItemInstanceEntityToCopy.getStageInstanceId() != null) {
+            stagePlanItem = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceEntityToCopy.getStageInstanceId());
+        }
+
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+            .createPlanItemInstanceEntityBuilder()
+            .planItem(planItemInstanceEntityToCopy.getPlanItem())
+            .caseDefinitionId(planItemInstanceEntityToCopy.getCaseDefinitionId())
+            .caseInstanceId(planItemInstanceEntityToCopy.getCaseInstanceId())
+            .stagePlanItemInstance(stagePlanItem)
+            .tenantId(planItemInstanceEntityToCopy.getTenantId())
+            .localVariables(localVariables)
+            .addToParent(addToParent)
+            .silentNameExpressionEvaluation(silentNameExpressionEvaluation)
+            .create();
 
         return planItemInstanceEntity;
     }
@@ -151,32 +184,12 @@ public abstract class CmmnOperation implements Runnable {
         return repetitionCounterVariableName;
     }
 
-    protected boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (planItemInstanceEntity != null && planItemInstanceEntity.getPlanItem() != null) {
-            return hasRepetitionRule(planItemInstanceEntity.getPlanItem());
-        }
-        return false;
+    public void markAsNoop() {
+        isNoop = true;
     }
 
-    protected boolean hasRepetitionRule(PlanItem planItem) {
-        return planItem.getItemControl() != null
-            && planItem.getItemControl().getRepetitionRule() != null;
-    }
-
-    protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (hasRepetitionRule(planItemInstanceEntity)) {
-            String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
-            return evaluateRepetitionRule(planItemInstanceEntity, repetitionCondition);
-        }
-        return false;
-    }
-
-    protected boolean evaluateRepetitionRule(VariableContainer variableContainer, String repetitionCondition) {
-        if (StringUtils.isNotEmpty(repetitionCondition)) {
-            return ExpressionUtil.evaluateBooleanExpression(commandContext, variableContainer, repetitionCondition);
-        } else {
-            return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
-        }
+    public boolean isNoop() {
+        return isNoop;
     }
 
 }

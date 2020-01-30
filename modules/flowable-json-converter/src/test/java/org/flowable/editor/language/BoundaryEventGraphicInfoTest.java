@@ -31,8 +31,8 @@ import static org.junit.Assert.assertThat;
  * Created by David Pardo
  */
 public class BoundaryEventGraphicInfoTest extends AbstractConverterTest {
-    final String TIMER_BOUNDERY_ID = "sid-4F284555-6D97-4F67-A926-C96F552A4404";
-    final String USER_TASK_ID = "sid-6A39AD39-C7BB-4D92-896B-CBF37D5D449B";
+    private static final String TIMER_BOUNDERY_ID = "sid-4F284555-6D97-4F67-A926-C96F552A4404";
+    private static final String USER_TASK_ID = "sid-6A39AD39-C7BB-4D92-896B-CBF37D5D449B";
 
     @Test
     public void graphicInfoOfBoundaryEventShouldRemainTheSame() throws Exception {

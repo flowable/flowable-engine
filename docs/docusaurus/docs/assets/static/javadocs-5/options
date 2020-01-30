@@ -1,0 +1,24 @@
+-classpath
+'/Users/tijsrademakers/.m2/repository/org/mybatis/mybatis/3.4.1/mybatis-3.4.1.jar:/Users/tijsrademakers/.m2/repository/org/springframework/spring-beans/4.1.5.RELEASE/spring-beans-4.1.5.RELEASE.jar:/Users/tijsrademakers/.m2/repository/javax/enterprise/concurrent/javax.enterprise.concurrent-api/1.0/javax.enterprise.concurrent-api-1.0.jar:/Users/tijsrademakers/.m2/repository/joda-time/joda-time/2.6/joda-time-2.6.jar:/Users/tijsrademakers/.m2/repository/org/drools/knowledge-api/5.5.0.Final/knowledge-api-5.5.0.Final.jar:/Users/tijsrademakers/.m2/repository/org/apache/commons/commons-lang3/3.3.2/commons-lang3-3.3.2.jar:/Users/tijsrademakers/.m2/repository/org/flowable/flowable-image-generator/5.23.0/flowable-image-generator-5.23.0.jar:/Users/tijsrademakers/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.7.5/jackson-annotations-2.7.5.jar:/Users/tijsrademakers/.m2/repository/org/mvel/mvel2/2.1.3.Final/mvel2-2.1.3.Final.jar:/Users/tijsrademakers/.m2/repository/org/apache/geronimo/specs/geronimo-jta_1.1_spec/1.1.1/geronimo-jta_1.1_spec-1.1.1.jar:/Users/tijsrademakers/.m2/repository/org/flowable/flowable-process-validation/5.23.0/flowable-process-validation-5.23.0.jar:/Users/tijsrademakers/.m2/repository/org/apache/commons/commons-email/1.4/commons-email-1.4.jar:/Users/tijsrademakers/.m2/repository/javax/activation/activation/1.1.1/activation-1.1.1.jar:/Users/tijsrademakers/.m2/repository/com/fasterxml/uuid/java-uuid-generator/3.1.3/java-uuid-generator-3.1.3.jar:/Users/tijsrademakers/.m2/repository/org/codehaus/groovy/groovy-all/2.4.5/groovy-all-2.4.5.jar:/Users/tijsrademakers/.m2/repository/org/drools/drools-core/5.5.0.Final/drools-core-5.5.0.Final.jar:/Users/tijsrademakers/.m2/repository/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar:/Users/tijsrademakers/.m2/repository/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c.jar:/Users/tijsrademakers/.m2/repository/org/slf4j/slf4j-api/1.7.6/slf4j-api-1.7.6.jar:/Users/tijsrademakers/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.7.5/jackson-core-2.7.5.jar:/Users/tijsrademakers/.m2/repository/org/eclipse/jdt/core/compiler/ecj/3.5.1/ecj-3.5.1.jar:/Users/tijsrademakers/.m2/repository/org/flowable/flowable-bpmn-converter/5.23.0/flowable-bpmn-converter-5.23.0.jar:/Users/tijsrademakers/.m2/repository/org/drools/knowledge-internal-api/5.5.0.Final/knowledge-internal-api-5.5.0.Final.jar:/Users/tijsrademakers/.m2/repository/com/thoughtworks/xstream/xstream/1.4.1/xstream-1.4.1.jar:/Users/tijsrademakers/.m2/repository/org/flowable/flowable-bpmn-model/5.23.0/flowable-bpmn-model-5.23.0.jar:/Users/tijsrademakers/.m2/repository/org/antlr/antlr/3.3/antlr-3.3.jar:/Users/tijsrademakers/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/tijsrademakers/.m2/repository/antlr/antlr/2.7.7/antlr-2.7.7.jar:/Users/tijsrademakers/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.7.5/jackson-databind-2.7.5.jar:/Users/tijsrademakers/.m2/repository/org/antlr/stringtemplate/3.2.1/stringtemplate-3.2.1.jar:/Users/tijsrademakers/.m2/repository/com/sun/mail/javax.mail/1.5.2/javax.mail-1.5.2.jar:/Users/tijsrademakers/.m2/repository/org/drools/drools-compiler/5.5.0.Final/drools-compiler-5.5.0.Final.jar:/Users/tijsrademakers/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar:/Users/tijsrademakers/.m2/repository/org/antlr/antlr-runtime/3.3/antlr-runtime-3.3.jar:/Users/tijsrademakers/.m2/repository/org/slf4j/jcl-over-slf4j/1.7.6/jcl-over-slf4j-1.7.6.jar:/Users/tijsrademakers/.m2/repository/org/springframework/spring-core/4.1.5.RELEASE/spring-core-4.1.5.RELEASE.jar:/Users/tijsrademakers/.m2/repository/junit/junit/4.11/junit-4.11.jar:/Users/tijsrademakers/.m2/repository/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/Users/tijsrademakers/Documents/github/flowable5/modules/flowable-engine/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2017 <a href="http://flowable.org">Flowable</a>. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/tijsrademakers/Documents/github/flowable5/modules/flowable-engine/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'Flowable - Engine 5.23.0 API'
+-linkoffline
+'http://docs.oracle.com/javase/6/docs/api' '/Users/tijsrademakers/Documents/github/flowable5/modules/flowable-engine/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'Flowable - Engine 5.23.0 API'

@@ -328,7 +328,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
 
         downgradeHistoryJobConfigurations();
 
-        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(10000L, 100L);
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
         assertEquals("test form key", historicTaskInstance.getFormKey());
 

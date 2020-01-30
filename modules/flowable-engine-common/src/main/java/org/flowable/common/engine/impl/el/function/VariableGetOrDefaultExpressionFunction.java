@@ -12,8 +12,8 @@
  */
 package org.flowable.common.engine.impl.el.function;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Returns the value of a variable, or a default if the value is null.
@@ -23,12 +23,12 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableGetOrDefaultExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableGetOrDefaultExpressionFunction(String variableScopeName) {
-        super(variableScopeName, "getOrDefault");
+    public VariableGetOrDefaultExpressionFunction() {
+        super("getOrDefault");
     }
 
-    public static Object getOrDefault(VariableScope variableScope, String variableName, Object value) {
-        Object variableValue = getVariableValue(variableScope, variableName);
+    public static Object getOrDefault(VariableContainer variableContainer, String variableName, Object value) {
+        Object variableValue = getVariableValue(variableContainer, variableName);
         if (variableValue != null) {
             return variableValue;
         } else {

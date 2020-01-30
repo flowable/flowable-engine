@@ -108,6 +108,7 @@ flowableAdminApp.controller('ProcessDefinitionsController', ['$rootScope', '$sco
           $scope.gridDefinitions = {
               data: 'processDefinitionsData.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               rowHeight: 36,

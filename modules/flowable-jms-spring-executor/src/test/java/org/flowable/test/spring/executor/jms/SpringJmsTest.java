@@ -12,10 +12,10 @@
  */
 package org.flowable.test.spring.executor.jms;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.awaitility.Awaitility;
 import org.flowable.engine.ProcessEngine;
@@ -51,7 +51,7 @@ public class SpringJmsTest {
         processEngine.getRuntimeService().startProcessInstanceByKey("AsyncProcess", vars);
 
         // Wait until the process is completely finished
-        Awaitility.await().atMost(1, TimeUnit.MINUTES).pollInterval(500, TimeUnit.MILLISECONDS).untilAsserted(
+        Awaitility.await().atMost(Duration.ofMinutes(1)).pollInterval(Duration.ofMillis(500)).untilAsserted(
             () -> Assert.assertEquals(0L, processEngine.getRuntimeService().createProcessInstanceQuery().count()));
 
         for (String activityName : Arrays.asList("A", "B", "C", "D", "E", "F", "After boundary", "The user task", "G", "G1", "G2", "G3", "H", "I", "J", "K", "L")) {

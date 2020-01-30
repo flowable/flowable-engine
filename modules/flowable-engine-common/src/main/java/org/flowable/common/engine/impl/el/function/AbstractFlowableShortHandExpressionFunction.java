@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 
 /**
@@ -51,18 +52,45 @@ public abstract class AbstractFlowableShortHandExpressionFunction implements Flo
         // - word group
         // - Optionally followed by a single our double quote
         // - followed by 0 or more whitespaces
-        // - followed by a comma or a closing parenthese
-        this.pattern = Pattern.compile(buildOrWordGroup(getFunctionPrefixOptions()) + ":" 
+        // - followed by a comma or a closing parentheses
+        String matchingFunctionPrefix;
+        List<String> functionPrefixOptions = getFunctionPrefixOptions();
+        if (!functionPrefixOptions.isEmpty()) {
+            matchingFunctionPrefix = buildOrWordGroup(functionPrefixOptions) + ":";
+        } else {
+            // In case there are no function prefix options then use empty string
+            matchingFunctionPrefix = "";
+        }
+        this.pattern = Pattern.compile(matchingFunctionPrefix
                 + buildOrWordGroup(functionNameOptions) 
                 + "\\s*\\(\\s*'?\"?(.*?)'?\"?\\s*"
                 + (isMultiParameterFunction() ? "," : "\\)"));
         
-        this.replacePattern = getFinalFunctionPrefix() + ":" 
-                + functionName 
-                + (isNoParameterMethod() ? ("(" + variableScopeName) : ("(" + variableScopeName + ",'$3'") ) // 3th word group, the parameter: prefix and function name are two first groups
-                + (isMultiParameterFunction() ? "," : ")");
-        
         this.prefix = getFinalFunctionPrefix();
+
+        StringBuilder replacePatternBuilder = new StringBuilder();
+        if (StringUtils.isNotEmpty(this.prefix)) {
+            replacePatternBuilder.append(this.prefix).append(":");
+        }
+
+        replacePatternBuilder.append(functionName);
+
+        if (isNoParameterMethod()) {
+            replacePatternBuilder.append('(').append(variableScopeName);
+        } else if (!functionPrefixOptions.isEmpty()) {
+            replacePatternBuilder.append('(').append(variableScopeName).append(",'$3'"); // 3th word group, the parameter: prefix and function name are two first groups
+        } else {
+            replacePatternBuilder.append('(').append(variableScopeName).append(",'$2'"); // 2th word group, the parameter: function name is the first group, there are no prefix options
+        }
+
+        if (isMultiParameterFunction()) {
+            replacePatternBuilder.append(',');
+        } else {
+            replacePatternBuilder.append(')');
+        }
+
+        this.replacePattern = replacePatternBuilder.toString();
+
         this.localName = functionName;
         
         // By convention, the implementing class should have one method with the same name

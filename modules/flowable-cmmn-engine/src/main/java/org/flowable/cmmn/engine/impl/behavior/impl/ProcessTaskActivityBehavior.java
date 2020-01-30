@@ -12,8 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -28,14 +30,12 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -48,6 +48,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     protected Expression processRefExpression;
     protected String processRef;
     protected Boolean fallbackToDefaultTenant;
+    protected ProcessTask processTask;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
         super(processTask.isBlocking(), processTask.getBlockingExpression(), processTask.getInParameters(), processTask.getOutParameters());
@@ -55,6 +56,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         this.processRefExpression = processRefExpression;
         this.processRef = processTask.getProcessRef();
         this.fallbackToDefaultTenant = processTask.getFallbackToDefaultTenant();
+        this.processTask = processTask;
     }
 
     @Override
@@ -85,7 +87,15 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         }
 
         String processInstanceId = processInstanceService.generateNewProcessInstanceId();
-        planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
+        if (StringUtils.isNotEmpty(processTask.getProcessInstanceIdVariableName())) {
+            Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(processTask.getProcessInstanceIdVariableName());
+            String idVariableName = (String) expression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(idVariableName)) {
+                planItemInstanceEntity.setVariable(idVariableName, processInstanceId);
+            }
+        }
+
+        planItemInstanceEntity.setReferenceType(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
         planItemInstanceEntity.setReferenceId(processInstanceId);
 
         if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isEnableEntityLinks()) {
@@ -93,13 +103,15 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             EntityLinkUtil.createNewEntityLink(planItemInstanceEntity.getCaseInstanceId(), processInstanceId, ScopeTypes.BPMN);
         }
 
+        String businessKey = getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, processTask);
+
         boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
         if (blocking) {
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap);
+            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
         } else {
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId,
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap);
+            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
         }
 
         if (!blocking) {
@@ -115,7 +127,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         if (planItemInstance.getReferenceId() == null) {
             throw new FlowableException("Cannot trigger process task plan item instance : no reference id set");
         }
-        if (!CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
+        if (!ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger process task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }
@@ -151,11 +163,11 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
     @Override
     public void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade) {
-        if (CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(delegatePlanItemInstance.getReferenceType())) {
+        if (ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(delegatePlanItemInstance.getReferenceType())) {
             delegatePlanItemInstance.setState(PlanItemInstanceState.TERMINATED); // This is not the regular termination, but the state still needs to be correct
             deleteProcessInstance(commandContext, delegatePlanItemInstance);
         } else {
-            throw new FlowableException("Can only delete a child entity for a plan item with callback type " + CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
+            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
         }
     }
 

@@ -44,7 +44,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 public class DeploymentManager {
 
     protected DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache;
-    protected ProcessDefinitionInfoCache processDefinitionInfoCache;
+    protected DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache;
     protected DeploymentCache<Object> appResourceCache;
     protected DeploymentCache<Object> knowledgeBaseCache; // Needs to be object to avoid an import to Drools in this core class
     protected List<EngineDeployer> deployers;
@@ -237,11 +237,11 @@ public class DeploymentManager {
         this.processDefinitionCache = processDefinitionCache;
     }
 
-    public ProcessDefinitionInfoCache getProcessDefinitionInfoCache() {
+    public DeploymentCache<ProcessDefinitionInfoCacheObject> getProcessDefinitionInfoCache() {
         return processDefinitionInfoCache;
     }
 
-    public void setProcessDefinitionInfoCache(ProcessDefinitionInfoCache processDefinitionInfoCache) {
+    public void setProcessDefinitionInfoCache(DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache) {
         this.processDefinitionInfoCache = processDefinitionInfoCache;
     }
 

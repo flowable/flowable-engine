@@ -26,7 +26,6 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -53,18 +52,12 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class DeploymentEntityManagerImpl extends AbstractEntityManager<DeploymentEntity> implements DeploymentEntityManager {
-
-    protected DeploymentDataManager deploymentDataManager;
+public class DeploymentEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<DeploymentEntity, DeploymentDataManager>
+    implements DeploymentEntityManager {
 
     public DeploymentEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, DeploymentDataManager deploymentDataManager) {
-        super(processEngineConfiguration);
-        this.deploymentDataManager = deploymentDataManager;
-    }
-
-    @Override
-    protected DataManager<DeploymentEntity> getDataManager() {
-        return deploymentDataManager;
+        super(processEngineConfiguration, deploymentDataManager);
     }
 
     @Override
@@ -300,35 +293,47 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
 
     @Override
     public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
-        return deploymentDataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
+        return dataManager.findDeploymentCountByQueryCriteria(deploymentQuery);
     }
 
     @Override
     public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
-        return deploymentDataManager.findDeploymentsByQueryCriteria(deploymentQuery);
+        return dataManager.findDeploymentsByQueryCriteria(deploymentQuery);
     }
 
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
-        return deploymentDataManager.getDeploymentResourceNames(deploymentId);
+        return dataManager.getDeploymentResourceNames(deploymentId);
     }
 
     @Override
     public List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
-        return deploymentDataManager.findDeploymentsByNativeQuery(parameterMap);
+        return dataManager.findDeploymentsByNativeQuery(parameterMap);
     }
 
     @Override
     public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
-        return deploymentDataManager.findDeploymentCountByNativeQuery(parameterMap);
+        return dataManager.findDeploymentCountByNativeQuery(parameterMap);
     }
 
-    public DeploymentDataManager getDeploymentDataManager() {
-        return deploymentDataManager;
+    protected ResourceEntityManager getResourceEntityManager() {
+        return engineConfiguration.getResourceEntityManager();
     }
 
-    public void setDeploymentDataManager(DeploymentDataManager deploymentDataManager) {
-        this.deploymentDataManager = deploymentDataManager;
+    protected ModelEntityManager getModelEntityManager() {
+        return engineConfiguration.getModelEntityManager();
+    }
+
+    protected ProcessDefinitionEntityManager getProcessDefinitionEntityManager() {
+        return engineConfiguration.getProcessDefinitionEntityManager();
+    }
+
+    protected ProcessDefinitionInfoEntityManager getProcessDefinitionInfoEntityManager() {
+        return engineConfiguration.getProcessDefinitionInfoEntityManager();
+    }
+
+    protected ExecutionEntityManager getExecutionEntityManager() {
+        return engineConfiguration.getExecutionEntityManager();
     }
 
 }

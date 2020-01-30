@@ -18,7 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = {
     "org.flowable.ui.admin.repository",
     "org.flowable.ui.admin.service",

@@ -36,13 +36,16 @@ public class GenericEventListenerXmlConverter extends PlanItemDefinitionXmlConve
 
     @Override
     protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String eventType = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_TYPE);
-        if ("signal".equals(eventType)) {
+        String listenerType = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_TYPE);
+        if ("signal".equals(listenerType)) {
             SignalEventListener signalEventListener = new SignalEventListener();
             signalEventListener.setSignalRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_SIGNAL_REF));
             return convertCommonAttributes(xtr, signalEventListener);
+
         } else {
-            return convertCommonAttributes(xtr, new GenericEventListener());
+            GenericEventListener genericEventListener = new GenericEventListener();
+            return convertCommonAttributes(xtr, genericEventListener);
+
         }
     }
 

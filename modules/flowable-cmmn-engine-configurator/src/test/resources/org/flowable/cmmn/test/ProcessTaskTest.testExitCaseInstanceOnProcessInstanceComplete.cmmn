@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+    <case id="testExitCaseInstanceOnProcessInstanceComplete" name="secondcase" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItem1" name="Process task" definitionRef="processTask1">
+                <itemControl>
+                    <manualActivationRule></manualActivationRule>
+                </itemControl>
+            </planItem>
+            <planItem id="planItem2" name="Task in case" definitionRef="humanTask1"></planItem>
+            <sentry id="sentry1">
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <processTask id="processTask1" name="Process task">
+                <extensionElements>
+                    <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
+                </extensionElements>
+                <processRefExpression><![CDATA[oneTask]]></processRefExpression>
+            </processTask>
+            <humanTask id="humanTask1" name="Task in case" flowable:assignee="${initiator}" flowable:formFieldValidation="false" />
+            <exitCriterion id="exitCriterion2" sentryRef="sentry1"></exitCriterion>
+        </casePlanModel>
+    </case>
+</definitions>

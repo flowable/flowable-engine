@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.engine.impl.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +44,8 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     protected String resourceName;
     protected String resourceNameLike;
     protected String authorizationUserId;
+    protected Collection<String> authorizationGroups;
+    protected boolean authorizationGroupsSet;
     protected Integer version;
     protected Integer versionGt;
     protected Integer versionGte;
@@ -255,8 +258,12 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
     
-    public List<String> getAuthorizationGroups() {
-        if (authorizationUserId == null) {
+    public Collection<String> getAuthorizationGroups() {
+        // if authorizationGroupsSet is true then startableByUserOrGroups was called
+        // and the groups passed in that methods have precedence
+        if (authorizationGroupsSet) {
+            return authorizationGroups;
+        } else if (authorizationUserId == null) {
             return null;
         }
         return CommandContextUtil.getCmmnEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(authorizationUserId);
@@ -268,6 +275,17 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
             throw new FlowableIllegalArgumentException("userId is null");
         }
         this.authorizationUserId = userId;
+        return this;
+    }
+
+    @Override
+    public CaseDefinitionQuery startableByUserOrGroups(String userId, Collection<String> groups) {
+        if (userId == null && (groups == null || groups.isEmpty())) {
+            throw new FlowableIllegalArgumentException("userId is null and groups are null or empty");
+        }
+        this.authorizationUserId = userId;
+        this.authorizationGroups = groups;
+        this.authorizationGroupsSet = true;
         return this;
     }
 
@@ -408,6 +426,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public boolean isIncludeAuthorization() {
+        return authorizationUserId != null || (authorizationGroups != null && !authorizationGroups.isEmpty());
     }
 
 }

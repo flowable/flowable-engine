@@ -117,6 +117,9 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessBusinessKey() != null) {
             query.processInstanceBusinessKey(queryRequest.getProcessBusinessKey());
         }
+        if (queryRequest.getProcessBusinessKeyLike() != null) {
+            query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
+        }
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
         }
@@ -256,6 +259,14 @@ public class BaseProcessInstanceResource {
             case LIKE:
                 if (actualValue instanceof String) {
                     processInstanceQuery.variableValueLike(variable.getName(), (String) actualValue);
+                } else {
+                    throw new FlowableIllegalArgumentException("Only string variable values are supported for like, but was: " + actualValue.getClass().getName());
+                }
+                break;
+
+            case LIKE_IGNORE_CASE:
+                if (actualValue instanceof String) {
+                    processInstanceQuery.variableValueLikeIgnoreCase(variable.getName(), (String) actualValue);
                 } else {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported for like, but was: " + actualValue.getClass().getName());
                 }

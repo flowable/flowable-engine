@@ -77,11 +77,14 @@ public interface CmmnXmlConstants {
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
 
     String ATTRIBUTE_TRIGGER_MODE = "triggerMode";
+    String ATTRIBUTE_EXIT_EVENT_TYPE = "exitEventType";
+    String ATTRIBUTE_EXIT_TYPE = "exitType";
 
     String ELEMENT_REQUIRED_RULE = "requiredRule";
     String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
     String ELEMENT_REPETITION_RULE = "repetitionRule";
     String ELEMENT_COMPLETION_NEUTRAL_RULE = "completionNeutralRule";
+    String ELEMENT_PARENT_COMPLETION_RULE = "parentCompletionRule";
 
     String ELEMENT_PROCESS = "process";
     String ELEMENT_DECISION = "decision";
@@ -112,7 +115,11 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_PROCESS_REF = "processRef";
     String ATTRIBUTE_DECISION_REF = "decisionRef";
     String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
+    String ATTRIBUTE_BUSINESS_KEY = "businessKey";
+    String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
+    String ATTRIBUTE_ID_VARIABLE_NAME = "idVariableName";
 
+    String ELEMENT_CASE_REF_EXPRESSION = "caseRefExpression";
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     String ELEMENT_DECISION_REF_EXPRESSION = "decisionRefExpression";
     String ELEMENT_CONDITION = "condition";
@@ -144,6 +151,9 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
 
     String ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
+    
+    String ATTRIBUTE_LABEL = "label";
+    String ATTRIBUTE_ICON = "icon";
 
     String ELEMENT_FIELD = "field";
     String ATTRIBUTE_FIELD_STRING = "stringValue";
@@ -162,12 +172,23 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_CATEGORY = "category";
 
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
+    String ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME = "maxInstanceCount";
+    String ATTRIBUTE_REPETITION_COLLECTION_VARIABLE_NAME = "collectionVariable";
+    String ATTRIBUTE_REPETITION_ELEMENT_VARIABLE_NAME = "elementVariable";
+    String ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME = "elementIndexVariable";
 
     String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
 
-    String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType";
+    String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType"; // Note that this is the same as ELEMENT_EVENT_TYPE. We can't change this (backwards compatibility)
     String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";
     String ATTRIBUTE_EVENT_LISTENER_SIGNAL_REF = "signalRef";
+
+    String ELEMENT_EVENT_TYPE = "eventType";
+    String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
+    String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
+    String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
+    String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
+    String START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID = "storeAsUniqueReferenceId";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

@@ -44,6 +44,9 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
+import org.flowable.eventregistry.impl.EventRegistryEngine;
+import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
+import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.SpringFormExpressionManager;
@@ -63,6 +66,8 @@ import org.flowable.spring.boot.content.ContentEngineAutoConfiguration;
 import org.flowable.spring.boot.content.ContentEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.dmn.DmnEngineAutoConfiguration;
 import org.flowable.spring.boot.dmn.DmnEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.eventregistry.EventRegistryAutoConfiguration;
+import org.flowable.spring.boot.eventregistry.EventRegistryServicesAutoConfiguration;
 import org.flowable.spring.boot.form.FormEngineAutoConfiguration;
 import org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
@@ -90,6 +95,8 @@ public class AllEnginesAutoConfigurationTest {
             AppEngineAutoConfiguration.class,
             IdmEngineAutoConfiguration.class,
             IdmEngineServicesAutoConfiguration.class,
+            EventRegistryAutoConfiguration.class,
+            EventRegistryServicesAutoConfiguration.class,
             CmmnEngineAutoConfiguration.class,
             CmmnEngineServicesAutoConfiguration.class,
             ContentEngineAutoConfiguration.class,
@@ -113,6 +120,7 @@ public class AllEnginesAutoConfigurationTest {
                 .hasSingleBean(DmnEngine.class)
                 .hasSingleBean(FormEngine.class)
                 .hasSingleBean(IdmEngine.class)
+                .hasSingleBean(EventRegistryEngine.class)
                 .hasSingleBean(ProcessEngine.class)
                 .hasSingleBean(SpringAppEngineConfiguration.class)
                 .hasSingleBean(SpringCmmnEngineConfiguration.class)
@@ -120,6 +128,7 @@ public class AllEnginesAutoConfigurationTest {
                 .hasSingleBean(SpringDmnEngineConfiguration.class)
                 .hasSingleBean(SpringFormEngineConfiguration.class)
                 .hasSingleBean(SpringIdmEngineConfiguration.class)
+                .hasSingleBean(SpringEventRegistryEngineConfiguration.class)
                 .hasSingleBean(SpringProcessEngineConfiguration.class)
                 .hasSingleBean(SpringCmmnEngineConfigurator.class)
                 .hasSingleBean(SpringContentEngineConfigurator.class)
@@ -134,6 +143,7 @@ public class AllEnginesAutoConfigurationTest {
             SpringDmnEngineConfiguration dmnEngineConfiguration = context.getBean(SpringDmnEngineConfiguration.class);
             SpringFormEngineConfiguration formEngineConfiguration = context.getBean(SpringFormEngineConfiguration.class);
             SpringIdmEngineConfiguration idmEngineConfiguration = context.getBean(SpringIdmEngineConfiguration.class);
+            SpringEventRegistryEngineConfiguration eventEngineConfiguration = context.getBean(SpringEventRegistryEngineConfiguration.class);
             SpringProcessEngineConfiguration processEngineConfiguration = context.getBean(SpringProcessEngineConfiguration.class);
 
             assertThat(appEngineConfiguration.getEngineConfigurations())
@@ -145,6 +155,7 @@ public class AllEnginesAutoConfigurationTest {
                     entry(EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG, contentEngineConfiguration),
                     entry(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration),
                     entry(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG, idmEngineConfiguration),
+                    entry(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG, eventEngineConfiguration),
                     entry(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG, processEngineConfiguration)
                 )
                 .containsAllEntriesOf(cmmnEngineConfiguration.getEngineConfigurations())
@@ -152,6 +163,7 @@ public class AllEnginesAutoConfigurationTest {
                 .containsAllEntriesOf(contentEngineConfiguration.getEngineConfigurations())
                 .containsAllEntriesOf(formEngineConfiguration.getEngineConfigurations())
                 .containsAllEntriesOf(idmEngineConfiguration.getEngineConfigurations())
+                .containsAllEntriesOf(eventEngineConfiguration.getEngineConfigurations())
                 .containsAllEntriesOf(processEngineConfiguration.getEngineConfigurations());
 
             SpringCmmnEngineConfigurator cmmnConfigurator = context.getBean(SpringCmmnEngineConfigurator.class);
@@ -159,6 +171,7 @@ public class AllEnginesAutoConfigurationTest {
             SpringDmnEngineConfigurator dmnConfigurator = context.getBean(SpringDmnEngineConfigurator.class);
             SpringFormEngineConfigurator formConfigurator = context.getBean(SpringFormEngineConfigurator.class);
             SpringIdmEngineConfigurator idmConfigurator = context.getBean(SpringIdmEngineConfigurator.class);
+            SpringEventRegistryConfigurator eventConfigurator = context.getBean(SpringEventRegistryConfigurator.class);
             SpringProcessEngineConfigurator processConfigurator = context.getBean(SpringProcessEngineConfigurator.class);
             assertThat(appEngineConfiguration.getConfigurators())
                 .as("AppEngineConfiguration configurators")

@@ -22,14 +22,14 @@ import org.junit.Test;
  */
 public class VariableExistsExpressionEnhancerTest {
     
-    private VariableExistsExpressionFunction expressionFunction = new VariableExistsExpressionFunction("planItemInstance");
+    private VariableExistsExpressionFunction expressionFunction = new VariableExistsExpressionFunction();
     
     @Test
     public void testRegexNameReplacement() {
-        assertRegexCorrect("${variables:exists(myVar)}", "${variables:exists(planItemInstance,'myVar')}");
-        assertRegexCorrect("${variables:exist(myVar)}", "${variables:exists(planItemInstance,'myVar')}");
+        assertRegexCorrect("${variables:exists(myVar)}", "${variables:exists(variableContainer,'myVar')}");
+        assertRegexCorrect("${variables:exist(myVar)}", "${variables:exists(variableContainer,'myVar')}");
         
-        assertRegexCorrect("${variables:exists('myVar')}", "${variables:exists(planItemInstance,'myVar')}");
+        assertRegexCorrect("${variables:exists('myVar')}", "${variables:exists(variableContainer,'myVar')}");
     }
         
     public void assertRegexCorrect(String in, String out) {

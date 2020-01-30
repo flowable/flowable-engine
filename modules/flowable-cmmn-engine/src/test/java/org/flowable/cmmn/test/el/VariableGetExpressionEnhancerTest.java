@@ -22,12 +22,12 @@ import org.junit.Test;
  */
 public class VariableGetExpressionEnhancerTest {
     
-    private VariableGetExpressionFunction expressionFunction = new VariableGetExpressionFunction("planItemInstance");
+    private VariableGetExpressionFunction expressionFunction = new VariableGetExpressionFunction();
     
     @Test
     public void testRegexDefault() {
-        assertRegexCorrect("${variables:get(myVar)}", "${variables:get(planItemInstance,'myVar')}");
-        assertRegexCorrect("${var:get('form_someForm_outcome') == 'close'}", "${variables:get(planItemInstance,'form_someForm_outcome') == 'close'}");
+        assertRegexCorrect("${variables:get(myVar)}", "${variables:get(variableContainer,'myVar')}");
+        assertRegexCorrect("${var:get('form_someForm_outcome') == 'close'}", "${variables:get(variableContainer,'form_someForm_outcome') == 'close'}");
     }
 
     public void assertRegexCorrect(String in, String out) {

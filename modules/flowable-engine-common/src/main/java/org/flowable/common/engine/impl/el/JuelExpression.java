@@ -44,6 +44,8 @@ public class JuelExpression implements Expression {
     @Override
     public Object getValue(VariableContainer variableContainer) {
         ELContext elContext = expressionManager.getElContext(variableContainer);
+        Object originalValueContext = elContext.getContext(EvaluationState.class);
+        elContext.putContext(EvaluationState.class, EvaluationState.READ);
         try {
             return resolveGetValueExpression(elContext);
         } catch (PropertyNotFoundException pnfe) {
@@ -54,6 +56,8 @@ public class JuelExpression implements Expression {
             throw ex;
         } catch (Exception e) {
             throw new FlowableException("Error while evaluating expression: " + expressionText, e);
+        } finally {
+            elContext.putContext(EvaluationState.class, originalValueContext);
         }
     }
 
@@ -64,10 +68,15 @@ public class JuelExpression implements Expression {
     @Override
     public void setValue(Object value, VariableContainer variableContainer) {
         ELContext elContext = expressionManager.getElContext(variableContainer);
+        Object originalValueContext = elContext.getContext(EvaluationState.class);
+        elContext.putContext(EvaluationState.class, EvaluationState.WRITE);
+
         try {
             resolveSetValueExpression(value, elContext);
         } catch (Exception e) {
             throw new FlowableException("Error while evaluating expression: " + expressionText, e);
+        } finally {
+            elContext.putContext(EvaluationState.class, originalValueContext);
         }
     }
 

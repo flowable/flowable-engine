@@ -1,0 +1,28 @@
+name: Flowable Java EA Build
+
+on:
+  push:
+    branches:
+      - master
+      - 'flowable-release-*'
+
+jobs:
+  test_jdk14:
+    name: Linux (OpenJDK EA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 10
+      - name: Install
+        # If installing the JDK is in a different step then wrong java would be used
+        # Need to do install first in order for the OSGi tests to work
+        run: |
+          . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
+          ./mvnw install -V -B --no-transfer-progress -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+      - name: Test
+        # If installing the JDK is in a different step then wrong java would be used
+        run: |
+          . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
+          ./mvnw verify -Pdistro,errorLogging,includeDockerTests -B -V -Dmaven.test.redirectTestOutputToFile=false
+        continue-on-error: true

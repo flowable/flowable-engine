@@ -88,6 +88,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_CASE_DEFINITION_DEPLOYMENT_ID = "caseDefinitionDeploymentId";
     String FIELD_CASE_DEFINITION_DESCRIPTION = "caseDefinitionDescription";
     String FIELD_CASE_DEFINITION_ID = "caseDefinitionId";
+    String FIELD_DERIVED_CASE_DEFINITION_ID = "derivedCaseDefinitionId";
     String FIELD_CASE_DEFINITION_KEY = "caseDefinitionKey";
     String FIELD_CASE_DEFINITION_NAME = "caseDefinitionName";
     String FIELD_CASE_DEFINITION_VERSION = "caseDefinitionVersion";
@@ -107,6 +108,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_GROUP_ID = "groupId";
     String FIELD_ID = "id";
     String FIELD_IS_STAGE = "isStage";
+    String FIELD_IS_SHOW_IN_OVERVIEW = "isShowInOverview";
     String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
     String FIELD_ENTITY_LINK_TYPE = "entityLinkType";
     String FIELD_LAST_AVAILABLE_TIME = "lastAvailableTime";
@@ -128,6 +130,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_REFERENCE_TYPE = "referenceType";
     String FIELD_ENTRY_CRITERION_ID = "entryCriterionId";
     String FIELD_EXIT_CRITERION_ID = "exitCriterionId";
+    String FIELD_EXTRA_VALUE = "extraValue";
     String FIELD_REVISION = "revision";
     String FIELD_SCOPE_ID = "scopeId";
     String FIELD_SCOPE_DEFINITION_ID = "scopeDefinitionId";

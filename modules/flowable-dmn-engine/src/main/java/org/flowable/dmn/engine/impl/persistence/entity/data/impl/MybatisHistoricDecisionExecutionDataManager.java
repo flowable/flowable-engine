@@ -50,7 +50,7 @@ public class MybatisHistoricDecisionExecutionDataManager extends AbstractDmnData
     @Override
     @SuppressWarnings("unchecked")
     public List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery) {
-        return getDbSqlSession().selectList("selectHistoricDecisionExecutionsByQueryCriteria", decisionExecutionQuery);
+        return getDbSqlSession().selectList("selectHistoricDecisionExecutionsByQueryCriteria", decisionExecutionQuery, getManagedEntityClass());
     }
 
     @Override

@@ -14,8 +14,11 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +36,9 @@ import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.cfg.MailServerInfo;
+import org.flowable.content.api.ContentItem;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -54,7 +58,6 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailActivityBehavior.class);
 
-    private static final Class<?>[] ALLOWED_ATT_TYPES = new Class<?>[] { File.class, File[].class, String.class, String[].class, DataSource.class, DataSource[].class };
     private static final String NEWLINE_REGEX = "\\r?\\n";
 
     protected Expression to;
@@ -394,52 +397,70 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         return null;
     }
 
-    private void getFilesFromFields(Expression expression, DelegateExecution execution, List<File> files, List<DataSource> dataSources) {
-        Object value = checkAllowedTypes(expression, execution);
+    protected void getFilesFromFields(Expression expression, DelegateExecution execution, List<File> files, List<DataSource> dataSources) {
+
+        if (expression == null) {
+            return;
+        }
+
+        Object value = expression.getValue(execution);
         if (value != null) {
-            if (value instanceof File) {
-                files.add((File) value);
-            } else if (value instanceof String) {
-                files.add(new File((String) value));
-            } else if (value instanceof File[]) {
-                Collections.addAll(files, (File[]) value);
-            } else if (value instanceof String[]) {
-                String[] paths = (String[]) value;
-                for (String path : paths) {
-                    files.add(new File(path));
-                }
-            } else if (value instanceof DataSource) {
-                dataSources.add((DataSource) value);
-            } else if (value instanceof DataSource[]) {
-                for (DataSource ds : (DataSource[]) value) {
-                    if (ds != null) {
-                        dataSources.add(ds);
+
+            if (value instanceof Collection) {
+                Collection collection = (Collection) value;
+                if (!collection.isEmpty()) {
+                    for (Object object : collection) {
+                        addExpressionValueToAttachments(object, files, dataSources);
                     }
                 }
+
+            } else {
+                addExpressionValueToAttachments(value, files, dataSources);
+
             }
-        }
-        for (Iterator<File> it = files.iterator(); it.hasNext();) {
-            File file = it.next();
-            if (!fileExists(file)) {
-                it.remove();
-            }
+
+            files.removeIf(file -> !fileExists(file));
         }
     }
 
-    private Object checkAllowedTypes(Expression expression, DelegateExecution execution) {
-        if (expression == null) {
-            return null;
-        }
-        Object value = expression.getValue(execution);
-        if (value == null) {
-            return null;
-        }
-        for (Class<?> allowedType : ALLOWED_ATT_TYPES) {
-            if (allowedType.isInstance(value)) {
-                return value;
+    protected void addExpressionValueToAttachments(Object value, List<File> files, List<DataSource> dataSources) {
+        if (value instanceof File) {
+            files.add((File) value);
+
+        } else if (value instanceof String) {
+            files.add(new File((String) value));
+
+        } else if (value instanceof File[]) {
+            Collections.addAll(files, (File[]) value);
+
+        } else if (value instanceof String[]) {
+            String[] paths = (String[]) value;
+            for (String path : paths) {
+                files.add(new File(path));
             }
+
+        } else if (value instanceof DataSource) {
+            dataSources.add((DataSource) value);
+
+        } else if (value instanceof DataSource[]) {
+            for (DataSource ds : (DataSource[]) value) {
+                if (ds != null) {
+                    dataSources.add(ds);
+                }
+            }
+
+        } else if (value instanceof ContentItem) {
+            dataSources.add(new ContentItemDataSourceWrapper((ContentItem) value));
+
+        } else if (value instanceof ContentItem[]) {
+            for (ContentItem contentItem : (ContentItem[]) value) {
+                dataSources.add(new ContentItemDataSourceWrapper(contentItem));
+            }
+
+        } else {
+            throw new FlowableException("Invalid attachment type: " + value.getClass());
+
         }
-        throw new FlowableException("Invalid attachment type: " + value.getClass());
     }
 
     protected boolean fileExists(File file) {
@@ -482,4 +503,36 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
         return forceTo;
     }
+
+    public static class ContentItemDataSourceWrapper implements DataSource {
+
+        protected ContentItem contentItem;
+
+        public ContentItemDataSourceWrapper(ContentItem contentItem) {
+            this.contentItem = contentItem;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return CommandContextUtil.getContentService().getContentItemData(contentItem.getId());
+        }
+
+        @Override
+        public OutputStream getOutputStream() throws IOException {
+            // Not needed for mail attachment
+            return null;
+        }
+
+        @Override
+        public String getContentType() {
+            return contentItem.getMimeType();
+        }
+
+        @Override
+        public String getName() {
+            return contentItem.getName();
+        }
+
+    }
+
 }

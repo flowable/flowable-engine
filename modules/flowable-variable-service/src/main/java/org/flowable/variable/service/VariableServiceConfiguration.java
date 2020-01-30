@@ -62,6 +62,8 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     
     protected int maxLengthString;
     
+    protected boolean loggingSessionEnabled;
+    
     /**
      * This flag determines whether variables of the type 'serializable' will be tracked. This means that, when true, in a JavaDelegate you can write
      *
@@ -217,7 +219,16 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         this.maxLengthString = maxLengthString;
         return this;
     }
-    
+
+    public boolean isLoggingSessionEnabled() {
+        return loggingSessionEnabled;
+    }
+
+    public VariableServiceConfiguration setLoggingSessionEnabled(boolean loggingSessionEnabled) {
+        this.loggingSessionEnabled = loggingSessionEnabled;
+        return this;
+    }
+
     public boolean isSerializableVariableTypeTrackDeserializedObjects() {
         return serializableVariableTypeTrackDeserializedObjects;
     }

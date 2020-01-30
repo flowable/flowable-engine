@@ -19,7 +19,7 @@ import org.flowable.common.engine.impl.runtime.ClockReader;
 
 public class CycleBusinessCalendar extends BusinessCalendarImpl {
 
-    public static String NAME = "cycle";
+    public static final String NAME = "cycle";
 
     public CycleBusinessCalendar(ClockReader clockReader) {
         super(clockReader);

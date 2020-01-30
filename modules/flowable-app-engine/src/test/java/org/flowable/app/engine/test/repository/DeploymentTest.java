@@ -101,6 +101,7 @@ public class DeploymentTest extends FlowableAppTestCase {
         for (String resourceName : resourceNames) {
             if ("vacationRequestApp.app".equals(resourceName)) {
                 vacationRequestAppFound = true;
+                break;
             }
         }
         assertTrue(vacationRequestAppFound);

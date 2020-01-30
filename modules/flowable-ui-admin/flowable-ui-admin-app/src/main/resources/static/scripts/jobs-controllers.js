@@ -116,6 +116,7 @@ flowableAdminApp.controller('JobsController', ['$scope', '$rootScope', '$http', 
           $scope.gridJobs = {
               data: 'jobData.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               enableSorting: false,

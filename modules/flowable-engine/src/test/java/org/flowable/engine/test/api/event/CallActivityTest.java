@@ -36,6 +36,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -700,6 +701,48 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityWithEventSubprocessParent.bpmn20.xml",
+        "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityWithEventSubprocess.bpmn20.xml"
+    })
+    public void testCallActivityWithEventSubprocess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testWithEventSubprocessParent");
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("One", task.getName());
+
+        // Completing the task should trigger the event subprocess
+        taskService.complete(task.getId());
+        Task subOneTask = taskService.createTaskQuery().taskName("sub one").singleResult();
+        assertNotNull(subOneTask);
+        taskService.complete(subOneTask.getId());
+
+        // Complete the last task
+        task = taskService.createTaskQuery().singleResult();
+        assertEquals("Two", task.getName());
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityWithEventSubprocessParent.bpmn20.xml",
+        "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityWithEventSubprocessInterrupting.bpmn20.xml"
+    })
+    public void testCallActivityWithEventSubprocessInterrupting() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testWithEventSubprocessParent");
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("One", task.getName());
+
+        // Completing the task should trigger the event subprocess. This interupts the main flow.
+        taskService.complete(task.getId());
+        Task subOneTask = taskService.createTaskQuery().taskName("sub one").singleResult();
+        assertNotNull(subOneTask);
+        taskService.complete(subOneTask.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
 
     class CallActivityEventListener extends AbstractFlowableEngineEventListener {

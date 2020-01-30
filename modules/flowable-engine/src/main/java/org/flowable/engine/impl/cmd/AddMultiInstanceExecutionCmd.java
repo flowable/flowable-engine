@@ -36,7 +36,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
 
     private static final long serialVersionUID = 1L;
     
-    protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
+    protected static final String NUMBER_OF_INSTANCES = "nrOfInstances";
     
     protected String activityId;
     protected String parentExecutionId;

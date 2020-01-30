@@ -4,7 +4,7 @@
 
 === Spring Boot
 
-Spring Boot is an application framework which, according to link:$$http://projects.spring.io/spring-boot/$$[its website], _makes it easy to create stand-alone, production-grade Spring based Applications that can you can "just run". It takes an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need very little Spring configuration_.
+Spring Boot is an application framework which, according to link:$$http://projects.spring.io/spring-boot/$$[its website], _makes it easy to create stand-alone, production-grade Spring based Applications that you can "just run". It takes an opinionated view of the Spring platform and third-party libraries so you can get started with minimum fuss. Most Spring Boot applications need very little Spring configuration_.
 
 For more information on Spring Boot, see link:$$http://projects.spring.io/spring-boot/$$[http://projects.spring.io/spring-boot/]
 
@@ -44,7 +44,7 @@ You can now run your Spring Boot application:
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class MyApplication {
 
     public static void main(String[] args) {
@@ -178,7 +178,7 @@ Also, add following code lines to test if the deployment actually worked. The _C
 
 [source,java,linenums]
 ----
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class MyApplication {
 
     public static void main(String[] args) {
@@ -625,7 +625,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 ----
 {
   "flowable": {
-    "version": "6.5.0-SNAPSHOT"
+    "version": "6.5.0.event-SNAPSHOT"
   }
 }
 ----
@@ -782,6 +782,14 @@ flowable.http.socket-timeout=5s # Socket timeout for the http client
 flowable.http.connection-request-timeout=5s # Connection Request Timeout for the http client
 flowable.http.request-retry-limit=3 # Request retry limit for the http client
 flowable.http.disable-cert-verify=false # Whether to disable certificate validation for the http client
+
+# Flowable REST
+flowable.rest.app.cors.enabled=true # Whether to enable CORS requests at all. If false, the other properties have no effect
+flowable.rest.app.cors.allow-credentials=true # Whether to include credentials in a CORS request
+flowable.rest.app.cors.allowed-origins=* # Comma-separated URLs to accept CORS requests from
+flowable.rest.app.cors.allowed-headers=* # Comma-separated HTTP headers to allow in a CORS request
+flowable.rest.app.cors.allowed-methods=DELETE,GET,PATCH,POST,PUT # Comma-separated HTTP verbs to allow in a CORS request
+flowable.rest.app.cors.exposed-headers=* # Comma-separated list of headers to expose in CORS response
 
 # Actuator
 management.endpoint.flowable.cache.time-to-live=0ms # Maximum time that a response can be cached.

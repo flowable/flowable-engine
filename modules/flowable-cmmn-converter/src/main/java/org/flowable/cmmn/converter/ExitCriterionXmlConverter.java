@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.converter;
 
+import static org.flowable.cmmn.converter.CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE;
+
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.cmmn.model.CmmnElement;
@@ -36,6 +38,11 @@ public class ExitCriterionXmlConverter extends CriterionXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Criterion exitCriterion = (Criterion) super.convert(xtr, conversionHelper);
         exitCriterion.setExitCriterion(true);
+
+        // parse exit-sentry specific additional properties
+        exitCriterion.setExitType(xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EXIT_TYPE));
+        exitCriterion.setExitEventType(xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EXIT_EVENT_TYPE));
+
         conversionHelper.addExitCriteriaToCurrentElement(exitCriterion);
         return exitCriterion;
     }

@@ -115,9 +115,9 @@ public interface ActivityBehaviorFactory {
 
     public abstract ServiceTaskExpressionActivityBehavior createServiceTaskExpressionActivityBehavior(ServiceTask serviceTask);
 
-    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask);
+    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel);
 
-    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask);
+    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel);
 
     public abstract MailActivityBehavior createMailActivityBehavior(ServiceTask serviceTask);
 

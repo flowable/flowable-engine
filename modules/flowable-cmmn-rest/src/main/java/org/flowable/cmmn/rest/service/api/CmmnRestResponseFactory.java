@@ -57,7 +57,11 @@ import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
+import org.flowable.common.rest.variable.InstantRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
+import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
+import org.flowable.common.rest.variable.LocalDateRestVariableConverter;
+import org.flowable.common.rest.variable.LocalDateTimeRestVariableConverter;
 import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
@@ -459,6 +463,8 @@ public class CmmnRestResponseFactory {
         result.setParentId(caseInstance.getParentId());
         result.setCallbackId(caseInstance.getCallbackId());
         result.setCallbackType(caseInstance.getCallbackType());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
         result.setTenantId(caseInstance.getTenantId());
 
         for (String name : caseInstance.getCaseVariables().keySet()) {
@@ -484,6 +490,8 @@ public class CmmnRestResponseFactory {
         result.setParentId(caseInstance.getParentId());
         result.setCallbackId(caseInstance.getCallbackId());
         result.setCallbackType(caseInstance.getCallbackType());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
         result.setTenantId(caseInstance.getTenantId());
         result.setCompleted(false);
 
@@ -513,12 +521,19 @@ public class CmmnRestResponseFactory {
         PlanItemInstanceResponse result = new PlanItemInstanceResponse();
         result.setId(planItemInstance.getId());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItemInstance.getId()));
+        result.setName(planItemInstance.getName());
         result.setCaseDefinitionId(planItemInstance.getCaseDefinitionId());
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, planItemInstance.getCaseDefinitionId()));
+        if (planItemInstance.getDerivedCaseDefinitionId() != null) {
+            result.setDerivedCaseDefinitionId(planItemInstance.getDerivedCaseDefinitionId());
+            result.setDerivedCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, planItemInstance.getDerivedCaseDefinitionId()));
+        }
         result.setCaseInstanceId(planItemInstance.getCaseInstanceId());
         result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, planItemInstance.getCaseInstanceId()));
-        result.setStageInstanceId(planItemInstance.getStageInstanceId());
-        result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItemInstance.getStageInstanceId()));
+        if (planItemInstance.getStageInstanceId() != null) {
+            result.setStageInstanceId(planItemInstance.getStageInstanceId());
+            result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItemInstance.getStageInstanceId()));
+        }
         result.setPlanItemDefinitionId(planItemInstance.getPlanItemDefinitionId());
         result.setPlanItemDefinitionType(planItemInstance.getPlanItemDefinitionType());
         result.setState(planItemInstance.getState());
@@ -526,9 +541,23 @@ public class CmmnRestResponseFactory {
         result.setReferenceId(planItemInstance.getReferenceId());
         result.setReferenceType(planItemInstance.getReferenceType());
         result.setCreateTime(planItemInstance.getCreateTime());
+        result.setLastAvailableTime(planItemInstance.getLastAvailableTime());
+        result.setLastEnabledTime(planItemInstance.getLastEnabledTime());
+        result.setLastDisabledTime(planItemInstance.getLastDisabledTime());
+        result.setLastStartedTime(planItemInstance.getLastStartedTime());
+        result.setLastSuspendedTime(planItemInstance.getLastSuspendedTime());
+        result.setCompletedTime(planItemInstance.getCompletedTime());
+        result.setOccurredTime(planItemInstance.getOccurredTime());
+        result.setTerminatedTime(planItemInstance.getTerminatedTime());
+        result.setExitTime(planItemInstance.getExitTime());
+        result.setEndedTime(planItemInstance.getEndedTime());
         result.setStartUserId(planItemInstance.getStartUserId());
         result.setStage(planItemInstance.isStage());
-        result.setCompleteable(planItemInstance.isCompleteable());
+        result.setCompletable(planItemInstance.isCompletable());
+        result.setEntryCriterionId(planItemInstance.getEntryCriterionId());
+        result.setExitCriterionId(planItemInstance.getExitCriterionId());
+        result.setFormKey(planItemInstance.getFormKey());
+        result.setExtraValue(planItemInstance.getExtraValue());
         result.setTenantId(planItemInstance.getTenantId());
 
         return result;
@@ -565,6 +594,11 @@ public class CmmnRestResponseFactory {
             }
         }
         result.setTenantId(caseInstance.getTenantId());
+        result.setState(caseInstance.getState());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
+        result.setCallbackId(caseInstance.getCallbackId());
+        result.setCallbackType(caseInstance.getCallbackType());
         return result;
     }
 
@@ -725,6 +759,7 @@ public class CmmnRestResponseFactory {
         result.setName(historicPlanItemInstance.getName());
         result.setState(historicPlanItemInstance.getState());
         result.setCaseDefinitionId(historicPlanItemInstance.getCaseDefinitionId());
+        result.setDerivedCaseDefinitionId(historicPlanItemInstance.getDerivedCaseDefinitionId());
         result.setCaseInstanceId(historicPlanItemInstance.getCaseInstanceId());
         result.setStageInstanceId(historicPlanItemInstance.getStageInstanceId());
         result.setStage(historicPlanItemInstance.isStage());
@@ -742,13 +777,25 @@ public class CmmnRestResponseFactory {
         result.setTerminatedTime(historicPlanItemInstance.getTerminatedTime());
         result.setExitTime(historicPlanItemInstance.getExitTime());
         result.setEndedTime(historicPlanItemInstance.getEndedTime());
+        result.setLastUpdatedTime(historicPlanItemInstance.getLastUpdatedTime());
         result.setStartUserId(historicPlanItemInstance.getStartUserId());
         result.setReferenceId(historicPlanItemInstance.getReferenceId());
         result.setReferenceType(historicPlanItemInstance.getReferenceType());
+        result.setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());
+        result.setExitCriterionId(historicPlanItemInstance.getExitCriterionId());
+        result.setFormKey(historicPlanItemInstance.getFormKey());
+        result.setExtraValue(historicPlanItemInstance.getExtraValue());
+        result.setShowInOverview(historicPlanItemInstance.isShowInOverview());
         result.setTenantId(historicPlanItemInstance.getTenantId());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, historicPlanItemInstance.getId()));
-        result.setHistoricCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, historicPlanItemInstance.getCaseInstanceId()));
+        result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, historicPlanItemInstance.getCaseInstanceId()));
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, historicPlanItemInstance.getCaseDefinitionId()));
+        if (historicPlanItemInstance.getDerivedCaseDefinitionId() != null) {
+            result.setDerivedCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, historicPlanItemInstance.getDerivedCaseDefinitionId()));
+        }
+        if (historicPlanItemInstance.getStageInstanceId() != null) {
+            result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, historicPlanItemInstance.getStageInstanceId()));
+        }
         return result;
     }
 
@@ -853,6 +900,10 @@ public class CmmnRestResponseFactory {
         variableConverters.add(new DoubleRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
+        variableConverters.add(new InstantRestVariableConverter());
+        variableConverters.add(new LocalDateRestVariableConverter());
+        variableConverters.add(new LocalDateTimeRestVariableConverter());
+        variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 
     protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+    xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" 
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Milestone One" definitionRef="milestone1" />
+            <planItem id="planItem2" name="Stage One" definitionRef="stage1" />
+
+            <milestone id="milestone1" name="Milestone 1" flowable:displayOrder="5" flowable:includeInStageOverview="false" />
+
+            <stage id="stage1" name="Nested Stage">
+
+                <planItem id="planItem3" name="Milestone Two" definitionRef="milestone2" />
+                
+                <milestone id="milestone2" name="Milestone 2" flowable:displayOrder="3" flowable:includeInStageOverview="true" />
+
+            </stage>
+
+        </casePlanModel>
+    </case>
+    
+</definitions>

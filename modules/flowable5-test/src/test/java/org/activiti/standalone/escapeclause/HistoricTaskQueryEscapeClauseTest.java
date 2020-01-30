@@ -101,17 +101,17 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByProcessDefinitionKeyLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // processDefinitionKeyLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLike("%\\%%").list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLike("%|%%").list();
             assertEquals(0, list.size());
 
-            list = historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLike("%\\_%").list();
+            list = historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLike("%|_%").list();
             assertEquals(0, list.size());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionKeyLike("%\\%%").processDefinitionId("undefined").list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionKeyLike("%|%%").processDefinitionId("undefined").list();
             assertEquals(0, list.size());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionKeyLike("%\\_%").processDefinitionId("undefined").list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionKeyLike("%|_%").processDefinitionId("undefined").list();
             assertEquals(0, list.size());
         }
     }
@@ -119,17 +119,17 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByProcessDefinitionKeyLikeIgnoreCase() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // processDefinitionKeyLikeIgnoreCase
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLikeIgnoreCase("%\\%%").list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLikeIgnoreCase("%|%%").list();
             assertEquals(0, list.size());
 
-            list = historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLikeIgnoreCase("%\\_%").list();
+            list = historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLikeIgnoreCase("%|_%").list();
             assertEquals(0, list.size());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionKeyLikeIgnoreCase("%\\%%").processDefinitionId("undefined").list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionKeyLikeIgnoreCase("%|%%").processDefinitionId("undefined").list();
             assertEquals(0, list.size());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionKeyLikeIgnoreCase("%\\_%").processDefinitionId("undefined").list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionKeyLikeIgnoreCase("%|_%").processDefinitionId("undefined").list();
             assertEquals(0, list.size());
         }
     }
@@ -137,7 +137,7 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByProcessDefinitionNameLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // processDefinitionNameLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processDefinitionNameLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processDefinitionNameLike("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(4, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
@@ -145,7 +145,7 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
             assertEquals(task4.getId(), list.get(3).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionNameLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processDefinitionNameLike("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(4, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
@@ -157,23 +157,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByProcessInstanceBusinessKeyLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // processInstanceBusinessKeyLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task2.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task3.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLike("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task2.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLike("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task3.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -183,23 +183,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByProcessInstanceBusinessKeyLikeIgnoreCase() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // processInstanceBusinessKeyLikeIgnoreCase
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task2.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task3.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLikeIgnoreCase("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task2.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().processInstanceBusinessKeyLikeIgnoreCase("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task3.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -209,17 +209,17 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskDefinitionKeyLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskDefinitionKeyLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskDefinitionKeyLike("%\\%%").list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskDefinitionKeyLike("%|%%").list();
             assertEquals(0, list.size());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskDefinitionKeyLike("%\\_%").list();
+            list = historyService.createHistoricTaskInstanceQuery().taskDefinitionKeyLike("%|_%").list();
             assertEquals(0, list.size());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKeyLike("%\\%%").processDefinitionId("undefined").list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKeyLike("%|%%").processDefinitionId("undefined").list();
             assertEquals(0, list.size());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKeyLike("%\\_%").processDefinitionId("undefined").list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKeyLike("%|_%").processDefinitionId("undefined").list();
             assertEquals(0, list.size());
         }
     }
@@ -227,23 +227,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskNameLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskNameLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskNameLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskNameLike("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskNameLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskNameLike("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskNameLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskNameLike("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskNameLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskNameLike("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -253,23 +253,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskNameLikeIgnoreCase() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskNameLikeIgnoreCase
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -279,23 +279,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskDescriptionLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskDescriptionLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLike("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLike("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -305,23 +305,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskDescriptionLikeIgnoreCase() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskDescriptionLikeIgnoreCase
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLikeIgnoreCase("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskDescriptionLikeIgnoreCase("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLikeIgnoreCase("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskDescriptionLikeIgnoreCase("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -339,20 +339,20 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
             taskService.deleteTask(task6.getId(), "deleteReason_");
 
             // taskDeleteReasonLike
-            HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskDeleteReasonLike("%\\%%").singleResult();
+            HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskDeleteReasonLike("%|%%").singleResult();
             assertNotNull(historicTask);
             assertEquals(task5.getId(), historicTask.getId());
 
-            historicTask = historyService.createHistoricTaskInstanceQuery().taskDeleteReasonLike("%\\_%").singleResult();
+            historicTask = historyService.createHistoricTaskInstanceQuery().taskDeleteReasonLike("%|_%").singleResult();
             assertNotNull(historicTask);
             assertEquals(task6.getId(), historicTask.getId());
 
             // orQuery
-            historicTask = historyService.createHistoricTaskInstanceQuery().or().taskDeleteReasonLike("%\\%%").processDefinitionId("undefined").singleResult();
+            historicTask = historyService.createHistoricTaskInstanceQuery().or().taskDeleteReasonLike("%|%%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicTask);
             assertEquals(task5.getId(), historicTask.getId());
 
-            historicTask = historyService.createHistoricTaskInstanceQuery().or().taskDeleteReasonLike("%\\_%").processDefinitionId("undefined").singleResult();
+            historicTask = historyService.createHistoricTaskInstanceQuery().or().taskDeleteReasonLike("%|_%").processDefinitionId("undefined").singleResult();
             assertNotNull(historicTask);
             assertEquals(task6.getId(), historicTask.getId());
 
@@ -365,23 +365,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskOwnerLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskOwnerLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskOwnerLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskOwnerLike("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskOwnerLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskOwnerLike("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLike("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLike("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -391,23 +391,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskOwnerLikeIgnoreCase() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskOwnerLikeIgnoreCase
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskOwnerLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskOwnerLikeIgnoreCase("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskOwnerLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskOwnerLikeIgnoreCase("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLikeIgnoreCase("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskOwnerLikeIgnoreCase("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -417,23 +417,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskAssigneeLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskAssigneeLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLike("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLike("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -443,23 +443,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskAssigneeLikeIgnoreCase() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // taskAssigneeLikeIgnoreCase
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLikeIgnoreCase("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLikeIgnoreCase("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLikeIgnoreCase("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskAssigneeLikeIgnoreCase("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLikeIgnoreCase("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLikeIgnoreCase("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLikeIgnoreCase("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLikeIgnoreCase("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -469,23 +469,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTenantIdLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // tenantIdLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskTenantIdLike("%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskTenantIdLike("%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task2.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskTenantIdLike("%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskTenantIdLike("%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task3.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskTenantIdLike("%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskTenantIdLike("%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task2.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskTenantIdLike("%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskTenantIdLike("%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task3.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -495,23 +495,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryLikeByQueryVariableValue() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // variableValueLike
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLike("var1", "%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLike("var1", "%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLike("var1", "%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLike("var1", "%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLike("var1", "%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLike("var1", "%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLike("var1", "%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLike("var1", "%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
@@ -521,23 +521,23 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryLikeIgnoreCaseByQueryVariableValue() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // variableValueLikeIgnoreCase
-            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLikeIgnoreCase("var1", "%\\%%").orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLikeIgnoreCase("var1", "%|%%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLikeIgnoreCase("var1", "%\\_%").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().taskVariableValueLikeIgnoreCase("var1", "%|_%").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());
 
             // orQuery
-            list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLikeIgnoreCase("var1", "%\\%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLikeIgnoreCase("var1", "%|%%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task1.getId(), list.get(0).getId());
             assertEquals(task3.getId(), list.get(1).getId());
 
-            list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLikeIgnoreCase("var1", "%\\_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
+            list = historyService.createHistoricTaskInstanceQuery().or().taskVariableValueLikeIgnoreCase("var1", "%|_%").processDefinitionId("undefined").orderByHistoricTaskInstanceStartTime().asc().list();
             assertEquals(2, list.size());
             assertEquals(task2.getId(), list.get(0).getId());
             assertEquals(task4.getId(), list.get(1).getId());

@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.api.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.time.Duration;
 import java.util.Date;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -20,6 +24,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -328,5 +333,57 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     public void testGetTableName() {
         String table = managementService.getTableName(EventSubscriptionEntity.class, false);
         assertEquals("ACT_RU_EVENT_SUBSCR", table);
+    }
+
+    @Test
+    void testAcquireAlreadyAcquiredLock() {
+        String lockName = "testLock";
+        LockManager testLockManager1 = managementService.getLockManager(lockName);
+
+        assertThat(testLockManager1.acquireLock()).isTrue();
+        // acquiring the lock from the same lock manager should always return true
+        assertThat(testLockManager1.acquireLock()).isTrue();
+        assertThat(managementService.getProperties()).containsKey(lockName);
+
+        LockManager testLockManager2 = managementService.getLockManager(lockName);
+        assertThat(testLockManager2.acquireLock()).isFalse();
+
+        testLockManager1.releaseLock();
+        assertThat(managementService.getProperties()).doesNotContainKey(lockName);
+
+        assertThat(testLockManager2.acquireLock()).isTrue();
+        assertThat(testLockManager1.acquireLock()).isFalse();
+
+        assertThat(managementService.getProperties()).containsKey(lockName);
+        testLockManager2.releaseLock();
+        assertThat(managementService.getProperties()).doesNotContainKey(lockName);
+    }
+
+    @Test
+    void testWaitForLock() {
+        Duration initialLockPollRate = processEngineConfiguration.getLockPollRate();
+        try {
+            processEngineConfiguration.setLockPollRate(Duration.ofMillis(100));
+            String lockName = "testWaitForLock";
+            LockManager testLockManager1 = managementService.getLockManager(lockName);
+
+            testLockManager1.waitForLock(Duration.ofMillis(100));
+            assertThat(testLockManager1.acquireLock()).isTrue();
+            // acquiring the lock from the same lock manager should always return true
+
+            LockManager testLockManager2 = managementService.getLockManager(lockName);
+            assertThatThrownBy(() -> testLockManager2.waitForLock(Duration.ofMillis(250)))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Could not acquire lock testWaitForLock. Current lock value:");
+            assertThat(testLockManager2.acquireLock()).isFalse();
+
+            testLockManager1.releaseLock();
+            testLockManager2.waitForLock(Duration.ofSeconds(1));
+            assertThat(testLockManager2.acquireLock()).isTrue();
+            testLockManager2.releaseLock();
+            assertThat(managementService.getProperties()).doesNotContainKey(lockName);
+        } finally {
+            processEngineConfiguration.setLockPollRate(initialLockPollRate);
+        }
     }
 }

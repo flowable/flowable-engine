@@ -30,8 +30,7 @@ public class SpringLimitedExpressionsTest extends SpringFlowableTestCase {
 
     @Deployment
     public void testLimitedBeansExposed() throws Exception {
-        // Start process, which has a service-task which calls 'bean1', which is
-        // exposed
+        // Start process, which has a service-task which calls 'bean1', which is exposed
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("limitedExpressionProcess");
 
         String beanOutput = (String) runtimeService.getVariable(processInstance.getId(), "beanOutput");

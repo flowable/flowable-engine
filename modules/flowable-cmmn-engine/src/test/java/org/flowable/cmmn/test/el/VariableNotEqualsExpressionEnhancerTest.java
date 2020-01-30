@@ -22,17 +22,17 @@ import org.junit.Test;
  */
 public class VariableNotEqualsExpressionEnhancerTest {
     
-    private VariableNotEqualsExpressionFunction expressionFunction = new VariableNotEqualsExpressionFunction("planItemInstance");
+    private VariableNotEqualsExpressionFunction expressionFunction = new VariableNotEqualsExpressionFunction();
     
     @Test
     public void testRegexNameReplacement() {
-        assertRegexCorrect("${variables:notEquals(myVar,123)}", "${variables:notEquals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${vars:notEquals(myVar,123)}", "${variables:notEquals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${var:notEquals(myVar,123)}", "${variables:notEquals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect("${variables:notEquals(myVar,123)}", "${variables:notEquals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${vars:notEquals(myVar,123)}", "${variables:notEquals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${var:notEquals(myVar,123)}", "${variables:notEquals(variableContainer,'myVar',123)}");
         
-        assertRegexCorrect("${variables:ne(myVar,123)}", "${variables:notEquals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${vars:ne(myVar,123)}", "${variables:notEquals(planItemInstance,'myVar',123)}");
-        assertRegexCorrect("${var:ne(myVar,123)}", "${variables:notEquals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect("${variables:ne(myVar,123)}", "${variables:notEquals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${vars:ne(myVar,123)}", "${variables:notEquals(variableContainer,'myVar',123)}");
+        assertRegexCorrect("${var:ne(myVar,123)}", "${variables:notEquals(variableContainer,'myVar',123)}");
     }
         
     public void assertRegexCorrect(String in, String out) {

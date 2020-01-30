@@ -23,6 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -90,6 +92,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
                 .caseDefinitionKey("oneHumanTaskCase")
                 .name("someName")
                 .businessKey("someBusinessKey")
+                .callbackId("someCallbackId")
+                .callbackType("someCallbackType")
+                .referenceId("someReferenceId")
+                .referenceType("someReferenceType")
                 .start();
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
         
@@ -103,6 +109,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertEquals("someBusinessKey", historicCaseInstance.getBusinessKey());
         assertEquals(caseInstance.getCaseDefinitionId(), historicCaseInstance.getCaseDefinitionId());
         assertEquals(CaseInstanceState.ACTIVE, historicCaseInstance.getState());
+        assertEquals("someCallbackId", historicCaseInstance.getCallbackId());
+        assertEquals("someCallbackType", historicCaseInstance.getCallbackType());
+        assertEquals("someReferenceId", historicCaseInstance.getReferenceId());
+        assertEquals("someReferenceType", historicCaseInstance.getReferenceType());
         assertNotNull(historicCaseInstance.getStartTime());
         assertNull(historicCaseInstance.getEndTime());
         
@@ -119,6 +129,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertEquals("someBusinessKey", historicCaseInstance.getBusinessKey());
         assertEquals(caseInstance.getCaseDefinitionId(), historicCaseInstance.getCaseDefinitionId());
         assertEquals(CaseInstanceState.COMPLETED, historicCaseInstance.getState());
+        assertEquals("someCallbackId", historicCaseInstance.getCallbackId());
+        assertEquals("someCallbackType", historicCaseInstance.getCallbackType());
+        assertEquals("someReferenceId", historicCaseInstance.getReferenceId());
+        assertEquals("someReferenceType", historicCaseInstance.getReferenceType());
         assertNotNull(historicCaseInstance.getStartTime());
         assertNotNull(historicCaseInstance.getEndTime());
     }
@@ -398,6 +412,70 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
     
     @Test
     @CmmnDeployment
+    public void testCasePageTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneCasePageTask").start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals(2, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertEquals(1, cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                        .planItemInstanceFormKey("testKey")
+                        .planItemInstanceCaseInstanceId(caseInstance.getId())
+                        .singleResult();
+        assertEquals("The Case Page Task", historicPlanItemInstance.getName());
+        assertEquals("testKey", historicPlanItemInstance.getFormKey());
+        assertEquals("testKey", historicPlanItemInstance.getExtraValue());
+        assertNull(historicPlanItemInstance.getEndedTime());
+        
+        List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForPlanItemInstance(historicPlanItemInstance.getId());
+        assertEquals(5, historicIdentityLinks.size());
+        
+        List<HistoricIdentityLink> historicAssigneeLink = historicIdentityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.ASSIGNEE)).collect(Collectors.toList());
+        assertEquals(1, historicAssigneeLink.size());
+        assertEquals("johnDoe", historicAssigneeLink.get(0).getUserId());
+        
+        List<HistoricIdentityLink> historicOwnerLink = historicIdentityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.OWNER)).collect(Collectors.toList());
+        assertEquals(1, historicOwnerLink.size());
+        assertEquals("janeDoe", historicOwnerLink.get(0).getUserId());
+        
+        List<HistoricIdentityLink> historicCandidateUserLinks = historicIdentityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) && 
+                        identityLink.getUserId() != null).collect(Collectors.toList());
+        assertEquals(2, historicCandidateUserLinks.size());
+        List<String> linkValues = new ArrayList<>();
+        for (HistoricIdentityLink candidateLink : historicCandidateUserLinks) {
+            linkValues.add(candidateLink.getUserId());
+        }
+        assertTrue(linkValues.contains("johnDoe"));
+        assertTrue(linkValues.contains("janeDoe"));
+        
+        List<HistoricIdentityLink> historicGroupLink = historicIdentityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
+                        identityLink.getGroupId() != null).collect(Collectors.toList());
+        assertEquals(1, historicGroupLink.size());
+        assertEquals("sales", historicGroupLink.get(0).getGroupId());
+        
+        // Complete
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(historicTaskInstance.getEndTime());
+        
+        assertEquals(2, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
+        historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                        .planItemInstanceFormKey("testKey")
+                        .planItemInstanceCaseInstanceId(caseInstance.getId())
+                        .singleResult();
+        assertNotNull(historicPlanItemInstance.getEndedTime());
+    }
+    
+    @Test
+    @CmmnDeployment
     public void testPlanItemInstances() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleCaseFlow").start();
         List<PlanItemInstance> currentPlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
@@ -412,6 +490,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertTrue(historicPlanItemInstances.stream().map(HistoricPlanItemInstance::getPlanItemDefinitionType).anyMatch(PlanItemDefinitionType.MILESTONE::equalsIgnoreCase));
         assertTrue(historicPlanItemInstances.stream().anyMatch(h -> "task".equalsIgnoreCase(h.getPlanItemDefinitionType()) && "planItemTaskA".equalsIgnoreCase(h.getElementId())));
         
+        boolean showInOverviewMilestone = false;
+        Date lastEnabledTimeTaskA = null;
         for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
             assertEquals(caseInstance.getId(), historicPlanItemInstance.getCaseInstanceId());
             assertEquals(caseInstance.getCaseDefinitionId(), historicPlanItemInstance.getCaseDefinitionId());
@@ -426,12 +506,17 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
             assertNull(historicPlanItemInstance.getEntryCriterionId());
             assertNull(historicPlanItemInstance.getExitCriterionId());
             
-            if (historicPlanItemInstance.getElementId().equals("planItemTaskA")) {
-                assertNotNull(historicPlanItemInstance.getLastEnabledTime());
+            if ("planItemTaskA".equals(historicPlanItemInstance.getElementId())) {
+                lastEnabledTimeTaskA = historicPlanItemInstance.getLastEnabledTime();
+            } else if ("planItemMilestoneOne".equals(historicPlanItemInstance.getElementId())) {
+                showInOverviewMilestone = historicPlanItemInstance.isShowInOverview();
             } else {
                 assertNull(historicPlanItemInstance.getLastEnabledTime());
             }
         }
+        
+        assertNotNull(lastEnabledTimeTaskA);
+        assertTrue(showInOverviewMilestone);
         
         // Disable task
         PlanItemInstance task = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemTaskA").singleResult();
@@ -499,6 +584,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertNull(completedHistoricPlanItemInstance.getTerminatedTime());
         assertNotNull(completedHistoricPlanItemInstance.getLastUpdatedTime());
         assertTrue(historicPlanItemInstance.getLastUpdatedTime().before(completedHistoricPlanItemInstance.getLastUpdatedTime()));
+        
+        HistoricPlanItemInstance completedMilestoneInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceElementId("planItemMilestoneOne").singleResult();
+        assertNotNull(completedMilestoneInstance.getEndedTime());
+        assertTrue(completedMilestoneInstance.isShowInOverview());
         
         cmmnEngineConfiguration.getClock().reset();
     }
@@ -669,7 +758,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
     @Test
     @CmmnDeployment
     public void testPlanItemInstancesStateChangesWithFixedTime() {
-        Date fixTime = Date.from(Instant.now());
+        // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+        Date fixTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(823));
         cmmnEngineConfiguration.getClock().setCurrentTime(fixTime);
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

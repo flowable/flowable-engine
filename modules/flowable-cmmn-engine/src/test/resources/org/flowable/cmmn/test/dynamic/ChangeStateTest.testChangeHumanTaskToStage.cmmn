@@ -21,11 +21,11 @@
                 </planItemOnPart>
             </sentry>
 
-            <humanTask id="task1" name="Task 1" flowable:assignee="kermit" />
+            <humanTask id="task1" name="Task One" flowable:assignee="kermit" />
 
             <stage id="stage1" name="Stage One">
                 <planItem id="subPlanItem1" name="Sub task One" definitionRef="subTask1" />
-                <humanTask id="subTask1" name="Sub task 1" flowable:assignee="kermit" />
+                <humanTask id="subTask1" name="Sub task One" flowable:assignee="kermit" />
             </stage>
 
         </casePlanModel>

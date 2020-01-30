@@ -69,6 +69,7 @@ public class BoundaryEventConverterTest extends AbstractConverterTest {
         assertFalse(timerElement.isCancelActivity());
         assertEquals("PT5M", timerEvent.getTimeDuration());
         assertEquals("sid-F21E9F4D-EA19-44DF-B1D3-14663A809CAE", errorElement.getAttachedToRefId());
+        assertEquals("myCalendarName", ((TimerEventDefinition) extractEventDefinition(timerElement)).getCalendarName());
 
     }
 

@@ -19,8 +19,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -46,12 +46,12 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
             cmmnTaskService.complete(task.getId());
                 
-            HistoricCaseInstanceQueryImpl query = new HistoricCaseInstanceQueryImpl();
+            HistoricCaseInstanceQuery query = cmmnHistoryService.createHistoricCaseInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
             query.finishedBefore(cal.getTime());
                     
-            cmmnHistoryService.deleteHistoricCaseInstancesAndRelatedData(query);
+            query.deleteWithRelatedData();
             
             assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
             assertEquals(0, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
@@ -84,11 +84,11 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
                 cmmnTaskService.complete(task.getId());
             }
                     
-            HistoricCaseInstanceQueryImpl query = new HistoricCaseInstanceQueryImpl();
+            HistoricCaseInstanceQuery query = cmmnHistoryService.createHistoricCaseInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
             query.finishedBefore(cal.getTime());
-            cmmnHistoryService.deleteHistoricCaseInstancesAndRelatedData(query);
+            query.deleteWithRelatedData();
             
             assertEquals(10, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
             assertEquals(20, cmmnHistoryService.createHistoricPlanItemInstanceQuery().count());

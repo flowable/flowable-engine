@@ -71,6 +71,19 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             }
         };
 
+        $scope.showCaseDiagram = function () {
+            $modal.open({
+                templateUrl: 'views/case-instance-diagram-popup.html',
+                windowClass: 'modal modal-full-width',
+                controller: 'ShowCaseInstanceDiagramPopupCtrl',
+                resolve: {
+                    caseInstance: function () {
+                        return $scope.caseInstance;
+                    }
+                }
+            });
+        }
+
         $scope.openDecisionTable = function (decisionTable) {
             if (decisionTable && decisionTable.getProperty('id')) {
                 $location.path("/decision-table-execution/" + decisionTable.getProperty('id'));
@@ -142,6 +155,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridTasks = {
                     data: 'tasks.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -171,6 +185,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridVariables = {
                     data: 'variables.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -195,6 +210,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridJobs = {
                     data: 'jobs.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -219,6 +235,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridDecisionTables = {
                     data: 'decisionTables.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -248,6 +265,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 $scope.gridFormInstances = {
                     data: 'formInstances.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,
@@ -501,13 +519,13 @@ flowableAdminApp.controller('ShowCaseInstanceDiagramPopupCtrl',
         };
 
         $timeout(function () {
-            $("#bpmnModel").attr("data-instance-id", caseInstance.id);
-            $("#bpmnModel").attr("data-definition-id", caseInstance.caseDefinitionId);
-            $("#bpmnModel").attr("data-server-id", $rootScope.activeServers['cmmn'].id);
-            if (process.endTime != undefined) {
-                $("#bpmnModel").attr("data-history-id", caseInstance.id);
+            $("#cmmnModel").attr("data-instance-id", caseInstance.id);
+            $("#cmmnModel").attr("data-definition-id", caseInstance.caseDefinitionId);
+            $("#cmmnModel").attr("data-server-id", $rootScope.activeServers['cmmn'].id);
+            if (caseInstance.endTime != undefined) {
+                $("#cmmnModel").attr("data-history-id", caseInstance.id);
             }
-            $("#bpmnModel").load("./display/displaymodel.html?instanceId=" + caseInstance.id);
+            $("#cmmnModel").load("./display-cmmn/displaymodel.html?instanceId=" + caseInstance.id);
         }, 200);
 
 

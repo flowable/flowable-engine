@@ -70,6 +70,11 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(fallbackToDefaultTenant)) {
             callActivity.setFallbackToDefaultTenant(Boolean.valueOf(fallbackToDefaultTenant));
         }
+
+        String idVariableName = BpmnXMLUtil.getAttributeValue(BpmnXMLConstants.ATTRIBUTE_ID_VARIABLE_NAME, xtr);
+        if (StringUtils.isNotEmpty(idVariableName)) {
+            callActivity.setProcessInstanceIdVariableName(idVariableName);
+        }
         
         parseChildElements(getXMLElementName(), callActivity, childParserMap, model, xtr);
         return callActivity;
@@ -107,6 +112,9 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         }
         if (callActivity.getFallbackToDefaultTenant() != null) {
             writeQualifiedAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, callActivity.getFallbackToDefaultTenant().toString(), xtw);
+        }
+        if (callActivity.getProcessInstanceIdVariableName() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_ID_VARIABLE_NAME, callActivity.getProcessInstanceIdVariableName(), xtw);
         }
     }
 

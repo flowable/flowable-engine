@@ -14,7 +14,7 @@ package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
 
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * Compares the value of a variable (fetched using the variableName through the variable scope).
@@ -24,19 +24,19 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableNotEqualsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableNotEqualsExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("notEquals", "ne"), "notEquals");
+    public VariableNotEqualsExpressionFunction() {
+        super(Arrays.asList("notEquals", "ne"), "notEquals");
     }
 
-    public static boolean notEquals(VariableScope variableScope, String variableName, Object variableValue) {
+    public static boolean notEquals(VariableContainer variableContainer, String variableName, Object variableValue) {
         
         // Special handling for null: when the variable is null, false is returned.
         // This is similar to equals, where a null variable value will always return false 
         // (it's effectively ignored) - unless it's compared to null itself)
         
-        Object actualValue = getVariableValue(variableScope, variableName);
+        Object actualValue = getVariableValue(variableContainer, variableName);
         if (actualValue != null) {
-            return !VariableEqualsExpressionFunction.equals(variableScope, variableName, variableValue);
+            return !VariableEqualsExpressionFunction.equals(variableContainer, variableName, variableValue);
         }
         
         return false;

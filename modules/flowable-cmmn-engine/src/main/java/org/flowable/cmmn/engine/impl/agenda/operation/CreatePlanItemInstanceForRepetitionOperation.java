@@ -36,4 +36,9 @@ public class CreatePlanItemInstanceForRepetitionOperation extends CreatePlanItem
         return PlanItemTransition.CREATE;
     }
 
+    @Override
+    protected String getOperationName() {
+        return "[Create plan item for repetition]";
+    }
+
 }

@@ -29,7 +29,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     protected String formKey; // For the start form of the plan model. Null otherwise
     protected String validateFormFields;
     protected Integer displayOrder;
-    protected boolean includeInStageOverview;
+    protected String includeInStageOverview;
     protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
 
     public void addPlanItemDefinition(PlanItemDefinition planItemDefinition) {
@@ -158,11 +158,11 @@ public class Stage extends PlanFragment implements HasExitCriteria {
         this.displayOrder = displayOrder;
     }
 
-    public  boolean isIncludeInStageOverview() {
+    public String getIncludeInStageOverview() {
         return includeInStageOverview;
     }
 
-    public void setIncludeInStageOverview(boolean includeInStageOverview) {
+    public void setIncludeInStageOverview(String includeInStageOverview) {
         this.includeInStageOverview = includeInStageOverview;
     }
 

@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -42,6 +43,17 @@ public interface CmmnHistoryService {
     HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
 
     HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery();
+    
+    /**
+     * Gives back a stage overview of the historic case instance which includes the stage information of the case model.
+     * 
+     * @param caseInstanceId
+     *            id of the case instance, cannot be null.
+     * @return list of stage info objects 
+     * @throws FlowableObjectNotFoundException
+     *             when the case instance doesn't exist.
+     */
+    List<StageResponse> getStageOverview(String caseInstanceId);
 
     void deleteHistoricCaseInstance(String caseInstanceId);
     
@@ -50,20 +62,6 @@ public interface CmmnHistoryService {
      * historic task instance doesn't exist, no exception is thrown and the method returns normal.
      */
     void deleteHistoricTaskInstance(String taskId);
-    
-    /**
-     * Deletes matching historic case instances
-     * 
-     * @param caseInstanceQuery the query to match case instances to delete
-     */
-    void deleteHistoricCaseInstances(HistoricCaseInstanceQuery caseInstanceQuery);
-    
-    /**
-     * Deletes matching historic case instances
-     * 
-     * @param caseInstanceQuery the query to match case instances to delete
-     */
-    void deleteHistoricCaseInstancesAndRelatedData(HistoricCaseInstanceQuery caseInstanceQuery);
     
     /**
      * Retrieves the {@link HistoricIdentityLink}s associated with the given task. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a certain task
@@ -76,6 +74,12 @@ public interface CmmnHistoryService {
      * certain case instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
      */
     List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String caseInstanceId);
+    
+    /**
+     * Retrieves the {@link HistoricIdentityLink}s associated with the given plan item instance. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a
+     * certain case instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
+     */
+    List<HistoricIdentityLink> getHistoricIdentityLinksForPlanItemInstance(String planItemInstanceId);
     
     /**
      * Retrieves the {@link HistoricEntityLink}s associated with the given case instance.

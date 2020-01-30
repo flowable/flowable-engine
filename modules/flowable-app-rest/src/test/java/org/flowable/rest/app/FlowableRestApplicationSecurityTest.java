@@ -57,7 +57,6 @@ public class FlowableRestApplicationSecurityTest {
         Arrays.asList(
             "self",
             "flowable",
-            "auditevents",
             "beans",
             "health",
             "conditions",
@@ -72,12 +71,10 @@ public class FlowableRestApplicationSecurityTest {
             "metrics",
             "metrics-requiredMetricName",
             "scheduledtasks",
-            "httptrace",
             "mappings",
             "caches",
             "caches-cache",
-            "health-component",
-            "health-component-instance"
+            "health-path"
         )
     );
 

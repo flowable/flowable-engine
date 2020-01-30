@@ -12,7 +12,7 @@
  */
 package org.flowable.task.api;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Allows programmatic querying of {@link Task}s;
@@ -30,7 +30,7 @@ public interface TaskQuery extends TaskInfoQuery<TaskQuery, Task> {
     TaskQuery taskDelegationState(DelegationState delegationState);
 
     /**
-     * Select tasks that has been claimed or assigned to user or waiting to claim by user (candidate user or groups). You can invoke {@link #taskCandidateGroupIn(List)} to include tasks that can be
+     * Select tasks that has been claimed or assigned to user or waiting to claim by user (candidate user or groups). You can invoke {@link TaskInfoQuery#taskCandidateGroupIn(Collection)} to include tasks that can be
      * claimed by a user in the given groups while set property <strong>dbIdentityUsed</strong> to <strong>false</strong> in process engine configuration or using custom session factory of
      * GroupIdentityManager.
      */

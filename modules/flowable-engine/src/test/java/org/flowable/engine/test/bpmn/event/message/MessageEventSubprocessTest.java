@@ -13,17 +13,26 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.List;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
 
@@ -527,6 +536,133 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
 
         // done!
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+    }
+
+    @Test
+    @Deployment
+    public void testNonInterruptingSimpleActivities() {
+        runtimeService.startProcessInstanceByKey("testSimpleMessageEventSubProcess");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task")
+            );
+
+        // Message the Event sub process
+        Execution eventMessageExecution = runtimeService.createExecutionQuery().messageEventSubscriptionName("eventMessage").singleResult();
+        assertThat(eventMessageExecution).isNotNull();
+        runtimeService.messageEventReceived("eventMessage", eventMessageExecution.getId());
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "messageEventSubProcess"),
+                tuple("startEvent", "eventSubProcessMessageStart"),
+                tuple("sequenceFlow", "eventSubProcessFlow1"),
+                tuple("userTask", "eventSubProcessTask1")
+            );
+
+        // Complete the user task in the event sub process
+        Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask1").singleResult();
+        assertThat(eventSubProcessTask).isNotNull();
+        taskService.complete(eventSubProcessTask.getId());
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "messageEventSubProcess"),
+                tuple("startEvent", "eventSubProcessMessageStart"),
+                tuple("sequenceFlow", "eventSubProcessFlow1"),
+                tuple("userTask", "eventSubProcessTask1"),
+                tuple("sequenceFlow", "eventSubProcessFlow2"),
+                tuple("endEvent", "eventSubProcessEnd")
+            );
+
+        ActivityInstance eventSubProcessActivity = runtimeService.createActivityInstanceQuery()
+            .activityType("eventSubProcess")
+            .activityId("messageEventSubProcess")
+            .singleResult();
+        assertThat(eventSubProcessActivity).isNotNull();
+        assertThat(eventSubProcessActivity.getEndTime()).isNotNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                    tuple("startEvent", "start"),
+                    tuple("sequenceFlow", "flow1"),
+                    tuple("userTask", "task"),
+                    tuple("eventSubProcess", "messageEventSubProcess"),
+                    tuple("startEvent", "eventSubProcessMessageStart"),
+                    tuple("sequenceFlow", "eventSubProcessFlow1"),
+                    tuple("userTask", "eventSubProcessTask1"),
+                    tuple("sequenceFlow", "eventSubProcessFlow2"),
+                    tuple("endEvent", "eventSubProcessEnd")
+                );
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testInterruptingSimpleActivities() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSimpleMessageEventSubProcess");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task")
+            );
+
+        // Message the Event sub process
+        Execution eventMessageExecution = runtimeService.createExecutionQuery().messageEventSubscriptionName("eventMessage").singleResult();
+        assertThat(eventMessageExecution).isNotNull();
+        runtimeService.messageEventReceived("eventMessage", eventMessageExecution.getId());
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+            .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+            .containsExactlyInAnyOrder(
+                tuple("startEvent", "start"),
+                tuple("sequenceFlow", "flow1"),
+                tuple("userTask", "task"),
+                tuple("eventSubProcess", "messageEventSubProcess"),
+                tuple("startEvent", "eventSubProcessMessageStart"),
+                tuple("sequenceFlow", "eventSubProcessFlow1"),
+                tuple("userTask", "eventSubProcessTask1")
+            );
+
+        // Complete the user task in the event sub process
+        Task eventSubProcessTask = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask1").singleResult();
+        assertThat(eventSubProcessTask).isNotNull();
+        taskService.complete(eventSubProcessTask.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                    tuple("startEvent", "start"),
+                    tuple("sequenceFlow", "flow1"),
+                    tuple("userTask", "task"),
+                    tuple("eventSubProcess", "messageEventSubProcess"),
+                    tuple("startEvent", "eventSubProcessMessageStart"),
+                    tuple("sequenceFlow", "eventSubProcessFlow1"),
+                    tuple("userTask", "eventSubProcessTask1"),
+                    tuple("sequenceFlow", "eventSubProcessFlow2"),
+                    tuple("endEvent", "eventSubProcessEnd")
+                );
+        }
+
+        assertProcessEnded(processInstance.getId());
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

@@ -13,6 +13,8 @@
 package org.flowable.compatibility.test;
 
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -22,6 +24,8 @@ import org.junit.Rule;
 
 public abstract class AbstractFlowable6CompatibilityTest {
 
+    protected ProcessEngine processEngine;
+    protected ProcessEngineConfiguration processEngineConfiguration;
     protected RepositoryService repositoryService;
     protected RuntimeService runtimeService;
     protected TaskService taskService;
@@ -32,6 +36,8 @@ public abstract class AbstractFlowable6CompatibilityTest {
 
     @Before
     public void setupServices() {
+        this.processEngine = flowableRule.getProcessEngine();
+        this.processEngineConfiguration = flowableRule.getProcessEngine().getProcessEngineConfiguration();
         this.repositoryService = flowableRule.getRepositoryService();
         this.runtimeService = flowableRule.getRuntimeService();
         this.taskService = flowableRule.getTaskService();

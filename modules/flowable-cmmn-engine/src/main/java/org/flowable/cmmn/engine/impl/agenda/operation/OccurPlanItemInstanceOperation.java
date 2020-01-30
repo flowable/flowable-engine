@@ -54,5 +54,10 @@ public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstance
         planItemInstanceEntity.setOccurredTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceOccurred(planItemInstanceEntity);
     }
+
+    @Override
+    protected String getOperationName() {
+        return "[Occur plan item]";
+    }
     
 }

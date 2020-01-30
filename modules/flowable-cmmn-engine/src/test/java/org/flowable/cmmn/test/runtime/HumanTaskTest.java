@@ -58,7 +58,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         assertNotNull(caseInstance);
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         assertEquals("JohnDoe", task.getAssignee());
         String task1Id = task.getId();
         
@@ -84,15 +84,15 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
         assertNull(task.getAssignee());
         String task2Id = task.getId();
 
         task = cmmnTaskService.createTaskQuery().taskCandidateGroup("test").caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
 
         task = cmmnTaskService.createTaskQuery().taskCandidateUser("test2").caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
+        assertEquals("Task Two", task.getName());
 
         assertThat(cmmnTaskService.getIdentityLinksForTask(task2Id))
             .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
@@ -172,14 +172,14 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             assertEquals("flowable", caseInstance.getTenantId());
 
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("Task 1", task.getName());
+            assertEquals("Task One", task.getName());
             assertEquals("JohnDoe", task.getAssignee());
             assertEquals("flowable", task.getTenantId());
 
             cmmnTaskService.complete(task.getId());
 
             task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("Task 2", task.getName());
+            assertEquals("Task Two", task.getName());
             assertEquals("flowable", task.getTenantId());
             cmmnTaskService.complete(task.getId());
 
@@ -210,7 +210,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             assertEquals("flowable", caseInstance.getTenantId());
 
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("Task 1", task.getName());
+            assertEquals("Task One", task.getName());
             assertEquals("JohnDoe", task.getAssignee());
             assertEquals("flowable", task.getTenantId());
 
@@ -290,7 +290,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
+        assertEquals("Task One", task.getName());
         assertNull(task.getAssignee());
 
         assertEquals(0, cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).size());

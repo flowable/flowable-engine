@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+    <process id="testSimpleErrorEventSubProcess" name="Test Simple Error Event Sub Process" isExecutable="true">
+        <startEvent id="start" flowable:formFieldValidation="true"/>
+        <endEvent id="end"/>
+        <subProcess id="errorEventSubProcess" name="subProcess" triggeredByEvent="true">
+            <userTask id="eventSubProcessTask1" name="Sub Process Task" flowable:formFieldValidation="true"/>
+            <endEvent id="eventSubProcessEnd"/>
+            <startEvent id="eventSubProcessStart" isInterrupting="true">
+                <errorEventDefinition/>
+            </startEvent>
+            <sequenceFlow id="eventSubProcessFlow2" sourceRef="eventSubProcessTask1" targetRef="eventSubProcessEnd"/>
+            <sequenceFlow id="eventSubProcessFlow1" sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask1"/>
+        </subProcess>
+        <subProcess id="subProcess" name="subProcess">
+            <startEvent id="subProcessStart" flowable:formFieldValidation="true"/>
+            <endEvent id="subProcessEnd">
+                <errorEventDefinition errorRef="testError"/>
+            </endEvent>
+            <sequenceFlow id="subProcessFlow1" sourceRef="subProcessStart" targetRef="subProcessEnd"/>
+        </subProcess>
+        <sequenceFlow id="flow2" sourceRef="subProcess" targetRef="end"/>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="subProcess"/>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_testSimpleErrorEventSubProcess">
+        <bpmndi:BPMNPlane bpmnElement="testSimpleErrorEventSubProcess" id="BPMNPlane_testSimpleErrorEventSubProcess">
+            <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+                <omgdc:Bounds height="30.0" width="30.0" x="90.0" y="150.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+                <omgdc:Bounds height="28.0" width="28.0" x="510.0" y="151.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="errorEventSubProcess" id="BPMNShape_errorEventSubProcess">
+                <omgdc:Bounds height="224.0" width="404.0" x="102.0" y="330.0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="eventSubProcessTask1" id="BPMNShape_eventSubProcessTask1">
+                <omgdc:Bounds height="80.0" width="100.0" x="207.0" y="403.5"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="eventSubProcessEnd" id="BPMNShape_eventSubProcessEnd">
+                <omgdc:Bounds height="28.0" width="28.0" x="382.5" y="429.5"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="eventSubProcessStart" id="BPMNShape_eventSubProcessStart">
+                <omgdc:Bounds height="30.0" width="30.0" x="117.0" y="428.5"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="subProcess" id="BPMNShape_subProcess">
+                <omgdc:Bounds height="151.0" width="188.0" x="210.0" y="89.5"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="subProcessStart" id="BPMNShape_subProcessStart">
+                <omgdc:Bounds height="30.0" width="30.0" x="240.5" y="151.5"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="subProcessEnd" id="BPMNShape_subProcessEnd">
+                <omgdc:Bounds height="28.0" width="28.0" x="315.0" y="152.5"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+                <omgdi:waypoint x="119.94999837205718" y="165.0"/>
+                <omgdi:waypoint x="209.99999999999807" y="165.0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+                <omgdi:waypoint x="397.95000000000005" y="165.0"/>
+                <omgdi:waypoint x="510.0" y="165.0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="subProcessFlow1" id="BPMNEdge_subProcessFlow1">
+                <omgdi:waypoint x="270.449996642631" y="166.5"/>
+                <omgdi:waypoint x="315.0" y="166.5"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="eventSubProcessFlow2" id="BPMNEdge_eventSubProcessFlow2">
+                <omgdi:waypoint x="306.94999999998237" y="443.5"/>
+                <omgdi:waypoint x="382.5" y="443.5"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="eventSubProcessFlow1" id="BPMNEdge_eventSubProcessFlow1">
+                <omgdi:waypoint x="146.94999883049306" y="443.5"/>
+                <omgdi:waypoint x="207.0" y="443.5"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

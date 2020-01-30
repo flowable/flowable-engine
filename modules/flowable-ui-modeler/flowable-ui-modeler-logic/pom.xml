@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.flowable</groupId>
     	<artifactId>flowable-ui-modeler</artifactId>
-    	<version>6.5.0-SNAPSHOT</version>
+    	<version>6.5.1-SNAPSHOT</version>
 	</parent>
 	<packaging>jar</packaging>
 
@@ -73,6 +73,14 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-form-json-converter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-json-converter</artifactId>
         </dependency>
 
 		<dependency>
@@ -218,7 +226,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>2.1.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>

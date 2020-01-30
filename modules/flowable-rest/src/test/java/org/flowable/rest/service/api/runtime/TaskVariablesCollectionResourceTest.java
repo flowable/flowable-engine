@@ -22,6 +22,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -45,10 +48,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to Task variables.
  * 
  * @author Frederik Heremans
+ * @author Filip Hrisafov
  */
 public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase {
 
@@ -70,6 +77,9 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         processVariables.put("doubleProcVar", 99.99);
         processVariables.put("booleanProcVar", Boolean.TRUE);
         processVariables.put("dateProcVar", cal.getTime());
+        processVariables.put("instantProcVar", Instant.parse("2019-12-13T12:32:45.583345Z"));
+        processVariables.put("localDateProcVar", LocalDate.parse("2020-01-18"));
+        processVariables.put("localDateTimeProcVar", LocalDateTime.parse("2020-01-18T16:18:45"));
         processVariables.put("byteArrayProcVar", "Some raw bytes".getBytes());
         processVariables.put("overlappingVariable", "process-value");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
@@ -85,6 +95,9 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         taskVariables.put("doubleTaskVar", 99.99);
         taskVariables.put("booleanTaskVar", Boolean.TRUE);
         taskVariables.put("dateTaskVar", cal.getTime());
+        taskVariables.put("instantTaskVar", Instant.parse("2019-12-13T12:32:45.583345Z"));
+        taskVariables.put("localDateTaskVar", LocalDate.parse("2020-01-18"));
+        taskVariables.put("localDateTimeTaskVar", LocalDateTime.parse("2020-01-18T16:18:45"));
         taskVariables.put("byteArrayTaskVar", "Some raw bytes".getBytes());
         taskVariables.put("overlappingVariable", "task-value");
         taskService.setVariablesLocal(task.getId(), taskVariables);
@@ -96,8 +109,36 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertNotNull(responseNode);
+        JsonAssertions.assertThatJson(responseNode)
+            .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo("["
+                + "  { name: 'stringProcVar', type: 'string', value: 'This is a ProcVariable', scope: 'global' },"
+                + "  { name: 'intProcVar', type: 'integer', value: 123, scope: 'global' },"
+                + "  { name: 'longProcVar', type: 'long', value: 1234, scope: 'global' },"
+                + "  { name: 'shortProcVar', type: 'short', value: 123, scope: 'global' },"
+                + "  { name: 'doubleProcVar', type: 'double', value: 99.99, scope: 'global' },"
+                + "  { name: 'booleanProcVar', type: 'boolean', value: true, scope: 'global' },"
+                + "  { name: 'dateProcVar', type: 'date', value: '${json-unit.any-string}', scope: 'global' },"
+                + "  { name: 'instantProcVar', type: 'instant', value: '2019-12-13T12:32:45.583Z', scope: 'global' },"
+                + "  { name: 'localDateProcVar', type: 'localDate', value: '2020-01-18', scope: 'global' },"
+                + "  { name: 'localDateTimeProcVar', type: 'localDateTime', value: '2020-01-18T16:18:45', scope: 'global' },"
+                + "  { name: 'byteArrayProcVar', type: 'binary', value: null, scope: 'global' },"
+
+                + "  { name: 'stringTaskVar', type: 'string', value: 'This is a TaskVariable', scope: 'local' },"
+                + "  { name: 'intTaskVar', type: 'integer', value: 123, scope: 'local' },"
+                + "  { name: 'longTaskVar', type: 'long', value: 1234, scope: 'local' },"
+                + "  { name: 'shortTaskVar', type: 'short', value: 123, scope: 'local' },"
+                + "  { name: 'doubleTaskVar', type: 'double', value: 99.99, scope: 'local' },"
+                + "  { name: 'booleanTaskVar', type: 'boolean', value: true, scope: 'local' },"
+                + "  { name: 'dateTaskVar', type: 'date', value: '${json-unit.any-string}', scope: 'local' },"
+                + "  { name: 'instantTaskVar', type: 'instant', value: '2019-12-13T12:32:45.583Z', scope: 'local' },"
+                + "  { name: 'localDateTaskVar', type: 'localDate', value: '2020-01-18', scope: 'local' },"
+                + "  { name: 'localDateTimeTaskVar', type: 'localDateTime', value: '2020-01-18T16:18:45', scope: 'local' },"
+                + "  { name: 'byteArrayTaskVar', type: 'binary', value: null, scope: 'local' },"
+                + "  { name: 'overlappingVariable', type: 'string', value: 'task-value', scope: 'local' }"
+                + "]");
         assertTrue(responseNode.isArray());
-        assertEquals(17, responseNode.size());
+        assertEquals(23, responseNode.size());
 
         // Overlapping variable should contain task-value AND be defined as
         // "local"
@@ -120,7 +161,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         closeResponse(response);
         assertNotNull(responseNode);
         assertTrue(responseNode.isArray());
-        assertEquals(9, responseNode.size());
+        assertEquals(12, responseNode.size());
 
         for (int i = 0; i < responseNode.size(); i++) {
             JsonNode var = responseNode.get(i);
@@ -134,7 +175,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         closeResponse(response);
         assertNotNull(responseNode);
         assertTrue(responseNode.isArray());
-        assertEquals(9, responseNode.size());
+        assertEquals(12, responseNode.size());
 
         foundOverlapping = false;
         for (int i = 0; i < responseNode.size(); i++) {

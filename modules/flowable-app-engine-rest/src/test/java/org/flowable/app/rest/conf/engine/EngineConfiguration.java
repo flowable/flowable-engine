@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.conf.engine;
 
+import java.sql.Driver;
+
 import javax.sql.DataSource;
 
 import org.flowable.app.api.AppManagementService;
@@ -20,68 +22,71 @@ import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.AppEngineFactoryBean;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
+
+    @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}")
+    protected String jdbcUrl;
+
+    @Value("${jdbc.driver:org.h2.Driver}")
+    protected Class<? extends Driver> jdbcDriver;
+
+    @Value("${jdbc.username:sa}")
+    protected String jdbcUsername;
+
+    @Value("${jdbc.password:}")
+    protected String jdbcPassword;
 
     @Bean
     public DataSource dataSource() {
         SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setDriverClass(org.h2.Driver.class);
+        ds.setDriverClass(jdbcDriver);
 
         // Connection settings
         ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
-        ds.setUsername("sa");
+        ds.setUsername(jdbcUsername);
+        ds.setPassword(jdbcPassword);
 
         return ds;
     }
 
     @Bean(name = "transactionManager")
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
+    public PlatformTransactionManager annotationDrivenTransactionManager(DataSource dataSource) {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
+        transactionManager.setDataSource(dataSource);
         return transactionManager;
     }
 
-    @Bean(name = "appEngineFactoryBean")
-    public AppEngineFactoryBean appEngineFactoryBean() {
+    @Bean(name = "appEngine")
+    public AppEngineFactoryBean appEngineFactoryBean(AppEngineConfiguration appEngineConfiguration) {
         AppEngineFactoryBean factoryBean = new AppEngineFactoryBean();
-        factoryBean.setAppEngineConfiguration(appEngineConfiguration());
+        factoryBean.setAppEngineConfiguration(appEngineConfiguration);
         return factoryBean;
     }
 
-    @Bean(name = "appEngine")
-    public AppEngine appEngine() {
-        // Safe to call the getObject() on the @Bean annotated appEngineFactoryBean(), will be
-        // the fully initialized object instanced from the factory and will NOT be created more than once
-        try {
-            return appEngineFactoryBean().getObject();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Bean(name = "appEngineConfiguration")
-    public AppEngineConfiguration appEngineConfiguration() {
+    public AppEngineConfiguration appEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
         SpringAppEngineConfiguration appEngineConfiguration = new SpringAppEngineConfiguration();
-        appEngineConfiguration.setDataSource(dataSource());
+        appEngineConfiguration.setDataSource(dataSource);
         appEngineConfiguration.setDatabaseSchemaUpdate(AppEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-        appEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
+        appEngineConfiguration.setTransactionManager(transactionManager);
         return appEngineConfiguration;
     }
 
     @Bean
-    public AppRepositoryService appRepositoryService() {
-        return appEngine().getAppRepositoryService();
+    public AppRepositoryService appRepositoryService(AppEngine appEngine) {
+        return appEngine.getAppRepositoryService();
     }
 
     @Bean
-    public AppManagementService managementService() {
-        return appEngine().getAppManagementService();
+    public AppManagementService managementService(AppEngine appEngine) {
+        return appEngine.getAppManagementService();
     }
 }

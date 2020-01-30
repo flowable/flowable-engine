@@ -52,12 +52,12 @@ public class DeploymentQueryEscapeClauseTest extends AbstractEscapeClauseTestCas
 
     @Test
     public void testQueryByNameLike() {
-        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("%\\%%");
+        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("%|%%");
         assertEquals("one%", query.singleResult().getName());
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
 
-        query = repositoryService.createDeploymentQuery().deploymentNameLike("%\\_%");
+        query = repositoryService.createDeploymentQuery().deploymentNameLike("%|_%");
         assertEquals("two_", query.singleResult().getName());
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
@@ -65,19 +65,19 @@ public class DeploymentQueryEscapeClauseTest extends AbstractEscapeClauseTestCas
 
     @Test
     public void testQueryByProcessDefinitionKeyLike() {
-        DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("%\\_%");
+        DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("%|_%");
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
 
     @Test
     public void testQueryByTenantIdLike() {
-        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentTenantIdLike("%\\%%");
+        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentTenantIdLike("%|%%");
         assertEquals("One%", query.singleResult().getTenantId());
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
 
-        query = repositoryService.createDeploymentQuery().deploymentTenantIdLike("%\\_%");
+        query = repositoryService.createDeploymentQuery().deploymentTenantIdLike("%|_%");
         assertEquals("Two_", query.singleResult().getTenantId());
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());

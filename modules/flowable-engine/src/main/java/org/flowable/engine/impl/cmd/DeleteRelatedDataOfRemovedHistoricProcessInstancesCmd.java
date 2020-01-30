@@ -18,6 +18,7 @@ import java.io.Serializable;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 
 public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Command<Object>, Serializable {
 
@@ -27,7 +28,10 @@ public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Co
     public Object execute(CommandContext commandContext) {
         CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricProcessIdentityLinksForNonExistingInstances();
         CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricTaskIdentityLinksForNonExistingInstances();
-        CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLinksForNonExistingProcessInstances();
+        HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+        if (historicEntityLinkService != null) {
+            historicEntityLinkService.deleteHistoricEntityLinksForNonExistingProcessInstances();
+        }
         CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
         CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingProcessInstances();
         CommandContextUtil.getHistoricDetailEntityManager(commandContext).deleteHistoricDetailForNonExistingProcessInstances();

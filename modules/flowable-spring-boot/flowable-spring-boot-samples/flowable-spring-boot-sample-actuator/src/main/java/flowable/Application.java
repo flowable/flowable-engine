@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Bean;
  * definition.
  *
  */
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class Application {
 
     @Bean

@@ -44,6 +44,7 @@ flowableAdminApp.controller('CmmnDeploymentController', ['$scope', '$rootScope',
                 $scope.gridCaseDefinitions = {
                     data: 'caseDefinitions.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected : false,
                     enableSorting: false,

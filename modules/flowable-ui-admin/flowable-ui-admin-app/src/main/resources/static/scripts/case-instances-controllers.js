@@ -223,6 +223,7 @@ flowableAdminApp.controller('CaseInstancesController', ['$rootScope', '$scope', 
           $scope.gridInstances = {
               data: 'caseInstances.data',
               enableRowReordering: true,
+              enableColumnResize: true,
               multiSelect: false,
               keepLastSelected : false,
               rowHeight: 36,

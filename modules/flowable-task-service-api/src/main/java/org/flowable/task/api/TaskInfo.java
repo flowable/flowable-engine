@@ -91,6 +91,15 @@ public interface TaskInfo {
      */
     String getScopeDefinitionId();
 
+    /**
+     * If this task runs in the context of a case and stage, this method returns it's closest parent stage instance id (the stage plan item instance id to be
+     * precise). Even if the direct parent of the task is a process which itself might have been created out of a process task of a case, its stage instance
+     * is reflected in the task.
+     *
+     * @return the stage instance id this task belongs to or null, if this task is not part of a case at all or is not a child element of a stage
+     */
+    String getPropagatedStageInstanceId();
+
     /** The date/time when this task was created */
     Date getCreateTime();
 

@@ -16,7 +16,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
@@ -26,85 +26,71 @@ import org.flowable.form.engine.impl.persistence.entity.data.FormDefinitionDataM
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class FormDefinitionEntityManagerImpl extends AbstractEntityManager<FormDefinitionEntity> implements FormDefinitionEntityManager {
-
-    protected FormDefinitionDataManager formDefinitionDataManager;
+public class FormDefinitionEntityManagerImpl
+    extends AbstractEngineEntityManager<FormEngineConfiguration, FormDefinitionEntity, FormDefinitionDataManager>
+    implements FormDefinitionEntityManager {
 
     public FormDefinitionEntityManagerImpl(FormEngineConfiguration formEngineConfiguration, FormDefinitionDataManager formDefinitionDataManager) {
-        super(formEngineConfiguration);
-        this.formDefinitionDataManager = formDefinitionDataManager;
-    }
-
-    @Override
-    protected DataManager<FormDefinitionEntity> getDataManager() {
-        return formDefinitionDataManager;
+        super(formEngineConfiguration, formDefinitionDataManager);
     }
 
     @Override
     public FormDefinitionEntity findLatestFormDefinitionByKey(String formDefinitionKey) {
-        return formDefinitionDataManager.findLatestFormDefinitionByKey(formDefinitionKey);
+        return dataManager.findLatestFormDefinitionByKey(formDefinitionKey);
     }
 
     @Override
     public FormDefinitionEntity findLatestFormDefinitionByKeyAndTenantId(String formDefinitionKey, String tenantId) {
-        return formDefinitionDataManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
+        return dataManager.findLatestFormDefinitionByKeyAndTenantId(formDefinitionKey, tenantId);
     }
 
     @Override
     public void deleteFormDefinitionsByDeploymentId(String deploymentId) {
-        formDefinitionDataManager.deleteFormDefinitionsByDeploymentId(deploymentId);
+        dataManager.deleteFormDefinitionsByDeploymentId(deploymentId);
     }
 
     @Override
     public List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery) {
-        return formDefinitionDataManager.findFormDefinitionsByQueryCriteria(formQuery);
+        return dataManager.findFormDefinitionsByQueryCriteria(formQuery);
     }
 
     @Override
     public long findFormDefinitionCountByQueryCriteria(FormDefinitionQueryImpl formQuery) {
-        return formDefinitionDataManager.findFormDefinitionCountByQueryCriteria(formQuery);
+        return dataManager.findFormDefinitionCountByQueryCriteria(formQuery);
     }
 
     @Override
     public FormDefinitionEntity findFormDefinitionByDeploymentAndKey(String deploymentId, String formDefinitionKey) {
-        return formDefinitionDataManager.findFormDefinitionByDeploymentAndKey(deploymentId, formDefinitionKey);
+        return dataManager.findFormDefinitionByDeploymentAndKey(deploymentId, formDefinitionKey);
     }
 
     @Override
     public FormDefinitionEntity findFormDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String formDefinitionKey, String tenantId) {
-        return formDefinitionDataManager.findFormDefinitionByDeploymentAndKeyAndTenantId(deploymentId, formDefinitionKey, tenantId);
+        return dataManager.findFormDefinitionByDeploymentAndKeyAndTenantId(deploymentId, formDefinitionKey, tenantId);
     }
 
     @Override
     public FormDefinitionEntity findFormDefinitionByKeyAndVersionAndTenantId(String formDefinitionKey, Integer formVersion, String tenantId) {
         if (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-            return formDefinitionDataManager.findFormDefinitionByKeyAndVersion(formDefinitionKey, formVersion);
+            return dataManager.findFormDefinitionByKeyAndVersion(formDefinitionKey, formVersion);
         } else {
-            return formDefinitionDataManager.findFormDefinitionByKeyAndVersionAndTenantId(formDefinitionKey, formVersion, tenantId);
+            return dataManager.findFormDefinitionByKeyAndVersionAndTenantId(formDefinitionKey, formVersion, tenantId);
         }
     }
 
     @Override
     public List<FormDefinition> findFormDefinitionsByNativeQuery(Map<String, Object> parameterMap) {
-        return formDefinitionDataManager.findFormDefinitionsByNativeQuery(parameterMap);
+        return dataManager.findFormDefinitionsByNativeQuery(parameterMap);
     }
 
     @Override
     public long findFormDefinitionCountByNativeQuery(Map<String, Object> parameterMap) {
-        return formDefinitionDataManager.findFormDefinitionCountByNativeQuery(parameterMap);
+        return dataManager.findFormDefinitionCountByNativeQuery(parameterMap);
     }
 
     @Override
     public void updateFormDefinitionTenantIdForDeployment(String deploymentId, String newTenantId) {
-        formDefinitionDataManager.updateFormDefinitionTenantIdForDeployment(deploymentId, newTenantId);
-    }
-
-    public FormDefinitionDataManager getFormDefinitionDataManager() {
-        return formDefinitionDataManager;
-    }
-
-    public void setFormDefinitionDataManager(FormDefinitionDataManager formDefinitionDataManager) {
-        this.formDefinitionDataManager = formDefinitionDataManager;
+        dataManager.updateFormDefinitionTenantIdForDeployment(deploymentId, newTenantId);
     }
 
 }

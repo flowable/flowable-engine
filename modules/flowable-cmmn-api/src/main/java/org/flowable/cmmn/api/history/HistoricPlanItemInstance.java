@@ -28,6 +28,8 @@ public interface HistoricPlanItemInstance {
 
     String getCaseDefinitionId();
 
+    String getDerivedCaseDefinitionId();
+
     String getCaseInstanceId();
 
     String getStageInstanceId();
@@ -73,6 +75,12 @@ public interface HistoricPlanItemInstance {
     String getEntryCriterionId();
 
     String getExitCriterionId();
+    
+    String getFormKey();
+    
+    String getExtraValue();
+    
+    boolean isShowInOverview();
 
     String getTenantId();
 

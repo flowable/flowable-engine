@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -107,6 +108,21 @@ public class TaskHelper {
             } else {
                 eventDispatcher.dispatchEvent(
                         FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity));
+            }
+        }
+        
+        if (processEngineConfiguration.isLoggingSessionEnabled() && taskEntity.getExecutionId() != null) {
+            String taskLabel = null;
+            if (StringUtils.isNotEmpty(taskEntity.getName())) {
+                taskLabel = taskEntity.getName();
+            } else {
+                taskLabel = taskEntity.getId();
+            }
+        
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+            if (execution != null) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_COMPLETE, 
+                                "User task '" + taskLabel + "' completed", taskEntity, execution);
             }
         }
 

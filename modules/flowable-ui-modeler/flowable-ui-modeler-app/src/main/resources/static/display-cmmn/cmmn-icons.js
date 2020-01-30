@@ -81,6 +81,20 @@ function _drawProcessTaskIcon(paper, startX, startY)
     processTaskIcon.scale(0.7, 0.7);
 }
 
+function _drawSendTaskIcon(paper, startX, startY)
+{
+    var path1 = paper.path("M 1 3 L 9 11 L 17 3 L 1 3 z M 1 5 L 1 13 L 5 9 L 1 5 z M 17 5 L 13 9 L 17 13 L 17 5 z M 6 10 L 1 15 L 17 15 L 12 10 L 9 13 L 6 10 z");
+    path1.attr({
+        "stroke": "none",
+        "fill": "#16964d"
+    });
+
+    var sendTaskIcon = paper.set();
+    sendTaskIcon.push(path1);
+
+    sendTaskIcon.transform("T" + startX + "," + startY);
+}
+
 function _drawDecisionTaskIcon(paper, startX, startY)
 {
     var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.9,2.4000386 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z");

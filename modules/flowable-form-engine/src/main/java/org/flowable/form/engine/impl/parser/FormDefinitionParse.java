@@ -14,6 +14,7 @@ package org.flowable.form.engine.impl.parser;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -71,14 +72,7 @@ public class FormDefinitionParse {
         String encoding = formEngineConfig.getXmlEncoding();
         FormJsonConverter converter = new FormJsonConverter();
 
-        try {
-            InputStreamReader in = null;
-            if (encoding != null) {
-                in = new InputStreamReader(streamSource.getInputStream(), encoding);
-            } else {
-                in = new InputStreamReader(streamSource.getInputStream());
-            }
-
+        try (InputStreamReader in = newInputStreamReaderForSource(encoding)) {
             String formJson = IOUtils.toString(in);
             formModel = converter.convertToFormModel(formJson);
 
@@ -95,6 +89,14 @@ public class FormDefinitionParse {
             throw new FlowableException("Error parsing form definition JSON", e);
         }
         return this;
+    }
+
+    private InputStreamReader newInputStreamReaderForSource(String encoding) throws UnsupportedEncodingException {
+        if (encoding != null) {
+            return new InputStreamReader(streamSource.getInputStream(), encoding);
+        } else {
+            return new InputStreamReader(streamSource.getInputStream());
+        }
     }
 
     public FormDefinitionParse name(String name) {

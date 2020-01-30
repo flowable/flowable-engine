@@ -15,6 +15,8 @@ package org.flowable.dmn.test.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -26,6 +28,7 @@ import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.task.api.Task;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -251,6 +254,26 @@ public class DecisionTaskTest {
 
     @Test
     @CmmnDeployment(
+        resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testUseDmnOutputInEntryCriteria.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testUseDmnOutputInEntryCriteria.dmn"
+        }
+    )
+    public void testUseDmnOutputInEntryCriteria() {
+        CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+            .caseDefinitionKey("testRules")
+            .variable("first", "11")
+            .variable("second", "11")
+            .start();
+
+        // The entry sentry on the first stage uses the output of the DMN table
+        List<Task> tasks = cmmnRule.getCmmnTaskService().createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals("Human task", tasks.get(0).getName());
+        assertEquals("Task One", tasks.get(1).getName());
+    }
+
+    @Test
+    @CmmnDeployment(
         resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTaskFallBackToDefaultTenant.cmmn"},
         tenantId = "flowable"
     )
@@ -290,6 +313,8 @@ public class DecisionTaskTest {
 
         deployDmnTableWithGlobalTenantFallback("otherTenant");
     }
+
+    // Helper methodes
 
     protected void deployDmnTableAssertCaseStarted() {
         org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRule.getCmmnRepositoryService().createDeployment().

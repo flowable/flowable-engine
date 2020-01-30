@@ -80,28 +80,28 @@ public class DefaultCaseDiagramCanvas {
     protected static final int LINE_HEIGHT = FONT_SIZE + FONT_SPACING;
 
     // Colors
-    protected static Color TASK_BOX_COLOR = new Color(249, 249, 249);
-    protected static Color SUBPROCESS_BOX_COLOR = new Color(255, 255, 255);
-    protected static Color EVENT_COLOR = new Color(255, 255, 255);
-    protected static Color CONNECTION_COLOR = new Color(88, 88, 88);
-    protected static Color CONDITIONAL_INDICATOR_COLOR = new Color(255, 255, 255);
-    protected static Color HIGHLIGHT_COLOR = Color.RED;
-    protected static Color LABEL_COLOR = new Color(112, 146, 190);
-    protected static Color TASK_BORDER_COLOR = new Color(187, 187, 187);
-    protected static Color STAGE_BORDER_COLOR = new Color(0, 0, 0);
-    protected static Color EVENT_BORDER_COLOR = new Color(88, 88, 88);
+    protected static final Color TASK_BOX_COLOR = new Color(249, 249, 249);
+    protected static final Color SUBPROCESS_BOX_COLOR = new Color(255, 255, 255);
+    protected static final Color EVENT_COLOR = new Color(255, 255, 255);
+    protected static final Color CONNECTION_COLOR = new Color(88, 88, 88);
+    protected static final Color CONDITIONAL_INDICATOR_COLOR = new Color(255, 255, 255);
+    protected static final Color HIGHLIGHT_COLOR = Color.RED;
+    protected static final Color LABEL_COLOR = new Color(112, 146, 190);
+    protected static final Color TASK_BORDER_COLOR = new Color(187, 187, 187);
+    protected static final Color STAGE_BORDER_COLOR = new Color(0, 0, 0);
+    protected static final Color EVENT_BORDER_COLOR = new Color(88, 88, 88);
 
     // Fonts
     protected static Font LABEL_FONT;
     protected static Font ANNOTATION_FONT;
 
     // Strokes
-    protected static Stroke THICK_TASK_BORDER_STROKE = new BasicStroke(3.0f);
-    protected static Stroke GATEWAY_TYPE_STROKE = new BasicStroke(3.0f);
-    protected static Stroke ASSOCIATION_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 2.0f, 2.0f }, 0.0f);
+    protected static final Stroke THICK_TASK_BORDER_STROKE = new BasicStroke(3.0f);
+    protected static final Stroke GATEWAY_TYPE_STROKE = new BasicStroke(3.0f);
+    protected static final Stroke ASSOCIATION_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 2.0f, 2.0f }, 0.0f);
 
     // icons
-    protected static int ICON_PADDING = 5;
+    protected static final int ICON_PADDING = 5;
     protected static BufferedImage TIMER_IMAGE;
     protected static BufferedImage USERLISTENER_IMAGE;
     protected static BufferedImage USERTASK_IMAGE;
@@ -109,6 +109,7 @@ public class DefaultCaseDiagramCanvas {
     protected static BufferedImage CASETASK_IMAGE;
     protected static BufferedImage PROCESSTASK_IMAGE;
     protected static BufferedImage DECISIONTASK_IMAGE;
+    protected static BufferedImage SENDEVENTTASK_IMAGE;
 
     protected int canvasWidth = -1;
     protected int canvasHeight = -1;
@@ -202,6 +203,7 @@ public class DefaultCaseDiagramCanvas {
             CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
             PROCESSTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/processTask.png", customClassLoader));
             DECISIONTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/decisionTask.png", customClassLoader));
+            SENDEVENTTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/sendEventTask.png", customClassLoader));
 
         } catch (IOException e) {
             LOGGER.warn("Could not load image for case diagram creation: {}", e.getMessage());
@@ -277,10 +279,10 @@ public class DefaultCaseDiagramCanvas {
         }
 
         for (int i = 1; i < xPoints.length; i++) {
-            Integer sourceX = xPoints[i - 1];
-            Integer sourceY = yPoints[i - 1];
-            Integer targetX = xPoints[i];
-            Integer targetY = yPoints[i];
+            int sourceX = xPoints[i - 1];
+            int sourceY = yPoints[i - 1];
+            int targetX = xPoints[i];
+            int targetY = yPoints[i];
             Line2D.Double line = new Line2D.Double(sourceX, sourceY, targetX, targetY);
             g.draw(line);
         }
@@ -555,6 +557,10 @@ public class DefaultCaseDiagramCanvas {
 
     public void drawServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(SERVICETASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+    
+    public void drawSendEventTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SENDEVENTTASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawCaseTask(String name, GraphicInfo graphicInfo, double scaleFactor) {

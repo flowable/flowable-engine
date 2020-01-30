@@ -83,6 +83,8 @@ public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmn
         newSubProcessExecution.setEventScope(false);
         newSubProcessExecution.setScope(true);
 
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newSubProcessExecution);
+
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
 

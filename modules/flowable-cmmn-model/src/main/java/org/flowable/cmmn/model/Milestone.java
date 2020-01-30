@@ -17,4 +17,22 @@ package org.flowable.cmmn.model;
  */
 public class Milestone extends PlanItemDefinition {
     
+    protected Integer displayOrder;
+    protected String includeInStageOverview;
+    
+    public Integer getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public void setDisplayOrder(Integer displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+
+    public String getIncludeInStageOverview() {
+        return includeInStageOverview;
+    }
+
+    public void setIncludeInStageOverview(String includeInStageOverview) {
+        this.includeInStageOverview = includeInStageOverview;
+    }
 }

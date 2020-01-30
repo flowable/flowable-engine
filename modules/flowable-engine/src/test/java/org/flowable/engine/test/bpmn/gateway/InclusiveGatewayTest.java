@@ -486,7 +486,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testAsyncBehavior() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("async");
-        waitForJobExecutorToProcessAllJobs(7000L, 250);
+        waitForJobExecutorToProcessAllJobs(10000L, 250);
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 

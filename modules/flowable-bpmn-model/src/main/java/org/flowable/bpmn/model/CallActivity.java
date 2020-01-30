@@ -33,6 +33,7 @@ public class CallActivity extends Activity {
     protected boolean useLocalScopeForOutParameters;
     protected boolean completeAsync;
     protected Boolean fallbackToDefaultTenant;
+    protected String processInstanceIdVariableName;
 
     public String getCalledElement() {
         return calledElement;
@@ -162,6 +163,14 @@ public class CallActivity extends Activity {
 
     public String getCalledElementType() {
         return calledElementType;
+    }
+
+    public String getProcessInstanceIdVariableName() {
+        return processInstanceIdVariableName;
+    }
+
+    public void setProcessInstanceIdVariableName(String processInstanceIdVariableName) {
+        this.processInstanceIdVariableName = processInstanceIdVariableName;
     }
 
 }

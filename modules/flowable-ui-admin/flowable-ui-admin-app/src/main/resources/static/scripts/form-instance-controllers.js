@@ -34,6 +34,7 @@ flowableAdminApp.controller('FormInstanceController', ['$rootScope', '$scope', '
                 $scope.gridFormFieldValues = {
                     data: 'formFieldValues.data',
                     enableRowReordering: false,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     enableSorting: false,

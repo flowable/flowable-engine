@@ -18,6 +18,7 @@ import java.io.Serializable;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 
 /**
  * @author Tijs Rademakers
@@ -31,7 +32,10 @@ public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Comma
         CommandContextUtil.getHistoricMilestoneInstanceEntityManager(commandContext).deleteHistoricMilestoneInstancesForNonExistingCaseInstances();
         CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricCaseIdentityLinksForNonExistingInstances();
         CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricTaskIdentityLinksForNonExistingInstances();
-        CommandContextUtil.getHistoricEntityLinkService().deleteHistoricEntityLinksForNonExistingCaseInstances();
+        HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+        if (historicEntityLinkService != null) {
+            historicEntityLinkService.deleteHistoricEntityLinksForNonExistingCaseInstances();
+        }
         CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
         CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingCaseInstances();
 

@@ -12,6 +12,8 @@
  */
 package org.flowable.form.rest.conf.engine;
 
+import java.sql.Driver;
+
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -21,6 +23,7 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.spring.FormEngineFactoryBean;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -29,74 +32,76 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
+
+    @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}")
+    protected String jdbcUrl;
+
+    @Value("${jdbc.driver:org.h2.Driver}")
+    protected Class<? extends Driver> jdbcDriver;
+
+    @Value("${jdbc.username:sa}")
+    protected String jdbcUsername;
+
+    @Value("${jdbc.password:}")
+    protected String jdbcPassword;
 
     @Bean
     public DataSource dataSource() {
         SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setDriverClass(org.h2.Driver.class);
+        ds.setDriverClass(jdbcDriver);
 
         // Connection settings
         ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
-        ds.setUsername("sa");
+        ds.setUsername(jdbcUsername);
+        ds.setPassword(jdbcPassword);
 
         return ds;
     }
 
     @Bean(name = "transactionManager")
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
+    public PlatformTransactionManager annotationDrivenTransactionManager(DataSource dataSource) {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
+        transactionManager.setDataSource(dataSource);
         return transactionManager;
     }
 
-    @Bean(name = "formEngineFactoryBean")
-    public FormEngineFactoryBean formEngineFactoryBean() {
+    @Bean(name = "formEngine")
+    public FormEngineFactoryBean formEngineFactoryBean(FormEngineConfiguration formEngineConfiguration) {
         FormEngineFactoryBean factoryBean = new FormEngineFactoryBean();
-        factoryBean.setFormEngineConfiguration(formEngineConfiguration());
+        factoryBean.setFormEngineConfiguration(formEngineConfiguration);
         return factoryBean;
     }
 
-    @Bean(name = "formEngine")
-    public FormEngine formEngine() {
-        // Safe to call the getObject() on the @Bean annotated formEngineFactoryBean(), will be
-        // the fully initialized object instanced from the factory and will NOT be created more than once
-        try {
-            return formEngineFactoryBean().getObject();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Bean(name = "formEngineConfiguration")
-    public FormEngineConfiguration formEngineConfiguration() {
+    public FormEngineConfiguration formEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
 
         TestSpringFormEngineConfiguration formEngineConfiguration = new TestSpringFormEngineConfiguration();
-        formEngineConfiguration.setDataSource(dataSource());
+        formEngineConfiguration.setDataSource(dataSource);
         formEngineConfiguration.setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-        formEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
+        formEngineConfiguration.setTransactionManager(transactionManager);
         return formEngineConfiguration;
     }
 
     @Bean
-    public FormRepositoryService formRepositoryService() {
-        return formEngine().getFormRepositoryService();
+    public FormRepositoryService formRepositoryService(FormEngine formEngine) {
+        return formEngine.getFormRepositoryService();
     }
 
     @Bean
-    public FormManagementService managementService() {
-        return formEngine().getFormManagementService();
+    public FormManagementService managementService(FormEngine formEngine) {
+        return formEngine.getFormManagementService();
     }
 
     @Bean
-    public FormService formService() {
-        return formEngine().getFormService();
+    public FormService formService(FormEngine formEngine) {
+        return formEngine.getFormService();
     }
 
     @Bean
-    public IdmIdentityService idmIdentityService() {
-        return ((IdmEngineConfigurationApi) formEngine().getFormEngineConfiguration().getEngineConfigurations()
+    public IdmIdentityService idmIdentityService(FormEngine formEngine) {
+        return ((IdmEngineConfigurationApi) formEngine.getFormEngineConfiguration().getEngineConfigurations()
                 .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 

@@ -14,7 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
@@ -24,6 +24,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -61,6 +62,11 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
         if (caseTask.getFallbackToDefaultTenant() != null) {
             propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, caseTask.getFallbackToDefaultTenant());
         }
+
+        if (StringUtils.isNotEmpty(caseTask.getCaseInstanceIdVariableName())) {
+            propertiesNode.put(PROPERTY_ID_VARIABLE_NAME, caseTask.getCaseInstanceIdVariableName());
+        }
+
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, caseTask);
 
         if (caseTask.getInParameters() != null && !caseTask.getInParameters().isEmpty()) {
@@ -72,6 +78,12 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
             ObjectNode outParametersNode = propertiesNode.putObject(CmmnStencilConstants.PROPERTY_CASE_OUT_PARAMETERS);
             ArrayNode outParametersArray = outParametersNode.putArray("outParameters");
             readIOParameters(caseTask.getOutParameters(), outParametersArray);
+        }
+        if (caseTask.getBusinessKey() != null) {
+            propertiesNode.put(PROPERTY_CASE_BUSINESS_KEY, caseTask.getBusinessKey());
+        }
+        if (caseTask.isInheritBusinessKey()) {
+            propertiesNode.put(PROPERTY_CASE_INHERIT_BUSINESS_KEY, caseTask.isInheritBusinessKey());
         }
     }
 
@@ -103,9 +115,24 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
             task.setOutParameters(readIOParameters(outParametersNode));
         }
 
+        JsonNode caseTaskBusinessKey = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_CASE_BUSINESS_KEY, elementNode);
+        if (caseTaskBusinessKey != null) {
+            task.setBusinessKey(caseTaskBusinessKey.asText());
+        }
+
+        JsonNode caseTaskInheritBusinessKey = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_CASE_INHERIT_BUSINESS_KEY, elementNode);
+        if (caseTaskInheritBusinessKey != null) {
+            task.setInheritBusinessKey(caseTaskInheritBusinessKey.asBoolean());
+        }
+
         boolean fallbackToDefaultTenant = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, elementNode, false);
         if (fallbackToDefaultTenant) {
             task.setFallbackToDefaultTenant(true);
+        }
+
+        JsonNode idVariableName = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_ID_VARIABLE_NAME, elementNode);
+        if (idVariableName != null && idVariableName.isTextual()) {
+            task.setCaseInstanceIdVariableName(idVariableName.asText());
         }
 
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);

@@ -44,6 +44,8 @@ public interface DynamicBpmnConstants {
 
     String SEQUENCE_FLOW_CONDITION = "sequenceFlowCondition";
 
+    String CALL_ACTIVITY_CALLED_ELEMENT =  "callActivityCalledElement";
+
     String LOCALIZATION_LANGUAGE = "language";
     String LOCALIZATION_NAME = "name";
     String LOCALIZATION_DESCRIPTION = "description";

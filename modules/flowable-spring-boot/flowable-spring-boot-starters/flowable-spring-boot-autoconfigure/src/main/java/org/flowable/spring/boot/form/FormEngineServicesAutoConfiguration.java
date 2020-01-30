@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Filip Hrisafov
  * @author Javier Casal
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnFormEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -57,7 +57,7 @@ public class FormEngineServicesAutoConfiguration {
      * If a process engine is present that means that the FormEngine was created as part of it.
      * Therefore extract it from the FormEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.form.engine.FormEngine",
         "org.flowable.app.engine.AppEngine"
@@ -80,7 +80,7 @@ public class FormEngineServicesAutoConfiguration {
      * If an app engine is present that means that the FormEngine was created as part of the app engine.
      * Therefore extract it from the FormEngines.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.form.engine.FormEngine"
     })
@@ -102,7 +102,7 @@ public class FormEngineServicesAutoConfiguration {
     /**
      * If there is no process engine configuration, then trigger a creation of the form engine.
      */
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(type = {
         "org.flowable.form.engine.FormEngine",
         "org.flowable.engine.ProcessEngine",

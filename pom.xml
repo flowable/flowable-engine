@@ -14,22 +14,34 @@
 	</parent>
 
 	<packaging>pom</packaging>
-	<version>6.5.0-SNAPSHOT</version>
+	<version>6.5.1-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<spring.framework.version>5.1.8.RELEASE</spring.framework.version>
-		<spring.security.version>5.1.5.RELEASE</spring.security.version>
-		<jackson.version>2.9.9</jackson.version>
+		<spring.framework.version>5.2.2.RELEASE</spring.framework.version>
+		<spring.security.version>5.2.1.RELEASE</spring.security.version>
+		<spring.amqp.version>2.2.2.RELEASE</spring.amqp.version>
+		<spring.kafka.version>2.3.4.RELEASE</spring.kafka.version>
+		<jackson.version>2.10.2</jackson.version>
+		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.24.0</camel.version>
-		<cxf.version>3.3.2</cxf.version>
-		<slf4j.version>1.7.26</slf4j.version>
-		<spring.boot.version>2.1.6.RELEASE</spring.boot.version>
+		<cxf.version>3.3.5</cxf.version>
+		<slf4j.version>1.7.30</slf4j.version>
+		<spring.boot.version>2.2.2.RELEASE</spring.boot.version>
 
-		<junit.version>4.12</junit.version>
-		<junit.jupiter.version>5.5.1</junit.jupiter.version>
-		<mockito.version>3.0.0</mockito.version>
+		<junit.version>4.13</junit.version>
+		<junit.jupiter.version>5.5.2</junit.jupiter.version>
+		<hikari.version>3.4.2</hikari.version>
+		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
+		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
+		<mockito.version>3.2.4</mockito.version>
+		<testcontainers.version>1.12.4</testcontainers.version>
+
+		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
+		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
+
+		<spotify.docker.plugin.version>1.4.10</spotify.docker.plugin.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -116,27 +128,27 @@
 			<dependency>
 			    <groupId>commons-codec</groupId>
 			    <artifactId>commons-codec</artifactId>
-			    <version>1.13</version>
+			    <version>1.14</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.5.9</version>
+				<version>4.5.11</version>
 			</dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>4.4.11</version>
+                <version>4.4.13</version>
             </dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.5.9</version>
+				<version>4.5.11</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.jdbc</groupId>
-				<artifactId>ojdbc7</artifactId>
-				<version>12.1.0.1</version>
+				<artifactId>${oracle.jdbc.artifact}</artifactId>
+				<version>${oracle.jdbc.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -147,12 +159,12 @@
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
-				<version>2.3.1</version>
+				<version>2.3.2</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-xjc</artifactId>
-				<version>2.3.1</version>
+				<version>2.3.2</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -201,16 +213,27 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
+				<groupId>com.zaxxer</groupId>
+				<artifactId>HikariCP</artifactId>
+				<version>${hikari.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.27</version>
-				<scope>test</scope>
+				<version>8.0.17</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.1.4.4</version>
-				<scope>test</scope>
+				<version>11.5.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
@@ -543,6 +566,46 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-json-converter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-spring-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-event-registry-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-eventsubscription-service</artifactId>
 				<version>${project.version}</version>
@@ -713,7 +776,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-jsr223</artifactId>
-				<version>2.5.7</version>
+				<version>2.5.9</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -738,17 +801,12 @@
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
-				<version>3.5.2</version>
+				<version>3.5.3</version>
 			</dependency>
 			<dependency>
               <groupId>org.mybatis</groupId>
               <artifactId>mybatis-spring</artifactId>
-              <version>2.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>3.3.1</version>
+              <version>2.0.3</version>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
@@ -818,6 +876,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
+				<artifactId>spring-jms</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
 				<artifactId>spring-orm</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
@@ -850,6 +913,16 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.amqp</groupId>
+				<artifactId>spring-rabbit</artifactId>
+				<version>${spring.amqp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.kafka</groupId>
+				<artifactId>spring-kafka</artifactId>
+				<version>${spring.kafka.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
@@ -891,7 +964,7 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>3.7.0</version>
+				<version>3.8.0</version>
 				<exclusions>
 					<exclusion>
 						<groupId>ch.qos.logback</groupId>
@@ -908,8 +981,7 @@
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>9.4.1212.jre7</version>
-				<scope>test</scope>
+				<version>42.2.6</version>
 			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>
@@ -919,12 +991,12 @@
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.10.3</version>
+				<version>2.10.5</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>28.0-jre</version>
+				<version>28.2-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
@@ -939,7 +1011,7 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
-				<version>2.9.9.1</version>
+				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.datatype</groupId>
@@ -955,6 +1027,12 @@
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-joda</artifactId>
 				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>jakarta.jms</groupId>
+				<artifactId>jakarta.jms-api</artifactId>
+				<version>${jakarta-jms.version}</version>
 			</dependency>
 			<!-- Camel integration -->
 			<dependency>
@@ -985,24 +1063,19 @@
 			<dependency>
 				<groupId>com.microsoft.sqlserver</groupId>
 				<artifactId>mssql-jdbc</artifactId>
-				<version>6.4.0.jre8</version>
+				<version>7.4.1.jre8</version>
 			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.12.2</version>
+				<version>3.14.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>net.javacrumbs.json-unit</groupId>
 				<artifactId>json-unit-assertj</artifactId>
-				<version>2.8.0</version>
+				<version>2.11.1</version>
 				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.4.10</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -1021,6 +1094,11 @@
 		<module>modules/flowable-variable-service</module>
         <module>modules/flowable-identitylink-service-api</module>
 		<module>modules/flowable-identitylink-service</module>
+		<module>modules/flowable-event-registry-api</module>
+		<module>modules/flowable-event-registry-model</module>
+		<module>modules/flowable-event-registry-json-converter</module>
+		<module>modules/flowable-event-registry</module>
+		<module>modules/flowable-event-registry-configurator</module>
 		<module>modules/flowable-eventsubscription-service-api</module>
 		<module>modules/flowable-eventsubscription-service</module>
         <module>modules/flowable-task-service-api</module>
@@ -1057,7 +1135,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
@@ -1067,7 +1145,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.1</version>
+				<version>2.22.2</version>
 				<configuration>
 					<failIfNoTests>false</failIfNoTests>
 					<trimStackTrace>false</trimStackTrace>
@@ -1114,9 +1192,19 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>com.spotify</groupId>
+					<artifactId>dockerfile-maven-plugin</artifactId>
+					<version>${spotify.docker.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>${maven.deploy.plugin.version}</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.1.2</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -1127,8 +1215,26 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.1.1</version>
+					<configuration>
+						<source>${jdk.version}</source>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven.resources.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.5</version>
+					<version>3.2.3</version>
 					<configuration>
 						<failOnMissingWebXml>false</failOnMissingWebXml>
 						<archive>
@@ -1195,6 +1301,11 @@
 						</execution>
 					</executions>
 				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.6.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -1221,6 +1332,9 @@
                 <module>modules/flowable-spring-common</module>
                 <module>modules/flowable-engine-configurator</module>
                 <module>modules/flowable-spring-configurator</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-app-engine-spring</module>
                 <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
@@ -1298,10 +1412,11 @@
 						</executions>
 					</plugin>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<configuration>
-							<additionalparam>-Xdoclint:none</additionalparam>
-						</configuration>
+                            <doclint>none</doclint>
+                        </configuration>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -1341,6 +1456,9 @@
 				<module>modules/flowable-idm-spring</module>
 				<module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-ldap</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
@@ -1433,7 +1551,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.3</version>
+                        <version>0.8.4</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -1477,6 +1595,9 @@
                 <module>modules/flowable-idm-spring</module>
                 <module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
                 <module>modules/flowable-content-engine</module>
                 <module>modules/flowable-content-engine-configurator</module>
                 <module>modules/flowable-content-spring</module>
@@ -1565,12 +1686,28 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>dmn</id>
+			<modules>
+				<module>modules/flowable-dmn-model</module>
+				<module>modules/flowable-dmn-api</module>
+				<module>modules/flowable-dmn-engine</module>
+				<module>modules/flowable-dmn-xml-converter</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>databasecontent</id>
 			<activation>
 				<property>
 					<name>databasecontent</name>
 				</property>
 			</activation>
+			<modules>
+				<module>modules/flowable-content-api</module>
+				<module>modules/flowable-content-engine</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>content</id>
 			<modules>
 				<module>modules/flowable-content-api</module>
 				<module>modules/flowable-content-engine</module>
@@ -1652,6 +1789,10 @@
 				<module>modules/flowable-idm-engine-configurator</module>
 				<module>modules/flowable-idm-spring</module>
 				<module>modules/flowable-idm-spring-configurator</module>
+                <module>modules/flowable-event-registry-configurator</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-rest</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
@@ -1712,6 +1853,51 @@
                     </plugin>
                 </plugins>
             </build>
+		</profile>
+		<profile>
+			<id>postgresql</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>mssql</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.microsoft.sqlserver</groupId>
+					<artifactId>mssql-jdbc</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>mysql</id>
+			<dependencies>
+				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>db2</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.ibm.db2</groupId>
+					<artifactId>jcc</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>oracle</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle.jdbc</groupId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
+				</dependency>
+			</dependencies>
 		</profile>
 	</profiles>
 

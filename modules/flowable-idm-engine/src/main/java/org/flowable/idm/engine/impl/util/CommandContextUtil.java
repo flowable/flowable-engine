@@ -70,7 +70,7 @@ public class CommandContextUtil {
     }
     
     public static PropertyEntityManager getPropertyEntityManager(CommandContext commandContext) {
-        return getIdmEngineConfiguration(commandContext).getPropertyEntityManager();
+        return getIdmEngineConfiguration(commandContext).getIdmPropertyEntityManager();
     }
     
     public static UserEntityManager getUserEntityManager() {

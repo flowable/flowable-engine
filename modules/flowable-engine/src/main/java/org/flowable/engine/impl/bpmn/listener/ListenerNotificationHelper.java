@@ -30,7 +30,6 @@ import org.flowable.engine.delegate.BaseExecutionListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
@@ -39,6 +38,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ExecutionHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.task.service.delegate.BaseTaskListener;
+import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**

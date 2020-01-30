@@ -23,7 +23,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEve
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 
 /**
- * Service which provides access to variables.
+ * Service which provides access to eventsubscriptions.
  * 
  * @author Tijs Rademakers
  */
@@ -82,5 +82,7 @@ public interface EventSubscriptionService {
     void deleteEventSubscriptionsForScopeIdAndType(String scopeId, String scopeType);
     
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
+
+    void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
     
 }

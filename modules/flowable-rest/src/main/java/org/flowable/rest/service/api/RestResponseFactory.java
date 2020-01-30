@@ -29,8 +29,11 @@ import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
+import org.flowable.common.rest.variable.InstantRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
 import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
+import org.flowable.common.rest.variable.LocalDateRestVariableConverter;
+import org.flowable.common.rest.variable.LocalDateTimeRestVariableConverter;
 import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
@@ -566,32 +569,7 @@ public class RestResponseFactory {
     }
 
     public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, RestUrlBuilder urlBuilder) {
-        ProcessInstanceResponse result = new ProcessInstanceResponse();
-        result.setActivityId(processInstance.getActivityId());
-        result.setStartUserId(processInstance.getStartUserId());
-        result.setStartTime(processInstance.getStartTime());
-        result.setBusinessKey(processInstance.getBusinessKey());
-        result.setId(processInstance.getId());
-        result.setName(processInstance.getName());
-        result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
-        result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
-        result.setEnded(processInstance.isEnded());
-        result.setSuspended(processInstance.isSuspended());
-        result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
-        result.setCallbackId(processInstance.getCallbackId());
-        result.setCallbackType(processInstance.getCallbackType());
-        result.setTenantId(processInstance.getTenantId());
-
-        // Added by Ryan Johnston
-        if (processInstance.isEnded()) {
-            // Process complete. Note the same in the result.
-            result.setCompleted(true);
-        } else {
-            // Process not complete. Note the same in the result.
-            result.setCompleted(false);
-        }
-        // End Added by Ryan Johnston
-
+        ProcessInstanceResponse result = internalCreateProcessInstanceResponse(processInstance, urlBuilder);
         if (processInstance.getProcessVariables() != null) {
             Map<String, Object> variableMap = processInstance.getProcessVariables();
             for (String name : variableMap.keySet()) {
@@ -602,34 +580,11 @@ public class RestResponseFactory {
         return result;
     }
 
-    public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, boolean returnVariables, Map<String, Object> runtimeVariableMap,
-            List<HistoricVariableInstance> historicVariableList) {
+    public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, boolean returnVariables,
+            Map<String, Object> runtimeVariableMap, List<HistoricVariableInstance> historicVariableList) {
 
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        ProcessInstanceResponse result = new ProcessInstanceResponse();
-        result.setActivityId(processInstance.getActivityId());
-        result.setStartUserId(processInstance.getStartUserId());
-        result.setStartTime(processInstance.getStartTime());
-        result.setBusinessKey(processInstance.getBusinessKey());
-        result.setId(processInstance.getId());
-        result.setName(processInstance.getName());
-        result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
-        result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
-        result.setEnded(processInstance.isEnded());
-        result.setSuspended(processInstance.isSuspended());
-        result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
-        result.setCallbackId(processInstance.getCallbackId());
-        result.setCallbackType(processInstance.getCallbackType());
-        result.setTenantId(processInstance.getTenantId());
-
-        // Added by Ryan Johnston
-        if (processInstance.isEnded()) {
-            // Process complete. Note the same in the result.
-            result.setCompleted(true);
-        } else {
-            // Process not complete. Note the same in the result.
-            result.setCompleted(false);
-        }
+        ProcessInstanceResponse result = internalCreateProcessInstanceResponse(processInstance, urlBuilder);
 
         if (returnVariables) {
 
@@ -649,8 +604,33 @@ public class RestResponseFactory {
                 }
             }
         }
-        // End Added by Ryan Johnston
+        return result;
+    }
 
+    protected ProcessInstanceResponse internalCreateProcessInstanceResponse(ProcessInstance processInstance, RestUrlBuilder urlBuilder) {
+        ProcessInstanceResponse result = new ProcessInstanceResponse();
+        result.setActivityId(processInstance.getActivityId());
+        result.setStartUserId(processInstance.getStartUserId());
+        result.setStartTime(processInstance.getStartTime());
+        result.setBusinessKey(processInstance.getBusinessKey());
+        result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
+        result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+        result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
+        result.setEnded(processInstance.isEnded());
+        result.setSuspended(processInstance.isSuspended());
+        result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
+        result.setReferenceId(processInstance.getReferenceId());
+        result.setReferenceType(processInstance.getReferenceType());
+        result.setTenantId(processInstance.getTenantId());
+
+        if (processInstance.isEnded()) {
+            result.setCompleted(true);
+        } else {
+            result.setCompleted(false);
+        }
         return result;
     }
 
@@ -780,6 +760,8 @@ public class RestResponseFactory {
         }
         result.setCallbackId(processInstance.getCallbackId());
         result.setCallbackType(processInstance.getCallbackType());
+        result.setReferenceId(processInstance.getReferenceId());
+        result.setReferenceType(processInstance.getReferenceType());
         result.setTenantId(processInstance.getTenantId());
         return result;
     }
@@ -1367,6 +1349,9 @@ public class RestResponseFactory {
         variableConverters.add(new DoubleRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
+        variableConverters.add(new InstantRestVariableConverter());
+        variableConverters.add(new LocalDateRestVariableConverter());
+        variableConverters.add(new LocalDateTimeRestVariableConverter());
         variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 

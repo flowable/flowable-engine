@@ -239,6 +239,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
             $scope.gridProcessInstances = {
                 data: 'processInstances.data',
                 enableRowReordering: false,
+                enableColumnResize: true,
                 multiSelect: false,
                 keepLastSelected : false,
                 enableSorting: false,
@@ -264,6 +265,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
             $scope.gridJobs = {
                 data: 'jobs.data',
                 enableRowReordering: false,
+                enableColumnResize: true,
                 multiSelect: false,
                 keepLastSelected : false,
                 enableSorting: false,
@@ -288,6 +290,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
                 $scope.gridDecisionTables = {
                     data: 'decisionTables',
                     enableRowReordering: true,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     rowHeight: 36,
@@ -310,6 +313,7 @@ flowableAdminApp.controller('ProcessDefinitionController', ['$scope', '$rootScop
                 $scope.gridFormDefinitions = {
                     data: 'formDefinitions',
                     enableRowReordering: true,
+                    enableColumnResize: true,
                     multiSelect: false,
                     keepLastSelected: false,
                     rowHeight: 36,
@@ -402,7 +406,7 @@ flowableAdminApp.controller('ShowProcessDefinitionMigrationPopupCtrl',
         
         $http({
             method: 'GET',
-            url: '/app/rest/admin/process-definitions?key=' + $scope.processDefinition.key
+            url: '/app/rest/admin/process-definitions?key=' + $scope.processDefinition.key + '&size=1000'
         }).success(function (response, status, headers, config) {
             var definitionList = response.data;
             var finalResult = [];

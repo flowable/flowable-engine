@@ -25,7 +25,7 @@ import org.springframework.security.config.core.GrantedAuthorityDefaults;
     FlowableCommonAppProperties.class,
     FlowableRestAppProperties.class
 })
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class FlowableRemoteIdmAutoConfiguration {
 
     @ConditionalOnMissingBean
