@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,10 +20,10 @@ import java.util.List;
  */
 public class DmnDefinition extends NamedElement {
 
-    public static final String DMN_1_1 = "http://www.omg.org/spec/DMN/20151101";
     protected String expressionLanguage;
     protected String typeLanguage;
     protected String namespace;
+    protected List<InputData> inputData = new ArrayList<>();
     protected List<ItemDefinition> itemDefinitions = new ArrayList<>();
     protected List<Decision> decisions = new ArrayList<>();
 
@@ -51,6 +51,18 @@ public class DmnDefinition extends NamedElement {
         this.namespace = namespace;
     }
 
+    public List<InputData> getInputData() {
+        return inputData;
+    }
+    public void setInputData(List<InputData> inputData) {
+        this.inputData = inputData;
+    }
+    public void addInputData(InputData inputData) {
+        this.inputData.add(inputData);
+    }
+    public void setItemDefinitions(List<ItemDefinition> itemDefinitions) {
+        this.itemDefinitions = itemDefinitions;
+    }
     public List<ItemDefinition> getItemDefinitions() {
         return itemDefinitions;
     }

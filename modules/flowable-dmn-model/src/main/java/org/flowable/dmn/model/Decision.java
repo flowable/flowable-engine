@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,9 @@
  */
 package org.flowable.dmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Yvo Swillens
  */
@@ -19,6 +22,8 @@ public class Decision extends NamedElement {
 
     protected String question;
     protected String allowedAnswers;
+    protected List<InformationRequirement> informationRequirements = new ArrayList<>();
+    protected List<AuthorityRequirement> authorityRequirements = new ArrayList<>();
     protected Expression expression;
     protected boolean forceDMN11;
 
@@ -36,6 +41,28 @@ public class Decision extends NamedElement {
 
     public void setAllowedAnswers(String allowedAnswers) {
         this.allowedAnswers = allowedAnswers;
+    }
+
+    public List<InformationRequirement> getInformationRequirements() {
+        return informationRequirements;
+    }
+    public void setInformationRequirements(List<InformationRequirement> informationRequirements) {
+        this.informationRequirements = informationRequirements;
+    }
+
+    public void addInformationRequirement(InformationRequirement informationRequirement) {
+        this.informationRequirements.add(informationRequirement);
+    }
+
+    public List<AuthorityRequirement> getAuthorityRequirements() {
+        return authorityRequirements;
+    }
+    public void setAuthorityRequirements(List<AuthorityRequirement> authorityRequirements) {
+        this.authorityRequirements = authorityRequirements;
+    }
+
+    public void addAuthorityRequirement(AuthorityRequirement authorityRequirement) {
+        this.authorityRequirements.add(authorityRequirement);
     }
 
     public Expression getExpression() {
