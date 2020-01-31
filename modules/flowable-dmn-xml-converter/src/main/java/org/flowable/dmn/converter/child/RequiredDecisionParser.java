@@ -14,6 +14,7 @@ package org.flowable.dmn.converter.child;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.flowable.dmn.model.AuthorityRequirement;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnElement;
@@ -34,12 +35,17 @@ public class RequiredDecisionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof InformationRequirement))
+        if (!(parentElement instanceof InformationRequirement) && !(parentElement instanceof AuthorityRequirement)) {
             return;
+        }
 
         DmnElementReference requiredDecision = new DmnElementReference();
         requiredDecision.setHref(xtr.getAttributeValue(null, ATTRIBUTE_HREF));
 
-        ((InformationRequirement) parentElement).setRequiredDecision(requiredDecision);
+        if (parentElement instanceof InformationRequirement) {
+            ((InformationRequirement) parentElement).setRequiredDecision(requiredDecision);
+        } else if (parentElement instanceof AuthorityRequirement) {
+            ((AuthorityRequirement) parentElement).setRequiredDecision(requiredDecision);
+        }
     }
 }
