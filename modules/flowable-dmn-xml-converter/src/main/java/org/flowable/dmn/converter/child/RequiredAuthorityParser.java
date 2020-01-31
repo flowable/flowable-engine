@@ -18,7 +18,6 @@ import org.flowable.dmn.model.AuthorityRequirement;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.DmnElementReference;
-import org.flowable.dmn.model.InformationRequirement;
 
 /**
  * @author Tijs Rademakers

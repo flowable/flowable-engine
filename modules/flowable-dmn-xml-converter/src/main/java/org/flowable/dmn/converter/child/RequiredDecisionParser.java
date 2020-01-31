@@ -16,11 +16,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.dmn.model.AuthorityRequirement;
 import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.DmnElementReference;
 import org.flowable.dmn.model.InformationRequirement;
-import org.flowable.dmn.model.InputClause;
 
 /**
  * @author Tijs Rademakers

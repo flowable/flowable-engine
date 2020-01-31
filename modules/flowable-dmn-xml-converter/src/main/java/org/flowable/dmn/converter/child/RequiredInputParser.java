@@ -32,10 +32,9 @@ public class RequiredInputParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof InformationRequirement))
-            if (!(parentElement instanceof InformationRequirement) && !(parentElement instanceof AuthorityRequirement)) {
-                return;
-            }
+        if (!(parentElement instanceof InformationRequirement) && !(parentElement instanceof AuthorityRequirement)) {
+            return;
+        }
 
         DmnElementReference requiredInput = new DmnElementReference();
         requiredInput.setHref(xtr.getAttributeValue(null, ATTRIBUTE_HREF));
