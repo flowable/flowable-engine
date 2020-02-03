@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.junit.Assert;
@@ -144,4 +145,15 @@ public class SecureScriptingTest extends SecureScriptingBaseTest {
         Assert.assertNotNull(task);
     }
 
+    @Test
+    public void testAccessToBeans() {
+        deployProcessDefinition("test-secure-script-spring-bean-access.bpmn20.xml");
+        addWhiteListedClass(ExposedBean.class.getName());
+        addWhiteListedClass(ExecutionEntityImpl.class.getCanonicalName());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("useSpringBeans");
+        Object c = runtimeService.getVariable(processInstance.getId(), "c");
+        Assert.assertTrue(c instanceof Number);
+        Number cNumber = (Number) c;
+        Assert.assertEquals(exposedBean.getNumber(), cNumber.intValue());
+    }
 }
