@@ -1632,6 +1632,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery orderByCategory() {
+        orderBy(HistoricTaskInstanceQueryProperty.CATEGORY);
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQueryImpl orderByDeleteReason() {
         orderBy(HistoricTaskInstanceQueryProperty.DELETE_REASON);
         return this;

@@ -753,4 +753,9 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      */
     T orderByDueDateNullsLast();
 
+    /**
+     * Order by category (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    T orderByCategory();
+
 }

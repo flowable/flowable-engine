@@ -3139,6 +3139,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(12, taskService.createTaskQuery().orderByExecutionId().asc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskCreateTime().asc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskDueDate().asc().list().size());
+        assertEquals(12, taskService.createTaskQuery().orderByCategory().asc().list().size());
 
         assertEquals(12, taskService.createTaskQuery().orderByTaskId().desc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskName().desc().list().size());
@@ -3149,6 +3150,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertEquals(12, taskService.createTaskQuery().orderByExecutionId().desc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskCreateTime().desc().list().size());
         assertEquals(12, taskService.createTaskQuery().orderByTaskDueDate().desc().list().size());
+        assertEquals(12, taskService.createTaskQuery().orderByCategory().desc().list().size());
 
         assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").asc().list().size());
         assertEquals(6, taskService.createTaskQuery().orderByTaskId().taskName("testTask").desc().list().size());

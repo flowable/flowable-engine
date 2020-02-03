@@ -775,6 +775,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().asc().count());
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().count());
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().asc().count());
+        assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCategory().asc().count());
 
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByDeleteReason().desc().count());
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByExecutionId().desc().count());
@@ -788,6 +789,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().desc().count());
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().desc().count());
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().desc().count());
+        assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCategory().desc().count());
     }
 
     @Test
