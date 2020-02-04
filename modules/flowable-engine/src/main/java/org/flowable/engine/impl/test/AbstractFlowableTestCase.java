@@ -66,7 +66,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @EnsureCleanDb(excludeTables = {
     "ACT_GE_PROPERTY",
-    "ACT_ID_PROPERTY"
+    "ACT_ID_PROPERTY",
+    "FLW_EV_DATABASECHANGELOGLOCK",
+    "FLW_EV_DATABASECHANGELOG"
 })
 public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 

@@ -491,13 +491,17 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
                 if (eventRegistryConfigurator != null) {
                     specificConfigurators.add(eventRegistryConfigurator);
                 } else {
-                    specificConfigurators.add(new EventRegistryEngineConfigurator());
+                    specificConfigurators.add(createDefaultEventRegistryEngineConfigurator());
                 }
             }
             
             return specificConfigurators;
         }
         return Collections.emptyList();
+    }
+
+    protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
+        return new EventRegistryEngineConfigurator();
     }
 
     @Override
