@@ -27,9 +27,9 @@
             "SELECT-GROUP-NO-MATCHING-RESULTS": "Usa el campo buscar de arriba para encontrar grupos"
         },
         "TITLE": {
-            "MATCHING-PEOPLE": "Personas coincidentes",
+            "MATCHING-PEOPLE": "Personas que coinciden",
             "SELECT-GROUP": "Seleccionar grupo",
-            "MATCHING-GROUPS": "Grupos coincidentes"
+            "MATCHING-GROUPS": "Grupos que coinciden"
         }
     },
     "LOGIN": {
@@ -105,7 +105,7 @@
         }
       },
       "USER-MGMT": {
-        "TITLE": "Usuarios coincidentes",
+        "TITLE": "Usuarios que coinciden",
          "CREATE-USER": "Crear usuario",
          "NAME-SEARCH": "Buscar por nombre",
          "COMPANY": "Compañía",
@@ -125,8 +125,8 @@
          "ORDER-BY": "Ordenar por",
          "SHOW-NEXT": "Mostrar siguiente",
          "SHOW-PREVIOUS": "Mostrar anterior",
-         "NO-MATCHING-USERS": "No se encontraron usuarios coincidentes",
-         "MATCHING-USERS": "Se encontraron {{total | number}} usuarios coincidentes, mostrando de {{start + 1}} a {{start + size}}",
+         "NO-MATCHING-USERS": "No se encontraron usuarios que coincidan",
+         "MATCHING-USERS": "Se encontraron {{total | number}} usuarios que coinciden, mostrando de {{start + 1}} a {{start + size}}",
          "ID": "Identificador",
          "EMAIL": "Email",
          "NAME": "Nombre",

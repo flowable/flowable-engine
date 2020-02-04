@@ -135,8 +135,8 @@
             "ASSIGN": "Seleccionar participante",
             "ASSIGNEE": "Asignado",
             "CONTENT": "Contenido relacionado",
-            "CREATE-NEW": "Nueva tarea",
             "SUBTASK": "Subtarea",
+            "CREATE-NEW": "Nueva tarea",
             "FORM": "Formulario",
             "DETAILS": "Detalles",
             "ADD-RELATED-CONTENT": "Agregar contenido relacionado",
@@ -294,8 +294,8 @@
             "DIAGRAM": "Diagrama de caso"
         },
         "FILTER": {
-            "CREATED-DESC": "Nuevos primero",
-            "CREATED-ASC": "Antiguos primero",
+            "CREATED-DESC": "El más reciente primero",
+            "CREATED-ASC": "El más antiguo primero",
             "ENDED-DESC": "Completado más reciente",
             "ENDED-ASC": "Completado más antiguo",
             "STATE-SUMMARY": "Mostrando {{state.title | translate}} casos",
