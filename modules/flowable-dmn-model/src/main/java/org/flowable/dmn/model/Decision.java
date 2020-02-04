@@ -22,6 +22,7 @@ public class Decision extends NamedElement {
 
     protected String question;
     protected String allowedAnswers;
+    protected InformationItem variable;
     protected List<InformationRequirement> informationRequirements = new ArrayList<>();
     protected List<AuthorityRequirement> authorityRequirements = new ArrayList<>();
     protected Expression expression;
@@ -43,6 +44,12 @@ public class Decision extends NamedElement {
         this.allowedAnswers = allowedAnswers;
     }
 
+    public InformationItem getVariable() {
+        return variable;
+    }
+    public void setVariable(InformationItem variable) {
+        this.variable = variable;
+    }
     public List<InformationRequirement> getInformationRequirements() {
         return informationRequirements;
     }

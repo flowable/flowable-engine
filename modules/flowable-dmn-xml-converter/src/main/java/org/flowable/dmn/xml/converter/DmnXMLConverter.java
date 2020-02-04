@@ -88,6 +88,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
         addConverter(new AuthorityRequirementConverter());
         addConverter(new ItemDefinitionXMLConverter());
         addConverter(new InputDataXMLConverter());
+        addConverter(new VariableXMLConverter());
     }
 
     public static void addConverter(BaseDmnXMLConverter converter) {
@@ -374,6 +375,20 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
                 DmnXMLUtil.writeElementDescription(decision, xtw);
                 DmnXMLUtil.writeExtensionElements(decision, xtw);
+
+                if (decision.getVariable() != null) {
+                    xtw.writeStartElement(ELEMENT_VARIABLE);
+                    if (StringUtils.isNotEmpty(decision.getVariable().getId())) {
+                        xtw.writeAttribute(ATTRIBUTE_ID, decision.getVariable().getId());
+                    }
+                    if (StringUtils.isNotEmpty(decision.getVariable().getName())) {
+                        xtw.writeAttribute(ATTRIBUTE_NAME, decision.getVariable().getName());
+                    }
+                    if (StringUtils.isNotEmpty(decision.getVariable().getTypeRef())) {
+                        xtw.writeAttribute(ATTRIBUTE_TYPE_REF, decision.getVariable().getTypeRef());
+                    }
+                    xtw.writeEndElement();
+                }
 
                 for (InformationRequirement informationRequirement : decision.getInformationRequirements()) {
                     xtw.writeStartElement(ELEMENT_INFORMATION_REQUIREMENT);

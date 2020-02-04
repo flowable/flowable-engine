@@ -40,6 +40,12 @@ public class Chapter11Test extends AbstractConverterTest {
             .extracting(ItemDefinition::getName)
             .containsExactly("Income", "Repayments", "Expenses");
 
+        assertThat(model.getDecisions()).as("decisions")
+            .filteredOn(dec -> dec.getVariable() != null)
+            .extracting(dec -> dec.getVariable().getName())
+            .containsExactly("Adjudication", "Bureau call type", "Strategy", "Eligibility", "Routing", "Pre-bureau affordability", "Post-bureau affordability",
+                "Post-bureau risk category", "Pre-bureau risk category", "Application risk score", "Required monthly installment");
+
     }
 
 }
