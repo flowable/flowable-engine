@@ -90,6 +90,13 @@ public class SecureJavascriptConfigurator extends AbstractProcessEngineConfigura
      */
     protected int scriptOptimizationLevel = -1;
 
+    /**
+     * When true, access to beans in {@link AbstractEngineConfiguration#beans} is enabled.
+     *
+     * By default disabled
+     */
+    protected boolean enableAccessToBeans = false;
+
     @Override
     public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
 
@@ -138,6 +145,7 @@ public class SecureJavascriptConfigurator extends AbstractProcessEngineConfigura
                 secureScriptContextFactory.setObserveInstructionCount(getNrOfInstructionsBeforeStateCheckCallback());
             }
 
+            secureScriptContextFactory.setEnableAccessToBeans(isEnableAccessToBeans());
             ContextFactory.initGlobal(secureScriptContextFactory);
         }
     }
@@ -221,4 +229,12 @@ public class SecureJavascriptConfigurator extends AbstractProcessEngineConfigura
         return secureScriptClassShutter;
     }
 
+    public SecureJavascriptConfigurator setEnableAccessToBeans(boolean enableAccessToBeans) {
+        this.enableAccessToBeans = enableAccessToBeans;
+        return this;
+    }
+
+    public boolean isEnableAccessToBeans() {
+        return enableAccessToBeans;
+    }
 }

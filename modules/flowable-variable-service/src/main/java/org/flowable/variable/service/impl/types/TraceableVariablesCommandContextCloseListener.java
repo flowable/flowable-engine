@@ -17,27 +17,28 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 
 /**
- * A {@link CommandContextCloseListener} that holds one {@link DeserializedObject} instance that is added by the {@link SerializableType}.
+ * A {@link CommandContextCloseListener} that holds one {@link TraceableObject} instance that is added by {@link MutableVariableType}(s).
  * 
- * On the {@link #closing(CommandContext)} of the {@link CommandContext}, the {@link DeserializedObject} will be verified if it is dirty. If so, it will update the right entities such that changes
- * will be flushed.
+ * On the {@link #closing(CommandContext)} of the {@link CommandContext}, the {@link TraceableObject} will be verified if it is dirty.
+ * If so, it will update the right entities such that changes will be flushed.
  * 
- * It's important that this happens in the {@link #closing(CommandContext)}, as this happens before the {@link CommandContext#close()} is called and when all the sessions are flushed (including the
- * {@link DbSqlSession} in the relational DB case (the data needs to be ready then).
+ * It's important that this happens in the {@link #closing(CommandContext)}, as this happens before the {@link CommandContext#close()} is called
+ * and when all the sessions are flushed (including the {@link DbSqlSession} in the relational DB case (the data needs to be ready then).
  * 
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class VerifyDeserializedObjectCommandContextCloseListener implements CommandContextCloseListener {
+public class TraceableVariablesCommandContextCloseListener implements CommandContextCloseListener {
 
-    protected DeserializedObject deserializedObject;
+    protected TraceableObject<?, ?> traceableObject;
 
-    public VerifyDeserializedObjectCommandContextCloseListener(DeserializedObject deserializedObject) {
-        this.deserializedObject = deserializedObject;
+    public TraceableVariablesCommandContextCloseListener(TraceableObject<?, ?> traceableObject) {
+        this.traceableObject = traceableObject;
     }
 
     @Override
     public void closing(CommandContext commandContext) {
-        deserializedObject.verifyIfBytesOfSerializedObjectChanged();
+        traceableObject.updateIfValueChanged();
     }
 
     @Override

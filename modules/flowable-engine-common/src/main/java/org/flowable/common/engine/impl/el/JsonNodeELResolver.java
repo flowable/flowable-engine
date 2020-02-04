@@ -16,6 +16,7 @@ import java.beans.FeatureDescriptor;
 import java.math.BigDecimal;
 import java.util.Iterator;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
@@ -23,6 +24,8 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.PropertyNotWritableException;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -172,7 +175,7 @@ public class JsonNodeELResolver extends ELResolver {
         }
         Object result = null;
         if (isResolvable(base)) {
-            JsonNode resultNode = getResultNode((JsonNode) base, property);
+            JsonNode resultNode = getResultNode((JsonNode) base, property, context);
             if (resultNode != null && resultNode.isValueNode()) {
                 if (resultNode.isBoolean()) {
                     result = resultNode.asBoolean();
@@ -184,21 +187,33 @@ public class JsonNodeELResolver extends ELResolver {
                     result = resultNode.asDouble();
                 } else if (resultNode.isTextual()) {
                     result = resultNode.asText();
+                } else if (resultNode.isNull()) {
+                    result = null;
                 } else {
                     result = resultNode.toString();
                 }
+                context.setPropertyResolved(true);
 
-            } else {
+            } else if (resultNode != null) {
                 result = resultNode;
+                context.setPropertyResolved(true);
             }
-            context.setPropertyResolved(true);
         }
         return result;
     }
 
-    protected JsonNode getResultNode(JsonNode base, Object property) {
+    protected JsonNode getResultNode(JsonNode base, Object property, ELContext context) {
         if (property instanceof String) {
-            return base.get((String) property);
+            JsonNode propertyNode = base.get((String) property);
+            if (propertyNode != null) {
+                return propertyNode;
+            }
+
+            if (!readOnly && base instanceof ObjectNode && context.getContext(EvaluationState.class) == EvaluationState.WRITE) {
+                // The base does not have the requested property, so add it and return it, only if we are in write evaluation state
+                return ((ObjectNode) base).putObject((String) property);
+            }
+            return null;
         } else if (property instanceof Number) {
             return base.get(((Number) property).intValue());
         } else {
@@ -269,30 +284,74 @@ public class JsonNodeELResolver extends ELResolver {
             throw new NullPointerException("context is null");
         }
         if (base instanceof ObjectNode) {
-            if (readOnly) {
-                throw new PropertyNotWritableException("resolver is read-only");
-            }
-            ObjectNode node = (ObjectNode) base;
-            if (value instanceof BigDecimal) {
-                node.put(property.toString(), (BigDecimal) value);
-
-            } else if (value instanceof Boolean) {
-                node.put(property.toString(), (Boolean) value);
-
-            } else if (value instanceof Long) {
-                node.put(property.toString(), (Long) value);
-
-            } else if (value instanceof Double) {
-                node.put(property.toString(), (Double) value);
-
-            } else if (value != null) {
-                node.put(property.toString(), value.toString());
-
-            } else {
-                node.putNull(property.toString());
-            }
-            context.setPropertyResolved(true);
+            setValue(context, (ObjectNode) base, property, value);
+        } else if (base instanceof ArrayNode) {
+            setValue(context, (ArrayNode) base, property, value);
         }
+    }
+
+    protected void setValue(ELContext context, ObjectNode node, Object property, Object value) {
+        if (readOnly) {
+            throw new PropertyNotWritableException("resolver is read-only");
+        }
+        JsonNode jsonNode = createNode(node, value);
+        node.set(property.toString(), jsonNode);
+        context.setPropertyResolved(true);
+    }
+
+    protected void setValue(ELContext context, ArrayNode node, Object property, Object value) {
+        if (readOnly) {
+            throw new PropertyNotWritableException("resolver is read-only");
+        }
+
+        int index = toIndex(property);
+        JsonNode jsonNode = createNode(node, value);
+        node.set(index, jsonNode);
+        context.setPropertyResolved(true);
+    }
+
+    protected JsonNode createNode(JsonNodeCreator nodeCreator, Object value) {
+        JsonNode jsonNode;
+        if (value instanceof BigDecimal) {
+            jsonNode = nodeCreator.numberNode((BigDecimal) value);
+
+        } else if (value instanceof Boolean) {
+            jsonNode = nodeCreator.booleanNode((Boolean) value);
+
+        } else if (value instanceof Long) {
+            jsonNode = nodeCreator.numberNode((Long) value);
+
+        } else if (value instanceof Double) {
+            jsonNode = nodeCreator.numberNode((Double) value);
+
+        } else if (value instanceof JsonNode) {
+            jsonNode = (JsonNode) value;
+        } else if (value != null) {
+            jsonNode = nodeCreator.textNode(value.toString());
+
+        } else {
+            jsonNode = nodeCreator.nullNode();
+
+        }
+
+        return jsonNode;
+    }
+
+    protected int toIndex(Object property) {
+        int index;
+        if (property instanceof Number) {
+            index = ((Number) property).intValue();
+        } else if (property instanceof String) {
+            try {
+                index = Integer.valueOf((String) property);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Cannot parse array index: " + property, e);
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot coerce property to array index: " + property);
+        }
+
+        return index;
     }
 
     /**

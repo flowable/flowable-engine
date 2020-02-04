@@ -94,7 +94,6 @@ import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
 import org.flowable.variable.service.impl.types.LocalDateTimeType;
 import org.flowable.variable.service.impl.types.LocalDateType;
-import org.flowable.variable.service.impl.types.LongJsonType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
@@ -148,6 +147,18 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected List<VariableType> customPostVariableTypes;
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
+    /**
+     * This flag determines whether variables of the type 'json' and 'longJson' will be tracked.
+     * <p>
+     * This means that, when true, in a JavaDelegate you can write:
+     * <pre><code>
+     *     JsonNode jsonNode = (JsonNode) execution.getVariable("customer");
+     *     customer.put("name", "Kermit");
+     * </code></pre>
+     * And the changes to the JsonNode will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
+     */
+    protected boolean jsonVariableTypeTrackObjects = true;
+
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -411,8 +422,9 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper));
-            variableTypes.addType(new LongJsonType(getMaxLengthString() + 1, objectMapper));
+            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            // longJsonType only needed for reading purposes
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
             if (customPostVariableTypes != null) {
@@ -730,6 +742,15 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public AppEngineConfiguration setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+        return this;
+    }
+
+    public boolean isJsonVariableTypeTrackObjects() {
+        return jsonVariableTypeTrackObjects;
+    }
+
+    public AppEngineConfiguration setJsonVariableTypeTrackObjects(boolean jsonVariableTypeTrackObjects) {
+        this.jsonVariableTypeTrackObjects = jsonVariableTypeTrackObjects;
         return this;
     }
 

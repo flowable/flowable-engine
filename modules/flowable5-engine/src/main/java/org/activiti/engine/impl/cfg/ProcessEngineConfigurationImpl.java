@@ -226,7 +226,6 @@ import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JsonType;
-import org.flowable.variable.service.impl.types.LongJsonType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
@@ -1368,8 +1367,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new DateType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(maxLengthStringVariableType, objectMapper));
-            variableTypes.addType(new LongJsonType(maxLengthStringVariableType + 1, objectMapper));
+            variableTypes.addType(new JsonType(maxLengthStringVariableType, objectMapper, false));
+            // longJsonType only needed for reading purposes
+            variableTypes.addType(JsonType.longJsonType(maxLengthStringVariableType, objectMapper, false));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType());
             if (customPostVariableTypes != null) {
