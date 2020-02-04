@@ -20,16 +20,19 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.converter.child.AllowedValuesParser;
 import org.flowable.dmn.converter.child.BaseChildElementParser;
 import org.flowable.dmn.converter.child.InputClauseParser;
 import org.flowable.dmn.converter.child.InputEntryParser;
 import org.flowable.dmn.converter.child.InputExpressionParser;
+import org.flowable.dmn.converter.child.ItemComponentParser;
 import org.flowable.dmn.converter.child.OutputClauseParser;
 import org.flowable.dmn.converter.child.OutputEntryParser;
 import org.flowable.dmn.converter.child.OutputValuesParser;
 import org.flowable.dmn.converter.child.RequiredAuthorityParser;
 import org.flowable.dmn.converter.child.RequiredDecisionParser;
 import org.flowable.dmn.converter.child.RequiredInputParser;
+import org.flowable.dmn.converter.child.TypeRefParser;
 import org.flowable.dmn.converter.child.VariableParser;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
@@ -57,6 +60,9 @@ public class DmnXMLUtil implements DmnXMLConstants {
         addGenericParser(new RequiredAuthorityParser());
         addGenericParser(new RequiredDecisionParser());
         addGenericParser(new RequiredInputParser());
+        addGenericParser(new AllowedValuesParser());
+        addGenericParser(new ItemComponentParser());
+        addGenericParser(new TypeRefParser());
     }
 
     private static void addGenericParser(BaseChildElementParser parser) {
@@ -77,7 +83,6 @@ public class DmnXMLUtil implements DmnXMLConstants {
             xtr.next();
 
             if (xtr.isStartElement()) {
-
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     inExtensionElements = true;
                 } else if (localParserMap.containsKey(xtr.getLocalName())) {

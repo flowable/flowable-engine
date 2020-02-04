@@ -38,11 +38,12 @@ public class InputDataXMLConverter extends BaseDmnXMLConverter {
 
     @Override
     protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
-        InputData clause = new InputData();
-        clause.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
-        clause.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
-        parseChildElements(getXMLElementName(), clause, decision, xtr);
-        return clause;
+        InputData inputData = new InputData();
+        inputData.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
+        inputData.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+        parseChildElements(getXMLElementName(), inputData, decision, xtr);
+
+        return inputData;
     }
 
     @Override

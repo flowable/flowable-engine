@@ -1,7 +1,6 @@
 package org.flowable.dmn.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.filter;
 
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;

@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
@@ -83,9 +84,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
         addConverter(new InputClauseXMLConverter());
         addConverter(new OutputClauseXMLConverter());
         addConverter(new DecisionRuleXMLConverter());
-        addConverter(new InputDataXMLConverter());
         addConverter(new InformationRequirementConverter());
         addConverter(new AuthorityRequirementConverter());
+        addConverter(new ItemDefinitionXMLConverter());
+        addConverter(new InputDataXMLConverter());
     }
 
     public static void addConverter(BaseDmnXMLConverter converter) {
@@ -344,7 +346,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     xtw.writeStartElement(ELEMENT_VARIABLE);
                     xtw.writeAttribute(ATTRIBUTE_ID, variable.getId());
                     xtw.writeAttribute(ATTRIBUTE_TYPE_REF, variable.getTypeRef());
-                    if (StringUtils.isNotEmpty(inputData.getName())) {
+                    if (StringUtils.isNotEmpty(variable.getName())) {
                         xtw.writeAttribute(ATTRIBUTE_NAME, variable.getName());
                     }
                     xtw.writeEndElement();
@@ -356,22 +358,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 xtw.writeEndElement();
             }
 
-            for (ItemDefinition itemDefinition : model.getItemDefinitions()) {
-                xtw.writeStartElement(ELEMENT_ITEM_DEFINITION);
-                xtw.writeAttribute(ATTRIBUTE_ID, itemDefinition.getId());
-                if (StringUtils.isNotEmpty(itemDefinition.getName())) {
-                    xtw.writeAttribute(ATTRIBUTE_NAME, itemDefinition.getName());
-                }
-
-                DmnXMLUtil.writeElementDescription(itemDefinition, xtw);
-                DmnXMLUtil.writeExtensionElements(itemDefinition, xtw);
-
-                xtw.writeStartElement(ELEMENT_TYPE_DEFINITION);
-                xtw.writeCharacters(itemDefinition.getTypeDefinition());
-                xtw.writeEndElement();
-
-                xtw.writeEndElement();
-            }
+            writeItemDefinition(model.getItemDefinitions(), xtw);
 
             for (Decision decision : model.getDecisions()) {
                 xtw.writeStartElement(ELEMENT_DECISION);
@@ -421,133 +408,145 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 }
 
                 // decision table
-                DecisionTable decisionTable = (DecisionTable) decision.getExpression();
-                xtw.writeStartElement(ELEMENT_DECISION_TABLE);
-                xtw.writeAttribute(ATTRIBUTE_ID, decisionTable.getId());
+                if (decision.getExpression() != null) {
+                    DecisionTable decisionTable = (DecisionTable) decision.getExpression();
 
-                if (decisionTable.getHitPolicy() != null) {
-                    xtw.writeAttribute(ATTRIBUTE_HIT_POLICY, decisionTable.getHitPolicy().getValue());
-                }
+                    xtw.writeStartElement(ELEMENT_DECISION_TABLE);
+                    xtw.writeAttribute(ATTRIBUTE_ID, decisionTable.getId());
 
-                if (decisionTable.getAggregation() != null) {
-                    xtw.writeAttribute(ATTRIBUTE_AGGREGATION, decisionTable.getAggregation().toString());
-                }
-
-                DmnXMLUtil.writeElementDescription(decisionTable, xtw);
-                DmnXMLUtil.writeExtensionElements(decisionTable, xtw);
-
-                for (InputClause clause : decisionTable.getInputs()) {
-                    xtw.writeStartElement(ELEMENT_INPUT_CLAUSE);
-                    if (StringUtils.isNotEmpty(clause.getId())) {
-                        xtw.writeAttribute(ATTRIBUTE_ID, clause.getId());
-                    }
-                    if (StringUtils.isNotEmpty(clause.getLabel())) {
-                        xtw.writeAttribute(ATTRIBUTE_LABEL, clause.getLabel());
+                    if (decisionTable.getHitPolicy() != null) {
+                        xtw.writeAttribute(ATTRIBUTE_HIT_POLICY, decisionTable.getHitPolicy().getValue());
                     }
 
-                    DmnXMLUtil.writeElementDescription(clause, xtw);
-                    DmnXMLUtil.writeExtensionElements(clause, xtw);
+                    if (decisionTable.getAggregation() != null) {
+                        xtw.writeAttribute(ATTRIBUTE_AGGREGATION, decisionTable.getAggregation().toString());
+                    }
 
-                    if (clause.getInputExpression() != null) {
-                        xtw.writeStartElement(ELEMENT_INPUT_EXPRESSION);
-                        xtw.writeAttribute(ATTRIBUTE_ID, clause.getInputExpression().getId());
+                    DmnXMLUtil.writeElementDescription(decisionTable, xtw);
+                    DmnXMLUtil.writeExtensionElements(decisionTable, xtw);
 
-                        if (StringUtils.isNotEmpty(clause.getInputExpression().getTypeRef())) {
-                            xtw.writeAttribute(ATTRIBUTE_TYPE_REF, clause.getInputExpression().getTypeRef());
+                    for (InputClause clause : decisionTable.getInputs()) {
+                        xtw.writeStartElement(ELEMENT_INPUT_CLAUSE);
+                        if (StringUtils.isNotEmpty(clause.getId())) {
+                            xtw.writeAttribute(ATTRIBUTE_ID, clause.getId());
+                        }
+                        if (StringUtils.isNotEmpty(clause.getLabel())) {
+                            xtw.writeAttribute(ATTRIBUTE_LABEL, clause.getLabel());
                         }
 
-                        if (StringUtils.isNotEmpty(clause.getInputExpression().getText())) {
+                        DmnXMLUtil.writeElementDescription(clause, xtw);
+                        DmnXMLUtil.writeExtensionElements(clause, xtw);
+
+                        if (clause.getInputExpression() != null) {
+                            xtw.writeStartElement(ELEMENT_INPUT_EXPRESSION);
+
+                            if (StringUtils.isNotEmpty(clause.getInputExpression().getId())) {
+                                xtw.writeAttribute(ATTRIBUTE_ID, clause.getInputExpression().getId());
+                            }
+
+                            if (StringUtils.isNotEmpty(clause.getInputExpression().getTypeRef())) {
+                                xtw.writeAttribute(ATTRIBUTE_TYPE_REF, clause.getInputExpression().getTypeRef());
+                            }
+
+                            if (StringUtils.isNotEmpty(clause.getInputExpression().getText())) {
+                                xtw.writeStartElement(ELEMENT_TEXT);
+                                xtw.writeCharacters(clause.getInputExpression().getText());
+                                xtw.writeEndElement();
+                            }
+
+                            xtw.writeEndElement();
+                        }
+
+                        if (clause.getInputValues() != null && StringUtils.isNotEmpty(clause.getInputValues().getText())) {
+                            xtw.writeStartElement(ELEMENT_INPUT_VALUES);
                             xtw.writeStartElement(ELEMENT_TEXT);
-                            xtw.writeCharacters(clause.getInputExpression().getText());
+                            xtw.writeCharacters(clause.getInputValues().getText());
+                            xtw.writeEndElement();
                             xtw.writeEndElement();
                         }
 
                         xtw.writeEndElement();
                     }
 
-                    if (clause.getInputValues() != null && StringUtils.isNotEmpty(clause.getInputValues().getText())) {
-                        xtw.writeStartElement(ELEMENT_INPUT_VALUES);
-                        xtw.writeStartElement(ELEMENT_TEXT);
-                        xtw.writeCharacters(clause.getInputValues().getText());
-                        xtw.writeEndElement();
-                        xtw.writeEndElement();
-                    }
+                    for (OutputClause clause : decisionTable.getOutputs()) {
+                        xtw.writeStartElement(ELEMENT_OUTPUT_CLAUSE);
+                        if (StringUtils.isNotEmpty(clause.getId())) {
+                            xtw.writeAttribute(ATTRIBUTE_ID, clause.getId());
+                        }
+                        if (StringUtils.isNotEmpty(clause.getLabel())) {
+                            xtw.writeAttribute(ATTRIBUTE_LABEL, clause.getLabel());
+                        }
+                        if (StringUtils.isNotEmpty(clause.getName())) {
+                            xtw.writeAttribute(ATTRIBUTE_NAME, clause.getName());
+                        }
+                        if (StringUtils.isNotEmpty(clause.getTypeRef())) {
+                            xtw.writeAttribute(ATTRIBUTE_TYPE_REF, clause.getTypeRef());
+                        }
 
-                    xtw.writeEndElement();
-                }
-
-                for (OutputClause clause : decisionTable.getOutputs()) {
-                    xtw.writeStartElement(ELEMENT_OUTPUT_CLAUSE);
-                    if (StringUtils.isNotEmpty(clause.getId())) {
-                        xtw.writeAttribute(ATTRIBUTE_ID, clause.getId());
-                    }
-                    if (StringUtils.isNotEmpty(clause.getLabel())) {
-                        xtw.writeAttribute(ATTRIBUTE_LABEL, clause.getLabel());
-                    }
-                    if (StringUtils.isNotEmpty(clause.getName())) {
-                        xtw.writeAttribute(ATTRIBUTE_NAME, clause.getName());
-                    }
-                    if (StringUtils.isNotEmpty(clause.getTypeRef())) {
-                        xtw.writeAttribute(ATTRIBUTE_TYPE_REF, clause.getTypeRef());
-                    }
-
-                    if (clause.getOutputValues() != null && StringUtils.isNotEmpty(clause.getOutputValues().getText())) {
-                        xtw.writeStartElement(ELEMENT_OUTPUT_VALUES);
-                        xtw.writeStartElement(ELEMENT_TEXT);
-                        xtw.writeCharacters(clause.getOutputValues().getText());
-                        xtw.writeEndElement();
-                        xtw.writeEndElement();
-                    }
-
-                    DmnXMLUtil.writeElementDescription(clause, xtw);
-                    DmnXMLUtil.writeExtensionElements(clause, xtw);
-
-                    xtw.writeEndElement();
-                }
-
-                for (DecisionRule rule : decisionTable.getRules()) {
-                    xtw.writeStartElement(ELEMENT_RULE);
-                    if (StringUtils.isNotEmpty(rule.getId())) {
-                        xtw.writeAttribute(ATTRIBUTE_ID, rule.getId());
-                    }
-
-                    DmnXMLUtil.writeElementDescription(rule, xtw);
-                    DmnXMLUtil.writeExtensionElements(rule, xtw);
-
-                    for (RuleInputClauseContainer container : rule.getInputEntries()) {
-                        xtw.writeStartElement(ELEMENT_INPUT_ENTRY);
-                        xtw.writeAttribute(ATTRIBUTE_ID, container.getInputEntry().getId());
-
-                        DmnXMLUtil.writeExtensionElements(container.getInputEntry(), xtw);
-
-                        if (StringUtils.isNotEmpty(container.getInputEntry().getText())) {
+                        if (clause.getOutputValues() != null && StringUtils.isNotEmpty(clause.getOutputValues().getText())) {
+                            xtw.writeStartElement(ELEMENT_OUTPUT_VALUES);
                             xtw.writeStartElement(ELEMENT_TEXT);
-                            xtw.writeCData(container.getInputEntry().getText());
+                            xtw.writeCharacters(clause.getOutputValues().getText());
+                            xtw.writeEndElement();
+                            xtw.writeEndElement();
+                        }
+
+                        DmnXMLUtil.writeElementDescription(clause, xtw);
+                        DmnXMLUtil.writeExtensionElements(clause, xtw);
+
+                        xtw.writeEndElement();
+                    }
+
+                    for (DecisionRule rule : decisionTable.getRules()) {
+                        xtw.writeStartElement(ELEMENT_RULE);
+                        if (StringUtils.isNotEmpty(rule.getId())) {
+                            xtw.writeAttribute(ATTRIBUTE_ID, rule.getId());
+                        }
+
+                        DmnXMLUtil.writeElementDescription(rule, xtw);
+                        DmnXMLUtil.writeExtensionElements(rule, xtw);
+
+                        for (RuleInputClauseContainer container : rule.getInputEntries()) {
+                            xtw.writeStartElement(ELEMENT_INPUT_ENTRY);
+                            xtw.writeAttribute(ATTRIBUTE_ID, container.getInputEntry().getId());
+
+                            DmnXMLUtil.writeExtensionElements(container.getInputEntry(), xtw);
+
+                            if (StringUtils.isNotEmpty(container.getInputEntry().getText())) {
+                                xtw.writeStartElement(ELEMENT_TEXT);
+                                xtw.writeCData(container.getInputEntry().getText());
+                                xtw.writeEndElement();
+                            }
+
+                            xtw.writeEndElement();
+                        }
+
+                        for (RuleOutputClauseContainer container : rule.getOutputEntries()) {
+                            xtw.writeStartElement(ELEMENT_OUTPUT_ENTRY);
+                            xtw.writeAttribute(ATTRIBUTE_ID, container.getOutputEntry().getId());
+
+                            if (StringUtils.isNotEmpty(container.getOutputEntry().getText())) {
+                                xtw.writeStartElement(ELEMENT_TEXT);
+                                xtw.writeCData(container.getOutputEntry().getText());
+                                xtw.writeEndElement();
+                            }
+
                             xtw.writeEndElement();
                         }
 
                         xtw.writeEndElement();
                     }
 
-                    for (RuleOutputClauseContainer container : rule.getOutputEntries()) {
-                        xtw.writeStartElement(ELEMENT_OUTPUT_ENTRY);
-                        xtw.writeAttribute(ATTRIBUTE_ID, container.getOutputEntry().getId());
 
-                        if (StringUtils.isNotEmpty(container.getOutputEntry().getText())) {
-                            xtw.writeStartElement(ELEMENT_TEXT);
-                            xtw.writeCData(container.getOutputEntry().getText());
-                            xtw.writeEndElement();
-                        }
-
-                        xtw.writeEndElement();
-                    }
-
-                    xtw.writeEndElement();
-                }
 
                 xtw.writeEndElement();
 
+
+
                 xtw.writeEndElement();
+
+
+                }
             }
 
             // end definitions root element
@@ -566,5 +565,59 @@ public class DmnXMLConverter implements DmnXMLConstants {
             LOGGER.error("Error writing DMN XML", e);
             throw new DmnXMLException("Error writing DMN XML", e);
         }
+    }
+
+    protected void writeItemDefinition(List<ItemDefinition> itemDefinitions, XMLStreamWriter xtw) throws Exception {
+        writeItemDefinition(itemDefinitions, false, xtw);
+    }
+
+    protected void writeItemDefinition(List<ItemDefinition> itemDefinitions, boolean isItemComponent, XMLStreamWriter xtw) throws Exception {
+        if (itemDefinitions == null) {
+            return;
+        }
+
+        for (ItemDefinition itemDefinition : itemDefinitions) {
+            if (isItemComponent) {
+                xtw.writeStartElement(ELEMENT_ITEM_COMPONENT);
+            } else {
+                xtw.writeStartElement(ELEMENT_ITEM_DEFINITION);
+            }
+            if (StringUtils.isNotEmpty(itemDefinition.getId())) {
+                xtw.writeAttribute(ATTRIBUTE_ID, itemDefinition.getId());
+            }
+            if (StringUtils.isNotEmpty(itemDefinition.getName())) {
+                xtw.writeAttribute(ATTRIBUTE_NAME, itemDefinition.getName());
+            }
+            if (StringUtils.isNotEmpty(itemDefinition.getLabel())) {
+                xtw.writeAttribute(ATTRIBUTE_LABEL, itemDefinition.getLabel());
+            }
+            if (itemDefinition.isCollection()) {
+                xtw.writeAttribute(ATTRIBUTE_IS_COLLECTION, "true");
+            }
+
+            DmnXMLUtil.writeElementDescription(itemDefinition, xtw);
+            DmnXMLUtil.writeExtensionElements(itemDefinition, xtw);
+
+            if (itemDefinition.getTypeRef() != null) {
+                xtw.writeStartElement(ELEMENT_TYPE_REF);
+                xtw.writeCharacters(itemDefinition.getTypeRef());
+                xtw.writeEndElement();
+            }
+
+            if (itemDefinition.getAllowedValues() != null) {
+                xtw.writeStartElement(ELEMENT_REQUIRED_AUTHORITY);
+                xtw.writeStartElement(ELEMENT_TEXT);
+                xtw.writeCharacters(itemDefinition.getAllowedValues().getText());
+                xtw.writeEndElement();
+                xtw.writeEndElement();
+            }
+
+            if (itemDefinition.getItemComponents().size() > 0) {
+                writeItemDefinition(itemDefinition.getItemComponents(), true, xtw);
+            }
+
+            xtw.writeEndElement();
+        }
+
     }
 }

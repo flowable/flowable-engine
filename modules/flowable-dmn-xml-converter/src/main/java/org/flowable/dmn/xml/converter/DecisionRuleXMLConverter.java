@@ -17,7 +17,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
-import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
 
@@ -40,6 +39,8 @@ public class DecisionRuleXMLConverter extends BaseDmnXMLConverter {
     @Override
     protected DmnElement convertXMLToElement(XMLStreamReader xtr, DmnDefinition model, Decision decision) throws Exception {
         DecisionRule rule = new DecisionRule();
+        rule.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
+        rule.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
         parseChildElements(getXMLElementName(), rule, decision, xtr);
         return rule;
     }

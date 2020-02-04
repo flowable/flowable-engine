@@ -82,7 +82,10 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
             model.addItemDefinition((ItemDefinition) parsedElement);
         } else if (parsedElement instanceof InputData) {
             InputData inputData = (InputData) parsedElement;
-            model.addInputData(inputData);
+            // TODO: handle inputData as href in DecisionService (same tag)
+            if (inputData.getVariable() != null) {
+                model.addInputData(inputData);
+            }
         } else if (parsedElement instanceof InformationRequirement) {
             InformationRequirement informationRequirement = (InformationRequirement) parsedElement;
             decision.addInformationRequirement(informationRequirement);

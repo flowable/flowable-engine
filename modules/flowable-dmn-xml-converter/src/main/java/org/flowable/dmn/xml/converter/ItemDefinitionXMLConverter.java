@@ -16,7 +16,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.ItemDefinition;
@@ -41,20 +40,10 @@ public class ItemDefinitionXMLConverter extends BaseDmnXMLConverter {
         ItemDefinition itemDefinition = new ItemDefinition();
         itemDefinition.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
         itemDefinition.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+        itemDefinition.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
+        itemDefinition.setCollection(Boolean.parseBoolean(xtr.getAttributeValue(null, ATTRIBUTE_IS_COLLECTION)));
 
-        boolean readyWithItemDefinition = false;
-        try {
-            while (!readyWithItemDefinition && xtr.hasNext()) {
-                xtr.next();
-                if (xtr.isStartElement() && ELEMENT_TYPE_DEFINITION.equalsIgnoreCase(xtr.getLocalName())) {
-                    itemDefinition.setTypeDefinition(xtr.getElementText());
-                } else if (xtr.isEndElement() && getXMLElementName().equalsIgnoreCase(xtr.getLocalName())) {
-                    readyWithItemDefinition = true;
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Error parsing input expression", e);
-        }
+        parseChildElements(getXMLElementName(), itemDefinition, decision, xtr);
 
         return itemDefinition;
     }

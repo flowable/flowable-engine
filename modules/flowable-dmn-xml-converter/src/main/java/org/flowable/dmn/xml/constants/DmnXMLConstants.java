@@ -35,6 +35,7 @@ public interface DmnXMLConstants {
     public static final String ATTRIBUTE_NAMESPACE = "namespace";
     public static final String ATTRIBUTE_AGGREGATION = "aggregation";
     public static final String ATTRIBUTE_FORCE_DMN_11 = "forceDMN11";
+    public static final String ATTRIBUTE_IS_COLLECTION = "isCollection";
 
     public static final String ELEMENT_DEFINITIONS = "definitions";
     public static final String ELEMENT_DECISION = "decision";
@@ -49,7 +50,9 @@ public interface DmnXMLConstants {
     public static final String ELEMENT_REQUIRED_AUTHORITY = "requiredAuthority";
 
     public static final String ELEMENT_ITEM_DEFINITION = "itemDefinition";
-    public static final String ELEMENT_TYPE_DEFINITION = "typeDefinition";
+    public static final String ELEMENT_ITEM_COMPONENT = "itemComponent";
+    public static final String ELEMENT_TYPE_REF = "typeRef";
+    public static final String ELEMENT_ALLOWED_VALUES = "allowedValues";
 
     public static final String ELEMENT_INPUT_CLAUSE = "input";
     public static final String ELEMENT_OUTPUT_CLAUSE = "output";
