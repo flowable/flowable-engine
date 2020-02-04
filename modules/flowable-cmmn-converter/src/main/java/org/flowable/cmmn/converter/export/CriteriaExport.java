@@ -12,14 +12,14 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import java.util.List;
+
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
-
-import java.util.List;
 
 public class CriteriaExport implements CmmnXmlConstants {
 
@@ -48,7 +48,7 @@ public class CriteriaExport implements CmmnXmlConstants {
             }
 
             if (StringUtils.isNotEmpty(criterion.getSentryRef())) {
-                xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SENTRY_REF, criterion.getSentryRef());
+                xtw.writeAttribute(ATTRIBUTE_SENTRY_REF, criterion.getSentryRef());
             }
 
             if (StringUtils.isNotEmpty(criterion.getExitType())) {
