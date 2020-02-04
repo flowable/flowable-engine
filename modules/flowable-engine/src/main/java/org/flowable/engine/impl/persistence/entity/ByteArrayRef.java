@@ -97,7 +97,10 @@ public class ByteArrayRef implements Serializable {
     private void ensureInitialized() {
         if (id != null && entity == null) {
             entity = CommandContextUtil.getByteArrayEntityManager().findById(id);
-            name = entity.getName();
+
+            if (entity != null) {
+                name = entity.getName();
+            }
         }
     }
 
