@@ -932,8 +932,8 @@
           "STRUCTURAL" : "Estructura",
           "GATEWAYS" : "Puertas de enlace",
           "BOUNDARYEVENTS" : "Eventos de frontera",
-          "INTERMEDIATECATCHINGEVENTS" : "Eventos de captura intermedia",
-          "INTERMEDIATETHROWINGEVENTS" : "Eventos de lanzamiento intermedio",
+          "INTERMEDIATECATCHINGEVENTS" : "Eventos intermedios de captura",
+          "INTERMEDIATETHROWINGEVENTS" : "Eventos intermedios de lanzamiento",
           "SWIMLANES" : "Carriles",
           "CONNECTINGOBJECTS" : "Objetos conectores",
           "ARTIFACTS" : "Artefactos"
@@ -1063,67 +1063,67 @@
           "DESCRIPTION" : "Una puerta de enlace de evento"
         },
         "BOUNDARYCONDITIONALEVENT" : {
-          "TITLE" : "Evento fr. condicional",
+          "TITLE" : "Evento frontera condicional",
           "DESCRIPTION" : "Un evento de frontera que evalúa un evento condicional"
         },
         "BOUNDARYERROREVENT" : {
-          "TITLE" : "Evento fr. de error",
+          "TITLE" : "Evento frontera de error",
           "DESCRIPTION" : "Un evento de frontera que captura un error BPMN"
         },
         "BOUNDARYESCALATIONEVENT" : {
-          "TITLE" : "Evento fr. de escalamiento",
+          "TITLE" : "Evento frontera de escalamiento",
           "DESCRIPTION" : "Un evento de frontera que captura un escalamiento BPMN"
         },
         "BOUNDARYTIMEREVENT" : {
-          "TITLE" : "Evento fr. temporizado",
+          "TITLE" : "Evento frontera temporizado",
           "DESCRIPTION" : "Un evento de frontera disparado por un temporizador"
         },
         "BOUNDARYSIGNALEVENT" : {
-          "TITLE" : "Evento fr. de señal",
+          "TITLE" : "Evento frontera de señal",
           "DESCRIPTION" : "Un evento de frontera disparado por una señal"
         },
         "BOUNDARYMESSAGEEVENT" : {
-          "TITLE" : "Evento fr. de mensaje",
+          "TITLE" : "Evento frontera de mensaje",
           "DESCRIPTION" : "Un evento de frontera disparado por un mensaje"
         },
         "BOUNDARYCANCELEVENT" : {
-          "TITLE" : "Evento fr. de cancelación",
+          "TITLE" : "Evento frontera de cancelación",
           "DESCRIPTION" : "Un evento de cancelación de frontera"
         },
         "BOUNDARYEVENTREGISTRYEVENT" : {
-          "TITLE" : "Evento fr. de registración",
+          "TITLE" : "Evento frontera de registración",
           "DESCRIPTION" : "Un evento de registración de frontera"
         },
         "BOUNDARYCOMPENSATIONEVENT" : {
-          "TITLE" : "Evento fr. de compensación",
+          "TITLE" : "Evento frontera de compensación",
           "DESCRIPTION" : "Un evento de compensación de frontera"
         },
         "CATCHTIMEREVENT" : {
-          "TITLE" : "Evento int. de captura de temporizador",
+          "TITLE" : "Evento intermedio de captura temporizado",
           "DESCRIPTION" : "Un evento intermedio de captura disparado por un temporizador"
         },
         "CATCHSIGNALEVENT" : {
-          "TITLE" : "Evento int. de captura de señal",
+          "TITLE" : "Evento intermedio de captura de señal",
           "DESCRIPTION" : "Un evento intermedio de captura disparado por una señal"
         },
         "CATCHMESSAGEEVENT" : {
-          "TITLE" : "Evento int. de captura de mensaje",
+          "TITLE" : "Evento intermedio de captura de mensaje",
           "DESCRIPTION" : "Un evento intermedio de captura disparado por un mensaje"
         },
         "CATCHCONDITIONALEVENT" : {
-          "TITLE" : "Evento int. de captura condicional",
+          "TITLE" : "Evento intermedio de captura condicional",
           "DESCRIPTION" : "Un evento intermedio de captura disparado por una condición"
         },
         "THROWNONEEVENT" : {
-          "TITLE" : "Evento int. sin lanzamiento",
+          "TITLE" : "Evento intermedio sin lanzamiento",
           "DESCRIPTION" : "Un evento intermedio sin un disparador específico"
         },
         "THROWSIGNALEVENT" : {
-          "TITLE" : "Evento int. de lanzamiento de señal",
+          "TITLE" : "Evento intermedio de lanzamiento de señal",
           "DESCRIPTION" : "Un evento intermedio con un disparador de señal"
         },
         "THROWESCALATIONEVENT" : {
-          "TITLE" : "Evento int. de lanzamiento de escalamiento",
+          "TITLE" : "Evento intermedio de lanzamiento de escalamiento",
           "DESCRIPTION" : "Un evento intermedio con un disparador de escalamiento"
         },
         "ENDNONEEVENT" : {
@@ -1369,12 +1369,20 @@
           "MAILTASKTEXT" : {
             "TITLE" : "Texto",
             "DESCRIPTION" : "El contenido del email, en caso de necesitar enviar texto plano (no enriquecido). Puede ser utilizado en combinación con HTML para clientes de email que no soproten contenido enriquecido. En ese caso el cliente recae en esta alternativa de sólo texto."
+          },
+          "MAILTASKTEXTVAR" : {
+            "TITLE" : "Variable del texto",
+            "DESCRIPTION" : "El nombre de la variable de caso que contiene el texto del contenido del email, en caso de necesitar enviar texto plano (no enriquecido). Puede ser utilizado en combinación con HTML para clientes de email que no soproten contenido enriquecido. En ese caso el cliente recae en esta alternativa de sólo texto."
           }
         },
         "MAILTASKHTMLPACKAGE": {
           "MAILTASKHTML" : {
-            "TITLE" : "Html",
+            "TITLE" : "HTML",
             "DESCRIPTION" : "Una porción de HTML que se usa como contenido del email."
+          },
+          "MAILTASKHTMLVAR" : {
+            "TITLE" : "Variable del HTML",
+            "DESCRIPTION" : "El nombre de la variable de caso que contiene el HTML que se usa como contenido del email."
           }
         },
         "MAILTASKCHARSETPACKAGE" : {
@@ -1432,7 +1440,7 @@
           }
         },
         "HTTPTASKREQUESTBODYPACKAGE" : {
-          "HTTPTASKREQUESTBODYPACKAGE" : {
+          "HTTPTASKREQUESTBODY" : {
             "TITLE" : "Cuerpo de la petición",
             "DESCRIPTION" : "Cuerpo de la petición. Por ejemplo, ${sampleBody}."
           }
@@ -1766,6 +1774,10 @@
         "HTTPTASK" : {
           "TITLE" : "Tarea de HTTP",
           "DESCRIPTION" : "Una tarea que usa HTTP"
+        },
+        "MAILTASK" : {
+          "TITLE" : "Tarea de email",
+          "DESCRIPTION" : "Una tarea de email"
         },
         "SCRIPTTASK" : {
           "TITLE" : "Tarea de script",
@@ -2636,11 +2648,11 @@
     "PROPERTY.PARAMETER.TARGETEXPRESSION.PLACEHOLDER" : "Introduce un expresión de objetivo",
     "PROPERTY.PARAMETER.EMPTY" : "No hay parámetro seleccionado",
 
-    "PROPERTY.SUBPROCESSREFERENCE.EMPTY" : "No hay referencia seleccionada",
-    "PROPERTY.SUBPROCESSREFERENCE.TITLE" : "Referencia a subproceso colapsado",
-    "PROPERTY.SUBPROCESSREFERENCE.ERROR.SUBPROCESS" : "Ocurrió un error cargando subprocesos. Intenta más tarde",
-    "PROPERTY.SUBPROCESSREFERENCE.SUBPROCESS.LOADING" : "Cargando subprocesos...",
-    "PROPERTY.SUBPROCESSREFERENCE.SUBPROCESS.EMPTY" : "Esta carpeta no contiene subprocesos",
+    "PROPERTY.PROCESSREFERENCE.EMPTY" : "No hay referencia seleccionada",
+    "PROPERTY.PROCESSREFERENCE.TITLE" : "Referencia a proceso",
+    "PROPERTY.PROCESSREFERENCE.ERROR.PROCESS" : "Ocurrió un error cargando los procesos. Intenta más tarde",
+    "PROPERTY.PROCESSREFERENCE.PROCESS.LOADING" : "Cargando procesos...",
+    "PROPERTY.PROCESSREFERENCE.PROCESS.EMPTY" : "Esta carpeta no contiene procesos",
 
     "PROPERTY.FORMREFERENCE.EMPTY" : "No hay referencia seleccionada",
     "PROPERTY.FORMREFERENCE.TITLE" : "Referencia a formulario",
