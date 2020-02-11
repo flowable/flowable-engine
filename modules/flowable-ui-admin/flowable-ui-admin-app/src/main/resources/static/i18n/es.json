@@ -36,7 +36,7 @@
             "TASKS": "Tareas",
             "JOBS": "Trabajos",
             "BATCHES": "Lotes",
-            "EVENT-SUBSCRIPTIONS": "suscripciónes a eventos",
+            "EVENT-SUBSCRIPTIONS": "Suscripciones a eventos",
             "CONFIGURATION": "Configuración",
             "CONFIGURATION-ENGINE": "Motor",
             "DECISION-TABLES": "Tablas de decisión",
@@ -105,7 +105,7 @@
         }
     },
     "PROCESS-DEFINITIONS": {
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} definiciones que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} definiciones que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay definiciones de proceso que coincidan.",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
@@ -230,7 +230,7 @@
     },
     "PROCESS-INSTANCES": {
         "TITLE": "Instancias de proceso",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} instancias de proceso que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} instancias de proceso que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay instancias de proceso que coincidan.",
         "FILTER": {
             "NAME": "Nombre",
@@ -356,7 +356,7 @@
     },
     "TASKS": {
         "TITLE": "Tareas",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} tareas que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} tareas que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay tareas que coincidan.",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
@@ -401,7 +401,7 @@
     },
     "DEPLOYMENTS": {
         "TITLE": "Despliegues",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay despliegues que coincidan.",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
@@ -481,7 +481,7 @@
     },
     "JOBS": {
         "TITLE": "Trabajos",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} trabajos que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} trabajos que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay trabajos que coincidan.",
         "FILTER": {
         	"JOBTYPE": {
@@ -520,8 +520,8 @@
     },
     "BATCHES": {
         "TITLE": "Lotes",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} lotes que coincidan.",
-        "LIST-MESSAGE-EMPTY": "No hay lotes conicidentes.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} lotes que coinciden.",
+        "LIST-MESSAGE-EMPTY": "No hay lotes que coincidan.",
         "FILTER": {
             "BATCH-TYPE": "Tipo de lote",
             "SEARCH-KEY": "Clave de búsqueda",
@@ -620,9 +620,9 @@
         "TENANT-ID": "Tenant:"
     },
     "EVENT-SUBSCRIPTIONS": {
-    	"TITLE": "suscripciónes a eventos",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} suscripciónes a eventos que coincidan.",
-        "LIST-MESSAGE-EMPTY": "No hay suscripciónes a eventos que coincidan.",
+    	"TITLE": "Suscripciones a eventos",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} suscripciones a eventos que coinciden.",
+        "LIST-MESSAGE-EMPTY": "No hay suscripciones a eventos que coincidan.",
     	"FILTER": {
             "PROCESS-DEFINITION": "Definición de proceso",
             "ALL-PROCESS-DEFINITIONS": "Todas las definiciones de proceo",
@@ -773,44 +773,6 @@
             }
         }
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "VARIABLES": {
         "HEADER": {
             "NAME": "Nombre",
@@ -877,7 +839,7 @@
     },
     "CMMN-DEPLOYMENTS": {
         "TITLE": "Despliegues",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay despliegues que coincidan.",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
@@ -929,7 +891,7 @@
         }
     },
     "CASE-DEFINITIONS": {
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} definiciones que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} definiciones que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay definiciones de caso que coincidan.",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
@@ -1014,7 +976,7 @@
     },
     "CASE-INSTANCES": {
         "TITLE": "Instancais de caso",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} instancias de caso que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} instancias de caso que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay instancias de caso que coincidan.",
         "FILTER": {
             "NAME": "Nombre",
@@ -1128,11 +1090,13 @@
     },
     "APP-DEPLOYMENTS": {
         "TITLE": "Despliegues",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay despliegues que coincidan.",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
-            "TENANTID": "ID de tenant (distingue mayúsculas)"
+            "TENANTID": "ID de tenant (distingue mayúsculas)",
+            "LATEST": "Última versión",
+            "LATEST-HELP": "Sólo mostrar las últimas versiones"
         },
         "SORT": {
             "ID": "ID",
@@ -1140,8 +1104,12 @@
         },
         "HEADER": {
             "ID": "ID",
+            "APP-DEFINITION-ID": "ID de aplicación",
+            "DEPLOYMENT-ID": "ID despl. de proceso",
+            "DMN-DEPLOYMENT-ID": "ID despl. de DMN",
             "NAME": "Nombre",
             "DEPLOY-TIME": "Fecha despliegue",
+            "DEPLOYED-BY": "Desplegado por",
             "CATEGORY": "Categoría",
             "TENANT": "Tenant"
         },
@@ -1152,6 +1120,7 @@
         "POPUP": {
             "UPLOAD": {
                 "DESCRIPTION": "Seleccione un archivo de definición de aplicación .app para despleggar o suba un paquete de aplicación con sus recursos contenidos en un archivo .zip o .bar.",
+                "WARNING": "Sólo es posible cargar una aplicación a una instancia de interfaz de usuario (UI) de Flowable.",
                 "DROPZONE": "O arrastra un archivo aquí",
                 "NO-DROP": "No esta permitido arrastrar archivos por su navegador",
                 "CANCEL-UPLOAD": "Cancelar carga",
@@ -1180,7 +1149,7 @@
         }
     },
     "APP-DEFINITIONS": {
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} definiciones que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} definiciones que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay definiciones de aplicación que coincidan.",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
@@ -1235,7 +1204,7 @@
     },
     "DECISION-TABLE-DEPLOYMENTS": {
         "TITLE": "Despliegues de tablas de decisión",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} despliegues que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay despliegues que coincidan",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
@@ -1288,7 +1257,7 @@
     },
     "DECISION-TABLES": {
         "TITLE": "Tablas de decisión",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} tablas de decisión que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} tablas de decisión que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay tablas de decisión que coincidan.",
         "FILTER": {
             "NAME": "Nombre",
@@ -1322,8 +1291,8 @@
         "TITLE": {
             "DECISION-AUDITS": "Auditorias de decisión"
         },
-        "DECISION-AUDITS-MESSAGE": "Esta tabla de decisión tiene {{total}} auditorias, mostrando {{size}}.",
-        "DECISION-AUDITS-MESSAGE-EMPTY": "Esta tabla de decisión no tiene auditorias",
+        "DECISION-EXECUTION-MESSAGE": "Esta tabla de decisión tiene {{total}} auditorias, mostrando {{size}}.",
+        "DECISION-EXECUTION-MESSAGE-EMPTY": "Esta tabla de decisión no tiene auditorias",
         "ACTION": {
             "EDIT-CATEGORY": "Editar categoría",
             "SHOW-ALL-JOBS": "Mostrar todos los trabajos",
@@ -1344,7 +1313,7 @@
     },
     "DECISION-TABLE-EXECUTIONS": {
         "TITLE": "Ejecuciones de tablas de decisión",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} ejecuciones de tablas de decisión que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} ejecuciones de tablas de decisión que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay ejecuciones de tablas de decisión que coincidan.",
         "FILTER": {
             "DEFINITION-ID": "ID de la definción",
@@ -1368,7 +1337,7 @@
     },
     "DECISION-TABLE-EXECUTION": {
         "TITLE": "Ejecución de tabla de decisión",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} tablas de decisión que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} tablas de decisión que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay tablas de decisión que coincidan.",
         "DEFINITION-ID": "ID de definición de decisión",
         "DEPLOYMENT-ID": "ID de despligue",
@@ -1417,7 +1386,7 @@
     },
     "FORM-DEFINITIONS": {
     	"TITLE": "Definición de formularios",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} formularios que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} formularios que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay formularios que coincidan.",
         "HEADER": {
             "ID": "ID",
@@ -1480,7 +1449,7 @@
     },
     "FORM-DEPLOYMENTS": {
         "TITLE": "Despliegues de formulario",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} despliegues de formulario que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} despliegues de formulario que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay despliegues de formularios que coincidan.",
         "FILTER": {
             "NAME": "Nombre (distingue mayúsculas)",
@@ -1533,7 +1502,7 @@
     },
     "FORM-INSTANCES": {
         "TITLE": "Instancias de formulario",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} instancias de formulario que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de{{total}} instancias de formulario que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay instancias de formulario que coincidan.",
         "HEADER": {
             "ID": "ID",
@@ -1579,7 +1548,7 @@
     },
     "CONTENT-ITEMS": {
         "TITLE": "Items de contenido",
-        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} items de contenido que coincidan.",
+        "LIST-MESSAGE": "Mostrando {{size}} resultados, de un total de {{total}} items de contenido que coinciden.",
         "LIST-MESSAGE-EMPTY": "No hay items de contenido.",
         "HEADER": {
             "ID": "ID",
