@@ -152,19 +152,17 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
         ContentItem origContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
         assertNotNull(origContentItem);
 
-        InputStream binaryContent = null;
-        try {
-            binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+        try (InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes())) {
 
             // Get content item data
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-                    ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId));
+                ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId));
             httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, null));
             CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
             closeResponse(response);
 
             response = executeRequest(new HttpGet(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
-                    ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
+                ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId)), HttpStatus.SC_OK);
 
             // Check response headers
             assertEquals("application/pdf", response.getEntity().getContentType().getValue());
@@ -178,9 +176,6 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
         } finally {
             contentService.deleteContentItem(contentItemId);
-            if (binaryContent != null) {
-                binaryContent.close();
-            }
         }
     }
 
