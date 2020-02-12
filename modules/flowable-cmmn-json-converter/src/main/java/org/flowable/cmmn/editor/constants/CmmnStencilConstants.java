@@ -125,6 +125,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_SERVICETASK_FIELD_STRING_VALUE = "stringValue";
     String PROPERTY_SERVICETASK_FIELD_STRING = "string";
     String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
+    String PROPERTY_SERVICETASK_STORE_RESULT_AS_TRANSIENT = "servicetaskstoreresultvariabletransient";
 
     String PROPERTY_SCRIPT_TASK_SCRIPT_FORMAT = "scriptformat";
     String PROPERTY_SCRIPT_TASK_SCRIPT_TEXT = "scripttext";

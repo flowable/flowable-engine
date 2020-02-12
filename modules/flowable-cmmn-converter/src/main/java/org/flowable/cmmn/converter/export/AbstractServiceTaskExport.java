@@ -54,6 +54,9 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
                 if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, serviceTask.getResultVariableName());
                 }
+                if (serviceTask.isStoreResultVariableAsTransient()) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_STORE_RESULT_AS_TRANSIENT, String.valueOf(serviceTask.isStoreResultVariableAsTransient()));
+                }
                 break;
 
             case HttpServiceTask.HTTP_TASK:
