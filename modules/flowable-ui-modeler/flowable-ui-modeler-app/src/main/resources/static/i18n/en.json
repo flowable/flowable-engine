@@ -251,6 +251,12 @@
             "DESCRIPTION" : "Sets the service task to be triggerable"
           }
         },
+        "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+          "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+            "TITLE" : "Store result variable transiently",
+            "DESCRIPTION" : "Flag that marks that the result of the expression will not be persisted at the end of the database transaction."
+          }
+        },
         "SCRIPTFORMATPACKAGE" : {
           "SCRIPTFORMAT" : {
             "TITLE" : "Script format",
@@ -1731,6 +1737,12 @@
           "AVAILABLECONDITION": {
             "TITLE": "Available condition",
             "DESCRIPTION": "An optional condition expression on an event listener to indicate to determine when it becomes available."
+          }
+        },
+        "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+          "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+            "TITLE" : "Store result variable transiently",
+            "DESCRIPTION" : "Flag that marks that the result of the expression will not be persisted at the end of the database transaction."
           }
         }
       },

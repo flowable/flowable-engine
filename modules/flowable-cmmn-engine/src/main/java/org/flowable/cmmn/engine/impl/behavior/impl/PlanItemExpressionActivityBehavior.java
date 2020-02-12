@@ -29,10 +29,12 @@ public class PlanItemExpressionActivityBehavior extends CoreCmmnActivityBehavior
 
     protected String expression;
     protected String resultVariable;
+    protected boolean storeResultVariableAsTransient;
 
-    public PlanItemExpressionActivityBehavior(String expression, String resultVariable) {
+    public PlanItemExpressionActivityBehavior(String expression, String resultVariable, boolean storeResultVariableAsTransient) {
         this.expression = expression;
         this.resultVariable = resultVariable;
+        this.storeResultVariableAsTransient = storeResultVariableAsTransient;
     }
     
     @Override
@@ -42,7 +44,11 @@ public class PlanItemExpressionActivityBehavior extends CoreCmmnActivityBehavior
             Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
             value = expressionObject.getValue(planItemInstanceEntity);
             if (resultVariable != null) {
-                planItemInstanceEntity.setVariable(resultVariable, value);
+                if(storeResultVariableAsTransient) {
+                    planItemInstanceEntity.setTransientVariable(resultVariable, value);
+                } else {
+                    planItemInstanceEntity.setVariable(resultVariable, value);
+                }
             }
 
             CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);

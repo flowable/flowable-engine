@@ -69,12 +69,12 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
-        assertEquals(2, planItemDefinitions.size());
-        assertEquals(2, planModel.findPlanItemDefinitionsOfType(Task.class, false).size());
+        assertEquals(3, planItemDefinitions.size());
+        assertEquals(3, planModel.findPlanItemDefinitionsOfType(Task.class, false).size());
         
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertEquals(2, planItems.size());
+        assertEquals(3, planItems.size());
         
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
         PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
@@ -87,7 +87,8 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertEquals("result", taskA.getResultVariableName());
         assertFalse(taskA.isAsync());
         assertFalse(taskA.isExclusive());
-        
+        assertFalse(taskA.isStoreResultVariableAsTransient());
+
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
         assertEquals(1, planItemTaskB.getEntryCriteria().size());
@@ -120,6 +121,18 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         ExtensionElement extensionElement = extensionElements.get(0);
         assertEquals("taskTest", extensionElement.getName());
         assertEquals("hello", extensionElement.getElementText());
+
+        PlanItem planItemTaskC = cmmnModel.findPlanItem("planItemTaskC");
+        planItemDefinition = planItemTaskC.getPlanItemDefinition();
+        assertEquals(0, planItemTaskC.getEntryCriteria().size());
+        assertTrue(planItemDefinition instanceof ServiceTask);
+        ServiceTask taskC = (ServiceTask) planItemDefinition;
+        assertEquals(ServiceTask.JAVA_TASK, taskC.getType());
+        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, taskC.getImplementationType());
+        assertEquals("${'test'}", taskC.getImplementation());
+        assertEquals("transientResult", taskC.getResultVariableName());
+        assertTrue(taskC.isStoreResultVariableAsTransient());
+
     }
 
 }

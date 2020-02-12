@@ -104,6 +104,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
     String ATTRIBUTE_IS_ASYNCHRONOUS = "async";
     String ATTRIBUTE_IS_EXCLUSIVE = "exclusive";
+    String ATTRIBUTE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
     String ATTRIBUTE_IS_AUTO_COMPLETE = "autoComplete";
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";

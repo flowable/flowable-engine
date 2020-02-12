@@ -51,6 +51,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
     protected String resultVariable;
     protected List<MapExceptionEntry> mapExceptions;
     protected boolean useLocalScopeForResultVariable;
+    protected boolean storeResultVariableAsTransient;
 
     public ServiceTaskExpressionActivityBehavior(ServiceTask serviceTask, Expression expression, Expression skipExpression) {
 
@@ -60,6 +61,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
         this.resultVariable = serviceTask.getResultVariableName();
         this.mapExceptions = serviceTask.getMapExceptions();
         this.useLocalScopeForResultVariable = serviceTask.isUseLocalScopeForResultVariable();
+        this.storeResultVariableAsTransient = serviceTask.isStoreResultVariableAsTransient();
     }
 
     @Override
@@ -86,10 +88,18 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
 
                 value = expression.getValue(execution);
                 if (resultVariable != null) {
-                    if (useLocalScopeForResultVariable) {
-                        execution.setVariableLocal(resultVariable, value);
+                    if(storeResultVariableAsTransient) {
+                        if (useLocalScopeForResultVariable) {
+                            execution.setTransientVariableLocal(resultVariable, value);
+                        } else {
+                            execution.setTransientVariable(resultVariable, value);
+                        }
                     } else {
-                        execution.setVariable(resultVariable, value);
+                        if (useLocalScopeForResultVariable) {
+                            execution.setVariableLocal(resultVariable, value);
+                        } else {
+                            execution.setVariable(resultVariable, value);
+                        }
                     }
                 }
             }

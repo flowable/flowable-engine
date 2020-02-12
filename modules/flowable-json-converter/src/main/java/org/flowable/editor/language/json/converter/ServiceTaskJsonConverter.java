@@ -157,7 +157,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             if (serviceTask.isUseLocalScopeForResultVariable()) {
                 propertiesNode.put(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, serviceTask.isUseLocalScopeForResultVariable());
             }
-            
+
+            if (serviceTask.isStoreResultVariableAsTransient()) {
+                propertiesNode.put(PROPERTY_SERVICETASK_STORE_TRANSIENT_VARIABLE, serviceTask.isStoreResultVariableAsTransient());
+            }
+
             if (StringUtils.isNotEmpty(serviceTask.getFailedJobRetryTimeCycleValue())) {
             	propertiesNode.put(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, serviceTask.getFailedJobRetryTimeCycleValue());
             }
@@ -194,7 +198,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, elementNode)) {
             task.setUseLocalScopeForResultVariable(true);
         }
-        
+
+        if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_STORE_TRANSIENT_VARIABLE, elementNode)) {
+            task.setStoreResultVariableAsTransient(true);
+        }
+
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, elementNode))) {
             task.setFailedJobRetryTimeCycleValue(getPropertyValueAsString(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, elementNode));
         }

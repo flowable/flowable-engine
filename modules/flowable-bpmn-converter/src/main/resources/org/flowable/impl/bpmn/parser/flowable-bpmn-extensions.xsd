@@ -300,6 +300,23 @@
     </annotation>
   </attribute>
 
+  <attribute name="useLocalScopeForResultVariable" type="boolean">
+    <annotation>
+      <documentation>
+        Stores the variable locally, e.g. on the execution of a sub process.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="storeResultVariableAsTransient" type="boolean">
+    <annotation>
+      <documentation>
+        Can be used to store the result variable of an expression transiently.
+        Transient variables will not be persisted at the end of the database transaction.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <element name="field">
     <annotation>
       <documentation>

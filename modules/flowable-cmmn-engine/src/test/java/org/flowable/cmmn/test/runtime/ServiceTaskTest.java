@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -172,6 +173,20 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                         .caseInstanceId(caseInstance.getId())
                         .variableName("testExpression")
                         .singleResult().getValue());
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testStoreTransientVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .start();
+
+        Object transientResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "transientResult");
+        Object persistentResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "persistentResult");
+
+        assertNull(transientResult);
+        assertEquals(persistentResult, "Result is: test");
     }
     
 }
