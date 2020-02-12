@@ -41,9 +41,11 @@ import org.flowable.dmn.model.AuthorityRequirement;
 import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.DmnElementReference;
 import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InformationItem;
@@ -89,6 +91,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
         addConverter(new ItemDefinitionXMLConverter());
         addConverter(new InputDataXMLConverter());
         addConverter(new VariableXMLConverter());
+        addConverter(new DecisionServiceXMLConverter());
     }
 
     public static void addConverter(BaseDmnXMLConverter converter) {
@@ -315,7 +318,6 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
     public byte[] convertToXML(DmnDefinition model, String encoding) {
         try {
-
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             XMLOutputFactory xof = XMLOutputFactory.newInstance();
@@ -551,17 +553,38 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
                         xtw.writeEndElement();
                     }
+                    xtw.writeEndElement();
 
-
-
-                xtw.writeEndElement();
-
-
-
-                xtw.writeEndElement();
-
-
+                    xtw.writeEndElement();
                 }
+            }
+
+            for (DecisionService decisionService : model.getDecisionServices()) {
+                xtw.writeStartElement(ELEMENT_DECISION_SERVICE);
+                xtw.writeAttribute(ATTRIBUTE_ID, decisionService.getId());
+                if (StringUtils.isNotEmpty(decisionService.getName())) {
+                    xtw.writeAttribute(ATTRIBUTE_NAME, decisionService.getName());
+                }
+
+                for (DmnElementReference reference : decisionService.getOutputDecisions()) {
+                    xtw.writeStartElement(ELEMENT_OUTPUT_DECISION);
+                    xtw.writeAttribute(ATTRIBUTE_HREF, reference.getHref());
+                    xtw.writeEndElement();
+                }
+
+                for (DmnElementReference reference : decisionService.getEncapsulatedDecisions()) {
+                    xtw.writeStartElement(ELEMENT_ENCAPSULATED_DECISION);
+                    xtw.writeAttribute(ATTRIBUTE_HREF, reference.getHref());
+                    xtw.writeEndElement();
+                }
+
+                for (DmnElementReference reference : decisionService.getInputData()) {
+                    xtw.writeStartElement(ELEMENT_INPUT_DATA);
+                    xtw.writeAttribute(ATTRIBUTE_HREF, reference.getHref());
+                    xtw.writeEndElement();
+                }
+
+                xtw.writeEndElement();
             }
 
             // end definitions root element

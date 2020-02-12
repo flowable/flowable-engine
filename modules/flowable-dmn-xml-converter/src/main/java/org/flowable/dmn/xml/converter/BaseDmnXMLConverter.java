@@ -24,6 +24,7 @@ import org.flowable.dmn.converter.util.DmnXMLUtil;
 import org.flowable.dmn.model.AuthorityRequirement;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
@@ -97,6 +98,9 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
             if (decision.getVariable() == null) {
                 decision.setVariable((InformationItem) parsedElement);
             }
+        }  else if (parsedElement instanceof DecisionService) {
+            DecisionService decisionService = (DecisionService) parsedElement;
+            model.addDecisionService(decisionService);
         }
 
     }
