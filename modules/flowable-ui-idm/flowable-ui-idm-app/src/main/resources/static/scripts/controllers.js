@@ -36,7 +36,6 @@ flowableApp.controller('LoginController', ['$scope', '$location', '$cookies', 'A
                 }
             }
         });
-
         $scope.login = function () {
 
             $scope.model.loading = true;

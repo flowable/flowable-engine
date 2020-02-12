@@ -1,16 +1,8 @@
 package org.flowable.ui.idm.model;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
-import org.json.JSONObject;
-import org.springframework.http.converter.json.GsonFactoryBean;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SSOUserInfo {

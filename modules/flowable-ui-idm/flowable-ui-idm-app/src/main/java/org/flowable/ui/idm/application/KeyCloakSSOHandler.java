@@ -1,4 +1,4 @@
-package org.flowable.ui.idm.rest.app;
+package org.flowable.ui.idm.application;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -9,11 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.ui.idm.model.SSOUserInfo;
+import org.flowable.ui.idm.rest.app.SSOHandler;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,13 +24,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.context.annotation.Primary;
 
-/**
- * Custom implementation of a SSOHandler. This one uses Keycloak
- *
- * @author mattydebie
- */
 @Component
+@Primary
+@ConditionalOnProperty(
+            value="flowable.sso.provider",
+            havingValue = "keycloak")
 public class KeyCloakSSOHandler implements SSOHandler {
 
     private static Logger LOGGER = LoggerFactory.getLogger(KeyCloakSSOHandler.class);
@@ -48,6 +50,18 @@ public class KeyCloakSSOHandler implements SSOHandler {
     @Value("${flowable.sso.keycloak.url.info:#{null}}")
     private String ssoUserInfoUrl;
 
+    @Value("${flowable.sso.keycloak.scope:#{null}}")
+    private String ssoScope;
+
+    @Value("${flowable.sso.keycloak.userinfo.tenant:#{null}}")
+    private String ssoUserInfoTenant;
+
+    @Value("${flowable.sso.keycloak.userinfo.client_roles:#{null}}")
+    private String ssoUserInfoClientRoles;
+
+    @Autowired
+    private Environment env;
+
     private String redirectUri = null;
 
     private String state = UUID.randomUUID().toString();
@@ -63,7 +77,7 @@ public class KeyCloakSSOHandler implements SSOHandler {
 
         String stateReturned = request.getParameter("state");
 
-        if (!stateReturned.equals(state)) {
+        if( !stateReturned.equals(state)){
             LOGGER.error("Return sso 'state' did not match original state");
             return null;
         }
@@ -79,7 +93,7 @@ public class KeyCloakSSOHandler implements SSOHandler {
         return ssoExternalUrl
             + "?response_type=code"
             + "&client_id=" + ssoClientId
-            + "&scope=all"
+            + "&scope=" + ssoScope
             + "&state=" + state
             + "&redirect_uri=" + redirectUri
             + "&response_mode=query";
@@ -117,8 +131,15 @@ public class KeyCloakSSOHandler implements SSOHandler {
         json = new JSONObject(resp);
 
         List<String> privs = new ArrayList<>();
-        for (Object priv : json.getJSONArray("privileges")) {
-            privs.add(priv.toString());
+        if(json.has(ssoUserInfoClientRoles)){
+            for (Object priv : json.getJSONArray(ssoUserInfoClientRoles)) {
+                privs.add(priv.toString());
+            }
+        }
+
+        String tenant = null;
+        if(json.has(ssoUserInfoTenant)){
+            tenant = json.getString(ssoUserInfoTenant);
         }
 
         return new SSOUserInfo(
@@ -127,7 +148,7 @@ public class KeyCloakSSOHandler implements SSOHandler {
             json.getString("family_name"),
             json.getString("email"),
             privs,
-            json.getString("tenant")
+            tenant
         );
 
     }

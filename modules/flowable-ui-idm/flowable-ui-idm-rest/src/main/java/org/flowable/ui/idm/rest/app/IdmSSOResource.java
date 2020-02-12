@@ -13,9 +13,7 @@
 package org.flowable.ui.idm.rest.app;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,8 +33,8 @@ import org.flowable.ui.idm.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,13 +46,13 @@ import com.google.common.net.HttpHeaders;
 
 /**
  * @author Matthias De Bie
- * <p>
- * TODO: update user before logging in
- * TODO: make a config option to automatically redirect to sso in stead of idm
+ * @author Ruben De Swaef
  */
 @RestController
 @RequestMapping("/app")
 public class IdmSSOResource {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(IdmSSOResource.class);
 
     @Autowired
     protected UserService userService;
@@ -67,6 +65,9 @@ public class IdmSSOResource {
 
     @Autowired
     protected RememberMeServices rememberMeServices;
+
+    @Value("${flowable.common.app.idm-url:#{null}}")
+    private String redirectIdmUrl;
 
     @RequestMapping(value = "/sso/external", method = RequestMethod.GET)
     public void getSsoExternalUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -101,13 +102,14 @@ public class IdmSSOResource {
         if (ssoUserInfo != null) {
             try {
                 UserInformation userInfo = userService.getUserInformation(ssoUserInfo.getId());
-                loginWithSso(request, response, userInfo.getUser());
+                loginWithSso(request, response, userInfo.getUser(), ssoUserInfo);
 
             } catch (NotFoundException e) {
                 // userInfo not found: create new account
                 createSsoAccount(request, response, ssoUserInfo);
 
             } catch (IOException e) {
+                LOGGER.error("Could not use an account with this userinformation.");
                 e.printStackTrace();
             }
         } else {
@@ -115,10 +117,9 @@ public class IdmSSOResource {
         }
     }
 
-    private static Logger LOGGER = LoggerFactory.getLogger(IdmSSOResource.class);
-
-    private void loginWithSso(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
-        String redirectTo = request.getRequestURL().toString().replace("/app/sso/return", "");
+    private void loginWithSso(HttpServletRequest request, HttpServletResponse response, User user, SSOUserInfo userInfo) throws IOException {
+        // If there is nog redirect cookie found, redirect to the IDM
+        String redirectTo = redirectIdmUrl;
 
         if (request.getCookies() != null) {
             Optional<Cookie> optional = Arrays.stream(request.getCookies())
@@ -126,12 +127,21 @@ public class IdmSSOResource {
                 .findFirst();
 
             if (optional.isPresent()) {
-                redirectTo = URLDecoder.decode(optional.get().getValue());
+                redirectTo = URLDecoder.decode(optional.get().getValue(), "UTF-8");
             }
         }
 
         response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
         response.setHeader("Location", redirectTo);
+        if(userInfo != null){
+            userService.updateUserDetails(
+                userInfo.getId(),
+                userInfo.getFirstName(),
+                userInfo.getLastName(),
+                userInfo.getEmail()
+                // userInfo.getTenant()   !! This depends on PR 1444/1687, merged in 6.5.0
+            );
+        }
         rememberMeServices.loginSuccess(request, response, new SSOAuthentication(user));
         response.getOutputStream().flush();
     }
@@ -143,7 +153,7 @@ public class IdmSSOResource {
             userInfo.getLastName(),
             userInfo.getEmail(),
             UUID.randomUUID().toString()
-            // userInfo.getTenant()   !! This depends on PR 1444 !!
+            // userInfo.getTenant()   !! This depends on PR 1444/1687, merged in 6.5.0
         );
 
         if (userInfo.getPrivileges() != null) {
@@ -156,26 +166,14 @@ public class IdmSSOResource {
             }
 
             try {
-                loginWithSso(request, response, userService.getUserInformation(userInfo.getId()).getUser());
+                loginWithSso(request, response, userService.getUserInformation(userInfo.getId()).getUser(), null);
             } catch (IOException e) {
+                LOGGER.error("Could not login with SSO after creating an account.");
                 e.printStackTrace();
             }
         } else {
-
-            response.setContentType(MediaType.TEXT_HTML_VALUE);
-
-            try {
-                OutputStreamWriter osw = new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8);
-
-                osw.append("<div style='display: flex; justify-content: center; align-items: center; width: 100%; height: 100vh; padding: 0; margin: 0;'>");
-                osw.append("<h1>Please wait for an admin to approve your account.</h1>");
-                osw.append("</div>");
-
-                osw.flush();
-                osw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // User has no access privileges
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
     }
 }
