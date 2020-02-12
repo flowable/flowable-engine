@@ -1019,6 +1019,17 @@
         "popular" : true
       }
       ]
+    },
+    {
+      "name" : "servicetaskstoreresultvariabletransientpackage",
+      "properties" : [ {
+        "id" : "servicetaskstoreresultvariabletransient",
+        "type" : "Boolean",
+        "title" : "CMMN.PROPERTYPACKAGES.SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE.SERVICETASKSTORERESULTVARIABLETRANSIENT.TITLE",
+        "value" : "false",
+        "description" : "CMMN.PROPERTYPACKAGES.SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE.SERVICETASKSTORERESULTVARIABLETRANSIENT.DESCRIPTION",
+        "popular" : true
+      } ]
     }, {
       "name" : "transitioneventpackage",
       "properties" : [ {
@@ -1164,6 +1175,7 @@
       "servicetaskdelegateexpressionpackage",
       "servicetaskfieldspackage",
       "servicetaskresultvariablepackage",
+      "servicetaskstoreresultvariabletransientpackage",
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",

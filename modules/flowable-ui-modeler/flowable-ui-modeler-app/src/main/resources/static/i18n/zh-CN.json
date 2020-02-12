@@ -241,6 +241,12 @@
           "DESCRIPTION" : "将服务任务设置为可触发的"
         }
       },
+      "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+        "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+          "TITLE" : "使結果變量瞬變",
+          "DESCRIPTION" : "指示存储結果變量变量瞬态的标志"
+        }
+      },
       "SCRIPTFORMATPACKAGE" : {
         "SCRIPTFORMAT" : {
           "TITLE" : "脚本格式",
@@ -1478,7 +1484,7 @@
       },
       "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE": {
         "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT": {
-          "TITLE": "将响应保存为瞬态变量",
+          "TITLE": "使結果變量瞬态變的",
           "DESCRIPTION": "指示存储响应变量瞬态的标志"
         }
       },
@@ -1646,6 +1652,12 @@
         "AVAILABLECONDITION": {
           "TITLE": "可用条件",
           "DESCRIPTION": "事件监听器上的可选条件表达式，用于指示何时可用。"
+        }
+      },
+      "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+        "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+          "TITLE" : "使結果變量瞬變",
+          "DESCRIPTION" : "指示存储結果變量变量瞬态的标志"
         }
       }
     },
