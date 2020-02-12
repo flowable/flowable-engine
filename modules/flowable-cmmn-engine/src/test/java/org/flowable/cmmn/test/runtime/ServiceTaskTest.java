@@ -263,8 +263,6 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
     }
 
-
-
     @Test
     @CmmnDeployment
     public void testStoreTransientVariable() {

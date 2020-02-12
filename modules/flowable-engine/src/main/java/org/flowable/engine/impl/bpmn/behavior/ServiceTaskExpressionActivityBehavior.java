@@ -62,8 +62,8 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
         this.resultVariable = serviceTask.getResultVariableName();
         this.mapExceptions = serviceTask.getMapExceptions();
         this.useLocalScopeForResultVariable = serviceTask.isUseLocalScopeForResultVariable();
-        this.storeResultVariableAsTransient = serviceTask.isStoreResultVariableAsTransient();
         this.triggerable = serviceTask.isTriggerable();
+        this.storeResultVariableAsTransient = serviceTask.isStoreResultVariableAsTransient();
     }
 
     @Override
@@ -90,7 +90,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
 
                 value = expression.getValue(execution);
                 if (resultVariable != null) {
-                    if (storeResultVariableAsTransient) {
+                    if(storeResultVariableAsTransient) {
                         if (useLocalScopeForResultVariable) {
                             execution.setTransientVariableLocal(resultVariable, value);
                         } else {

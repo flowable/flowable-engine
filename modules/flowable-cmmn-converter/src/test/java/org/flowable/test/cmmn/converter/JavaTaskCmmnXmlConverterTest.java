@@ -109,17 +109,17 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
                 .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
                 .containsExactly(tuple("taskTest", "hello"));
 
-        PlanItem planItemTaskC = cmmnModel.findPlanItem("planItemTaskB");
+        PlanItem planItemTaskC = cmmnModel.findPlanItem("planItemTaskC");
         planItemDefinition = planItemTaskC.getPlanItemDefinition();
-        assertThat(planItemTaskC.getEntryCriteria()).hasSize(1);
+        assertThat(planItemTaskC.getEntryCriteria()).isEmpty();
         assertThat(planItemDefinition).isInstanceOf(ServiceTask.class);
         ServiceTask taskC = (ServiceTask) planItemDefinition;
         assertThat(taskC.getType()).isEqualTo(ServiceTask.JAVA_TASK);
         assertThat(taskC.getImplementationType()).isEqualTo(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
         assertThat(taskC.getImplementation()).isEqualTo("${'test'}");
         assertThat(taskC.getResultVariableName()).isEqualTo("transientResult");
-        assertThat(taskC.isAsync()).isTrue();
-        assertThat(taskC.isExclusive()).isTrue();
+        assertThat(taskC.isAsync()).isFalse();
+        assertThat(taskC.isExclusive()).isFalse();
         assertThat(taskC.isStoreResultVariableAsTransient()).isTrue();
     }
 
