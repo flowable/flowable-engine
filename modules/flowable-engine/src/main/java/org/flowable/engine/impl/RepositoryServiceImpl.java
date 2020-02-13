@@ -21,7 +21,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -369,7 +369,7 @@ public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     }
 
     @Override
-    public List<DmnDecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId) {
+    public List<DmnDecision> getDecisionTablesForProcessDefinition(String processDefinitionId) {
         return commandExecutor.execute(new GetDecisionTablesForProcessDefinitionCmd(processDefinitionId));
     }
 

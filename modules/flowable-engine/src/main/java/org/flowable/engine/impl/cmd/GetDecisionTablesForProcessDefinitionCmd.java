@@ -25,8 +25,8 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.DmnDecisionTableQuery;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.api.DmnDecisionQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -37,7 +37,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 /**
  * @author Yvo Swillens
  */
-public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<DmnDecisionTable>>, Serializable {
+public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<DmnDecision>>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String processDefinitionId;
@@ -48,7 +48,7 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<Dm
     }
 
     @Override
-    public List<DmnDecisionTable> execute(CommandContext commandContext) {
+    public List<DmnDecision> execute(CommandContext commandContext) {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 
         if (processDefinition == null) {
@@ -66,14 +66,14 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<Dm
         }
 
         dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
-        List<DmnDecisionTable> decisionTables = getDecisionTablesFromModel(bpmnModel, processDefinition);
+        List<DmnDecision> decisionTables = getDecisionTablesFromModel(bpmnModel, processDefinition);
 
         return decisionTables;
     }
 
-    protected List<DmnDecisionTable> getDecisionTablesFromModel(BpmnModel bpmnModel, ProcessDefinition processDefinition) {
+    protected List<DmnDecision> getDecisionTablesFromModel(BpmnModel bpmnModel, ProcessDefinition processDefinition) {
         Set<String> decisionTableKeys = new HashSet<>();
-        List<DmnDecisionTable> decisionTables = new ArrayList<>();
+        List<DmnDecision> decisionTables = new ArrayList<>();
         List<ServiceTask> serviceTasks = bpmnModel.getMainProcess().findFlowElementsOfType(ServiceTask.class, true);
 
         for (ServiceTask serviceTask : serviceTasks) {
@@ -96,23 +96,23 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<Dm
         return decisionTables;
     }
 
-    protected void addDecisionTableToCollection(List<DmnDecisionTable> decisionTables, String decisionTableKey, ProcessDefinition processDefinition) {
-        DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery().decisionTableKey(decisionTableKey);
+    protected void addDecisionTableToCollection(List<DmnDecision> decisionTables, String decisionTableKey, ProcessDefinition processDefinition) {
+        DmnDecisionQuery definitionQuery = dmnRepositoryService.createDecisionQuery().decisionKey(decisionTableKey);
         Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
         if (deployment.getParentDeploymentId() != null) {
             List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
             
             if (dmnDeployments != null && dmnDeployments.size() > 0) {
-                decisionTableQuery.deploymentId(dmnDeployments.get(0).getId());
+                definitionQuery.deploymentId(dmnDeployments.get(0).getId());
             } else {
-                decisionTableQuery.latestVersion();
+                definitionQuery.latestVersion();
             }
             
         } else {
-            decisionTableQuery.latestVersion();
+            definitionQuery.latestVersion();
         }
         
-        DmnDecisionTable decisionTable = decisionTableQuery.singleResult();
+        DmnDecision decisionTable = definitionQuery.singleResult();
         
         if (decisionTable != null) {
             decisionTables.add(decisionTable);
