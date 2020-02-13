@@ -16,7 +16,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,7 +48,7 @@ public class ProcessDefinitionDecisionTableCollectionResource extends BaseProces
 
         ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
         
-        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
+        List<DmnDecision> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
 
         return restResponseFactory.createDecisionTableResponseList(decisionTables, processDefinitionId);
     }
