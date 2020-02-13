@@ -13,15 +13,15 @@
 package org.flowable.dmn.engine.impl.util;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
+import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
- * A utility class that hides the complexity of {@link DecisionTableEntity} and {@link Decision} lookup. Use this class rather than accessing the decision table cache or {@link DeploymentManager}
+ * A utility class that hides the complexity of {@link DecisionEntity} and {@link Decision} lookup. Use this class rather than accessing the decision table cache or {@link DeploymentManager}
  * directly.
  * 
  * @author Joram Barrez
@@ -29,15 +29,15 @@ import org.flowable.dmn.model.DmnDefinition;
  */
 public class DecisionTableUtil {
 
-    public static DecisionTableEntity getDecisionTableEntity(String decisionTableId) {
+    public static DecisionEntity getDecisionTableEntity(String decisionTableId) {
         return getDecisionTableEntity(decisionTableId, false);
     }
 
-    public static DecisionTableEntity getDecisionTableEntity(String decisionTableId, boolean checkCacheOnly) {
+    public static DecisionEntity getDecisionTableEntity(String decisionTableId, boolean checkCacheOnly) {
         if (checkCacheOnly) {
-            DecisionTableCacheEntry cacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDecisionCache().get(decisionTableId);
+            DecisionCacheEntry cacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDefinitionCache().get(decisionTableId);
             if (cacheEntry != null) {
-                return cacheEntry.getDecisionTableEntity();
+                return cacheEntry.getDecisionEntity();
             }
             return null;
         } else {
@@ -46,33 +46,25 @@ public class DecisionTableUtil {
         }
     }
 
-    public static Decision getDecision(String decisionTableId) {
-        DeploymentManager deploymentManager = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager();
-
-        // This will check the cache in the findDeployedDecisionById and resolveDecisionTable method
-        DecisionTableEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionTableId);
-        return deploymentManager.resolveDecisionTable(decisionTableEntity).getDecision();
-    }
-
     public static DmnDefinition getDmnDefinition(String decisionTableId) {
         DeploymentManager deploymentManager = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager();
 
         // This will check the cache in the findDeployedDecisionById and resolveDecisionTable method
-        DecisionTableEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionTableId);
-        return deploymentManager.resolveDecisionTable(decisionTableEntity).getDmnDefinition();
+        DecisionEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionTableId);
+        return deploymentManager.resolveDecision(decisionTableEntity).getDmnDefinition();
     }
 
-    public static DmnDefinition getDmnDefinitionFromCache(String decisionTableId) {
-        DecisionTableCacheEntry cacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDecisionCache().get(decisionTableId);
+    public static DmnDefinition getDmnDefinitionFromCache(String definitionId) {
+        DecisionCacheEntry cacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDefinitionCache().get(definitionId);
         if (cacheEntry != null) {
             return cacheEntry.getDmnDefinition();
         }
         return null;
     }
 
-    public static DecisionTableEntity getDecisionTableFromDatabase(String decisionTableId) {
-        DecisionTableEntityManager decisionTableEntityManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager();
-        DecisionTableEntity decisionTable = decisionTableEntityManager.findById(decisionTableId);
+    public static DecisionEntity getDecisionTableFromDatabase(String decisionTableId) {
+        DecisionEntityManager decisionTableEntityManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionEntityManager();
+        DecisionEntity decisionTable = decisionTableEntityManager.findById(decisionTableId);
         if (decisionTable == null) {
             throw new FlowableException("No decision table found with id " + decisionTableId);
         }

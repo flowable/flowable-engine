@@ -19,6 +19,8 @@ import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
+import org.flowable.dmn.model.DmnDefinition;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Yvo Swillens
  */
 public interface RuleEngineExecutor {
+    DecisionExecutionAuditContainer execute(DecisionService decisionService, DmnDefinition definition, ExecuteDecisionInfo executeDecisionInfo);
 
     DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionInfo executeDecisionInfo);
     

@@ -17,7 +17,7 @@ import java.util.Map;
 public class ExecuteDecisionInfo {
 
     protected String decisionKey;
-    protected String decisionDefinitionId;
+    protected String decisionId;
     protected int decisionVersion;
     protected String deploymentId;
     protected String parentDeploymentId;
@@ -36,11 +36,11 @@ public class ExecuteDecisionInfo {
     public void setDecisionKey(String decisionKey) {
         this.decisionKey = decisionKey;
     }
-    public String getDecisionDefinitionId() {
-        return decisionDefinitionId;
+    public String getDecisionId() {
+        return decisionId;
     }
-    public void setDecisionDefinitionId(String decisionDefinitionId) {
-        this.decisionDefinitionId = decisionDefinitionId;
+    public void setDecisionId(String decisionId) {
+        this.decisionId = decisionId;
     }
     public int getDecisionVersion() {
         return decisionVersion;

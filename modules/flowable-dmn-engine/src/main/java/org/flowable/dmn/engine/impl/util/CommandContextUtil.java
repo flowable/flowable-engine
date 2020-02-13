@@ -18,7 +18,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
@@ -69,12 +69,12 @@ public class CommandContextUtil {
         return getDmnEngineConfiguration(commandContext).getDeploymentEntityManager();
     }
     
-    public static DecisionTableEntityManager getDecisionTableEntityManager() {
-        return getDecisionTableEntityManager(getCommandContext());
+    public static DecisionEntityManager getDecisionEntityManager() {
+        return getDecisionEntityManager(getCommandContext());
     }
     
-    public static DecisionTableEntityManager getDecisionTableEntityManager(CommandContext commandContext) {
-        return getDmnEngineConfiguration(commandContext).getDecisionTableEntityManager();
+    public static DecisionEntityManager getDecisionEntityManager(CommandContext commandContext) {
+        return getDmnEngineConfiguration(commandContext).getDecisionEntityManager();
     }
     
     public static HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager() {

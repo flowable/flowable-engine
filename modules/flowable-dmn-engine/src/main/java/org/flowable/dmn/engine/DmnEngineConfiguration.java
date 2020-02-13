@@ -78,11 +78,11 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
-import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
+import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManagerImpl;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
+import org.flowable.dmn.engine.impl.persistence.entity.DefinitionEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
@@ -91,11 +91,11 @@ import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecution
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.TableDataManagerImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.HistoricDecisionExecutionDataManager;
-import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionTableDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecisionDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoricDecisionExecutionDataManager;
@@ -124,13 +124,13 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     // DATA MANAGERS ///////////////////////////////////////////////////
 
     protected DmnDeploymentDataManager deploymentDataManager;
-    protected DecisionTableDataManager decisionTableDataManager;
+    protected DecisionDataManager decisionDataManager;
     protected DmnResourceDataManager resourceDataManager;
     protected HistoricDecisionExecutionDataManager historicDecisionExecutionDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected DmnDeploymentEntityManager deploymentEntityManager;
-    protected DecisionTableEntityManager decisionTableEntityManager;
+    protected DecisionEntityManager decisionEntityManager;
     protected DmnResourceEntityManager resourceEntityManager;
     protected HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager;
     protected TableDataManager tableDataManager;
@@ -156,7 +156,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     protected boolean historyEnabled;
 
     protected int decisionCacheLimit = -1; // By default, no limit
-    protected DeploymentCache<DecisionTableCacheEntry> decisionCache;
+    protected DeploymentCache<DecisionCacheEntry> definitionCache;
 
     protected ObjectMapper dmnEngineObjectMapper = new ObjectMapper();
 
@@ -276,8 +276,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisDmnDeploymentDataManager(this);
         }
-        if (decisionTableDataManager == null) {
-            decisionTableDataManager = new MybatisDecisionTableDataManager(this);
+        if (decisionDataManager == null) {
+            decisionDataManager = new MybatisDecisionDataManager(this);
         }
         if (resourceDataManager == null) {
             resourceDataManager = new MybatisDmnResourceDataManager(this);
@@ -293,8 +293,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         if (deploymentEntityManager == null) {
             deploymentEntityManager = new DmnDeploymentEntityManagerImpl(this, deploymentDataManager);
         }
-        if (decisionTableEntityManager == null) {
-            decisionTableEntityManager = new DecisionTableEntityManagerImpl(this, decisionTableDataManager);
+        if (decisionEntityManager == null) {
+            decisionEntityManager = new DefinitionEntityManagerImpl(this, decisionDataManager);
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new DmnResourceEntityManagerImpl(this, resourceDataManager);
@@ -428,18 +428,18 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         }
 
         // Decision cache
-        if (decisionCache == null) {
+        if (definitionCache == null) {
             if (decisionCacheLimit <= 0) {
-                decisionCache = new DefaultDeploymentCache<>();
+                definitionCache = new DefaultDeploymentCache<>();
             } else {
-                decisionCache = new DefaultDeploymentCache<>(decisionCacheLimit);
+                definitionCache = new DefaultDeploymentCache<>(decisionCacheLimit);
             }
         }
 
-        deploymentManager = new DeploymentManager(decisionCache, this);
+        deploymentManager = new DeploymentManager(definitionCache, this);
         deploymentManager.setDeployers(deployers);
         deploymentManager.setDeploymentEntityManager(deploymentEntityManager);
-        deploymentManager.setDecisionTableEntityManager(decisionTableEntityManager);
+        deploymentManager.setDecisionEntityManager(decisionEntityManager);
     }
 
     public Collection<? extends Deployer> getDefaultDeployers() {
@@ -780,12 +780,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
-    public DeploymentCache<DecisionTableCacheEntry> getDecisionCache() {
-        return decisionCache;
+    public DeploymentCache<DecisionCacheEntry> getDefinitionCache() {
+        return definitionCache;
     }
 
-    public DmnEngineConfiguration setDecisionCache(DeploymentCache<DecisionTableCacheEntry> decisionCache) {
-        this.decisionCache = decisionCache;
+    public DmnEngineConfiguration setDefinitionCache(DeploymentCache<DecisionCacheEntry> definitionCache) {
+        this.definitionCache = definitionCache;
         return this;
     }
 
@@ -798,12 +798,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
-    public DecisionTableDataManager getDecisionTableDataManager() {
-        return decisionTableDataManager;
+    public DecisionDataManager getDecisionDataManager() {
+        return decisionDataManager;
     }
 
-    public DmnEngineConfiguration setDecisionTableDataManager(DecisionTableDataManager decisionTableDataManager) {
-        this.decisionTableDataManager = decisionTableDataManager;
+    public DmnEngineConfiguration setDecisionDataManager(DecisionDataManager decisionDataManager) {
+        this.decisionDataManager = decisionDataManager;
         return this;
     }
 
@@ -834,12 +834,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
-    public DecisionTableEntityManager getDecisionTableEntityManager() {
-        return decisionTableEntityManager;
+    public DecisionEntityManager getDecisionEntityManager() {
+        return decisionEntityManager;
     }
 
-    public DmnEngineConfiguration setDecisionTableEntityManager(DecisionTableEntityManager decisionTableEntityManager) {
-        this.decisionTableEntityManager = decisionTableEntityManager;
+    public DmnEngineConfiguration setDecisionEntityManager(DecisionEntityManager decisionEntityManager) {
+        this.decisionEntityManager = decisionEntityManager;
         return this;
     }
 

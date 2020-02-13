@@ -20,16 +20,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
-import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
+import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DmnDefinition;
 
 /**
  * @author Yvo Swillens
@@ -38,150 +38,141 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected ExecuteDecisionInfo executeDecisionInfo = new ExecuteDecisionInfo();
+    protected ExecuteDecisionInfo executeDefinitionInfo = new ExecuteDecisionInfo();
 
-    public AbstractExecuteDecisionCmd(ExecuteDecisionBuilderImpl decisionBuilder) {
-        executeDecisionInfo.setDecisionKey(decisionBuilder.getDecisionKey());
-        executeDecisionInfo.setParentDeploymentId(decisionBuilder.getParentDeploymentId());
-        executeDecisionInfo.setInstanceId(decisionBuilder.getInstanceId());
-        executeDecisionInfo.setExecutionId(decisionBuilder.getExecutionId());
-        executeDecisionInfo.setActivityId(decisionBuilder.getActivityId());
-        executeDecisionInfo.setScopeType(decisionBuilder.getScopeType());
-        executeDecisionInfo.setVariables(decisionBuilder.getVariables());
-        executeDecisionInfo.setTenantId(decisionBuilder.getTenantId());
-        executeDecisionInfo.setFallbackToDefaultTenant(decisionBuilder.isFallbackToDefaultTenant());
+    public AbstractExecuteDecisionCmd(ExecuteDecisionBuilderImpl definitionBuilder) {
+        executeDefinitionInfo.setDecisionKey(definitionBuilder.getDecisionKey());
+        executeDefinitionInfo.setParentDeploymentId(definitionBuilder.getParentDeploymentId());
+        executeDefinitionInfo.setInstanceId(definitionBuilder.getInstanceId());
+        executeDefinitionInfo.setExecutionId(definitionBuilder.getExecutionId());
+        executeDefinitionInfo.setActivityId(definitionBuilder.getActivityId());
+        executeDefinitionInfo.setScopeType(definitionBuilder.getScopeType());
+        executeDefinitionInfo.setVariables(definitionBuilder.getVariables());
+        executeDefinitionInfo.setTenantId(definitionBuilder.getTenantId());
+        executeDefinitionInfo.setFallbackToDefaultTenant(definitionBuilder.isFallbackToDefaultTenant());
     }
 
     public AbstractExecuteDecisionCmd(String decisionKey, Map<String, Object> variables) {
-        executeDecisionInfo.setDecisionKey(decisionKey);
-        executeDecisionInfo.setVariables(variables);
+        executeDefinitionInfo.setDecisionKey(decisionKey);
+        executeDefinitionInfo.setVariables(variables);
     }
 
-
-    protected DmnDecisionTable resolveDecisionTable() {
-        DmnDecisionTable decisionTable = null;
+    protected DmnDefinition resolveDefinition() {
+        DmnDecision definition = null;
         DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-        DecisionTableEntityManager decisionTableManager = dmnEngineConfiguration.getDecisionTableEntityManager();
+        DecisionEntityManager definitionManager = dmnEngineConfiguration.getDecisionEntityManager();
 
-        String decisionKey = executeDecisionInfo.getDecisionKey();
-        String parentDeploymentId = executeDecisionInfo.getParentDeploymentId();
-        String tenantId = executeDecisionInfo.getTenantId();
+        String definitionKey = executeDefinitionInfo.getDecisionKey();
+        String parentDeploymentId = executeDefinitionInfo.getParentDeploymentId();
+        String tenantId = executeDefinitionInfo.getTenantId();
 
-        if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) &&
+        if (StringUtils.isNotEmpty(definitionKey) && StringUtils.isNotEmpty(parentDeploymentId) &&
                         !dmnEngineConfiguration.isAlwaysLookupLatestDefinitionVersion() && StringUtils.isNotEmpty(tenantId)) {
             
             List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
                 new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
 
             if (dmnDeployments != null && dmnDeployments.size() != 0) {
-                decisionTable = decisionTableManager.findDecisionTableByDeploymentAndKeyAndTenantId(
-                    dmnDeployments.get(0).getId(), decisionKey, tenantId);
+                definition = definitionManager.findDecisionByDeploymentAndKeyAndTenantId(
+                    dmnDeployments.get(0).getId(), definitionKey, tenantId);
             }
 
-            if (decisionTable == null) {
+            if (definition == null) {
                 // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
-                decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
+                definition = definitionManager.findLatestDecisionByKeyAndTenantId(definitionKey, tenantId);
 
-                if (decisionTable == null) {
+                if (definition == null) {
                     // if fallback to default tenant is enabled do a final lookup query
-                    if (executeDecisionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
-                        String defaultTenant = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.DMN, decisionKey);
+                    if (executeDefinitionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
+                        String defaultTenant = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.DMN, definitionKey);
                         if (StringUtils.isNotEmpty(defaultTenant)) {
-                            decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, defaultTenant);
-                            if (decisionTable == null) {
-                                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                                    ". There was also no fall back decision table found for default tenant " + defaultTenant);
+                            definition = definitionManager.findLatestDecisionByKeyAndTenantId(definitionKey, defaultTenant);
+                            if (definition == null) {
+                                throw new FlowableObjectNotFoundException("No decision found for key: " + definitionKey +
+                                    ". There was also no fall back decision found for default tenant " + defaultTenant);
                             }
                             
                         } else {
-                            decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
-                            if (decisionTable == null) {
-                                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                            definition = definitionManager.findLatestDecisionByKey(definitionKey);
+                            if (definition == null) {
+                                throw new FlowableObjectNotFoundException("No decision found for key: " + definitionKey +
                                     ". There was also no fall back decision table found without tenant.");
                             }
                         }
                         
                     } else {
-                        throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                        throw new FlowableObjectNotFoundException("No decision found for key: " + definitionKey +
                             ", parent deployment id " + parentDeploymentId + " and tenant id: " + tenantId +
-                            ". There was also no fall back decision table found without parent deployment id.");
+                            ". There was also no fall back decision found without parent deployment id.");
                     }
                 }
             }
             
-        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(parentDeploymentId) && 
+        } else if (StringUtils.isNotEmpty(definitionKey) && StringUtils.isNotEmpty(parentDeploymentId) &&
                         !dmnEngineConfiguration.isAlwaysLookupLatestDefinitionVersion()) {
             
             List<DmnDeployment> dmnDeployments = CommandContextUtil.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
                 new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
 
             if (dmnDeployments != null && dmnDeployments.size() != 0) {
-                decisionTable = decisionTableManager.findDecisionTableByDeploymentAndKey(dmnDeployments.get(0).getId(), decisionKey);
+                definition = definitionManager.findDecisionByDeploymentAndKey(dmnDeployments.get(0).getId(), definitionKey);
             }
 
-            if (decisionTable == null) {
+            if (definition == null) {
                 // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
-                decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
+                definition = definitionManager.findLatestDecisionByKey(definitionKey);
 
-                if (decisionTable == null) {
-                    throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
+                if (definition == null) {
+                    throw new FlowableObjectNotFoundException("No decision found for key: " + definitionKey +
                         " and parent deployment id " + parentDeploymentId +
-                        ". There was also no fall back decision table found without parent deployment id.");
+                        ". There was also no fall back decision found without parent deployment id.");
                 }
             }
             
-        } else if (StringUtils.isNotEmpty(decisionKey) && StringUtils.isNotEmpty(tenantId)) {
-            decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
-            if (decisionTable == null) {
-                if (executeDecisionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
-                    String defaultTenant = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.DMN, decisionKey);
+        } else if (StringUtils.isNotEmpty(definitionKey) && StringUtils.isNotEmpty(tenantId)) {
+            definition = definitionManager.findLatestDecisionByKeyAndTenantId(definitionKey, tenantId);
+            if (definition == null) {
+                if (executeDefinitionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
+                    String defaultTenant = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.DMN, definitionKey);
                     if (StringUtils.isNotEmpty(defaultTenant)) {
-                        decisionTable = decisionTableManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, defaultTenant);
-                        if (decisionTable == null) {
-                            throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                                ". There was also no fall back decision table found for default tenant " +
+                        definition = definitionManager.findLatestDecisionByKeyAndTenantId(definitionKey, defaultTenant);
+                        if (definition == null) {
+                            throw new FlowableObjectNotFoundException("No decision found for key: " + definitionKey +
+                                ". There was also no fall back decision found for default tenant " +
                                     defaultTenant + ".");
                         }
                         
                     } else {
-                        decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
-                        if (decisionTable == null) {
-                            throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey +
-                                ". There was also no fall back decision table found without tenant.");
+                        definition = definitionManager.findLatestDecisionByKey(definitionKey);
+                        if (definition == null) {
+                            throw new FlowableObjectNotFoundException("No decision found for key: " + definitionKey +
+                                ". There was also no fall back decision found without tenant.");
                         }
                     }
                     
                 } else {
                     throw new FlowableObjectNotFoundException(
-                        "Decision table for key [" + decisionKey + "] and tenantId [" + tenantId + "] was not found");
+                        "Decision for key [" + definitionKey + "] and tenantId [" + tenantId + "] was not found");
                 }
             }
 
-        } else if (StringUtils.isNotEmpty(decisionKey)) {
-            decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
-            if (decisionTable == null) {
-                throw new FlowableObjectNotFoundException("Decision table for key [" + decisionKey + "] was not found");
+        } else if (StringUtils.isNotEmpty(definitionKey)) {
+            definition = definitionManager.findLatestDecisionByKey(definitionKey);
+            if (definition == null) {
+                throw new FlowableObjectNotFoundException("Decision for key [" + definitionKey + "] was not found");
             }
             
         } else {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
-        executeDecisionInfo.setDecisionDefinitionId(decisionTable.getId());
-        executeDecisionInfo.setDecisionVersion(decisionTable.getVersion());
-        executeDecisionInfo.setDeploymentId(decisionTable.getDeploymentId());
+        executeDefinitionInfo.setDecisionId(definition.getId());
+        executeDefinitionInfo.setDecisionVersion(definition.getVersion());
+        executeDefinitionInfo.setDeploymentId(definition.getDeploymentId());
 
-        return decisionTable;
-    }
+        DecisionCacheEntry decisionTableCacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().resolveDecision(definition);
+        DmnDefinition dmnDefinition = decisionTableCacheEntry.getDmnDefinition();
 
-    protected Decision resolveDecision(DmnDecisionTable decisionTable) {
-        if (decisionTable == null) {
-            throw new FlowableIllegalArgumentException("decisionTable is null");
-        }
-
-        DecisionTableCacheEntry decisionTableCacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().resolveDecisionTable(decisionTable);
-        Decision decision = decisionTableCacheEntry.getDecision();
-
-        return decision;
+        return dmnDefinition;
     }
 }

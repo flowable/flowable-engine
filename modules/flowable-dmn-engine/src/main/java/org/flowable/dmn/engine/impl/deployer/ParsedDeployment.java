@@ -17,63 +17,69 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.dmn.engine.impl.parser.DmnParse;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
- * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources and processes associated with each
- * DecisionTableEntity - all produced by parsing the deployment.
+ * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DefinitionEntities and resources and processes associated with each
+ * DefinitionEntity - all produced by parsing the deployment.
  * 
- * The DecisionTableEntities are expected to be "not fully set-up" - they may be inconsistent with the DeploymentEntity and/or the persisted versions, and if the deployment is new, they will not yet
+ * The DefinitionEntities are expected to be "not fully set-up" - they may be inconsistent with the DeploymentEntity and/or the persisted versions, and if the deployment is new, they will not yet
  * be persisted.
  */
 public class ParsedDeployment {
 
     protected DmnDeploymentEntity deploymentEntity;
 
-    protected List<DecisionTableEntity> decisionTables;
-    protected Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses;
-    protected Map<DecisionTableEntity, EngineResource> mapDecisionTablesToResources;
+    protected List<DecisionEntity> decisions;
+    protected Map<DecisionEntity, DmnParse> mapDecisionsToParses;
+    protected Map<DecisionEntity, EngineResource> mapDecisionsToResources;
 
     public ParsedDeployment(
-            DmnDeploymentEntity entity, List<DecisionTableEntity> decisionTables,
-            Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses,
-            Map<DecisionTableEntity, EngineResource> mapDecisionTablesToResources) {
+            DmnDeploymentEntity entity, List<DecisionEntity> decisions,
+            Map<DecisionEntity, DmnParse> mapDecisionsToParses,
+            Map<DecisionEntity, EngineResource> mapDecisionsToResources) {
 
         this.deploymentEntity = entity;
-        this.decisionTables = decisionTables;
-        this.mapDecisionTablesToParses = mapDecisionTablesToParses;
-        this.mapDecisionTablesToResources = mapDecisionTablesToResources;
+        this.decisions = decisions;
+        this.mapDecisionsToParses = mapDecisionsToParses;
+        this.mapDecisionsToResources = mapDecisionsToResources;
     }
 
     public DmnDeploymentEntity getDeployment() {
         return deploymentEntity;
     }
 
-    public List<DecisionTableEntity> getAllDecisionTables() {
-        return decisionTables;
+    public List<DecisionEntity> getAllDecisions() {
+        return decisions;
     }
 
-    public EngineResource getResourceForDecisionTable(DecisionTableEntity decisionTable) {
-        return mapDecisionTablesToResources.get(decisionTable);
+    public EngineResource getResourceForDecision(DecisionEntity decision) {
+        return mapDecisionsToResources.get(decision);
     }
 
-    public DmnParse getDmnParseForDecisionTable(DecisionTableEntity decisionTable) {
-        return mapDecisionTablesToParses.get(decisionTable);
+    public DmnParse getDmnParseForDecision(DecisionEntity decision) {
+        return mapDecisionsToParses.get(decision);
     }
 
-    public DmnDefinition getDmnDefinitionForDecisionTable(DecisionTableEntity decisionTable) {
-        DmnParse parse = getDmnParseForDecisionTable(decisionTable);
+    public DmnDefinition getDmnDefinitionForDecision(DecisionEntity decision) {
+        DmnParse parse = getDmnParseForDecision(decision);
 
         return (parse == null ? null : parse.getDmnDefinition());
     }
 
-    public Decision getDecisionForDecisionTable(DecisionTableEntity decisionTable) {
-        DmnDefinition dmnDefinition = getDmnDefinitionForDecisionTable(decisionTable);
+    public DecisionService getDecisionServiceForDecisionEntity(DecisionEntity decisionEntity) {
+        DmnDefinition dmnDefinition = getDmnDefinitionForDecision(decisionEntity);
 
-        return (dmnDefinition == null ? null : dmnDefinition.getDecisionById(decisionTable.getKey()));
+        return (dmnDefinition == null ? null : dmnDefinition.getDecisionServiceById(decisionEntity.getKey()));
     }
 
+    public Decision getDecisionForDecisionEntity(DecisionEntity decisionEntity) {
+        DmnDefinition dmnDefinition = getDmnDefinitionForDecision(decisionEntity);
+
+        return (dmnDefinition == null ? null : dmnDefinition.getDecisionById(decisionEntity.getKey()));
+    }
 }

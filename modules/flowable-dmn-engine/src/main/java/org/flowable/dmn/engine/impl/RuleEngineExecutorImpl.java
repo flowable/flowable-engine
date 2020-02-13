@@ -15,6 +15,7 @@ package org.flowable.dmn.engine.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +38,9 @@ import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecution
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
+import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.RuleInputClauseContainer;
@@ -65,7 +68,29 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     }
 
     /**
-     * Executes the given decision table and creates the outcome results
+     * Executes the given definition and creates the outcome results
+     *
+     * @param decisionService       the decision service
+     * @param definition            the DMN definition
+     * @param executeDecisionInfo
+     * @return updated execution variables map
+     */
+    @Override
+    public DecisionExecutionAuditContainer execute(DecisionService decisionService, DmnDefinition definition, ExecuteDecisionInfo executeDecisionInfo) {
+        if (decisionService == null) {
+            throw new IllegalArgumentException("no decision service provided");
+        }
+        if (definition == null) {
+            throw new IllegalArgumentException("no definition provided");
+        }
+        AtomicReference<DecisionExecutionAuditContainer> executionAuditContainer;
+        definition.getDecisions().forEach(decision -> execute(decision, executeDecisionInfo));
+
+        return new DecisionExecutionAuditContainer();
+    }
+
+    /**
+     * Executes the given decision and creates the outcome results
      *
      * @param decision            the DMN decision
      * @param executeDecisionInfo
@@ -106,7 +131,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             if (dmnEngineConfiguration.isHistoryEnabled()) {
                 HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager = dmnEngineConfiguration.getHistoricDecisionExecutionEntityManager();
                 HistoricDecisionExecutionEntity decisionExecutionEntity = historicDecisionExecutionEntityManager.create();
-                decisionExecutionEntity.setDecisionDefinitionId(executeDecisionInfo.getDecisionDefinitionId());
+                decisionExecutionEntity.setDecisionDefinitionId(executeDecisionInfo.getDecisionId());
                 decisionExecutionEntity.setDeploymentId(executeDecisionInfo.getDeploymentId());
                 decisionExecutionEntity.setStartTime(executionContext.getAuditContainer().getStartTime());
                 decisionExecutionEntity.setEndTime(executionContext.getAuditContainer().getEndTime());

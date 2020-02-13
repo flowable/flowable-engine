@@ -19,10 +19,11 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
+import org.flowable.dmn.model.DmnDefinition;
 
 /**
  * @author Tijs Rademakers
@@ -42,25 +43,23 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
 
     public ExecuteDecisionWithAuditTrailCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables) {
         this(decisionKey, variables);
-        executeDecisionInfo.setParentDeploymentId(parentDeploymentId);
+        executeDefinitionInfo.setParentDeploymentId(parentDeploymentId);
     }
 
     public ExecuteDecisionWithAuditTrailCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables, String tenantId) {
         this(decisionKey, parentDeploymentId, variables);
-        executeDecisionInfo.setTenantId(tenantId);
+        executeDefinitionInfo.setTenantId(tenantId);
     }
 
     @Override
     public DecisionExecutionAuditContainer execute(CommandContext commandContext) {
-        if (executeDecisionInfo.getDecisionKey() == null) {
+        if (executeDefinitionInfo.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
-        Decision decision = null;
+        DmnDefinition definition;
         try {
-            DmnDecisionTable decisionTable = resolveDecisionTable();
-            decision = resolveDecision(decisionTable);
-            
+            definition = resolveDefinition();
         } catch (FlowableException e) {
             DecisionExecutionAuditContainer container = new DecisionExecutionAuditContainer();
             container.setFailed();
@@ -68,7 +67,14 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
             return container;
         }
 
-        return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDecisionInfo);
+        DecisionService decisionService = definition.getDecisionServiceById(executeDefinitionInfo.getDecisionKey());
+
+        if (decisionService != null) {
+            return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decisionService, definition, executeDefinitionInfo);
+        } else {
+            Decision decision = definition.getDecisionById(executeDefinitionInfo.getDecisionKey());
+            return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDefinitionInfo);
+        }
     }
 
 }

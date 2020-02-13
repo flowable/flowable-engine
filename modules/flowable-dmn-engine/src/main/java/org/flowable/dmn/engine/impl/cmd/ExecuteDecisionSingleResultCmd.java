@@ -19,11 +19,13 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
+import org.flowable.dmn.model.DmnDefinition;
+
 /**
  * @author Tijs Rademakers
  * @author Yvo Swillens
@@ -42,25 +44,31 @@ public class ExecuteDecisionSingleResultCmd extends AbstractExecuteDecisionCmd i
 
     public ExecuteDecisionSingleResultCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables) {
         this(decisionKey, variables);
-        executeDecisionInfo.setParentDeploymentId(parentDeploymentId);
+        executeDefinitionInfo.setParentDeploymentId(parentDeploymentId);
     }
 
     public ExecuteDecisionSingleResultCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables, String tenantId) {
         this(decisionKey, parentDeploymentId, variables);
-        executeDecisionInfo.setTenantId(tenantId);
+        executeDefinitionInfo.setTenantId(tenantId);
     }
 
     @Override
     public Map<String, Object> execute(CommandContext commandContext) {
-        if (executeDecisionInfo.getDecisionKey() == null) {
+        if (executeDefinitionInfo.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
         DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-        DmnDecisionTable decisionTable = resolveDecisionTable();
-        Decision decision = resolveDecision(decisionTable);
+        DmnDefinition definition = resolveDefinition();
+        DecisionService decisionService = definition.getDecisionServiceById(executeDefinitionInfo.getDecisionKey());
+        DecisionExecutionAuditContainer executionResult;
 
-        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
+        if (decisionService != null) {
+            executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decisionService, definition, executeDefinitionInfo);
+        } else {
+            Decision decision = definition.getDecisionById(executeDefinitionInfo.getDecisionKey());
+            executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDefinitionInfo);
+        }
 
         Map<String, Object> decisionResult = null;
         if (executionResult != null && executionResult.getDecisionResult() != null && !executionResult.getDecisionResult().isEmpty()) {
