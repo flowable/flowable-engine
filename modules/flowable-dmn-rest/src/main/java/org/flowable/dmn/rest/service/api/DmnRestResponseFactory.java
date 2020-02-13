@@ -29,7 +29,7 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.rest.service.api.decision.DmnRuleServiceResponse;
@@ -55,21 +55,21 @@ public class DmnRestResponseFactory {
         initializeVariableConverters();
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable) {
+    public DecisionTableResponse createDecisionTableResponse(DmnDecision decisionTable) {
         return createDecisionTableResponse(decisionTable, createUrlBuilder());
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, DmnRestUrlBuilder urlBuilder) {
+    public DecisionTableResponse createDecisionTableResponse(DmnDecision decisionTable, DmnRestUrlBuilder urlBuilder) {
         DecisionTableResponse response = new DecisionTableResponse(decisionTable);
         response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_TABLE, decisionTable.getId()));
 
         return response;
     }
 
-    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecisionTable> decisionTables) {
+    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecision> decisionTables) {
         DmnRestUrlBuilder urlBuilder = createUrlBuilder();
         List<DecisionTableResponse> responseList = new ArrayList<>();
-        for (DmnDecisionTable instance : decisionTables) {
+        for (DmnDecision instance : decisionTables) {
             responseList.add(createDecisionTableResponse(instance, urlBuilder));
         }
         return responseList;

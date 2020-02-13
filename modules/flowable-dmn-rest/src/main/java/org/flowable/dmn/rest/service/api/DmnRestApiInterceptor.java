@@ -12,8 +12,8 @@
  */
 package org.flowable.dmn.rest.service.api;
 
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.DmnDecisionTableQuery;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.api.DmnDecisionQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnDeploymentQuery;
@@ -25,9 +25,9 @@ public interface DmnRestApiInterceptor {
 
     void executeDecisionTable(DmnRuleServiceRequest request);
     
-    void accessDecisionTableInfoById(DmnDecisionTable decisionTable);
+    void accessDecisionTableInfoById(DmnDecision decisionTable);
     
-    void accessDecisionTableInfoWithQuery(DmnDecisionTableQuery decisionTableQuery);
+    void accessDecisionTableInfoWithQuery(DmnDecisionQuery decisionTableQuery);
     
     void accessDeploymentById(DmnDeployment deployment);
     

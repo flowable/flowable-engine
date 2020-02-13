@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.dmn.api.DmnDecisionTableQuery;
+import org.flowable.dmn.api.DmnDecisionQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.engine.impl.DecisionTableQueryProperty;
+import org.flowable.dmn.engine.impl.DecisionQueryProperty;
 import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +50,13 @@ public class DecisionTableCollectionResource {
     private static final Map<String, QueryProperty> properties = new HashMap<>();
 
     static {
-        properties.put("id", DecisionTableQueryProperty.DECISION_TABLE_ID);
-        properties.put("key", DecisionTableQueryProperty.DECISION_TABLE_KEY);
-        properties.put("category", DecisionTableQueryProperty.DECISION_TABLE_CATEGORY);
-        properties.put("name", DecisionTableQueryProperty.DECISION_TABLE_NAME);
-        properties.put("version", DecisionTableQueryProperty.DECISION_TABLE_VERSION);
-        properties.put("deploymentId", DecisionTableQueryProperty.DEPLOYMENT_ID);
-        properties.put("tenantId", DecisionTableQueryProperty.DECISION_TABLE_TENANT_ID);
+        properties.put("id", DecisionQueryProperty.DECISION_ID);
+        properties.put("key", DecisionQueryProperty.DECISION_KEY);
+        properties.put("category", DecisionQueryProperty.DECISION_CATEGORY);
+        properties.put("name", DecisionQueryProperty.DECISION_NAME);
+        properties.put("version", DecisionQueryProperty.DECISION_VERSION);
+        properties.put("deploymentId", DecisionQueryProperty.DECISION_DEPLOYMENT_ID);
+        properties.put("tenantId", DecisionQueryProperty.DECISION_TENANT_ID);
     }
 
     @Autowired
@@ -91,60 +91,60 @@ public class DecisionTableCollectionResource {
     })
     @GetMapping(value = "/dmn-repository/decision-tables", produces = "application/json")
     public DataResponse<DecisionTableResponse> getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
-        DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
+        DmnDecisionQuery definitionQuery = dmnRepositoryService.createDecisionQuery();
 
         // Populate filter-parameters
         if (allRequestParams.containsKey("category")) {
-            decisionTableQuery.decisionTableCategory(allRequestParams.get("category"));
+            definitionQuery.decisionCategory(allRequestParams.get("category"));
         }
         if (allRequestParams.containsKey("categoryLike")) {
-            decisionTableQuery.decisionTableCategoryLike(allRequestParams.get("categoryLike"));
+            definitionQuery.decisionCategoryLike(allRequestParams.get("categoryLike"));
         }
         if (allRequestParams.containsKey("categoryNotEquals")) {
-            decisionTableQuery.decisionTableCategoryNotEquals(allRequestParams.get("categoryNotEquals"));
+            definitionQuery.decisionCategoryNotEquals(allRequestParams.get("categoryNotEquals"));
         }
         if (allRequestParams.containsKey("key")) {
-            decisionTableQuery.decisionTableKey(allRequestParams.get("key"));
+            definitionQuery.decisionKey(allRequestParams.get("key"));
         }
         if (allRequestParams.containsKey("keyLike")) {
-            decisionTableQuery.decisionTableKeyLike(allRequestParams.get("keyLike"));
+            definitionQuery.decisionKeyLike(allRequestParams.get("keyLike"));
         }
         if (allRequestParams.containsKey("name")) {
-            decisionTableQuery.decisionTableName(allRequestParams.get("name"));
+            definitionQuery.decisionName(allRequestParams.get("name"));
         }
         if (allRequestParams.containsKey("nameLike")) {
-            decisionTableQuery.decisionTableNameLike(allRequestParams.get("nameLike"));
+            definitionQuery.decisionNameLike(allRequestParams.get("nameLike"));
         }
         if (allRequestParams.containsKey("resourceName")) {
-            decisionTableQuery.decisionTableResourceName(allRequestParams.get("resourceName"));
+            definitionQuery.decisionResourceName(allRequestParams.get("resourceName"));
         }
         if (allRequestParams.containsKey("resourceNameLike")) {
-            decisionTableQuery.decisionTableResourceNameLike(allRequestParams.get("resourceNameLike"));
+            definitionQuery.decisionResourceNameLike(allRequestParams.get("resourceNameLike"));
         }
         if (allRequestParams.containsKey("version")) {
-            decisionTableQuery.decisionTableVersion(Integer.valueOf(allRequestParams.get("version")));
+            definitionQuery.decisionVersion(Integer.valueOf(allRequestParams.get("version")));
         }
 
         if (allRequestParams.containsKey("latest")) {
             Boolean latest = Boolean.valueOf(allRequestParams.get("latest"));
             if (latest != null && latest) {
-                decisionTableQuery.latestVersion();
+                definitionQuery.latestVersion();
             }
         }
         if (allRequestParams.containsKey("deploymentId")) {
-            decisionTableQuery.deploymentId(allRequestParams.get("deploymentId"));
+            definitionQuery.deploymentId(allRequestParams.get("deploymentId"));
         }
         if (allRequestParams.containsKey("tenantId")) {
-            decisionTableQuery.decisionTableTenantId(allRequestParams.get("tenantId"));
+            definitionQuery.decisionTenantId(allRequestParams.get("tenantId"));
         }
         if (allRequestParams.containsKey("tenantIdLike")) {
-            decisionTableQuery.decisionTableTenantIdLike(allRequestParams.get("tenantIdLike"));
+            definitionQuery.decisionTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessDecisionTableInfoWithQuery(decisionTableQuery);
+            restApiInterceptor.accessDecisionTableInfoWithQuery(definitionQuery);
         }
 
-        return paginateList(allRequestParams, decisionTableQuery, "name", properties, dmnRestResponseFactory::createDecisionTableResponseList);
+        return paginateList(allRequestParams, definitionQuery, "name", properties, dmnRestResponseFactory::createDecisionTableResponseList);
     }
 }

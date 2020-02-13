@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -32,7 +32,7 @@ public class DecisionTableResponse {
     protected String deploymentId;
     protected String tenantId;
 
-    public DecisionTableResponse(DmnDecisionTable decisionTable) {
+    public DecisionTableResponse(DmnDecision decisionTable) {
         setId(decisionTable.getId());
         setCategory(decisionTable.getCategory());
         setName(decisionTable.getName());

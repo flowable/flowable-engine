@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
@@ -36,7 +36,7 @@ public class HistoricDecisionExecutionCollectionResourceTest extends BaseSpringD
                             .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn")
                             .deploy();
 
-            DmnDecisionTable firstDecision = dmnRepositoryService.createDecisionTableQuery().decisionTableKey("decision").deploymentId(firstDeployment.getId()).singleResult();
+            DmnDecision definition = dmnRepositoryService.createDecisionQuery().decisionKey("decision").deploymentId(firstDeployment.getId()).singleResult();
             
             Map<String, Object> variables = new HashMap<>();
             variables.put("inputVariable1", 1);
@@ -65,10 +65,10 @@ public class HistoricDecisionExecutionCollectionResourceTest extends BaseSpringD
             url = baseUrl + "?instanceId=instance2";
             assertResultsPresentInDataResponse(url);
             
-            url = baseUrl + "?decisionKey=" + firstDecision.getKey();
+            url = baseUrl + "?definitionKey=" + definition.getKey();
             assertResultsPresentInDataResponse(url, executionId1, executionId2);
             
-            url = baseUrl + "?decisionKey=unexisting";
+            url = baseUrl + "?definitionKey=unexisting";
             assertResultsPresentInDataResponse(url);
 
             url = baseUrl + "?deploymentId=" + firstDeployment.getId();
