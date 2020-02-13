@@ -41,7 +41,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 
@@ -145,7 +145,7 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
     
     @Override
-    public List<DmnDecisionTable> getDecisionTablesForCaseDefinition(String caseDefinitionId) {
+    public List<DmnDecision> getDecisionTablesForCaseDefinition(String caseDefinitionId) {
         return commandExecutor.execute(new GetDecisionTablesForCaseDefinitionCmd(caseDefinitionId));
     }
     

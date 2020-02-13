@@ -66,7 +66,7 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -799,20 +799,20 @@ public class CmmnRestResponseFactory {
         return result;
     }
 
-    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecisionTable> decisionTables, String processDefinitionId) {
+    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecision> decisionTables, String processDefinitionId) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<DecisionTableResponse> responseList = new ArrayList<>();
-        for (DmnDecisionTable decisionTable : decisionTables) {
+        for (DmnDecision decisionTable : decisionTables) {
             responseList.add(createDecisionTableResponse(decisionTable, processDefinitionId, urlBuilder));
         }
         return responseList;
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String processDefinitionId) {
+    public DecisionTableResponse createDecisionTableResponse(DmnDecision decisionTable, String processDefinitionId) {
         return createDecisionTableResponse(decisionTable, processDefinitionId, createUrlBuilder());
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String caseDefinitionId, RestUrlBuilder urlBuilder) {
+    public DecisionTableResponse createDecisionTableResponse(DmnDecision decisionTable, String caseDefinitionId, RestUrlBuilder urlBuilder) {
         DecisionTableResponse decisionTableResponse = new DecisionTableResponse(decisionTable);
         decisionTableResponse.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION_DECISION_TABLES_COLLECTION, caseDefinitionId));
 

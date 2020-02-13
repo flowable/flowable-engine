@@ -17,7 +17,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +38,7 @@ public class CaseDefinitionDecisionTableCollectionResource extends BaseCaseDefin
 
     @ApiOperation(value = "List decision tables for a case definition", nickname = "listCaseDefinitionDecisionTables", tags = { "Case Definitions" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the case definition was found and the decision tables are returned.", response = DmnDecisionTable.class, responseContainer = "List"),
+            @ApiResponse(code = 200, message = "Indicates the case definition was found and the decision tables are returned.", response = DmnDecision.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/decision-tables", produces = "application/json")
@@ -47,7 +47,7 @@ public class CaseDefinitionDecisionTableCollectionResource extends BaseCaseDefin
             HttpServletRequest request) {
 
         CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
-        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForCaseDefinition(caseDefinition.getId());
+        List<DmnDecision> decisionTables = repositoryService.getDecisionTablesForCaseDefinition(caseDefinition.getId());
 
         return restResponseFactory.createDecisionTableResponseList(decisionTables, caseDefinitionId);
     }

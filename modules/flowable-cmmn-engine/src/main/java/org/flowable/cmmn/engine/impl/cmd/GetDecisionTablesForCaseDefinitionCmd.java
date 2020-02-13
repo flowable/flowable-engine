@@ -29,15 +29,15 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.DmnDecisionTableQuery;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.api.DmnDecisionQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 
 /**
  * @author Tijs Rademakers
  */
-public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDecisionTable>>, Serializable {
+public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDecision>>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String caseDefinitionId;
@@ -48,7 +48,7 @@ public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDe
     }
 
     @Override
-    public List<DmnDecisionTable> execute(CommandContext commandContext) {
+    public List<DmnDecision> execute(CommandContext commandContext) {
         CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(caseDefinitionId);
         
         if (caseDefinition == null) {
@@ -66,14 +66,14 @@ public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDe
             throw new FlowableException("DMN repository service is not available");
         }
 
-        List<DmnDecisionTable> decisionTables = getDecisionTablesFromModel(caseModel, caseDefinition);
+        List<DmnDecision> decisionTables = getDecisionTablesFromModel(caseModel, caseDefinition);
 
         return decisionTables;
     }
 
-    protected List<DmnDecisionTable> getDecisionTablesFromModel(Case caseModel, CaseDefinition caseDefinition) {
+    protected List<DmnDecision> getDecisionTablesFromModel(Case caseModel, CaseDefinition caseDefinition) {
         Set<String> decisionTableKeys = new HashSet<>();
-        List<DmnDecisionTable> decisionTables = new ArrayList<>();
+        List<DmnDecision> decisionTables = new ArrayList<>();
         List<DecisionTask> decisionTasks = caseModel.getPlanModel().findPlanItemDefinitionsOfType(DecisionTask.class, true);
 
         for (DecisionTask decisionTask : decisionTasks) {
@@ -94,23 +94,23 @@ public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDe
         return decisionTables;
     }
 
-    protected void addDecisionTableToCollection(List<DmnDecisionTable> decisionTables, String decisionTableKey, CaseDefinition caseDefinition) {
-        DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery().decisionTableKey(decisionTableKey);
+    protected void addDecisionTableToCollection(List<DmnDecision> decisionTables, String decisionTableKey, CaseDefinition caseDefinition) {
+        DmnDecisionQuery definitionQuery = dmnRepositoryService.createDecisionQuery().decisionKey(decisionTableKey);
         CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
         if (deployment.getParentDeploymentId() != null) {
             List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
             
             if (dmnDeployments != null && dmnDeployments.size() > 0) {
-                decisionTableQuery.deploymentId(dmnDeployments.get(0).getId());
+                definitionQuery.deploymentId(dmnDeployments.get(0).getId());
             } else {
-                decisionTableQuery.latestVersion();
+                definitionQuery.latestVersion();
             }
             
         } else {
-            decisionTableQuery.latestVersion();
+            definitionQuery.latestVersion();
         }
         
-        DmnDecisionTable decisionTable = decisionTableQuery.singleResult();
+        DmnDecision decisionTable = definitionQuery.singleResult();
         
         if (decisionTable != null) {
             decisionTables.add(decisionTable);
