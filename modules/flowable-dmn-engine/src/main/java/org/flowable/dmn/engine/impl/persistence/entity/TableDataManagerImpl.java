@@ -53,7 +53,7 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
 
         // DMN module
         entityToTableNameMap.put(DmnDeploymentEntity.class, "ACT_DMN_DEPLOYMENT");
-        entityToTableNameMap.put(DecisionTableEntity.class, "ACT_DMN_DECISION_TABLE");
+        entityToTableNameMap.put(DecisionEntity.class, "ACT_DMN_DECISION");
         entityToTableNameMap.put(DmnResourceEntity.class, "ACT_DMN_DEPLOYMENT_RESOURCE");
         entityToTableNameMap.put(HistoricDecisionExecutionEntity.class, "ACT_DMN_HI_DECISION_EXECUTION");
     }

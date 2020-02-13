@@ -12,7 +12,7 @@
 
     <!-- Engine mappers -->
     <mapper resource="org/flowable/dmn/db/mapping/common.xml" />
-    <mapper resource="org/flowable/dmn/db/mapping/entity/DecisionTable.xml" />
+    <mapper resource="org/flowable/dmn/db/mapping/entity/Decision.xml" />
     <mapper resource="org/flowable/dmn/db/mapping/entity/Deployment.xml" />
     <mapper resource="org/flowable/dmn/db/mapping/entity/HistoricDecisionExecution.xml" />
     <mapper resource="org/flowable/dmn/db/mapping/entity/Resource.xml" />

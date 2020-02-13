@@ -124,13 +124,13 @@
       <if test="parentDeploymentIdLike != null">
         and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
       </if>
-      <if test="decisionTableKey != null || decisionTableKeyLike != null">
-        and exists(select 1 from ${prefix}ACT_DMN_DECISION_TABLE DECISIONTABLE where RES.ID_ = DECISIONTABLE.DEPLOYMENT_ID_ 
-        <if test="decisionTableKey != null">
-          and DECISIONTABLE.KEY_ = #{decisionTableKey}
+      <if test="decisionKey != null || decisionKeyLike != null">
+        and exists(select 1 from ${prefix}ACT_DMN_DECISION DECISION where RES.ID_ = DECISION.DEPLOYMENT_ID_
+        <if test="decisionKey != null">
+          and DECISION.KEY_ = #{decisionKey}
         </if>
-        <if test="decisionTableKeyLike != null">
-          and DECISIONTABLE.KEY_ like #{decisionTableKeyLike}
+        <if test="decisionKeyLike != null">
+          and DECISION.KEY_ like #{decisionKeyLike}
         </if>
         )
       </if>
