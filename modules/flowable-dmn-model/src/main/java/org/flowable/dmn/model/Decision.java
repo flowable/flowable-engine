@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author Yvo Swillens
  */
-public class Decision extends NamedElement {
+public class Decision extends DRGElement {
 
     protected String question;
     protected String allowedAnswers;
