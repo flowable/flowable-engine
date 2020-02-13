@@ -26,6 +26,7 @@ public class DmnDefinition extends NamedElement {
     protected List<InputData> inputData = new ArrayList<>();
     protected List<ItemDefinition> itemDefinitions = new ArrayList<>();
     protected List<Decision> decisions = new ArrayList<>();
+    protected List<DecisionService> decisionServices = new ArrayList<>();
 
     public String getExpressionLanguage() {
         return expressionLanguage;
@@ -83,6 +84,23 @@ public class DmnDefinition extends NamedElement {
         for (Decision decision : decisions) {
             if (id.equals(decision.getId())) {
                 return decision;
+            }
+        }
+        return null;
+    }
+
+    public List<DecisionService> getDecisionServices() {
+        return decisionServices;
+    }
+
+    public void addDecisionService(DecisionService decisionService) {
+        this.decisionServices.add(decisionService);
+    }
+
+    public DecisionService getDecisionServiceById(String id) {
+        for (DecisionService decisionService : decisionServices) {
+            if (id.equals((decisionService.getId()))) {
+                return decisionService;
             }
         }
         return null;
