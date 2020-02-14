@@ -144,9 +144,9 @@ public final class CmmnRestUrls {
     public static final String[] URL_CASE_DEFINITION_IMAGE = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_CASE_DEFINITION_RESOURCE, "{0}", SEGMENT_IMAGE };
 
     /**
-     * URL template for the image of a case definition: <i>cmmn-repository/case-definitions/{0:caseDefinitionId}/decision-tables</i>
+     * URL template for the image of a case definition: <i>cmmn-repository/case-definitions/{0:caseDefinitionId}/decisions</i>
      */
-    public static final String[] URL_CASE_DEFINITION_DECISION_TABLES_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_CASE_DEFINITION_RESOURCE, "{0}", SEGMENT_DECISION_TABLES };
+    public static final String[] URL_CASE_DEFINITION_DECISION_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_CASE_DEFINITION_RESOURCE, "{0}", SEGMENT_DECISION_TABLES };
 
     /**
      * URL template for the image of a case definition: <i>cmmn-repository/case-definitions/{0:caseDefinitionId}/form-definitions</i>

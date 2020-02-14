@@ -37,13 +37,13 @@ import org.flowable.dmn.api.DmnRepositoryService;
 /**
  * @author Tijs Rademakers
  */
-public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDecision>>, Serializable {
+public class GetDecisionsForCaseDefinitionCmd implements Command<List<DmnDecision>>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String caseDefinitionId;
     protected DmnRepositoryService dmnRepositoryService;
 
-    public GetDecisionTablesForCaseDefinitionCmd(String caseDefinitionId) {
+    public GetDecisionsForCaseDefinitionCmd(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
     }
 
@@ -66,24 +66,24 @@ public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDe
             throw new FlowableException("DMN repository service is not available");
         }
 
-        List<DmnDecision> decisionTables = getDecisionTablesFromModel(caseModel, caseDefinition);
+        List<DmnDecision> decision = getDecisionsFromModel(caseModel, caseDefinition);
 
-        return decisionTables;
+        return decision;
     }
 
-    protected List<DmnDecision> getDecisionTablesFromModel(Case caseModel, CaseDefinition caseDefinition) {
-        Set<String> decisionTableKeys = new HashSet<>();
-        List<DmnDecision> decisionTables = new ArrayList<>();
+    protected List<DmnDecision> getDecisionsFromModel(Case caseModel, CaseDefinition caseDefinition) {
+        Set<String> decisionKeys = new HashSet<>();
+        List<DmnDecision> decisions = new ArrayList<>();
         List<DecisionTask> decisionTasks = caseModel.getPlanModel().findPlanItemDefinitionsOfType(DecisionTask.class, true);
 
         for (DecisionTask decisionTask : decisionTasks) {
             if (decisionTask.getFieldExtensions() != null && decisionTask.getFieldExtensions().size() > 0) {
                 for (FieldExtension fieldExtension : decisionTask.getFieldExtensions()) {
                     if ("decisionTableReferenceKey".equals(fieldExtension.getFieldName())) {
-                        String decisionTableReferenceKey = fieldExtension.getStringValue();
-                        if (!decisionTableKeys.contains(decisionTableReferenceKey)) {
-                            addDecisionTableToCollection(decisionTables, decisionTableReferenceKey, caseDefinition);
-                            decisionTableKeys.add(decisionTableReferenceKey);
+                        String decisionReferenceKey = fieldExtension.getStringValue();
+                        if (!decisionKeys.contains(decisionReferenceKey)) {
+                            addDecisionToCollection(decisions, decisionReferenceKey, caseDefinition);
+                            decisionKeys.add(decisionReferenceKey);
                         }
                         break;
                     }
@@ -91,11 +91,11 @@ public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDe
             }
         }
 
-        return decisionTables;
+        return decisions;
     }
 
-    protected void addDecisionTableToCollection(List<DmnDecision> decisionTables, String decisionTableKey, CaseDefinition caseDefinition) {
-        DmnDecisionQuery definitionQuery = dmnRepositoryService.createDecisionQuery().decisionKey(decisionTableKey);
+    protected void addDecisionToCollection(List<DmnDecision> decisions, String decisionKey, CaseDefinition caseDefinition) {
+        DmnDecisionQuery definitionQuery = dmnRepositoryService.createDecisionQuery().decisionKey(decisionKey);
         CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
         if (deployment.getParentDeploymentId() != null) {
             List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
@@ -110,10 +110,10 @@ public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDe
             definitionQuery.latestVersion();
         }
         
-        DmnDecision decisionTable = definitionQuery.singleResult();
+        DmnDecision decision = definitionQuery.singleResult();
         
-        if (decisionTable != null) {
-            decisionTables.add(decisionTable);
+        if (decision != null) {
+            decisions.add(decision);
         }
     }
 }

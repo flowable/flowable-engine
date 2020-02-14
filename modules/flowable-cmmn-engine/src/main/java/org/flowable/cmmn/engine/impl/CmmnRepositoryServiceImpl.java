@@ -27,7 +27,7 @@ import org.flowable.cmmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteIdentityLinkForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeployCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCmmnModelCmd;
-import org.flowable.cmmn.engine.impl.cmd.GetDecisionTablesForCaseDefinitionCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetDecisionsForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDiagramCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceCmd;
@@ -143,10 +143,16 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     public void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId) {
         commandExecutor.execute(new SetDeploymentParentDeploymentIdCmd(deploymentId, newParentDeploymentId));
     }
-    
+
     @Override
+    public List<DmnDecision> getDecisionsForCaseDefinition(String caseDefinitionId) {
+        return commandExecutor.execute(new GetDecisionsForCaseDefinitionCmd(caseDefinitionId));
+    }
+
+    @Override
+    @Deprecated
     public List<DmnDecision> getDecisionTablesForCaseDefinition(String caseDefinitionId) {
-        return commandExecutor.execute(new GetDecisionTablesForCaseDefinitionCmd(caseDefinitionId));
+        return getDecisionsForCaseDefinition(caseDefinitionId);
     }
     
     @Override

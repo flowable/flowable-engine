@@ -17,7 +17,7 @@ import org.flowable.dmn.api.DmnDecision;
 /**
  * @author Yvo Swillens
  */
-public class DecisionTableResponse {
+public class DecisionResponse {
 
     private String id;
     private String category;
@@ -30,16 +30,16 @@ public class DecisionTableResponse {
     private String tenantId;
     private String url;
 
-    public DecisionTableResponse(DmnDecision decisionTable) {
-        this.id = decisionTable.getId();
-        this.category = decisionTable.getCategory();
-        this.name = decisionTable.getName();
-        this.key = decisionTable.getKey();
-        this.description = decisionTable.getDescription();
-        this.version = decisionTable.getVersion();
-        this.resourceName = decisionTable.getResourceName();
-        this.deploymentId = decisionTable.getDeploymentId();
-        this.tenantId = decisionTable.getTenantId();
+    public DecisionResponse(DmnDecision decision) {
+        this.id = decision.getId();
+        this.category = decision.getCategory();
+        this.name = decision.getName();
+        this.key = decision.getKey();
+        this.description = decision.getDescription();
+        this.version = decision.getVersion();
+        this.resourceName = decision.getResourceName();
+        this.deploymentId = decision.getDeploymentId();
+        this.tenantId = decision.getTenantId();
     }
 
     public String getId() {

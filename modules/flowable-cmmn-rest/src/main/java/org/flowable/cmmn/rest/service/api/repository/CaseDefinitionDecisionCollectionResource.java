@@ -34,21 +34,35 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
-public class CaseDefinitionDecisionTableCollectionResource extends BaseCaseDefinitionResource {
+public class CaseDefinitionDecisionCollectionResource extends BaseCaseDefinitionResource {
 
+    @ApiOperation(value = "List decisions for a case definition", nickname = "listCaseDefinitionDecisions", tags = { "Case Definitions" })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Indicates the case definition was found and the decisions are returned.", response = DmnDecision.class, responseContainer = "List"),
+        @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
+    })
+    @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/decisions", produces = "application/json")
+    public List<DecisionResponse> getDecisionsForCaseDefinition(
+        @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
+        HttpServletRequest request) {
+
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        List<DmnDecision> decisions = repositoryService.getDecisionsForCaseDefinition(caseDefinition.getId());
+
+        return restResponseFactory.createDecisionResponseList(decisions, caseDefinitionId);
+    }
+
+    @Deprecated
     @ApiOperation(value = "List decision tables for a case definition", nickname = "listCaseDefinitionDecisionTables", tags = { "Case Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case definition was found and the decision tables are returned.", response = DmnDecision.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/decision-tables", produces = "application/json")
-    public List<DecisionTableResponse> getDecisionTablesForCaseDefinition(
+    public List<DecisionResponse> getDecisionTablesForCaseDefinition(
             @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
             HttpServletRequest request) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
-        List<DmnDecision> decisionTables = repositoryService.getDecisionTablesForCaseDefinition(caseDefinition.getId());
-
-        return restResponseFactory.createDecisionTableResponseList(decisionTables, caseDefinitionId);
+        return getDecisionsForCaseDefinition(caseDefinitionId, request);
     }
 }

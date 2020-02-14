@@ -168,7 +168,20 @@ public interface CmmnRepositoryService {
      * @param caseDefinitionId
      *            id of the case definition, cannot be null.
      *
+     *
      */
+    List<DmnDecision> getDecisionsForCaseDefinition(String caseDefinitionId);
+
+    /**
+     * Retrieves the {@link DmnDecision}s associated with the given case definition.
+     *
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     *
+     * @deprecated replaced by getDecisionsForCaseDefinition(String caseDefinition)
+     *
+     */
+    @Deprecated
     List<DmnDecision> getDecisionTablesForCaseDefinition(String caseDefinitionId);
 
     /**
