@@ -89,7 +89,7 @@ import org.flowable.rest.service.api.management.BatchPartResponse;
 import org.flowable.rest.service.api.management.BatchResponse;
 import org.flowable.rest.service.api.management.JobResponse;
 import org.flowable.rest.service.api.management.TableResponse;
-import org.flowable.rest.service.api.repository.DecisionTableResponse;
+import org.flowable.rest.service.api.repository.DecisionResponse;
 import org.flowable.rest.service.api.repository.DeploymentResourceResponse;
 import org.flowable.rest.service.api.repository.DeploymentResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
@@ -1291,24 +1291,24 @@ public class RestResponseFactory {
         return response;
     }
 
-    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecision> decisionTables, String processDefinitionId) {
+    public List<DecisionResponse> createDecisionResponseList(List<DmnDecision> decisions, String processDefinitionId) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<DecisionTableResponse> responseList = new ArrayList<>();
-        for (DmnDecision decisionTable : decisionTables) {
-            responseList.add(createDecisionTableResponse(decisionTable, processDefinitionId, urlBuilder));
+        List<DecisionResponse> responseList = new ArrayList<>();
+        for (DmnDecision decision : decisions) {
+            responseList.add(createDecisionResponse(decision, processDefinitionId, urlBuilder));
         }
         return responseList;
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecision decisionTable, String processDefinitionId) {
-        return createDecisionTableResponse(decisionTable, processDefinitionId, createUrlBuilder());
+    public DecisionResponse createDecisionResponse(DmnDecision decision, String processDefinitionId) {
+        return createDecisionResponse(decision, processDefinitionId, createUrlBuilder());
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecision decisionTable, String processDefinitionId, RestUrlBuilder urlBuilder) {
-        DecisionTableResponse decisionTableResponse = new DecisionTableResponse(decisionTable);
-        decisionTableResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_DECISION_TABLES_COLLECTION, processDefinitionId));
+    public DecisionResponse createDecisionResponse(DmnDecision decision, String processDefinitionId, RestUrlBuilder urlBuilder) {
+        DecisionResponse decisionResponse = new DecisionResponse(decision);
+        decisionResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION_DECISION_COLLECTION, processDefinitionId));
 
-        return decisionTableResponse;
+        return decisionResponse;
     }
 
     public List<FormDefinitionResponse> createFormDefinitionResponseList(List<FormDefinition> formDefinitions, String processDefinitionId) {

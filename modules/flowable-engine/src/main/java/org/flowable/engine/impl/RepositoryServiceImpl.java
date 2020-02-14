@@ -38,7 +38,7 @@ import org.flowable.engine.impl.cmd.DeployCmd;
 import org.flowable.engine.impl.cmd.GetAppResourceModelCmd;
 import org.flowable.engine.impl.cmd.GetAppResourceObjectCmd;
 import org.flowable.engine.impl.cmd.GetBpmnModelCmd;
-import org.flowable.engine.impl.cmd.GetDecisionTablesForProcessDefinitionCmd;
+import org.flowable.engine.impl.cmd.GetDecisionsForProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
 import org.flowable.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
@@ -369,8 +369,13 @@ public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     }
 
     @Override
+    public List<DmnDecision> getDecisionsForProcessDefinition(String processDefinitionId) {
+        return commandExecutor.execute(new GetDecisionsForProcessDefinitionCmd(processDefinitionId));
+    }
+
+    @Override
     public List<DmnDecision> getDecisionTablesForProcessDefinition(String processDefinitionId) {
-        return commandExecutor.execute(new GetDecisionTablesForProcessDefinitionCmd(processDefinitionId));
+        return getDecisionsForProcessDefinition(processDefinitionId);
     }
 
     @Override

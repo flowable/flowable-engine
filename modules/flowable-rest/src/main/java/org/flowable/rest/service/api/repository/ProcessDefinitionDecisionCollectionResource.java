@@ -34,22 +34,36 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
-public class ProcessDefinitionDecisionTableCollectionResource extends BaseProcessDefinitionResource {
+public class ProcessDefinitionDecisionCollectionResource extends BaseProcessDefinitionResource {
 
+    @ApiOperation(value = "List decisions for a process-definition", nickname = "listProcessDefinitionDecisions", tags = { "Process Definitions" })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Indicates the process definition was found and the decisions are returned.", response = DecisionResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
+    })
+    @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/decisions", produces = "application/json")
+    public List<DecisionResponse> getDecisionsForProcessDefinition(
+        @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
+        HttpServletRequest request) {
+
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+
+        List<DmnDecision> decisions = repositoryService.getDecisionsForProcessDefinition(processDefinition.getId());
+
+        return restResponseFactory.createDecisionResponseList(decisions, processDefinitionId);
+    }
+
+    @Deprecated
     @ApiOperation(value = "List decision tables for a process-definition", nickname = "listProcessDefinitionDecisionTables", tags = { "Process Definitions" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DecisionTableResponse.class, responseContainer = "List"),
+            @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DecisionResponse.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", produces = "application/json")
-    public List<DecisionTableResponse> getDecisionTablesForProcessDefinition(
+    public List<DecisionResponse> getDecisionTablesForProcessDefinition(
             @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             HttpServletRequest request) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
-        
-        List<DmnDecision> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
-
-        return restResponseFactory.createDecisionTableResponseList(decisionTables, processDefinitionId);
+        return getDecisionsForProcessDefinition(processDefinitionId, request);
     }
 }
