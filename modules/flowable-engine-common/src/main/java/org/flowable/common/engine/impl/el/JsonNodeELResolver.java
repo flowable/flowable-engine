@@ -14,9 +14,9 @@ package org.flowable.common.engine.impl.el;
 
 import java.beans.FeatureDescriptor;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Iterator;
 
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
@@ -326,6 +326,10 @@ public class JsonNodeELResolver extends ELResolver {
 
         } else if (value instanceof JsonNode) {
             jsonNode = (JsonNode) value;
+        } else if (value instanceof CharSequence) {
+            jsonNode = nodeCreator.textNode(value.toString());
+        } else if (value instanceof Date) {
+            jsonNode = nodeCreator.textNode(((Date) value).toInstant().toString());
         } else if (value != null) {
             jsonNode = nodeCreator.textNode(value.toString());
 
