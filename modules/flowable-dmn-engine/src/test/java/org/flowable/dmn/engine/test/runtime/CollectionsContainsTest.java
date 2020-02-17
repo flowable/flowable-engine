@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -76,7 +76,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
@@ -133,7 +133,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
@@ -176,7 +176,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collectionDouble", collectionDouble);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")

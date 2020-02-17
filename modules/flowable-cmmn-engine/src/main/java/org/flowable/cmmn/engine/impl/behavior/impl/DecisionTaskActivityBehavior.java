@@ -28,7 +28,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -57,7 +57,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        DmnRuleService dmnRuleService = CommandContextUtil.getDmnRuleService(commandContext);
+        DmnDecisionService dmnRuleService = CommandContextUtil.getDmnRuleService(commandContext);
         if (dmnRuleService == null) {
             throw new FlowableException("Could not execute decision instance: no dmn service found.");
         }

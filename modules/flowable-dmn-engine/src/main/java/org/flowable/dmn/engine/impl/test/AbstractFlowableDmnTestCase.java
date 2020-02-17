@@ -20,7 +20,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.test.DmnTestHelper;
@@ -49,7 +49,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
     protected DmnEngineConfiguration dmnEngineConfiguration;
     protected DmnManagementService managementService;
     protected DmnRepositoryService repositoryService;
-    protected DmnRuleService ruleService;
+    protected DmnDecisionService ruleService;
     protected DmnHistoryService historyService;
 
     protected abstract void initializeDmnEngine();

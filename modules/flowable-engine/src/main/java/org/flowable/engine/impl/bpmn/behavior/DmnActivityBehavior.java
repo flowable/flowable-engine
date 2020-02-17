@@ -23,7 +23,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -97,7 +97,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
         Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
 
-        DmnRuleService ruleService = CommandContextUtil.getDmnRuleService();
+        DmnDecisionService ruleService = CommandContextUtil.getDmnRuleService();
 
         ExecuteDecisionBuilder executeDecisionBuilder = ruleService.createExecuteDecisionBuilder()
             .decisionKey(finaldecisionTableKeyValue)

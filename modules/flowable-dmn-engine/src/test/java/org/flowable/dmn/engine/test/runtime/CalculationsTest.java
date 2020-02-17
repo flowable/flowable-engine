@@ -13,7 +13,7 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -42,7 +42,7 @@ public class CalculationsTest {
         processVariablesInput.put("sample_input", inputDouble1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("dmnWithExpressionAndDecimals")
@@ -64,7 +64,7 @@ public class CalculationsTest {
         processVariablesInput.put("sample_input", inputFloat1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("dmnWithExpressionAndDecimals")
@@ -93,7 +93,7 @@ public class CalculationsTest {
         processVariablesInput.put("inputFloat1", inputFloat1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
@@ -116,7 +116,7 @@ public class CalculationsTest {
         processVariablesInput.put("referenceVar1", 10D);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")

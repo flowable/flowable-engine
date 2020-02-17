@@ -41,12 +41,12 @@ import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.impl.DmnEngineImpl;
 import org.flowable.dmn.engine.impl.DmnHistoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
-import org.flowable.dmn.engine.impl.DmnRuleServiceImpl;
+import org.flowable.dmn.engine.impl.DmnDecisionServiceImpl;
 import org.flowable.dmn.engine.impl.RuleEngineExecutorImpl;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
@@ -117,7 +117,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl();
     protected DmnRepositoryService dmnRepositoryService = new DmnRepositoryServiceImpl();
-    protected DmnRuleService ruleService = new DmnRuleServiceImpl();
+    protected DmnDecisionService ruleService = new DmnDecisionServiceImpl();
     protected DmnHistoryService dmnHistoryService = new DmnHistoryServiceImpl();
     protected RuleEngineExecutor ruleEngineExecutor;
 
@@ -679,11 +679,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     }
 
     @Override
-    public DmnRuleService getDmnRuleService() {
+    public DmnDecisionService getDmnRuleService() {
         return ruleService;
     }
 
-    public DmnEngineConfiguration setDmnRuleService(DmnRuleService ruleService) {
+    public DmnEngineConfiguration setDmnRuleService(DmnDecisionService ruleService) {
         this.ruleService = ruleService;
         return this;
     }

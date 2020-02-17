@@ -17,19 +17,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecision;
-import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class DeploymentTest extends AbstractFlowableDmnTest {

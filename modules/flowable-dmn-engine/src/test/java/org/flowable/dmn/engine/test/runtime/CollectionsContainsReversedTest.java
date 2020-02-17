@@ -13,7 +13,7 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -44,7 +44,7 @@ public class CollectionsContainsReversedTest {
         processVariablesInput.put("customerOne", customerOne);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
@@ -70,7 +70,7 @@ public class CollectionsContainsReversedTest {
         processVariablesInput.put("customerOne", customerOne);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")

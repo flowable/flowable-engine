@@ -24,7 +24,7 @@ import org.flowable.dmn.api.ExecuteDecisionBuilder;
  */
 public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
 
-    protected DmnRuleServiceImpl ruleService;
+    protected DmnDecisionServiceImpl decisionService;
 
     protected String decisionKey;
     protected String parentDeploymentId;
@@ -36,8 +36,8 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     protected Map<String, Object> variables;
     protected boolean fallbackToDefaultTenant;
 
-    public ExecuteDecisionBuilderImpl(DmnRuleServiceImpl ruleService) {
-        this.ruleService = ruleService;
+    public ExecuteDecisionBuilderImpl(DmnDecisionServiceImpl decisionService) {
+        this.decisionService = decisionService;
     }
 
     @Override
@@ -112,17 +112,17 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
 
     @Override
     public List<Map<String, Object>> execute() {
-        return ruleService.executeDecision(this);
+        return decisionService.executeDecision(this);
     }
     
     @Override
     public Map<String, Object> executeWithSingleResult() {
-        return ruleService.executeDecisionWithSingleResult(this);
+        return decisionService.executeDecisionWithSingleResult(this);
     }
     
     @Override
     public DecisionExecutionAuditContainer executeWithAuditTrail() {
-        return ruleService.executeDecisionWithAuditTrail(this);
+        return decisionService.executeDecisionWithAuditTrail(this);
     }
 
     public String getDecisionKey() {

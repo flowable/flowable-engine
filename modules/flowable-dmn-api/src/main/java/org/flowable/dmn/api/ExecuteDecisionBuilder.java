@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Helper for execution a decision.
  * 
- * An instance can be obtained through {@link org.flowable.dmn.api.DmnRuleService#createExecuteDecisionBuilder()}.
+ * An instance can be obtained through {@link DmnDecisionService#createExecuteDecisionBuilder()}.
  * 
  * decisionKey should be set before calling {@link #execute()} to execute a decision.
  * 

@@ -24,7 +24,7 @@ import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -131,8 +131,8 @@ public class EngineServiceUtil {
         return dmnRepositoryService;
     }
     
-    public static DmnRuleService getDmnRuleService(AbstractEngineConfiguration engineConfiguration) {
-        DmnRuleService dmnRuleService = null;
+    public static DmnDecisionService getDmnRuleService(AbstractEngineConfiguration engineConfiguration) {
+        DmnDecisionService dmnRuleService = null;
         DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(engineConfiguration);
         if (dmnEngineConfiguration != null) {
             dmnRuleService = dmnEngineConfiguration.getDmnRuleService();

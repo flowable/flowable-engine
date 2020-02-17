@@ -64,6 +64,8 @@ public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Co
         DecisionService decisionService = definition.getDecisionServiceById(executeDefinitionInfo.getDecisionKey());
 
         DecisionExecutionAuditContainer executionResult;
+
+        // executing a DecisionService is the default but will fallback to Decision
         if (decisionService != null) {
             executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decisionService, definition, executeDefinitionInfo);
         } else {

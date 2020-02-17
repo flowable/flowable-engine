@@ -18,7 +18,7 @@ import static org.junit.Assert.assertSame;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -49,7 +49,7 @@ public class CustomConfigRuntimeTest {
     public void postCustomExpressionFunction() {
 
         DmnEngine dmnEngine = flowableRule1.getDmnEngine();
-        DmnRuleService ruleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService ruleService = dmnEngine.getDmnRuleService();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
@@ -68,7 +68,7 @@ public class CustomConfigRuntimeTest {
     public void customExpressionFunctionMissingDefaultFunction() {
 
         DmnEngine dmnEngine = flowableRule2.getDmnEngine();
-        DmnRuleService ruleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService ruleService = dmnEngine.getDmnRuleService();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");

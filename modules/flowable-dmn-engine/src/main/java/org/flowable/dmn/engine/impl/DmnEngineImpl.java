@@ -16,7 +16,7 @@ import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
@@ -33,7 +33,7 @@ public class DmnEngineImpl implements DmnEngine {
     protected String name;
     protected DmnManagementService dmnManagementService;
     protected DmnRepositoryService dmnRepositoryService;
-    protected DmnRuleService dmnRuleService;
+    protected DmnDecisionService dmnRuleService;
     protected DmnHistoryService dmnHistoryService;
     protected DmnEngineConfiguration dmnEngineConfiguration;
 
@@ -95,7 +95,7 @@ public class DmnEngineImpl implements DmnEngine {
     }
 
     @Override
-    public DmnRuleService getDmnRuleService() {
+    public DmnDecisionService getDmnRuleService() {
         return dmnRuleService;
     }
     

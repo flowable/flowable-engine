@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -40,7 +40,7 @@ public class SpringJunit4Test {
     private DmnEngine dmnEngine;
 
     @Autowired
-    private DmnRuleService ruleService;
+    private DmnDecisionService ruleService;
 
     @Autowired
     @Rule

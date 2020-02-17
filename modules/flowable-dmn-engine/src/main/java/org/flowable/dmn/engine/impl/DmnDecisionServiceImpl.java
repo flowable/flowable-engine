@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionCmd;
@@ -27,7 +27,7 @@ import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionWithAuditTrailCmd;
 /**
  * @author Yvo Swillens
  */
-public class DmnRuleServiceImpl extends CommonEngineServiceImpl<DmnEngineConfiguration> implements DmnRuleService {
+public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineConfiguration> implements DmnDecisionService {
     
     @Override
     public ExecuteDecisionBuilder createExecuteDecisionBuilder() {

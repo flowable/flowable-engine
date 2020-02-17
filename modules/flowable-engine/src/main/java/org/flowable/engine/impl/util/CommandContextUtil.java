@@ -29,7 +29,7 @@ import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
@@ -411,8 +411,8 @@ public class CommandContextUtil {
         return dmnRepositoryService;
     }
 
-    public static DmnRuleService getDmnRuleService() {
-        DmnRuleService dmnRuleService = null;
+    public static DmnDecisionService getDmnRuleService() {
+        DmnDecisionService dmnRuleService = null;
         DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration();
         if (dmnEngineConfiguration != null) {
             dmnRuleService = dmnEngineConfiguration.getDmnRuleService();

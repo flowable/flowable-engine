@@ -43,7 +43,7 @@ import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.server.Server;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
@@ -80,7 +80,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
     protected static DmnEngineConfiguration dmnEngineConfiguration;
     protected static DmnRepositoryService dmnRepositoryService;
-    protected static DmnRuleService dmnRuleService;
+    protected static DmnDecisionService dmnRuleService;
     protected static DmnHistoryService dmnHistoryService;
 
     protected static CloseableHttpClient client;

@@ -24,7 +24,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public interface DmnRuleService {
+public interface DmnDecisionService {
 
     /**
      * Create a builder to execute a decision.
