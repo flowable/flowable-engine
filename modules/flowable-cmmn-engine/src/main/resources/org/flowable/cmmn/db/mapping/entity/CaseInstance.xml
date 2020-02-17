@@ -380,7 +380,7 @@
                 </foreach>
             </if>
             <if test="caseDefinitionId != null">
-                RES.CASE_DEF_ID_ = #{caseDefinitionId}
+                and RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
             <if test="caseDefinitionKey != null">
                 and CASE_DEF.KEY_ = #{caseDefinitionKey}
