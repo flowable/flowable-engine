@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="sentryIfPart" name="Sentry If Part Model">
+        <casePlanModel id="sentryCasePlanModel" name="Sentry Case plan model">
+            <planItem id="planItem1" name="Task B" definitionRef="humanTask">
+                <entryCriterion id="entryCriterion" sentryRef="sentry1"/>
+            </planItem>
+            <sentry id="sentry1" name="sentry name">
+                <documentation><![CDATA[sentry doc]]></documentation>
+                <ifPart>
+                    <condition><![CDATA[${true}]]></condition>
+                </ifPart>
+            </sentry>
+            <humanTask id="humanTask" name="Task B"/>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_sentryIfPart">
+            <cmmndi:CMMNShape id="CMMNShape_sentryCasePlanModel" cmmnElementRef="sentryCasePlanModel">
+                <dc:Bounds height="754.0" width="758.0" x="30.0" y="45.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="405.0" y="227.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion" cmmnElementRef="entryCriterion">
+                <dc:Bounds height="28.0" width="18.0" x="396.0" y="252.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>
