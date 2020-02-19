@@ -527,6 +527,25 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     process.getFlowElements().addAll(dataObjects);
                 }
 
+                String userStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERUSER, modelNode);
+                String groupStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, modelNode);
+
+                if (StringUtils.isNotEmpty(userStarterValue)) {
+                    String userStartArray[] = userStarterValue.split(",");
+
+                    List<String> userStarters = new ArrayList<>(Arrays.asList(userStartArray));
+
+                    process.setCandidateStarterUsers(userStarters);
+                }
+
+                if (StringUtils.isNotEmpty(groupStarterValue)) {
+                    String groupStarterArray[] = groupStarterValue.split(",");
+
+                    List<String> groupStarters = new ArrayList<>(Arrays.asList(groupStarterArray));
+
+                    process.setCandidateStarterGroups(groupStarters);
+                }
+
                 bpmnModel.addProcess(process);
 
                 ArrayNode laneArrayNode = (ArrayNode) shapeNode.get(EDITOR_CHILD_SHAPES);
