@@ -39,7 +39,7 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
         }
         
         if (StringUtils.isNotEmpty(task.getBlockingExpression())){
-            xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING_EXPRESSION, task.getBlockingExpression());
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_BLOCKING_EXPRESSION, task.getBlockingExpression());
         }
 
         // Async

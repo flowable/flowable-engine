@@ -64,7 +64,18 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
      */
     @Test
     public void testSimpleCmmnModelConversion() {
-        CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("simple-case.cmmn"));
+        CmmnModel cmmnModel = readXMLFile("org/flowable/test/cmmn/converter/simple-case.cmmn");
+        validateSimpleCaseModel(cmmnModel);
+    }
+
+    @Test
+    public void testSimpleCmmnModelDoubleConversion() {
+        CmmnModel cmmnModel = readXMLFile("org/flowable/test/cmmn/converter/simple-case.cmmn");
+        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
+        validateSimpleCaseModel(parsedModel);
+    }
+
+    protected void validateSimpleCaseModel(CmmnModel cmmnModel) {
         assertNotNull(cmmnModel);
         assertEquals(1, cmmnModel.getCases().size());
 
