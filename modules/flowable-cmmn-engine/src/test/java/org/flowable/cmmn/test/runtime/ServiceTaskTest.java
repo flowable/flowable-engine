@@ -12,19 +12,30 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.delegate.CmmnDelegateHelper;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.junit.Test;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class ServiceTaskTest extends FlowableCmmnTestCase {
     
@@ -177,6 +188,88 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testGetCmmnModelWithDelegateHelper() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .start();
+
+        assertThat(TestJavaDelegate01.cmmnModel).isNotNull();
+        assertThat(TestJavaDelegate01.cmmnElement)
+            .asInstanceOf(InstanceOfAssertFactories.type(PlanItem.class))
+            .extracting(PlanItem::getName)
+            .isEqualTo("Task One");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCreateFieldExpressionWithDelegateHelper() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .start();
+
+        Number variable = (Number) cmmnRuntimeService.getVariable(caseInstance.getId(), "delegateVariable");
+        assertThat(variable).isEqualTo(2L);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCreateFieldExpressionForLifecycleListenerWithDelegateHelper() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("myCase")
+            .start();
+
+        Number variable = (Number) cmmnRuntimeService.getVariable(caseInstance.getId(), "listenerVar");
+        assertThat(variable).isEqualTo(99L);
+    }
+
+    public static class TestJavaDelegate01 implements PlanItemJavaDelegate {
+
+        public static CmmnModel cmmnModel;
+        public static CmmnElement cmmnElement;
+
+        @Override
+        public void execute(DelegatePlanItemInstance planItemInstance) {
+            cmmnModel = CmmnDelegateHelper.getCmmnModel(planItemInstance);
+            cmmnElement = CmmnDelegateHelper.getCmmnElement(planItemInstance);
+        }
+
+    }
+
+    public static class TestJavaDelegate02 implements PlanItemJavaDelegate {
+
+        @Override
+        public void execute(DelegatePlanItemInstance planItemInstance) {
+            Expression delegateFieldExpression = CmmnDelegateHelper.getFieldExpression(planItemInstance, "delegateField");
+            planItemInstance.setVariable("delegateVariable", delegateFieldExpression.getValue(planItemInstance));
+
+        }
+
+    }
+
+    public static class TestLifecycleListener01 implements PlanItemInstanceLifecycleListener {
+
+        @Override
+        public String getSourceState() {
+            return null;
+        }
+
+        @Override
+        public String getTargetState() {
+            return null;
+        }
+
+        @Override
+        public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+            Expression delegateField = CmmnDelegateHelper.getFieldExpression(planItemInstance, "delegateField");
+            planItemInstance.setVariable("listenerVar", delegateField.getValue(planItemInstance));
+        }
+
+    }
+
+
+
+    @Test
+    @CmmnDeployment
     public void testStoreTransientVariable() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("myCase")
@@ -185,8 +278,8 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         Object transientResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "transientResult");
         Object persistentResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "persistentResult");
 
-        assertNull(transientResult);
-        assertEquals("Result is: test", persistentResult);
+        assertThat(transientResult).isNull();
+        assertThat(persistentResult).isEqualTo("Result is: test");
     }
-    
+
 }

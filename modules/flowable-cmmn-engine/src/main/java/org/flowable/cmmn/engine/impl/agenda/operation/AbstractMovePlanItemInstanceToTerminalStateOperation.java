@@ -17,7 +17,6 @@ import java.util.Objects;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
@@ -65,7 +64,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                     String oldState = newPlanItemInstanceEntity.getState();
                     String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
                     newPlanItemInstanceEntity.setState(newState);
-                    PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
+                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+                        .executeLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
 
                     // Plan item creation "for Repetition"
                     CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
