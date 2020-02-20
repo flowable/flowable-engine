@@ -16,7 +16,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
@@ -128,5 +131,31 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             addError(errors, Problems.CASE_TASK_NO_CASE_DEFINITION_KEY, process, caseServiceTask, "No case definition key is defined on the case task");
         }
     }
+    
+    protected void validateFieldDeclarationsForSendEventTask(org.flowable.bpmn.model.Process process, SendEventServiceTask sendEventServiceTask, List<ValidationError> errors) {
+        if (StringUtils.isEmpty(sendEventServiceTask.getEventType())) {
+            addError(errors, Problems.SEND_EVENT_TASK_NO_EVENT_TYPE, process, sendEventServiceTask, "No event type is defined on the send event task");
+        }
+        
+        if (StringUtils.isEmpty(getExtensionValue("channelKey", sendEventServiceTask))) {
+            addError(errors, Problems.SEND_EVENT_TASK_NO_CHANNEL_KEY, process, sendEventServiceTask, "No channel key is defined on the send event task");
+        }
+        
+        if (StringUtils.isEmpty(getExtensionValue("channelType", sendEventServiceTask))) {
+            addError(errors, Problems.SEND_EVENT_TASK_NO_CHANNEL_TYPE, process, sendEventServiceTask, "No channel type is defined on the send event task");
+        }
+        
+        if (StringUtils.isEmpty(getExtensionValue("channelDestination", sendEventServiceTask))) {
+            addError(errors, Problems.SEND_EVENT_TASK_NO_CHANNEL_DESTINATION, process, sendEventServiceTask, "No channel destination is defined on the send event task");
+        }
+    }
 
+    protected String getExtensionValue(String name, FlowElement flowElement) {
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(name);
+        if (extensionElements != null && extensionElements.size() > 0) {
+            return extensionElements.get(0).getElementText();
+        }
+        
+        return null;
+    }
 }
