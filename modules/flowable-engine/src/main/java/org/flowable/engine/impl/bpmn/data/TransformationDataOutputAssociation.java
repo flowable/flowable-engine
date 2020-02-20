@@ -12,8 +12,14 @@
  */
 package org.flowable.engine.impl.bpmn.data;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.impl.util.CommandContextUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A transformation based data output association
@@ -34,6 +40,20 @@ public class TransformationDataOutputAssociation extends AbstractDataAssociation
     @Override
     public void evaluate(DelegateExecution execution) {
         Object value = this.transformation.getValue(execution);
+
+        VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
+        try {
+            variableTypes.findVariableType(value);
+        } catch (final FlowableException e) {
+            // Couldn't find a variable type that is able to serialize the output value
+            // Perhaps the output value is a Java bean, we ry to convert it as JSon
+            try {
+                value = new ObjectMapper().convertValue(value, JsonNode.class);
+            } catch (final IllegalArgumentException e1) {
+                throw new FlowableException("An error occurs converting output value as JSon", e1);
+            }
+        }
+
         execution.setVariable(this.getTarget(), value);
     }
 }

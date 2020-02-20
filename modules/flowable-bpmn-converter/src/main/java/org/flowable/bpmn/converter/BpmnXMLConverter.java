@@ -84,6 +84,7 @@ import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.IntegerDataObject;
+import org.flowable.bpmn.model.JsonDataObject;
 import org.flowable.bpmn.model.LongDataObject;
 import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
@@ -183,6 +184,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         addConverter(new ValuedDataObjectXMLConverter(), LongDataObject.class);
         addConverter(new ValuedDataObjectXMLConverter(), DoubleDataObject.class);
         addConverter(new ValuedDataObjectXMLConverter(), DateDataObject.class);
+        addConverter(new ValuedDataObjectXMLConverter(), JsonDataObject.class);
 
         // Alfresco types
         addConverter(new AlfrescoStartEventXMLConverter());
