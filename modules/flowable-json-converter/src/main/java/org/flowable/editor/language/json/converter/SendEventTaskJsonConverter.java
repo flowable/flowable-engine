@@ -20,6 +20,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SendEventServiceTask;
+import org.flowable.bpmn.model.ServiceTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -97,6 +98,7 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
     @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         SendEventServiceTask task = new SendEventServiceTask();
+        task.setType(ServiceTask.SEND_EVENT_TASK);
         
         String eventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, elementNode);
         if (StringUtils.isNotEmpty(eventKey)) {
