@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -24,6 +25,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -329,6 +331,30 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
         // Stage should autocomplete immediately after task completion
         cmmnTaskService.complete(tasks.get(0).getId());
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void repetitiveStageWithRequiredItem() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repetitionWithRequired")
+                .start();
+
+        // start human task and complete it
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .name("Start from outside")
+                .singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        Task task = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(task).isNotNull();
+        cmmnTaskService.complete(task.getId()); // runs in an infinitive loop in case required is not stage scoped
+
+        // terminate instance since there is no other way to end it
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
     }
       
 }

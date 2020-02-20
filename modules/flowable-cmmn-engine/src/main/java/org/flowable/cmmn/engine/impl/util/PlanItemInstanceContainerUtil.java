@@ -25,6 +25,7 @@ import static org.flowable.cmmn.model.ParentCompletionRule.IGNORE_IF_AVAILABLE_O
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
@@ -194,7 +195,7 @@ public class PlanItemInstanceContainerUtil {
             .findByCaseInstanceIdAndPlanItemId(planItemInstance.getCaseInstanceId(), planItemInstance.getPlanItem().getId());
         if (planItemInstances != null && planItemInstances.size() > 0) {
             for (PlanItemInstanceEntity item : planItemInstances) {
-                if (COMPLETED.equals(item.getState())) {
+                if (Objects.equals(planItemInstance.getStageInstanceId(), item.getStageInstanceId()) && COMPLETED.equals(item.getState())) {
                     return true;
                 }
             }
