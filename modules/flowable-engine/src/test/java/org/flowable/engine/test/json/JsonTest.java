@@ -273,6 +273,10 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertNotNull(value);
         assertEquals(createBigJsonObject().toString(), value.toString());
 
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), BIG_JSON_OBJ);
+        assertNotNull(variableInstance);
+        assertEquals(createBigJsonObject().toString(), variableInstance.getValue().toString());
+
         task = taskService.createTaskQuery().active().singleResult();
         assertNotNull(task);
         assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
@@ -293,6 +297,14 @@ public class JsonTest extends PluggableFlowableTestCase {
             assertEquals("myValue", value.get("var").asText());
             assertEquals("myOtherValue", value.get("var2").asText());
             assertEquals("myThirdValue", value.get("var3").asText());
+
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName(BIG_JSON_OBJ)
+                    .singleResult();
+
+            assertNotNull(historicVariableInstance);
+            assertEquals(createBigJsonObject().toString(), historicVariableInstance.getValue().toString());
         }
 
         // It should be possible do remove a json variable
