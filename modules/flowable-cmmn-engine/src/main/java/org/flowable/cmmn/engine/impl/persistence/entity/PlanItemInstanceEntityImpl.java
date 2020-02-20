@@ -20,10 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -77,7 +79,10 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected PlanItemInstanceEntity stagePlanItemInstance;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
-    
+
+    protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
+    protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
+
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -511,6 +516,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setSentryPartInstanceCount(int sentryPartInstanceCount) {
         this.sentryPartInstanceCount = sentryPartInstanceCount;
+    }
+
+    @Override
+    public FlowableListener getCurrentFlowableListener() {
+        return currentFlowableListener;
+    }
+
+    @Override
+    public PlanItemInstanceLifecycleListener getCurrentLifecycleListener() {
+        return currentLifecycleListener;
+    }
+
+    @Override
+    public void setCurrentLifecycleListener(PlanItemInstanceLifecycleListener lifecycleListener, FlowableListener flowableListener) {
+        this.currentLifecycleListener = lifecycleListener;
+        this.currentFlowableListener = flowableListener;
     }
 
     @Override

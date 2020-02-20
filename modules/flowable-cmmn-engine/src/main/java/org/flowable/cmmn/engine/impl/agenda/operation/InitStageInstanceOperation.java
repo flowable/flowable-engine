@@ -13,7 +13,6 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Stage;
@@ -35,7 +34,8 @@ public class InitStageInstanceOperation extends AbstractPlanItemInstanceOperatio
         String oldState = planItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.ACTIVE;
         planItemInstanceEntity.setState(newState);
-        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
         planItemInstanceEntity.setStage(true);
         

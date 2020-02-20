@@ -387,7 +387,7 @@ public class AsyncHistoryUpgradeTest extends CustomConfigurationFlowableTestCase
 
     protected void finishOneTaskProcess(Task task) {
         taskService.complete(task.getId());
-        waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
+        waitForHistoryJobExecutorToProcessAllJobs(10_000L, 100L);
         assertNull(managementService.createHistoryJobQuery().singleResult());
     }
 

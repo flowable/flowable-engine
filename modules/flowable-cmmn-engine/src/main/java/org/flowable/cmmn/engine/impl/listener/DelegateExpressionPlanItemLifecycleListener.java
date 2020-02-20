@@ -53,13 +53,12 @@ public class DelegateExpressionPlanItemLifecycleListener implements PlanItemInst
     @Override
     public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         try {
-            DelegatePlanItemInstance delegatePlanItemInstance = (DelegatePlanItemInstance) planItemInstance;
-            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, (DelegatePlanItemInstance) planItemInstance, fieldExtensions);
+            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, planItemInstance, fieldExtensions);
 
             if (delegate instanceof PlanItemInstanceLifecycleListener) {
                 try {
                     PlanItemInstanceLifecycleListener listener = (PlanItemInstanceLifecycleListener) delegate;
-                    listener.stateChanged(delegatePlanItemInstance, oldState, newState);
+                    listener.stateChanged(planItemInstance, oldState, newState);
                 } catch (Exception e) {
                     throw new FlowableException("Exception while invoking PlanItemInstanceLifecycleListener: " + e.getMessage(), e);
                 }

@@ -31,7 +31,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
-import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -746,7 +745,8 @@ public abstract class AbstractCmmnDynamicStateManager {
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
         childPlanItemInstanceEntity.setState(newState);
-        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);

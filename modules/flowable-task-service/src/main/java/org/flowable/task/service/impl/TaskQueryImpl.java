@@ -1638,6 +1638,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQuery orderByCategory() {
+        return orderBy(TaskQueryProperty.CATEGORY);
+    }
+
+    @Override
     public TaskQuery orderByTenantId() {
         return orderBy(TaskQueryProperty.TENANT_ID);
     }
