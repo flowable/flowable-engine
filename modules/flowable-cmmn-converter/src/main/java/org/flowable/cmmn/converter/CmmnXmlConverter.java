@@ -386,7 +386,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         processDiEdges(cmmnModel, conversionHelper.getDiEdges());
 
         // In case there are some associations that didn't have a DI then create an ID for them
-        ensureIds(cmmnModel.getAssociations(), "association-");
+        ensureIds(cmmnModel.getAssociations(), "association_");
     }
 
     protected void processDiEdges(CmmnModel cmmnModel, List<CmmnDiEdge> diEdges) {
@@ -431,7 +431,20 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             // For every planItemOnPart of the sentry of the criterion an association should be created
             // The source ref of the planItemOnPart is the source of the association
 
-            for (SentryOnPart onPart : criterion.getSentry().getOnParts()) {
+            Sentry sentry = criterion.getSentry();
+            List<SentryOnPart> onParts;
+            if (sentry != null) {
+                onParts = sentry.getOnParts();
+            } else {
+                // This means that the criterion sentry was never set
+                // This can happen for non blocking tasks
+                // The reason for this is that the CMMN spec does not allow criteria on non blocking tasks.
+                // However, you can write them in the CMMN XML and the CmmnXmlConverter would skip this criteria
+                // (i.e. the task would have no exit criteria, thus the sentry will never be set in the Exit Criterion)
+                onParts = Collections.emptyList();
+            }
+
+            for (SentryOnPart onPart : onParts) {
                 PlanItem source = onPart.getSource();
                 if (source != null) {
                     Association association = new Association();
