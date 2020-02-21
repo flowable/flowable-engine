@@ -13,8 +13,10 @@
 package org.flowable.engine.impl.webservice;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -266,7 +269,6 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         final ObjectNode valuesObj = mapper.createObjectNode();
         valuesObj.put("value1", 111);
         valuesObj.put("value2", 222);
-        System.out.println(valuesObj);
 
         final Map<String, Object> initVariables = new HashMap<String, Object>();
         initVariables.put("bean", valuesObj);
@@ -296,7 +298,6 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         valuesObj.put("arg1", 1111);
         valuesObj.put("arg2", 2222);
         argsObj.set("args", valuesObj);
-        System.out.println(argsObj);
 
         final Map<String, Object> initVariables = new HashMap<String, Object>();
         initVariables.put("bean", argsObj);
@@ -307,6 +308,38 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         // -1 (initial value of counter) + 1111 + 2222 = 3332
         assertEquals(3332, webServiceMock.getCount());
         assertTrue(processInstance.isEnded());
+    }
+
+    /**
+     * Check the JSON conversion of a SOAP response XML part into JSon variable
+     */
+    @Test
+    @Deployment
+    public void testJsonDataObject() throws Exception {
+
+        final String myString = "my-string";
+        final GregorianCalendar myCalendar = new GregorianCalendar(2020, 1, 20, 0, 0, 0);
+        final Date myDate = myCalendar.getTime();
+        this.webServiceMock.setDataStructure(myString, myDate);
+
+        processEngineConfiguration.addWsEndpointAddress(
+                new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
+                new URL(WEBSERVICE_MOCK_ADDRESS));
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("jsonDataObject");
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        assertTrue(processInstance.isEnded());
+
+        final HistoricProcessInstance histProcInst = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId()).includeProcessVariables().singleResult();
+        final Object currentStructure = histProcInst.getProcessVariables().get("currentStructure");
+        assertTrue(currentStructure instanceof JsonNode);
+        final JsonNode currentStructureJson = (JsonNode) currentStructure;
+        assertEquals(myString, currentStructureJson.findValue("eltString").asText());
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        final String myDateJson = currentStructureJson.findValue("eltDate").asText();
+        assertEquals(myDate, sdf.parse(myDateJson));
     }
 
 }

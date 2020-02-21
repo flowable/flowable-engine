@@ -18,8 +18,12 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 
 /**
  * A transformation based data output association
@@ -46,9 +50,18 @@ public class TransformationDataOutputAssociation extends AbstractDataAssociation
             variableTypes.findVariableType(value);
         } catch (final FlowableException e) {
             // Couldn't find a variable type that is able to serialize the output value
-            // Perhaps the output value is a Java bean, we ry to convert it as JSon
+            // Perhaps the output value is a Java bean, we try to convert it as JSon
             try {
-                value = new ObjectMapper().convertValue(value, JsonNode.class);
+                final ObjectMapper mapper = new ObjectMapper();
+
+                // By default, Jackson serializes only public fields, we force to use all fields of the Java Bean
+                mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+
+                // By default, Jackson serializes java.util.Date as timestamp, we force ISO-8601
+                mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));
+
+                value = mapper.convertValue(value, JsonNode.class);
             } catch (final IllegalArgumentException e1) {
                 throw new FlowableException("An error occurs converting output value as JSon", e1);
             }
