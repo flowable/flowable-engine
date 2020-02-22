@@ -15,8 +15,6 @@ package org.flowable.spring.test.autodeployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Driver;
 import java.util.HashMap;
@@ -134,34 +132,34 @@ public class SpringAutoDeployTest {
         expectedFormDefinitionKeys.add("form1");
         expectedFormDefinitionKeys.add("form2");
 
-        assertEquals(expectedFormDefinitionKeys, formDefinitionKeys);
+        assertThat(formDefinitionKeys).isEqualTo(expectedFormDefinitionKeys);
     }
 
     @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContextWithoutDeploymentMode();
         FormDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-        assertEquals(1, deploymentQuery.count());
+        assertThat(deploymentQuery.count()).isOne();
         FormDefinitionQuery formDefinitionQuery = repositoryService.createFormDefinitionQuery();
-        assertEquals(2, formDefinitionQuery.count());
+        assertThat(formDefinitionQuery.count()).isEqualTo(2);
 
         // Creating a new app context with same resources doesn't lead to more deployments
         createAppContextWithoutDeploymentMode();
-        assertEquals(1, deploymentQuery.count());
-        assertEquals(2, formDefinitionQuery.count());
+        assertThat(deploymentQuery.count()).isOne();
+        assertThat(formDefinitionQuery.count()).isEqualTo(2);
     }
 
     // Updating the form file should lead to a new deployment when restarting the Spring container
     @Test
     public void testResourceRedeploymentAfterFormDefinitionChange() throws Exception {
         createAppContextWithoutDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isOne();
         applicationContext.close();
 
         String filePath = "org/flowable/spring/test/autodeployment/simple.form";
         String originalFormFileContent = IoUtil.readFileAsString(filePath);
         String updatedFormFileContent = originalFormFileContent.replace("My first form", "My first forms");
-        assertTrue(updatedFormFileContent.length() > originalFormFileContent.length());
+        assertThat(updatedFormFileContent.length() > originalFormFileContent.length()).isTrue();
         IoUtil.writeStringToFile(updatedFormFileContent, filePath);
 
         // Classic produced/consumer problem here:
@@ -178,15 +176,15 @@ public class SpringAutoDeployTest {
 
         // Assertions come AFTER the file write! Otherwise the form file is
         // messed up if the assertions fail.
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(4, repositoryService.createFormDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createFormDefinitionQuery().count()).isEqualTo(4);
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContextWithDefaultDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createFormDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isOne();
+        assertThat(repositoryService.createFormDefinitionQuery().count()).isEqualTo(2);
     }
 
     @Test
@@ -206,7 +204,7 @@ public class SpringAutoDeployTest {
         assertThat(repositoryService.createFormDefinitionQuery().list())
             .extracting(FormDefinition::getKey)
             .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
@@ -220,14 +218,14 @@ public class SpringAutoDeployTest {
         assertThat(repositoryService.createFormDefinitionQuery().list())
             .extracting(FormDefinition::getKey)
             .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContextWithSingleResourceDeploymentMode();
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createFormDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createFormDefinitionQuery().count()).isEqualTo(2);
     }
 
     @Test
@@ -267,8 +265,8 @@ public class SpringAutoDeployTest {
     @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContextWithResourceParenFolderDeploymentMode();
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(3, repositoryService.createFormDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createFormDefinitionQuery().count()).isEqualTo(3);
     }
 
     @Test
@@ -289,7 +287,7 @@ public class SpringAutoDeployTest {
         assertThat(repositoryService.createFormDefinitionQuery().list())
             .extracting(FormDefinition::getKey)
             .isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(0);
+        assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
     @Test
