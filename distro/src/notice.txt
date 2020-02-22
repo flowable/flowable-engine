@@ -106,7 +106,7 @@ com.fasterxml.jackson.datatype  jackson-datatype-joda       2.10.2          The 
 com.fasterxml.jackson.datatype  jackson-datatype-json-org   2.10.2          The Apache Software License, Version 2.0
 com.google.guava                guava                       28.2-jre        The Apache Software License, Version 2.0
 com.h2database                  h2                          1.4.199         The H2 License, Version 1.0
-com.fasterxml.uuid              java-uuid-generator         3.3.0           The Apache Software License, Version 2.0
+com.fasterxml.uuid              java-uuid-generator         4.0             The Apache Software License, Version 2.0
 com.sun.mail                    javax.mail                  1.6.2           CDDL/GPLv2+CE
 commons-beanutils               commons-beanutils           1.8.3           The Apache Software License, Version 2.0
 commons-codec                   commons-codec               1.14            Apache License, Version 2.0
