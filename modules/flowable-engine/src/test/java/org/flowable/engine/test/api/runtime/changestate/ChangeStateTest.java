@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.runtime.changestate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Iterator;
 import java.util.List;
@@ -2324,46 +2325,41 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         // Verify events
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
 
-        assertTrue(iterator.hasNext());
-        FlowableEvent event = iterator.next();
-        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("processVar2", ((FlowableVariableEvent) event).getVariableName());
-        assertEquals(10, ((FlowableVariableEvent) event).getVariableValue());
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(
+                        FlowableEngineEventType.VARIABLE_CREATED,
+                        FlowableEngineEventType.VARIABLE_CREATED,
+                        FlowableEngineEventType.ACTIVITY_CANCELLED,
+                        FlowableEngineEventType.ACTIVITY_CANCELLED,
+                        FlowableEngineEventType.VARIABLE_CREATED,
+                        FlowableEngineEventType.VARIABLE_CREATED,
+                        FlowableEngineEventType.ACTIVITY_STARTED
+                );
 
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("processVar1", ((FlowableVariableEvent) event).getVariableName());
-        assertEquals("test", ((FlowableVariableEvent) event).getVariableValue());
+        assertThat(changeStateEventListener.getEvents())
+                .filteredOn(stateEvent -> stateEvent instanceof  FlowableVariableEvent)
+                .extracting(
+                        stateEvent -> ((FlowableVariableEvent) stateEvent).getVariableName(),
+                        stateEvent -> ((FlowableVariableEvent) stateEvent).getVariableValue()
+                )
+                .containsExactlyInAnyOrder(
+                        tuple("processVar1", "test"),
+                        tuple("processVar2", 10),
+                        tuple("localVar1", "test2"),
+                        tuple("localVar2", 20)
+                );
 
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("localVar2", ((FlowableVariableEvent) event).getVariableName());
-        assertEquals(20, ((FlowableVariableEvent) event).getVariableValue());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("localVar1", ((FlowableVariableEvent) event).getVariableName());
-        assertEquals("test2", ((FlowableVariableEvent) event).getVariableValue());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
-
-        assertTrue(!iterator.hasNext());
+        assertThat(changeStateEventListener.getEvents())
+                .filteredOn(stateEvent -> stateEvent instanceof  FlowableActivityEvent)
+                .extracting(
+                        stateEvent -> ((FlowableActivityEvent) stateEvent).getActivityId()
+                        )
+                .containsExactlyInAnyOrder(
+                        "subTask",
+                        "subProcess",
+                        "taskBefore"
+                );
 
         taskService.complete(task.getId());
 
@@ -2417,47 +2413,41 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         // Verify events
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertThat(changeStateEventListener.getEvents())
+                .extracting(FlowableEvent::getType)
+                .containsExactly(
+                        FlowableEngineEventType.VARIABLE_CREATED,
+                        FlowableEngineEventType.VARIABLE_CREATED,
+                        FlowableEngineEventType.ACTIVITY_CANCELLED,
+                        FlowableEngineEventType.ACTIVITY_CANCELLED,
+                        FlowableEngineEventType.VARIABLE_CREATED,
+                        FlowableEngineEventType.VARIABLE_CREATED,
+                        FlowableEngineEventType.ACTIVITY_STARTED
+                );
 
-        assertTrue(iterator.hasNext());
-        FlowableEvent event = iterator.next();
-        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("processVar2", ((FlowableVariableEvent) event).getVariableName());
-        assertEquals(10, ((FlowableVariableEvent) event).getVariableValue());
+        assertThat(changeStateEventListener.getEvents())
+                .filteredOn(stateEvent -> stateEvent instanceof  FlowableVariableEvent)
+                .extracting(
+                        stateEvent -> ((FlowableVariableEvent) stateEvent).getVariableName(),
+                        stateEvent -> ((FlowableVariableEvent) stateEvent).getVariableValue()
+                )
+                .containsExactlyInAnyOrder(
+                        tuple("processVar1", "test"),
+                        tuple("processVar2", 10),
+                        tuple("localVar1", "test2"),
+                        tuple("localVar2", 20)
+                );
 
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("processVar1", ((FlowableVariableEvent) event).getVariableName());
-        assertEquals("test", ((FlowableVariableEvent) event).getVariableValue());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("localVar2", ((FlowableVariableEvent) event).getVariableName());
-        assertEquals(20, ((FlowableVariableEvent) event).getVariableValue());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("localVar1", ((FlowableVariableEvent) event).getVariableName());
-        assertEquals("test2", ((FlowableVariableEvent) event).getVariableValue());
-
-        assertTrue(iterator.hasNext());
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
-
-        assertTrue(!iterator.hasNext());
+        assertThat(changeStateEventListener.getEvents())
+                .filteredOn(stateEvent -> stateEvent instanceof  FlowableActivityEvent)
+                .extracting(
+                        stateEvent -> ((FlowableActivityEvent) stateEvent).getActivityId()
+                )
+                .containsExactlyInAnyOrder(
+                        "subTask",
+                        "subProcess",
+                        "taskBefore"
+                );
 
         taskService.complete(task.getId());
 
@@ -3381,3 +3371,4 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     }
 
 }
+

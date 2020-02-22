@@ -36,6 +36,12 @@ public class SentryExport implements CmmnXmlConstants {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TRIGGER_MODE, sentry.getTriggerMode());
         }
 
+        if (StringUtils.isNotEmpty(sentry.getDocumentation())) {
+            xtw.writeStartElement(ELEMENT_DOCUMENTATION);
+            xtw.writeCharacters(sentry.getDocumentation());
+            xtw.writeEndElement();
+        }
+
         boolean didWriteExtensionElement = CmmnXmlUtil.writeExtensionElements(sentry, false, null, xtw);
         if (didWriteExtensionElement) {
             xtw.writeEndElement();

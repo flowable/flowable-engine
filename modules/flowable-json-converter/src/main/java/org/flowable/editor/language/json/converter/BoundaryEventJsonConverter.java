@@ -73,7 +73,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
             if (boundaryEvent.getExtensionElements().get("eventType") != null && boundaryEvent.getExtensionElements().get("eventType").size() > 0) {
                 String eventType = boundaryEvent.getExtensionElements().get("eventType").get(0).getElementText();
                 if (StringUtils.isNotEmpty(eventType)) {
-                    return STENCIL_EVENT_START_EVENT_REGISTRY;
+                    return STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY;
                 }
             }
         }

@@ -50,11 +50,6 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <id>maven2.java.net</id>
-      <name>Java.net Repository for Maven 2</name>
-      <url>http://download.java.net/maven/2/</url>
-    </pluginRepository>
-    <pluginRepository>
       <id>sonatype-snapshot-repo</id>
       <snapshots>
         <enabled>true</enabled>

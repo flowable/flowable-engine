@@ -13,9 +13,9 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 
 import org.flowable.job.service.impl.util.CommandContextUtil;
-import java.nio.charset.StandardCharsets;
 
 /**
  * <p>
@@ -126,7 +126,10 @@ public class JobByteArrayRef implements Serializable {
     private void ensureInitialized() {
         if (id != null && entity == null) {
             entity = CommandContextUtil.getJobByteArrayEntityManager().findById(id);
-            name = entity.getName();
+
+            if (entity != null) {
+                name = entity.getName();
+            }
         }
     }
 

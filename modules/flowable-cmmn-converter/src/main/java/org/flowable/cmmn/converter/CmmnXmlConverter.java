@@ -17,12 +17,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
@@ -371,42 +374,91 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             planItem.getExitDependencies().forEach(exitDependency -> exitDependency.addExitDependentPlanItem(planItem));
         }
 
+        processCriteria(cmmnModel, conversionHelper.getEntryCriteria());
+        processCriteria(cmmnModel, conversionHelper.getExitCriteria());
+
 
         // set DI elements
         for (CmmnDiShape diShape : conversionHelper.getDiShapes()) {
             cmmnModel.addGraphicInfo(diShape.getCmmnElementRef(), diShape.getGraphicInfo());
         }
 
-        for (CmmnDiEdge diEdge : conversionHelper.getDiEdges()) {
-            Association association = new Association();
-            association.setId(diEdge.getId());
-            association.setSourceRef(diEdge.getCmmnElementRef());
-            association.setTargetRef(diEdge.getTargetCmmnElementRef());
+        processDiEdges(cmmnModel, conversionHelper.getDiEdges());
 
-            String planItemSourceRef = null;
-            PlanItem planItem = cmmnModel.findPlanItem(association.getSourceRef());
-            if (planItem == null) {
-                planItem = cmmnModel.findPlanItem(association.getTargetRef());
-                planItemSourceRef = association.getTargetRef();
+        // In case there are some associations that didn't have a DI then create an ID for them
+        ensureIds(cmmnModel.getAssociations(), "association_");
+    }
+
+    protected void processDiEdges(CmmnModel cmmnModel, List<CmmnDiEdge> diEdges) {
+        if (diEdges.isEmpty()) {
+            return;
+        }
+        // The DI Edges are actually the associations between the Criteria and Plan Items
+        // Link the associations with the edges
+        Map<String, List<Association>> associationsMap = cmmnModel.getAssociations()
+                .stream()
+                .collect(Collectors.groupingBy(association -> association.getSourceRef() + "_" + association.getTargetRef()));
+
+        for (CmmnDiEdge diEdge : diEdges) {
+            String associationKey = diEdge.getCmmnElementRef() + "_" + diEdge.getTargetCmmnElementRef();
+            List<Association> edgeAssociations;
+            if (associationsMap.containsKey(associationKey)) {
+                edgeAssociations = associationsMap.get(associationKey);
             } else {
-                planItemSourceRef = association.getSourceRef();
+                // Perhaps the association is reverse of what is expected
+                // exit criteria -> plan item
+                edgeAssociations = associationsMap.getOrDefault(diEdge.getTargetCmmnElementRef() + "_" + diEdge.getCmmnElementRef(), Collections.emptyList());
             }
 
-            if (planItem != null) {
-                for (Criterion criterion : planItem.getEntryCriteria()) {
-                    Sentry sentry = criterion.getSentry();
-                    if (sentry.getOnParts().size() > 0) {
-                        SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
-                        if (planItemSourceRef.equals(sentryOnPart.getSourceRef())) {
-                            association.setTransitionEvent(sentryOnPart.getStandardEvent());
-                        }
-                    }
+            ListIterator<Association> associationIterator = edgeAssociations.listIterator();
+            if (associationIterator.hasNext()) {
+                // If there was a DI edge for the association then use the id from the edge and remove it
+                // An association is between a plan item and a criterion
+                // which means that there might be more than one association between the same plan item and criterion
+                // therefore remove it once we set the id, so the next edge can set the next id
+                Association association = associationIterator.next();
+                association.setId(diEdge.getId());
+                associationIterator.remove();
+            }
+
+            cmmnModel.addFlowGraphicInfoList(diEdge.getId(), diEdge.getWaypoints());
+        }
+    }
+
+    protected void processCriteria(CmmnModel cmmnModel, List<Criterion> criteria) {
+        for (Criterion criterion : criteria) {
+            // Every criterion is potentially a target of an association
+            // For every planItemOnPart of the sentry of the criterion an association should be created
+            // The source ref of the planItemOnPart is the source of the association
+
+            Sentry sentry = criterion.getSentry();
+            List<SentryOnPart> onParts;
+            if (sentry != null) {
+                onParts = sentry.getOnParts();
+            } else {
+                // This means that the criterion sentry was never set
+                // This can happen for non blocking tasks
+                // The reason for this is that the CMMN spec does not allow criteria on non blocking tasks.
+                // However, you can write them in the CMMN XML and the CmmnXmlConverter would skip this criteria
+                // (i.e. the task would have no exit criteria, thus the sentry will never be set in the Exit Criterion)
+                onParts = Collections.emptyList();
+            }
+
+            for (SentryOnPart onPart : onParts) {
+                PlanItem source = onPart.getSource();
+                if (source != null) {
+                    Association association = new Association();
+                    association.setTargetElement(criterion);
+                    association.setTargetRef(criterion.getId());
+
+                    association.setSourceElement(source);
+                    association.setSourceRef(source.getId());
+
+                    association.setTransitionEvent(onPart.getStandardEvent());
+
+                    cmmnModel.addAssociation(association);
                 }
             }
-
-            cmmnModel.addAssociation(association);
-
-            cmmnModel.addFlowGraphicInfoList(association.getId(), diEdge.getWaypoints());
         }
     }
 

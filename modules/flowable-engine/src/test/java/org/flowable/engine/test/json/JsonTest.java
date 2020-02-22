@@ -17,6 +17,8 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -271,6 +273,10 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertNotNull(value);
         assertEquals(createBigJsonObject().toString(), value.toString());
 
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), BIG_JSON_OBJ);
+        assertNotNull(variableInstance);
+        assertEquals(createBigJsonObject().toString(), variableInstance.getValue().toString());
+
         task = taskService.createTaskQuery().active().singleResult();
         assertNotNull(task);
         assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
@@ -291,6 +297,14 @@ public class JsonTest extends PluggableFlowableTestCase {
             assertEquals("myValue", value.get("var").asText());
             assertEquals("myOtherValue", value.get("var2").asText());
             assertEquals("myThirdValue", value.get("var3").asText());
+
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName(BIG_JSON_OBJ)
+                    .singleResult();
+
+            assertNotNull(historicVariableInstance);
+            assertEquals(createBigJsonObject().toString(), historicVariableInstance.getValue().toString());
         }
 
         // It should be possible do remove a json variable
@@ -506,6 +520,56 @@ public class JsonTest extends PluggableFlowableTestCase {
                     + "    street: 'Sesame Street'"
                     + "  }"
                     + "}");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testSetDateInJsonNode() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", objectMapper.createObjectNode())
+                .start();
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+                .isEqualTo("{}");
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.creationDate}");
+            expression.setValue(Date.from(Instant.parse("2020-02-16T14:24:45.583Z")), CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return null;
+        });
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+                .isEqualTo("{ creationDate: '2020-02-16T14:24:45.583Z' }");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThatJson(historyService.createHistoricVariableInstanceQuery().variableName("customer").singleResult().getValue())
+                    .isEqualTo("{ creationDate: '2020-02-16T14:24:45.583Z' }");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testSetInstantInJsonNode() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", objectMapper.createObjectNode())
+                .start();
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+                .isEqualTo("{}");
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.creationDate}");
+            expression.setValue(Instant.parse("2020-02-16T14:24:45.583Z"), CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return null;
+        });
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+                .isEqualTo("{ creationDate: '2020-02-16T14:24:45.583Z' }");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThatJson(historyService.createHistoricVariableInstanceQuery().variableName("customer").singleResult().getValue())
+                    .isEqualTo("{ creationDate: '2020-02-16T14:24:45.583Z' }");
         }
     }
 

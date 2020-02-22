@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.spring.configurator.test;
+package org.flowable.spring.test.eventregistry;
 
 import java.util.List;
 import java.util.Random;
@@ -26,6 +26,7 @@ import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 @ContextConfiguration("classpath:flowable-context.xml")
-public class EventWithSpringBeanTest extends SpringEventFlowableTestCase {
+public class EventWithSpringBeanTest extends SpringFlowableTestCase {
     
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
     
@@ -84,8 +85,8 @@ public class EventWithSpringBeanTest extends SpringEventFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/eventregistry/spring/configurator/test/taskWithEventProcess.bpmn20.xml",
-        "org/flowable/eventregistry/spring/configurator/test/simpleEvent.event" })
+    @Deployment(resources = { "org/flowable/spring/test/eventregistry/taskWithEventProcess.bpmn20.xml",
+        "org/flowable/spring/test/eventregistry/simpleEvent.event" })
     public void testEventOnUserTask() {
         
         EventRegistryEngineConfiguration eventEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
@@ -116,14 +117,14 @@ public class EventWithSpringBeanTest extends SpringEventFlowableTestCase {
     }
     
     @Test
-    @Deployment(resources = { "org/flowable/eventregistry/spring/configurator/test/taskWithEventProcess.bpmn20.xml"})
+    @Deployment(resources = { "org/flowable/spring/test/eventregistry/taskWithEventProcess.bpmn20.xml"})
     public void testEventOnUserTaskWithoutVariablesSeparateDeployments() {
         
         EventRegistryEngineConfiguration eventEngineConfiguration = (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
                         .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
         
         EventRepositoryService eventRepositoryService = eventEngineConfiguration.getEventRepositoryService();
-        EventDeployment eventDeployment = eventRepositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/spring/configurator/test/simpleEvent.event").deploy();
+        EventDeployment eventDeployment = eventRepositoryService.createDeployment().addClasspathResource("org/flowable/spring/test/eventregistry/simpleEvent.event").deploy();
         
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskWithEventProcess");

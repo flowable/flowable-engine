@@ -2659,6 +2659,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return Collections.emptyList();
     }
 
+    protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
+        return new EventRegistryEngineConfigurator();
+    }
+
     @Override
     public ProcessEngineConfigurationImpl addConfigurator(EngineConfigurator configurator) {
         super.addConfigurator(configurator);

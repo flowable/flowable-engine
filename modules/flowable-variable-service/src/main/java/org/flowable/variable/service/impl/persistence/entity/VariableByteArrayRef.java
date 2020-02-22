@@ -14,6 +14,8 @@ package org.flowable.variable.service.impl.persistence.entity;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**
@@ -27,6 +29,8 @@ public class VariableByteArrayRef implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    protected CommandExecutor commandExecutor;
+
     private String id;
     private String name;
     private VariableByteArrayEntity entity;
@@ -36,8 +40,9 @@ public class VariableByteArrayRef implements Serializable {
     }
 
     // Only intended to be used by ByteArrayRefTypeHandler
-    public VariableByteArrayRef(String id) {
+    public VariableByteArrayRef(String id, CommandExecutor commandExecutor) {
         this.id = id;
+        this.commandExecutor = commandExecutor;
     }
 
     public String getId() {
@@ -96,8 +101,18 @@ public class VariableByteArrayRef implements Serializable {
 
     private void ensureInitialized() {
         if (id != null && entity == null) {
-            entity = CommandContextUtil.getByteArrayEntityManager().findById(id);
-            name = entity.getName();
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            if (commandContext != null) {
+                entity = CommandContextUtil.getByteArrayEntityManager(commandContext).findById(id);
+            } else if (commandExecutor != null) {
+                entity = commandExecutor.execute(context -> CommandContextUtil.getByteArrayEntityManager(context).findById(id));
+            } else {
+                throw new IllegalStateException("Cannot initialize byte array. There is no command context and there is no command Executor");
+            }
+
+            if (entity != null) {
+                name = entity.getName();
+            }
         }
     }
 

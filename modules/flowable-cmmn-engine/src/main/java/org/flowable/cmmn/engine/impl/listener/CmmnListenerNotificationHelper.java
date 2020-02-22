@@ -12,6 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.listener;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
@@ -21,7 +27,9 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.ImplementationType;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -89,6 +97,65 @@ public class CmmnListenerNotificationHelper {
         }
 
         return lifecycleListener;
+    }
+
+    public void executeLifecycleListeners(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+        if (Objects.equals(oldState, newState)) {
+            return;
+        }
+
+        // Lifecycle listeners on the element itself
+        PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
+        if (planItemDefinition != null) {
+            List<FlowableListener> flowableListeners = planItemDefinition.getLifecycleListeners();
+            if (flowableListeners != null && !flowableListeners.isEmpty()) {
+
+                for (FlowableListener flowableListener : flowableListeners) {
+                    if (stateMatches(flowableListener.getSourceState(), oldState) && stateMatches(flowableListener.getTargetState(), newState)) {
+                        PlanItemInstanceLifecycleListener lifecycleListener = createLifecycleListener(flowableListener);
+                        executeLifecycleListener(planItemInstance, oldState, newState, lifecycleListener, flowableListener);
+                    }
+                }
+            }
+        }
+
+        // Lifecycle listeners defined on the cmmn engine configuration
+        Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifeCycleListeners
+            = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getPlanItemInstanceLifecycleListeners();
+        if (planItemInstanceLifeCycleListeners != null && !planItemInstanceLifeCycleListeners.isEmpty()) {
+
+            List<PlanItemInstanceLifecycleListener> specificListeners = planItemInstanceLifeCycleListeners.get(planItemInstance.getPlanItemDefinitionType());
+            executeListeners(specificListeners, planItemInstance, oldState, newState);
+
+            List<PlanItemInstanceLifecycleListener> genericListeners = planItemInstanceLifeCycleListeners.get(null);
+            executeListeners(genericListeners, planItemInstance, oldState, newState);
+
+        }
+    }
+
+    public void executeListeners(List<PlanItemInstanceLifecycleListener> listeners, DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+        if (listeners != null) {
+            for (PlanItemInstanceLifecycleListener listener : listeners) {
+                executeLifecycleListener(planItemInstance, oldState, newState, listener, null);
+            }
+        }
+    }
+
+    public void executeLifecycleListener(DelegatePlanItemInstance planItemInstance, String oldState, String newState,
+            PlanItemInstanceLifecycleListener lifecycleListener, FlowableListener flowableListener) {
+        if (lifecycleListenerMatches(lifecycleListener, oldState, newState)) {
+            planItemInstance.setCurrentLifecycleListener(lifecycleListener, flowableListener);
+            lifecycleListener.stateChanged(planItemInstance, oldState, newState);
+            planItemInstance.setCurrentLifecycleListener(null, null);
+        }
+    }
+
+    protected boolean lifecycleListenerMatches(PlanItemInstanceLifecycleListener lifecycleListener, String oldState, String newState) {
+        return stateMatches(lifecycleListener.getSourceState(), oldState) && stateMatches(lifecycleListener.getTargetState(), newState);
+    }
+
+    protected boolean stateMatches(String listenerExpectedState, String actualState) {
+        return StringUtils.isEmpty(listenerExpectedState) || Objects.equals(actualState, listenerExpectedState);
     }
 
     protected CaseInstanceLifecycleListener createCaseLifecycleListener(FlowableListener listener) {

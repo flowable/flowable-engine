@@ -26,12 +26,14 @@ import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.common.spring.SpringTransactionContextFactory;
 import org.flowable.common.spring.SpringTransactionInterceptor;
+import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -70,6 +72,10 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         CmmnEngines.setInitialized(true);
         enginesBuild.add(cmmnEngine.getName());
         return cmmnEngine;
+    }
+
+    protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
+        return new SpringEventRegistryConfigurator();
     }
 
     public void setTransactionSynchronizationAdapterOrder(Integer transactionSynchronizationAdapterOrder) {

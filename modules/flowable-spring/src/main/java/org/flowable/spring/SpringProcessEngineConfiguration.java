@@ -20,6 +20,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.spring.AutoDeploymentStrategy;
@@ -31,6 +32,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
 import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
@@ -74,6 +76,10 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         ProcessEngines.setInitialized(true);
         enginesBuild.add(processEngine.getName());
         return processEngine;
+    }
+
+    protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
+        return new SpringEventRegistryConfigurator();
     }
 
     public void setTransactionSynchronizationAdapterOrder(Integer transactionSynchronizationAdapterOrder) {

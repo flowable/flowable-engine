@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Interface;
 import org.flowable.bpmn.model.Operation;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
@@ -46,7 +47,6 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                 && !ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) 
-                && !ServiceTask.CASE_TASK.equalsIgnoreCase(serviceTask.getType()) 
                 && StringUtils.isEmpty(serviceTask.getType())) {
             
             addError(errors, Problems.SERVICE_TASK_MISSING_IMPLEMENTATION, process, serviceTask,
@@ -75,6 +75,8 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                 validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), errors);
             } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.CASE_TASK)) {
                 validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, errors);
+            } else if (serviceTask.getType().equalsIgnoreCase(ServiceTask.SEND_EVENT_TASK)) {
+                validateFieldDeclarationsForSendEventTask(process, (SendEventServiceTask) serviceTask, errors);
             }
 
         }

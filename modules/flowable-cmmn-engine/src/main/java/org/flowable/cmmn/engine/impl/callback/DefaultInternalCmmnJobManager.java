@@ -15,12 +15,12 @@ package org.flowable.cmmn.engine.impl.callback;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
@@ -120,7 +120,9 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
             String oldState = newPlanItemInstanceEntity.getState();
             String newState = PlanItemInstanceState.AVAILABLE;
             newPlanItemInstanceEntity.setState(newState);
-            PlanItemLifeCycleListenerUtil.callLifecycleListeners(Context.getCommandContext(), planItemInstanceEntity, oldState, newState);
+            CommandContext commandContext = Context.getCommandContext();
+            CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+                .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
             // Plan createOperation, it will also sync planItemInstance history
             CommandContextUtil.getAgenda().planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);

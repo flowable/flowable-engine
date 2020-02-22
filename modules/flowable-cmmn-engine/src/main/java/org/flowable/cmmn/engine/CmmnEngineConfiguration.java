@@ -1935,6 +1935,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return Collections.emptyList();
     }
 
+    protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
+        return new EventRegistryEngineConfigurator();
+    }
+
     @Override
     public String getEngineName() {
         return cmmnEngineName;

@@ -39,9 +39,20 @@ public class EmailServiceTaskTest extends PluggableFlowableTestCase {
 
     @BeforeEach
     protected void setUp() throws Exception {
-        wiser = new Wiser();
-        wiser.setPort(5025);
-        wiser.start();
+        boolean serverUpAndRunning = false;
+        while (!serverUpAndRunning) {
+            wiser = new Wiser();
+            wiser.setPort(5025);
+
+            try {
+                wiser.start();
+                serverUpAndRunning = true;
+            } catch (RuntimeException e) { // Fix for slow port-closing CI Servers
+                if (e.getMessage().toLowerCase().contains("bindexception")) {
+                    Thread.sleep(250L);
+                }
+            }
+        }
     }
 
     @AfterEach
