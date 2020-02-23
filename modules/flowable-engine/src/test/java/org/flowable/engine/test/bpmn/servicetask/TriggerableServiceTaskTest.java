@@ -67,6 +67,28 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         assertNotNull(execution);
         assertEquals(3, runtimeService.getVariable(processId, "count"));
     }
+    
+    @Test
+    @Deployment
+    public void testExpression() {
+    	DummyTestBean testBean = new DummyTestBean();
+        Map<String, Object> varMap = new HashMap<>();
+        varMap.put("bean", testBean);
+
+        String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
+        assertNotNull(execution);
+        assertTrue((boolean) runtimeService.getVariable(processId, "executed"));
+
+        Map<String,Object> processVariables = new HashMap<>();
+        processVariables.put("count", 1);
+        runtimeService.trigger(execution.getId(), processVariables, null);
+
+        execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
+        assertNotNull(execution);
+        assertEquals(1, runtimeService.getVariable(processId, "count"));
+    }
 
     @Test
     @Deployment

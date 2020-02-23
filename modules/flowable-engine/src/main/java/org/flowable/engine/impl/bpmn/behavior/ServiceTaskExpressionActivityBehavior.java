@@ -51,6 +51,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
     protected String resultVariable;
     protected List<MapExceptionEntry> mapExceptions;
     protected boolean useLocalScopeForResultVariable;
+	private boolean triggerable;
 
     public ServiceTaskExpressionActivityBehavior(ServiceTask serviceTask, Expression expression, Expression skipExpression) {
 
@@ -60,6 +61,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
         this.resultVariable = serviceTask.getResultVariableName();
         this.mapExceptions = serviceTask.getMapExceptions();
         this.useLocalScopeForResultVariable = serviceTask.isUseLocalScopeForResultVariable();
+        this.triggerable = serviceTask.isTriggerable();
     }
 
     @Override
@@ -93,8 +95,9 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
                     }
                 }
             }
-
-            leave(execution);
+            if (!this.triggerable) {
+            	leave(execution);
+            }
             
         } catch (Exception exc) {
 
@@ -119,4 +122,10 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
             }
         }
     }
+
+	@Override
+	public void trigger(DelegateExecution execution, String signalName, Object signalData) {
+		leave(execution);
+	}
+    
 }
