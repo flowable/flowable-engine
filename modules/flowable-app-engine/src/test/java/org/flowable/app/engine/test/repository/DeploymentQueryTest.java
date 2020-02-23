@@ -56,18 +56,10 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
     public void testQueryNoParams() {
         assertThat(appRepositoryService.createDeploymentQuery().list()).hasSize(2);
         assertThat(appRepositoryService.createDeploymentQuery().count()).isEqualTo(2);
-        
-        boolean deployment1Found = false;
-        boolean deployment2Found = false;
-        for (AppDeployment cmmnDeployment : appRepositoryService.createDeploymentQuery().list()) {
-            if (deploymentId1.equals(cmmnDeployment.getId())) {
-                deployment1Found = true;
-            } else if (deploymentId2.equals(cmmnDeployment.getId())) {
-                deployment2Found = true;
-            }
-        }
-        assertThat(deployment1Found).isTrue();
-        assertThat(deployment2Found).isTrue();
+
+        assertThat(appRepositoryService.createDeploymentQuery().list())
+            .extracting(AppDeployment::getId)
+            .containsExactly(deploymentId1, deploymentId2);
     }
     
     @Test

@@ -49,15 +49,14 @@ public class DeploymentTest extends FlowableAppTestCase {
         assertThat(appDeployment).isNotNull();
         
         List<String> resourceNames = appRepositoryService.getDeploymentResourceNames(appDeployment.getId());
-        assertThat(resourceNames.size()).isEqualTo(1);
-        assertThat(resourceNames.get(0)).isEqualTo("org/flowable/app/engine/test/repository/DeploymentTest.testAppDefinitionDeployed.app");
+        assertThat(resourceNames).containsOnly("org/flowable/app/engine/test/repository/DeploymentTest.testAppDefinitionDeployed.app");
         
         InputStream inputStream = appRepositoryService.getResourceAsStream(appDeployment.getId(), resourceNames.get(0));
         assertThat(inputStream).isNotNull();
         inputStream.close();
         
         DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache = appEngineConfiguration.getAppDefinitionCache();
-        assertThat(((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().size()).isEqualTo(1);
+        assertThat(((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll()).hasSize(1);
         
         AppDefinitionCacheEntry cachedAppDefinition = ((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().iterator().next();
         assertThat(cachedAppDefinition.getAppModel()).isNotNull();
@@ -68,7 +67,7 @@ public class DeploymentTest extends FlowableAppTestCase {
         assertThat(appDefinition.getDeploymentId()).isNotNull();
         assertThat(appDefinition.getKey()).isNotNull();
         assertThat(appDefinition.getResourceName()).isNotNull();
-        assertThat(appDefinition.getVersion() > 0).isTrue();
+        assertThat(appDefinition.getVersion()).isPositive();
         
         appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(appDeployment.getId()).singleResult();
         assertThat(appDefinition.getId()).isNotNull();
@@ -92,23 +91,16 @@ public class DeploymentTest extends FlowableAppTestCase {
         assertThat(appDeployment).isNotNull();
         
         List<String> resourceNames = appRepositoryService.getDeploymentResourceNames(appDeployment.getId());
-        assertThat(resourceNames.size()).isEqualTo(4);
-        
-        boolean vacationRequestAppFound = false;
-        for (String resourceName : resourceNames) {
-            if ("vacationRequestApp.app".equals(resourceName)) {
-                vacationRequestAppFound = true;
-                break;
-            }
-        }
-        assertThat(vacationRequestAppFound).isTrue();
+        assertThat(resourceNames).hasSize(4);
+
+        assertThat(resourceNames).contains("vacationRequestApp.app");
         
         InputStream inputStream = appRepositoryService.getResourceAsStream(appDeployment.getId(), "vacationRequestApp.app");
         assertThat(inputStream).isNotNull();
         inputStream.close();
         
         DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache = appEngineConfiguration.getAppDefinitionCache();
-        assertThat(((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().size()).isEqualTo(1);
+        assertThat(((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll()).hasSize(1);
         
         AppDefinitionCacheEntry cachedAppDefinition = ((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().iterator().next();
         assertThat(cachedAppDefinition.getAppModel()).isNotNull();
@@ -119,7 +111,7 @@ public class DeploymentTest extends FlowableAppTestCase {
         assertThat(appDefinition.getDeploymentId()).isNotNull();
         assertThat(appDefinition.getKey()).isNotNull();
         assertThat(appDefinition.getResourceName()).isNotNull();
-        assertThat(appDefinition.getVersion() > 0).isTrue();
+        assertThat(appDefinition.getVersion()).isPositive();
         
         appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(appDeployment.getId()).singleResult();
         assertThat(appDefinition.getId()).isNotNull();

@@ -13,7 +13,8 @@
 package org.flowable.app.engine.test.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,9 +133,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByEmptyDeploymentIds() {
-        assertThrows(FlowableIllegalArgumentException.class, () -> {
-            appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>()).list();
-        });
+        assertThatThrownBy(() -> appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>()).list())
+            .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -176,9 +176,8 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByEmptyAppDefinitionIds() {
-        assertThrows(FlowableIllegalArgumentException.class, () -> {
-            appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>()).list();
-        });
+        assertThatThrownBy(() -> appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>()).list())
+            .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -401,24 +400,16 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().list()).hasSize(4);
         assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().count()).isEqualTo(4);
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().list();
-        for (int i = 0; i < appDefinitions.size(); i++) {
-            if (i > 0) {
-                assertThat(appDefinitions.get(i).getKey()).isEqualTo("testApp");
-            } else {
-                assertThat(appDefinitions.get(i).getKey()).isEqualTo("fullInfoApp");
-            }
-        }
+        assertThat(appDefinitions)
+            .extracting(AppDefinition::getKey)
+            .containsExactly("fullInfoApp", "testApp", "testApp", "testApp");
 
         assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().desc().list()).hasSize(4);
         assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().desc().count()).isEqualTo(4);
         appDefinitions = appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().desc().list();
-        for (int i = 0; i < appDefinitions.size(); i++) {
-            if (i <= 2) {
-                assertThat(appDefinitions.get(i).getKey()).isEqualTo("testApp");
-            } else {
-                assertThat(appDefinitions.get(i).getKey()).isEqualTo("fullInfoApp");
-            }
-        }
+        assertThat(appDefinitions)
+            .extracting(AppDefinition::getKey)
+            .containsExactly("testApp", "testApp", "testApp", "fullInfoApp");
     }
 
     @Test
@@ -453,16 +444,17 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().desc().count()).isEqualTo(4);
 
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().desc().list();
-        assertThat(appDefinitions.get(0).getVersion()).isEqualTo(3);
-        assertThat(appDefinitions.get(1).getVersion()).isEqualTo(2);
-        assertThat(appDefinitions.get(2).getVersion()).isEqualTo(1);
-        assertThat(appDefinitions.get(3).getVersion()).isEqualTo(1);
+        assertThat(appDefinitions)
+            .extracting(AppDefinition::getVersion)
+            .containsExactly(3, 2, 1, 1);
 
         appDefinitions = appRepositoryService.createAppDefinitionQuery().latestVersion().orderByAppDefinitionVersion().asc().list();
-        assertThat(appDefinitions.get(0).getVersion()).isEqualTo(1);
-        assertThat(appDefinitions.get(0).getKey()).isEqualTo("fullInfoApp");
-        assertThat(appDefinitions.get(1).getVersion()).isEqualTo(3);
-        assertThat(appDefinitions.get(1).getKey()).isEqualTo("testApp");
+        assertThat(appDefinitions)
+            .extracting(AppDefinition::getKey, AppDefinition::getVersion)
+            .containsExactly(
+                tuple("fullInfoApp", 1),
+                tuple("testApp", 3)
+            );
     }
 
     private List<String> getAppDefinitionIds(String deploymentId) {

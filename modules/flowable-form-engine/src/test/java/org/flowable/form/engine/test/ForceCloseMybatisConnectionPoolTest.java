@@ -40,7 +40,7 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemFormEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        assertThat(state.getIdleConnectionCount()).isGreaterThan(0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         // then
         // if the  engine is closed
@@ -64,14 +64,14 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemFormEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        assertThat(state.getIdleConnectionCount()).isGreaterThan(0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         // then
         // if the  engine is closed
         formEngine.close();
 
         // the idle connections are not closed
-        assertThat(state.getIdleConnectionCount()).isGreaterThan(0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         pooledDataSource.forceCloseAll();
         assertThat(state.getIdleConnectionCount()).isZero();

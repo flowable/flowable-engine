@@ -13,7 +13,7 @@
 package org.flowable.form.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,11 +101,9 @@ public class OptionFormFieldTest extends AbstractFlowableFormTest {
 
         // test expression failure on model
         variables.clear();
-        try {
-            formModel = getOptionsFormModelWithVariablesByKey(variables);
-            fail("Expression failure should result in a FlowableException");
-        } catch (FlowableException e) {
-        }
+
+        assertThatThrownBy(() -> getOptionsFormModelWithVariablesByKey(variables))
+            .isInstanceOf(FlowableException.class);
 
         // test expression failure on instance
         variables.clear();

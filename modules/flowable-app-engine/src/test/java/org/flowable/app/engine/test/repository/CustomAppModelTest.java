@@ -40,8 +40,9 @@ public class CustomAppModelTest extends FlowableAppTestCase {
             AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().appDefinitionKey("extraInfoApp").singleResult();
             
             AppModel appModel = appRepositoryService.getAppModel(appDefinition.getId());
-            assertThat(appModel).isNotNull();
-            assertThat(appModel instanceof CustomAppModel).isTrue();
+            assertThat(appModel)
+                .isNotNull()
+                .isInstanceOf(CustomAppModel.class);
             
             CustomAppModel customAppModel = (CustomAppModel) appModel;
             assertThat(customAppModel.getKey()).isEqualTo("extraInfoApp");

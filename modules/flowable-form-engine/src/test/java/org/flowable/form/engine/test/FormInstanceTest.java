@@ -14,6 +14,7 @@ package org.flowable.form.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -59,9 +60,10 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         SimpleFormModel formModel = (SimpleFormModel) formInstanceModel.getFormModel();
         assertThat(formModel.getFields().size()).isOne();
         FormField formField = formModel.getFields().get(0);
-        assertThat(formField.getId()).isEqualTo("input1");
-        assertThat(formField.getValue()).isEqualTo("test");
-        
+        assertThat(formModel.getFields())
+            .extracting(FormField::getId, FormField::getValue)
+            .containsExactly(tuple("input1", "test"));
+
         assertThat(formService.createFormInstanceQuery().id(formInstance.getId()).count()).isOne();
         formService.deleteFormInstance(formInstance.getId());
         assertThat(formService.createFormInstanceQuery().id(formInstance.getId()).count()).isZero();

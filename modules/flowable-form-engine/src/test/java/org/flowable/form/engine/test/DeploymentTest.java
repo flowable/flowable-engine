@@ -13,12 +13,14 @@
 package org.flowable.form.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInfo;
+import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.junit.jupiter.api.Test;
 
@@ -48,9 +50,10 @@ public class DeploymentTest extends AbstractFlowableFormTest {
 
         FormInfo formInfo = repositoryService.getFormModelByKey("form1");
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertThat(formModel.getFields().size()).isOne();
-        assertThat(formModel.getFields().get(0).getId()).isEqualTo("input1");
-        assertThat(formModel.getFields().get(0).getName()).isEqualTo("Input1");
+        assertThat(formModel.getFields()).hasSize(1);
+        assertThat(formModel.getFields())
+            .extracting(FormField::getId, FormField::getName)
+            .containsExactly(tuple("input1", "Input1"));
 
         FormDeployment redeployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/form/engine/test/deployment/simple2.form")
@@ -66,9 +69,10 @@ public class DeploymentTest extends AbstractFlowableFormTest {
 
         formInfo = repositoryService.getFormModelByKey("form1");
         formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertThat(formModel.getFields().size()).isOne();
-        assertThat(formModel.getFields().get(0).getId()).isEqualTo("input2");
-        assertThat(formModel.getFields().get(0).getName()).isEqualTo("Input2");
+        assertThat(formModel.getFields()).hasSize(1);
+        assertThat(formModel.getFields())
+            .extracting(FormField::getId, FormField::getName)
+            .containsExactly(tuple("input2", "Input2"));
 
         repositoryService.deleteDeployment(redeployment.getId());
     }
@@ -78,10 +82,11 @@ public class DeploymentTest extends AbstractFlowableFormTest {
             "org/flowable/form/engine/test/deployment/form_with_dates.form" })
     public void deploy2Forms() {
         List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormName().asc().list();
-        assertThat(formDefinitions.size()).isEqualTo(2);
+        assertThat(formDefinitions).hasSize(2);
 
-        assertThat(formDefinitions.get(0).getName()).isEqualTo("My date form");
-        assertThat(formDefinitions.get(1).getName()).isEqualTo("My first form");
+        assertThat(formDefinitions)
+            .extracting(FormDefinition::getName)
+            .containsExactly("My date form", "My first form");
     }
     
     @Test
