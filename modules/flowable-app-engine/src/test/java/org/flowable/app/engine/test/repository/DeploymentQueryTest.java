@@ -59,7 +59,7 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
 
         assertThat(appRepositoryService.createDeploymentQuery().list())
             .extracting(AppDeployment::getId)
-            .containsExactly(deploymentId1, deploymentId2);
+            .containsExactlyInAnyOrder(deploymentId1, deploymentId2);
     }
     
     @Test
