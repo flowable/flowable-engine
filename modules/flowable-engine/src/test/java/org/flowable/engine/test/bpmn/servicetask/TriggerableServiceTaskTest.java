@@ -67,11 +67,11 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         assertNotNull(execution);
         assertEquals(3, runtimeService.getVariable(processId, "count"));
     }
-    
+
     @Test
     @Deployment
     public void testExpression() {
-    	DummyTestBean testBean = new DummyTestBean();
+        DummyTestBean testBean = new DummyTestBean();
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("bean", testBean);
 
@@ -81,7 +81,7 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         assertNotNull(execution);
         assertTrue((boolean) runtimeService.getVariable(processId, "executed"));
 
-        Map<String,Object> processVariables = new HashMap<>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("count", 1);
         runtimeService.trigger(execution.getId(), processVariables, null);
 
