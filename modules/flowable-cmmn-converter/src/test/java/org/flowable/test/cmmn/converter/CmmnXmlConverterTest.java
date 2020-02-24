@@ -92,11 +92,10 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
         for (Sentry sentry : planModel.getSentries()) {
             List<SentryOnPart> onParts = sentry.getOnParts();
             if (onParts != null && !onParts.isEmpty()) {
-                assertThat(onParts).hasSize(1);
-                assertThat(onParts.get(0).getId()).isNotNull();
-                assertThat(onParts.get(0).getSourceRef()).isNotNull();
-                assertThat(onParts.get(0).getSource()).isNotNull();
-                assertThat(onParts.get(0).getStandardEvent()).isNotNull();
+                assertThat(onParts)
+                    .hasSize(1)
+                    .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getSource, SentryOnPart::getStandardEvent)
+                    .doesNotContainNull();
             } else {
                 assertThat(sentry.getSentryIfPart().getCondition()).isEqualTo("${true}");
                 assertThat(sentry.getName()).isEqualTo("criterion name");

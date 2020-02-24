@@ -57,42 +57,42 @@ public class SimpleDiCmmnXmlConverterTest extends AbstractConverterTest {
         
         GraphicInfo graphicInfo = cmmnModel.getGraphicInfo("myPlanModel");
         assertThat(graphicInfo).isNotNull();
-        assertThat(graphicInfo.getX()).isCloseTo(1.0, offset(0.1));
-        assertThat(graphicInfo.getY()).isCloseTo(19.0, offset(0.1));
-        assertThat(graphicInfo.getWidth()).isCloseTo(400.0, offset(0.1));
-        assertThat(graphicInfo.getHeight()).isCloseTo(300.0, offset(0.1));
+        assertThat(graphicInfo.getX()).isEqualTo(1.0);
+        assertThat(graphicInfo.getY()).isEqualTo(19.0);
+        assertThat(graphicInfo.getWidth()).isEqualTo(400.0);
+        assertThat(graphicInfo.getHeight()).isEqualTo(300.0);
         
         graphicInfo = cmmnModel.getGraphicInfo("planItem1");
         assertThat(graphicInfo).isNotNull();
-        assertThat(graphicInfo.getX()).isCloseTo(70.0, offset(0.1));
-        assertThat(graphicInfo.getY()).isCloseTo(65.0, offset(0.1));
-        assertThat(graphicInfo.getWidth()).isCloseTo(80.0, offset(0.1));
-        assertThat(graphicInfo.getHeight()).isCloseTo(60.0, offset(0.1));
+        assertThat(graphicInfo.getX()).isEqualTo(70.0);
+        assertThat(graphicInfo.getY()).isEqualTo(65.0);
+        assertThat(graphicInfo.getWidth()).isEqualTo(80.0);
+        assertThat(graphicInfo.getHeight()).isEqualTo(60.0);
         
         graphicInfo = cmmnModel.getGraphicInfo("planItem2");
         assertThat(graphicInfo).isNotNull();
-        assertThat(graphicInfo.getX()).isCloseTo(250.0, offset(0.1));
-        assertThat(graphicInfo.getY()).isCloseTo(100.0, offset(0.1));
-        assertThat(graphicInfo.getWidth()).isCloseTo(80.0, offset(0.1));
-        assertThat(graphicInfo.getHeight()).isCloseTo(60.0, offset(0.1));
+        assertThat(graphicInfo.getX()).isEqualTo(250.0);
+        assertThat(graphicInfo.getY()).isEqualTo(100.0);
+        assertThat(graphicInfo.getWidth()).isEqualTo(80.0);
+        assertThat(graphicInfo.getHeight()).isEqualTo(60.0);
         
         graphicInfo = cmmnModel.getGraphicInfo("criterion1");
         assertThat(graphicInfo).isNotNull();
-        assertThat(graphicInfo.getX()).isCloseTo(268.0, offset(0.1));
-        assertThat(graphicInfo.getY()).isCloseTo(216.0, offset(0.1));
-        assertThat(graphicInfo.getWidth()).isCloseTo(20.0, offset(0.1));
-        assertThat(graphicInfo.getHeight()).isCloseTo(28.0, offset(0.1));
+        assertThat(graphicInfo.getX()).isEqualTo(268.0);
+        assertThat(graphicInfo.getY()).isEqualTo(216.0);
+        assertThat(graphicInfo.getWidth()).isEqualTo(20.0);
+        assertThat(graphicInfo.getHeight()).isEqualTo(28.0);
         
         List<GraphicInfo> waypoints = cmmnModel.getFlowLocationGraphicInfo("CMMNEdge_onPart1");
         assertThat(waypoints).hasSize(4);
-        assertThat(waypoints.get(0).getX()).isCloseTo(170.0, offset(0.1));
-        assertThat(waypoints.get(0).getY()).isCloseTo(95.0, offset(0.1));
-        assertThat(waypoints.get(1).getX()).isCloseTo(220.0, offset(0.1));
-        assertThat(waypoints.get(1).getY()).isCloseTo(95.0, offset(0.1));
-        assertThat(waypoints.get(2).getX()).isCloseTo(220.0, offset(0.1));
-        assertThat(waypoints.get(2).getY()).isCloseTo(130.0, offset(0.1));
-        assertThat(waypoints.get(3).getX()).isCloseTo(250.0, offset(0.1));
-        assertThat(waypoints.get(3).getY()).isCloseTo(130.0, offset(0.1));
+        assertThat(waypoints.get(0).getX()).isEqualTo(170.0);
+        assertThat(waypoints.get(0).getY()).isEqualTo(95.0);
+        assertThat(waypoints.get(1).getX()).isEqualTo(220.0);
+        assertThat(waypoints.get(1).getY()).isEqualTo(95.0);
+        assertThat(waypoints.get(2).getX()).isEqualTo(220.0);
+        assertThat(waypoints.get(2).getY()).isEqualTo(130.0);
+        assertThat(waypoints.get(3).getX()).isEqualTo(250.0);
+        assertThat(waypoints.get(3).getY()).isEqualTo(130.0);
     }
 
 }

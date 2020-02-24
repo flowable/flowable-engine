@@ -43,12 +43,12 @@ public class ParentCompletionConverterTest extends AbstractConverterTest {
         assertThat(cmmnModel).isNotNull();
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertThat(planItems).hasSize(4);
-        planItems.forEach(planItem -> {
-            assertThat(planItem.getItemControl()).isNotNull();
-            assertThat(planItem.getItemControl().getParentCompletionRule()).isNotNull();
-            assertThat(planItem.getItemControl().getParentCompletionRule().getType()).isNotNull();
-        });
+        assertThat(planItems)
+            .hasSize(4)
+            .extracting(planItem -> planItem.getItemControl(),
+                planItem -> planItem.getItemControl().getParentCompletionRule(),
+                planItem -> planItem.getItemControl().getParentCompletionRule().getType())
+            .doesNotContainNull();
 
         assertThat(planItems)
             .extracting(planItem -> planItem.getItemControl().getParentCompletionRule().getType())

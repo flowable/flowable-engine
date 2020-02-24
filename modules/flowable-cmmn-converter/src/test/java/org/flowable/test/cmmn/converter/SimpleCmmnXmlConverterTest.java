@@ -74,11 +74,10 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(planModel.getSentries()).hasSize(3);
         for (Sentry sentry : planModel.getSentries()) {
             List<SentryOnPart> onParts = sentry.getOnParts();
-            assertThat(onParts).hasSize(1);
-            assertThat(onParts.get(0).getId()).isNotNull();
-            assertThat(onParts.get(0).getSourceRef()).isNotNull();
-            assertThat(onParts.get(0).getSource()).isNotNull();
-            assertThat(onParts.get(0).getStandardEvent()).isNotNull();
+            assertThat(onParts)
+                .hasSize(1)
+                .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getSource, SentryOnPart::getStandardEvent)
+                .doesNotContainNull();
         }
 
         // Plan items definitions
@@ -97,9 +96,9 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
         int nrOfTasks = 0;
         int nrOfMileStones = 0;
         for (PlanItem planItem : planItems) {
-            assertThat(planItem.getId()).isNotNull();
-            assertThat(planItem.getDefinitionRef()).isNotNull();
-            assertThat(planItem.getPlanItemDefinition()).isNotNull(); // Verify plan item definition ref is resolved
+            assertThat(planItem)
+                .extracting(PlanItem::getId, PlanItem::getDefinitionRef, PlanItem::getPlanItemDefinition) // Verify plan item definition ref is resolved
+                .doesNotContainNull();
 
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             if (planItemDefinition instanceof Milestone) {

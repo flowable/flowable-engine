@@ -37,20 +37,27 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
             assertThat(cmmnModel).isNotNull();
             Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
             List<PlanItem> planItems = planModel.getPlanItems();
-            assertThat(planItems).hasSize(4);
+            assertThat(planItems)
+                .hasSize(4)
+                .extracting(
+                    planItem -> planItem.getItemControl(),
+                    planItem -> planItem.getItemControl().getCompletionNeutralRule(),
+                    planItem -> planItem.getItemControl().getCompletionNeutralRule().getCondition())
+                .doesNotContainNull();
             planItems.forEach(planItem -> {
-                assertThat(planItem.getItemControl()).isNotNull();
-                assertThat(planItem.getItemControl().getCompletionNeutralRule()).isNotNull();
-                assertThat(planItem.getItemControl().getCompletionNeutralRule().getCondition()).isNotNull();
                 assertThat(planItem.getItemControl().getCompletionNeutralRule().getCondition()).isEqualTo("${" + planItem.getId() + "}");
             });
 
             Stage stageOne = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageOne");
             List<PlanItem> planItems1 = stageOne.getPlanItems();
-            assertThat(planItems1).hasSize(1);
+
+            assertThat(planItems1)
+                .hasSize(1)
+                .extracting(
+                    planItem -> planItem.getItemControl(),
+                    planItem -> planItem.getItemControl().getCompletionNeutralRule())
+                .doesNotContainNull();
             PlanItem planItem = planItems1.get(0);
-            assertThat(planItem.getItemControl()).isNotNull();
-            assertThat(planItem.getItemControl().getCompletionNeutralRule()).isNotNull();
             assertThat(planItem.getItemControl().getCompletionNeutralRule().getCondition()).isNull();
 
             List<ExtensionElement> extensionElements = planItem.getExtensionElements().get("planItemTest");
