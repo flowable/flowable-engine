@@ -12,8 +12,8 @@
  */
 package org.flowable.form.engine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class FormModelTest extends AbstractFlowableFormTest {
 
         FormInfo formInfo = formService.getFormModelWithVariablesById(formDefinitionId, null, variables, null, false);
 
-        assertEquals(formDefinitionId, formInfo.getId());
+        assertThat(formInfo.getId()).isEqualTo(formDefinitionId);
         assertFormModel(formInfo);
     }
     
@@ -51,31 +51,21 @@ public class FormModelTest extends AbstractFlowableFormTest {
 
         FormInfo formInfo = formService.getFormModelWithVariablesByKey("form1", null, variables, "flowable", false);
 
-        assertEquals(formDefinitionId, formInfo.getId());
+        assertThat(formInfo.getId()).isEqualTo(formDefinitionId);
         assertFormModel(formInfo);
     }
     
     @Test
     @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form", tenantId="flowable")
     public void getSimpleFormModelInAnotherTenantWithVariables() throws Exception {
-        try {
-            repositoryService.getFormModelByKey("form1", "someTenant", false).getId();
-            fail("expected exception");
-            
-        } catch (FlowableObjectNotFoundException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> repositoryService.getFormModelByKey("form1", "someTenant", false).getId())
+            .isInstanceOf(FlowableObjectNotFoundException.class);
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("input1", "test");
 
-        try {
-            formService.getFormModelWithVariablesByKey("form1", null, variables, "someTenant", false);
-            fail("expected exception");
-            
-        } catch (FlowableObjectNotFoundException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> formService.getFormModelWithVariablesByKey("form1", null, variables, "someTenant", false))
+            .isInstanceOf(FlowableObjectNotFoundException.class);
     }
     
     @Test
@@ -88,7 +78,7 @@ public class FormModelTest extends AbstractFlowableFormTest {
 
         FormInfo formInfo = formService.getFormModelWithVariablesByKey("form1", null, variables, "flowable", true);
 
-        assertEquals(formDefinitionId, formInfo.getId());
+        assertThat(formInfo.getId()).isEqualTo(formDefinitionId);
         assertFormModel(formInfo);
     }
     
@@ -105,7 +95,7 @@ public class FormModelTest extends AbstractFlowableFormTest {
     
             FormInfo formInfo = formService.getFormModelWithVariablesByKey("form1", null, variables, "flowable", true);
     
-            assertEquals(formDefinitionId, formInfo.getId());
+            assertThat(formInfo.getId()).isEqualTo(formDefinitionId);
             assertFormModel(formInfo);
             
         } finally {
@@ -119,25 +109,15 @@ public class FormModelTest extends AbstractFlowableFormTest {
         DefaultTenantProvider originalDefaultTenantProvider = formEngineConfiguration.getDefaultTenantProvider();
         formEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
-            try {
-                repositoryService.getFormModelByKey("form1", "someTenant", true).getId();
-                fail("expected exception");
-                
-            } catch (FlowableObjectNotFoundException e) {
-                // expected
-            }
-    
+            assertThatThrownBy(() -> repositoryService.getFormModelByKey("form1", "someTenant", true).getId())
+                .isInstanceOf(FlowableObjectNotFoundException.class);
+
             Map<String, Object> variables = new HashMap<>();
             variables.put("input1", "test");
-    
-            try {
-                formService.getFormModelWithVariablesByKey("form1", null, variables, "someTenant", true);
-                fail("expected exception");
-                
-            } catch (FlowableObjectNotFoundException e) {
-                // expected
-            }
-            
+
+            assertThatThrownBy(() -> formService.getFormModelWithVariablesByKey("form1", null, variables, "someTenant", true))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
+
         } finally {
             formEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
         }
@@ -157,7 +137,7 @@ public class FormModelTest extends AbstractFlowableFormTest {
     
             FormInfo formInfo = formService.getFormModelWithVariablesByKey("form1", null, variables, "flowable", false);
     
-            assertEquals(formDefinitionId, formInfo.getId());
+            assertThat(formInfo.getId()).isEqualTo(formDefinitionId);
             assertFormModel(formInfo);
             
         } finally {
@@ -173,24 +153,14 @@ public class FormModelTest extends AbstractFlowableFormTest {
         formEngineConfiguration.setFallbackToDefaultTenant(true);
         formEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
-            try {
-                repositoryService.getFormModelByKey("form1", "someTenant", false).getId();
-                fail("expected exception");
-                
-            } catch (FlowableObjectNotFoundException e) {
-                // expected
-            }
-    
+            assertThatThrownBy(() -> repositoryService.getFormModelByKey("form1", "someTenant", false).getId())
+                .isInstanceOf(FlowableObjectNotFoundException.class);
+
             Map<String, Object> variables = new HashMap<>();
             variables.put("input1", "test");
-    
-            try {
-                formService.getFormModelWithVariablesByKey("form1", null, variables, "someTenant", false);
-                fail("expected exception");
-                
-            } catch (FlowableObjectNotFoundException e) {
-                // expected
-            }
+
+            assertThatThrownBy(() -> formService.getFormModelWithVariablesByKey("form1", null, variables, "someTenant", false))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
             
         } finally {
             formEngineConfiguration.setFallbackToDefaultTenant(false);
@@ -200,10 +170,10 @@ public class FormModelTest extends AbstractFlowableFormTest {
     
     protected void assertFormModel(FormInfo formInfo) {
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertEquals(1, formModel.getFields().size());
+        assertThat(formModel.getFields()).hasSize(1);
         FormField formField = formModel.getFields().get(0);
-        assertEquals("input1", formField.getId());
-        assertEquals("test", formField.getValue());
+        assertThat(formField.getId()).isEqualTo("input1");
+        assertThat(formField.getValue()).isEqualTo("test");
     }
 
 }
