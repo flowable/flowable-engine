@@ -135,7 +135,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
 
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
-        super.trigger(execution, signalName, signalData);
+        leave(execution);
     }
 
 }
