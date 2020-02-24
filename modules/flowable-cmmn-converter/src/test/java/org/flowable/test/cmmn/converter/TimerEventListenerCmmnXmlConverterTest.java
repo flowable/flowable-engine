@@ -12,8 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -34,18 +34,17 @@ public class TimerEventListenerCmmnXmlConverterTest extends AbstractConverterTes
     @Test
     public void testConvertXmlToCmmnModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile("org/flowable/test/cmmn/converter/timer-event-listener.cmmn");
-        assertNotNull(cmmnModel);
+        assertThat(cmmnModel).isNotNull();
         
         List<HumanTask> humanTasks = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(HumanTask.class, true);
-        assertEquals(2, humanTasks.size());
+        assertThat(humanTasks).hasSize(2);
         
         List<TimerEventListener> timerEventListeners =  cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(TimerEventListener.class, true);
-        assertEquals(1, timerEventListeners.size());
-        
-        TimerEventListener timerEventListener = timerEventListeners.get(0);
-        assertEquals("PT6H", timerEventListener.getTimerExpression());
-        assertEquals("A", timerEventListener.getTimerStartTriggerPlanItem().getName());
-        assertEquals(PlanItemTransition.COMPLETE, timerEventListener.getTimerStartTriggerStandardEvent());
+        assertThat(timerEventListeners)
+            .hasSize(1)
+            .extracting(TimerEventListener::getTimerExpression, TimerEventListener::getTimerStartTriggerStandardEvent)
+            .containsExactly(tuple("PT6H", PlanItemTransition.COMPLETE));
+        assertThat(timerEventListeners.get(0).getTimerStartTriggerPlanItem().getName()).isEqualTo("A");
     }
 
 }

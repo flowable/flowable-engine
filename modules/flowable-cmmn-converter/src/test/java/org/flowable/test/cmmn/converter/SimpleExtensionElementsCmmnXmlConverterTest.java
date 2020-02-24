@@ -12,8 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -48,54 +48,54 @@ public class SimpleExtensionElementsCmmnXmlConverterTest extends AbstractConvert
     }
 
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertEquals(1, cmmnModel.getCases().size());
+        assertThat(cmmnModel).isNotNull();
+        assertThat(cmmnModel.getCases()).hasSize(1);
 
         // Case
         Case caze = cmmnModel.getCases().get(0);
-        assertEquals("myCase", caze.getId());
+        assertThat(caze.getId()).isEqualTo("myCase");
 
         // Plan model
         Stage planModel = caze.getPlanModel();
-        assertNotNull(planModel);
-        assertEquals("myPlanModel", planModel.getId());
-        assertEquals("My CasePlanModel", planModel.getName());
-        assertEquals("formKey", planModel.getFormKey());
-        assertEquals("formFieldValidationValue", planModel.getValidateFormFields());
+        assertThat(planModel).isNotNull();
+        assertThat(planModel.getId()).isEqualTo("myPlanModel");
+        assertThat(planModel.getName()).isEqualTo("My CasePlanModel");
+        assertThat(planModel.getFormKey()).isEqualTo("formKey");
+        assertThat(planModel.getValidateFormFields()).isEqualTo("formFieldValidationValue");
 
         Task task = (Task) planModel.findPlanItemDefinitionInStageOrUpwards("taskA");
-        assertEquals(1, task.getExtensionElements().size());
+        assertThat(task.getExtensionElements()).hasSize(1);
         List<ExtensionElement> extensionElements = task.getExtensionElements().get("taskTest");
-        assertEquals(1, extensionElements.size());
-        ExtensionElement extensionElement = extensionElements.get(0);
-        assertEquals("taskTest", extensionElement.getName());
-        assertEquals("hello", extensionElement.getElementText());
+        assertThat(extensionElements)
+            .hasSize(1)
+            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+            .containsExactly(tuple("taskTest", "hello"));
         
         Milestone milestone = (Milestone) planModel.findPlanItemDefinitionInStageOrUpwards("mileStoneOne");
-        assertEquals(1, milestone.getExtensionElements().size());
+        assertThat(milestone.getExtensionElements()).hasSize(1);
         extensionElements = milestone.getExtensionElements().get("milestoneTest");
-        assertEquals(1, extensionElements.size());
-        extensionElement = extensionElements.get(0);
-        assertEquals("milestoneTest", extensionElement.getName());
-        assertEquals("hello2", extensionElement.getElementText());
+        assertThat(extensionElements)
+            .hasSize(1)
+            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+            .containsExactly(tuple("milestoneTest", "hello2"));
         
         PlanItem planItem = planModel.findPlanItemInPlanFragmentOrDownwards("planItemTaskA");
-        assertEquals(1, planItem.getExtensionElements().size());
+        assertThat(planItem.getExtensionElements()).hasSize(1);
         extensionElements = planItem.getExtensionElements().get("test");
-        assertEquals(1, extensionElements.size());
-        extensionElement = extensionElements.get(0);
-        assertEquals("test", extensionElement.getName());
-        assertEquals("test", extensionElement.getElementText());
+        assertThat(extensionElements)
+            .hasSize(1)
+            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+            .containsExactly(tuple("test", "test"));
 
         List<Sentry> sentries = planModel.getSentries();
-        assertEquals(3, sentries.size());
+        assertThat(sentries).hasSize(3);
         Sentry sentry = sentries.get(0);
-        assertEquals(1, sentry.getExtensionElements().size());
+        assertThat(sentry.getExtensionElements()).hasSize(1);
         extensionElements = sentry.getExtensionElements().get("test2");
-        assertEquals(1, extensionElements.size());
-        extensionElement = extensionElements.get(0);
-        assertEquals("test2", extensionElement.getName());
-        assertEquals("test2", extensionElement.getElementText());
+        assertThat(extensionElements)
+            .hasSize(1)
+            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+            .containsExactly(tuple("test2", "test2"));
     }
 
 }

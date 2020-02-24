@@ -13,7 +13,7 @@
 package org.flowable.test.cmmn.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,10 +52,11 @@ public class EventListenerWithEventTypeXmlConverterTest extends AbstractConverte
         assertThat(genericEventListener.getEventType()).isEqualTo("myEvent");
 
         List<ExtensionElement> correlationParameters = genericEventListener.getExtensionElements().getOrDefault("eventCorrelationParameter", new ArrayList<>());
-        assertEquals(1, correlationParameters.size());
-        ExtensionElement extensionElement = correlationParameters.get(0);
-        assertEquals("customerId", extensionElement.getAttributeValue(null, "name"));
-        assertEquals("${customerIdVar}", extensionElement.getAttributeValue(null, "value"));
+        assertThat(correlationParameters)
+            .hasSize(1)
+            .extracting(extensionElement -> extensionElement.getAttributeValue(null, "name"),
+                extensionElement -> extensionElement.getAttributeValue(null, "value"))
+            .containsExactly(tuple("customerId", "${customerIdVar}"));
     }
 
 }

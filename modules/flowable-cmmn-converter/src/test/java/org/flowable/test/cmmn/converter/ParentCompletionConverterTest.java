@@ -12,8 +12,7 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -41,28 +40,27 @@ public class ParentCompletionConverterTest extends AbstractConverterTest {
     }
     
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
+        assertThat(cmmnModel).isNotNull();
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertEquals(4, planItems.size());
+        assertThat(planItems).hasSize(4);
         planItems.forEach(planItem -> {
-            assertNotNull(planItem.getItemControl());
-            assertNotNull(planItem.getItemControl().getParentCompletionRule());
-            assertNotNull(planItem.getItemControl().getParentCompletionRule().getType());
+            assertThat(planItem.getItemControl()).isNotNull();
+            assertThat(planItem.getItemControl().getParentCompletionRule()).isNotNull();
+            assertThat(planItem.getItemControl().getParentCompletionRule().getType()).isNotNull();
         });
-        
-        assertEquals(ParentCompletionRule.IGNORE, planItems.get(0).getItemControl().getParentCompletionRule().getType());
-        assertEquals(ParentCompletionRule.DEFAULT, planItems.get(1).getItemControl().getParentCompletionRule().getType());
-        assertEquals(ParentCompletionRule.IGNORE_IF_AVAILABLE, planItems.get(2).getItemControl().getParentCompletionRule().getType());
-        assertEquals(ParentCompletionRule.IGNORE_IF_AVAILABLE_OR_ENABLED, planItems.get(3).getItemControl().getParentCompletionRule().getType());
+
+        assertThat(planItems)
+            .extracting(planItem -> planItem.getItemControl().getParentCompletionRule().getType())
+            .containsExactly(ParentCompletionRule.IGNORE, ParentCompletionRule.DEFAULT, ParentCompletionRule.IGNORE_IF_AVAILABLE, ParentCompletionRule.IGNORE_IF_AVAILABLE_OR_ENABLED);
 
         Stage stageOne = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageOne");
         List<PlanItem> planItems1 = stageOne.getPlanItems();
-        assertEquals(1, planItems1.size());
+        assertThat(planItems1).hasSize(1);
         PlanItem planItem = planItems1.get(0);
-        assertNotNull(planItem.getItemControl());
-        assertNotNull(planItem.getItemControl().getParentCompletionRule());
-        assertEquals(ParentCompletionRule.IGNORE_AFTER_FIRST_COMPLETION, planItem.getItemControl().getParentCompletionRule().getType());
+        assertThat(planItem.getItemControl()).isNotNull();
+        assertThat(planItem.getItemControl().getParentCompletionRule()).isNotNull();
+        assertThat(planItem.getItemControl().getParentCompletionRule().getType()).isEqualTo(ParentCompletionRule.IGNORE_AFTER_FIRST_COMPLETION);
     }
 
 }

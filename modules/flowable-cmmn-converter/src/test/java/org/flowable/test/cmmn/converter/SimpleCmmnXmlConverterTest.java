@@ -12,10 +12,7 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -51,58 +48,58 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
     }
 
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertEquals(1, cmmnModel.getCases().size());
+        assertThat(cmmnModel).isNotNull();
+        assertThat(cmmnModel.getCases()).hasSize(1);
 
         // Case
         Case caze = cmmnModel.getCases().get(0);
-        assertEquals("myCase", caze.getId());
-        assertEquals("test", caze.getInitiatorVariableName());
-        assertEquals(2, caze.getCandidateStarterUsers().size());
-        assertTrue(caze.getCandidateStarterUsers().contains("test"));
-        assertTrue(caze.getCandidateStarterUsers().contains("test2"));
-        assertEquals(2, caze.getCandidateStarterGroups().size());
-        assertTrue(caze.getCandidateStarterGroups().contains("group"));
-        assertTrue(caze.getCandidateStarterGroups().contains("group2"));
+        assertThat(caze.getId()).isEqualTo("myCase");
+        assertThat(caze.getInitiatorVariableName()).isEqualTo("test");
+        assertThat(caze.getCandidateStarterUsers()).hasSize(2);
+        assertThat(caze.getCandidateStarterUsers().contains("test")).isTrue();
+        assertThat(caze.getCandidateStarterUsers().contains("test2")).isTrue();
+        assertThat(caze.getCandidateStarterGroups()).hasSize(2);
+        assertThat(caze.getCandidateStarterGroups().contains("group")).isTrue();
+        assertThat(caze.getCandidateStarterGroups().contains("group2")).isTrue();
 
         // Plan model
         Stage planModel = caze.getPlanModel();
-        assertNotNull(planModel);
-        assertEquals("myPlanModel", planModel.getId());
-        assertEquals("My CasePlanModel", planModel.getName());
-        assertEquals("formKey", planModel.getFormKey());
-        assertEquals("validateFormFieldsValue", planModel.getValidateFormFields());
+        assertThat(planModel).isNotNull();
+        assertThat(planModel.getId()).isEqualTo("myPlanModel");
+        assertThat(planModel.getName()).isEqualTo("My CasePlanModel");
+        assertThat(planModel.getFormKey()).isEqualTo("formKey");
+        assertThat(planModel.getValidateFormFields()).isEqualTo("validateFormFieldsValue");
 
         // Sentries
-        assertEquals(3, planModel.getSentries().size());
+        assertThat(planModel.getSentries()).hasSize(3);
         for (Sentry sentry : planModel.getSentries()) {
             List<SentryOnPart> onParts = sentry.getOnParts();
-            assertEquals(1, onParts.size());
-            assertNotNull(onParts.get(0).getId());
-            assertNotNull(onParts.get(0).getSourceRef());
-            assertNotNull(onParts.get(0).getSource());
-            assertNotNull(onParts.get(0).getStandardEvent());
+            assertThat(onParts).hasSize(1);
+            assertThat(onParts.get(0).getId()).isNotNull();
+            assertThat(onParts.get(0).getSourceRef()).isNotNull();
+            assertThat(onParts.get(0).getSource()).isNotNull();
+            assertThat(onParts.get(0).getStandardEvent()).isNotNull();
         }
 
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
-        assertEquals(4, planItemDefinitions.size());
-        assertEquals(2, planModel.findPlanItemDefinitionsOfType(Task.class, false).size());
-        assertEquals(2, planModel.findPlanItemDefinitionsOfType(Milestone.class, false).size());
+        assertThat(planItemDefinitions).hasSize(4);
+        assertThat(planModel.findPlanItemDefinitionsOfType(Task.class, false)).hasSize(2);
+        assertThat(planModel.findPlanItemDefinitionsOfType(Milestone.class, false)).hasSize(2);
         for (PlanItemDefinition planItemDefinition : planItemDefinitions) {
-            assertNotNull(planItemDefinition.getId());
-            assertNotNull(planItemDefinition.getName());
+            assertThat(planItemDefinition.getId()).isNotNull();
+            assertThat(planItemDefinition.getName()).isNotNull();
         }
 
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertEquals(4, planItems.size());
+        assertThat(planItems).hasSize(4);
         int nrOfTasks = 0;
         int nrOfMileStones = 0;
         for (PlanItem planItem : planItems) {
-            assertNotNull(planItem.getId());
-            assertNotNull(planItem.getDefinitionRef());
-            assertNotNull(planItem.getPlanItemDefinition()); // Verify plan item definition ref is resolved
+            assertThat(planItem.getId()).isNotNull();
+            assertThat(planItem.getDefinitionRef()).isNotNull();
+            assertThat(planItem.getPlanItemDefinition()).isNotNull(); // Verify plan item definition ref is resolved
 
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             if (planItemDefinition instanceof Milestone) {
@@ -112,22 +109,22 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
             }
 
             if (!planItem.getId().equals("planItemTaskA")) {
-                assertNotNull(planItem.getEntryCriteria());
-                assertEquals(1, planItem.getEntryCriteria().size());
-                assertNotNull(planItem.getEntryCriteria().get(0).getSentry()); // Verify if sentry reference is resolved
+                assertThat(planItem.getEntryCriteria()).isNotNull();
+                assertThat(planItem.getEntryCriteria()).hasSize(1);
+                assertThat(planItem.getEntryCriteria().get(0).getSentry()).isNotNull(); // Verify if sentry reference is resolved
             }
 
             if (planItem.getPlanItemDefinition() instanceof Task) {
                 if (planItem.getId().equals("planItemTaskB")) {
-                    assertFalse(((Task) planItem.getPlanItemDefinition()).isBlocking());
+                    assertThat(((Task) planItem.getPlanItemDefinition()).isBlocking()).isFalse();
                 } else {
-                    assertTrue(((Task) planItem.getPlanItemDefinition()).isBlocking());
+                    assertThat(((Task) planItem.getPlanItemDefinition()).isBlocking()).isTrue();
                 }
             }
         }
 
-        assertEquals(2, nrOfMileStones);
-        assertEquals(2, nrOfTasks);
+        assertThat(nrOfMileStones).isEqualTo(2);
+        assertThat(nrOfTasks).isEqualTo(2);
     }
 
 }

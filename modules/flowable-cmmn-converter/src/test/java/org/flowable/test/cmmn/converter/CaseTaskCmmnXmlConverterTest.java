@@ -13,9 +13,7 @@
 package org.flowable.test.cmmn.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
@@ -47,34 +45,34 @@ public class CaseTaskCmmnXmlConverterTest extends AbstractConverterTest {
     }
     
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertEquals(1, cmmnModel.getCases().size());
-        
+        assertThat(cmmnModel).isNotNull();
+
         // Case
-        Case caze = cmmnModel.getCases().get(0);
-        assertEquals("myCase", caze.getId());
-        
+        assertThat(cmmnModel.getCases())
+            .isNotNull()
+            .hasSize(1)
+            .extracting(Case::getId)
+            .containsExactly("myCase");
+
         // Plan model
-        Stage planModel = caze.getPlanModel();
-        assertNotNull(planModel);
-        assertEquals("myPlanModel", planModel.getId());
-        assertEquals("My CasePlanModel", planModel.getName());
+        Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
+        assertThat(planModel)
+            .extracting(Stage::getId, Stage::getName)
+            .containsExactly("myPlanModel", "My CasePlanModel");
         
         PlanItem planItemTask1 = cmmnModel.findPlanItem("planItem1");
         PlanItemDefinition planItemDefinition = planItemTask1.getPlanItemDefinition();
-        assertTrue(planItemDefinition instanceof CaseTask);
+        assertThat(planItemDefinition).isInstanceOf(CaseTask.class);
         CaseTask task1 = (CaseTask) planItemDefinition;
-        assertEquals("caseDefinitionKey", task1.getCaseRefExpression());
+        assertThat(task1.getCaseRefExpression()).isEqualTo("caseDefinitionKey");
         
-        assertTrue(task1.getFallbackToDefaultTenant());
+        assertThat(task1.getFallbackToDefaultTenant()).isTrue();
 
         assertThat(task1.getInParameters())
-                .isNotNull()
-                .hasSize(1);
-        IOParameter inParameter = task1.getInParameters().get(0);
-        assertThat(inParameter).isNotNull();
-        assertThat(inParameter.getSource()).isEqualTo("testSource");
-        assertThat(inParameter.getTarget()).isEqualTo("testTarget");
+            .isNotNull()
+            .hasSize(1)
+            .extracting(IOParameter::getSource, IOParameter::getTarget)
+            .containsExactly(tuple("testSource", "testTarget"));
     }
 
 }

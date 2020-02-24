@@ -12,9 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
@@ -46,39 +45,41 @@ public class ProcessTask2CmmnXmlConverterTest extends AbstractConverterTest {
     }
     
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertEquals(1, cmmnModel.getCases().size());
+        assertThat(cmmnModel).isNotNull();
         
         // Case
-        Case caze = cmmnModel.getCases().get(0);
-        assertEquals("processTaskModel", caze.getId());
+        assertThat(cmmnModel.getCases())
+            .hasSize(1)
+            .extracting(Case::getId)
+            .containsExactly("processTaskModel");
         
         // Plan model
-        Stage planModel = caze.getPlanModel();
-        assertNotNull(planModel);
-        assertEquals("onecaseplanmodel1", planModel.getId());
-        assertEquals("Case plan model", planModel.getName());
-        
+        Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
+        assertThat(planModel)
+            .isNotNull()
+            .extracting(Stage::getId, Stage::getName)
+            .containsExactly("onecaseplanmodel1", "Case plan model");
+
         PlanItem planItemTask1 = cmmnModel.findPlanItem("planItem2");
         PlanItemDefinition planItemDefinition = planItemTask1.getPlanItemDefinition();
-        assertTrue(planItemDefinition instanceof ProcessTask);
+        assertThat(planItemDefinition).isInstanceOf(ProcessTask.class);
         ProcessTask task1 = (ProcessTask) planItemDefinition;
-        assertEquals("myTestProcess", task1.getProcessRefExpression());
+        assertThat(task1.getProcessRefExpression()).isEqualTo("myTestProcess");
         
-        assertEquals(0, task1.getInParameters().size());
-        assertEquals(0, task1.getOutParameters().size());
+        assertThat(task1.getInParameters()).isEmpty();
+        assertThat(task1.getOutParameters()).isEmpty();
         
         PlanItemDefinition taskDefinition = cmmnModel.findPlanItemDefinition("onehumantask1");
-        assertTrue(taskDefinition instanceof HumanTask);
+        assertThat(taskDefinition).isInstanceOf(HumanTask.class);
         HumanTask humanTask = (HumanTask) taskDefinition;
-        assertEquals("Human task", humanTask.getName());
-        assertEquals("admin", humanTask.getAssignee());
-        assertEquals("admin", humanTask.getOwner());
-        assertEquals("aHumanTaskForm", humanTask.getFormKey());
-        assertEquals("50", humanTask.getPriority());
-        assertEquals("2019-01-01", humanTask.getDueDate());
-        assertEquals("testCategory", humanTask.getCategory());
-        assertEquals("validateFormFieldsValue", humanTask.getValidateFormFields());
+        assertThat(humanTask.getName()).isEqualTo("Human task");
+        assertThat(humanTask.getAssignee()).isEqualTo("admin");
+        assertThat(humanTask.getOwner()).isEqualTo("admin");
+        assertThat(humanTask.getFormKey()).isEqualTo("aHumanTaskForm");
+        assertThat(humanTask.getPriority()).isEqualTo("50");
+        assertThat(humanTask.getDueDate()).isEqualTo("2019-01-01");
+        assertThat(humanTask.getCategory()).isEqualTo("testCategory");
+        assertThat(humanTask.getValidateFormFields()).isEqualTo("validateFormFieldsValue");
     }
 
 }

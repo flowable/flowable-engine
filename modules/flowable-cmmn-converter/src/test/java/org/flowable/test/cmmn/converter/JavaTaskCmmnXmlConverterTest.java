@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,11 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -36,9 +33,9 @@ import org.junit.Test;
  * @author Tijs Rademakers
  */
 public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
-    
+
     private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/java-task.cmmn";
-    
+
     @Test
     public void convertXMLToModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
@@ -51,75 +48,68 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
         validateModel(parsedModel);
     }
-    
+
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertEquals(1, cmmnModel.getCases().size());
-        
+        assertThat(cmmnModel).isNotNull();
+
         // Case
-        Case caze = cmmnModel.getCases().get(0);
-        assertEquals("javaCase", caze.getId());
-        assertEquals("test", caze.getInitiatorVariableName());
-        
+        assertThat(cmmnModel.getCases())
+            .hasSize(1)
+            .extracting(Case::getId, Case::getInitiatorVariableName)
+            .containsExactly(tuple("javaCase", "test"));
+
         // Plan model
-        Stage planModel = caze.getPlanModel();
-        assertNotNull(planModel);
-        assertEquals("myPlanModel", planModel.getId());
-        assertEquals("My CasePlanModel", planModel.getName());
-        
+        Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
+        assertThat(planModel).isNotNull();
+        assertThat(cmmnModel.getCases())
+            .isNotNull()
+            .extracting(caze -> caze.getPlanModel().getId(), caze -> caze.getPlanModel().getName())
+            .containsExactly(tuple("myPlanModel", "My CasePlanModel"));
+
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
-        assertEquals(2, planItemDefinitions.size());
-        assertEquals(2, planModel.findPlanItemDefinitionsOfType(Task.class, false).size());
-        
+        assertThat(planItemDefinitions).hasSize(2);
+        assertThat(planModel.findPlanItemDefinitionsOfType(Task.class, false)).hasSize(2);
+
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertEquals(2, planItems.size());
-        
+        assertThat(planItems).hasSize(2);
+
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
         PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
-        assertEquals(0, planItemTaskA.getEntryCriteria().size());
-        assertTrue(planItemDefinition instanceof ServiceTask);
+        assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+        assertThat(planItemDefinition).isInstanceOf(ServiceTask.class);
         ServiceTask taskA = (ServiceTask) planItemDefinition;
-        assertEquals(ServiceTask.JAVA_TASK, taskA.getType());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, taskA.getImplementationType());
-        assertEquals("org.flowable.TestJavaDelegate", taskA.getImplementation());
-        assertEquals("result", taskA.getResultVariableName());
-        assertFalse(taskA.isAsync());
-        assertFalse(taskA.isExclusive());
-        
+        assertThat(taskA.getType()).isEqualTo(ServiceTask.JAVA_TASK);
+        assertThat(taskA.getImplementationType()).isEqualTo(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+        assertThat(taskA.getImplementation()).isEqualTo("org.flowable.TestJavaDelegate");
+        assertThat(taskA.getResultVariableName()).isEqualTo("result");
+        assertThat(taskA.isAsync()).isFalse();
+        assertThat(taskA.isExclusive()).isFalse();
+
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();
-        assertEquals(1, planItemTaskB.getEntryCriteria().size());
-        assertTrue(planItemDefinition instanceof ServiceTask);
+        assertThat(planItemTaskB.getEntryCriteria()).hasSize(1);
+        assertThat(planItemDefinition).isInstanceOf(ServiceTask.class);
         ServiceTask taskB = (ServiceTask) planItemDefinition;
-        assertEquals(ServiceTask.JAVA_TASK, taskB.getType());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, taskB.getImplementationType());
-        assertEquals("${testJavaDelegate}", taskB.getImplementation());
-        assertNull(taskB.getResultVariableName());
-        assertTrue(taskB.isAsync());
-        assertTrue(taskB.isExclusive());
-        
-        assertEquals(4, taskB.getFieldExtensions().size());
-        FieldExtension fieldExtension = taskB.getFieldExtensions().get(0);
-        assertEquals("fieldA", fieldExtension.getFieldName());
-        assertEquals("test", fieldExtension.getStringValue());
-        fieldExtension = taskB.getFieldExtensions().get(1);
-        assertEquals("fieldB", fieldExtension.getFieldName());
-        assertEquals("test", fieldExtension.getExpression());
-        fieldExtension = taskB.getFieldExtensions().get(2);
-        assertEquals("fieldC", fieldExtension.getFieldName());
-        assertEquals("test", fieldExtension.getStringValue());
-        fieldExtension = taskB.getFieldExtensions().get(3);
-        assertEquals("fieldD", fieldExtension.getFieldName());
-        assertEquals("test", fieldExtension.getExpression());
-        
-        assertEquals(1, taskB.getExtensionElements().size());
+        assertThat(taskB.getType()).isEqualTo(ServiceTask.JAVA_TASK);
+        assertThat(taskB.getImplementationType()).isEqualTo(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+        assertThat(taskB.getImplementation()).isEqualTo("${testJavaDelegate}");
+        assertThat(taskB.getResultVariableName()).isNull();
+        assertThat(taskB.isAsync()).isTrue();
+        assertThat(taskB.isExclusive()).isTrue();
+
+        assertThat(taskB.getFieldExtensions())
+            .hasSize(4)
+            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue, FieldExtension::getExpression)
+            .containsExactly(tuple("fieldA", "test", null), tuple("fieldB", null, "test"), tuple("fieldC", "test", null), tuple("fieldD", null, "test"));
+
+        assertThat(taskB.getExtensionElements()).hasSize(1);
         List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("taskTest");
-        assertEquals(1, extensionElements.size());
-        ExtensionElement extensionElement = extensionElements.get(0);
-        assertEquals("taskTest", extensionElement.getName());
-        assertEquals("hello", extensionElement.getElementText());
+        assertThat(extensionElements)
+            .hasSize(1)
+            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+            .containsExactly(tuple("taskTest", "hello"));
     }
 
 }

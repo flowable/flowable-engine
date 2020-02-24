@@ -12,12 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.InputStream;
 import java.util.List;
@@ -76,55 +72,56 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
     }
 
     protected void validateSimpleCaseModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertEquals(1, cmmnModel.getCases().size());
+        assertThat(cmmnModel).isNotNull();
 
         // Case
-        Case caze = cmmnModel.getCases().get(0);
-        assertEquals("myCase", caze.getId());
+        assertThat(cmmnModel.getCases())
+            .hasSize(1)
+            .extracting(Case::getId)
+            .containsExactly("myCase");
 
         // Plan model
-        Stage planModel = caze.getPlanModel();
-        assertNotNull(planModel);
-        assertEquals("myPlanModel", planModel.getId());
-        assertEquals("My CasePlanModel", planModel.getName());
-        assertEquals("casePlanForm", planModel.getFormKey());
+        Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
+        assertThat(cmmnModel.getCases())
+            .isNotNull()
+            .extracting(cases -> cases.getPlanModel().getId(), cases -> cases.getPlanModel().getName(), cases -> cases.getPlanModel().getFormKey())
+            .containsExactly(tuple("myPlanModel", "My CasePlanModel", "casePlanForm"));
 
         // Sentries
-        assertEquals(4, planModel.getSentries().size());
+        assertThat(planModel.getSentries()).hasSize(4);
         for (Sentry sentry : planModel.getSentries()) {
             List<SentryOnPart> onParts = sentry.getOnParts();
             if (onParts != null && !onParts.isEmpty()) {
-                assertEquals(1, onParts.size());
-                assertNotNull(onParts.get(0).getId());
-                assertNotNull(onParts.get(0).getSourceRef());
-                assertNotNull(onParts.get(0).getSource());
-                assertNotNull(onParts.get(0).getStandardEvent());
+                assertThat(onParts).hasSize(1);
+                assertThat(onParts.get(0).getId()).isNotNull();
+                assertThat(onParts.get(0).getSourceRef()).isNotNull();
+                assertThat(onParts.get(0).getSource()).isNotNull();
+                assertThat(onParts.get(0).getStandardEvent()).isNotNull();
             } else {
-                assertThat(sentry.getSentryIfPart().getCondition(), is("${true}"));
-                assertThat(sentry.getName(), is("criterion name"));
+                assertThat(sentry.getSentryIfPart().getCondition()).isEqualTo("${true}");
+                assertThat(sentry.getName()).isEqualTo("criterion name");
             }
         }
 
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
-        assertEquals(4, planItemDefinitions.size());
-        assertEquals(2, planModel.findPlanItemDefinitionsOfType(Task.class, false).size());
-        assertEquals(2, planModel.findPlanItemDefinitionsOfType(Milestone.class, false).size());
+        assertThat(planItemDefinitions).hasSize(4);
+        assertThat(planModel.findPlanItemDefinitionsOfType(Task.class, false)).hasSize(2);
+        assertThat(planModel.findPlanItemDefinitionsOfType(Milestone.class, false)).hasSize(2);
         for (PlanItemDefinition planItemDefinition : planItemDefinitions) {
-            assertNotNull(planItemDefinition.getId());
-            assertNotNull(planItemDefinition.getName());
+            assertThat(planItemDefinition.getId()).isNotNull();
+            assertThat(planItemDefinition.getName()).isNotNull();
         }
 
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertEquals(4, planItems.size());
+        assertThat(planItems).hasSize(4);
         int nrOfTasks = 0;
         int nrOfMileStones = 0;
         for (PlanItem planItem : planItems) {
-            assertNotNull(planItem.getId());
-            assertNotNull(planItem.getDefinitionRef());
-            assertNotNull(planItem.getPlanItemDefinition()); // Verify plan item definition ref is resolved
+            assertThat(planItem.getId()).isNotNull();
+            assertThat(planItem.getDefinitionRef()).isNotNull();
+            assertThat(planItem.getPlanItemDefinition()).isNotNull(); // Verify plan item definition ref is resolved
 
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             if (planItemDefinition instanceof Milestone) {
@@ -134,22 +131,24 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
             }
 
             if (!planItem.getId().equals("planItemTaskA")) {
-                assertNotNull(planItem.getEntryCriteria());
-                assertEquals(1, planItem.getEntryCriteria().size());
-                assertNotNull(planItem.getEntryCriteria().get(0).getSentry()); // Verify if sentry reference is resolved
+                assertThat(planItem.getEntryCriteria())
+                    .isNotNull()
+                    .hasSize(1)
+                    .extracting(Criterion::getSentry)
+                    .isNotNull(); // Verify if sentry reference is resolved
             }
 
             if (planItem.getPlanItemDefinition() instanceof Task) {
                 if (planItem.getId().equals("planItemTaskB")) {
-                    assertFalse(((Task) planItem.getPlanItemDefinition()).isBlocking());
+                    assertThat(((Task) planItem.getPlanItemDefinition()).isBlocking()).isFalse();
                 } else {
-                    assertTrue(((Task) planItem.getPlanItemDefinition()).isBlocking());
+                    assertThat(((Task) planItem.getPlanItemDefinition()).isBlocking()).isTrue();
                 }
             }
         }
 
-        assertEquals(2, nrOfMileStones);
-        assertEquals(2, nrOfTasks);
+        assertThat(nrOfMileStones).isEqualTo(2);
+        assertThat(nrOfTasks).isEqualTo(2);
     }
 
     /**
@@ -159,44 +158,46 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
     public void testExitCriteriaOnPlanModel() {
         CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("exit-criteria-on-planmodel.cmmn"));
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
-        assertEquals(4, planModel.getSentries().size());
+        assertThat(planModel.getSentries()).hasSize(4);
 
         List<Criterion> exitCriteria = planModel.getExitCriteria();
-        assertEquals(1, exitCriteria.size());
+        assertThat(exitCriteria).hasSize(1);
         Criterion criterion = exitCriteria.get(0);
-        assertNotNull(criterion.getSentry());
-        assertEquals("planItemMileStoneOne", criterion.getSentry().getOnParts().get(0).getSource().getId());
+        assertThat(criterion.getSentry()).isNotNull();
+        assertThat(criterion.getSentry().getOnParts().get(0).getSource().getId()).isEqualTo("planItemMileStoneOne");
     }
 
     @Test
     public void testNestedStages() {
         CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("nested-stages.cmmn"));
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
-        assertEquals(2, planModel.getPlanItems().size());
+        assertThat(planModel.getPlanItems()).hasSize(2);
 
         Stage nestedStage = null;
         for (PlanItem planItem : planModel.getPlanItems()) {
-            assertNotNull(planItem.getPlanItemDefinition());
+            assertThat(planItem.getPlanItemDefinition()).isNotNull();
             if (planItem.getPlanItemDefinition() instanceof Stage) {
                 nestedStage = (Stage) planItem.getPlanItemDefinition();
             }
         }
-        assertNotNull(nestedStage);
-        assertEquals("Nested Stage", nestedStage.getName());
+        assertThat(nestedStage).isNotNull();
+        assertThat(nestedStage.getName()).isEqualTo("Nested Stage");
 
         // Nested stage has 3 plan items, and one of them refereces the rootTook from the plan model
-        assertEquals(3, nestedStage.getPlanItems().size());
+        assertThat(nestedStage.getPlanItems()).hasSize(3);
         Stage nestedNestedStage = null;
         for (PlanItem planItem : nestedStage.getPlanItems()) {
-            assertNotNull(planItem.getPlanItemDefinition());
+            assertThat(planItem.getPlanItemDefinition()).isNotNull();
             if (planItem.getPlanItemDefinition()  instanceof Stage) {
                 nestedNestedStage = (Stage) planItem.getPlanItemDefinition();
             }
         }
-        assertNotNull(nestedNestedStage);
-        assertEquals("Nested Stage 2", nestedNestedStage.getName());
-        assertEquals(1, nestedNestedStage.getPlanItems().size());
-        assertEquals("rootTask", nestedNestedStage.getPlanItems().get(0).getPlanItemDefinition().getId());
+        assertThat(nestedNestedStage).isNotNull();
+        assertThat(nestedNestedStage.getName()).isEqualTo("Nested Stage 2");
+        assertThat(nestedNestedStage.getPlanItems())
+            .hasSize(1)
+            .extracting(planItem -> planItem.getPlanItemDefinition().getId())
+            .containsExactly("rootTask");
     }
 
     @Test
@@ -204,26 +205,24 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
         CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("case-lifecycle-listeners.cmmn"));
         cmmnModel = exportAndReadXMLFile(cmmnModel);
         
-        assertEquals(1, cmmnModel.getCases().size());
+        assertThat(cmmnModel.getCases()).hasSize(1);
         Case aCase = cmmnModel.getCases().get(0);
-        assertEquals(1, aCase.getLifecycleListeners().size());
-        FlowableListener caseListener = aCase.getLifecycleListeners().get(0);
-        assertEquals("active", caseListener.getSourceState());
-        assertEquals("completed", caseListener.getTargetState());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, caseListener.getImplementationType());
-        assertEquals("${caseInstance.setVariable('stageThree', false)}", caseListener.getImplementation());
+        assertThat(aCase.getLifecycleListeners())
+            .hasSize(1)
+            .extracting(FlowableListener::getSourceState, FlowableListener::getTargetState, FlowableListener::getImplementationType, FlowableListener::getImplementation)
+            .containsExactly(tuple("active", "completed", ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, "${caseInstance.setVariable('stageThree', false)}"));
     }
 
     @Test
     public void testMissingIdsAdded() {
         CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("exit-criteria-on-planmodel.cmmn"));
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
-        assertNotNull(planModel.getId());
+        assertThat(planModel.getId()).isNotNull();
 
         for (Sentry sentry : planModel.getSentries()) {
-            assertNotNull(sentry.getId());
+            assertThat(sentry.getId()).isNotNull();
             for (SentryOnPart onPart : sentry.getOnParts()) {
-                assertNotNull(onPart.getId());
+                assertThat(onPart.getId()).isNotNull();
             }
         }
     }
