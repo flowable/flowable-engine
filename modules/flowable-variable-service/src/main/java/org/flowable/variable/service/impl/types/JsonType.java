@@ -16,10 +16,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,8 +123,7 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
     }
 
     @Override
-    public boolean updateValueIfChanged(JsonNode originalNode, JsonNode originalCopyNode,
-        VariableInstanceEntity variableInstanceEntity) {
+    public boolean updateValueIfChanged(JsonNode originalNode, JsonNode originalCopyNode, VariableInstanceEntity variableInstanceEntity) {
         boolean valueChanged = false;
         if (!Objects.equals(originalNode, originalCopyNode)) {
             String textValue = originalNode.toString();
@@ -144,9 +145,14 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
         if (trackObjects && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
-                    new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields)
-                ));
+                if (commandContext.getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
+                    HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
+                                    commandContext.getCurrentEngineConfiguration();
+                    VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
+                    commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
+                        new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields, variableServiceConfiguration)
+                    ));
+                }
             }
         }
     }
