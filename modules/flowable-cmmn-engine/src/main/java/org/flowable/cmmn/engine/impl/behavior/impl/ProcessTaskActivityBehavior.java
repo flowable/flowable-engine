@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
 import org.flowable.cmmn.model.IOParameter;
@@ -48,6 +49,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     protected Expression processRefExpression;
     protected String processRef;
     protected Boolean fallbackToDefaultTenant;
+    protected boolean sameDeployment;
     protected ProcessTask processTask;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
@@ -56,6 +58,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         this.processRefExpression = processRefExpression;
         this.processRef = processTask.getProcessRef();
         this.fallbackToDefaultTenant = processTask.getFallbackToDefaultTenant();
+        this.sameDeployment = processTask.isSameDeployment();
         this.processTask = processTask;
     }
 
@@ -106,12 +109,15 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         String businessKey = getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, processTask);
 
         boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
+
+        String parentDeploymentId = getParentDeploymentIfSameDeployment(cmmnEngineConfiguration, planItemInstanceEntity);
+
         if (blocking) {
             processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey);
         } else {
             processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey);
         }
 
         if (!blocking) {
@@ -206,6 +212,17 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             }
             caseInstance.setVariable(variableName, variableValue);
         }
+    }
+
+    protected String getParentDeploymentIfSameDeployment(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (!sameDeployment) {
+            // If not same deployment then return null
+            // Parent deployment should not be taken into consideration then
+            return null;
+        } else {
+            return CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId(), cmmnEngineConfiguration);
+        }
+
     }
 
 }

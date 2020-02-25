@@ -80,6 +80,12 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
         fallbackToDefaultTenantField.setStringValue(fallbackToDefaultTenant ? "true" : "false");
         serviceTask.getFieldExtensions().add(fallbackToDefaultTenantField);
 
+        boolean sameDeployment = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT, elementNode);
+        FieldExtension sameDeploymentField = new FieldExtension();
+        sameDeploymentField.setFieldName(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY);
+        sameDeploymentField.setStringValue(sameDeployment ? "true" : "false");
+        serviceTask.getFieldExtensions().add(sameDeploymentField);
+
         return serviceTask;
     }
 

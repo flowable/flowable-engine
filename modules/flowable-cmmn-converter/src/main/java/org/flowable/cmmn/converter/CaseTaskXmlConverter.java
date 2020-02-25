@@ -49,6 +49,11 @@ public class CaseTaskXmlConverter extends TaskXmlConverter {
             caseTask.setFallbackToDefaultTenant(Boolean.valueOf(fallbackToDefaultTenantValue));
         }
 
+        String sameDeployment = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_SAME_DEPLOYMENT);
+        if (sameDeployment != null) {
+            caseTask.setSameDeployment(Boolean.parseBoolean(sameDeployment));
+        }
+
         String idVariableName = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ID_VARIABLE_NAME);
         if (StringUtils.isNotEmpty(idVariableName)) {
             caseTask.setCaseInstanceIdVariableName(idVariableName);

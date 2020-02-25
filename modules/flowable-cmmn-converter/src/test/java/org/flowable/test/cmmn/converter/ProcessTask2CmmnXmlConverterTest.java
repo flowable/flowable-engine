@@ -62,10 +62,10 @@ public class ProcessTask2CmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(planItemDefinition).isInstanceOf(ProcessTask.class);
         ProcessTask task1 = (ProcessTask) planItemDefinition;
         assertThat(task1.getProcessRefExpression()).isEqualTo("myTestProcess");
+        assertThat((task1.isSameDeployment())).isTrue();
 
         assertThat(task1.getInParameters()).isEmpty();
         assertThat(task1.getOutParameters()).isEmpty();
-
         PlanItemDefinition taskDefinition = cmmnModel.findPlanItemDefinition("onehumantask1");
         assertThat(taskDefinition).isInstanceOf(HumanTask.class);
         HumanTask humanTask = (HumanTask) taskDefinition;

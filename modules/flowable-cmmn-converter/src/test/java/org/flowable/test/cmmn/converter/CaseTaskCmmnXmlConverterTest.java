@@ -65,6 +65,7 @@ public class CaseTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(task1.getCaseRefExpression()).isEqualTo("caseDefinitionKey");
 
         assertThat(task1.getFallbackToDefaultTenant()).isTrue();
+        assertThat(task1.isSameDeployment()).isTrue();
 
         assertThat(task1.getInParameters())
                 .extracting(IOParameter::getSource, IOParameter::getTarget)

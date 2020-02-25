@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.FlowableException;
@@ -20,6 +21,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
+import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -32,12 +34,33 @@ import org.flowable.engine.repository.ProcessDefinition;
  */
 public class ProcessDefinitionUtil {
 
+    public static String getDefinitionDeploymentId(String processDefinitionId) {
+        return getDefinitionDeploymentId(processDefinitionId, CommandContextUtil.getProcessEngineConfiguration());
+    }
+
+    public static String getDefinitionDeploymentId(String processDefinitionId, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
+        ProcessDefinition processDefinition = getProcessDefinition(processDefinitionId, false, processEngineConfiguration);
+        if (processDefinition != null) {
+            DeploymentEntity processDeployment = deploymentManager.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
+            if (StringUtils.isEmpty(processDeployment.getParentDeploymentId())) {
+                return processDefinition.getDeploymentId();
+            }
+            return processDeployment.getParentDeploymentId();
+        }
+
+        return null;
+    }
+
     public static ProcessDefinition getProcessDefinition(String processDefinitionId) {
         return getProcessDefinition(processDefinitionId, false);
     }
 
     public static ProcessDefinition getProcessDefinition(String processDefinitionId, boolean checkCacheOnly) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        return getProcessDefinition(processDefinitionId, checkCacheOnly, CommandContextUtil.getProcessEngineConfiguration());
+    }
+
+    public static ProcessDefinition getProcessDefinition(String processDefinitionId, boolean checkCacheOnly, ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (checkCacheOnly) {
             ProcessDefinitionCacheEntry cacheEntry = processEngineConfiguration.getProcessDefinitionCache().get(processDefinitionId);
             if (cacheEntry != null) {

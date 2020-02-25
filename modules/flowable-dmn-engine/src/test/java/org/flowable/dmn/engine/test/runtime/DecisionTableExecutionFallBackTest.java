@@ -29,7 +29,8 @@ import org.junit.rules.ExpectedException;
 /**
  * This class tests fallbacks in {@link org.flowable.dmn.engine.impl.cmd.AbstractExecuteDecisionCmd}
  */
-public class DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
+public class
+DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
 
     public static final String TEST_TENANT_ID = "testTenantId";
     public static final String TEST_PARENT_DEPLOYMENT_ID = "testParentDeploymentId";
@@ -79,7 +80,8 @@ public class DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest 
     @Test
     public void decisionKeyTenantIdWrongTenantIdThrowsException() {
         expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("Decision table for key [decision1] and tenantId [WRONG_TENANT_ID] was not found");
+        expectedException.expectMessage("No decision found for key: decision1");
+        expectedException.expectMessage("and tenantId: WRONG_TENANT_ID");
 
         executeDecision("WRONG_TENANT_ID", null);
     }

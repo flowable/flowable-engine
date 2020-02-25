@@ -31,6 +31,10 @@ public interface CaseDefinitionEntityManager extends EntityManager<CaseDefinitio
 
     CaseDefinitionEntity findCaseDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String caseDefinitionKey, String tenantId);
 
+    CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKey(String parentDeploymentId, String caseDefinitionKey);
+
+    CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String caseDefinitionKey, String tenantId);
+
     CaseDefinition findCaseDefinitionByKeyAndVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId);
     
     void deleteCaseDefinitionAndRelatedData(String caseDefinitionId, boolean cascadeHistory);

@@ -97,14 +97,30 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             String caseDefinitionKey = caseInstanceBuilder.getCaseDefinitionKey();
             CaseDefinitionEntityManager caseDefinitionEntityManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
             String tenantId = caseInstanceBuilder.getTenantId();
+            String parentDeploymentId = caseInstanceBuilder.getCaseDefinitionParentDeploymentId();
             if (tenantId == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+
+                if (parentDeploymentId != null) {
+                    caseDefinition = caseDefinitionEntityManager.findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey);
+                }
+
+                if (caseDefinition == null) {
+                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+                }
+
                 if (caseDefinition == null) {
                     throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
                 }
                 
             } else if (!CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+                if (parentDeploymentId != null) {
+                    caseDefinition = caseDefinitionEntityManager
+                            .findCaseDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, caseDefinitionKey, tenantId);
+                }
+
+                if (caseDefinition == null) {
+                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+                }
 
                 if (caseDefinition == null) {
                     if (caseInstanceBuilder.isFallbackToDefaultTenant() || cmmnEngineConfiguration.isFallbackToDefaultTenant()) {

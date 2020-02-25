@@ -104,6 +104,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
                         BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue()))
                     );
                 }
+                if (PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY.equals(fieldExtension.getFieldName())) {
+                    propertiesNode.set(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT,
+                        BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue()))
+                    );
+                }
             }
 
         } else if ("http".equalsIgnoreCase(serviceTask.getType())) {

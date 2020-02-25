@@ -56,20 +56,25 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
     @Override
     public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
-        String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey) {
+            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey) {
         
-        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, stageInstanceId, tenantId, fallbackToDefaultTenant, inParametersMap, businessKey);
+        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, stageInstanceId, tenantId, fallbackToDefaultTenant,
+                parentDeploymentId, inParametersMap, businessKey);
     }
 
     @Override
     public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
-        String tenantId, Boolean fallbackToDefaultTenant, Map<String, Object> inParametersMap, String businessKey) {
+            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey) {
         
         ProcessInstanceBuilder processInstanceBuilder = processEngineConfiguration.getRuntimeService().createProcessInstanceBuilder();
         processInstanceBuilder.processDefinitionKey(processDefinitionKey);
         if (tenantId != null) {
             processInstanceBuilder.tenantId(tenantId);
             processInstanceBuilder.overrideProcessDefinitionTenantId(tenantId);
+        }
+
+        if (parentDeploymentId != null) {
+            processInstanceBuilder.processDefinitionParentDeploymentId(parentDeploymentId);
         }
         
         processInstanceBuilder.predefineProcessInstanceId(predefinedProcessInstanceId);
