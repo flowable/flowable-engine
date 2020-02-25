@@ -47,6 +47,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
+import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
@@ -429,7 +430,7 @@ import org.flowable.variable.service.impl.types.UUIDType;
  * @author Joram Barrez
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration implements
-        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes {
+        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes, HasVariableServiceConfiguration {
 
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
 
@@ -4899,6 +4900,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
         return this;
+    }
+    
+    @Override
+    public VariableServiceConfiguration getVariableServiceConfiguration() {
+        return variableServiceConfiguration;
     }
 
     public String getAsyncExecutorTenantId() {
