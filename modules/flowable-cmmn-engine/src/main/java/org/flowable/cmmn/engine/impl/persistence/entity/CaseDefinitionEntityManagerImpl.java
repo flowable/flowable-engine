@@ -69,6 +69,16 @@ public class CaseDefinitionEntityManagerImpl
     }
 
     @Override
+    public CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKey(String parentDeploymentId, String caseDefinitionKey) {
+        return dataManager.findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey);
+    }
+
+    @Override
+    public CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String caseDefinitionKey, String tenantId) {
+        return dataManager.findCaseDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, caseDefinitionKey, tenantId);
+    }
+
+    @Override
     public CaseDefinition findCaseDefinitionByKeyAndVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
         if (tenantId == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
             return dataManager.findCaseDefinitionByKeyAndVersion(caseDefinitionKey, caseDefinitionVersion);

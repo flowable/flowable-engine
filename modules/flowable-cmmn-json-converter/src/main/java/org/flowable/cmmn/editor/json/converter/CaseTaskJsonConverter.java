@@ -63,6 +63,8 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
             propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, caseTask.getFallbackToDefaultTenant());
         }
 
+        propertiesNode.put(PROPERTY_SAME_DEPLOYMENT, caseTask.isSameDeployment());
+
         if (StringUtils.isNotEmpty(caseTask.getCaseInstanceIdVariableName())) {
             propertiesNode.put(PROPERTY_ID_VARIABLE_NAME, caseTask.getCaseInstanceIdVariableName());
         }
@@ -128,6 +130,11 @@ public class CaseTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implem
         boolean fallbackToDefaultTenant = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, elementNode, false);
         if (fallbackToDefaultTenant) {
             task.setFallbackToDefaultTenant(true);
+        }
+
+        boolean sameDeployment = CmmnJsonConverterUtil.getPropertyValueAsBoolean(CmmnStencilConstants.PROPERTY_SAME_DEPLOYMENT, elementNode, false);
+        if (sameDeployment) {
+            task.setSameDeployment(true);
         }
 
         JsonNode idVariableName = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_ID_VARIABLE_NAME, elementNode);

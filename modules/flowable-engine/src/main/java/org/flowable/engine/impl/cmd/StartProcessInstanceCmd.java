@@ -54,6 +54,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     private static final long serialVersionUID = 1L;
     protected String processDefinitionKey;
     protected String processDefinitionId;
+    protected String processDefinitionParentDeploymentId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected String businessKey;
@@ -90,6 +91,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                 processInstanceBuilder.getVariables(),
                 processInstanceBuilder.getTenantId());
         
+        this.processDefinitionParentDeploymentId = processInstanceBuilder.getProcessDefinitionParentDeploymentId();
         this.processInstanceName = processInstanceBuilder.getProcessInstanceName();
         this.overrideDefinitionTenantId = processInstanceBuilder.getOverrideDefinitionTenantId();
         this.predefinedProcessInstanceId = processInstanceBuilder.getPredefinedProcessInstanceId();
@@ -206,13 +208,30 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         } else if (processDefinitionKey != null && (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId))) {
 
-            processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+            if (processDefinitionParentDeploymentId != null) {
+                processDefinition = processDefinitionEntityManager
+                        .findProcessDefinitionByParentDeploymentAndKey(processDefinitionParentDeploymentId, processDefinitionKey);
+            }
+
+            if (processDefinition == null) {
+                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+            }
+
             if (processDefinition == null) {
                 throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey + "'", ProcessDefinition.class);
             }
 
         } else if (processDefinitionKey != null && tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-            processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+
+            if (processDefinitionParentDeploymentId != null) {
+                processDefinition = processDefinitionEntityManager
+                        .findProcessDefinitionByParentDeploymentAndKeyAndTenantId(processDefinitionParentDeploymentId, processDefinitionKey, tenantId);
+            }
+
+            if (processDefinition == null) {
+                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+            }
+
             if (processDefinition == null) {
                 if (fallbackToDefaultTenant || processEngineConfiguration.isFallbackToDefaultTenant()) {
                     String defaultTenant = processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);

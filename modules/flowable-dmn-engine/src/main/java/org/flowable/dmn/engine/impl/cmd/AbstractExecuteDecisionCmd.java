@@ -153,14 +153,14 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
                     
                 } else {
                     throw new FlowableObjectNotFoundException(
-                        "Decision table for key [" + decisionKey + "] and tenantId [" + tenantId + "] was not found");
+                        "No decision found for key: " + decisionKey + " and tenantId: " + tenantId + ".");
                 }
             }
 
         } else if (StringUtils.isNotEmpty(decisionKey)) {
             decisionTable = decisionTableManager.findLatestDecisionTableByKey(decisionKey);
             if (decisionTable == null) {
-                throw new FlowableObjectNotFoundException("Decision table for key [" + decisionKey + "] was not found");
+                throw new FlowableObjectNotFoundException("No decision found for key: " + decisionKey + ".");
             }
             
         } else {

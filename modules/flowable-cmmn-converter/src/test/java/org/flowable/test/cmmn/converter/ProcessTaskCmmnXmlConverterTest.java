@@ -63,6 +63,7 @@ public class ProcessTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(planItemDefinition).isInstanceOf(ProcessTask.class);
         ProcessTask task1 = (ProcessTask) planItemDefinition;
         assertThat(task1.getProcessRefExpression()).isEqualTo("${processDefinitionKey}");
+        assertThat((task1.isSameDeployment())).isNotNull();
 
         assertThat(task1.getInParameters())
                 .extracting(IOParameter::getSource, IOParameter::getTarget)

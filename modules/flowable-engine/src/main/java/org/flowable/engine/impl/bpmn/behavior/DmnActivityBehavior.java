@@ -48,6 +48,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
     protected static final String EXPRESSION_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
+    protected static final String EXPRESSION_DECISION_TABLE_SAME_DEPLOYMENT = "sameDeployment";
 
     protected Task task;
 
@@ -94,14 +95,10 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             throw new FlowableIllegalArgumentException("decisionTableReferenceKey expression resolves to an empty value: " + decisionTableKeyValue);
         }
 
-        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
-        Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
-
         DmnRuleService ruleService = CommandContextUtil.getDmnRuleService();
 
         ExecuteDecisionBuilder executeDecisionBuilder = ruleService.createExecuteDecisionBuilder()
             .decisionKey(finaldecisionTableKeyValue)
-            .parentDeploymentId(deployment.getParentDeploymentId())
             .instanceId(execution.getProcessInstanceId())
             .executionId(execution.getId())
             .activityId(task.getId())
@@ -109,6 +106,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             .tenantId(execution.getTenantId());
 
         applyFallbackToDefaultTenant(execution, executeDecisionBuilder);
+        applyParentDeployment(execution, executeDecisionBuilder, processEngineConfiguration);
 
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
@@ -162,6 +160,26 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                 executeDecisionBuilder.fallbackToDefaultTenant();
             }
         }
+    }
+
+    protected void applyParentDeployment(DelegateExecution execution, ExecuteDecisionBuilder executeDecisionBuilder,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+        FieldExtension sameDeploymentFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_SAME_DEPLOYMENT);
+        String parentDeploymentId;
+        if (sameDeploymentFieldExtension != null) {
+            if (Boolean.parseBoolean(sameDeploymentFieldExtension.getStringValue())) {
+                parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(execution.getProcessDefinitionId(), processEngineConfiguration);
+            } else {
+                // If same deployment has not been requested then don't pass parentDeploymentId
+                parentDeploymentId = null;
+            }
+        } else {
+            // backwards compatibility (always apply parent deployment id)
+            parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(execution.getProcessDefinitionId(), processEngineConfiguration);
+
+        }
+        executeDecisionBuilder.parentDeploymentId(parentDeploymentId);
     }
 
     protected void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {

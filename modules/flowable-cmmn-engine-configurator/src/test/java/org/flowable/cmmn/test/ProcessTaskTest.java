@@ -63,6 +63,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     
@@ -1223,4 +1224,123 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId(), processIdVariable);
     }
 
+    @Test
+    public void testSameDeploymentTrue() {
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processTaskSameDeploymentTrue.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .deploy();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .start();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        Assertions.assertThat(processInstance).isNotNull();
+        Assertions.assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+
+        Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo("my task");
+
+        processEngineTaskService.complete(task.getId());
+
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcessV2.bpmn20.xml")
+                .deploy();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .start();
+
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        Assertions.assertThat(processInstance).isNotNull();
+        Assertions.assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+
+        task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo("my task");
+    }
+
+    @Test
+    public void testSameDeploymentTrueWithTenant() {
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processTaskSameDeploymentTrue.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .tenantId("flowable")
+                .deploy();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .tenantId("flowable")
+                .start();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        Assertions.assertThat(processInstance).isNotNull();
+        Assertions.assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+        Assertions.assertThat(processInstance.getTenantId()).isEqualTo("flowable");
+
+        Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo("my task");
+
+        processEngineTaskService.complete(task.getId());
+
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcessV2.bpmn20.xml")
+                .tenantId("flowable")
+                .deploy();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .tenantId("flowable")
+                .start();
+
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        Assertions.assertThat(processInstance).isNotNull();
+        Assertions.assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+        Assertions.assertThat(processInstance.getTenantId()).isEqualTo("flowable");
+
+        task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo("my task");
+    }
+
+    @Test
+    public void testWithoutSameDeployment() {
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processTaskWithoutSameDeployment.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .deploy();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .start();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        Assertions.assertThat(processInstance).isNotNull();
+        Assertions.assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+
+        Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo("my task");
+
+        processEngineTaskService.complete(task.getId());
+
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcessV2.bpmn20.xml")
+                .deploy();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .start();
+
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        Assertions.assertThat(processInstance).isNotNull();
+        Assertions.assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task V2");
+
+        task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo("Task V2");
+    }
 }

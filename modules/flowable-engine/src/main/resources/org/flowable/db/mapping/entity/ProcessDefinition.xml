@@ -294,6 +294,23 @@
       and KEY_ = #{processDefinitionKey}
       and TENANT_ID_ = #{tenantId}
   </select>
+
+    <!-- TODO when deploying cmmn from the Process engine then the BPMN resources do not have a parent deployment, they are the parent deployment   -->
+    <select id="selectProcessDefinitionByParentDeploymentAndKey" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{processDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+
+    <select id="selectProcessDefinitionByParentDeploymentAndKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{processDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
   
   <select id="selectProcessDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
     select *

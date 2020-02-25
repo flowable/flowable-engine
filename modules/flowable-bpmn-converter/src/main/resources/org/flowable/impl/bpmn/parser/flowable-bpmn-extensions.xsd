@@ -796,6 +796,17 @@
     </annotation>
   </attribute>
 
+  <attribute name="sameDeployment" type="boolean">
+    <annotation>
+      <documentation>
+        To be used on elements to first search for process / case definitions
+        in the same deployment as the current process definition.
+        If nothing is found in the same deployment it would continue searching in the tenant
+        and finally using fallbackToDefaultTenant
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="businessKey" type="tns:tExpression">
     <annotation>
       <documentation>

@@ -24,6 +24,18 @@ public interface CaseInstanceBuilder {
 
     CaseInstanceBuilder caseDefinitionKey(String caseDefinitionKey);
     
+    /**
+     * When looking up for a case definition by key it would first lookup for a case definition
+     * within the given parent deployment.
+     * Then it would fallback to the latest case definition with the given key.
+     * <p>
+     * This is typically needed when the CaseInstanceBuilder is called for example
+     * from the process engine to start a case instance and it needs to
+     * look up the case definition in the same deployment as the process.
+     * Or when starting a case via a case task from the cmmn engine
+     */
+    CaseInstanceBuilder caseDefinitionParentDeploymentId(String parentDeploymentId);
+
     CaseInstanceBuilder predefinedCaseInstanceId(String caseInstanceId);
 
     CaseInstanceBuilder name(String name);
@@ -104,6 +116,8 @@ public interface CaseInstanceBuilder {
     String getCaseDefinitionId();
 
     String getCaseDefinitionKey();
+
+    String getCaseDefinitionParentDeploymentId();
     
     String getPredefinedCaseInstanceId();
 

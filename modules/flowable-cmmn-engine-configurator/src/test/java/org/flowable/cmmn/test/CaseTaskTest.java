@@ -19,8 +19,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.assertj.core.api.Assertions;
 import org.flowable.cmmn.api.CallbackTypes;
@@ -45,6 +47,7 @@ import org.junit.Test;
  * @author Tijs Rademakers
  * @author Joram Barrez
  * @author Valentin Zickner
+ * @author Filip Hrisafov
  */
 public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
     
@@ -142,12 +145,165 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
     }
 
     @Test
+    public void testCaseTaskWithSameDeployment() {
+        Set<String> deploymentsToDelete = new HashSet<>();
+        Deployment deploymentV1 = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithSameDeployment.bpmn20.xml")
+                .addClasspathResource("org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
+                .deploy();
+
+        deploymentsToDelete.add(deploymentV1.getId());
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("caseTask")
+                    .start();
+
+            String caseInstanceId = processEngineRuntimeService.getVariable(processInstance.getId(), "caseInstanceId", String.class);
+
+            Task task = processEngineTaskService.createTaskQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getName()).isEqualTo("The Task");
+
+            // Starting after V2 deployment should use the same deployment task
+            Deployment deploymentV2 = processEngineRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/oneHumanTaskCaseV2.cmmn")
+                    .deploy();
+
+            deploymentsToDelete.add(deploymentV2.getId());
+
+            processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("caseTask")
+                    .start();
+
+            caseInstanceId = processEngineRuntimeService.getVariable(processInstance.getId(), "caseInstanceId", String.class);
+
+            task = processEngineTaskService.createTaskQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getName()).isEqualTo("The Task");
+
+        } finally {
+            for (String deploymentId : deploymentsToDelete) {
+                processEngineRepositoryService.deleteDeployment(deploymentId, true);
+            }
+        }
+    }
+
+    @Test
+    public void testCaseTaskWithSameDeploymentInTenant() {
+        Set<String> deploymentsToDelete = new HashSet<>();
+        Deployment deploymentV1 = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithSameDeployment.bpmn20.xml")
+                .addClasspathResource("org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
+                .tenantId("flowable")
+                .deploy();
+
+        deploymentsToDelete.add(deploymentV1.getId());
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("caseTask")
+                    .tenantId("flowable")
+                    .start();
+
+            String caseInstanceId = processEngineRuntimeService.getVariable(processInstance.getId(), "caseInstanceId", String.class);
+
+            Task task = processEngineTaskService.createTaskQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getName()).isEqualTo("The Task");
+            assertThat(task.getTenantId()).isEqualTo("flowable");
+
+            // Starting after V2 deployment should use the same deployment task
+            Deployment deploymentV2 = processEngineRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/oneHumanTaskCaseV2.cmmn")
+                    .tenantId("flowable")
+                    .deploy();
+
+            deploymentsToDelete.add(deploymentV2.getId());
+
+            processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("caseTask")
+                    .tenantId("flowable")
+                    .start();
+
+            caseInstanceId = processEngineRuntimeService.getVariable(processInstance.getId(), "caseInstanceId", String.class);
+
+            task = processEngineTaskService.createTaskQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getName()).isEqualTo("The Task");
+            assertThat(task.getTenantId()).isEqualTo("flowable");
+
+        } finally {
+            for (String deploymentId : deploymentsToDelete) {
+                processEngineRepositoryService.deleteDeployment(deploymentId, true);
+            }
+        }
+    }
+
+    @Test
+    public void testCaseTaskWithSameDeploymentFalse() {
+        Set<String> deploymentsToDelete = new HashSet<>();
+        Deployment deploymentV1 = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithSameDeploymentFalse.bpmn20.xml")
+                .addClasspathResource("org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
+                .deploy();
+
+        deploymentsToDelete.add(deploymentV1.getId());
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("caseTask")
+                    .start();
+
+            String caseInstanceId = processEngineRuntimeService.getVariable(processInstance.getId(), "caseInstanceId", String.class);
+
+            Task task = processEngineTaskService.createTaskQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getName()).isEqualTo("The Task");
+
+            // Starting after V2 deployment should use the same deployment task
+            Deployment deploymentV2 = processEngineRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/oneHumanTaskCaseV2.cmmn")
+                    .deploy();
+
+            deploymentsToDelete.add(deploymentV2.getId());
+
+            processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("caseTask")
+                    .start();
+
+            caseInstanceId = processEngineRuntimeService.getVariable(processInstance.getId(), "caseInstanceId", String.class);
+
+            task = processEngineTaskService.createTaskQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getName()).isEqualTo("The Task V2");
+
+        } finally {
+            for (String deploymentId : deploymentsToDelete) {
+                processEngineRepositoryService.deleteDeployment(deploymentId, true);
+            }
+        }
+    }
+
+    @Test
     @CmmnDeployment
     public void testCaseTaskWithParameters() {
         Deployment deployment = processEngineRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/caseTaskProcessWithParameters.bpmn20.xml")
                 .deploy();
-        
+
         try {
             Map<String, Object> variables = new HashMap<>();
             variables.put("testVar", "test");
