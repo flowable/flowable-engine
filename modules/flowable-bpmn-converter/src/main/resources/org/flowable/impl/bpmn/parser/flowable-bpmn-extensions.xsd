@@ -222,6 +222,16 @@
     </simpleType>
   </attribute>
 
+  <attribute name="caseDefinitionKey" type="string">
+    <annotation>
+      <documentation>
+        Attribute used on a Case Task.
+        The value can be a key string reference to a case definition
+        or an expression that would return the key fortheh case definition that should be used.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="type">
     <annotation>
       <documentation>
@@ -236,6 +246,7 @@
         <enumeration value="mule"/>
         <enumeration value="shell"/>
         <enumeration value="dmn"/>
+        <enumeration value="case"/>
       </restriction>
     </simpleType>
   </attribute>
