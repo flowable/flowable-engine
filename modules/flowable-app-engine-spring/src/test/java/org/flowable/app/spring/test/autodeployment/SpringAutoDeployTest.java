@@ -15,8 +15,6 @@ package org.flowable.app.spring.test.autodeployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.sql.Driver;
 import java.util.HashMap;
@@ -130,34 +128,34 @@ public class SpringAutoDeployTest {
         Set<String> expectedAppDefinitionKeys = new HashSet<>();
         expectedAppDefinitionKeys.add("simpleApp");
 
-        assertEquals(expectedAppDefinitionKeys, appDefinitionKeys);
+        assertThat(appDefinitionKeys).isEqualTo(expectedAppDefinitionKeys);
     }
 
     @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContextWithoutDeploymentMode();
         AppDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-        assertEquals(1, deploymentQuery.count());
+        assertThat(deploymentQuery.count()).isEqualTo(1);
         AppDefinitionQuery appDefinitionQuery = repositoryService.createAppDefinitionQuery();
-        assertEquals(1, appDefinitionQuery.count());
+        assertThat(appDefinitionQuery.count()).isEqualTo(1);
 
         // Creating a new app context with same resources doesn't lead to more deployments
         createAppContextWithoutDeploymentMode();
-        assertEquals(1, deploymentQuery.count());
-        assertEquals(1, appDefinitionQuery.count());
+        assertThat(deploymentQuery.count()).isEqualTo(1);
+        assertThat(appDefinitionQuery.count()).isEqualTo(1);
     }
 
     // Updating the form file should lead to a new deployment when restarting the Spring container
     @Test
     public void testResourceRedeploymentAfterAppDefinitionChange() throws Exception {
         createAppContextWithoutDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
         applicationContext.close();
 
         String filePath = "org/flowable/app/spring/test/autodeployment/simple.app";
         String originalAppFileContent = IoUtil.readFileAsString(filePath);
         String updatedAppFileContent = originalAppFileContent.replace("Simple app", "My simple app");
-        assertTrue(updatedAppFileContent.length() > originalAppFileContent.length());
+        assertThat(updatedAppFileContent.length() > originalAppFileContent.length()).isTrue();
         IoUtil.writeStringToFile(updatedAppFileContent, filePath);
 
         // Classic produced/consumer problem here:
@@ -174,15 +172,15 @@ public class SpringAutoDeployTest {
 
         // Assertions come AFTER the file write! Otherwise the form file is
         // messed up if the assertions fail.
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createAppDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createAppDefinitionQuery().count()).isEqualTo(2);
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContextWithDefaultDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(1, repositoryService.createAppDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createAppDefinitionQuery().count()).isEqualTo(1);
     }
 
     @Test
@@ -222,15 +220,15 @@ public class SpringAutoDeployTest {
     @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContextWithSingleResourceDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(1, repositoryService.createAppDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createAppDefinitionQuery().count()).isEqualTo(1);
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContextWithResourceParenFolderDeploymentMode();
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createAppDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createAppDefinitionQuery().count()).isEqualTo(2);
     }
 
     // --Helper methods
