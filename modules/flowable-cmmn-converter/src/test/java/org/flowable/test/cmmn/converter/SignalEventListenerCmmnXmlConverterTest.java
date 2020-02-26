@@ -45,10 +45,10 @@ public class SignalEventListenerCmmnXmlConverterTest extends AbstractConverterTe
         List<HumanTask> humanTasks = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(HumanTask.class, true);
         assertThat(humanTasks).hasSize(2);
 
-        List<SignalEventListener> signalEventListeners = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(SignalEventListener.class, true);
+        List<SignalEventListener> signalEventListeners = cmmnModel.getPrimaryCase().getPlanModel()
+                .findPlanItemDefinitionsOfType(SignalEventListener.class, true);
         assertThat(signalEventListeners)
-            .hasSize(1)
-            .extracting(SignalEventListener::getName, SignalEventListener::getId, SignalEventListener::getSignalRef)
-            .containsExactly(tuple("mySignalEventListener", "signalActionListener", "testSignal"));
+                .extracting(SignalEventListener::getName, SignalEventListener::getId, SignalEventListener::getSignalRef)
+                .containsExactly(tuple("mySignalEventListener", "signalActionListener", "testSignal"));
     }
 }

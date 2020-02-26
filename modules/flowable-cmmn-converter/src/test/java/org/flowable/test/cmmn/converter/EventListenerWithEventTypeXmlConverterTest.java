@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,9 +28,9 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class EventListenerWithEventTypeXmlConverterTest extends AbstractConverterTest {
-    
+
     private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/event-listener-with-event-type.cmmn";
-    
+
     @Test
     public void convertXMLToModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
@@ -43,7 +43,7 @@ public class EventListenerWithEventTypeXmlConverterTest extends AbstractConverte
         CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
         validateModel(parsedModel);
     }
-    
+
     public void validateModel(CmmnModel cmmnModel) {
         PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition("eventListener");
         assertThat(planItemDefinition).isInstanceOf(GenericEventListener.class);
@@ -53,10 +53,9 @@ public class EventListenerWithEventTypeXmlConverterTest extends AbstractConverte
 
         List<ExtensionElement> correlationParameters = genericEventListener.getExtensionElements().getOrDefault("eventCorrelationParameter", new ArrayList<>());
         assertThat(correlationParameters)
-            .hasSize(1)
-            .extracting(extensionElement -> extensionElement.getAttributeValue(null, "name"),
-                extensionElement -> extensionElement.getAttributeValue(null, "value"))
-            .containsExactly(tuple("customerId", "${customerIdVar}"));
+                .extracting(extensionElement -> extensionElement.getAttributeValue(null, "name"),
+                        extensionElement -> extensionElement.getAttributeValue(null, "value"))
+                .containsExactly(tuple("customerId", "${customerIdVar}"));
     }
 
 }

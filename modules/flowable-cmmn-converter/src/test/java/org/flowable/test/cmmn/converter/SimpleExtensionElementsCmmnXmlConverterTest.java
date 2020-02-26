@@ -67,25 +67,22 @@ public class SimpleExtensionElementsCmmnXmlConverterTest extends AbstractConvert
         assertThat(task.getExtensionElements()).hasSize(1);
         List<ExtensionElement> extensionElements = task.getExtensionElements().get("taskTest");
         assertThat(extensionElements)
-            .hasSize(1)
-            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-            .containsExactly(tuple("taskTest", "hello"));
-        
+                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                .containsExactly(tuple("taskTest", "hello"));
+
         Milestone milestone = (Milestone) planModel.findPlanItemDefinitionInStageOrUpwards("mileStoneOne");
         assertThat(milestone.getExtensionElements()).hasSize(1);
         extensionElements = milestone.getExtensionElements().get("milestoneTest");
         assertThat(extensionElements)
-            .hasSize(1)
-            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-            .containsExactly(tuple("milestoneTest", "hello2"));
-        
+                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                .containsExactly(tuple("milestoneTest", "hello2"));
+
         PlanItem planItem = planModel.findPlanItemInPlanFragmentOrDownwards("planItemTaskA");
         assertThat(planItem.getExtensionElements()).hasSize(1);
         extensionElements = planItem.getExtensionElements().get("test");
         assertThat(extensionElements)
-            .hasSize(1)
-            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-            .containsExactly(tuple("test", "test"));
+                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                .containsExactly(tuple("test", "test"));
 
         List<Sentry> sentries = planModel.getSentries();
         assertThat(sentries).hasSize(3);
@@ -93,9 +90,8 @@ public class SimpleExtensionElementsCmmnXmlConverterTest extends AbstractConvert
         assertThat(sentry.getExtensionElements()).hasSize(1);
         extensionElements = sentry.getExtensionElements().get("test2");
         assertThat(extensionElements)
-            .hasSize(1)
-            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-            .containsExactly(tuple("test2", "test2"));
+                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                .containsExactly(tuple("test2", "test2"));
     }
 
 }

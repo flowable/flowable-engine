@@ -54,17 +54,15 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
 
         // Case
         assertThat(cmmnModel.getCases())
-            .hasSize(1)
-            .extracting(Case::getId, Case::getInitiatorVariableName)
-            .containsExactly(tuple("javaCase", "test"));
+                .extracting(Case::getId, Case::getInitiatorVariableName)
+                .containsExactly(tuple("javaCase", "test"));
 
         // Plan model
         Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
         assertThat(planModel).isNotNull();
         assertThat(cmmnModel.getCases())
-            .isNotNull()
-            .extracting(caze -> caze.getPlanModel().getId(), caze -> caze.getPlanModel().getName())
-            .containsExactly(tuple("myPlanModel", "My CasePlanModel"));
+                .extracting(caze -> caze.getPlanModel().getId(), caze -> caze.getPlanModel().getName())
+                .containsExactly(tuple("myPlanModel", "My CasePlanModel"));
 
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
@@ -100,16 +98,14 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(taskB.isExclusive()).isTrue();
 
         assertThat(taskB.getFieldExtensions())
-            .hasSize(4)
-            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue, FieldExtension::getExpression)
-            .containsExactly(tuple("fieldA", "test", null), tuple("fieldB", null, "test"), tuple("fieldC", "test", null), tuple("fieldD", null, "test"));
+                .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue, FieldExtension::getExpression)
+                .containsExactly(tuple("fieldA", "test", null), tuple("fieldB", null, "test"), tuple("fieldC", "test", null), tuple("fieldD", null, "test"));
 
         assertThat(taskB.getExtensionElements()).hasSize(1);
         List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("taskTest");
         assertThat(extensionElements)
-            .hasSize(1)
-            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-            .containsExactly(tuple("taskTest", "hello"));
+                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                .containsExactly(tuple("taskTest", "hello"));
     }
 
 }

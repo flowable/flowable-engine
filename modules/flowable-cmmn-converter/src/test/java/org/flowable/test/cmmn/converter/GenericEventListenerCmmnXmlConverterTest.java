@@ -48,10 +48,10 @@ public class GenericEventListenerCmmnXmlConverterTest extends AbstractConverterT
         List<HumanTask> humanTasks = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(HumanTask.class, true);
         assertThat(humanTasks).hasSize(2);
 
-        List<GenericEventListener> genericEventListeners = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(GenericEventListener.class, true);
+        List<GenericEventListener> genericEventListeners = cmmnModel.getPrimaryCase().getPlanModel()
+                .findPlanItemDefinitionsOfType(GenericEventListener.class, true);
         assertThat(genericEventListeners)
-            .hasSize(1)
-            .extracting(GenericEventListener::getName, GenericEventListener::getId, GenericEventListener::getDocumentation)
-            .containsExactly(tuple("myGenericEventListener", "genericActionListener", "GenericEventListener documentation"));
+                .extracting(GenericEventListener::getName, GenericEventListener::getId, GenericEventListener::getDocumentation)
+                .containsExactly(tuple("myGenericEventListener", "genericActionListener", "GenericEventListener documentation"));
     }
 }

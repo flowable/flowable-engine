@@ -23,9 +23,9 @@ import org.flowable.cmmn.model.Stage;
 import org.junit.Test;
 
 public class ParentCompletionConverterTest extends AbstractConverterTest {
-    
+
     private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/parentCompletionRuleAtPlanItem.cmmn";
-    
+
     @Test
     public void convertXMLToModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
@@ -38,21 +38,21 @@ public class ParentCompletionConverterTest extends AbstractConverterTest {
         CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
         validateModel(parsedModel);
     }
-    
+
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         List<PlanItem> planItems = planModel.getPlanItems();
         assertThat(planItems)
-            .hasSize(4)
-            .extracting(planItem -> planItem.getItemControl(),
-                planItem -> planItem.getItemControl().getParentCompletionRule(),
-                planItem -> planItem.getItemControl().getParentCompletionRule().getType())
-            .doesNotContainNull();
+                .extracting(planItem -> planItem.getItemControl(),
+                        planItem -> planItem.getItemControl().getParentCompletionRule(),
+                        planItem -> planItem.getItemControl().getParentCompletionRule().getType())
+                .doesNotContainNull();
 
         assertThat(planItems)
-            .extracting(planItem -> planItem.getItemControl().getParentCompletionRule().getType())
-            .containsExactly(ParentCompletionRule.IGNORE, ParentCompletionRule.DEFAULT, ParentCompletionRule.IGNORE_IF_AVAILABLE, ParentCompletionRule.IGNORE_IF_AVAILABLE_OR_ENABLED);
+                .extracting(planItem -> planItem.getItemControl().getParentCompletionRule().getType())
+                .containsExactly(ParentCompletionRule.IGNORE, ParentCompletionRule.DEFAULT, ParentCompletionRule.IGNORE_IF_AVAILABLE,
+                        ParentCompletionRule.IGNORE_IF_AVAILABLE_OR_ENABLED);
 
         Stage stageOne = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageOne");
         List<PlanItem> planItems1 = stageOne.getPlanItems();

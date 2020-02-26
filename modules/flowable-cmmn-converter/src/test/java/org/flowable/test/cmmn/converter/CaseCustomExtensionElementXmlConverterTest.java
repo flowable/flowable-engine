@@ -53,8 +53,8 @@ public class CaseCustomExtensionElementXmlConverterTest extends AbstractConverte
         assertThat(customElements).hasSize(1);
 
         assertThat(customElements)
-            .extracting(ExtensionElement::getElementText, ExtensionElement::getNamespacePrefix, ExtensionElement::getNamespace)
-            .containsExactly(tuple("Element text", "flowable", "http://flowable.org/cmmn"));
+                .extracting(ExtensionElement::getElementText, ExtensionElement::getNamespacePrefix, ExtensionElement::getNamespace)
+                .containsExactly(tuple("Element text", "flowable", "http://flowable.org/cmmn"));
 
         assertThat(customElements.get(0).getAttributeValue(null, "attribute")).isEqualTo("Value");
     }

@@ -38,12 +38,12 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
             Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
             List<PlanItem> planItems = planModel.getPlanItems();
             assertThat(planItems)
-                .hasSize(4)
-                .extracting(
-                    planItem -> planItem.getItemControl(),
-                    planItem -> planItem.getItemControl().getCompletionNeutralRule(),
-                    planItem -> planItem.getItemControl().getCompletionNeutralRule().getCondition())
-                .doesNotContainNull();
+                    .hasSize(4)
+                    .extracting(
+                            planItem -> planItem.getItemControl(),
+                            planItem -> planItem.getItemControl().getCompletionNeutralRule(),
+                            planItem -> planItem.getItemControl().getCompletionNeutralRule().getCondition())
+                    .doesNotContainNull();
             planItems.forEach(planItem -> {
                 assertThat(planItem.getItemControl().getCompletionNeutralRule().getCondition()).isEqualTo("${" + planItem.getId() + "}");
             });
@@ -52,19 +52,18 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
             List<PlanItem> planItems1 = stageOne.getPlanItems();
 
             assertThat(planItems1)
-                .hasSize(1)
-                .extracting(
-                    planItem -> planItem.getItemControl(),
-                    planItem -> planItem.getItemControl().getCompletionNeutralRule())
-                .doesNotContainNull();
+                    .hasSize(1)
+                    .extracting(
+                            planItem -> planItem.getItemControl(),
+                            planItem -> planItem.getItemControl().getCompletionNeutralRule())
+                    .doesNotContainNull();
             PlanItem planItem = planItems1.get(0);
             assertThat(planItem.getItemControl().getCompletionNeutralRule().getCondition()).isNull();
 
             List<ExtensionElement> extensionElements = planItem.getExtensionElements().get("planItemTest");
             assertThat(extensionElements)
-                .hasSize(1)
-                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-                .containsExactly(tuple("planItemTest", "hello"));
+                    .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                    .containsExactly(tuple("planItemTest", "hello"));
         };
 
         validateModel(cmmnResource, modelValidator);
@@ -84,13 +83,12 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
                 assertThat(definition.getDefaultControl().getCompletionNeutralRule().getCondition()).isNotNull();
                 assertThat(definition.getDefaultControl().getCompletionNeutralRule().getCondition()).isEqualTo("${" + definition.getId() + "}");
             });
-            
+
             PlanItemDefinition planItemDef = cmmnModel.findPlanItemDefinition("taskTwo");
             List<ExtensionElement> extensionElements = planItemDef.getExtensionElements().get("taskTest");
             assertThat(extensionElements)
-                .hasSize(1)
-                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-                .containsExactly(tuple("taskTest", "hello"));
+                    .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                    .containsExactly(tuple("taskTest", "hello"));
         };
 
         validateModel(cmmnResource, modelValidator);

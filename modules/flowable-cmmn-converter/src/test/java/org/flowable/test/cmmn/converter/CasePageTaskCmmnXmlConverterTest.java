@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,9 +31,9 @@ import org.junit.Test;
  * @author Tijs Rademakers
  */
 public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
-    
+
     private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/case-page-task.cmmn";
-    
+
     @Test
     public void convertXMLToModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
@@ -46,28 +46,26 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
         validateModel(parsedModel);
     }
-    
+
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
-        
+
         // Case
         assertThat(cmmnModel.getCases())
-            .isNotNull()
-            .hasSize(1)
-            .extracting(Case::getId)
-            .containsExactly("casePageCase");
-        
+                .extracting(Case::getId)
+                .containsExactly("casePageCase");
+
         Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
-        
+
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
         assertThat(planItemDefinitions).hasSize(2);
         assertThat(planModel.findPlanItemDefinitionsOfType(CasePageTask.class, false)).hasSize(2);
-        
+
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
         assertThat(planItems).hasSize(2);
-        
+
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
         PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
         assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
@@ -81,12 +79,8 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(taskA.getIcon()).isEqualTo("Icon 1");
         assertThat(taskA.getAssignee()).isEqualTo("johndoe");
         assertThat(taskA.getOwner()).isEqualTo("janedoe");
-        assertThat(taskA.getCandidateUsers()).hasSize(2);
-        assertThat(taskA.getCandidateUsers().get(0)).isEqualTo("johndoe");
-        assertThat(taskA.getCandidateUsers().get(1)).isEqualTo("janedoe");
-        assertThat(taskA.getCandidateGroups()).hasSize(2);
-        assertThat(taskA.getCandidateGroups().get(0)).isEqualTo("sales");
-        assertThat(taskA.getCandidateGroups().get(1)).isEqualTo("management");
+        assertThat(taskA.getCandidateUsers()).containsExactly("johndoe", "janedoe");
+        assertThat(taskA.getCandidateGroups()).containsExactly("sales", "management");
         assertThat(planItemTaskA.getItemControl()).isNotNull();
         assertThat(planItemTaskA.getItemControl().getParentCompletionRule()).isNotNull();
         assertThat(planItemTaskA.getItemControl().getParentCompletionRule().getType()).isEqualTo(ParentCompletionRule.IGNORE);
@@ -101,13 +95,13 @@ public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(planItemTaskB.getItemControl()).isNotNull();
         assertThat(planItemTaskB.getItemControl().getParentCompletionRule()).isNotNull();
         assertThat(planItemTaskB.getItemControl().getParentCompletionRule().getType()).isEqualTo(ParentCompletionRule.IGNORE);
-        
+
         assertThat(taskB.getExtensionElements()).hasSize(1);
         List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("index");
         assertThat(extensionElements).hasSize(1);
         assertThat(extensionElements)
-            .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
-            .containsExactly(tuple("index", "0"));
+                .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
+                .containsExactly(tuple("index", "0"));
     }
 
 }

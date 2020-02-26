@@ -46,9 +46,8 @@ public class MilestoneCmmnXmlConverterTest extends AbstractConverterTest {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         List<Milestone> milestones = planModel.findPlanItemDefinitionsOfType(Milestone.class, false);
         assertThat(milestones)
-            .hasSize(1)
-            .extracting(Milestone::getName, Milestone::getDisplayOrder, Milestone::getIncludeInStageOverview)
-            .containsExactly(tuple("Milestone 1", 5, "false"));
+                .extracting(Milestone::getName, Milestone::getDisplayOrder, Milestone::getIncludeInStageOverview)
+                .containsExactly(tuple("Milestone 1", 5, "false"));
 
         Stage nestedStage = planModel.findPlanItemDefinitionsOfType(Stage.class, false).get(0);
         assertThat(nestedStage).isNotNull();
@@ -57,9 +56,8 @@ public class MilestoneCmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(nestedStage.getPlanItems()).hasSize(1);
         milestones = nestedStage.findPlanItemDefinitionsOfType(Milestone.class, false);
         assertThat(milestones)
-            .hasSize(1)
-            .extracting(Milestone::getName, Milestone::getDisplayOrder, Milestone::getIncludeInStageOverview)
-            .containsExactly(tuple("Milestone 2", 3, "true"));
+                .extracting(Milestone::getName, Milestone::getDisplayOrder, Milestone::getIncludeInStageOverview)
+                .containsExactly(tuple("Milestone 2", 3, "true"));
     }
 
 }

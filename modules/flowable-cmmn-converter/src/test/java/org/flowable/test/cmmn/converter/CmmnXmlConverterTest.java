@@ -49,7 +49,7 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
 
     /**
      * Test simple case model, with 4 consequent elements: taskA -> milestone 1 -> taskB -> milestone 2.
-     *
+     * <p>
      * The converters should check following model class instances:
      * - 1 case
      * - 1 stage (the plan model)
@@ -76,16 +76,14 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
 
         // Case
         assertThat(cmmnModel.getCases())
-            .hasSize(1)
-            .extracting(Case::getId)
-            .containsExactly("myCase");
+                .extracting(Case::getId)
+                .containsExactly("myCase");
 
         // Plan model
         Stage planModel = cmmnModel.getCases().get(0).getPlanModel();
         assertThat(cmmnModel.getCases())
-            .isNotNull()
-            .extracting(cases -> cases.getPlanModel().getId(), cases -> cases.getPlanModel().getName(), cases -> cases.getPlanModel().getFormKey())
-            .containsExactly(tuple("myPlanModel", "My CasePlanModel", "casePlanForm"));
+                .extracting(cases -> cases.getPlanModel().getId(), cases -> cases.getPlanModel().getName(), cases -> cases.getPlanModel().getFormKey())
+                .containsExactly(tuple("myPlanModel", "My CasePlanModel", "casePlanForm"));
 
         // Sentries
         assertThat(planModel.getSentries()).hasSize(4);
@@ -93,9 +91,9 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
             List<SentryOnPart> onParts = sentry.getOnParts();
             if (onParts != null && !onParts.isEmpty()) {
                 assertThat(onParts)
-                    .hasSize(1)
-                    .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getSource, SentryOnPart::getStandardEvent)
-                    .doesNotContainNull();
+                        .hasSize(1)
+                        .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getSource, SentryOnPart::getStandardEvent)
+                        .doesNotContainNull();
             } else {
                 assertThat(sentry.getSentryIfPart().getCondition()).isEqualTo("${true}");
                 assertThat(sentry.getName()).isEqualTo("criterion name");
@@ -131,10 +129,10 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
 
             if (!planItem.getId().equals("planItemTaskA")) {
                 assertThat(planItem.getEntryCriteria())
-                    .isNotNull()
-                    .hasSize(1)
-                    .extracting(Criterion::getSentry)
-                    .isNotNull(); // Verify if sentry reference is resolved
+                        .isNotNull()
+                        .hasSize(1)
+                        .extracting(Criterion::getSentry)
+                        .isNotNull(); // Verify if sentry reference is resolved
             }
 
             if (planItem.getPlanItemDefinition() instanceof Task) {
@@ -187,29 +185,29 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
         Stage nestedNestedStage = null;
         for (PlanItem planItem : nestedStage.getPlanItems()) {
             assertThat(planItem.getPlanItemDefinition()).isNotNull();
-            if (planItem.getPlanItemDefinition()  instanceof Stage) {
+            if (planItem.getPlanItemDefinition() instanceof Stage) {
                 nestedNestedStage = (Stage) planItem.getPlanItemDefinition();
             }
         }
         assertThat(nestedNestedStage).isNotNull();
         assertThat(nestedNestedStage.getName()).isEqualTo("Nested Stage 2");
         assertThat(nestedNestedStage.getPlanItems())
-            .hasSize(1)
-            .extracting(planItem -> planItem.getPlanItemDefinition().getId())
-            .containsExactly("rootTask");
+                .extracting(planItem -> planItem.getPlanItemDefinition().getId())
+                .containsExactly("rootTask");
     }
 
     @Test
     public void testCaseLifecycleListener() throws Exception {
         CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("case-lifecycle-listeners.cmmn"));
         cmmnModel = exportAndReadXMLFile(cmmnModel);
-        
+
         assertThat(cmmnModel.getCases()).hasSize(1);
         Case aCase = cmmnModel.getCases().get(0);
         assertThat(aCase.getLifecycleListeners())
-            .hasSize(1)
-            .extracting(FlowableListener::getSourceState, FlowableListener::getTargetState, FlowableListener::getImplementationType, FlowableListener::getImplementation)
-            .containsExactly(tuple("active", "completed", ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, "${caseInstance.setVariable('stageThree', false)}"));
+                .extracting(FlowableListener::getSourceState, FlowableListener::getTargetState, FlowableListener::getImplementationType,
+                        FlowableListener::getImplementation)
+                .containsExactly(
+                        tuple("active", "completed", ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, "${caseInstance.setVariable('stageThree', false)}"));
     }
 
     @Test

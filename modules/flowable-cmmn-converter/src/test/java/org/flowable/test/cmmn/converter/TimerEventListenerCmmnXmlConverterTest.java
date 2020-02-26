@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class TimerEventListenerCmmnXmlConverterTest extends AbstractConverterTest {
-    
+
     /**
      * @throws Exception
      */
@@ -35,15 +35,14 @@ public class TimerEventListenerCmmnXmlConverterTest extends AbstractConverterTes
     public void testConvertXmlToCmmnModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile("org/flowable/test/cmmn/converter/timer-event-listener.cmmn");
         assertThat(cmmnModel).isNotNull();
-        
+
         List<HumanTask> humanTasks = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(HumanTask.class, true);
         assertThat(humanTasks).hasSize(2);
-        
-        List<TimerEventListener> timerEventListeners =  cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(TimerEventListener.class, true);
+
+        List<TimerEventListener> timerEventListeners = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(TimerEventListener.class, true);
         assertThat(timerEventListeners)
-            .hasSize(1)
-            .extracting(TimerEventListener::getTimerExpression, TimerEventListener::getTimerStartTriggerStandardEvent)
-            .containsExactly(tuple("PT6H", PlanItemTransition.COMPLETE));
+                .extracting(TimerEventListener::getTimerExpression, TimerEventListener::getTimerStartTriggerStandardEvent)
+                .containsExactly(tuple("PT6H", PlanItemTransition.COMPLETE));
         assertThat(timerEventListeners.get(0).getTimerStartTriggerPlanItem().getName()).isEqualTo("A");
     }
 
