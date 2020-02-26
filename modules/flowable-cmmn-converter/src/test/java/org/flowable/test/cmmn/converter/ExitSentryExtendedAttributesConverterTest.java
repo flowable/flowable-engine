@@ -12,14 +12,13 @@
  */
 package org.flowable.test.cmmn.converter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_EXIT;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES;
 import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_INSTANCES;
 import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_DEFAULT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.flowable.cmmn.model.CmmnModel;
 import org.junit.Test;
@@ -42,7 +41,7 @@ public class ExitSentryExtendedAttributesConverterTest extends AbstractConverter
     }
 
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
+        assertThat(cmmnModel).isNotNull();
 
         assertCriterionExitEventType(cmmnModel, "exitCriterion1", null);
         assertCriterionExitEventType(cmmnModel, "exitCriterion2", EXIT_EVENT_TYPE_EXIT);
@@ -61,12 +60,12 @@ public class ExitSentryExtendedAttributesConverterTest extends AbstractConverter
     }
 
     protected void assertCriterionExitEventType(CmmnModel cmmnModel, String criterionId, String expectedExitEventType) {
-        assertNotNull(cmmnModel.getCriterion(criterionId));
-        assertEquals(expectedExitEventType, cmmnModel.getCriterion(criterionId).getExitEventType());
+        assertThat(cmmnModel.getCriterion(criterionId)).isNotNull();
+        assertThat(cmmnModel.getCriterion(criterionId).getExitEventType()).isEqualTo(expectedExitEventType);
     }
 
     protected void assertCriterionExitType(CmmnModel cmmnModel, String criterionId, String expectedExitType) {
-        assertNotNull(cmmnModel.getCriterion(criterionId));
-        assertEquals(expectedExitType, cmmnModel.getCriterion(criterionId).getExitType());
+        assertThat(cmmnModel.getCriterion(criterionId)).isNotNull();
+        assertThat(cmmnModel.getCriterion(criterionId).getExitType()).isEqualTo(expectedExitType);
     }
 }

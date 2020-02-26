@@ -62,22 +62,21 @@ public class ExitCriteriaNonBlockingCmmnXmlConverterTest extends AbstractConvert
         assertThat(planItemTaskA).isNotNull();
         assertThat(planItemTaskA.getDefinitionRef()).isEqualTo("taskDefinition");
 
-
         PlanItem planItemTaskB = cmmnModel.findPlanItem("taskB");
         assertThat(planItemTaskB).isNotNull();
         assertThat(planItemTaskB.getDefinitionRef()).isEqualTo("taskDefinition");
         assertThat(planItemTaskB.getExitCriteria())
-                .extracting(Criterion::getId, Criterion::getSentryRef)
-                .isEmpty();
+            .extracting(Criterion::getId, Criterion::getSentryRef)
+            .isEmpty();
 
         assertThat(planModel.getSentries())
-                .extracting(Sentry::getId)
-                .containsOnly("sentry");
+            .extracting(Sentry::getId)
+            .containsOnly("sentry");
         assertThat(planModel.getSentries().get(0).getOnParts())
-                .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getStandardEvent)
-                .containsOnly(
-                        tuple("onPart_1", "taskA", "complete")
-                );
+            .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getStandardEvent)
+            .containsOnly(
+                tuple("onPart_1", "taskA", "complete")
+            );
 
         assertThat(cmmnModel.getAssociations()).isEmpty();
     }

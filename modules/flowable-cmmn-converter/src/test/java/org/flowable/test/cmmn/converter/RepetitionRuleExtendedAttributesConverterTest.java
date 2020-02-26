@@ -12,9 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -49,9 +48,9 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
     }
 
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
-        assertNotNull(cmmnModel.getCases());
-        assertEquals(1, cmmnModel.getCases().size());
+        assertThat(cmmnModel).isNotNull();
+        assertThat(cmmnModel.getCases()).isNotNull();
+        assertThat(cmmnModel.getCases()).hasSize(1);
 
         Map<String, CaseElement> caseElements = cmmnModel.getCases().get(0).getAllCaseElements();
 
@@ -86,11 +85,11 @@ public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConve
         }
 
         RepetitionRule repetitionRule = ((PlanItem) planItems.get(0)).getItemControl().getRepetitionRule();
-        assertNotNull("no repetition rule found for plan item with name '" + planItemName + "'", repetitionRule);
+        assertThat(repetitionRule).as("no repetition rule found for plan item with name '" + planItemName + "'").isNotNull();
 
-        assertEquals(collectionVariableName, repetitionRule.getCollectionVariableName());
-        assertEquals(elementVariableName, repetitionRule.getElementVariableName());
-        assertEquals(elementIndexVariableName, repetitionRule.getElementIndexVariableName());
-        assertEquals(maxInstanceCount, repetitionRule.getMaxInstanceCount());
+        assertThat(repetitionRule.getCollectionVariableName()).isEqualTo(collectionVariableName);
+        assertThat(repetitionRule.getElementVariableName()).isEqualTo(elementVariableName);
+        assertThat(repetitionRule.getElementIndexVariableName()).isEqualTo(elementIndexVariableName);
+        assertThat(repetitionRule.getMaxInstanceCount()).isEqualTo(maxInstanceCount);
     }
 }
