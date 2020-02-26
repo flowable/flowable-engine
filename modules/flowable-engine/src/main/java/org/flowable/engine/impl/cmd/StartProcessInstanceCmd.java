@@ -136,14 +136,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
             if (startElement instanceof StartEvent) {
                 StartEvent startEvent = (StartEvent) startElement;
-                if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
+                String startFormKey = startEvent.getFormKey();
+                if (StringUtils.isNotEmpty(startFormKey)) {
                     FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService(commandContext);
 
-                    if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                        formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey());
-                    } else {
-                        formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey(), tenantId, processEngineConfiguration.isFallbackToDefaultTenant());
-                    }
+                    formInfo = resolveFormInfo(startEvent, processDefinition, formRepositoryService, processEngineConfiguration);
 
                     if (formInfo != null) {
                         if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
@@ -177,6 +174,29 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         return processInstance;
     }
 
+    protected FormInfo resolveFormInfo(StartEvent startEvent, ProcessDefinition processDefinition, FormRepositoryService formRepositoryService,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+        String formKey = startEvent.getFormKey();
+        FormInfo formInfo;
+        if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+            if (startEvent.isSameDeployment()) {
+                String parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(processDefinition, processEngineConfiguration);
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(formKey, parentDeploymentId);
+            } else {
+                formInfo = formRepositoryService.getFormModelByKey(formKey);
+            }
+        } else {
+            if (startEvent.isSameDeployment()) {
+                String parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(processDefinition, processEngineConfiguration);
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(formKey, parentDeploymentId, tenantId,
+                        processEngineConfiguration.isFallbackToDefaultTenant());
+            } else {
+                formInfo = formRepositoryService.getFormModelByKey(formKey, tenantId, processEngineConfiguration.isFallbackToDefaultTenant());
+            }
+        }
+
+        return formInfo;
+    }
     protected boolean isFormFieldValidationEnabled(ProcessEngineConfigurationImpl processEngineConfiguration, StartEvent startEvent) {
         if (processEngineConfiguration.isFormFieldValidationEnabled()) {
             return TaskHelper.isFormFieldValidationEnabled(NoExecutionVariableScope.getSharedInstance() // process instance does not exist yet

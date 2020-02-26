@@ -129,7 +129,12 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         if (formKey != null) {
             casePageTask.setFormKey(formKey);
         }
-        
+
+        String sameDeploymentAttribute = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_SAME_DEPLOYMENT);
+        if ("false".equalsIgnoreCase(sameDeploymentAttribute)) {
+            casePageTask.setSameDeployment(false);
+        }
+
         String label = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_LABEL);
         if (label != null) {
             casePageTask.setLabel(label);
