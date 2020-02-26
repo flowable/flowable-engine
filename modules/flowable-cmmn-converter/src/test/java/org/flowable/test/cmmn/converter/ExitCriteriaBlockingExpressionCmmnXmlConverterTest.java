@@ -67,25 +67,25 @@ public class ExitCriteriaBlockingExpressionCmmnXmlConverterTest extends Abstract
         assertThat(planItemTaskB).isNotNull();
         assertThat(planItemTaskB.getDefinitionRef()).isEqualTo("taskDefinition");
         assertThat(planItemTaskB.getExitCriteria())
-            .extracting(Criterion::getId, Criterion::getSentryRef)
-            .containsOnly(
-                tuple("exitCriterion_1", "sentry")
-            );
+                .extracting(Criterion::getId, Criterion::getSentryRef)
+                .containsOnly(
+                        tuple("exitCriterion_1", "sentry")
+                );
 
         assertThat(planModel.getSentries())
-            .extracting(Sentry::getId)
-            .containsOnly("sentry");
+                .extracting(Sentry::getId)
+                .containsOnly("sentry");
         assertThat(planModel.getSentries().get(0).getOnParts())
-            .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getStandardEvent)
-            .containsOnly(
-                tuple("onPart_1", "taskA", "complete")
-            );
+                .extracting(SentryOnPart::getId, SentryOnPart::getSourceRef, SentryOnPart::getStandardEvent)
+                .containsOnly(
+                        tuple("onPart_1", "taskA", "complete")
+                );
 
         assertThat(cmmnModel.getAssociations())
-            .extracting(Association::getId, Association::getSourceRef, Association::getTargetRef, Association::getTransitionEvent)
-            .containsOnly(
-                tuple("association_1", "taskA", "exitCriterion_1", "complete")
-            );
+                .extracting(Association::getId, Association::getSourceRef, Association::getTargetRef, Association::getTransitionEvent)
+                .containsOnly(
+                        tuple("association_1", "taskA", "exitCriterion_1", "complete")
+                );
     }
 
 }
