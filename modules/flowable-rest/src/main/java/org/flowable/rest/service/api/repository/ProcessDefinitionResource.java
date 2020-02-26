@@ -195,9 +195,14 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
         if (startElement instanceof StartEvent) {
             StartEvent startEvent = (StartEvent) startElement;
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-                Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
-                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
-                                deployment.getParentDeploymentId(), processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
+                if (startEvent.isSameDeployment()) {
+                    Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
+                    formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
+                                    deployment.getParentDeploymentId(), processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
+                } else {
+                    formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey(), processDefinition.getTenantId(),
+                            processEngineConfiguration.isFallbackToDefaultTenant());
+                }
             }
         }
 

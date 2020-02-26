@@ -39,9 +39,13 @@ public class ProcessDefinitionUtil {
     }
 
     public static String getDefinitionDeploymentId(String processDefinitionId, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
         ProcessDefinition processDefinition = getProcessDefinition(processDefinitionId, false, processEngineConfiguration);
+        return getDefinitionDeploymentId(processDefinition, processEngineConfiguration);
+    }
+
+    public static String getDefinitionDeploymentId(ProcessDefinition processDefinition, ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (processDefinition != null) {
+            DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
             DeploymentEntity processDeployment = deploymentManager.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
             if (StringUtils.isEmpty(processDeployment.getParentDeploymentId())) {
                 return processDefinition.getDeploymentId();

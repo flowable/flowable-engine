@@ -54,6 +54,11 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, stage.getFormKey());
         }
 
+        if (!stage.isSameDeployment()) {
+            // default is true
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SAME_DEPLOYMENT, "false");
+        }
+
         if (StringUtils.isNotEmpty(stage.getValidateFormFields())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FIELD_VALIDATION, stage.getValidateFormFields());
         }

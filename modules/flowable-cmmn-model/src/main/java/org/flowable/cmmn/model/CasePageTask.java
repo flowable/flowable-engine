@@ -21,6 +21,7 @@ public class CasePageTask extends Task {
     
     protected String type;
     protected String formKey;
+    protected boolean sameDeployment = true;
     protected String label;
     protected String icon;
     protected String assignee;
@@ -62,6 +63,14 @@ public class CasePageTask extends Task {
 
     public void setFormKey(String formKey) {
         this.formKey = formKey;
+    }
+
+    public boolean isSameDeployment() {
+        return sameDeployment;
+    }
+
+    public void setSameDeployment(boolean sameDeployment) {
+        this.sameDeployment = sameDeployment;
     }
 
     public String getAssignee() {
@@ -108,6 +117,7 @@ public class CasePageTask extends Task {
         
         setType(otherElement.getType());
         setFormKey(otherElement.getFormKey());
+        setSameDeployment(otherElement.isSameDeployment());
         setLabel(otherElement.getLabel());
         setIcon(otherElement.getIcon());
         setAssignee(otherElement.getAssignee());

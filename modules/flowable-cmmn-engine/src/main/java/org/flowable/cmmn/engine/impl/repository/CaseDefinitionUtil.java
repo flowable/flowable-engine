@@ -41,6 +41,11 @@ public class CaseDefinitionUtil {
         CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CaseDefinitionCacheEntry cacheEntry = deploymentManager.getCaseDefinitionCache().get(caseDefinitionId);
         CaseDefinition caseDefinition = getCaseDefinition(caseDefinitionId, deploymentManager, cacheEntry);
+        return getDefinitionDeploymentId(caseDefinition, cmmnEngineConfiguration);
+    }
+
+    public static String getDefinitionDeploymentId(CaseDefinition caseDefinition, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CmmnDeploymentEntity caseDeployment = deploymentManager.getDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
         if (StringUtils.isEmpty(caseDeployment.getParentDeploymentId())) {
             return caseDefinition.getDeploymentId();
