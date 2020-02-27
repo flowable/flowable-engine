@@ -34,6 +34,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,8 +132,14 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
 
         String caseDefinitionKey = getCaseDefinitionKey(caseServiceTask.getCaseDefinitionKey(), execution, expressionManager);
 
+        String parentDeploymentId = null;
+        if (caseServiceTask.isSameDeployment()) {
+            parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(execution.getProcessDefinitionId(), processEngineConfiguration);
+        }
+
         caseInstanceService.startCaseInstanceByKey(caseDefinitionKey, caseInstanceId,
-                        caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(), inParameters);
+                caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(),
+                parentDeploymentId, inParameters);
 
         // Bidirectional storing of reference to avoid queries later on
         executionEntity.setReferenceId(caseInstanceId);

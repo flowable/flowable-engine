@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
@@ -77,6 +78,14 @@ public class DeployCmd implements Command<CmmnDeployment> {
         deployment.setDeploymentTime(cmmnEngineConfiguration.getClock().getCurrentTime());
         deployment.setNew(true);
         CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).insert(deployment);
+
+        if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
+            // If no parent deployment id is set then set the current ID as the parent
+            // If something was deployed via this command than this deployment would
+            // be a parent deployment to other potential child deployments
+            deployment.setParentDeploymentId(deployment.getId());
+        }
+
         cmmnEngineConfiguration.getDeploymentManager().deploy(deployment, null);
         return deployment;
     }

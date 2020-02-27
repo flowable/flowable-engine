@@ -29,6 +29,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     protected String processDefinitionId;
     protected String processDefinitionKey;
+    protected String processDefinitionParentDeploymentId;
     protected String messageName;
     protected String processInstanceName;
     protected String businessKey;
@@ -53,6 +54,12 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder processDefinitionParentDeploymentId(String parentDeploymentId) {
+        this.processDefinitionParentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -216,6 +223,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public String getProcessDefinitionKey() {
         return processDefinitionKey;
+    }
+
+    public String getProcessDefinitionParentDeploymentId() {
+        return processDefinitionParentDeploymentId;
     }
 
     public String getMessageName() {

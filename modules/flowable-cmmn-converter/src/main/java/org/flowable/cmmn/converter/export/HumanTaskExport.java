@@ -59,6 +59,11 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
         if (StringUtils.isNotEmpty(humanTask.getFormKey())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, humanTask.getFormKey());
         }
+
+        if (!humanTask.isSameDeployment()) {
+            // default is true
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SAME_DEPLOYMENT, "false");
+        }
         
         if (StringUtils.isNotEmpty(humanTask.getValidateFormFields())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FIELD_VALIDATION, humanTask.getValidateFormFields());

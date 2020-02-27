@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.EventDeployment;
@@ -87,6 +88,13 @@ public class DeployCmd<T> implements Command<EventDeployment>, Serializable {
 
         // Save the data
         CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
+
+        if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
+            // If no parent deployment id is set then set the current ID as the parent
+            // If something was deployed via this command than this deployment would
+            // be a parent deployment to other potential child deployments
+            deployment.setParentDeploymentId(deployment.getId());
+        }
 
         // Actually deploy
         CommandContextUtil.getEventRegistryConfiguration().getDeploymentManager().deploy(deployment);

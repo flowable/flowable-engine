@@ -31,6 +31,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.engine.test.CmmnDeploymentId;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -50,6 +51,7 @@ import org.junit.rules.ExpectedException;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class CaseTaskTest extends FlowableCmmnTestCase {
 
@@ -560,6 +562,285 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         this.expectedException.expect(FlowableObjectNotFoundException.class);
         this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase' and tenant 'flowable'");
         assertBlockingCaseTaskFlow(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testSameDeployment.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void testSameDeployment() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertThat(planItemInstance).isNotNull();
+
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+
+        CaseInstance childCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceParentId(caseInstance.getId())
+                .singleResult();
+
+        assertThat(childCase).isNotNull();
+
+        PlanItemInstance childPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(childCase.getId())
+                .singleResult();
+
+        assertThat(childPlanItemInstance).isNotNull();
+        assertThat(childPlanItemInstance.getName()).isEqualTo("The Task");
+
+        String v2Deployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCaseV2.cmmn")
+                .deploy()
+                .getId();
+
+        try {
+            // Starting after V2 deployment should use the same deployment task
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+
+            planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            assertThat(planItemInstance).isNotNull();
+
+            // Triggering the task should start the child case instance
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+
+            childCase = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceParentId(caseInstance.getId())
+                    .singleResult();
+
+            assertThat(childCase).isNotNull();
+
+            childPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(childCase.getId())
+                    .singleResult();
+
+            assertThat(childPlanItemInstance).isNotNull();
+            assertThat(childPlanItemInstance.getName()).isEqualTo("The Task");
+        } finally {
+            cmmnRepositoryService.deleteDeployment(v2Deployment, true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testSameDeployment.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    }, tenantId = "flowable")
+    public void testSameDeploymentDifferentTenants() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .tenantId("flowable")
+                .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertThat(planItemInstance).isNotNull();
+
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+
+        CaseInstance childCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceParentId(caseInstance.getId())
+                .singleResult();
+
+        assertThat(childCase).isNotNull();
+        assertThat(childCase.getTenantId()).isEqualTo("flowable");
+
+        PlanItemInstance childPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(childCase.getId())
+                .singleResult();
+
+        assertThat(childPlanItemInstance).isNotNull();
+        assertThat(childPlanItemInstance.getName()).isEqualTo("The Task");
+
+        String v2Deployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCaseV2.cmmn")
+                .tenantId("flowable")
+                .deploy()
+                .getId();
+
+        try {
+            // Starting after V2 deployment should use the same deployment task
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .tenantId("flowable")
+                    .start();
+
+            planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            assertThat(planItemInstance).isNotNull();
+
+            // Triggering the task should start the child case instance
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+
+            childCase = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceParentId(caseInstance.getId())
+                    .singleResult();
+
+            assertThat(childCase).isNotNull();
+            assertThat(childCase.getTenantId()).isEqualTo("flowable");
+
+            childPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(childCase.getId())
+                    .singleResult();
+
+            assertThat(childPlanItemInstance).isNotNull();
+            assertThat(childPlanItemInstance.getName()).isEqualTo("The Task");
+        } finally {
+            cmmnRepositoryService.deleteDeployment(v2Deployment, true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources={
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testSameDeploymentGlobal.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void testGlobalSameDeployment() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertThat(planItemInstance).isNotNull();
+
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+
+        CaseInstance childCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceParentId(caseInstance.getId())
+                .singleResult();
+
+        assertThat(childCase).isNotNull();
+
+        PlanItemInstance childPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(childCase.getId())
+                .singleResult();
+
+        assertThat(childPlanItemInstance).isNotNull();
+        assertThat(childPlanItemInstance.getName()).isEqualTo("The Task");
+
+        String v2Deployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCaseV2.cmmn")
+                .deploy()
+                .getId();
+
+        try {
+            // Starting after V2 deployment should not use the same deployment task
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+
+            planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            assertThat(planItemInstance).isNotNull();
+
+            // Triggering the task should start the child case instance
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+
+            childCase = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceParentId(caseInstance.getId())
+                    .singleResult();
+
+            assertThat(childCase).isNotNull();
+
+            childPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(childCase.getId())
+                    .singleResult();
+
+            assertThat(childPlanItemInstance).isNotNull();
+            assertThat(childPlanItemInstance.getName()).isEqualTo("The Task V2");
+        } finally {
+            cmmnRepositoryService.deleteDeployment(v2Deployment, true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testSameDeploymentFalse() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertThat(planItemInstance).isNotNull();
+
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+
+        CaseInstance childCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceParentId(caseInstance.getId())
+                .singleResult();
+
+        assertThat(childCase).isNotNull();
+
+        PlanItemInstance childPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(childCase.getId())
+                .singleResult();
+
+        assertThat(childPlanItemInstance).isNotNull();
+        assertThat(childPlanItemInstance.getName()).isEqualTo("The Task");
+
+        String v2Deployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCaseV2.cmmn")
+                .deploy()
+                .getId();
+
+        try {
+            // Starting after V2 deployment should not use the same deployment task
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+
+            planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            assertThat(planItemInstance).isNotNull();
+
+            // Triggering the task should start the child case instance
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+
+            childCase = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceParentId(caseInstance.getId())
+                    .singleResult();
+
+            assertThat(childCase).isNotNull();
+
+            childPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(childCase.getId())
+                    .singleResult();
+
+            assertThat(childPlanItemInstance).isNotNull();
+            assertThat(childPlanItemInstance.getName()).isEqualTo("The Task V2");
+        } finally {
+            cmmnRepositoryService.deleteDeployment(v2Deployment, true);
+        }
+
     }
 
     @Test

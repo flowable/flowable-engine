@@ -14,8 +14,6 @@
 package org.flowable.eventregistry.spring.test.autodeployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Driver;
 import java.util.HashMap;
@@ -125,34 +123,34 @@ public class SpringAutoDeployTest {
         expectedEventDefinitionKeys.add("myEvent");
         expectedEventDefinitionKeys.add("myEvent2");
 
-        assertEquals(expectedEventDefinitionKeys, eventDefinitionKeys);
+        assertThat(eventDefinitionKeys).isEqualTo(expectedEventDefinitionKeys);
     }
 
     @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContextWithoutDeploymentMode();
         EventDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-        assertEquals(1, deploymentQuery.count());
+        assertThat(deploymentQuery.count()).isOne();
         EventDefinitionQuery eventDefinitionQuery = repositoryService.createEventDefinitionQuery();
-        assertEquals(2, eventDefinitionQuery.count());
+        assertThat(eventDefinitionQuery.count()).isEqualTo(2);
 
         // Creating a new app context with same resources doesn't lead to more deployments
         createAppContextWithoutDeploymentMode();
-        assertEquals(1, deploymentQuery.count());
-        assertEquals(2, eventDefinitionQuery.count());
+        assertThat(deploymentQuery.count()).isOne();
+        assertThat(eventDefinitionQuery.count()).isEqualTo(2);
     }
 
     // Updating the event file should lead to a new deployment when restarting the Spring container
     @Test
     public void testResourceRedeploymentAfterEventDefinitionChange() throws Exception {
         createAppContextWithoutDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isOne();
         applicationContext.close();
 
         String filePath = "org/flowable/eventregistry/spring/test/autodeployment/simpleEvent.event";
         String originalEventFileContent = IoUtil.readFileAsString(filePath);
         String updatedEventFileContent = originalEventFileContent.replace("My event", "My event test");
-        assertTrue(updatedEventFileContent.length() > originalEventFileContent.length());
+        assertThat(updatedEventFileContent.length()).isGreaterThan(originalEventFileContent.length());
         IoUtil.writeStringToFile(updatedEventFileContent, filePath);
 
         // Classic produced/consumer problem here:
@@ -169,16 +167,16 @@ public class SpringAutoDeployTest {
 
         // Assertions come AFTER the file write! Otherwise the event file is
         // messed up if the assertions fail.
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(4, repositoryService.createEventDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createEventDefinitionQuery().count()).isEqualTo(4);
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContextWithDefaultDeploymentMode();
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createEventDefinitionQuery().count());
-        assertEquals(1, repositoryService.createChannelDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isOne();
+        assertThat(repositoryService.createEventDefinitionQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createChannelDefinitionQuery().count()).isOne();
     }
 
     @Test
@@ -192,15 +190,15 @@ public class SpringAutoDeployTest {
         assertThat(repositoryService.createEventDefinitionQuery().list())
             .extracting(EventDefinition::getKey)
             .containsExactlyInAnyOrder("myEvent", "myEvent2");
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createDeploymentQuery().count()).isOne();
     }
 
     @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContextWithSingleResourceDeploymentMode();
-        assertEquals(3, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createEventDefinitionQuery().count());
-        assertEquals(1, repositoryService.createChannelDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(3);
+        assertThat(repositoryService.createEventDefinitionQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createChannelDefinitionQuery().count()).isOne();
     }
 
     @Test
@@ -220,8 +218,8 @@ public class SpringAutoDeployTest {
     @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContextWithResourceParentFolderDeploymentMode();
-        assertEquals(2, repositoryService.createDeploymentQuery().count());
-        assertEquals(3, repositoryService.createEventDefinitionQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createEventDefinitionQuery().count()).isEqualTo(3);
     }
 
     @Test

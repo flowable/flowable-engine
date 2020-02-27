@@ -24,6 +24,7 @@ public class HumanTask extends Task {
     protected String owner;
     protected String priority;
     protected String formKey;
+    protected boolean sameDeployment = true;
     protected String validateFormFields;
     protected String dueDate;
     protected String category;
@@ -61,6 +62,14 @@ public class HumanTask extends Task {
 
     public void setFormKey(String formKey) {
         this.formKey = formKey;
+    }
+
+    public boolean isSameDeployment() {
+        return sameDeployment;
+    }
+
+    public void setSameDeployment(boolean sameDeployment) {
+        this.sameDeployment = sameDeployment;
     }
 
     public String getValidateFormFields() {
@@ -123,6 +132,7 @@ public class HumanTask extends Task {
         setAssignee(otherElement.getAssignee());
         setOwner(otherElement.getOwner());
         setFormKey(otherElement.getFormKey());
+        setSameDeployment(otherElement.isSameDeployment());
         setValidateFormFields(otherElement.getValidateFormFields());
         setDueDate(otherElement.getDueDate());
         setPriority(otherElement.getPriority());

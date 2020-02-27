@@ -12,8 +12,8 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -40,17 +40,15 @@ public class SignalEventListenerCmmnXmlConverterTest extends AbstractConverterTe
     }
 
     public void validateModel(CmmnModel cmmnModel) {
-        assertNotNull(cmmnModel);
+        assertThat(cmmnModel).isNotNull();
 
         List<HumanTask> humanTasks = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(HumanTask.class, true);
-        assertEquals(2, humanTasks.size());
+        assertThat(humanTasks).hasSize(2);
 
-        List<SignalEventListener> signalEventListeners = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(SignalEventListener.class, true);
-        assertEquals(1, signalEventListeners.size());
-
-        SignalEventListener signalEventListener = signalEventListeners.get(0);
-        assertEquals("mySignalEventListener", signalEventListener.getName());
-        assertEquals("signalActionListener",signalEventListener.getId());
-        assertEquals("testSignal",signalEventListener.getSignalRef());
+        List<SignalEventListener> signalEventListeners = cmmnModel.getPrimaryCase().getPlanModel()
+                .findPlanItemDefinitionsOfType(SignalEventListener.class, true);
+        assertThat(signalEventListeners)
+                .extracting(SignalEventListener::getName, SignalEventListener::getId, SignalEventListener::getSignalRef)
+                .containsExactly(tuple("mySignalEventListener", "signalActionListener", "testSignal"));
     }
 }
