@@ -41,28 +41,27 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
         outboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
-            .key("testEvent")
-            .resourceName("testEvent.event")
-            .payload("customerId", EventPayloadTypes.STRING)
-            .deploy();
+                .outboundChannelKey("out-channel")
+                .key("testEvent")
+                .resourceName("testEvent.event")
+                .payload("customerId", EventPayloadTypes.STRING)
+                .deploy();
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
         TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
         getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
-            .put("outboundEventChannelAdapter", outboundEventChannelAdapter);
+                .put("outboundEventChannelAdapter", outboundEventChannelAdapter);
 
         getEventRepositoryService().createOutboundChannelModelBuilder()
-            .key("out-channel")
-            .resourceName("out.channel")
-            .channelAdapter("${outboundEventChannelAdapter}")
-            .jsonSerializer()
-            .deploy();
+                .key("out-channel")
+                .resourceName("out.channel")
+                .channelAdapter("${outboundEventChannelAdapter}")
+                .jsonSerializer()
+                .deploy();
 
         return outboundEventChannelAdapter;
     }
-
 
     @After
     public void unregisterEventDefinition() {
@@ -77,9 +76,9 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
     @CmmnDeployment
     public void testSimpleSendEvent() throws Exception {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testSendEvent")
-            .variable("myVariable", "Hello World!")
-            .start();
+                .caseDefinitionKey("testSendEvent")
+                .variable("myVariable", "Hello World!")
+                .start();
 
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
