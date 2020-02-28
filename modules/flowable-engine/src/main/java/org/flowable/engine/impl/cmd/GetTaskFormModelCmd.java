@@ -18,15 +18,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.repository.Deployment;
-import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
@@ -104,10 +105,16 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
 
         String parentDeploymentId = null;
         if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
-            RepositoryService repositoryService = processEngineConfiguration.getRepositoryService();
-            ProcessDefinition processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
-            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
-            parentDeploymentId = deployment.getParentDeploymentId();
+            Process process = ProcessDefinitionUtil.getProcess(task.getProcessDefinitionId());
+            FlowElement element = process.getFlowElement(task.getTaskDefinitionKey(), true);
+            boolean sameDeployment = true;
+            if (element instanceof UserTask) {
+                sameDeployment = ((UserTask) element).isSameDeployment();
+            }
+            if (sameDeployment) {
+                // If it is not same deployment then there is no need to search for parent deployment
+                parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(task.getProcessDefinitionId(), processEngineConfiguration);
+            }
         }
 
         FormInfo formInfo = null;
