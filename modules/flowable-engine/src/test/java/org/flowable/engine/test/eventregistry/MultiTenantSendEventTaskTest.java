@@ -60,7 +60,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
         inboundEventChannelAdapter = setupTestInboundChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .payload("tenantAProperty", EventPayloadTypes.STRING)
@@ -70,7 +69,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .payload("tenantBProperty", EventPayloadTypes.STRING)
@@ -80,7 +78,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
@@ -89,7 +86,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)

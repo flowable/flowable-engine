@@ -90,11 +90,7 @@ public class BpmnEventModelUtil {
                 if (flowElement instanceof SendEventServiceTask) {
                     SendEventServiceTask task = (SendEventServiceTask) flowElement;
                     eventModel.setPayload(getInIOParameterEventPayload(task.getEventInParameters()));
-                    String channelKey = getElementValue("channelKey", flowElement);
-                    if (StringUtils.isNotEmpty(channelKey)) {
-                        eventModel.addOutboundChannelKey(channelKey);
-                    }
-                    
+
                     if (task.isTriggerable() && StringUtils.isNotEmpty(task.getTriggerEventType())) {
                         EventModel triggerEventModel = new EventModel();
                         String triggerEventName = getElementValue("triggerEventName", flowElement);
@@ -108,22 +104,13 @@ public class BpmnEventModelUtil {
                         triggerEventModel.setPayload(getOutIOParameterEventPayload(task.getEventOutParameters()));
                         triggerEventModel.setCorrelationParameters(getEventCorrelationParameters(flowElement.getExtensionElements().get("triggerEventCorrelationParameter")));
                         
-                        String triggerChannelKey = getElementValue("triggerChannelKey", flowElement);
-                        if (StringUtils.isNotEmpty(triggerChannelKey)) {
-                            triggerEventModel.addInboundChannelKey(triggerChannelKey);
-                        }
-                        
                         eventModelMap.put(task.getTriggerEventType(), triggerEventModel);
                     }
                     
                 } else {
                     eventModel.setPayload(getOutParameterEventPayload(flowElement.getExtensionElements().get("eventOutParameter")));
                     eventModel.setCorrelationParameters(getEventCorrelationParameters(flowElement.getExtensionElements().get("eventCorrelationParameter")));
-                    
-                    String channelKey = getElementValue("channelKey", flowElement);
-                    if (StringUtils.isNotEmpty(channelKey)) {
-                        eventModel.addInboundChannelKey(channelKey);
-                    }
+
                 }
                 
                 eventModelMap.put(eventKey, eventModel);

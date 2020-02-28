@@ -15,16 +15,16 @@ package org.flowable.eventregistry.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EventModel {
 
     protected String key;
     protected String name;
-    protected Collection<String> inboundChannelKeys = new ArrayList<>();
-    protected Collection<String> outboundChannelKeys = new ArrayList<>();
     protected Collection<EventCorrelationParameter> correlationParameters = new ArrayList<>();
     protected Collection<EventPayload> payload = new ArrayList<>();
 
@@ -42,30 +42,6 @@ public class EventModel {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Collection<String> getInboundChannelKeys() {
-        return inboundChannelKeys;
-    }
-    
-    public void addInboundChannelKey(String inboundChannelKey) {
-        this.inboundChannelKeys.add(inboundChannelKey);
-    }
-
-    public void setInboundChannelKeys(Collection<String> inboundChannelKeys) {
-        this.inboundChannelKeys = inboundChannelKeys;
-    }
-
-    public Collection<String> getOutboundChannelKeys() {
-        return outboundChannelKeys;
-    }
-    
-    public void addOutboundChannelKey(String outboundChannelKey) {
-        this.outboundChannelKeys.add(outboundChannelKey);
-    }
-
-    public void setOutboundChannelKeys(Collection<String> outboundChannelKeys) {
-        this.outboundChannelKeys = outboundChannelKeys;
     }
 
     public Collection<EventCorrelationParameter> getCorrelationParameters() {

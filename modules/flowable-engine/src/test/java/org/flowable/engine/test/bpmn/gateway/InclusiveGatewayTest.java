@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,9 +25,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -1211,49 +1215,25 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
-    /*
-     * @Test
-     * @Deployment public void testAsyncBehavior() { for (int i = 0; i < 100; i++) { ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("async"); } assertEquals(200,
-     * managementService.createJobQuery().count()); waitForJobExecutorToProcessAllJobs(120000, 5000); assertEquals(0, managementService.createJobQuery().count()); assertEquals(0,
-     * runtimeService.createProcessInstanceQuery().count()); }
-     */
+    @Test
+    @Deployment
+    public void testHistoricActivitiesForInclusiveGateway() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("myProcess").start();
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
 
-    // /* This test case is related to ACT-1877 */
-    //
-    // @Test
-    // @Deployment(resources={"org/flowable/engine/test/bpmn/gateway/InclusiveGatewayTest.testWithSignalBoundaryEvent.bpmn20.xml"})
-    // public void testJoinAfterBoudarySignalEvent() {
-    //
-    //
-    // ProcessInstance processInstanceId =
-    // runtimeService.startProcessInstanceByKey("InclusiveGatewayAfterSignalBoundaryEvent");
-    //
-    // /// Gets the execution waiting for a message notification*/
-    // String subcriptedExecutionId =
-    // runtimeService.createExecutionQuery().processInstanceId(processInstanceId.getId()).messageEventSubscriptionName("MyMessage").singleResult().getId();
-    //
-    // /*Notify message received: this makes one execution to go on*/
-    // runtimeService.messageEventReceived("MyMessage", subcriptedExecutionId);
-    //
-    // /*The other execution goes on*/
-    // org.flowable.task.service.Task userTask =
-    // taskService.createTaskQuery().processInstanceId(processInstanceId.getId()).singleResult();
-    // assertEquals("There's still an active execution waiting in the first task",
-    // "usertask1",userTask.getTaskDefinitionKey());
-    //
-    // taskService.complete( userTask.getId());
-    //
-    // /*The two executions become one because of Inclusive Gateway*/
-    // /*The process ends*/
-    // userTask =
-    // taskService.createTaskQuery().processInstanceId(processInstanceId.getId()).singleResult();
-    // assertEquals("Only when both executions reach the inclusive gateway, flow arrives to the last user task",
-    // "usertask2",userTask.getTaskDefinitionKey());
-    // taskService.complete(userTask.getId());
-    //
-    // long nExecutions =
-    // runtimeService.createExecutionQuery().processInstanceId(processInstanceId.getId()).count();
-    // assertEquals(0, nExecutions);
-    //
-    // }
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+
+            HistoricActivityInstance inclusiveGateway1 = historyService.createHistoricActivityInstanceQuery().activityId("inclusiveGateway1").singleResult();
+            assertThat(inclusiveGateway1.getStartTime()).isNotNull();
+            assertThat(inclusiveGateway1.getEndTime()).isNotNull();
+
+            tasks.forEach(t -> taskService.complete(t.getId()));
+
+            HistoricActivityInstance inclusiveGateway2 = historyService.createHistoricActivityInstanceQuery().activityId("inclusiveGateway2").singleResult();
+            assertThat(inclusiveGateway2.getStartTime()).isNotNull();
+            assertThat(inclusiveGateway2.getEndTime()).isNotNull();
+
+        }
+    }
 }

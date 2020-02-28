@@ -951,9 +951,6 @@ The response body is a JSON representation of the org.flowable.eventregistry.mod
     {
        "key": "myEvent",
        "name": "My event",
-       "inboundChannelKeys": [
-          "test-channel"
-       ],
        "correlationParameters": [
           {
             "name": "customerId",

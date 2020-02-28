@@ -50,6 +50,7 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
@@ -402,7 +403,6 @@ class KafkaChannelDefinitionProcessorTest {
             eventRepositoryService.createEventModelBuilder()
                 .resourceName("testEvent.event")
                 .key("customer")
-                .outboundChannelKey("outboundCustomer")
                 .correlationParameter("customer", EventPayloadTypes.STRING)
                 .payload("name", EventPayloadTypes.STRING)
                 .deploy();
@@ -417,11 +417,13 @@ class KafkaChannelDefinitionProcessorTest {
                 .deploy();
 
             EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+
+            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.singletonList(channelModel), Collections.emptyList(), payloadInstances);
 
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
             assertThat(records).isEmpty();
@@ -461,11 +463,12 @@ class KafkaChannelDefinitionProcessorTest {
             consumer.subscribe(Collections.singleton("outbound-customer"));
 
             EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.singletonList(channelModel), Collections.emptyList(), payloadInstances);
 
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
             assertThat(records).isEmpty();

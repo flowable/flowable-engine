@@ -133,7 +133,6 @@ public class MultiTenantCmmnEventRegistryConsumerTest  extends FlowableEventRegi
 
     private void deployEventDefinition(String channelKey, String key, String tenantId, String ... optionalExtraPayload) {
         EventModelBuilder eventModelBuilder = getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey(channelKey)
             .key(key)
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)

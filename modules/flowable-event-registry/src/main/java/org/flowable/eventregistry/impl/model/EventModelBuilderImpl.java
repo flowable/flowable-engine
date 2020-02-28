@@ -12,8 +12,6 @@
  */
 package org.flowable.eventregistry.impl.model;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -41,8 +39,6 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     protected String deploymentTenantId;
 
     protected String key;
-    protected Collection<String> inboundChannelKeys;
-    protected Collection<String> outboundChannelKeys;
     protected Map<String, EventCorrelationParameter> correlationParameterDefinitions = new LinkedHashMap<>();
     protected Map<String, EventPayload> eventPayloadDefinitions = new LinkedHashMap<>();
 
@@ -87,36 +83,6 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     }
 
     @Override
-    public EventModelBuilder inboundChannelKey(String channelKey) {
-        if (inboundChannelKeys == null) {
-            inboundChannelKeys = new HashSet<>();
-        }
-        inboundChannelKeys.add(channelKey);
-        return this;
-    }
-
-    @Override
-    public EventModelBuilder inboundChannelKeys(Collection<String> channelKeys) {
-        channelKeys.forEach(this::inboundChannelKey);
-        return this;
-    }
-
-    @Override
-    public EventModelBuilder outboundChannelKey(String channelKey) {
-        if (outboundChannelKeys == null) {
-            outboundChannelKeys = new HashSet<>();
-        }
-        outboundChannelKeys.add(channelKey);
-        return this;
-    }
-
-    @Override
-    public EventModelBuilder outboundChannelKeys(Collection<String> channelKeys) {
-        channelKeys.forEach(this::outboundChannelKey);
-        return this;
-    }
-
-    @Override
     public EventModelBuilder correlationParameter(String name, String type) {
         correlationParameterDefinitions.put(name, new EventCorrelationParameter(name, type));
         payload(name, type);
@@ -142,15 +108,13 @@ public class EventModelBuilderImpl implements EventModelBuilder {
         
         EventModel eventModel = buildEventModel();
 
-        EventDeployment eventDeployment = eventRepository.createDeployment()
+        return eventRepository.createDeployment()
             .name(deploymentName)
             .addEventDefinition(resourceName, new EventJsonConverter().convertToJson(eventModel))
             .category(category)
             .parentDeploymentId(parentDeploymentId)
             .tenantId(deploymentTenantId)
             .deploy();
-
-        return eventDeployment;
     }
 
     protected EventModel buildEventModel() {
@@ -160,14 +124,6 @@ public class EventModelBuilderImpl implements EventModelBuilder {
             eventModel.setKey(key);
         } else {
             throw new FlowableIllegalArgumentException("An event definition key is mandatory");
-        }
-
-        if (inboundChannelKeys != null) {
-            eventModel.setInboundChannelKeys(inboundChannelKeys);
-        }
-
-        if (outboundChannelKeys != null) {
-            eventModel.setOutboundChannelKeys(outboundChannelKeys);
         }
 
         eventModel.getCorrelationParameters().addAll(correlationParameterDefinitions.values());

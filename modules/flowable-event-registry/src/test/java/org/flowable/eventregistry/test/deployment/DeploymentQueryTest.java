@@ -32,11 +32,8 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
     
     private String eventModel = "{\n" + 
             "    \"key\": \"$changeme$\",\n" + 
-            "    \"name\": \"My first event\",\n" + 
-            "    \"inboundChannelKeys\": [\n" + 
-            "       \"$changemechannel\"\n" + 
-            "    ]\n" + 
-            "}\n" + 
+            "    \"name\": \"My first event\"\n" +
+            "}\n" +
             "";
     
     private String channelModel = "{\n" + 
