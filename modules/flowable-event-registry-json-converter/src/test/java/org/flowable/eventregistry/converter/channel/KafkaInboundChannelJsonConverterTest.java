@@ -13,7 +13,6 @@
 package org.flowable.eventregistry.converter.channel;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
 import org.flowable.eventregistry.model.ChannelEventKeyDetection;
 import org.flowable.eventregistry.model.ChannelModel;
@@ -64,10 +63,9 @@ class KafkaInboundChannelJsonConverterTest extends AbstractChannelConverterTest 
                 assertThat(model.getTopicPattern()).isEqualTo("*customer");
                 assertThat(model.getClientIdPrefix()).isEqualTo("customer-");
                 assertThat(model.getConcurrency()).isEqualTo("2");
-                assertThat(model.getProperties())
-                    .containsOnly(
-                        entry("connections.max.idle.ms", "10000")
-                    );
+                assertThat(model.getCustomProperties()).hasSize(1);
+                assertThat(model.getCustomProperties().get(0).getName()).isEqualTo("connections.max.idle.ms");
+                assertThat(model.getCustomProperties().get(0).getValue()).isEqualTo("10000");
             });
     }
 

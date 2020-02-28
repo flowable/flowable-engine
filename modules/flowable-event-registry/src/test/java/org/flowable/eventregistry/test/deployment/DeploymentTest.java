@@ -122,9 +122,6 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         EventModel eventModel = repositoryService.getEventModelById(eventDefinition.getId());
         assertEquals("myEvent", eventModel.getKey());
         
-        assertEquals(1, eventModel.getInboundChannelKeys().size());
-        assertEquals("test-channel", eventModel.getInboundChannelKeys().iterator().next());
-        
         assertEquals(1, eventModel.getCorrelationParameters().size());
         EventCorrelationParameter correlationParameter = eventModel.getCorrelationParameters().iterator().next();
         assertEquals("customerId", correlationParameter.getName());
@@ -154,9 +151,6 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         eventModel = repositoryService.getEventModelById(eventDefinition.getId());
         assertEquals("myEvent", eventModel.getKey());
-        
-        assertEquals(1, eventModel.getInboundChannelKeys().size());
-        assertEquals("test-channel2", eventModel.getInboundChannelKeys().iterator().next());
         
         assertEquals(1, eventModel.getCorrelationParameters().size());
         correlationParameter = eventModel.getCorrelationParameters().iterator().next();

@@ -46,7 +46,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
         outboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("testEvent")
             .resourceName("testEvent.event")
             .payload("tenantACustomerId", EventPayloadTypes.STRING)
@@ -54,7 +53,6 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
             .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("testEvent")
             .resourceName("testEvent.event")
             .payload("tenantBCustomerId", EventPayloadTypes.STRING)

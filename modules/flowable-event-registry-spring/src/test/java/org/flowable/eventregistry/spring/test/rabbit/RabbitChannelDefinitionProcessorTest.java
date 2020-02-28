@@ -34,6 +34,7 @@ import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
@@ -108,7 +109,6 @@ class RabbitChannelDefinitionProcessorTest {
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("test")
-            .inboundChannelKey("testChannel")
             .correlationParameter("customer", EventPayloadTypes.STRING)
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
@@ -155,7 +155,6 @@ class RabbitChannelDefinitionProcessorTest {
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("test")
-            .inboundChannelKey("testChannel")
             .correlationParameter("customer", EventPayloadTypes.STRING)
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
@@ -226,7 +225,6 @@ class RabbitChannelDefinitionProcessorTest {
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("customer")
-            .outboundChannelKey("outboundCustomer")
             .correlationParameter("customer", EventPayloadTypes.STRING)
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
@@ -241,11 +239,12 @@ class RabbitChannelDefinitionProcessorTest {
             .deploy();
 
         EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+        ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
         Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.singletonList(channelModel), Collections.emptyList(), payloadInstances);
 
         eventRegistry.sendEventOutbound(kermitEvent);
 
@@ -269,7 +268,6 @@ class RabbitChannelDefinitionProcessorTest {
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("customer")
-            .outboundChannelKey("outboundCustomer")
             .correlationParameter("customer", EventPayloadTypes.STRING)
             .payload("name", EventPayloadTypes.STRING)
             .deploy();
@@ -283,11 +281,12 @@ class RabbitChannelDefinitionProcessorTest {
             .deploy();
 
         EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+        ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
         Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+        EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.singletonList(channelModel), Collections.emptyList(), payloadInstances);
 
         eventRegistry.sendEventOutbound(kermitEvent);
 
@@ -357,11 +356,12 @@ class RabbitChannelDefinitionProcessorTest {
         try {
 
             EventModel customerModel = eventRepositoryService.getEventModelByKey("customer");
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.emptyList(), payloadInstances);
+            EventInstance kermitEvent = new EventInstanceImpl(customerModel, Collections.singletonList(channelModel), Collections.emptyList(), payloadInstances);
 
             eventRegistry.sendEventOutbound(kermitEvent);
 

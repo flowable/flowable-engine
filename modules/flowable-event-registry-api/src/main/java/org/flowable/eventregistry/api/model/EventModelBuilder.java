@@ -12,8 +12,6 @@
  */
 package org.flowable.eventregistry.api.model;
 
-import java.util.Collection;
-
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
@@ -54,28 +52,6 @@ public interface EventModelBuilder {
      * Set the parent deployment id for the event deployment.
      */
     EventModelBuilder parentDeploymentId(String parentDeploymentId);
-
-    /**
-     * {@link EventModel} can be bound to inbound or outbound channels.
-     * Calling this method will bind it to an inbound channel with the given key.
-     */
-    EventModelBuilder inboundChannelKey(String channelKey);
-
-    /**
-     * Allows to set multiple channel keys. See {@link #inboundChannelKey(String)}.
-     */
-    EventModelBuilder inboundChannelKeys(Collection<String> channelKeys);
-
-    /**
-     * {@link EventModel} can be bound to inbound or outbound channels.
-     * Calling this method will bind it to an inbound channel with the given key.
-     */
-    EventModelBuilder outboundChannelKey(String channelKey);
-
-    /**
-     * Allows to set multiple channel keys. See {@link #inboundChannelKey(String)}.
-     */
-    EventModelBuilder outboundChannelKeys(Collection<String> channelKeys);
 
     /**
      * Defines one payload element of an event definition.

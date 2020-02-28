@@ -41,7 +41,6 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
         outboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("testEvent")
             .resourceName("testEvent.event")
             .payload("customerId", EventPayloadTypes.STRING)

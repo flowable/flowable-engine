@@ -40,7 +40,6 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
         inboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)

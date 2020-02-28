@@ -13,17 +13,24 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
@@ -33,10 +40,12 @@ import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -60,24 +69,15 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
 
     @Override
     public void execute(DelegateExecution execution) {
-        EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        EventRegistry eventRegistry = CommandContextUtil.getEventRegistry(commandContext);
 
-        EventModel eventDefinition = null;
-        if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
-            eventDefinition = CommandContextUtil.getEventRepositoryService().getEventModelByKey(sendEventServiceTask.getEventType());
-        } else {
-            eventDefinition = CommandContextUtil.getEventRepositoryService().getEventModelByKey(sendEventServiceTask.getEventType(), 
-                            execution.getTenantId());
-        }
-
-        if (eventDefinition == null) {
-            throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType());
-        }
+        EventModel eventDefinition = getEventModel(commandContext, execution);
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         boolean sendSynchronously = sendEventServiceTask.isSendSynchronously();
         if (!sendSynchronously) {
-            JobService jobService = CommandContextUtil.getJobService();
+            JobService jobService = CommandContextUtil.getJobService(commandContext);
 
             JobEntity job = jobService.createJob();
             job.setExecutionId(execution.getId());
@@ -96,13 +96,17 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
 
             jobService.createAsyncJob(job, true);
             jobService.scheduleAsyncJob(job);
+
         } else {
             Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceBpmnUtil.createEventPayloadInstances(executionEntity,
-                CommandContextUtil.getProcessEngineConfiguration(CommandContextUtil.getCommandContext()).getExpressionManager(),
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager(),
                 execution.getCurrentFlowElement(),
                 eventDefinition);
-            EventInstanceImpl eventInstance = new EventInstanceImpl(eventDefinition, Collections.emptyList(), eventPayloadInstances);
+
+            List<ChannelModel> channelModels = getChannelModels(commandContext, execution);
+            EventInstanceImpl eventInstance = new EventInstanceImpl(eventDefinition, channelModels, Collections.emptyList(), eventPayloadInstances);
             eventRegistry.sendEventOutbound(eventInstance);
+
         }
 
         if (sendEventServiceTask.isTriggerable()) {
@@ -110,9 +114,11 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
 
                 if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
-                    triggerEventDefinition = CommandContextUtil.getEventRepositoryService().getEventModelByKey(sendEventServiceTask.getTriggerEventType());
+                    triggerEventDefinition = CommandContextUtil.getEventRepositoryService(commandContext)
+                        .getEventModelByKey(sendEventServiceTask.getTriggerEventType());
                 } else {
-                    triggerEventDefinition = CommandContextUtil.getEventRepositoryService().getEventModelByKey(sendEventServiceTask.getTriggerEventType(), 
+                    triggerEventDefinition = CommandContextUtil.getEventRepositoryService(commandContext)
+                        .getEventModelByKey(sendEventServiceTask.getTriggerEventType(),
                                     execution.getTenantId());
                 }
 
@@ -120,7 +126,8 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 triggerEventDefinition = eventDefinition;
             }
             
-            EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService().createEventSubscriptionBuilder()
+            EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil
+                .getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
                     .eventType(triggerEventDefinition.getKey())
                     .executionId(execution.getId())
                     .processInstanceId(execution.getProcessInstanceId())
@@ -128,8 +135,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                     .processDefinitionId(execution.getProcessDefinitionId())
                     .scopeType(ScopeTypes.BPMN)
                     .tenantId(execution.getTenantId())
-                    .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER, 
-                                    Context.getCommandContext(), executionEntity))
+                    .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER, commandContext, executionEntity))
                     .create();
             
             CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
@@ -139,7 +145,73 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             leave(execution);
         }
     }
-    
+
+    protected EventModel getEventModel(CommandContext commandContext, DelegateExecution execution) {
+        EventModel eventModel = null;
+        if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
+            eventModel = CommandContextUtil.getEventRepositoryService(commandContext)
+                .getEventModelByKey(sendEventServiceTask.getEventType());
+        } else {
+            eventModel = CommandContextUtil.getEventRepositoryService(commandContext)
+                .getEventModelByKey(sendEventServiceTask.getEventType(), execution.getTenantId());
+        }
+
+        if (eventModel == null) {
+            throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType());
+        }
+        return eventModel;
+    }
+
+    protected List<ChannelModel> getChannelModels(CommandContext commandContext, DelegateExecution execution) {
+        List<String> channelKeys = new ArrayList<>();
+
+        Map<String, List<ExtensionElement>> extensionElements = execution.getCurrentFlowElement().getExtensionElements();
+        if (extensionElements != null) {
+            List<ExtensionElement> channelKeyElements = extensionElements.get("channelKey");
+            if (channelKeyElements != null && !channelKeyElements.isEmpty()) {
+                String channelKey = channelKeyElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(channelKey)) {
+                    ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager();
+                    Expression expression = expressionManager.createExpression(channelKey);
+                    Object resolvedChannelKey = expression.getValue(execution);
+                    if (resolvedChannelKey instanceof Collection) {
+                        for (Object next : (Collection) resolvedChannelKey) {
+                            if (next instanceof String) {
+                                String[] keys = ((String) next).split(",");
+                                channelKeys.addAll(Arrays.asList(keys));
+
+                            } else {
+                                throw new FlowableIllegalArgumentException("Can only use a collection of String elements for referencing channel model key");
+
+                            }
+                        }
+
+                    } else if (resolvedChannelKey instanceof String) {
+                        String[] keys = ((String) resolvedChannelKey).split(",");
+                        channelKeys.addAll(Arrays.asList(keys));
+
+                    }
+                }
+            }
+        }
+
+        if (channelKeys.isEmpty()) {
+            throw new FlowableException("No channel keys configured");
+        }
+
+        EventRepositoryService eventRepositoryService = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext).getEventRepositoryService();
+        List<ChannelModel> channelModels = new ArrayList<>(channelKeys.size());
+        for (String channelKey : channelKeys) {
+            if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
+                channelModels.add(eventRepositoryService.getChannelModelByKey(channelKey));
+            } else {
+                channelModels.add(eventRepositoryService.getChannelModelByKey(channelKey, execution.getTenantId()));
+            }
+        }
+
+        return channelModels;
+    }
+
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         if (sendEventServiceTask.isTriggerable()) {
@@ -148,7 +220,8 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, sendEventServiceTask, (EventInstance) eventInstance);
             }
 
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
             ExecutionEntity executionEntity = (ExecutionEntity) execution;
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
 
@@ -161,9 +234,9 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             
             EventModel eventModel = null;
             if (Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, execution.getTenantId())) {
-                eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(eventType);
+                eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(eventType);
             } else {
-                eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(eventType, execution.getTenantId());
+                eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(eventType, execution.getTenantId());
             }
 
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {

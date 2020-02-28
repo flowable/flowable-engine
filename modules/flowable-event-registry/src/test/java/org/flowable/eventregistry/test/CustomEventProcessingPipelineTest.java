@@ -36,6 +36,7 @@ import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.junit.jupiter.api.AfterEach;
@@ -154,18 +155,19 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             .channelAdapter("${testOutboundChannelAdapter}")
             .delegateExpressionSerializer("${testOutboundEventSerializer}")
             .deploy();
-        
+
         eventRegistryEngine.getEventRepositoryService().createEventModelBuilder()
             .key("testKey")
             .deploymentTenantId("testTenantId")
-            .outboundChannelKey("customTestOutboundChannel")
             .resourceName("myEvent.event")
             .deploy();
         
         EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId");
+        ChannelModel channelModel = eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("customTestOutboundChannel");
 
         EventInstanceImpl eventInstance = new EventInstanceImpl();
         eventInstance.setEventModel(eventModel);
+        eventInstance.setChannelModels(Collections.singletonList(channelModel));
         eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance);
 
         assertThat(testOutboundChannelAdapter.counter.get()).isEqualTo(1);
@@ -192,14 +194,15 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         eventRegistryEngine.getEventRepositoryService().createEventModelBuilder()
             .key("testKey")
             .deploymentTenantId("testTenantId")
-            .outboundChannelKey("customTestOutboundChannel")
             .resourceName("myEvent.event")
             .deploy();
 
         EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId");
+        ChannelModel channelModel = eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("customTestOutboundChannel");
 
         EventInstanceImpl eventInstance = new EventInstanceImpl();
         eventInstance.setEventModel(eventModel);
+        eventInstance.setChannelModels(Collections.singletonList(channelModel));
         eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance);
 
         assertThat(testOutboundChannelAdapter.counter.get()).isEqualTo(1);

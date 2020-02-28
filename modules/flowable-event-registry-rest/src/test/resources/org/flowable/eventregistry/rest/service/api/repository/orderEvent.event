@@ -1,9 +1,6 @@
 {
     "key": "myOrderEvent",
     "name": "My order event",
-    "inboundChannelKeys": [
-        "order-channel"
-    ],
     "correlationParameters": [
         {
             "name": "orderId",
