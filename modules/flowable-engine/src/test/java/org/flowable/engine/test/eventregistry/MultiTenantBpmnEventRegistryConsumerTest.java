@@ -104,7 +104,6 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("sharedChannel")
             .resourceName("sharedChannel.channel")
-            .deploymentTenantId(TENANT_A)
             .channelAdapter("${testInboundChannelAdapter2}")
             .jsonDeserializer()
             .fixedEventKey("sameKey")

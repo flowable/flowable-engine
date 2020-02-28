@@ -14,6 +14,7 @@
         <serviceTask id="sendEventTask" flowable:type="send-event" flowable:triggerable="true">
             <extensionElements>
                 <flowable:eventType>myEvent</flowable:eventType>
+                <flowable:channelKey>out-channel</flowable:channelKey>
                 <flowable:triggerEventType>myTriggerEvent</flowable:triggerEventType>
                 <flowable:eventInParameter source="${customerId}" target="eventProperty" />
                 <flowable:triggerEventCorrelationParameter name="customerId" value="${customerId}" />
