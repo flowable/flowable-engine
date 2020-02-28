@@ -50,19 +50,17 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
         // executions leave the gateway.
 
         execution.inactivate();
-        executeInclusiveGatewayLogic((ExecutionEntity) execution);
+        executeInclusiveGatewayLogic((ExecutionEntity) execution, false);
     }
 
     @Override
     public void executeInactive(ExecutionEntity executionEntity) {
-        executeInclusiveGatewayLogic(executionEntity);
+        executeInclusiveGatewayLogic(executionEntity, true);
     }
 
-    protected void executeInclusiveGatewayLogic(ExecutionEntity execution) {
+    protected void executeInclusiveGatewayLogic(ExecutionEntity execution, boolean inactiveCheck) {
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-
-        lockFirstParentScope(execution);
 
         Collection<ExecutionEntity> allExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(execution.getProcessInstanceId());
         Iterator<ExecutionEntity> executionIterator = allExecutions.iterator();
@@ -74,18 +72,17 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
                     //Now check if they are in the same "execution path"
                     if (executionEntity.getParentId().equals(execution.getParentId())) {
                         oneExecutionCanReachGatewayInstance = true;
-                        break;
                     }
                 }
             } else if (executionEntity.getId().equals(execution.getId()) && executionEntity.isActive()) {
                 // Special case: the execution has reached the inc gw, but the operation hasn't been executed yet for that execution
                 oneExecutionCanReachGatewayInstance = true;
-                break;
             }
         }
 
-        // Is needed to set the endTime for all historic activity joins
-        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
+        if (!inactiveCheck) {
+            lockFirstParentScope(execution);
+        }
 
         // If no execution can reach the gateway, the gateway activates and executes fork behavior
         if (!oneExecutionCanReachGatewayInstance) {
@@ -103,7 +100,9 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
             }
 
             // Leave
+            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(execution, null);
             CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(execution, true);
         }
     }
+
 }
