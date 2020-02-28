@@ -41,7 +41,7 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
     @After
     public void deleteTasks() {
         if (task != null) {
-            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(0L);
             cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
             cmmnTaskService.deleteTask(task.getId());
         }
@@ -49,9 +49,13 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
 
     @Test
     public void createTaskEvent() {
-        task = cmmnTaskService.createTaskBuilder().
-            assignee("testAssignee").
-            create();
+        task = cmmnTaskService.createTaskBuilder()
+                .assignee("testAssignee")
+                .create();
+        assertThat(task).isNotNull();
+        assertThat(task.getId()).isNotNull();
+        assertThat(task.getName()).isNull();
+        assertThat(task.getAssignee()).isEqualTo("testAssignee");
     }
 
     @Test
@@ -59,19 +63,23 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
         String previousUserId = Authentication.getAuthenticatedUserId();
         Authentication.setAuthenticatedUserId("testUser");
         try {
-            task = cmmnTaskService.createTaskBuilder().
-                assignee("testAssignee").
-                create();
+            task = cmmnTaskService.createTaskBuilder()
+                    .assignee("testAssignee")
+                    .create();
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
+        assertThat(task).isNotNull();
+        assertThat(task.getId()).isNotNull();
+        assertThat(task.getName()).isNull();
+        assertThat(task.getAssignee()).isEqualTo("testAssignee");
     }
 
     @Test
     public void createUserTaskLogEntry() {
-        task = cmmnTaskService.createTaskBuilder().
-            assignee("testAssignee").
-            create();
+        task = cmmnTaskService.createTaskBuilder()
+                .assignee("testAssignee")
+                .create();
         cmmnHistoryService.createHistoricTaskLogEntryBuilder().taskId(task.getId()).create();
     }
 
