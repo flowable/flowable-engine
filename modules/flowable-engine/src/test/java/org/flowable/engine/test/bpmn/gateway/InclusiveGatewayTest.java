@@ -1214,26 +1214,4 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
     }
-
-    @Test
-    @Deployment
-    public void testHistoricActivitiesForInclusiveGateway() {
-        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("myProcess").start();
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(tasks).hasSize(2);
-
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-
-            HistoricActivityInstance inclusiveGateway1 = historyService.createHistoricActivityInstanceQuery().activityId("inclusiveGateway1").singleResult();
-            assertThat(inclusiveGateway1.getStartTime()).isNotNull();
-            assertThat(inclusiveGateway1.getEndTime()).isNotNull();
-
-            tasks.forEach(t -> taskService.complete(t.getId()));
-
-            HistoricActivityInstance inclusiveGateway2 = historyService.createHistoricActivityInstanceQuery().activityId("inclusiveGateway2").singleResult();
-            assertThat(inclusiveGateway2.getStartTime()).isNotNull();
-            assertThat(inclusiveGateway2.getEndTime()).isNotNull();
-
-        }
-    }
 }

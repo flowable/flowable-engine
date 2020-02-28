@@ -41,10 +41,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 /**
- * Modified the "createCaseInstance" method to conditionally call a "createCaseInstanceResponse" method with a different signature, which will conditionally return the case variables that
- * exist when the case instance either enters its first wait state or completes. In this case, the different method is always called with a flag of true, which means that it will always return
- * those variables. If variables are not to be returned, the original method is called, which doesn't return the variables.
- * 
  * @author Tijs Rademakers
  */
 @RestController
