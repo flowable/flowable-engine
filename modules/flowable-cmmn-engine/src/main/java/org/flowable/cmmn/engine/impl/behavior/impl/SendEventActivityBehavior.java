@@ -12,7 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,12 +25,18 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -47,6 +58,19 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
 
         EventRegistry eventRegistry = CommandContextUtil.getEventRegistry();
 
+        EventModel eventModel = getEventModel(planItemInstanceEntity, key);
+        List<ChannelModel> channelModels = getChannelModels(commandContext, planItemInstanceEntity);
+
+        Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceCmmnUtil
+            .createEventPayloadInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventModel);
+        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel, channelModels, Collections.emptyList(),  eventPayloadInstances);
+
+        eventRegistry.sendEventOutbound(eventInstance);
+
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+    }
+
+    protected EventModel getEventModel(PlanItemInstanceEntity planItemInstanceEntity, String key) {
         EventModel eventModel = null;
         if (Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, planItemInstanceEntity.getTenantId())) {
             eventModel = CommandContextUtil.getEventRepositoryService().getEventModelByKey(key);
@@ -57,17 +81,57 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
         if (eventModel == null) {
             throw new FlowableException("No event model found for event key " + key);
         }
+        return eventModel;
+    }
 
-        EventInstanceImpl eventInstance = new EventInstanceImpl();
-        eventInstance.setEventModel(eventModel);
+    protected List<ChannelModel> getChannelModels(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        List<String> channelKeys = new ArrayList<>();
 
-        Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceCmmnUtil
-            .createEventPayloadInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventModel);
-        eventInstance.setPayloadInstances(eventPayloadInstances);
+        Map<String, List<ExtensionElement>> extensionElements = planItemInstanceEntity.getPlanItem().getPlanItemDefinition().getExtensionElements();
+        if (extensionElements != null) {
+            List<ExtensionElement> channelKeyElements = extensionElements.get("channelKey");
+            if (channelKeyElements != null && !channelKeyElements.isEmpty()) {
+                String channelKey = channelKeyElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(channelKey)) {
+                    ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager();
+                    Expression expression = expressionManager.createExpression(channelKey);
+                    Object resolvedChannelKey = expression.getValue(planItemInstanceEntity);
+                    if (resolvedChannelKey instanceof Collection) {
+                        for (Object next : (Collection) resolvedChannelKey) {
+                            if (next instanceof String) {
+                                String[] keys = ((String) next).split(",");
+                                channelKeys.addAll(Arrays.asList(keys));
 
-        eventRegistry.sendEventOutbound(eventInstance);
+                            } else {
+                                throw new FlowableIllegalArgumentException("Can only use a collection of String elements for referencing channel model key");
 
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+                            }
+                        }
+
+                    } else if (resolvedChannelKey instanceof String) {
+                        String[] keys = ((String) resolvedChannelKey).split(",");
+                        channelKeys.addAll(Arrays.asList(keys));
+
+                    }
+                }
+            }
+        }
+
+        if (channelKeys.isEmpty()) {
+            throw new FlowableException("No channel keys configured");
+        }
+
+        EventRepositoryService eventRepositoryService = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext).getEventRepositoryService();
+        List<ChannelModel> channelModels = new ArrayList<>(channelKeys.size());
+        for (String channelKey : channelKeys) {
+            if (Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, planItemInstanceEntity.getTenantId())) {
+                channelModels.add(eventRepositoryService.getChannelModelByKey(channelKey));
+            } else {
+                channelModels.add(eventRepositoryService.getChannelModelByKey(channelKey, planItemInstanceEntity.getTenantId()));
+            }
+        }
+
+        return channelModels;
     }
 
     protected String getEventKey() {
