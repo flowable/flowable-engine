@@ -56,6 +56,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
 
     @BeforeEach
     protected void setUp() throws Exception {
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         outboundEventChannelAdapter = setupTestChannel();
         inboundEventChannelAdapter = setupTestInboundChannel();
 
@@ -137,6 +138,8 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
             repositoryService.deleteDeployment(cleanupDeploymentId, true);
         }
         cleanupDeploymentIds.clear();
+
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(false);
     }
 
     private void deployProcessModel(String modelResource, String tenantId) {

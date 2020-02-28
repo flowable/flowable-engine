@@ -17,7 +17,7 @@ import java.util.Random;
 
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.ExecutionHelper;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 
 /**
@@ -34,7 +34,7 @@ public class SetRandomVariablesTaskListener implements TaskListener {
         String varName;
         for (int i = 0; i < 5; i++) {
             varName = "variable-" + new Random().nextInt(10);
-            ExecutionEntity execution = ExecutionHelper.getExecution(delegateTask.getExecutionId());
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(delegateTask.getExecutionId());
             execution.setVariable(varName, getRandomValue());
         }
 

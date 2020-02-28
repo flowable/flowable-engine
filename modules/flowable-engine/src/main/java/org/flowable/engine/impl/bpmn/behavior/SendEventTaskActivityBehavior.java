@@ -62,6 +62,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     private static final long serialVersionUID = 1L;
     
     protected SendEventServiceTask sendEventServiceTask;
+    protected boolean executedAsAsyncJob;
     
     public SendEventTaskActivityBehavior(SendEventServiceTask sendEventServiceTask) {
         this.sendEventServiceTask = sendEventServiceTask;
@@ -72,10 +73,10 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         EventRegistry eventRegistry = CommandContextUtil.getEventRegistry(commandContext);
 
-        EventModel eventDefinition = getEventModel(commandContext, execution);
+        EventModel eventModel = getEventModel(commandContext, execution);
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        boolean sendSynchronously = sendEventServiceTask.isSendSynchronously();
+        boolean sendSynchronously = sendEventServiceTask.isSendSynchronously() || executedAsAsyncJob;
         if (!sendSynchronously) {
             JobService jobService = CommandContextUtil.getJobService(commandContext);
 
@@ -101,15 +102,15 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceBpmnUtil.createEventPayloadInstances(executionEntity,
                 CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager(),
                 execution.getCurrentFlowElement(),
-                eventDefinition);
+                eventModel);
 
             List<ChannelModel> channelModels = getChannelModels(commandContext, execution);
-            EventInstanceImpl eventInstance = new EventInstanceImpl(eventDefinition, channelModels, Collections.emptyList(), eventPayloadInstances);
+            EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel, channelModels, Collections.emptyList(), eventPayloadInstances);
             eventRegistry.sendEventOutbound(eventInstance);
 
         }
 
-        if (sendEventServiceTask.isTriggerable()) {
+        if (sendEventServiceTask.isTriggerable() && !executedAsAsyncJob) {
             EventModel triggerEventDefinition = null;
             if (StringUtils.isNotEmpty(sendEventServiceTask.getTriggerEventType())) {
 
@@ -123,7 +124,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 }
 
             } else {
-                triggerEventDefinition = eventDefinition;
+                triggerEventDefinition = eventModel;
             }
             
             EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil
@@ -140,8 +141,10 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             
             CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
             executionEntity.getEventSubscriptions().add(eventSubscription);
-        } else if (sendSynchronously) {
-            // If ths send task is specifically marked to send synchronously and is not triggerable then leave
+
+        } else if ( (sendSynchronously && !executedAsAsyncJob)
+                || (!sendEventServiceTask.isTriggerable() && executedAsAsyncJob)) {
+            // If this send task is specifically marked to send synchronously and is not triggerable then leave
             leave(execution);
         }
     }
@@ -247,5 +250,12 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             
             leave(execution);
         }
+    }
+
+    public boolean isExecutedAsAsyncJob() {
+        return executedAsAsyncJob;
+    }
+    public void setExecutedAsAsyncJob(boolean executedAsAsyncJob) {
+        this.executedAsAsyncJob = executedAsAsyncJob;
     }
 }
