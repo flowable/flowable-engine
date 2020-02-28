@@ -28,7 +28,7 @@ public class MyTaskListenerBean implements TaskListener {
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(delegateTask.getExecutionId())
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(delegateTask.getExecutionId());
         execution.setVariable("taskListenerVar", "working");
         if (someField != null) {
             execution.setVariable("taskListenerField", someField.getValue(delegateTask));
