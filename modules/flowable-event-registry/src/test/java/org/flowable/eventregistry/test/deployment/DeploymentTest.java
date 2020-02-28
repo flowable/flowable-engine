@@ -316,4 +316,18 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             repositoryService.deleteDeployment(newDeployment.getId());
         }
     }
+
+    @Test
+    @EventDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/eventWithChannelKeys.event")
+    public void deployEventWithChannelKeys() {
+
+        // In 6.5.0, event models had channel keys (inbound/outbound).
+        // This test validates that they still can be deployed.
+
+        EventDefinition eventDefinition = repositoryService.createEventDefinitionQuery()
+            .eventDefinitionKey("myOrderEvent")
+            .latestVersion()
+            .singleResult();
+        assertNotNull(eventDefinition);
+    }
 }
