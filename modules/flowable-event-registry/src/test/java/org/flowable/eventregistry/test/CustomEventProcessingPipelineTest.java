@@ -52,6 +52,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
 
     @BeforeEach
     void setup() {
+        eventEngineConfiguration.setFallbackToDefaultTenant(true);
         initialBeans = eventEngineConfiguration.getExpressionManager().getBeans();
         eventEngineConfiguration.getExpressionManager().setBeans(new HashMap<>());
     }
@@ -62,6 +63,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             .forEach(eventDeployment -> eventRegistryEngine.getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
 
         eventEngineConfiguration.getExpressionManager().setBeans(initialBeans);
+        eventEngineConfiguration.setFallbackToDefaultTenant(false);
     }
 
     @Test

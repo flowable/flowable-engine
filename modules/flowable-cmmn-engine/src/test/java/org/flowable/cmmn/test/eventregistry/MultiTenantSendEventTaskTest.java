@@ -43,6 +43,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
 
     @Before
     public void registerEventDefinition() {
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         outboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
@@ -84,6 +85,8 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
             cmmnRepositoryService.deleteDeployment(cleanupDeploymentId, true);
         }
         cleanupDeploymentIds.clear();
+
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(false);
     }
 
     @Test
