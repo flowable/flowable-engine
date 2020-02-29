@@ -50,9 +50,6 @@ public class EventJsonConverterTest {
         assertEquals("myEvent", eventModel.getKey());
         assertEquals("My event", eventModel.getName());
         
-        assertEquals(1, eventModel.getInboundChannelKeys().size());
-        assertEquals("test-channel", eventModel.getInboundChannelKeys().iterator().next());
-        
         assertEquals(1, eventModel.getCorrelationParameters().size());
         EventCorrelationParameter correlationParameter = eventModel.getCorrelationParameters().iterator().next();
         assertEquals("customerId", correlationParameter.getName());

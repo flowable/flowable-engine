@@ -122,9 +122,6 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         EventModel eventModel = repositoryService.getEventModelById(eventDefinition.getId());
         assertEquals("myEvent", eventModel.getKey());
         
-        assertEquals(1, eventModel.getInboundChannelKeys().size());
-        assertEquals("test-channel", eventModel.getInboundChannelKeys().iterator().next());
-        
         assertEquals(1, eventModel.getCorrelationParameters().size());
         EventCorrelationParameter correlationParameter = eventModel.getCorrelationParameters().iterator().next();
         assertEquals("customerId", correlationParameter.getName());
@@ -154,9 +151,6 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         eventModel = repositoryService.getEventModelById(eventDefinition.getId());
         assertEquals("myEvent", eventModel.getKey());
-        
-        assertEquals(1, eventModel.getInboundChannelKeys().size());
-        assertEquals("test-channel2", eventModel.getInboundChannelKeys().iterator().next());
         
         assertEquals(1, eventModel.getCorrelationParameters().size());
         correlationParameter = eventModel.getCorrelationParameters().iterator().next();
@@ -321,5 +315,19 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             repositoryService.deleteDeployment(deployment.getId());
             repositoryService.deleteDeployment(newDeployment.getId());
         }
+    }
+
+    @Test
+    @EventDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/eventWithChannelKeys.event")
+    public void deployEventWithChannelKeys() {
+
+        // In 6.5.0, event models had channel keys (inbound/outbound).
+        // This test validates that they still can be deployed.
+
+        EventDefinition eventDefinition = repositoryService.createEventDefinitionQuery()
+            .eventDefinitionKey("myOrderEvent")
+            .latestVersion()
+            .singleResult();
+        assertNotNull(eventDefinition);
     }
 }

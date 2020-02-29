@@ -12,9 +12,9 @@
  */
 package org.flowable.eventregistry.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -30,7 +30,7 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
     protected String topicPattern;
     protected String clientIdPrefix;
     protected String concurrency;
-    protected Map<String, String> properties;
+    protected List<CustomProperty> properties;
     
     public KafkaInboundChannelModel() {
         super();
@@ -77,19 +77,42 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
         this.concurrency = concurrency;
     }
 
-    public Map<String, String> getProperties() {
+    public List<CustomProperty> getCustomProperties() {
         return properties;
     }
 
-    public void addProperty(String name, String value) {
+    public void addCustomProperty(String name, String value) {
         if (properties == null) {
-            properties = new LinkedHashMap<>();
+            properties = new ArrayList<>();
         }
 
-        properties.put(name, value);
+        properties.add(new CustomProperty(name, value));
     }
 
-    public void setProperties(Map<String, String> properties) {
+    public void setCustomProperties(List<CustomProperty> properties) {
         this.properties = properties;
+    }
+
+    public static class CustomProperty {
+
+        protected String name;
+        protected String value;
+
+        public CustomProperty(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public String getValue() {
+            return value;
+        }
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 }

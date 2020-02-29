@@ -21,11 +21,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "Only one of eventDefinitionId or eventDefinitionKey can be used in the request body")
+@ApiModel(description = "Data for creating an event instance. "
+    + "Only one of eventDefinitionId or eventDefinitionKey can be used in the request body. Same applies to channelDefinitionId/Key")
 public class EventInstanceCreateRequest {
 
     protected String eventDefinitionId;
     protected String eventDefinitionKey;
+
+    protected String channelDefinitionId;
+    protected String channelDefinitionKey;
+
     protected ObjectNode eventPayload;
     protected String tenantId;
 
@@ -45,6 +50,28 @@ public class EventInstanceCreateRequest {
 
     public void setEventDefinitionKey(String eventDefinitionKey) {
         this.eventDefinitionKey = eventDefinitionKey;
+    }
+
+    @ApiModelProperty(example = "myChannel:1:123")
+    public String getChannelDefinitionId() {
+        return channelDefinitionId;
+    }
+
+    public void setChannelDefinitionId(String channelDefinitionId) {
+        this.channelDefinitionId = channelDefinitionId;
+    }
+
+    @ApiModelProperty(example = "myChannel")
+    public String getChannelDefinitionKey() {
+        return channelDefinitionKey;
+    }
+
+    public void setChannelDefinitionKey(String channelDefinitionKey) {
+        this.channelDefinitionKey = channelDefinitionKey;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     @ApiModelProperty(example = "tenant1")

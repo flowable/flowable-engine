@@ -14,8 +14,9 @@
   "topicPattern": "*customer",
   "clientIdPrefix": "customer-",
   "concurrency": "2",
-  "properties": {
-    "connections.max.idle.ms": "10000"
+  "customProperties": {
+    "name": "connections.max.idle.ms",
+    "value": "10000"
   },
 
   "deserializerType": "json",

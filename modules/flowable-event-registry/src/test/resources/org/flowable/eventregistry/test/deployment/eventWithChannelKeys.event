@@ -1,11 +1,17 @@
 {
     "key": "myOrderEvent",
     "name": "My order event",
+    "inboundChannelKeys": [
+        "order-channel"
+    ],
+    "outboundChannelKeys": [
+        "outboundCustomer"
+    ],
     "correlationParameters": [
         {
             "name": "orderId",
             "type": "string"
-        }
+            }
     ],
     "payload": [
         {

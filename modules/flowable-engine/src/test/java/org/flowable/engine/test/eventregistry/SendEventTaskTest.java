@@ -52,14 +52,12 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         inboundEventChannelAdapter = setupTestInboundChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .payload("eventProperty", EventPayloadTypes.STRING)
             .deploy();
         
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
             .key("anotherEvent")
             .resourceName("anotherEvent.event")
             .payload("nameProperty", EventPayloadTypes.STRING)
@@ -67,7 +65,6 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
             .deploy();
         
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myTriggerEvent")
             .resourceName("myTriggerEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)

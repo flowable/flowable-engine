@@ -43,6 +43,7 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         
         // first send event that doesn't match process boundary event
         requestNode.put("eventDefinitionKey", "myEvent");
+        requestNode.put("channelDefinitionKey", "myChannel");
         ObjectNode payloadNode = requestNode.putObject("eventPayload");
         payloadNode.put("customerId", "notExisting");
         payloadNode.put("productNumber", "p456");

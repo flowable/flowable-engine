@@ -95,7 +95,6 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = setupTestChannel();
 
         repositoryService.createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
@@ -127,7 +126,6 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = setupTestChannelWithCustomDeserializer();
 
         repositoryService.createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
