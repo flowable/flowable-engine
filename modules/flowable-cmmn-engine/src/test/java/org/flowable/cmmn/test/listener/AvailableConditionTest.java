@@ -41,7 +41,7 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
         assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
 
         // The event listener query should not return them as they are unavailable
-        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).list()).isEmpty();
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).stateUnavailable().list()).hasSize(1);
 
         // After case instance start human task A should be active, human taskA B should be enabled
@@ -113,7 +113,7 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
     public void testAvailableConditionDismisses() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAvailableCondition").start();
 
-        // The plan item instance for the event listener should have been created in the unavailabe state, as the condition is not true.
+        // The plan item instance for the event listener should have been created in the unavailable state, as the condition is not true.
         PlanItemInstance eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
             .planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
         assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
