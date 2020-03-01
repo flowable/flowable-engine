@@ -23,18 +23,28 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.runtime.AbstractCmmnDynamicStateManager;
+import org.flowable.cmmn.engine.impl.runtime.CaseInstanceChangeState;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.cmmn.engine.impl.runtime.ChangePlanItemStateBuilderImpl;
+import org.flowable.cmmn.engine.impl.runtime.MovePlanItemInstanceEntityContainer;
+import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Valentin Zickner
@@ -104,8 +114,37 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
     }
 
     protected void doValidatePlanItemMappings(String caseInstanceId, List<PlanItemMigrationMapping> planItemMigrationMappings, CmmnModel newModel, CaseInstanceMigrationDocument document, CaseInstanceMigrationValidationResult validationResult, CommandContext commandContext) {
-        throw new UnsupportedOperationException("not implemented"); // TODO
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getPlanItemInstanceEntityManager();
+
+        List<PlanItemInstanceEntity> activeMainPlanItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstanceId);
+        Map<String, PlanItemMigrationMapping> mappingLookupMap = groupByFromPlanItemId(planItemMigrationMappings, validationResult);
+
+        for (PlanItemInstanceEntity activeMainPlanItemInstance : activeMainPlanItemInstances) {
+            String elementId = activeMainPlanItemInstance.getElementId();
+            if (!mappingLookupMap.containsKey(elementId)) {
+                checkAutoMapping(caseInstanceId, newModel, validationResult, activeMainPlanItemInstance, elementId);
+            } else {
+                checkManualMapping(newModel, validationResult, mappingLookupMap, elementId);
+            }
+        }
+
     }
+
+    protected void checkAutoMapping(String caseInstanceId, CmmnModel newModel, CaseInstanceMigrationValidationResult validationResult, PlanItemInstanceEntity activeMainPlanItemInstance, String elementId) {
+        if (!hasPlanItemDefined(newModel, elementId)) {
+            validationResult.addValidationMessage("Case instance (id:'" + caseInstanceId + "') has a running plan item (id:'" + activeMainPlanItemInstance.getId() + "') that is not mapped for migration");
+        }
+    }
+
+    protected void checkManualMapping(CmmnModel newModel, CaseInstanceMigrationValidationResult validationResult, Map<String, PlanItemMigrationMapping> mappingLookupMap, String elementId) {
+        PlanItemMigrationMapping migrationMapping = mappingLookupMap.get(elementId);
+        for (String toPlanItemId : migrationMapping.getToPlanItemIds()) {
+            if (!hasPlanItemDefined(newModel, toPlanItemId)) {
+                validationResult.addValidationMessage("Invalid mapping for '" + elementId + "' to '" + toPlanItemId + "', cannot be found in the case definition");
+            }
+        }
+    }
+
 
     @Override
     public void migrateCaseInstance(String caseInstanceId, CaseInstanceMigrationDocument document, CommandContext commandContext) {
@@ -127,8 +166,8 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
     @Override
     public void migrateCaseInstancesOfCaseDefinition(String caseDefinitionId, CaseInstanceMigrationDocument document, CommandContext commandContext) {
-        CaseDefinition caseDefinition = resolveCaseDefinition(document, commandContext);
-        if (caseDefinition == null) {
+        CaseDefinition caseDefinitionToMigrateTo = resolveCaseDefinition(document, commandContext);
+        if (caseDefinitionToMigrateTo == null) {
             throw new FlowableException("Cannot find the case definition to migrate to, identified by " + printCaseDefinitionIdentifierMessage(document));
         }
 
@@ -137,12 +176,91 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(caseInstanceQueryByCaseDefinitionId);
 
         for (CaseInstance caseInstance : caseInstances) {
-            doMigrateCaseInstance(caseInstance, caseDefinition, document, commandContext);
+            doMigrateCaseInstance(caseInstance, caseDefinitionToMigrateTo, document, commandContext);
         }
     }
 
-    protected void doMigrateCaseInstance(CaseInstance caseInstance, CaseDefinition caseDefinition, CaseInstanceMigrationDocument document, CommandContext commandContext) {
-        throw new UnsupportedOperationException("not implemented"); // TODO
+    protected void doMigrateCaseInstance(CaseInstance caseInstance, CaseDefinition caseDefinitionToMigrateTo, CaseInstanceMigrationDocument document, CommandContext commandContext) {
+        LOGGER.debug("Start migration of case instance with Id:'{}' to case definition identified by {}", caseInstance.getId(), printCaseDefinitionIdentifierMessage(document));
+        List<String> activePlanItemDefinitions = new ArrayList<>();
+        List<String> availablePlanItemDefinitions = new ArrayList<>();
+        List<ChangePlanItemStateBuilderImpl> changePlanItemStateBuilders = prepareChangeStateBuilders(caseInstance, caseDefinitionToMigrateTo, document, availablePlanItemDefinitions, activePlanItemDefinitions, commandContext);
+
+        LOGGER.debug("Updating case definition reference of case root execution with id:'{}' to '{}'", caseInstance.getId(), caseDefinitionToMigrateTo.getId());
+        ((CaseInstanceEntity) caseInstance).setCaseDefinitionId(caseDefinitionToMigrateTo.getId());
+
+        LOGGER.debug("Resolve plan item instances to migrate");
+        List<MovePlanItemInstanceEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
+        for (ChangePlanItemStateBuilderImpl builder : changePlanItemStateBuilders) {
+            moveExecutionEntityContainerList.addAll(resolveMovePlanItemInstanceEntityContainers(builder, caseDefinitionToMigrateTo.getId(), document.getCaseInstanceVariables(), commandContext));
+        }
+
+        CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
+                .setCaseInstanceId(caseInstance.getId())
+                .setCaseDefinitionToMigrateTo(caseDefinitionToMigrateTo)
+                .setMovePlanItemInstanceEntityContainers(moveExecutionEntityContainerList)
+                .setActivatePlanItemDefinitionIds(activePlanItemDefinitions)
+                .setChangePlanItemToAvailableIdList(availablePlanItemDefinitions)
+                .setCaseVariables(document.getCaseInstanceVariables())
+                .setChildInstanceTaskVariables(document.getPlanItemLocalVariables());
+        doMovePlanItemState(caseInstanceChangeState, commandContext);
+
+        LOGGER.debug("Updating case definition of unchanged case tasks");
+        // TODO? need to handle case tasks?
+
+        LOGGER.debug("Updating case definition reference in plan item instances");
+        CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).updatePlanItemInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
+
+        LOGGER.debug("Updating case definition reference in history");
+        changeCaseDefinitionReferenceOfHistory(caseInstance, caseDefinitionToMigrateTo, commandContext);
+    }
+
+    protected List<ChangePlanItemStateBuilderImpl> prepareChangeStateBuilders(CaseInstance caseInstance, CaseDefinition caseDefinitionToMigrateTo, CaseInstanceMigrationDocument document, List<String> availablePlanItemDefinitions, List<String> activePlanItemDefinitions, CommandContext commandContext) {
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getPlanItemInstanceEntityManager();
+
+        String destinationTenantId = caseDefinitionToMigrateTo.getTenantId();
+        if (!Objects.equals(caseInstance.getTenantId(), destinationTenantId)) {
+            throw new FlowableException("Tenant mismatch between Case Instance ('" + caseInstance.getTenantId() + "') and Case Definition ('" + destinationTenantId + "') to migrate to");
+        }
+
+        String caseInstanceId = caseInstance.getId();
+        List<ChangePlanItemStateBuilderImpl> changePlanItemStateBuilders = new ArrayList<>();
+        ChangePlanItemStateBuilderImpl changePlanItemStateBuilder = new ChangePlanItemStateBuilderImpl();
+        changePlanItemStateBuilder.caseInstanceId(caseInstanceId);
+        changePlanItemStateBuilders.add(changePlanItemStateBuilder);
+
+
+        Map<String, List<PlanItemInstanceEntity>> planItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstanceId)
+                .stream()
+                .collect(Collectors.groupingBy(PlanItemInstanceEntity::getPlanItemDefinitionId));
+        Map<String, PlanItemMigrationMapping> mappingLookupMap = groupByFromPlanItemId(document.getPlanItemMigrationMappings(), null);
+        Set<String> mappedPlanItems = mappingLookupMap.keySet();
+
+        // Partition the plan items by explicitly mapped or not
+        Map<Boolean, List<String>> partitionedExecutionActivityIds = planItemInstances.keySet()
+                .stream()
+                .collect(Collectors.partitioningBy(mappedPlanItems::contains));
+        List<String> planItemsIdsToAutoMap = partitionedExecutionActivityIds.get(false);
+        List<String> planItemsIdsToMapExplicitly = partitionedExecutionActivityIds.get(true);
+
+        for (String planItemDefinitionId : planItemsIdsToAutoMap) {
+            List<PlanItemInstanceEntity> planItemInstanceEntities = planItemInstances.get(planItemDefinitionId);
+            if (planItemInstanceEntities.size() > 1) {
+                List<String> planItemInstanceIds = planItemInstanceEntities.stream().map(PlanItemInstanceEntity::getId).collect(Collectors.toList());
+                changePlanItemStateBuilder.movePlanItemInstancesToSinglePlanItemDefinitionId(planItemInstanceIds, planItemDefinitionId);
+            } else {
+                PlanItemInstanceEntity planItemInstanceEntity = planItemInstanceEntities.get(0);
+                changePlanItemStateBuilder.movePlanItemInstanceToPlanItemDefinitionId(planItemInstanceEntity.getId(), planItemDefinitionId);
+            }
+        }
+
+        // TODO explicit mapping
+
+        return changePlanItemStateBuilders;
+    }
+
+    protected void changeCaseDefinitionReferenceOfHistory(CaseInstance caseInstance, CaseDefinition caseDefinitionToMigrateTo, CommandContext commandContext) {
+ //       throw new UnsupportedOperationException("not implemented"); // TODO
     }
 
     @Override
@@ -158,12 +276,40 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
     @Override
     protected Map<String, List<PlanItemInstance>> resolveActiveStagePlanItemInstances(String caseInstanceId, CommandContext commandContext) {
-        return Collections.emptyMap();
+        // TODO is this correct?
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
+        PlanItemInstanceQueryImpl planItemInstanceQuery = new PlanItemInstanceQueryImpl(commandContext);
+        planItemInstanceQuery.caseInstanceId(caseInstanceId)
+                .onlyStages()
+                .planItemInstanceStateActive();
+        List<PlanItemInstance> planItemInstances = planItemInstanceEntityManager.findByCriteria(planItemInstanceQuery);
+
+        return planItemInstances.stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionId));
     }
 
     @Override
     protected boolean isDirectPlanItemDefinitionMigration(PlanItemDefinition currentPlanItemDefinition, PlanItemDefinition newPlanItemDefinition) {
-        throw new UnsupportedOperationException("not implemented"); // TODO
+        return false;
+    }
+
+    protected Map<String, PlanItemMigrationMapping> groupByFromPlanItemId(List<PlanItemMigrationMapping> planItemMigrationMappings, CaseInstanceMigrationValidationResult validationResult) {
+        Map<String, PlanItemMigrationMapping> lookupMap = new HashMap<>();
+        for (PlanItemMigrationMapping planItemMigrationMapping : planItemMigrationMappings) {
+            for (String planItemId : planItemMigrationMapping.getFromPlanItemIds()) {
+                if (lookupMap.containsKey(planItemId) && validationResult != null) {
+                    validationResult.addValidationMessage("Duplicate mapping for '" + planItemId + "', the latest mapping is going to be used");
+                }
+                lookupMap.put(planItemId, planItemMigrationMapping);
+            }
+        }
+        return lookupMap;
+    }
+
+    protected boolean hasPlanItemDefined(CmmnModel model, String elementId) {
+        return model.getPrimaryCase()
+                .getAllCaseElements()
+                .containsKey(elementId);
     }
 
     protected CaseDefinition resolveCaseDefinition(CaseInstanceMigrationDocument document, CommandContext commandContext) {
@@ -183,6 +329,5 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         String tenantId = document.getMigrateToCaseDefinitionTenantId();
         return id != null ? "[id:'" + id + "']" : "[key:'" + key + "', version:'" + version + "', tenantId:'" + tenantId + "']";
     }
-
 
 }

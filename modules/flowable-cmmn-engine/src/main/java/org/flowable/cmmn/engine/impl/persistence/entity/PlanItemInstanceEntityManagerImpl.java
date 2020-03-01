@@ -447,6 +447,20 @@ public class PlanItemInstanceEntityManagerImpl
         getDataManager().delete(planItemInstanceEntity);
     }
 
+    @Override
+    public void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId) {
+        PlanItemInstanceQueryImpl planItemQuery = new PlanItemInstanceQueryImpl();
+        planItemQuery.caseInstanceId(caseInstanceId);
+        List<PlanItemInstance> planItemInstances = findByCriteria(planItemQuery);
+        if (planItemInstances != null) {
+            for (PlanItemInstance planItemInstance : planItemInstances) {
+                PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
+                planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
+                update(planItemInstanceEntity);
+            }
+        }
+    }
+
     protected CaseInstanceEntityManager getCaseInstanceEntityManager() {
         return engineConfiguration.getCaseInstanceEntityManager();
     }

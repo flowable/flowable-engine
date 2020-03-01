@@ -81,7 +81,7 @@ public abstract class AbstractCmmnDynamicStateManager {
                 planItemInstancesByParent.values().forEach(planItemInstances -> {
                     MovePlanItemInstanceEntityContainer movePlanItemInstanceEntityContainer = new MovePlanItemInstanceEntityContainer(planItemInstances, planItemInstanceContainer.getMoveToPlanItemDefinitionIds());
                     PlanItemInstanceEntity firstPlanItemInstance = planItemInstances.get(0);
-                    movePlanItemInstanceEntityContainer.setCaseDefinitionId(firstPlanItemInstance.getCaseDefinitionId());
+                    movePlanItemInstanceEntityContainer.setCaseDefinitionId(migrateToCaseDefinitionId == null ? firstPlanItemInstance.getCaseDefinitionId() : migrateToCaseDefinitionId);
                     movePlanItemInstanceEntityContainer.setCaseInstanceId(firstPlanItemInstance.getCaseInstanceId());
                     movePlanItemInstanceEntityContainer.setTenantId(firstPlanItemInstance.getTenantId());
                     if (planItemInstanceContainer.getNewAssigneeId() != null) {

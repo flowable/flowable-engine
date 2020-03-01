@@ -32,6 +32,7 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     protected String migrateToCaseDefinitionTenantId;
     protected List<PlanItemMigrationMapping> planItemMigrationMappings = new ArrayList<>();
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
+    protected Map<String, Map<String, Object>> planItemLocalVariables = new HashMap<>();
 
     public static CaseInstanceMigrationDocument fromJson(String caseInstanceMigrationDocumentJson) {
         throw new UnsupportedOperationException("not implemented"); // TODO
@@ -88,7 +89,7 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
 
     @Override
     public Map<String, Map<String, Object>> getPlanItemLocalVariables() {
-        throw new UnsupportedOperationException("not implemented"); // TODO
+        return this.planItemLocalVariables;
     }
 
     @Override

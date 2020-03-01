@@ -1089,6 +1089,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
+        initService(cmmnMigrationService);
     }
 
     @Override
