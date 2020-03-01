@@ -45,9 +45,17 @@ public abstract class PlanItemMigrationMapping {
             return Collections.singletonList(fromPlanItemId);
         }
 
+        public String getFromPlanItemId() {
+            return fromPlanItemId;
+        }
+
         @Override
         public List<String> getToPlanItemIds() {
             return Collections.singletonList(toPlanItemId);
+        }
+
+        public String getToPlanItemId() {
+            return toPlanItemId;
         }
 
         @Override

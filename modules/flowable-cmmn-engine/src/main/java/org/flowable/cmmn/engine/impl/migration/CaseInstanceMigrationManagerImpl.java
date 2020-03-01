@@ -254,7 +254,20 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             }
         }
 
-        // TODO explicit mapping
+        for (PlanItemMigrationMapping planItemMigrationMapping : document.getPlanItemMigrationMappings()) {
+            if (planItemMigrationMapping instanceof PlanItemMigrationMapping.OneToOneMapping) {
+                String fromPlanItemId = ((PlanItemMigrationMapping.OneToOneMapping) planItemMigrationMapping).getFromPlanItemId();
+                String toPlanItemId = ((PlanItemMigrationMapping.OneToOneMapping) planItemMigrationMapping).getToPlanItemId();
+                String newAssignee = ((PlanItemMigrationMapping.OneToOneMapping) planItemMigrationMapping).getWithNewAssignee();
+
+                if (planItemsIdsToMapExplicitly.contains(fromPlanItemId)) {
+                    changePlanItemStateBuilder.movePlanItemDefinitionIdTo(fromPlanItemId, toPlanItemId, newAssignee);
+                    planItemsIdsToMapExplicitly.remove(fromPlanItemId);
+                }
+            } else {
+                throw new UnsupportedOperationException("Unknown migration type or not yet implemented");
+            }
+        }
 
         return changePlanItemStateBuilders;
     }

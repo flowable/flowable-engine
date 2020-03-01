@@ -158,20 +158,21 @@ public abstract class AbstractCmmnDynamicStateManager {
         return movePlanItemInstanceEntityContainer;
     }
 
-    protected void prepareMovePlanItemInstanceEntityContainer(MovePlanItemInstanceEntityContainer movePlanItemInstanceContainer, CommandContext commandContext) {
+    protected void prepareMovePlanItemInstanceEntityContainer(MovePlanItemInstanceEntityContainer movePlanItemInstanceContainer, String migrateToCaseDefinitionId, CommandContext commandContext) {
         for (String planItemDefinitionId : movePlanItemInstanceContainer.getMoveToPlanItemDefinitionIds()) {
             // Get first plan item instance to get case definition id
             PlanItemInstanceEntity firstPlanItemInstance = movePlanItemInstanceContainer.getPlanItemInstances().get(0);
             CmmnModel cmmnModel = CaseDefinitionUtil.getCmmnModel(firstPlanItemInstance.getCaseDefinitionId());
             String currentPlanItemId = firstPlanItemInstance.getElementId();
             PlanItem currentPlanItem = resolvePlanItemFromCmmnModel(cmmnModel, currentPlanItemId, firstPlanItemInstance.getCaseDefinitionId());
-            PlanItem newPlanItem = resolvePlanItemFromCmmnModelWithDefinitionId(cmmnModel, planItemDefinitionId, firstPlanItemInstance.getCaseDefinitionId());
+            PlanItem newPlanItem = resolvePlanItemFromCmmnModelWithDefinitionId(planItemDefinitionId, migrateToCaseDefinitionId == null ? firstPlanItemInstance.getCaseDefinitionId() : migrateToCaseDefinitionId);
             
             movePlanItemInstanceContainer.addMoveToPlanItem(currentPlanItem.getDefinitionRef(), currentPlanItem, newPlanItem);
         }
     }
     
-    protected PlanItem resolvePlanItemFromCmmnModelWithDefinitionId(CmmnModel cmmnModel, String planItemDefinitionId, String caseDefinitionId) {
+    protected PlanItem resolvePlanItemFromCmmnModelWithDefinitionId(String planItemDefinitionId, String caseDefinitionId) {
+        CmmnModel cmmnModel = CaseDefinitionUtil.getCmmnModel(caseDefinitionId);
         PlanItem planItem = cmmnModel.findPlanItemByPlanItemDefinitionId(planItemDefinitionId);
         if (planItem == null) {
             throw new FlowableException("Cannot find plan item with definition id '" + planItemDefinitionId + "' in case definition with id '" + caseDefinitionId + "'");
@@ -215,7 +216,7 @@ public abstract class AbstractCmmnDynamicStateManager {
                     CmmnEngineConfiguration cmmnEngineConfiguration, CommandContext commandContext) {
         
         for (MovePlanItemInstanceEntityContainer movePlanItemInstanceContainer : caseInstanceChangeState.getMovePlanItemInstanceEntityContainers()) {
-            prepareMovePlanItemInstanceEntityContainer(movePlanItemInstanceContainer, commandContext);
+            prepareMovePlanItemInstanceEntityContainer(movePlanItemInstanceContainer, getCaseDefinitionIdToMigrateTo(caseInstanceChangeState), commandContext);
 
             List<PlanItemInstanceEntity> planItemInstancesToMove = movePlanItemInstanceContainer.getPlanItemInstances();
 
@@ -270,7 +271,7 @@ public abstract class AbstractCmmnDynamicStateManager {
         
         for (String planItemDefinitionId : caseInstanceChangeState.getActivatePlanItemDefinitionIds()) {
             
-            PlanItem planItem = resolvePlanItemFromCmmnModelWithDefinitionId(cmmnModel, planItemDefinitionId, caseInstance.getCaseDefinitionId());
+            PlanItem planItem = resolvePlanItemFromCmmnModelWithDefinitionId(planItemDefinitionId, caseInstance.getCaseDefinitionId());
 
             PlanItemInstanceEntity newPlanItemInstance = createStagesAndPlanItemInstances(planItem, 
                             caseInstance, movingPlanItemInstances, caseInstanceChangeState, commandContext);
@@ -473,9 +474,10 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
             
             if (newPlanItemInstance == null) {
+                String caseDefinitionIdToMigrateTo = getCaseDefinitionIdToMigrateTo(caseInstanceChangeState);
                 newPlanItemInstance = planItemInstanceEntityManager.createPlanItemInstanceEntityBuilder()
                     .planItem(newPlanItem)
-                    .caseDefinitionId(movePlanItemInstanceEntityContainer.getCaseDefinitionId())
+                    .caseDefinitionId(caseDefinitionIdToMigrateTo == null ? movePlanItemInstanceEntityContainer.getCaseDefinitionId() : caseDefinitionIdToMigrateTo)
                     .caseInstanceId(movePlanItemInstanceEntityContainer.getCaseInstanceId())
                     .stagePlanItemInstance(parentPlanItemInstance)
                     .tenantId(movePlanItemInstanceEntityContainer.getTenantId())
@@ -821,4 +823,13 @@ public abstract class AbstractCmmnDynamicStateManager {
         }
         return caseDefinition;
     }
+
+    protected String getCaseDefinitionIdToMigrateTo(CaseInstanceChangeState caseInstanceChangeState) {
+        String caseDefinitionIdToMigrateTo = null;
+        if (caseInstanceChangeState.getCaseDefinitionToMigrateTo() != null) {
+            caseDefinitionIdToMigrateTo = caseInstanceChangeState.getCaseDefinitionToMigrateTo().getId();
+        }
+        return caseDefinitionIdToMigrateTo;
+    }
+
 }

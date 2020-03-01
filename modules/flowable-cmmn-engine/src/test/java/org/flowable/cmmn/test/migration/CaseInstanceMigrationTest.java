@@ -17,7 +17,7 @@ import org.flowable.cmmn.api.migration.PlanItemMigrationMapping;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.junit.jupiter.api.Disabled;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -49,25 +49,29 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .list();
-        assertThat(planItemInstances).hasSize(1);
-        PlanItemInstance planItemInstance = planItemInstances.get(0);
-        assertThat(planItemInstance).isNotNull();
-        assertThat(planItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
-        assertThat(planItemInstance.getName()).isEqualTo("Task 1");
+        assertThat(planItemInstances).hasSize(2);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
     }
 
     @Test
-    @Disabled("custom mapping is not yet implemented")
-    void withValidOneToOneMapping() {
+    void withSimpleOneTaskCaseWithMappingToSecondNewTask() {
         // Arrange
-        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml");
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
-        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/three-task.cmmn.xml");
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml");
 
         // Act
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
-                .addActivityMigrationMapping(new PlanItemMigrationMapping.OneToOneMapping("planItem2", "planItem3"))
+                .addActivityMigrationMapping(new PlanItemMigrationMapping.OneToOneMapping("humanTask1", "humanTask2"))
                 .migrate(caseInstance.getId());
 
         // Assert
@@ -76,9 +80,18 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .singleResult();
         assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
                 .list();
+        assertThat(planItemInstances).hasSize(2);
         assertThat(planItemInstances)
-                .hasSize(2);
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
     }
 
 }
