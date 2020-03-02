@@ -24,6 +24,7 @@ public class DecisionService extends Invocable {
     protected List<DmnElementReference> encapsulatedDecisions = new ArrayList<>();
     protected List<DmnElementReference> inputDecisions = new ArrayList<>();
     protected List<DmnElementReference> inputData = new ArrayList<>();
+    protected DmnDefinition dmnDefinition;
 
     public List<DmnElementReference> getOutputDecisions() {
         return outputDecisions;
@@ -60,5 +61,11 @@ public class DecisionService extends Invocable {
     }
     public void addInputData(DmnElementReference inputData) {
         this.inputData.add(inputData);
+    }
+    public DmnDefinition getDmnDefinition() {
+        return dmnDefinition;
+    }
+    public void setDmnDefinition(DmnDefinition dmnDefinition) {
+        this.dmnDefinition = dmnDefinition;
     }
 }
