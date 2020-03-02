@@ -44,7 +44,7 @@ public class CollectionsContainsReversedTest {
         processVariablesInput.put("customerOne", customerOne);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
@@ -70,7 +70,7 @@ public class CollectionsContainsReversedTest {
         processVariablesInput.put("customerOne", customerOne);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")

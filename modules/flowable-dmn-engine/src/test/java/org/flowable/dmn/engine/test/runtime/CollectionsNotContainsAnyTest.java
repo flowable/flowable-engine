@@ -50,7 +50,7 @@ public class CollectionsNotContainsAnyTest {
         processVariablesInput.put("collection4", inputVariable4);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
@@ -84,7 +84,7 @@ public class CollectionsNotContainsAnyTest {
         processVariablesInput.put("collection4", inputVariable4);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decision")

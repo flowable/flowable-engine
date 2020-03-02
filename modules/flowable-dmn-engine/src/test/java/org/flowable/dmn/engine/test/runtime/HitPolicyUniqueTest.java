@@ -40,7 +40,7 @@ public class HitPolicyUniqueTest {
     @DmnDeployment
     public void uniqueHitPolicy() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
@@ -54,7 +54,7 @@ public class HitPolicyUniqueTest {
     @DmnDeployment
     public void uniqueHitPolicyViolated() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
@@ -79,7 +79,7 @@ public class HitPolicyUniqueTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
 
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")

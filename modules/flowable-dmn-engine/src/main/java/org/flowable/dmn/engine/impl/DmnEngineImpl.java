@@ -33,7 +33,7 @@ public class DmnEngineImpl implements DmnEngine {
     protected String name;
     protected DmnManagementService dmnManagementService;
     protected DmnRepositoryService dmnRepositoryService;
-    protected DmnDecisionService dmnRuleService;
+    protected DmnDecisionService dmnDecisionService;
     protected DmnHistoryService dmnHistoryService;
     protected DmnEngineConfiguration dmnEngineConfiguration;
 
@@ -42,7 +42,7 @@ public class DmnEngineImpl implements DmnEngine {
         this.name = dmnEngineConfiguration.getEngineName();
         this.dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
         this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-        this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+        this.dmnDecisionService = dmnEngineConfiguration.getDmnRuleService();
         this.dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
         
         if (dmnEngineConfiguration.getSchemaManagementCmd() != null) {
@@ -95,8 +95,8 @@ public class DmnEngineImpl implements DmnEngine {
     }
 
     @Override
-    public DmnDecisionService getDmnRuleService() {
-        return dmnRuleService;
+    public DmnDecisionService getDmnDecisionService() {
+        return dmnDecisionService;
     }
     
     @Override

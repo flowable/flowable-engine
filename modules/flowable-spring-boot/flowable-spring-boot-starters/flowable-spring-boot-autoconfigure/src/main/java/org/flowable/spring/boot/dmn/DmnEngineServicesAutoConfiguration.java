@@ -132,7 +132,7 @@ public class DmnEngineServicesAutoConfiguration {
 
     @Bean
     public DmnDecisionService dmnRuleService(DmnEngine dmnEngine) {
-        return dmnEngine.getDmnRuleService();
+        return dmnEngine.getDmnDecisionService();
     }
 
     @Bean

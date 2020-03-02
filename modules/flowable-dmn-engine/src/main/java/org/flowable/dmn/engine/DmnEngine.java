@@ -30,7 +30,7 @@ public interface DmnEngine extends Engine {
 
     DmnRepositoryService getDmnRepositoryService();
 
-    DmnDecisionService getDmnRuleService();
+    DmnDecisionService getDmnDecisionService();
     
     DmnHistoryService getDmnHistoryService();
 

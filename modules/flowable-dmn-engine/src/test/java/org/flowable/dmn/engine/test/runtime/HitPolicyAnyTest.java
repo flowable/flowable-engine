@@ -41,7 +41,7 @@ public class HitPolicyAnyTest {
     @DmnDeployment
     public void anyHitPolicy() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 2);
@@ -59,7 +59,7 @@ public class HitPolicyAnyTest {
     @DmnDeployment
     public void anyHitPolicyViolated() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 2);
@@ -79,7 +79,7 @@ public class HitPolicyAnyTest {
     @DmnDeployment
     public void anyHitPolicyNoValueViolated() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 2);
@@ -107,7 +107,7 @@ public class HitPolicyAnyTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
 
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 2);

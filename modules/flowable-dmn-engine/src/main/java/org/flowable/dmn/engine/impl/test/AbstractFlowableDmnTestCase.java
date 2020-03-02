@@ -150,7 +150,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
         dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
         managementService = dmnEngine.getDmnManagementService();
         repositoryService = dmnEngine.getDmnRepositoryService();
-        ruleService = dmnEngine.getDmnRuleService();
+        ruleService = dmnEngine.getDmnDecisionService();
         historyService = dmnEngine.getDmnHistoryService();
     }
 

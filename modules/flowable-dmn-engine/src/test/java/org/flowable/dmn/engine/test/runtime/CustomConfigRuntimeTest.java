@@ -49,7 +49,7 @@ public class CustomConfigRuntimeTest {
     public void postCustomExpressionFunction() {
 
         DmnEngine dmnEngine = flowableRule1.getDmnEngine();
-        DmnDecisionService ruleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
@@ -68,7 +68,7 @@ public class CustomConfigRuntimeTest {
     public void customExpressionFunctionMissingDefaultFunction() {
 
         DmnEngine dmnEngine = flowableRule2.getDmnEngine();
-        DmnDecisionService ruleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");

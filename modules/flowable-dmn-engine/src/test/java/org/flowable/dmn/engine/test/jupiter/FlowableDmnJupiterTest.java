@@ -41,7 +41,7 @@ class FlowableDmnJupiterTest {
     @Test
     @DmnDeployment
     void extensionUsageExample(DmnEngine dmnEngine) {
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 2);
@@ -60,14 +60,14 @@ class FlowableDmnJupiterTest {
 
     @Test
     @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/jupiter/FlowableDmnJupiterTest.extensionUsageExample.dmn")
-    void extensionUsageExampleWithDmnDeploymentAnnotation(DmnDecisionService dmnRuleService, DmnRepositoryService dmnRepositoryService,
+    void extensionUsageExampleWithDmnDeploymentAnnotation(DmnDecisionService dmnDecisionService, DmnRepositoryService dmnRepositoryService,
         @DmnDeploymentId String deploymentId) {
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 2);
         inputVariables.put("inputVariable2", "test2");
 
-        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+        Map<String, Object> result = dmnDecisionService.createExecuteDecisionBuilder()
             .decisionKey("extensionUsage")
             .variables(inputVariables)
             .executeWithSingleResult();

@@ -50,7 +50,7 @@ public class AbstractFlowableDmnTest {
         }
         this.dmnEngineConfiguration = cachedDmnEngine.getDmnEngineConfiguration();
         this.repositoryService = cachedDmnEngine.getDmnRepositoryService();
-        this.ruleService = cachedDmnEngine.getDmnRuleService();
+        this.ruleService = cachedDmnEngine.getDmnDecisionService();
         this.managementService = cachedDmnEngine.getDmnManagementService();
     }
 

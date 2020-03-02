@@ -47,7 +47,7 @@ public class FlowableDmnEngineConfiguration {
 
     @Bean
     public DmnDecisionService dmnRuleService() {
-        return ruleEngine().getDmnRuleService();
+        return ruleEngine().getDmnDecisionService();
     }
     
     @Bean

@@ -34,7 +34,7 @@ public class DecisionServiceTest {
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/simple_decisionservice.dmn")
     public void executeDecisionServiceWithoutStartVariables() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("age", 18D);

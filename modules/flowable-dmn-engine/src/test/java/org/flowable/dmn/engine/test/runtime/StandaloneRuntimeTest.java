@@ -35,7 +35,7 @@ public class StandaloneRuntimeTest {
     @DmnDeployment
     public void ruleUsageExample() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
         inputVariables.put("inputVariable1", 2);
