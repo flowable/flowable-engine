@@ -86,19 +86,11 @@ public class CmmnEventModelUtil {
                 if (element instanceof SendEventServiceTask) {
                     SendEventServiceTask task = (SendEventServiceTask) element;
                     eventModel.setPayload(getInParameterEventPayload(task.getExtensionElements().get("eventInParameter")));
-                    String channelKey = getElementValue("channelKey", task);
-                    if (StringUtils.isNotEmpty(channelKey)) {
-                        eventModel.addOutboundChannelKey(channelKey);
-                    }
-                    
+
                 } else {
                     eventModel.setPayload(getOutParameterEventPayload(element.getExtensionElements().get("eventOutParameter")));
                     eventModel.setCorrelationParameters(getEventCorrelationParameters(element.getExtensionElements().get("eventCorrelationParameter")));
                     
-                    String channelKey = getElementValue("channelKey", element);
-                    if (StringUtils.isNotEmpty(channelKey)) {
-                        eventModel.addInboundChannelKey(channelKey);
-                    }
                 }
                 
                 eventModelMap.put(eventKey, eventModel);

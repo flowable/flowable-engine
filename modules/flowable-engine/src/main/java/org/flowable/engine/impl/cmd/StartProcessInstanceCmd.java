@@ -54,6 +54,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     private static final long serialVersionUID = 1L;
     protected String processDefinitionKey;
     protected String processDefinitionId;
+    protected String processDefinitionParentDeploymentId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected String businessKey;
@@ -90,6 +91,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                 processInstanceBuilder.getVariables(),
                 processInstanceBuilder.getTenantId());
         
+        this.processDefinitionParentDeploymentId = processInstanceBuilder.getProcessDefinitionParentDeploymentId();
         this.processInstanceName = processInstanceBuilder.getProcessInstanceName();
         this.overrideDefinitionTenantId = processInstanceBuilder.getOverrideDefinitionTenantId();
         this.predefinedProcessInstanceId = processInstanceBuilder.getPredefinedProcessInstanceId();
@@ -134,14 +136,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
             if (startElement instanceof StartEvent) {
                 StartEvent startEvent = (StartEvent) startElement;
-                if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
+                String startFormKey = startEvent.getFormKey();
+                if (StringUtils.isNotEmpty(startFormKey)) {
                     FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService(commandContext);
 
-                    if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                        formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey());
-                    } else {
-                        formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey(), tenantId, processEngineConfiguration.isFallbackToDefaultTenant());
-                    }
+                    formInfo = resolveFormInfo(startEvent, processDefinition, formRepositoryService, processEngineConfiguration);
 
                     if (formInfo != null) {
                         if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
@@ -175,6 +174,29 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         return processInstance;
     }
 
+    protected FormInfo resolveFormInfo(StartEvent startEvent, ProcessDefinition processDefinition, FormRepositoryService formRepositoryService,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+        String formKey = startEvent.getFormKey();
+        FormInfo formInfo;
+        if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+            if (startEvent.isSameDeployment()) {
+                String parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(processDefinition, processEngineConfiguration);
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(formKey, parentDeploymentId);
+            } else {
+                formInfo = formRepositoryService.getFormModelByKey(formKey);
+            }
+        } else {
+            if (startEvent.isSameDeployment()) {
+                String parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(processDefinition, processEngineConfiguration);
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(formKey, parentDeploymentId, tenantId,
+                        processEngineConfiguration.isFallbackToDefaultTenant());
+            } else {
+                formInfo = formRepositoryService.getFormModelByKey(formKey, tenantId, processEngineConfiguration.isFallbackToDefaultTenant());
+            }
+        }
+
+        return formInfo;
+    }
     protected boolean isFormFieldValidationEnabled(ProcessEngineConfigurationImpl processEngineConfiguration, StartEvent startEvent) {
         if (processEngineConfiguration.isFormFieldValidationEnabled()) {
             return TaskHelper.isFormFieldValidationEnabled(NoExecutionVariableScope.getSharedInstance() // process instance does not exist yet
@@ -206,13 +228,30 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         } else if (processDefinitionKey != null && (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId))) {
 
-            processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+            if (processDefinitionParentDeploymentId != null) {
+                processDefinition = processDefinitionEntityManager
+                        .findProcessDefinitionByParentDeploymentAndKey(processDefinitionParentDeploymentId, processDefinitionKey);
+            }
+
+            if (processDefinition == null) {
+                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+            }
+
             if (processDefinition == null) {
                 throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey + "'", ProcessDefinition.class);
             }
 
         } else if (processDefinitionKey != null && tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-            processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+
+            if (processDefinitionParentDeploymentId != null) {
+                processDefinition = processDefinitionEntityManager
+                        .findProcessDefinitionByParentDeploymentAndKeyAndTenantId(processDefinitionParentDeploymentId, processDefinitionKey, tenantId);
+            }
+
+            if (processDefinition == null) {
+                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+            }
+
             if (processDefinition == null) {
                 if (fallbackToDefaultTenant || processEngineConfiguration.isFallbackToDefaultTenant()) {
                     String defaultTenant = processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);

@@ -50,7 +50,6 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         inboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -97,14 +98,30 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             String caseDefinitionKey = caseInstanceBuilder.getCaseDefinitionKey();
             CaseDefinitionEntityManager caseDefinitionEntityManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
             String tenantId = caseInstanceBuilder.getTenantId();
+            String parentDeploymentId = caseInstanceBuilder.getCaseDefinitionParentDeploymentId();
             if (tenantId == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+
+                if (parentDeploymentId != null) {
+                    caseDefinition = caseDefinitionEntityManager.findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey);
+                }
+
+                if (caseDefinition == null) {
+                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+                }
+
                 if (caseDefinition == null) {
                     throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
                 }
                 
             } else if (!CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+                if (parentDeploymentId != null) {
+                    caseDefinition = caseDefinitionEntityManager
+                            .findCaseDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, caseDefinitionKey, tenantId);
+                }
+
+                if (caseDefinition == null) {
+                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+                }
 
                 if (caseDefinition == null) {
                     if (caseInstanceBuilder.isFallbackToDefaultTenant() || cmmnEngineConfiguration.isFallbackToDefaultTenant()) {
@@ -290,13 +307,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService(commandContext);
                 if (formRepositoryService != null) {
 
-                    FormInfo formInfo = null;
-                    if (caseInstanceEntity.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(caseInstanceEntity.getTenantId())) {
-                        formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey());
-                    } else {
-                        formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey(), caseInstanceEntity.getTenantId(),
-                                        cmmnEngineConfiguration.isFallbackToDefaultTenant());
-                    }
+                    FormInfo formInfo = resolveFormInfo(planModel, caseDefinition, caseInstanceEntity.getTenantId(),
+                            formRepositoryService, cmmnEngineConfiguration);
 
                     if (formInfo != null) {
                         FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration().getFormFieldHandler();
@@ -328,6 +340,30 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             }
         }
 
+    }
+
+    protected FormInfo resolveFormInfo(Stage planModel, CaseDefinition caseDefinition, String tenantId, FormRepositoryService formRepositoryService,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        String formKey = planModel.getFormKey();
+        FormInfo formInfo;
+        if (tenantId == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+            if (planModel.isSameDeployment()) {
+                String parentDeploymentId = CaseDefinitionUtil.getDefinitionDeploymentId(caseDefinition, cmmnEngineConfiguration);
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(formKey, parentDeploymentId);
+            } else {
+                formInfo = formRepositoryService.getFormModelByKey(formKey);
+            }
+        } else {
+            if (planModel.isSameDeployment()) {
+                String parentDeploymentId = CaseDefinitionUtil.getDefinitionDeploymentId(caseDefinition, cmmnEngineConfiguration);
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(formKey, parentDeploymentId, tenantId,
+                        cmmnEngineConfiguration.isFallbackToDefaultTenant());
+            } else {
+                formInfo = formRepositoryService.getFormModelByKey(formKey, tenantId, cmmnEngineConfiguration.isFallbackToDefaultTenant());
+            }
+        }
+
+        return formInfo;
     }
 
     protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, Stage stage) {

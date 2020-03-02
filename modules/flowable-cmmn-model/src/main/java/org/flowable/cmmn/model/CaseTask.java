@@ -20,6 +20,7 @@ public class CaseTask extends ChildTask {
     protected String caseRef;
     protected String caseRefExpression;
     protected Boolean fallbackToDefaultTenant;
+    protected boolean sameDeployment;
     protected String caseInstanceIdVariableName;
 
     public String getCaseRef() {
@@ -44,6 +45,14 @@ public class CaseTask extends ChildTask {
 
     public void setFallbackToDefaultTenant(Boolean fallbackToDefaultTenant) {
         this.fallbackToDefaultTenant = fallbackToDefaultTenant;
+    }
+
+    public boolean isSameDeployment() {
+        return sameDeployment;
+    }
+
+    public void setSameDeployment(boolean sameDeployment) {
+        this.sameDeployment = sameDeployment;
     }
 
     public String getCaseInstanceIdVariableName() {

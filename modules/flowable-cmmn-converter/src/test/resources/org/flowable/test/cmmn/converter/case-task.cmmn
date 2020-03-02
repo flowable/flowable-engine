@@ -21,7 +21,7 @@
             </sentry>
 
             <task id="theTask" name="The Task" isBlocking="true" />
-            <caseTask id="theCase" isBlocking="true" flowable:fallbackToDefaultTenant="true">
+            <caseTask id="theCase" isBlocking="true" flowable:fallbackToDefaultTenant="true" flowable:sameDeployment="true">
                 <extensionElements>
                     <flowable:in source="testSource" target="testTarget"></flowable:in>
                 </extensionElements>

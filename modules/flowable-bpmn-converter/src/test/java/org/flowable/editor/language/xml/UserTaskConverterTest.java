@@ -57,6 +57,7 @@ public class UserTaskConverterTest extends AbstractConverterTest {
         assertEquals("User task", userTask.getName());
         assertEquals("Test Category", userTask.getCategory());
         assertEquals("testKey", userTask.getFormKey());
+        assertTrue(userTask.isSameDeployment());
         assertEquals("40", userTask.getPriority());
         assertEquals("2012-11-01", userTask.getDueDate());
 

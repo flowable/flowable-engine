@@ -104,6 +104,23 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
     }
 
     @Override
+    public ProcessDefinitionEntity findProcessDefinitionByParentDeploymentAndKey(String parentDeploymentId, String processDefinitionKey) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("parentDeploymentId", parentDeploymentId);
+        parameters.put("processDefinitionKey", processDefinitionKey);
+        return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionByParentDeploymentAndKey", parameters);
+    }
+
+    @Override
+    public ProcessDefinitionEntity findProcessDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String processDefinitionKey, String tenantId) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("parentDeploymentId", parentDeploymentId);
+        parameters.put("processDefinitionKey", processDefinitionKey);
+        parameters.put("tenantId", tenantId);
+        return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionByParentDeploymentAndKeyAndTenantId", parameters);
+    }
+
+    @Override
     public ProcessDefinitionEntity findProcessDefinitionByKeyAndVersion(String processDefinitionKey, Integer processDefinitionVersion) {
         Map<String, Object> params = new HashMap<>();
         params.put("processDefinitionKey", processDefinitionKey);

@@ -120,6 +120,22 @@
       and KEY_ = #{caseDefinitionKey}
       and TENANT_ID_ = #{tenantId}
   </select>
+
+  <select id="selectCaseDefinitionByParentDeploymentAndKey" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_CMMN_CASEDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_CMMN_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{caseDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+
+  <select id="selectCaseDefinitionByParentDeploymentAndKeyAndTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_CMMN_CASEDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_CMMN_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{caseDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
   
   <select id="selectCaseDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *

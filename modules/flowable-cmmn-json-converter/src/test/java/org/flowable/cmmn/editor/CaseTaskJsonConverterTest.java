@@ -55,6 +55,7 @@ public class CaseTaskJsonConverterTest extends AbstractConverterTest {
         assertEquals("sid-E06221FA-0225-4EF8-A1E8-8DC177326B77", caseTask.getId());
         assertEquals("caseTaskName", caseTask.getName());
         assertTrue(caseTask.getFallbackToDefaultTenant());
+        assertTrue(caseTask.isSameDeployment());
 
         assertThat(caseTask.getInParameters())
                 .isNotNull()

@@ -46,6 +46,7 @@
             "isblockingexpression": "",
             "casetaskcasereference": "",
             "fallbacktodefaulttenant": true,
+            "samedeployment": true,
             "casetaskinparameters": {
               "inParameters": [
                 {

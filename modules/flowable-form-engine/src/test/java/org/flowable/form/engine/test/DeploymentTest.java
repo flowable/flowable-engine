@@ -12,14 +12,15 @@
  */
 package org.flowable.form.engine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInfo;
+import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +33,8 @@ public class DeploymentTest extends AbstractFlowableFormTest {
                 .latestVersion()
                 .formDefinitionKey("form1")
                 .singleResult();
-        assertNotNull(formDefinition);
-        assertEquals("form1", formDefinition.getKey());
+        assertThat(formDefinition).isNotNull();
+        assertThat(formDefinition.getKey()).isEqualTo("form1");
     }
 
     @Test
@@ -43,15 +44,16 @@ public class DeploymentTest extends AbstractFlowableFormTest {
                 .latestVersion()
                 .formDefinitionKey("form1")
                 .singleResult();
-        assertNotNull(formDefinition);
-        assertEquals("form1", formDefinition.getKey());
-        assertEquals(1, formDefinition.getVersion());
+        assertThat(formDefinition).isNotNull();
+        assertThat(formDefinition.getKey()).isEqualTo("form1");
+        assertThat(formDefinition.getVersion()).isOne();
 
         FormInfo formInfo = repositoryService.getFormModelByKey("form1");
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertEquals(1, formModel.getFields().size());
-        assertEquals("input1", formModel.getFields().get(0).getId());
-        assertEquals("Input1", formModel.getFields().get(0).getName());
+        assertThat(formModel.getFields()).hasSize(1);
+        assertThat(formModel.getFields())
+            .extracting(FormField::getId, FormField::getName)
+            .containsExactly(tuple("input1", "Input1"));
 
         FormDeployment redeployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/form/engine/test/deployment/simple2.form")
@@ -61,15 +63,16 @@ public class DeploymentTest extends AbstractFlowableFormTest {
                 .latestVersion()
                 .formDefinitionKey("form1")
                 .singleResult();
-        assertNotNull(formDefinition);
-        assertEquals("form1", formDefinition.getKey());
-        assertEquals(2, formDefinition.getVersion());
+        assertThat(formDefinition).isNotNull();
+        assertThat(formDefinition.getKey()).isEqualTo("form1");
+        assertThat(formDefinition.getVersion()).isEqualTo(2);
 
         formInfo = repositoryService.getFormModelByKey("form1");
         formModel = (SimpleFormModel) formInfo.getFormModel();
-        assertEquals(1, formModel.getFields().size());
-        assertEquals("input2", formModel.getFields().get(0).getId());
-        assertEquals("Input2", formModel.getFields().get(0).getName());
+        assertThat(formModel.getFields()).hasSize(1);
+        assertThat(formModel.getFields())
+            .extracting(FormField::getId, FormField::getName)
+            .containsExactly(tuple("input2", "Input2"));
 
         repositoryService.deleteDeployment(redeployment.getId());
     }
@@ -79,10 +82,11 @@ public class DeploymentTest extends AbstractFlowableFormTest {
             "org/flowable/form/engine/test/deployment/form_with_dates.form" })
     public void deploy2Forms() {
         List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormName().asc().list();
-        assertEquals(2, formDefinitions.size());
+        assertThat(formDefinitions).hasSize(2);
 
-        assertEquals("My date form", formDefinitions.get(0).getName());
-        assertEquals("My first form", formDefinitions.get(1).getName());
+        assertThat(formDefinitions)
+            .extracting(FormDefinition::getName)
+            .containsExactly("My date form", "My first form");
     }
     
     @Test
@@ -98,23 +102,23 @@ public class DeploymentTest extends AbstractFlowableFormTest {
         
         try {
             FormDefinition definition = repositoryService.createFormDefinitionQuery().deploymentId(deployment.getId()).singleResult();
-            assertNotNull(definition);
-            assertEquals("form1", definition.getKey());
-            assertEquals(1, definition.getVersion());
+            assertThat(definition).isNotNull();
+            assertThat(definition.getKey()).isEqualTo("form1");
+            assertThat(definition.getVersion()).isOne();
             
             FormDefinition newDefinition = repositoryService.createFormDefinitionQuery().deploymentId(newDeployment.getId()).singleResult();
-            assertNotNull(newDefinition);
-            assertEquals("form1", newDefinition.getKey());
-            assertEquals(2, newDefinition.getVersion());
+            assertThat(newDefinition).isNotNull();
+            assertThat(newDefinition.getKey()).isEqualTo("form1");
+            assertThat(newDefinition.getVersion()).isEqualTo(2);
             
             FormInfo formInfo = repositoryService.getFormModelByKeyAndParentDeploymentId("form1", "someDeploymentId");
-            assertEquals("form1", formInfo.getKey());
-            assertEquals(1, formInfo.getVersion());
+            assertThat(formInfo.getKey()).isEqualTo("form1");
+            assertThat(formInfo.getVersion()).isOne();
             
             formEngineConfiguration.setAlwaysLookupLatestDefinitionVersion(true);
             formInfo = repositoryService.getFormModelByKeyAndParentDeploymentId("form1", "someDeploymentId");
-            assertEquals("form1", formInfo.getKey());
-            assertEquals(2, formInfo.getVersion());
+            assertThat(formInfo.getKey()).isEqualTo("form1");
+            assertThat(formInfo.getVersion()).isEqualTo(2);
         
         } finally {
             formEngineConfiguration.setAlwaysLookupLatestDefinitionVersion(false);
