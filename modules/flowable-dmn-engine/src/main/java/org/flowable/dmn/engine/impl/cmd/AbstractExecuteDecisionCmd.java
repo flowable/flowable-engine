@@ -20,15 +20,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
+import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
+import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
@@ -180,5 +185,26 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         DmnDefinition dmnDefinition = decisionTableCacheEntry.getDmnDefinition();
 
         return dmnDefinition;
+    }
+
+    protected void execute(CommandContext commandContext, DmnDefinition definition) {
+        DecisionService decisionService = definition.getDecisionServiceById(executeDecisionContext.getDecisionKey());
+        DecisionExecutionAuditContainer auditContainer;
+
+        // executing a DecisionService is the default but will fallback to Decision
+        if (decisionService != null) {
+            auditContainer = DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decisionService, executeDecisionContext);
+            executeDecisionContext.setDecisionExecutionAuditContainer(auditContainer);
+            executeDecisionContext.setDmnElement(decisionService);
+
+            CommandContextUtil.getAgenda(commandContext).planExecuteDecisionServiceOperation(executeDecisionContext, decisionService);
+        } else {
+            Decision decision = definition.getDecisionById(executeDecisionContext.getDecisionKey());
+            auditContainer = DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, executeDecisionContext);
+            executeDecisionContext.setDecisionExecutionAuditContainer(auditContainer);
+            executeDecisionContext.setDmnElement(decision);
+
+            CommandContextUtil.getAgenda(commandContext).planExecuteDecisionOperation(executeDecisionContext, decision);
+        }
     }
 }

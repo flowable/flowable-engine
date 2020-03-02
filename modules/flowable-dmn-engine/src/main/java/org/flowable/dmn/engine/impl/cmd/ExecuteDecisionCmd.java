@@ -15,6 +15,7 @@ package org.flowable.dmn.engine.impl.cmd;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Command<List<Map<String, Object>>> {
+public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Command<Void> {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteDecisionCmd.class);
 
@@ -61,33 +62,14 @@ public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Co
     }
 
     @Override
-    public List<Map<String, Object>> execute(CommandContext commandContext) {
+    public Void execute(CommandContext commandContext) {
         if (executeDecisionContext.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
-        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
         DmnDefinition definition = resolveDefinition();
 
-        DecisionService decisionService = definition.getDecisionServiceById(executeDecisionContext.getDecisionKey());
-
-        DecisionExecutionAuditContainer auditContainer;
-
-        // executing a DecisionService is the default but will fallback to Decision
-        if (decisionService != null) {
-            auditContainer = DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decisionService, executeDecisionContext);
-            executeDecisionContext.setDecisionExecutionAuditContainer(auditContainer);
-            executeDecisionContext.setDmnElement(decisionService);
-
-            CommandContextUtil.getAgenda(commandContext).planExecuteDecisionServiceOperation(executeDecisionContext, decisionService);
-        } else {
-            Decision decision = definition.getDecisionById(executeDecisionContext.getDecisionKey());
-            auditContainer = DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, executeDecisionContext);
-            executeDecisionContext.setDecisionExecutionAuditContainer(auditContainer);
-            executeDecisionContext.setDmnElement(decision);
-
-            CommandContextUtil.getAgenda(commandContext).planExecuteDecisionOperation(executeDecisionContext, decision);
-        }
+        execute(commandContext, definition);
 
         return null;
     }
