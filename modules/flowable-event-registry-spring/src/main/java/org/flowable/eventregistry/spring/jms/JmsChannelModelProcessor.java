@@ -117,10 +117,10 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ChannelModelP
         return new JmsChannelMessageListenerAdapter(eventRegistry, inboundChannelModel);
     }
 
-    protected void processOutboundDefinition(JmsOutboundChannelModel channelDefinition) {
-        String destination = channelDefinition.getDestination();
-        if (channelDefinition.getOutboundEventChannelAdapter() == null && StringUtils.hasText(destination)) {
-            channelDefinition.setOutboundEventChannelAdapter(new JmsOperationsOutboundEventChannelAdapter(jmsOperations, destination));
+    protected void processOutboundDefinition(JmsOutboundChannelModel channelModel) {
+        String destination = channelModel.getDestination();
+        if (channelModel.getOutboundEventChannelAdapter() == null && StringUtils.hasText(destination)) {
+            channelModel.setOutboundEventChannelAdapter(new JmsOperationsOutboundEventChannelAdapter(jmsOperations, destination));
         }
     }
 
