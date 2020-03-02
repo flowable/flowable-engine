@@ -19,9 +19,11 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Iterator;
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDeployment;
+import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.JsonPointerBasedInboundEventTenantDetector;
@@ -239,6 +241,27 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         assertEquals("My channel", channelDefinitions.get(0).getName());
         assertEquals("Order channel", channelDefinitions.get(1).getName());
+    }
+
+    @Test
+    public void deployNewChannelVersion() {
+        DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache = eventEngineConfiguration.getChannelDefinitionCache();
+
+        repositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel.channel").deploy();
+        ChannelDefinition channelDefinition1 = repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").latestVersion().singleResult();
+        assertEquals("My channel", channelDefinition1.getName());
+
+        assertThat(channelDefinitionCache.size()).isEqualTo(1);
+        assertThat(channelDefinitionCache.get(channelDefinition1.getId())).isNotNull();
+
+        repositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel").deploy();
+
+        ChannelDefinition channelDefinition2 = repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").latestVersion().singleResult();
+        assertEquals("My channel2", channelDefinition2.getName());
+
+        assertThat(channelDefinitionCache.size()).isEqualTo(1);
+        assertThat(channelDefinitionCache.get(channelDefinition1.getId())).isNull();
+        assertThat(channelDefinitionCache.get(channelDefinition2.getId())).isNotNull();
     }
     
     @Test
