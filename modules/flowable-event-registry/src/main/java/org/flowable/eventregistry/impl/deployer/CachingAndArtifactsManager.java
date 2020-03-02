@@ -40,6 +40,12 @@ public class CachingAndArtifactsManager {
     protected EventJsonConverter eventJsonConverter = new EventJsonConverter();
     protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter();
 
+    public void removeChannelDefinitionFromCache(String channelDefinitionId) {
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryConfiguration();
+        DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache = eventRegistryEngineConfiguration.getDeploymentManager().getChannelDefinitionCache();
+        channelDefinitionCache.remove(channelDefinitionId);
+    }
+
     /**
      * Ensures that the event and channel definitions are cached in the appropriate places, including the deployment's collection of deployed artifacts and the deployment manager's cache.
      */

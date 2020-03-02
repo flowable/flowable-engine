@@ -66,7 +66,12 @@ public class EventDefinitionDeployer implements Deployer {
             Map<ChannelDefinitionEntity, ChannelDefinitionEntity> mapOfNewChannelDefinitionToPreviousVersion = getPreviousVersionsOfChannelDefinitions(parsedDeployment);
             setChannelDefinitionVersionsAndIds(parsedDeployment, mapOfNewChannelDefinitionToPreviousVersion);
             persistChannelDefinitions(parsedDeployment);
-            
+
+            // There should be only one channel definition in the cache (otherwise it could be detected as a 'new version' by the EventRegistryChangeDetectionManager)
+            for (ChannelDefinitionEntity previousChannelDefinition : mapOfNewChannelDefinitionToPreviousVersion.values()) {
+                cachingAndArtifactsManager.removeChannelDefinitionFromCache(previousChannelDefinition.getId());
+            }
+
         } else {
             makeEventDefinitionsConsistentWithPersistedVersions(parsedDeployment);
             makeChannelDefinitionsConsistentWithPersistedVersions(parsedDeployment);
