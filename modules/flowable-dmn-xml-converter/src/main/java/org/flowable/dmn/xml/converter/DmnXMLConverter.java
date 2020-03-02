@@ -257,6 +257,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     parentElement = model;
                 } else if (ELEMENT_DECISION.equals(xtr.getLocalName())) {
                     currentDecision = new Decision();
+                    currentDecision.setDmnDefinition(model);
                     model.addDecision(currentDecision);
                     currentDecision.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
                     currentDecision.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
@@ -282,7 +283,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     currentDecision.setExpression(currentDecisionTable);
                     parentElement = currentDecisionTable;
                 } else if (ELEMENT_DESCRIPTION.equals(xtr.getLocalName())) {
-                    parentElement.setDescription(xtr.getElementText());
+                    // limit description to 255 characters
+                    String description = xtr.getElementText();
+                    if (description != null) {
+                        parentElement.setDescription(description.substring(0, 255));
+                    }
                 } else if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     while (xtr.hasNext()) {
                         xtr.next();
@@ -392,7 +397,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     xtw.writeEndElement();
                 }
 
-                for (InformationRequirement informationRequirement : decision.getInformationRequirements()) {
+                for (InformationRequirement informationRequirement : decision.getRequiredDecisions()) {
                     xtw.writeStartElement(ELEMENT_INFORMATION_REQUIREMENT);
                     xtw.writeAttribute(ATTRIBUTE_ID, informationRequirement.getId());
 
@@ -401,6 +406,13 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeAttribute(ATTRIBUTE_HREF, informationRequirement.getRequiredDecision().getHref());
                         xtw.writeEndElement();
                     }
+
+                    xtw.writeEndElement();
+                }
+
+                for (InformationRequirement informationRequirement : decision.getRequiredInputs()) {
+                    xtw.writeStartElement(ELEMENT_INFORMATION_REQUIREMENT);
+                    xtw.writeAttribute(ATTRIBUTE_ID, informationRequirement.getId());
 
                     if (informationRequirement.getRequiredInput() != null) {
                         xtw.writeStartElement(ELEMENT_REQUIRED_INPUT);

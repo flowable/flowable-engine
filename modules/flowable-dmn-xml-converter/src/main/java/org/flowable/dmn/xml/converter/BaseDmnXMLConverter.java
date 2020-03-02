@@ -90,7 +90,11 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
             }
         } else if (parsedElement instanceof InformationRequirement) {
             InformationRequirement informationRequirement = (InformationRequirement) parsedElement;
-            decision.addInformationRequirement(informationRequirement);
+            if (informationRequirement.getRequiredDecision() != null) {
+                decision.addRequiredDecision(informationRequirement);
+            } else if (informationRequirement.getRequiredInput() != null) {
+                decision.addRequiredInput(informationRequirement);
+            }
         } else if (parsedElement instanceof AuthorityRequirement) {
             AuthorityRequirement authorityRequirement = (AuthorityRequirement) parsedElement;
             decision.addAuthorityRequirement(authorityRequirement);
@@ -100,6 +104,7 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
             }
         }  else if (parsedElement instanceof DecisionService) {
             DecisionService decisionService = (DecisionService) parsedElement;
+            decisionService.setDmnDefinition(model);
             model.addDecisionService(decisionService);
         }
 
