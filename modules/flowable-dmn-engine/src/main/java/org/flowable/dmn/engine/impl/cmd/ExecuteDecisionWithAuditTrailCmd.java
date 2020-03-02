@@ -43,17 +43,17 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
 
     public ExecuteDecisionWithAuditTrailCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables) {
         this(decisionKey, variables);
-        executeDefinitionInfo.setParentDeploymentId(parentDeploymentId);
+        executeDecisionContext.setParentDeploymentId(parentDeploymentId);
     }
 
     public ExecuteDecisionWithAuditTrailCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables, String tenantId) {
         this(decisionKey, parentDeploymentId, variables);
-        executeDefinitionInfo.setTenantId(tenantId);
+        executeDecisionContext.setTenantId(tenantId);
     }
 
     @Override
     public DecisionExecutionAuditContainer execute(CommandContext commandContext) {
-        if (executeDefinitionInfo.getDecisionKey() == null) {
+        if (executeDecisionContext.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
@@ -67,13 +67,13 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
             return container;
         }
 
-        DecisionService decisionService = definition.getDecisionServiceById(executeDefinitionInfo.getDecisionKey());
+        DecisionService decisionService = definition.getDecisionServiceById(executeDecisionContext.getDecisionKey());
 
         if (decisionService != null) {
-            return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decisionService, definition, executeDefinitionInfo);
+            return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decisionService, executeDecisionContext);
         } else {
-            Decision decision = definition.getDecisionById(executeDefinitionInfo.getDecisionKey());
-            return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDefinitionInfo);
+            Decision decision = definition.getDecisionById(executeDecisionContext.getDecisionKey());
+            return CommandContextUtil.getDmnEngineConfiguration().getRuleEngineExecutor().execute(decision, executeDecisionContext);
         }
     }
 

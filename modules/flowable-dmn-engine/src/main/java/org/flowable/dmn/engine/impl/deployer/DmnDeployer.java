@@ -97,7 +97,8 @@ public class DmnDeployer implements Deployer {
             if (usePrefixId) {
                 decision.setId(decision.getIdPrefix() + idGenerator.getNextId());
             } else {
-                decision.setId(idGenerator.getNextId());
+                String id = idGenerator.getNextId();
+                decision.setId(id);
             }
         }
     }

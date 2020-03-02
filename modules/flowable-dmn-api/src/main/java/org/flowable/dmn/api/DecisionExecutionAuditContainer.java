@@ -53,6 +53,16 @@ public class DecisionExecutionAuditContainer {
     public DecisionExecutionAuditContainer() {
     }
 
+    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, Boolean strictMode, Map<String, Object> inputVariables) {
+        this.startTime = new Date();
+        this.decisionKey = decisionKey;
+        this.decisionName = decisionName;
+        this.decisionVersion = decisionVersion;
+        this.strictMode = strictMode;
+        this.inputVariableTypes = getVariablesTypeMap(inputVariables);
+    }
+
+
     public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, HitPolicy hitPolicy, 
                     Boolean strictMode, Map<String, Object> inputVariables) {
         

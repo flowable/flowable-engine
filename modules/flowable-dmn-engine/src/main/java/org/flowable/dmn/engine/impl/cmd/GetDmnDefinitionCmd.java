@@ -17,7 +17,7 @@ import java.io.Serializable;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.util.DecisionTableUtil;
+import org.flowable.dmn.engine.impl.util.DecisionUtil;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
@@ -39,6 +39,6 @@ public class GetDmnDefinitionCmd implements Command<DmnDefinition>, Serializable
             throw new FlowableIllegalArgumentException("decisionTableId is null");
         }
 
-        return DecisionTableUtil.getDmnDefinition(decisionTableId);
+        return DecisionUtil.getDmnDefinitionByDecisionId(decisionTableId);
     }
 }

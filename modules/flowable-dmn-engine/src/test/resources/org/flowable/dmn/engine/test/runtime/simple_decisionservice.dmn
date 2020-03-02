@@ -1,0 +1,258 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_c0e9d8ba-4b7f-11e7-8197-a26608126000" name="Risk Rating Decision Table"
+             namespace="http://www.flowable.org/dmn">
+    <decision id="decision1" name="Decision 1">
+        <informationRequirement id="infoRequirement1_1">
+            <requiredDecision href="#decision2" />
+        </informationRequirement>
+        <decisionTable id="decisionTable1">
+            <input>
+                <inputExpression id="inputExpression1" typeRef="string">
+                    <text>input11</text>
+                </inputExpression>
+            </input>
+            <output id="output1" label="Output 1" name="output1" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry1">
+                    <text><![CDATA[.startsWith('test')]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1">
+                    <text>'test1'</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2">
+                    <text><![CDATA[.endsWith('test')]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2">
+                    <text>'test2'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision2" name="Decision 2">
+        <informationRequirement id="infoRequirement1_2">
+            <requiredDecision href="#decision3" />
+        </informationRequirement>
+        <decisionTable id="decisionTable2" hitPolicy="OUTPUT ORDER">
+            <input label="Age">
+                <inputExpression id="inputExpression2_1" typeRef="number">
+                    <text>age</text>
+                </inputExpression>
+            </input>
+            <input label="Risk category">
+                <inputExpression id="inputExpression2_3" typeRef="string">
+                    <text>riskcategory</text>
+                </inputExpression>
+                <inputValues>
+                    <text>"LOW","MEDIUM","HIGH"</text>
+                </inputValues>
+            </input>
+            <input label="Debt review">
+                <inputExpression id="inputExpression2_4" typeRef="boolean">
+                    <text>debtreview</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression2_2" label="Routing" name="routing" typeRef="string">
+                <outputValues>
+                    <text>"DECLINE","REFER","ACCEPT"</text>
+                </outputValues>
+            </output>
+            <output id="outputExpression2_5" label="Review level" name="reviewlevel" typeRef="string">
+                <outputValues>
+                    <text>"LEVEL 2","LEVEL 1","NONE"</text>
+                </outputValues>
+            </output>
+            <output id="outputExpression2_6" label="Reason" name="reason" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry2_1_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2_3_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2_4_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2_1">
+                    <text><![CDATA["ACCEPT"]]></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_5_1">
+                    <text><![CDATA["NONE"]]></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_6_1">
+                    <text><![CDATA["Acceptable"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2_1_2">
+                    <text><![CDATA[<18]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2_3_2">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2_4_2">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2_2">
+                    <text><![CDATA["DECLINE"]]></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_5_2">
+                    <text><![CDATA["NONE"]]></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_6_2">
+                    <text><![CDATA["Applicant too young"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2_1_3">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2_3_3">
+                    <text><![CDATA["HIGH"]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2_4_3">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2_3">
+                    <text><![CDATA["REFER"]]></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_5_3">
+                    <text><![CDATA["LEVEL 1"]]></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_6_3">
+                    <text><![CDATA["High risk application"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2_1_4">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2_3_4">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2_4_4">
+                    <text><![CDATA[true]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2_4">
+                    <text><![CDATA["REFER"]]></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_5_4">
+                    <text><![CDATA["LEVEL 2"]]></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_6_4">
+                    <text><![CDATA["Applicant under debt review"]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision3" name="Simple decision">
+        <decisionTable id="decisionTable3">
+            <input>
+                <inputExpression id="inputExpression3_1" typeRef="date">
+                    <text>input1</text>
+                </inputExpression>
+            </input>
+            <output id="output3_1" label="Output 1" name="output1" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry3_1">
+                    <text><![CDATA[> fn_addDate(fn_now(),1,2,3)]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry3_1">
+                    <text>'test1'</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry3_2">
+                    <text><![CDATA[< fn_addDate(fn_now(),1,2,3)]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry3_2">
+                    <text>'test2'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision4" name="Decision 4">
+        <informationRequirement id="infoRequirement4_1">
+            <requiredDecision href="#decision1" />
+        </informationRequirement>
+        <decisionTable id="decisionTable4">
+            <input>
+                <inputExpression id="inputExpression4_1" typeRef="date">
+                    <text>input1</text>
+                </inputExpression>
+            </input>
+            <output id="output4_1" label="Output 1" name="output1" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry4_1">
+                    <text><![CDATA[< fn_date('2015-01-01')]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry4_1">
+                    <text>'test1'</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry4_2">
+                    <text><![CDATA[> fn_date('2015-01-01')]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry4_2">
+                    <text>'test2'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision5" name="Full Decision">
+        <decisionTable id="decisionTable5" hitPolicy="FIRST">
+            <input>
+                <inputExpression id="inputExpression5_1" typeRef="decision1Type">
+                    <text>inputVariable1</text>
+                </inputExpression>
+            </input>
+            <input>
+                <inputExpression id="inputExpression5_22" typeRef="string">
+                    <text>inputVariable2</text>
+                </inputExpression>
+            </input>
+            <output id="output5_1" label="Output 1" name="outputVariable1" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry5_1">
+                    <text>1</text>
+                </inputEntry>
+                <inputEntry id="inputEntry5_2">
+                    <text>"test1"</text>
+                </inputEntry>
+                <outputEntry id="outputEntry5_1">
+                    <text>"result1"</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry5_3">
+                    <text>1.0</text>
+                </inputEntry>
+                <inputEntry id="inputEntry5_4">
+                    <text>"test1"</text>
+                </inputEntry>
+                <outputEntry id="outputEntry5_2">
+                    <text>"result1"</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry5_5">
+                    <text>== 1</text>
+                </inputEntry>
+                <inputEntry id="inputEntry5_6">
+                    <text>"test2"</text>
+                </inputEntry>
+                <outputEntry id="outputEntry5_3">
+                    <text>"result2"</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decisionService id="decisionService1" name="Decision Service 1">
+        <outputDecision href="#decision1"/>
+        <outputDecision href="#decision4"/>
+        <encapsulatedDecision href="#decision2"/>
+        <encapsulatedDecision href="#decision3"/>
+<!--        <encapsulatedDecision href="#decision5"/>-->
+    </decisionService>
+</definitions>

@@ -13,9 +13,10 @@
 package org.flowable.dmn.engine.impl.audit;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
+import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,18 @@ public class DecisionExecutionAuditUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DecisionExecutionAuditUtil.class);
 
-    public static DecisionExecutionAuditContainer initializeRuleExecutionAudit(Decision decision, ExecuteDecisionInfo executeDecisionInfo) {
+    public static DecisionExecutionAuditContainer initializeRuleExecutionAudit(DecisionService decisionService, ExecuteDecisionContext executeDecisionInfo) {
+
+        if (decisionService == null || decisionService.getId() == null) {
+            LOGGER.error("decision service does not contain key");
+            throw new IllegalArgumentException("decision does not contain decision key");
+        }
+
+        return new DecisionExecutionAuditContainer(decisionService.getId(), decisionService.getName(), executeDecisionInfo.getDecisionVersion(),
+           CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), executeDecisionInfo.getVariables());
+    }
+
+    public static DecisionExecutionAuditContainer initializeRuleExecutionAudit(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
 
         if (decision == null || decision.getId() == null) {
             LOGGER.error("decision does not contain key");

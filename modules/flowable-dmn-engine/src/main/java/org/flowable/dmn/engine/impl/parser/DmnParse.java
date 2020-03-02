@@ -29,6 +29,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
@@ -91,6 +92,15 @@ public class DmnParse implements DmnXMLConstants {
                     decisionEntity.setResourceName(name);
                     decisionEntity.setDeploymentId(deployment.getId());
                     decisionEntity.setDescription(decision.getDescription());
+                    decisions.add(decisionEntity);
+                }
+                for (DecisionService decisionService : dmnDefinition.getDecisionServices()) {
+                    DecisionEntity decisionEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionDataManager().create();
+                    decisionEntity.setKey(decisionService.getId());
+                    decisionEntity.setName(decisionService.getName());
+                    decisionEntity.setResourceName(name);
+                    decisionEntity.setDeploymentId(deployment.getId());
+                    decisionEntity.setDescription(decisionService.getDescription());
                     decisions.add(decisionEntity);
                 }
             }

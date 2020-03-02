@@ -19,9 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
+import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
@@ -36,7 +37,18 @@ public class ELExecutionContextBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ELExecutionContextBuilder.class);
 
-    public static ELExecutionContext build(Decision decision, ExecuteDecisionInfo executeDecisionInfo) {
+    public static ELExecutionContext build(DecisionService decisionService, ExecuteDecisionContext executeDecisionInfo) {
+        ELExecutionContext executionContext = new ELExecutionContext();
+        executionContext.setInstanceId(executeDecisionInfo.getInstanceId());
+        executionContext.setScopeType(executeDecisionInfo.getScopeType());
+        executionContext.setTenantId(executeDecisionInfo.getTenantId());
+
+        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decisionService, executeDecisionInfo));
+
+        return executionContext;
+    }
+
+    public static ELExecutionContext build(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
         ELExecutionContext executionContext = new ELExecutionContext();
         executionContext.setInstanceId(executeDecisionInfo.getInstanceId());
         executionContext.setScopeType(executeDecisionInfo.getScopeType());

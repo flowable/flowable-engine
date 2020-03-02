@@ -12,9 +12,13 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ExecuteDecisionInfo {
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.model.DmnElement;
+
+public class ExecuteDecisionContext {
 
     protected String decisionKey;
     protected String decisionId;
@@ -29,7 +33,30 @@ public class ExecuteDecisionInfo {
     protected String tenantId;
     protected boolean fallbackToDefaultTenant;
     protected boolean forceDMN11;
-    
+    protected DmnElement dmnElement;
+    protected DecisionExecutionAuditContainer decisionExecutionAuditContainer;
+    protected Map<String, DecisionExecutionAuditContainer> decisionResults = new LinkedHashMap<>();
+    protected ExecuteDecisionContext parentExecuteDecisionContext;
+
+    public ExecuteDecisionContext() {}
+
+    public ExecuteDecisionContext(DmnElement dmnElement, ExecuteDecisionContext parentExecuteDecisionContext) {
+        decisionKey = parentExecuteDecisionContext.getDecisionKey();
+        decisionId = parentExecuteDecisionContext.getTenantId();
+        decisionVersion = parentExecuteDecisionContext.getDecisionVersion();
+        deploymentId = parentExecuteDecisionContext.getDeploymentId();
+        parentDeploymentId = parentExecuteDecisionContext.getParentDeploymentId();
+        instanceId = parentExecuteDecisionContext.getInstanceId();
+        executionId = parentExecuteDecisionContext.getExecutionId();
+        activityId = parentExecuteDecisionContext.getActivityId();
+        scopeType = parentExecuteDecisionContext.getScopeType();
+        variables = parentExecuteDecisionContext.getVariables();
+        tenantId = parentExecuteDecisionContext.getTenantId();
+        fallbackToDefaultTenant = parentExecuteDecisionContext.isFallbackToDefaultTenant();
+        this.dmnElement = dmnElement;
+        this.parentExecuteDecisionContext = parentExecuteDecisionContext;
+    }
+
     public String getDecisionKey() {
         return decisionKey;
     }
@@ -107,5 +134,35 @@ public class ExecuteDecisionInfo {
     }
     public void setForceDMN11(boolean forceDMN11) {
         this.forceDMN11 = forceDMN11;
+    }
+    public DmnElement getDmnElement() {
+        return dmnElement;
+    }
+    public void setDmnElement(DmnElement dmnElement) {
+        this.dmnElement = dmnElement;
+    }
+    public DecisionExecutionAuditContainer getDecisionExecutionAuditContainer() {
+        return decisionExecutionAuditContainer;
+    }
+    public void setDecisionExecutionAuditContainer(DecisionExecutionAuditContainer decisionExecutionAuditContainer) {
+        this.decisionExecutionAuditContainer = decisionExecutionAuditContainer;
+    }
+    public DecisionExecutionAuditContainer getDecisionResult(String decisionKey) {
+        return decisionResults.get(decisionKey);
+    }
+    public void addDecisionResult(String decisionKey, DecisionExecutionAuditContainer decisionResult) {
+        decisionResults.put(decisionKey, decisionResult);
+    }
+    public Map<String, DecisionExecutionAuditContainer> getDecisionResults() {
+        return decisionResults;
+    }
+    public void setDecisionResults(Map<String, DecisionExecutionAuditContainer> decisionResults) {
+        this.decisionResults = decisionResults;
+    }
+    public ExecuteDecisionContext getParentExecuteDecisionContext() {
+        return parentExecuteDecisionContext;
+    }
+    public void setParentExecuteDecisionContext(ExecuteDecisionContext parentExecuteDecisionContext) {
+        this.parentExecuteDecisionContext = parentExecuteDecisionContext;
     }
 }

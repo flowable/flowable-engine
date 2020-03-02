@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
+import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 
 /**
  * @author Tijs Rademakers
@@ -161,6 +162,18 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         return variables;
     }
 
-   
+    public ExecuteDecisionContext buildExecuteDecisionContext() {
+        ExecuteDecisionContext executeDecisionContext = new ExecuteDecisionContext();
+        executeDecisionContext.setDecisionKey(decisionKey);
+        executeDecisionContext.setParentDeploymentId(parentDeploymentId);
+        executeDecisionContext.setInstanceId(instanceId);
+        executeDecisionContext.setExecutionId(executionId);
+        executeDecisionContext.setActivityId(activityId);
+        executeDecisionContext.setScopeType(scopeType);
+        executeDecisionContext.setVariables(variables);
+        executeDecisionContext.setTenantId(tenantId);
+        executeDecisionContext.setFallbackToDefaultTenant(fallbackToDefaultTenant);
 
+        return executeDecisionContext;
+    }
 }

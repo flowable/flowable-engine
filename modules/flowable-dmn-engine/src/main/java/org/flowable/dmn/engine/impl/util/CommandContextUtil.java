@@ -18,6 +18,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.engine.impl.agenda.DmnEngineAgenda;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
@@ -92,7 +93,15 @@ public class CommandContextUtil {
     public static DmnRepositoryService getDmnRepositoryService(CommandContext commandContext) {
         return getDmnEngineConfiguration(commandContext).getDmnRepositoryService();
     }
-    
+
+    public static DmnEngineAgenda getAgenda() {
+        return getAgenda(getCommandContext());
+    }
+
+    public static DmnEngineAgenda getAgenda(CommandContext commandContext) {
+        return commandContext.getSession(DmnEngineAgenda.class);
+    }
+
     public static CommandContext getCommandContext() {
         return Context.getCommandContext();
     }

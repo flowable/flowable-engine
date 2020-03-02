@@ -25,7 +25,7 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
-import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
+import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -38,23 +38,29 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected ExecuteDecisionInfo executeDefinitionInfo = new ExecuteDecisionInfo();
+    protected ExecuteDecisionContext executeDecisionContext;
+
+    public AbstractExecuteDecisionCmd(ExecuteDecisionContext executeDecisionContext) {
+        this.executeDecisionContext = executeDecisionContext;
+    }
 
     public AbstractExecuteDecisionCmd(ExecuteDecisionBuilderImpl definitionBuilder) {
-        executeDefinitionInfo.setDecisionKey(definitionBuilder.getDecisionKey());
-        executeDefinitionInfo.setParentDeploymentId(definitionBuilder.getParentDeploymentId());
-        executeDefinitionInfo.setInstanceId(definitionBuilder.getInstanceId());
-        executeDefinitionInfo.setExecutionId(definitionBuilder.getExecutionId());
-        executeDefinitionInfo.setActivityId(definitionBuilder.getActivityId());
-        executeDefinitionInfo.setScopeType(definitionBuilder.getScopeType());
-        executeDefinitionInfo.setVariables(definitionBuilder.getVariables());
-        executeDefinitionInfo.setTenantId(definitionBuilder.getTenantId());
-        executeDefinitionInfo.setFallbackToDefaultTenant(definitionBuilder.isFallbackToDefaultTenant());
+        executeDecisionContext = new ExecuteDecisionContext();
+        executeDecisionContext.setDecisionKey(definitionBuilder.getDecisionKey());
+        executeDecisionContext.setParentDeploymentId(definitionBuilder.getParentDeploymentId());
+        executeDecisionContext.setInstanceId(definitionBuilder.getInstanceId());
+        executeDecisionContext.setExecutionId(definitionBuilder.getExecutionId());
+        executeDecisionContext.setActivityId(definitionBuilder.getActivityId());
+        executeDecisionContext.setScopeType(definitionBuilder.getScopeType());
+        executeDecisionContext.setVariables(definitionBuilder.getVariables());
+        executeDecisionContext.setTenantId(definitionBuilder.getTenantId());
+        executeDecisionContext.setFallbackToDefaultTenant(definitionBuilder.isFallbackToDefaultTenant());
     }
 
     public AbstractExecuteDecisionCmd(String decisionKey, Map<String, Object> variables) {
-        executeDefinitionInfo.setDecisionKey(decisionKey);
-        executeDefinitionInfo.setVariables(variables);
+        executeDecisionContext = new ExecuteDecisionContext();
+        executeDecisionContext.setDecisionKey(decisionKey);
+        executeDecisionContext.setVariables(variables);
     }
 
     protected DmnDefinition resolveDefinition() {
@@ -62,9 +68,9 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
         DecisionEntityManager definitionManager = dmnEngineConfiguration.getDecisionEntityManager();
 
-        String definitionKey = executeDefinitionInfo.getDecisionKey();
-        String parentDeploymentId = executeDefinitionInfo.getParentDeploymentId();
-        String tenantId = executeDefinitionInfo.getTenantId();
+        String definitionKey = executeDecisionContext.getDecisionKey();
+        String parentDeploymentId = executeDecisionContext.getParentDeploymentId();
+        String tenantId = executeDecisionContext.getTenantId();
 
         if (StringUtils.isNotEmpty(definitionKey) && StringUtils.isNotEmpty(parentDeploymentId) &&
                         !dmnEngineConfiguration.isAlwaysLookupLatestDefinitionVersion() && StringUtils.isNotEmpty(tenantId)) {
@@ -83,7 +89,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
                 if (definition == null) {
                     // if fallback to default tenant is enabled do a final lookup query
-                    if (executeDefinitionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
+                    if (executeDecisionContext.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
                         String defaultTenant = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.DMN, definitionKey);
                         if (StringUtils.isNotEmpty(defaultTenant)) {
                             definition = definitionManager.findLatestDecisionByKeyAndTenantId(definitionKey, defaultTenant);
@@ -132,7 +138,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         } else if (StringUtils.isNotEmpty(definitionKey) && StringUtils.isNotEmpty(tenantId)) {
             definition = definitionManager.findLatestDecisionByKeyAndTenantId(definitionKey, tenantId);
             if (definition == null) {
-                if (executeDefinitionInfo.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
+                if (executeDecisionContext.isFallbackToDefaultTenant() || dmnEngineConfiguration.isFallbackToDefaultTenant()) {
                     String defaultTenant = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.DMN, definitionKey);
                     if (StringUtils.isNotEmpty(defaultTenant)) {
                         definition = definitionManager.findLatestDecisionByKeyAndTenantId(definitionKey, defaultTenant);
@@ -166,9 +172,9 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
-        executeDefinitionInfo.setDecisionId(definition.getId());
-        executeDefinitionInfo.setDecisionVersion(definition.getVersion());
-        executeDefinitionInfo.setDeploymentId(definition.getDeploymentId());
+        executeDecisionContext.setDecisionId(definition.getId());
+        executeDecisionContext.setDecisionVersion(definition.getVersion());
+        executeDecisionContext.setDeploymentId(definition.getDeploymentId());
 
         DecisionCacheEntry decisionTableCacheEntry = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().resolveDecision(definition);
         DmnDefinition dmnDefinition = decisionTableCacheEntry.getDmnDefinition();

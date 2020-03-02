@@ -153,7 +153,6 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_decisions.dmn")
     public void deployMultipleDecisions() throws Exception {
-
         DmnDecision decision = repositoryService.createDecisionQuery()
                 .latestVersion()
                 .decisionKey("decision")
@@ -187,7 +186,6 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
 
     @Test
     public void deployWithCategory() throws Exception {
-
         repositoryService.createDeployment().name("secondDeployment")
                 .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
                 .tenantId("testTenant")
@@ -251,6 +249,17 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
                 .count();
 
         assertEquals(2, count);
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/chapter11.dmn")
+    public void testDecisionServicesDeployment() {
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
+        assertNotNull(deployment);
+
+        List<DmnDecision> decisions = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
+        assertEquals(13, decisions.size());
+
     }
     
     @Test

@@ -71,22 +71,18 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
      * Executes the given definition and creates the outcome results
      *
      * @param decisionService       the decision service
-     * @param definition            the DMN definition
      * @param executeDecisionInfo
      * @return updated execution variables map
      */
     @Override
-    public DecisionExecutionAuditContainer execute(DecisionService decisionService, DmnDefinition definition, ExecuteDecisionInfo executeDecisionInfo) {
+    public DecisionExecutionAuditContainer execute(DecisionService decisionService, ExecuteDecisionContext executeDecisionContext) {
         if (decisionService == null) {
             throw new IllegalArgumentException("no decision service provided");
         }
-        if (definition == null) {
-            throw new IllegalArgumentException("no definition provided");
-        }
-        AtomicReference<DecisionExecutionAuditContainer> executionAuditContainer;
-        definition.getDecisions().forEach(decision -> execute(decision, executeDecisionInfo));
 
-        return new DecisionExecutionAuditContainer();
+        ELExecutionContext executionContext = ELExecutionContextBuilder.build(decisionService, executeDecisionContext);
+
+        return executionContext.getAuditContainer();
     }
 
     /**
@@ -97,7 +93,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
      * @return updated execution variables map
      */
     @Override
-    public DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionInfo executeDecisionInfo) {
+    public DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
 
         if (decision == null) {
             throw new IllegalArgumentException("no decision provided");

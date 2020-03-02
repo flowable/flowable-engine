@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
+import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
@@ -28,9 +28,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Yvo Swillens
  */
 public interface RuleEngineExecutor {
-    DecisionExecutionAuditContainer execute(DecisionService decisionService, DmnDefinition definition, ExecuteDecisionInfo executeDecisionInfo);
+    DecisionExecutionAuditContainer execute(DecisionService decisionService, ExecuteDecisionContext executeDecisionInfo);
 
-    DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionInfo executeDecisionInfo);
+    DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionContext executeDecisionInfo);
     
     Map<String, AbstractHitPolicy> getHitPolicyBehaviors();
 

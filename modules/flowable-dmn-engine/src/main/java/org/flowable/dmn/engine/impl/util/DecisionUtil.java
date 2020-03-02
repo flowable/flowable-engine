@@ -13,11 +13,13 @@
 package org.flowable.dmn.engine.impl.util;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
@@ -27,7 +29,7 @@ import org.flowable.dmn.model.DmnDefinition;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class DecisionTableUtil {
+public class DecisionUtil {
 
     public static DecisionEntity getDecisionTableEntity(String decisionTableId) {
         return getDecisionTableEntity(decisionTableId, false);
@@ -46,11 +48,11 @@ public class DecisionTableUtil {
         }
     }
 
-    public static DmnDefinition getDmnDefinition(String decisionTableId) {
+    public static DmnDefinition getDmnDefinitionByDecisionId(String decisionId) {
         DeploymentManager deploymentManager = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager();
 
         // This will check the cache in the findDeployedDecisionById and resolveDecisionTable method
-        DecisionEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionTableId);
+        DecisionEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionId);
         return deploymentManager.resolveDecision(decisionTableEntity).getDmnDefinition();
     }
 
@@ -70,5 +72,16 @@ public class DecisionTableUtil {
         }
 
         return decisionTable;
+    }
+
+    public static DecisionService getDecisionService(String decisionId) {
+        DmnDefinition dmnDefinition = getDmnDefinitionByDecisionId(decisionId);
+        DecisionService decisionService = dmnDefinition.getDecisionServiceById(decisionId);
+
+        if (decisionService == null) {
+            throw new FlowableObjectNotFoundException("Could not find decision service with id: " + decisionId);
+        }
+
+        return decisionService;
     }
 }

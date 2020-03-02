@@ -48,6 +48,9 @@ import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnDecisionServiceImpl;
 import org.flowable.dmn.engine.impl.RuleEngineExecutorImpl;
+import org.flowable.dmn.engine.impl.agenda.DefaultDmnEngineAgendaFactory;
+import org.flowable.dmn.engine.impl.agenda.DmnEngineAgendaFactory;
+import org.flowable.dmn.engine.impl.agenda.DmnEngineAgendaSessionFactory;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.SchemaOperationsDmnEngineBuild;
@@ -77,6 +80,7 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyOutputOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
+import org.flowable.dmn.engine.impl.interceptor.DmnCommandInvoker;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
@@ -111,6 +115,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DMN_";
 
     protected String dmnEngineName = DmnEngines.NAME_DEFAULT;
+
+    protected DmnEngineAgendaFactory dmnEngineAgendaFactory;
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////
@@ -228,6 +234,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initDmnEngineAgendaFactory();
 
         if (usingRelationalDatabase) {
             initDataSource();
@@ -406,6 +413,24 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         }
 
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
+    }
+
+    @Override
+    public void initCommandInvoker() {
+        if (commandInvoker == null) {
+            commandInvoker = new DmnCommandInvoker();
+        }
+    }
+    public void initDmnEngineAgendaFactory() {
+        if (dmnEngineAgendaFactory == null) {
+            dmnEngineAgendaFactory = new DefaultDmnEngineAgendaFactory();
+        }
+    }
+
+    @Override
+    public void initSessionFactories() {
+        super.initSessionFactories();
+        addSessionFactory(new DmnEngineAgendaSessionFactory(dmnEngineAgendaFactory));
     }
 
     // deployers
@@ -858,6 +883,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     public DmnEngineConfiguration setResourceEntityManager(DmnResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
+        return this;
+    }
+
+    public DmnEngineAgendaFactory getDmnEngineAgendaFactory() {
+        return dmnEngineAgendaFactory;
+    }
+
+    public DmnEngineConfiguration setDmnEngineAgendaFactory(DmnEngineAgendaFactory dmnEngineAgendaFactory) {
+        this.dmnEngineAgendaFactory = dmnEngineAgendaFactory;
         return this;
     }
 

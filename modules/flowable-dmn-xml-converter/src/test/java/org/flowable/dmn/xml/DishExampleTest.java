@@ -40,14 +40,12 @@ public class DishExampleTest extends AbstractConverterTest {
             .containsExactly("dish", "season", "guestCount");
 
         assertThat(model.getDecisions()).as("decisions")
-            .flatExtracting(Decision::getInformationRequirements)
-            .filteredOn(ir -> ir.getRequiredDecision() != null)
+            .flatExtracting(Decision::getRequiredDecisions)
             .extracting(ir -> ir.getRequiredDecision().getHref())
             .containsExactly("#season", "#guestCount");
 
         assertThat(model.getDecisions()).as("decisions")
-            .flatExtracting(Decision::getInformationRequirements)
-            .filteredOn(ir -> ir.getRequiredInput() != null)
+            .flatExtracting(Decision::getRequiredInputs)
             .extracting(ir -> ir.getRequiredInput().getHref())
             .containsExactly("#temperature_id", "#dayType_id");
 
