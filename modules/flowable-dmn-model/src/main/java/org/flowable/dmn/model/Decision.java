@@ -23,10 +23,12 @@ public class Decision extends DRGElement {
     protected String question;
     protected String allowedAnswers;
     protected InformationItem variable;
-    protected List<InformationRequirement> informationRequirements = new ArrayList<>();
+    protected List<InformationRequirement> requiredDecisions = new ArrayList<>();
+    protected List<InformationRequirement> requiredInputs = new ArrayList<>();
     protected List<AuthorityRequirement> authorityRequirements = new ArrayList<>();
     protected Expression expression;
     protected boolean forceDMN11;
+    protected DmnDefinition dmnDefinition;
 
     public String getQuestion() {
         return question;
@@ -50,17 +52,25 @@ public class Decision extends DRGElement {
     public void setVariable(InformationItem variable) {
         this.variable = variable;
     }
-    public List<InformationRequirement> getInformationRequirements() {
-        return informationRequirements;
-    }
-    public void setInformationRequirements(List<InformationRequirement> informationRequirements) {
-        this.informationRequirements = informationRequirements;
-    }
 
-    public void addInformationRequirement(InformationRequirement informationRequirement) {
-        this.informationRequirements.add(informationRequirement);
+    public List<InformationRequirement> getRequiredDecisions() {
+        return requiredDecisions;
     }
-
+    public void setRequiredDecisions(List<InformationRequirement> requiredDecisions) {
+        this.requiredDecisions = requiredDecisions;
+    }
+    public void addRequiredDecision(InformationRequirement requiredDecision) {
+        this.requiredDecisions.add(requiredDecision);
+    }
+    public List<InformationRequirement> getRequiredInputs() {
+        return requiredInputs;
+    }
+    public void setRequiredInputs(List<InformationRequirement> requiredInputs) {
+        this.requiredInputs = requiredInputs;
+    }
+    public void addRequiredInput(InformationRequirement requiredInput) {
+        this.requiredInputs.add(requiredInput);
+    }
     public List<AuthorityRequirement> getAuthorityRequirements() {
         return authorityRequirements;
     }
@@ -85,5 +95,12 @@ public class Decision extends DRGElement {
     }
     public void setForceDMN11(boolean forceDMN11) {
         this.forceDMN11 = forceDMN11;
+    }
+
+    public DmnDefinition getDmnDefinition() {
+        return dmnDefinition;
+    }
+    public void setDmnDefinition(DmnDefinition dmnDefinition) {
+        this.dmnDefinition = dmnDefinition;
     }
 }
