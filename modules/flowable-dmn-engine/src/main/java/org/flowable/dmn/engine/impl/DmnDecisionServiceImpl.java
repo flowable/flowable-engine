@@ -16,18 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionCmd;
-import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionSingleResultCmd;
 import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionWithAuditTrailCmd;
-import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
-import org.flowable.dmn.model.DmnElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,98 +38,49 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
     public ExecuteDecisionBuilder createExecuteDecisionBuilder() {
         return new ExecuteDecisionBuilderImpl(this);
     }
-    
-    @Override
-    @Deprecated
-    public List<Map<String, Object>> executeDecisionByKey(String decisionKey, Map<String, Object> inputVariables) {
-        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, inputVariables));
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Object> executeDecisionByKeySingleResult(String decisionKey, Map<String, Object> inputVariables) {
-        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(decisionKey, inputVariables));
-    }
-
-    @Override
-    @Deprecated
-    public DecisionExecutionAuditContainer executeDecisionByKeyWithAuditTrail(String decisionKey, Map<String, Object> inputVariables) {
-        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(decisionKey, inputVariables));
-    }
-
-    @Override
-    @Deprecated
-    public List<Map<String, Object>> executeDecisionByKeyAndTenantId(String decisionKey, Map<String, Object> inputVariables, String tenantId) {
-        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, null, inputVariables, tenantId));
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Object> executeDecisionByKeyAndTenantIdSingleResult(String decisionKey, Map<String, Object> inputVariables, String tenantId) {
-        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(decisionKey, null, inputVariables, tenantId));
-    }
-
-    @Override
-    @Deprecated
-    public DecisionExecutionAuditContainer executeDecisionByKeyAndTenantIdWithAuditTrail(String decisionKey, Map<String, Object> inputVariables, String tenantId) {
-        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(decisionKey, null, inputVariables, tenantId));
-    }
-
-    @Override
-    @Deprecated
-    public List<Map<String, Object>> executeDecisionByKeyAndParentDeploymentId(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables) {
-        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, parentDeploymentId, inputVariables));
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Object> executeDecisionByKeyAndParentDeploymentIdSingleResult(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables) {
-        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(decisionKey, parentDeploymentId, inputVariables));
-    }
-
-    @Override
-    @Deprecated
-    public DecisionExecutionAuditContainer executeDecisionByKeyAndParentDeploymentIdWithAuditTrail(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
-        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
-    }
-    
-    @Override
-    @Deprecated
-    public List<Map<String, Object>> executeDecisionByKeyParentDeploymentIdAndTenantId(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
-        return commandExecutor.execute(new ExecuteDecisionCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
-    }
-    
-    @Override
-    @Deprecated
-    public Map<String, Object> executeDecisionByKeyParentDeploymentIdAndTenantIdSingleResult(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
-        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
-    }
-    
-    @Override
-    @Deprecated
-    public DecisionExecutionAuditContainer executeDecisionByKeyParentDeploymentIdAndTenantIdWithAuditTrail(String decisionKey, String parentDeploymentId, Map<String, Object> inputVariables, String tenantId) {
-        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(decisionKey, parentDeploymentId, inputVariables, tenantId));
-    }
 
     public List<Map<String, Object>> executeDecision(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
-        LOGGER.debug("### Start executing decision");
+        ExecuteDecisionContext executeDecisionContext = execute(executeDecisionBuilder);
+
+        List<Map<String, Object>> decisionResult = composeDecisionResult(executeDecisionContext);
+
+        return decisionResult;
+    }
+    
+    public Map<String, Object> executeDecisionWithSingleResult(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
+        ExecuteDecisionContext executeDecisionContext = execute(executeDecisionBuilder);
+
+        Map<String, Object> singleDecisionResult = null;
+        List<Map<String, Object>> decisionResult = composeDecisionResult(executeDecisionContext);
+
+        if (decisionResult != null && !decisionResult.isEmpty()) {
+            if (decisionResult.size() > 1) {
+                throw new FlowableException("more than one result");
+            }
+            singleDecisionResult = decisionResult.get(0);
+        }
+
+        return singleDecisionResult;
+    }
+
+    public DecisionExecutionAuditContainer executeDecisionWithAuditTrail(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
+        ExecuteDecisionContext executeDecisionContext = executeDecisionBuilder.buildExecuteDecisionContext();
+
+        commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(executeDecisionContext));
+
+        executeDecisionContext.getDecisionExecutionAuditContainer().stopAudit();
+
+        return executeDecisionContext.getDecisionExecutionAuditContainer();
+    }
+
+    protected ExecuteDecisionContext execute(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
         ExecuteDecisionContext executeDecisionContext = executeDecisionBuilder.buildExecuteDecisionContext();
 
         commandExecutor.execute(new ExecuteDecisionCmd(executeDecisionContext));
 
         executeDecisionContext.getDecisionExecutionAuditContainer().stopAudit();
 
-        LOGGER.debug("### End executing decision");
-        List<Map<String, Object>> result = composeDecisionResult(executeDecisionContext);
-        return result;
-    }
-    
-    public Map<String, Object> executeDecisionWithSingleResult(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
-        return commandExecutor.execute(new ExecuteDecisionSingleResultCmd(executeDecisionBuilder));
-    }
-    
-    public DecisionExecutionAuditContainer executeDecisionWithAuditTrail(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
-        return commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(executeDecisionBuilder));
+        return executeDecisionContext;
     }
 
     protected List<Map<String, Object>> composeDecisionResult(ExecuteDecisionContext executeDecisionContext) {
