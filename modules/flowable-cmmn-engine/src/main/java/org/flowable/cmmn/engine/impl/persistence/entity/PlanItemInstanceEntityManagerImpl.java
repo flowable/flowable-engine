@@ -449,8 +449,9 @@ public class PlanItemInstanceEntityManagerImpl
 
     @Override
     public void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId) {
-        PlanItemInstanceQueryImpl planItemQuery = new PlanItemInstanceQueryImpl();
-        planItemQuery.caseInstanceId(caseInstanceId);
+        PlanItemInstanceQuery planItemQuery = new PlanItemInstanceQueryImpl()
+                .caseInstanceId(caseInstanceId)
+                .includeEnded();
         List<PlanItemInstance> planItemInstances = findByCriteria(planItemQuery);
         if (planItemInstances != null) {
             for (PlanItemInstance planItemInstance : planItemInstances) {

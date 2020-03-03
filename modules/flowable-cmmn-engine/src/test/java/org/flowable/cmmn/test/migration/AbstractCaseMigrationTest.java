@@ -16,6 +16,7 @@ package org.flowable.cmmn.test.migration;
 import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -35,6 +36,7 @@ public class AbstractCaseMigrationTest {
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
     protected CmmnMigrationService cmmnMigrationService;
+    protected CmmnTaskService cmmnTaskService;
 
     @BeforeEach
     protected void setUp(CmmnEngineConfiguration cmmnEngineConfiguration) {
@@ -42,6 +44,7 @@ public class AbstractCaseMigrationTest {
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         this.cmmnMigrationService = cmmnEngineConfiguration.getCmmnMigrationService();
+        this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
     }
 
     @AfterEach

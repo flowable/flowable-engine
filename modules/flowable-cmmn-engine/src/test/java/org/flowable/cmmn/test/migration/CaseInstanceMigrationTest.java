@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -161,6 +162,79 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(planItem2.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
         assertThat(planItem2.getName()).isEqualTo("Task 2");
         assertThat(planItem2.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+    }
+
+    @Test
+    void withTwoTasksIntroducingANewStageAroundSecondTask() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/second-task-linked-with-sentry.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/stage-linked-with-sentry.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+        Map<String, List<PlanItemInstance>> planItemsByElementId = planItemInstances.stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getElementId));
+        PlanItemInstance planItem1 = planItemsByElementId.get("planItem1").get(0);
+        assertThat(planItem1.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(planItem1.getName()).isEqualTo("Task 1");
+        assertThat(planItem1.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        PlanItemInstance planItem2 = planItemsByElementId.get("planItem2").get(0);
+        assertThat(planItem2.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(planItem2.getName()).isEqualTo("Task 2");
+        assertThat(planItem2.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        PlanItemInstance planItem3 = planItemsByElementId.get("planItem3").get(0);
+        assertThat(planItem3.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(planItem3.getPlanItemDefinitionId()).isEqualTo("expandedStage1");
+        assertThat(planItem3.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+    }
+
+    @Test
+    void withTwoTasksIntroducingANewStageAroundSecondTaskAndSecondTaskActive() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/second-task-linked-with-sentry.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/stage-linked-with-sentry.cmmn.xml");
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        cmmnTaskService.complete(task.getId());
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+        Map<String, List<PlanItemInstance>> planItemsByElementId = planItemInstances.stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getElementId));
+        PlanItemInstance planItem2 = planItemsByElementId.get("planItem2").get(0);
+        assertThat(planItem2.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(planItem2.getName()).isEqualTo("Task 2");
+        assertThat(planItem2.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        PlanItemInstance planItem3 = planItemsByElementId.get("planItem3").get(0);
+        assertThat(planItem3.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(planItem3.getPlanItemDefinitionId()).isEqualTo("expandedStage1");
+        assertThat(planItem3.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
     }
 
     @Test

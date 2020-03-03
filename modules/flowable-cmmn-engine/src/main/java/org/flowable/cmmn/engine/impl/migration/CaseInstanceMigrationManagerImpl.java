@@ -230,9 +230,9 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         changePlanItemStateBuilders.add(changePlanItemStateBuilder);
 
 
-        Map<String, List<PlanItemInstanceEntity>> planItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstanceId)
+        Map<String, List<PlanItemInstance>> planItemInstances = planItemInstanceEntityManager.findByCriteria(new PlanItemInstanceQueryImpl().caseInstanceId(caseInstanceId).planItemInstanceStateActive())
                 .stream()
-                .collect(Collectors.groupingBy(PlanItemInstanceEntity::getPlanItemDefinitionId));
+                .collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionId));
         Map<String, PlanItemMigrationMapping> mappingLookupMap = groupByFromPlanItemId(document.getPlanItemMigrationMappings(), null);
         Set<String> mappedPlanItems = mappingLookupMap.keySet();
 
@@ -244,12 +244,12 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         List<String> planItemsIdsToMapExplicitly = partitionedExecutionActivityIds.get(true);
 
         for (String planItemDefinitionId : planItemsIdsToAutoMap) {
-            List<PlanItemInstanceEntity> planItemInstanceEntities = planItemInstances.get(planItemDefinitionId);
+            List<PlanItemInstance> planItemInstanceEntities = planItemInstances.get(planItemDefinitionId);
             if (planItemInstanceEntities.size() > 1) {
-                List<String> planItemInstanceIds = planItemInstanceEntities.stream().map(PlanItemInstanceEntity::getId).collect(Collectors.toList());
+                List<String> planItemInstanceIds = planItemInstanceEntities.stream().map(PlanItemInstance::getId).collect(Collectors.toList());
                 changePlanItemStateBuilder.movePlanItemInstancesToSinglePlanItemDefinitionId(planItemInstanceIds, planItemDefinitionId);
             } else {
-                PlanItemInstanceEntity planItemInstanceEntity = planItemInstanceEntities.get(0);
+                PlanItemInstance planItemInstanceEntity = planItemInstanceEntities.get(0);
                 changePlanItemStateBuilder.movePlanItemInstanceToPlanItemDefinitionId(planItemInstanceEntity.getId(), planItemDefinitionId);
             }
         }
