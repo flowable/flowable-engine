@@ -13,8 +13,7 @@
 
 package org.flowable.spring.test.el;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
@@ -22,7 +21,6 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,24 +43,24 @@ public class SpringCustomBeanTest {
                             .variable("var1", "John Doe")
                             .start();
             
-            Assert.assertNotNull(caseInstance);
+            assertThat(caseInstance).isNotNull();
             
             PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                             .caseInstanceId(caseInstance.getId())
                             .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                             .singleResult();
-            assertNotNull(planItemInstance);
+            assertThat(planItemInstance).isNotNull();
             
-            assertEquals("hello John Doe", cmmnRuntimeService.getVariable(caseInstance.getId(), "customResponse"));
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "customResponse")).isEqualTo("hello John Doe");
             
             // Triggering the task should start the child case instance
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-            assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
             
-            assertEquals("hello John Doe", cmmnRule.getCmmnHistoryService().createHistoricVariableInstanceQuery()
-                            .caseInstanceId(caseInstance.getId())
-                            .variableName("customResponse")
-                            .singleResult().getValue());
+            assertThat(cmmnRule.getCmmnHistoryService().createHistoricVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .variableName("customResponse")
+                    .singleResult().getValue()).isEqualTo("hello John Doe");
         } finally {
             removeAllDeployments();
         }
