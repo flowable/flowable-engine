@@ -12,14 +12,13 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.UNAVAILABLE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -29,7 +28,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -46,7 +44,7 @@ public class CaseCompletionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Complete case", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Complete case if completable", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Force complete case", AVAILABLE);
@@ -55,13 +53,13 @@ public class CaseCompletionExitSentryTest extends FlowableCmmnTestCase {
         // trigger the user event listener to manually complete the case (not forcing it though)
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "Complete case if completable"));
 
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().finished().singleResult();
-        assertNotNull(historicCaseInstance);
-        assertEquals(COMPLETED, historicCaseInstance.getState());
+        assertThat(historicCaseInstance).isNotNull();
+        assertThat(historicCaseInstance.getState()).isEqualTo(COMPLETED);
     }
 
     @Test
@@ -69,46 +67,43 @@ public class CaseCompletionExitSentryTest extends FlowableCmmnTestCase {
     public void testCompleteCaseThroughExitSentryWithException() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("exitSentryTestCaseTwo").start();
 
-        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+        List<PlanItemInstance> planItemInstances1 = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(4, planItemInstances.size());
-        assertPlanItemInstanceState(planItemInstances, "Complete case", AVAILABLE);
-        assertPlanItemInstanceState(planItemInstances, "Complete case if completable", AVAILABLE);
-        assertPlanItemInstanceState(planItemInstances, "Force complete case", AVAILABLE);
-        assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
+        assertThat(planItemInstances1).hasSize(4);
+        assertPlanItemInstanceState(planItemInstances1, "Complete case", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances1, "Complete case if completable", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances1, "Force complete case", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances1, "Task A", ENABLED);
 
         // manually start Task A to have an active plan item, making the case not completable
-        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+        cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances1, "Task A"));
 
-        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        final List<PlanItemInstance> planItemInstances2 = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(4, planItemInstances.size());
-        assertPlanItemInstanceState(planItemInstances, "Complete case", AVAILABLE);
-        assertPlanItemInstanceState(planItemInstances, "Complete case if completable", UNAVAILABLE);
-        assertPlanItemInstanceState(planItemInstances, "Force complete case", AVAILABLE);
-        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertThat(planItemInstances2).hasSize(4);
+        assertPlanItemInstanceState(planItemInstances2, "Complete case", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances2, "Complete case if completable", UNAVAILABLE);
+        assertPlanItemInstanceState(planItemInstances2, "Force complete case", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances2, "Task A", ACTIVE);
 
-        try {
-            // trigger the user event listener to manually complete the case, which should lead into an exception
-            cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "Complete case"));
-            Assert.fail("Must lead into an exception");
-        } catch (FlowableIllegalArgumentException e) {
-            assertTrue(e.getMessage().startsWith("Cannot exit case with 'complete' event type"));
-        }
+        // trigger the user event listener to manually complete the case, which should lead into an exception
+        assertThatThrownBy(() -> cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances2, "Complete case")))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageStartingWith("Cannot exit case with 'complete' event type");
 
         // now complete Task A to make the stage completable
-        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances2, "Task A"));
 
         // trigger the user event listener again as the stage should not be completable
-        cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "Complete case"));
+        cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances2, "Complete case"));
 
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().finished().singleResult();
-        assertNotNull(historicCaseInstance);
-        assertEquals(COMPLETED, historicCaseInstance.getState());
+        assertThat(historicCaseInstance).isNotNull();
+        assertThat(historicCaseInstance.getState()).isEqualTo(COMPLETED);
     }
 
     @Test
@@ -118,7 +113,7 @@ public class CaseCompletionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Complete case", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Complete case if completable", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Force complete case", AVAILABLE);
@@ -129,7 +124,7 @@ public class CaseCompletionExitSentryTest extends FlowableCmmnTestCase {
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
         assertPlanItemInstanceState(planItemInstances, "Complete case", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Complete case if completable", UNAVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Force complete case", AVAILABLE);
@@ -138,12 +133,12 @@ public class CaseCompletionExitSentryTest extends FlowableCmmnTestCase {
         // trigger the user event listener to manually complete the case with a force to complete
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "Force complete case"));
 
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().finished().singleResult();
-        assertNotNull(historicCaseInstance);
-        assertEquals(COMPLETED, historicCaseInstance.getState());
+        assertThat(historicCaseInstance).isNotNull();
+        assertThat(historicCaseInstance.getState()).isEqualTo(COMPLETED);
     }
 }

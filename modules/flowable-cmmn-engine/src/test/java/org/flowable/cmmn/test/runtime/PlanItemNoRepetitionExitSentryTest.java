@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -56,7 +56,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -76,7 +76,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -91,13 +91,13 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
         // start Task A, check it to be in active state and then trigger its exit sentry, which will kill active task a
         cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "Kill active tasks A"));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(8, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(8);
         assertNoPlanItemInstance(planItemInstances, "Task A");
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertNoPlanItemInstance(planItemInstances, "Kill active tasks A");
@@ -117,7 +117,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -134,7 +134,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -154,7 +154,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -176,7 +176,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -196,7 +196,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -222,7 +222,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances,"Kill active tasks B"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(7, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(7);
         assertNoPlanItemInstance(planItemInstances, "Task B");
         assertNoPlanItemInstance(planItemInstances, "Kill active and enabled tasks B");
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
@@ -242,7 +242,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -263,7 +263,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances,"Kill active and enabled tasks B"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(7, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(7);
         assertNoPlanItemInstance(planItemInstances, "Task B");
         assertNoPlanItemInstance(planItemInstances, "Kill active and enabled tasks B");
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
@@ -283,7 +283,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -309,7 +309,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances,"Kill active and enabled tasks B"));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(7, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(7);
         assertNoPlanItemInstance(planItemInstances, "Task B");
         assertNoPlanItemInstance(planItemInstances, "Kill active and enabled tasks B");
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
@@ -329,7 +329,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -350,7 +350,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
         // trigger exit sentry on Task D which must kill it
         cmmnRuntimeService.setVariable(caseInstance.getId(), "exitActiveTasksD", true);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(8, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(8);
         assertNoPlanItemInstance(planItemInstances, "Task D");
     }
 
@@ -361,7 +361,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
         assertPlanItemInstanceState(planItemInstances, "Kill active and enabled tasks B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Kill active tasks B", AVAILABLE);
@@ -387,7 +387,7 @@ public class PlanItemNoRepetitionExitSentryTest extends FlowableCmmnTestCase {
         // trigger exit sentry on Task F which must kill it
         cmmnRuntimeService.setVariable(caseInstance.getId(), "exitActiveTasksF", true);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(8, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(8);
         assertNoPlanItemInstance(planItemInstances, "Task F");
     }
 }

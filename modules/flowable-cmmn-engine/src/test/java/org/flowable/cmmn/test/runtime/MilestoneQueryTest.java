@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.test.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -41,15 +39,15 @@ public class MilestoneQueryTest extends FlowableCmmnTestCase {
         //Check setup
         assertCaseInstanceNotEnded(caseInstance);
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().list();
-        assertEquals(7, planItemInstances.size());
-        assertEquals(3, planItemInstances.stream().filter(p -> PlanItemDefinitionType.MILESTONE.equals(p.getPlanItemDefinitionType()))
-                .filter(p -> PlanItemInstanceState.AVAILABLE.equals(p.getState())).count());
-        assertEquals(4, planItemInstances.stream().filter(p -> PlanItemDefinitionType.USER_EVENT_LISTENER.equals(p.getPlanItemDefinitionType()))
-                .filter(p -> PlanItemInstanceState.AVAILABLE.equals(p.getState())).count());
+        assertThat(planItemInstances).hasSize(7);
+        assertThat(planItemInstances.stream().filter(p -> PlanItemDefinitionType.MILESTONE.equals(p.getPlanItemDefinitionType()))
+                .filter(p -> PlanItemInstanceState.AVAILABLE.equals(p.getState())).count()).isEqualTo(3);
+        assertThat(planItemInstances.stream().filter(p -> PlanItemDefinitionType.USER_EVENT_LISTENER.equals(p.getPlanItemDefinitionType()))
+                .filter(p -> PlanItemInstanceState.AVAILABLE.equals(p.getState())).count()).isEqualTo(4);
 
         List<MilestoneInstance> milestoneInstances = cmmnRuntimeService.createMilestoneInstanceQuery().list();
-        assertNotNull(milestoneInstances);
-        assertTrue(milestoneInstances.isEmpty());
+        assertThat(milestoneInstances).isNotNull();
+        assertThat(milestoneInstances).isEmpty();
 
         //event triggering
         setClockTo(new Date(System.currentTimeMillis() + 60_000L));
@@ -82,53 +80,51 @@ public class MilestoneQueryTest extends FlowableCmmnTestCase {
         afterThirdCalendar.add(Calendar.MINUTE, 1);
         Date afterThirdTrigger = afterThirdCalendar.getTime();
 
-        assertEquals(3, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(3);
 
         //There are two named milestones
         MilestoneInstance abcMilestone = cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("abcMilestone").singleResult();
-        assertNotNull(abcMilestone);
-        assertEquals("abcMilestone", abcMilestone.getName());
+        assertThat(abcMilestone).isNotNull();
+        assertThat(abcMilestone.getName()).isEqualTo("abcMilestone");
 
         MilestoneInstance xyzMilestone = cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("xyzMilestone").singleResult();
-        assertNotNull(xyzMilestone);
-        assertEquals("xyzMilestone", xyzMilestone.getName());
+        assertThat(xyzMilestone).isNotNull();
+        assertThat(xyzMilestone.getName()).isEqualTo("xyzMilestone");
 
         MilestoneInstance one = cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("1").singleResult();
-        assertNotNull(one);
-        assertEquals("1", one.getName());
+        assertThat(one).isNotNull();
+        assertThat(one.getName()).isEqualTo("1");
 
         //One Milestone has no name
         List<MilestoneInstance> list = cmmnRuntimeService.createMilestoneInstanceQuery().orderByMilestoneName().asc().list();
-        assertEquals(3, list.size());
-        //assertNull(list.get(0).getName());
-        assertEquals("1", list.get(0).getName());
-        assertEquals("abcMilestone", list.get(1).getName());
-        assertEquals("xyzMilestone", list.get(2).getName());
+        assertThat(list)
+                .extracting(MilestoneInstance::getName)
+                .containsExactly("1", "abcMilestone", "xyzMilestone");
 
         //Query timestamps
         MilestoneInstance milestone1 = cmmnRuntimeService.createMilestoneInstanceQuery()
                 .milestoneInstanceReachedAfter(beforeFirstTrigger)
                 .milestoneInstanceReachedBefore(afterFirstTrigger)
                 .singleResult();
-        assertNotNull(milestone1);
-        assertEquals("milestonePlanItem1", milestone1.getElementId());
+        assertThat(milestone1).isNotNull();
+        assertThat(milestone1.getElementId()).isEqualTo("milestonePlanItem1");
         MilestoneInstance milestone2 = cmmnRuntimeService.createMilestoneInstanceQuery()
                 .milestoneInstanceReachedAfter(beforeSecondTrigger)
                 .milestoneInstanceReachedBefore(afterSecondTrigger)
                 .singleResult();
-        assertNotNull(milestone2);
-        assertEquals("milestonePlanItem2", milestone2.getElementId());
+        assertThat(milestone2).isNotNull();
+        assertThat(milestone2.getElementId()).isEqualTo("milestonePlanItem2");
         MilestoneInstance milestone3 = cmmnRuntimeService.createMilestoneInstanceQuery()
                 .milestoneInstanceReachedAfter(beforeThirdTrigger)
                 .milestoneInstanceReachedBefore(afterThirdTrigger)
                 .singleResult();
-        assertNotNull(milestone3);
-        assertEquals("milestonePlanItem3", milestone3.getElementId());
+        assertThat(milestone3).isNotNull();
+        assertThat(milestone3.getElementId()).isEqualTo("milestonePlanItem3");
 
         list = cmmnRuntimeService.createMilestoneInstanceQuery().orderByTimeStamp().desc().list();
-        assertEquals("milestonePlanItem3", list.get(0).getElementId());
-        assertEquals("milestonePlanItem2", list.get(1).getElementId());
-        assertEquals("milestonePlanItem1", list.get(2).getElementId());
+        assertThat(list)
+                .extracting(MilestoneInstance::getElementId)
+                .containsExactly("milestonePlanItem3", "milestonePlanItem2", "milestonePlanItem1");
 
         //Finish Case by triggering the last event
         event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("event4").singleResult();
