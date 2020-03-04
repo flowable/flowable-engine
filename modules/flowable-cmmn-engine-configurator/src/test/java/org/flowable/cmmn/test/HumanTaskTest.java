@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -36,7 +35,7 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
     public void setup() {
         super.setupServices();
         FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) processEngine.getProcessEngineConfiguration()
-            .getEngineConfigurations().get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+                .getEngineConfigurations().get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         this.formRepositoryService = formEngineConfiguration.getFormRepositoryService();
 
         formRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/simple.form").deploy();
@@ -45,7 +44,7 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
     @After
     public void deleteFormDeployment() {
         this.formRepositoryService.createDeploymentQuery().list().forEach(
-            formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
+                formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId())
         );
     }
 
@@ -53,18 +52,19 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
     @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn")
     public void completeHumanTaskWithoutVariables() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
-            caseDefinitionKey("myCase").
-            start();
-        assertNotNull(caseInstance);
+                caseDefinitionKey("myCase").
+                start();
+        assertThat(caseInstance).isNotNull();
 
         Task caseTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertNotNull(caseTask);
+        assertThat(caseTask).isNotNull();
 
-        cmmnTaskService.completeTaskWithForm(caseTask.getId(), formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult().getId(),
-            "__COMPLETE", null);
+        cmmnTaskService
+                .completeTaskWithForm(caseTask.getId(), formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult().getId(),
+                        "__COMPLETE", null);
 
         CaseInstance dbCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertNull(dbCaseInstance);
+        assertThat(dbCaseInstance).isNull();
     }
 
 }
