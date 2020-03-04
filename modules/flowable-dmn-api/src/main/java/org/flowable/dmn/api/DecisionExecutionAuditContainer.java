@@ -62,6 +62,8 @@ public class DecisionExecutionAuditContainer {
         this.decisionVersion = decisionVersion;
         this.strictMode = strictMode;
         this.inputVariableTypes = getVariablesTypeMap(inputVariables);
+        // create defensive copy of input variables
+        this.inputVariables = createDefensiveCopyInputVariables(inputVariables);
     }
 
     public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, HitPolicy hitPolicy, 
