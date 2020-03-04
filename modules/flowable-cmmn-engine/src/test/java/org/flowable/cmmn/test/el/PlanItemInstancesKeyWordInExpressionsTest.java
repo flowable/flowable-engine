@@ -13,7 +13,6 @@
 package org.flowable.cmmn.test.el;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -39,167 +38,168 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
     @CmmnDeployment
     public void testWithState() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
-        assertEquals(8, evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}"));
-        assertEquals(4, evaluateExpression(caseInstance.getId(), "${planItemInstances.active().count()}"));
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.available().count()}"));
-        assertEquals(3, evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.suspended().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.waitingForRepetition().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.unavailable().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.asyncActive().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}")).isEqualTo(8);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.active().count()}")).isEqualTo(4);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.available().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().count()}")).isEqualTo(3);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.suspended().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.waitingForRepetition().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.unavailable().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.asyncActive().count()}")).isEqualTo(0);
 
         cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("E").singleResult().getId());
 
-        assertEquals(8, evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}"));
-        assertEquals(5, evaluateExpression(caseInstance.getId(), "${planItemInstances.active().count()}"));
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.available().count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}")).isEqualTo(8);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.active().count()}")).isEqualTo(5);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.available().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().count()}")).isEqualTo(0);
 
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("F").singleResult().getId());
 
-        assertEquals(10, evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}"));
-        assertEquals(7, evaluateExpression(caseInstance.getId(), "${planItemInstances.active().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.available().count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().count()}"));
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}")).isEqualTo(10);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.active().count()}")).isEqualTo(7);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.available().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().count()}")).isEqualTo(0);
 
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("E").singleResult().getId());
 
-        assertEquals(10, evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.active().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.available().count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().count()}"));
-        assertEquals(4, evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}")).isEqualTo(10);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.active().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.available().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().count()}")).isEqualTo(4);
 
-        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
-        assertEquals(10, evaluateExpression(planItemInstanceEntity, "${planItemInstances.count()}"));
-        assertEquals(2, evaluateExpression(planItemInstanceEntity, "${planItemInstances.active().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.available().count()}"));
-        assertEquals(2, evaluateExpression(planItemInstanceEntity, "${planItemInstances.enabled().count()}"));
-        assertEquals(2, evaluateExpression(planItemInstanceEntity, "${planItemInstances.completed().count()}"));
-        assertEquals(4, evaluateExpression(planItemInstanceEntity, "${planItemInstances.terminated().count()}"));
+        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A")
+                .singleResult();
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.count()}")).isEqualTo(10);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.active().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.available().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.enabled().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.completed().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.terminated().count()}")).isEqualTo(4);
     }
 
     @Test
     @CmmnDeployment
     public void testWithTerminalOrNonTerminal() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
-        assertEquals(8, evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyNonTerminal().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyTerminal().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyNonTerminal().count()}")).isEqualTo(8);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyTerminal().count()}")).isEqualTo(0);
 
-        assertEquals(4, evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyNonTerminal().active().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyNonTerminal().active().count()}")).isEqualTo(4);
 
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("F").singleResult().getId());
-        assertEquals(9, evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyNonTerminal().count()}"));
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyTerminal().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyNonTerminal().count()}")).isEqualTo(9);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyTerminal().count()}")).isEqualTo(1);
 
         cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("E").singleResult().getId());
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("E").singleResult().getId());
 
-        assertEquals(4, evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyNonTerminal().count()}"));
-        assertEquals(6, evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyTerminal().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyNonTerminal().count()}")).isEqualTo(4);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyTerminal().count()}")).isEqualTo(6);
 
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyTerminal().completed().count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().onlyTerminal().count()}"));
-        assertEquals(4, evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().onlyTerminal().count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.onlyTerminal().completed().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().onlyTerminal().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.terminated().onlyTerminal().count()}")).isEqualTo(4);
     }
 
     @Test
     @CmmnDeployment
     public void testWithId() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a').count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a', 'b').count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionIds('a', 'b').count()}"));
-        assertEquals(3, evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a', 'b', 'stage1').count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a').count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a', 'b').count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionIds('a', 'b').count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a', 'b', 'stage1').count()}")).isEqualTo(3);
 
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('invalid').count()}"));
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('invalid', 'a').count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('invalid').count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('invalid', 'a').count()}")).isEqualTo(1);
     }
 
     @Test
     @CmmnDeployment
     public void testWithName() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.name('A').count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.name('A', 'B').count()}"));
-        assertEquals(2, evaluateExpression(caseInstance.getId(), "${planItemInstances.names('A', 'B').count()}"));
-        assertEquals(3, evaluateExpression(caseInstance.getId(), "${planItemInstances.name('A', 'B', 'Stage1').count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.name('A').count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.name('A', 'B').count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.names('A', 'B').count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.name('A', 'B', 'Stage1').count()}")).isEqualTo(3);
 
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.name('invalid').count()}"));
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.name('invalid', 'A').count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.name('invalid').count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.name('invalid', 'A').count()}")).isEqualTo(1);
     }
 
     @Test
     @CmmnDeployment
     public void testWithStateAndId() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a').active().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a').enabled().count()}")).isEqualTo(0);
 
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a').active().count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.definitionId('a').enabled().count()}"));
-
-        assertEquals(1, evaluateExpression(caseInstance.getId(), "${planItemInstances.active().definitionId('a').count()}"));
-        assertEquals(0, evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().definitionId('a').count()}"));
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.active().definitionId('a').count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().definitionId('a').count()}")).isEqualTo(0);
     }
 
     @Test
     @CmmnDeployment
     public void testWithStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
-        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("F").singleResult();
-        assertEquals(2, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().count()}"));
-        assertEquals(1, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().active().count()}"));
-        assertEquals(1, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().available().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().suspended().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().terminated().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().waitingForRepetition().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().unavailable().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().asyncActive().count()}"));
+        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("F")
+                .singleResult();
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().active().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().available().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().suspended().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().terminated().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().waitingForRepetition().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().unavailable().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().asyncActive().count()}")).isEqualTo(0);
 
-        assertEquals(1, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().definitionId('f').active().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().definitionId('g').active().count()}"));
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().definitionId('f').active().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().definitionId('g').active().count()}")).isEqualTo(0);
 
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("F").singleResult().getId());
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("G").singleResult().getId());
         planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("H").singleResult();
-        assertEquals(2, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().count()}"));
-        assertEquals(1, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().active().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().available().count()}"));
-        assertEquals(1, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().completed().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().suspended().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().terminated().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().waitingForRepetition().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().unavailable().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().asyncActive().count()}"));
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().count()}")).isEqualTo(2);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().active().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().available().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().completed().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().suspended().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().terminated().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().waitingForRepetition().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().unavailable().count()}")).isEqualTo(0);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().asyncActive().count()}")).isEqualTo(0);
 
-        assertEquals(1, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().onlyTerminal().count()}"));
-        assertEquals(1, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().onlyTerminal().completed().count()}"));
-        assertEquals(0, evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().onlyTerminal().terminated().count()}"));
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().onlyTerminal().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().onlyTerminal().completed().count()}")).isEqualTo(1);
+        assertThat(evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().onlyTerminal().terminated().count()}")).isEqualTo(0);
     }
 
     @Test
     @CmmnDeployment
     public void testReturnIdsAndNames() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
         List<String> ids = (List<String>) evaluateExpression(caseInstance.getId(), "${planItemInstances.active().getDefinitionIds()}");
         assertThat(ids).contains("a", "b", "stage1", "f");
@@ -221,62 +221,65 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
     @CmmnDeployment
     public void testGetList() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
         assertThat((List<PlanItemInstanceEntity>) evaluateExpression(caseInstance.getId(), "${planItemInstances.active().getList()}"))
-            .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
-            .contains("A", "B", "F", "Stage1");
+                .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
+                .contains("A", "B", "F", "Stage1");
 
         assertThat((List<PlanItemInstanceEntity>) evaluateExpression(caseInstance.getId(), "${planItemInstances.enabled().getList()}"))
-            .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
-            .contains("C", "D", "E");
+                .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
+                .contains("C", "D", "E");
 
         assertThat((List<PlanItemInstanceEntity>) evaluateExpression(caseInstance.getId(), "${planItemInstances.completed().getList()}"))
-            .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName()).isEmpty();
+                .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName()).isEmpty();
 
-        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("F").singleResult();
+        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("F")
+                .singleResult();
         assertThat((List<PlanItemInstanceEntity>) evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().getList()}"))
-            .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
-            .contains("F", "Stage2");
+                .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
+                .contains("F", "Stage2");
 
         assertThat((List<PlanItemInstanceEntity>) evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().active().getList()}"))
-            .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
-            .contains("F");
+                .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
+                .contains("F");
 
-        assertThat((List<PlanItemInstanceEntity>) evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().definitionId('stage2').getList()}"))
-            .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
-            .contains("Stage2");
+        assertThat((List<PlanItemInstanceEntity>) evaluateExpression(planItemInstanceEntity,
+                "${planItemInstances.currentStage().definitionId('stage2').getList()}"))
+                .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
+                .contains("Stage2");
 
         assertThat((List<PlanItemInstanceEntity>) evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().name('Stage2').getList()}"))
-            .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
-            .contains("Stage2");
+                .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName())
+                .contains("Stage2");
 
-        assertThat((List<PlanItemInstanceEntity>) evaluateExpression(planItemInstanceEntity, "${planItemInstances.currentStage().definitionId('Stage2').active().getList()}"))
-            .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName()).isEmpty();
+        assertThat((List<PlanItemInstanceEntity>) evaluateExpression(planItemInstanceEntity,
+                "${planItemInstances.currentStage().definitionId('Stage2').active().getList()}"))
+                .extracting(planItemInstance -> planItemInstance.getPlanItem().getPlanItemDefinition().getName()).isEmpty();
     }
 
     @Test
     @CmmnDeployment
     public void testUseInSentryCondition() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().count()).isEqualTo(0);
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult();
-        assertEquals("A", planItemInstance.getName());
+        assertThat(planItemInstance.getName()).isEqualTo("A");
 
         cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId());
 
         // B gets activated through expression
-        assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().count()).isEqualTo(2);
     }
 
     @Test
     @CmmnDeployment
     public void testStoreCountInVariable() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult();
         cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId());
@@ -288,30 +291,34 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
     @CmmnDeployment
     public void testUsageInAvailableCondition() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
 
         // The user event listeners should not be active after start
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceStateAvailable().count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable().count()).isEqualTo(0);
 
         // Starting the human tasks should make the user event listeners available
-        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().planItemInstanceName("Human task 1").singleResult().getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceStateAvailable().count()).isEqualTo(1);
+        cmmnRuntimeService.startPlanItemInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().planItemInstanceName("Human task 1").singleResult().getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable().count()).isEqualTo(1);
 
-        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().planItemInstanceName("Human task 2").singleResult().getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceStateAvailable().count()).isEqualTo(2);
+        cmmnRuntimeService.startPlanItemInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().planItemInstanceName("Human task 2").singleResult().getId());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable().count()).isEqualTo(2);
 
         // Triggering an event listener should make the tasks again enabled (as they are manual activation)
         cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery().name("cancel 1").singleResult().getId());
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
-            .planItemInstanceStateAvailable().list()).extracting(PlanItemInstance::getName)
-            .contains("cancel 2");
+                .planItemInstanceStateAvailable().list()).extracting(PlanItemInstance::getName)
+                .contains("cancel 2");
 
         cmmnRuntimeService.completeUserEventListenerInstance(cmmnRuntimeService.createUserEventListenerInstanceQuery().name("cancel 2").singleResult().getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceStateAvailable().count()).isEqualTo(0);
-
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable().count()).isEqualTo(0);
 
     }
-
 
     private Object evaluateExpression(String caseInstanceId, String expressionText) {
         return cmmnEngineConfiguration.getCommandExecutor().execute((Command<Object>) commandContext -> {
