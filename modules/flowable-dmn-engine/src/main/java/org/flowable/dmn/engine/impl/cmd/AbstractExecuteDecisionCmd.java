@@ -28,7 +28,6 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
-import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -193,15 +192,11 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
         // executing a DecisionService is the default but will fallback to Decision
         if (decisionService != null) {
-            auditContainer = DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decisionService, executeDecisionContext);
-            executeDecisionContext.setDecisionExecutionAuditContainer(auditContainer);
             executeDecisionContext.setDmnElement(decisionService);
 
             CommandContextUtil.getAgenda(commandContext).planExecuteDecisionServiceOperation(executeDecisionContext, decisionService);
         } else {
             Decision decision = definition.getDecisionById(executeDecisionContext.getDecisionKey());
-            auditContainer = DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, executeDecisionContext);
-            executeDecisionContext.setDecisionExecutionAuditContainer(auditContainer);
             executeDecisionContext.setDmnElement(decision);
 
             CommandContextUtil.getAgenda(commandContext).planExecuteDecisionOperation(executeDecisionContext, decision);

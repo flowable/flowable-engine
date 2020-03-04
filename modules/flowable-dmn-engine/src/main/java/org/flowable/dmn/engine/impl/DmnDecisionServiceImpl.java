@@ -68,9 +68,14 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
         commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(executeDecisionContext));
 
-        executeDecisionContext.getDecisionExecutionAuditContainer().stopAudit();
+        DecisionExecutionAuditContainer decisionExecution = executeDecisionContext.getDecisionExecution();
 
-        return executeDecisionContext.getDecisionExecutionAuditContainer();
+        decisionExecution.stopAudit();
+
+        List<Map<String, Object>> decisionResult = composeDecisionResult(executeDecisionContext);
+        decisionExecution.setDecisionResult(decisionResult);
+
+        return decisionExecution;
     }
 
     protected ExecuteDecisionContext execute(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
@@ -78,7 +83,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
         commandExecutor.execute(new ExecuteDecisionCmd(executeDecisionContext));
 
-        executeDecisionContext.getDecisionExecutionAuditContainer().stopAudit();
+        executeDecisionContext.getDecisionExecution().stopAudit();
 
         return executeDecisionContext;
     }
@@ -89,10 +94,10 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
             List<Map<String, Object>> result = new ArrayList<>();
             DecisionService decisionService = (DecisionService) executeDecisionContext.getDmnElement();
             decisionService.getOutputDecisions().forEach(elementReference ->
-                result.addAll(executeDecisionContext.getDecisionResult(elementReference.getParsedId()).getDecisionResult()));
+                result.addAll(executeDecisionContext.getDecisionExecution().getChildDecisionExecution(elementReference.getParsedId()).getDecisionResult()));
             return result;
         } else {
-            return executeDecisionContext.getDecisionExecutionAuditContainer().getDecisionResult();
+            return executeDecisionContext.getDecisionExecution().getDecisionResult();
         }
     }
 }

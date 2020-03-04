@@ -67,7 +67,7 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
             container.setFailed();
             container.setExceptionMessage(e.getMessage());
 
-            executeDecisionContext.setDecisionExecutionAuditContainer(container);
+            executeDecisionContext.setDecisionExecution(container);
             return null;
         }
 

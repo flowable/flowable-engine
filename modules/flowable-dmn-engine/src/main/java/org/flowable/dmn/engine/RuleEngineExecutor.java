@@ -28,8 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Yvo Swillens
  */
 public interface RuleEngineExecutor {
-    DecisionExecutionAuditContainer execute(DecisionService decisionService, ExecuteDecisionContext executeDecisionInfo);
-
     DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionContext executeDecisionInfo);
     
     Map<String, AbstractHitPolicy> getHitPolicyBehaviors();

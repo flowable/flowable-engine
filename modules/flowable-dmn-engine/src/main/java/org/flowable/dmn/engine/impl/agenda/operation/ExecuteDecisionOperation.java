@@ -18,7 +18,6 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,21 +36,15 @@ public class ExecuteDecisionOperation extends DmnOperation {
 
     @Override
     public void run() {
-        LOGGER.debug("#### Executing decision operation {}", decision.getId());
         DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-
-        LOGGER.debug("#### Executing decision {}", decision.getId());
-
         DecisionExecutionAuditContainer auditContainer = dmnEngineConfiguration
             .getRuleEngineExecutor()
             .execute(decision, executeDecisionContext);
 
-        LOGGER.debug("#### Returning decision operation {}", executeDecisionContext.getDecisionKey());
-
-        if (executeDecisionContext.getParentExecuteDecisionContext() != null) {
-            executeDecisionContext.getParentExecuteDecisionContext().addDecisionResult(decision.getId(), auditContainer);
+        if (!executeDecisionContext.getDmnElement().equals(decision)) {
+            executeDecisionContext.getDecisionExecution().addChildDecisionExecution(decision.getId(), auditContainer);
         } else {
-            executeDecisionContext.setDecisionExecutionAuditContainer(auditContainer);
+            executeDecisionContext.setDecisionExecution(auditContainer);
         }
     }
 }

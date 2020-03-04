@@ -15,6 +15,7 @@ package org.flowable.dmn.api;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,7 @@ public class DecisionExecutionAuditContainer {
     protected String exceptionMessage;
     protected String validationMessage;
     protected Boolean strictMode;
+    protected Map<String, DecisionExecutionAuditContainer> childDecisionExecutions = new LinkedHashMap<>();
 
     public DecisionExecutionAuditContainer() {
     }
@@ -61,7 +63,6 @@ public class DecisionExecutionAuditContainer {
         this.strictMode = strictMode;
         this.inputVariableTypes = getVariablesTypeMap(inputVariables);
     }
-
 
     public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, HitPolicy hitPolicy, 
                     Boolean strictMode, Map<String, Object> inputVariables) {
@@ -237,6 +238,19 @@ public class DecisionExecutionAuditContainer {
 
     public void addDecisionResultType(String decisionResultId, String decisionResultType) {
         this.decisionResultTypes.put(decisionResultId, decisionResultType);
+    }
+
+    public DecisionExecutionAuditContainer getChildDecisionExecution(String decisionKey) {
+        return childDecisionExecutions.get(decisionKey);
+    }
+    public void addChildDecisionExecution(String decisionKey, DecisionExecutionAuditContainer decisionResult) {
+        childDecisionExecutions.put(decisionKey, decisionResult);
+    }
+    public Map<String, DecisionExecutionAuditContainer> getChildDecisionExecutions() {
+        return childDecisionExecutions;
+    }
+    public void setChildDecisionExecutions(Map<String, DecisionExecutionAuditContainer> childDecisionExecutions) {
+        this.childDecisionExecutions = childDecisionExecutions;
     }
 
     protected static boolean isBoolean(Object obj) {

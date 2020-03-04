@@ -15,7 +15,6 @@ package org.flowable.dmn.engine.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,9 +37,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecution
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
-import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
-import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.RuleInputClauseContainer;
@@ -68,24 +65,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     }
 
     /**
-     * Executes the given definition and creates the outcome results
-     *
-     * @param decisionService       the decision service
-     * @param executeDecisionInfo
-     * @return updated execution variables map
-     */
-    @Override
-    public DecisionExecutionAuditContainer execute(DecisionService decisionService, ExecuteDecisionContext executeDecisionContext) {
-        if (decisionService == null) {
-            throw new IllegalArgumentException("no decision service provided");
-        }
-
-        ELExecutionContext executionContext = ELExecutionContextBuilder.build(decisionService, executeDecisionContext);
-
-        return executionContext.getAuditContainer();
-    }
-
-    /**
      * Executes the given decision and creates the outcome results
      *
      * @param decision            the DMN decision
@@ -94,7 +73,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
      */
     @Override
     public DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
-
         if (decision == null) {
             throw new IllegalArgumentException("no decision provided");
         }
