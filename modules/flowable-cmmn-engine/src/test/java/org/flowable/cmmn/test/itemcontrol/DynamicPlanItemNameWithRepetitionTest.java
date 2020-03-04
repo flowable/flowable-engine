@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,13 +36,13 @@ public class DynamicPlanItemNameWithRepetitionTest extends FlowableCmmnTestCase 
     public void testDynamicNameWithRepetitionCollectionAndCaseVariable() {
         List<String> myCollection = Arrays.asList("A", "B", "C");
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("dynamicPlanItemNameTest")
-            .variable("myCollection", myCollection)
-            .variable("foo", "FooValue")
-            .start();
+                .caseDefinitionKey("dynamicPlanItemNameTest")
+                .variable("myCollection", myCollection)
+                .variable("foo", "FooValue")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task (A / 0 - FooValue)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task (B / 1 - FooValue)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task (C / 2 - FooValue)", ACTIVE);

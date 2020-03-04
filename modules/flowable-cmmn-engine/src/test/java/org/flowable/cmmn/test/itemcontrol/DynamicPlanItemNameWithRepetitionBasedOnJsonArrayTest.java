@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -45,13 +45,13 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
         arrayNode.addObject().put("name", "C").put("foo", "c");
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("dynamicPlanItemNameTestOnJsonArray")
-            .variable("myCollection", arrayNode)
-            .variable("foo", "FooValue")
-            .start();
+                .caseDefinitionKey("dynamicPlanItemNameTestOnJsonArray")
+                .variable("myCollection", arrayNode)
+                .variable("foo", "FooValue")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task (A / 0 - FooValue)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task (B / 1 - FooValue)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task (C / 2 - FooValue)", ACTIVE);
@@ -68,13 +68,13 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
         arrayNode.addObject().put("name", "C").put("bar", "c");
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("dynamicPlanItemNameTestOnJsonArray")
-            .variable("myCollection", arrayNode)
-            .variable("foo", "FooValue")
-            .start();
+                .caseDefinitionKey("dynamicPlanItemNameTestOnJsonArray")
+                .variable("myCollection", arrayNode)
+                .variable("foo", "FooValue")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task (A / 0 - FooValue)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task (B / 1 - FooValue)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task (C / 2 - FooValue)", ACTIVE);
@@ -91,12 +91,12 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
         arrayNode.addObject().put("name", "C").put("bar", "c");
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("dynamicPlanItemNameTestOnJsonArray")
-            .variable("foo", "FooValue")
-            .start();
+                .caseDefinitionKey("dynamicPlanItemNameTestOnJsonArray")
+                .variable("foo", "FooValue")
+                .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(1, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(1);
 
         // as we don't have the collection yet available, the name must use the expression as fallback without any exception, as the item / itemIndex local
         // variables are not available on the available plan item instance
@@ -106,7 +106,7 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", arrayNode);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
 
         assertPlanItemInstanceState(planItemInstances, "Task (A / 0 - FooValue)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task (B / 1 - FooValue)", ACTIVE);
