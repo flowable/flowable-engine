@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.test.junit4;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -32,6 +32,6 @@ public class SpringJunit4Test {
     @CmmnDeployment
     public void simpleCaseTest() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder().caseDefinitionKey("junitCase").start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
     }
 }
