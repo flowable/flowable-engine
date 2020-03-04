@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.test.el;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.impl.el.function.VariableEqualsExpressionFunction;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class VariableEqualsExpressionEnhancerTest {
     }
     
     public void assertRegexCorrect(String in, String out) {
-        assertEquals(out, expressionFunction.enhance(in));
+        assertThat(expressionFunction.enhance(in)).isEqualTo(out);
     }
 
 }
