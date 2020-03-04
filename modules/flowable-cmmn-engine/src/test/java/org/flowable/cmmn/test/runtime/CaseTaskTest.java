@@ -13,12 +13,8 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +40,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Joram Barrez
@@ -55,9 +49,6 @@ import org.junit.rules.ExpectedException;
 public class CaseTaskTest extends FlowableCmmnTestCase {
 
     protected String oneTaskCaseDeploymentId;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void deployOneTaskCaseDefinition() {
@@ -81,20 +72,20 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testCaseReferenceExpression() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("myCase")
-            .variable("myVar", "oneTaskCase")
-            .start();
+                .caseDefinitionKey("myCase")
+                .variable("myVar", "oneTaskCase")
+                .start();
         assertBlockingCaseTaskFlow(caseInstance);
     }
 
     @Test
     public void testBasicBlockingWithTenant() {
         cmmnRepositoryService.deleteDeployment(oneTaskCaseDeploymentId, true);
-        oneTaskCaseDeploymentId = cmmnRepositoryService.createDeployment().
-                tenantId("flowable").
-                addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn").
-                addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn").
-                deploy().getId();
+        oneTaskCaseDeploymentId = cmmnRepositoryService.createDeployment()
+                .tenantId("flowable")
+                .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+                .deploy().getId();
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId("flowable").start();
         assertBlockingCaseTaskFlow(caseInstance);
@@ -110,50 +101,49 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
                 tenantId("flowable").
                 addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn").
                 deploy().getId();
-        try {
-            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId("flowable").start();
-            this.expectedException.expect(FlowableObjectNotFoundException.class);
-            this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase' and tenant 'flowable'");
-            assertBlockingCaseTaskFlow(caseInstance);
-        } finally {
-            cmmnRepositoryService.deleteDeployment(parentCaseDeploymentId, true);
-        }
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId("flowable").start();
+        assertThatThrownBy(() -> assertBlockingCaseTaskFlow(caseInstance))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("Case definition was not found by key 'oneTaskCase' and tenant 'flowable'");
+        cmmnRepositoryService.deleteDeployment(parentCaseDeploymentId, true);
     }
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/runtime/CaseTaskTest.testSimpleBlockingSubCase.cmmn",
-        "org/flowable/cmmn/test/runtime/CaseTaskTest.testSimpleBlockingSubCaseChildCase.cmmn"
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testSimpleBlockingSubCase.cmmn",
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testSimpleBlockingSubCaseChildCase.cmmn"
     })
     public void testSimpleBlockingSubCase() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("endEndCase").start();
 
         // Verify case task plan item instance
         PlanItemInstance caseTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .planItemDefinitionType(PlanItemDefinitionType.CASE_TASK)
-            .singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, caseTaskPlanItemInstance.getState());
+                .planItemDefinitionType(PlanItemDefinitionType.CASE_TASK)
+                .singleResult();
+        assertThat(caseTaskPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         // Verify child case instance
         CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
         PlanItemInstance humanTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(childCaseInstance.getId())
-            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
-            .singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, humanTaskPlanItemInstance.getState());
+                .caseInstanceId(childCaseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .singleResult();
+        assertThat(humanTaskPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            HistoricCaseInstance historicChildCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseInstance.getId()).singleResult();
-            assertEquals(cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(caseInstance.getId()).planItemDefinitionType(PlanItemDefinitionType.CASE_TASK).singleResult().getId(), historicChildCaseInstance.getCallbackId());
-            assertEquals(CallbackTypes.PLAN_ITEM_CHILD_CASE, historicChildCaseInstance.getCallbackType());
+            HistoricCaseInstance historicChildCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseInstance.getId())
+                    .singleResult();
+            assertThat(historicChildCaseInstance.getCallbackId()).isEqualTo(cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId()).planItemDefinitionType(PlanItemDefinitionType.CASE_TASK).singleResult().getId());
+            assertThat(historicChildCaseInstance.getCallbackType()).isEqualTo(CallbackTypes.PLAN_ITEM_CHILD_CASE);
         }
 
         PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(childCaseInstance.getId())
-            .planItemDefinitionType(PlanItemDefinitionType.STAGE)
-            .singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stagePlanItemInstance.getState());
+                .caseInstanceId(childCaseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.STAGE)
+                .singleResult();
+        assertThat(stagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         // Completing the task should complete both case instances
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(childCaseInstance.getId()).singleResult().getId());
@@ -165,47 +155,39 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testBasicSubHumanTask() {
         String oneHumanTaskDeploymentId = cmmnRepositoryService.createDeployment()
-                        .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn").deploy().getId();
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn").deploy().getId();
 
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
             Task taskBeforeSubTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("Task One", taskBeforeSubTask.getName());
+            assertThat(taskBeforeSubTask.getName()).isEqualTo("Task One");
             Task childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
-            assertEquals(taskBeforeSubTask.getId(), childTask.getId());
+            assertThat(childTask.getId()).isEqualTo(taskBeforeSubTask.getId());
 
             cmmnTaskService.complete(taskBeforeSubTask.getId());
 
             Task taskInSubTask = cmmnTaskService.createTaskQuery().singleResult();
-            assertEquals("Sub task", taskInSubTask.getName());
+            assertThat(taskInSubTask.getName()).isEqualTo("Sub task");
             childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
-            assertEquals(taskInSubTask.getId(), childTask.getId());
+            assertThat(childTask.getId()).isEqualTo(taskInSubTask.getId());
 
-            List<HistoricTaskInstance> childTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceIdWithChildren(caseInstance.getId()).list();
-            assertEquals(2, childTasks.size());
-            List<String> taskIds = new ArrayList<>();
-            for (HistoricTaskInstance task : childTasks) {
-                taskIds.add(task.getId());
-            }
-            assertTrue(taskIds.contains(taskBeforeSubTask.getId()));
-            assertTrue(taskIds.contains(taskInSubTask.getId()));
+            List<HistoricTaskInstance> childTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceIdWithChildren(caseInstance.getId())
+                    .list();
+            assertThat(childTasks)
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskBeforeSubTask.getId(), taskInSubTask.getId());
 
             cmmnTaskService.complete(taskInSubTask.getId());
 
             Task taskAfterSubTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("Task Two", taskAfterSubTask.getName());
+            assertThat(taskAfterSubTask.getName()).isEqualTo("Task Two");
             childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
-            assertEquals(taskAfterSubTask.getId(), childTask.getId());
+            assertThat(childTask.getId()).isEqualTo(taskAfterSubTask.getId());
 
             childTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceIdWithChildren(caseInstance.getId()).list();
-            assertEquals(3, childTasks.size());
-            taskIds = new ArrayList<>();
-            for (HistoricTaskInstance task : childTasks) {
-                taskIds.add(task.getId());
-            }
-            assertTrue(taskIds.contains(taskBeforeSubTask.getId()));
-            assertTrue(taskIds.contains(taskInSubTask.getId()));
-            assertTrue(taskIds.contains(taskAfterSubTask.getId()));
+            assertThat(childTasks)
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskBeforeSubTask.getId(), taskInSubTask.getId(), taskAfterSubTask.getId());
 
         } finally {
             cmmnRepositoryService.deleteDeployment(oneHumanTaskDeploymentId, true);
@@ -214,95 +196,95 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     protected void assertBlockingCaseTaskFlow(CaseInstance caseInstance) {
-        assertNotNull(caseInstance);
-        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(caseInstance).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(1);
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertNotNull(planItemInstance);
+        assertThat(planItemInstance).isNotNull();
 
         List<EntityLink> entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
-        assertEquals(0, entityLinks.size());
+        assertThat(entityLinks).isEmpty();
 
         // Triggering the task should start the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(2);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(0);
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
-        assertEquals(2, planItemInstances.size());
-        assertEquals("The Case", planItemInstances.get(0).getName());
-        assertEquals("The Task", planItemInstances.get(1).getName());
-        assertEquals(planItemInstance.getTenantId(), planItemInstances.get(1).getTenantId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("The Case", "The Task");
+        assertThat(planItemInstances.get(1).getTenantId()).isEqualTo(planItemInstance.getTenantId());
 
         entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
-        assertEquals(1, entityLinks.size());
+        assertThat(entityLinks).hasSize(1);
         EntityLink entityLink = entityLinks.get(0);
 
         checkEntityLink(entityLink, caseInstance, planItemInstances.get(1).getCaseInstanceId());
 
         List<EntityLink> entityLinkParentsForCaseInstance = cmmnRuntimeService.getEntityLinkParentsForCaseInstance(entityLink.getReferenceScopeId());
-        assertEquals(1, entityLinkParentsForCaseInstance.size());
+        assertThat(entityLinkParentsForCaseInstance).hasSize(1);
 
         checkEntityLink(entityLinkParentsForCaseInstance.get(0), caseInstance, planItemInstances.get(1).getCaseInstanceId());
 
         // Triggering the task from the child case instance should complete the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
-        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertEquals("Task Two", planItemInstance.getName());
+        assertThat(planItemInstance.getName()).isEqualTo("Task Two");
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
 
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
-        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(2);
 
         List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId());
-        assertEquals(1, historicEntityLinks.size());
+        assertThat(historicEntityLinks).hasSize(1);
 
         checkHistoricEntityLink(historicEntityLinks.get(0), caseInstance, planItemInstances.get(1).getCaseInstanceId());
 
         List<HistoricEntityLink> historicEntityLinkParentForCaseInstance = cmmnHistoryService
-            .getHistoricEntityLinkParentsForCaseInstance(entityLink.getReferenceScopeId());
-        assertEquals(1, historicEntityLinkParentForCaseInstance.size());
+                .getHistoricEntityLinkParentsForCaseInstance(entityLink.getReferenceScopeId());
+        assertThat(historicEntityLinkParentForCaseInstance).hasSize(1);
 
         checkHistoricEntityLink(historicEntityLinkParentForCaseInstance.get(0), caseInstance, planItemInstances.get(1).getCaseInstanceId());
     }
 
     private void checkEntityLink(EntityLink entityLink, CaseInstance caseInstance, String referenceScopeId) {
-        assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
-        assertNotNull(entityLink.getCreateTime());
-        assertEquals(caseInstance.getId(), entityLink.getScopeId());
-        assertEquals(ScopeTypes.CMMN, entityLink.getScopeType());
-        assertNull(entityLink.getScopeDefinitionId());
-        assertEquals(referenceScopeId, entityLink.getReferenceScopeId());
-        assertEquals(ScopeTypes.CMMN, entityLink.getReferenceScopeType());
-        assertNull(entityLink.getReferenceScopeDefinitionId());
-        assertEquals(HierarchyType.ROOT, entityLink.getHierarchyType());
+        assertThat(entityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
+        assertThat(entityLink.getCreateTime()).isNotNull();
+        assertThat(entityLink.getScopeId()).isEqualTo(caseInstance.getId());
+        assertThat(entityLink.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(entityLink.getScopeDefinitionId()).isNull();
+        assertThat(entityLink.getReferenceScopeId()).isEqualTo(referenceScopeId);
+        assertThat(entityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(entityLink.getReferenceScopeDefinitionId()).isNull();
+        assertThat(entityLink.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
     }
 
     private void checkHistoricEntityLink(HistoricEntityLink historicEntityLink, CaseInstance caseInstance, String referenceScopeId) {
-        assertEquals(EntityLinkType.CHILD, historicEntityLink.getLinkType());
-        assertNotNull(historicEntityLink.getCreateTime());
-        assertEquals(caseInstance.getId(), historicEntityLink.getScopeId());
-        assertEquals(ScopeTypes.CMMN, historicEntityLink.getScopeType());
-        assertNull(historicEntityLink.getScopeDefinitionId());
-        assertEquals(referenceScopeId, historicEntityLink.getReferenceScopeId());
-        assertEquals(ScopeTypes.CMMN, historicEntityLink.getReferenceScopeType());
-        assertNull(historicEntityLink.getReferenceScopeDefinitionId());
-        assertEquals(HierarchyType.ROOT, historicEntityLink.getHierarchyType());
+        assertThat(historicEntityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
+        assertThat(historicEntityLink.getCreateTime()).isNotNull();
+        assertThat(historicEntityLink.getScopeId()).isEqualTo(caseInstance.getId());
+        assertThat(historicEntityLink.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(historicEntityLink.getScopeDefinitionId()).isNull();
+        assertThat(historicEntityLink.getReferenceScopeId()).isEqualTo(referenceScopeId);
+        assertThat(historicEntityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(historicEntityLink.getReferenceScopeDefinitionId()).isNull();
+        assertThat(historicEntityLink.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
     }
 
     // Same as testBasicBlocking(), but now with a non-blocking case task
@@ -310,159 +292,159 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testBasicNonBlocking() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertNotNull(caseInstance);
-        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(caseInstance).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(1);
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertNotNull(planItemInstance);
+        assertThat(planItemInstance).isNotNull();
 
         // Triggering the task should start the case instance (which is non-blocking -> directly go to task two)
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
 
-        assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(2);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(0);
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
-        assertEquals(2, planItemInstances.size());
-        assertEquals("Task Two", planItemInstances.get(0).getName());
-        assertEquals("The Task", planItemInstances.get(1).getName());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Task Two", "The Task");
 
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertEquals("The Task", planItemInstance.getName());
+        assertThat(planItemInstance.getName()).isEqualTo("The Task");
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
 
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
-        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(2);
     }
 
     @Test
     @CmmnDeployment
     public void testRuntimeServiceTriggerCasePlanItemInstance() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(2);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(2);
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
-        assertEquals(3, planItemInstances.size());
-        assertEquals("Task One", planItemInstances.get(0).getName());
-        assertEquals("The Case", planItemInstances.get(1).getName());
-        assertEquals("The Task", planItemInstances.get(2).getName());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Task One", "The Case", "The Task");
 
         // Triggering the planitem of the case should terminate the case and go to task two
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
 
-        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(1);
 
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
-        assertEquals(2, planItemInstances.size());
-        assertEquals("Task One", planItemInstances.get(0).getName());
-        assertEquals("Task Two", planItemInstances.get(1).getName());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Task One", "Task Two");
     }
 
     @Test
     @CmmnDeployment
     public void testRuntimeServiceTriggerNonBlockingCasePlanItem() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(2);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(2);
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .singleResult();
-        assertEquals("Task One", planItemInstance.getName());
+        assertThat(planItemInstance.getName()).isEqualTo("Task One");
 
         // Triggering the task plan item completes the parent case, but the child case remains
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(1);
 
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .singleResult();
-        assertEquals("The Task", planItemInstance.getName());
+        assertThat(planItemInstance.getName()).isEqualTo("The Task");
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(2);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(0);
     }
 
     @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceWithNonBlockingCaseTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(2);
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertEquals("Task One", planItemInstance.getName());
+        assertThat(planItemInstance.getName()).isEqualTo("Task One");
 
         // Terminating the parent case instance should not terminate the child (it's non-blocking)
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(1);
 
         // Terminate child
         CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
-        assertNotNull(childCaseInstance);
-        HistoricCaseInstance historicChildCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
-        assertNotNull(historicChildCaseInstance);
+        assertThat(childCaseInstance).isNotNull();
+        HistoricCaseInstance historicChildCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstance.getId())
+                .singleResult();
+        assertThat(historicChildCaseInstance).isNotNull();
 
         cmmnRuntimeService.terminateCaseInstance(childCaseInstance.getId());
-        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(2);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(0);
     }
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/runtime/CaseTaskTest.terminateAvailableCaseTask.cmmn",
-        "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.terminateAvailableCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
     })
     public void testTerminateAvailableCaseTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("terminateAvailableCaseTask").start();
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemDefinitionType(PlanItemDefinitionType.CASE_TASK)
-            .planItemInstanceStateAvailable().singleResult();
-        assertEquals("myCase", planItemInstance.getName());
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.CASE_TASK)
+                .planItemInstanceStateAvailable().singleResult();
+        assertThat(planItemInstance.getName()).isEqualTo("myCase");
 
         // When the event listener now occurs, the stage should be exited, also exiting the case task plan item
         UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .singleResult();
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
 
         assertCaseInstanceEnded(caseInstance);
@@ -472,51 +454,51 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTerminateCaseInstanceWithNestedCaseTasks() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(4);
 
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-        assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(4);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(0);
 
     }
 
     @Test
     @CmmnDeployment
     public void testFallbackToDefaultTenant() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
-            caseDefinitionKey("myCase").
-            tenantId("flowable").
-            overrideCaseDefinitionTenantId("flowable").
-            fallbackToDefaultTenant().
-            start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .tenantId("flowable")
+                .overrideCaseDefinitionTenantId("flowable")
+                .fallbackToDefaultTenant()
+                .start();
 
         assertBlockingCaseTaskFlow(caseInstance);
-        assertEquals("flowable", caseInstance.getTenantId());
+        assertThat(caseInstance.getTenantId()).isEqualTo("flowable");
     }
 
     @Test
-    @CmmnDeployment(resources="org/flowable/cmmn/test/runtime/CaseTaskTest.testGlobalFallbackToDefaultTenant.cmmn", tenantId="defaultFlowable")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/CaseTaskTest.testGlobalFallbackToDefaultTenant.cmmn", tenantId = "defaultFlowable")
     public void testGlobalFallbackToDefaultTenant() {
         String tenantDeploymentId = cmmnRepositoryService.createDeployment()
-                        .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
-                        .tenantId("defaultFlowable")
-                        .deploy()
-                        .getId();
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+                .tenantId("defaultFlowable")
+                .deploy()
+                .getId();
 
         DefaultTenantProvider originalDefaultTenantProvider = cmmnEngineConfiguration.getDefaultTenantProvider();
         cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
         cmmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
-            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
-                caseDefinitionKey("myCase").
-                tenantId("flowable").
-                overrideCaseDefinitionTenantId("flowable").
-                fallbackToDefaultTenant().
-                start();
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .tenantId("flowable")
+                    .overrideCaseDefinitionTenantId("flowable")
+                    .fallbackToDefaultTenant()
+                    .start();
 
             assertBlockingCaseTaskFlow(caseInstance);
-            assertEquals("flowable", caseInstance.getTenantId());
+            assertThat(caseInstance.getTenantId()).isEqualTo("flowable");
 
         } finally {
             cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
@@ -526,22 +508,20 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    @CmmnDeployment(resources="org/flowable/cmmn/test/runtime/CaseTaskTest.testGlobalFallbackToDefaultTenant.cmmn", tenantId="defaultFlowable")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/CaseTaskTest.testGlobalFallbackToDefaultTenant.cmmn", tenantId = "defaultFlowable")
     public void testGlobalFallbackToDefaultTenantNoDefinition() {
         DefaultTenantProvider originalDefaultTenantProvider = cmmnEngineConfiguration.getDefaultTenantProvider();
         cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
         cmmnEngineConfiguration.setDefaultTenantValue("defaultFlowable");
         try {
-            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
-                caseDefinitionKey("myCase").
-                tenantId("flowable").
-                overrideCaseDefinitionTenantId("flowable").
-                fallbackToDefaultTenant().
-                start();
-
-            this.expectedException.expect(FlowableObjectNotFoundException.class);
-            assertBlockingCaseTaskFlow(caseInstance);
-
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .tenantId("flowable")
+                    .overrideCaseDefinitionTenantId("flowable")
+                    .fallbackToDefaultTenant()
+                    .start();
+            assertThatThrownBy(() -> assertBlockingCaseTaskFlow(caseInstance))
+                    .isInstanceOf(FlowableObjectNotFoundException.class);
         } finally {
             cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
             cmmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
@@ -551,16 +531,15 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testFallbackToDefaultTenantFalse() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
-            caseDefinitionKey("myCase").
-            tenantId("flowable").
-            overrideCaseDefinitionTenantId("flowable").
-            fallbackToDefaultTenant().
-            start();
-
-        this.expectedException.expect(FlowableObjectNotFoundException.class);
-        this.expectedException.expectMessage("Case definition was not found by key 'oneTaskCase' and tenant 'flowable'");
-        assertBlockingCaseTaskFlow(caseInstance);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .tenantId("flowable")
+                .overrideCaseDefinitionTenantId("flowable")
+                .fallbackToDefaultTenant()
+                .start();
+        assertThatThrownBy(() -> assertBlockingCaseTaskFlow(caseInstance))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("Case definition was not found by key 'oneTaskCase' and tenant 'flowable'");
     }
 
     @Test
@@ -707,7 +686,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    @CmmnDeployment(resources={
+    @CmmnDeployment(resources = {
             "org/flowable/cmmn/test/runtime/CaseTaskTest.testSameDeploymentGlobal.cmmn",
             "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
     })
@@ -845,24 +824,24 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @Test
     public void testEntityLinksAreDeleted() {
         String deploymentId = cmmnRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn").deploy().getId();
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn").deploy().getId();
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         try {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertEquals("Sub task", task.getName());
+            assertThat(task.getName()).isEqualTo("Sub task");
 
-            assertEquals(1, cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
-            assertEquals(1, cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
+            assertThat(cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId())).hasSize(1);
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId())).hasSize(1);
 
             cmmnTaskService.complete(task.getId());
 
-            assertEquals(1, cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId())).hasSize(1);
         } finally {
             cmmnRepositoryService.deleteDeployment(deploymentId, true);
         }
 
-        assertEquals(0, cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
+        assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId())).isEmpty();
     }
 
     @Test
@@ -1001,29 +980,29 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testIdVariableName() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testIdVariableName")
-            .start();
+                .caseDefinitionKey("testIdVariableName")
+                .start();
 
         CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
-            .caseDefinitionKey("oneTaskCase")
-            .singleResult();
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
 
-        assertEquals(subCase.getId(), cmmnRuntimeService.getVariable(caseInstance.getId(), "caseIdVariable"));
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "caseIdVariable")).isEqualTo(subCase.getId());
     }
 
     @Test
     @CmmnDeployment
     public void testIdVariableNameExpression() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testIdVariableName")
-            .variable("idVariableName", "test")
-            .start();
+                .caseDefinitionKey("testIdVariableName")
+                .variable("idVariableName", "test")
+                .start();
 
         CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
-            .caseDefinitionKey("oneTaskCase")
-            .singleResult();
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
 
-        assertEquals(subCase.getId(), cmmnRuntimeService.getVariable(caseInstance.getId(), "test"));
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "test")).isEqualTo(subCase.getId());
     }
 
 }
