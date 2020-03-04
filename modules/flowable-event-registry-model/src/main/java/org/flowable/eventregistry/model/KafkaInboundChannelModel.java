@@ -30,7 +30,7 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
     protected String topicPattern;
     protected String clientIdPrefix;
     protected String concurrency;
-    protected List<CustomProperty> properties;
+    protected List<CustomProperty> customProperties;
     
     public KafkaInboundChannelModel() {
         super();
@@ -78,25 +78,29 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
     }
 
     public List<CustomProperty> getCustomProperties() {
-        return properties;
+        return customProperties;
     }
 
     public void addCustomProperty(String name, String value) {
-        if (properties == null) {
-            properties = new ArrayList<>();
+        if (customProperties == null) {
+            customProperties = new ArrayList<>();
         }
 
-        properties.add(new CustomProperty(name, value));
+        customProperties.add(new CustomProperty(name, value));
     }
 
     public void setCustomProperties(List<CustomProperty> properties) {
-        this.properties = properties;
+        this.customProperties = properties;
     }
 
     public static class CustomProperty {
 
         protected String name;
         protected String value;
+
+        public CustomProperty() {
+
+        }
 
         public CustomProperty(String name, String value) {
             this.name = name;

@@ -6,19 +6,8 @@
   "channelType": "inbound",
   "type": "kafka",
 
-  "groupId": "wealth",
   "topics": [
-    "customer",
-    "test-customer"
-  ],
-  "topicPattern": "*customer",
-  "clientIdPrefix": "customer-",
-  "concurrency": "2",
-  "customProperties": [
-    {
-    "name": "connections.max.idle.ms",
-    "value": "10000"
-    }
+    "customer"
   ],
 
   "deserializerType": "json",
