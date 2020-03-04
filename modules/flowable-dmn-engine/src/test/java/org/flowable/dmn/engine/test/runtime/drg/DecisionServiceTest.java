@@ -12,16 +12,18 @@
  */
 package org.flowable.dmn.engine.test.runtime.drg;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -32,7 +34,7 @@ public class DecisionServiceTest {
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/simple_decisionservice.dmn")
-    public void executeDecisionServiceWithoutStartVariables() {
+    public void executeDecisionServiceDecisionExecutionOrder() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
@@ -43,11 +45,33 @@ public class DecisionServiceTest {
         inputVariables.put("inputVariable1", 5D);
         inputVariables.put("riskcategory", "HIGH");
 
+        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("decisionService1")
+            .variables(inputVariables)
+            .executeWithAuditTrail();
+
+        assertThat(result.getChildDecisionExecutions().keySet())
+            .containsExactly("decision3", "decision2", "decision1", "decision4");
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/related_decisionservice.dmn")
+    public void executeDecisionServiceWithoutDecisionOutcomes() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.put("input1", "test");
+
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decisionService1")
             .variables(inputVariables)
             .execute();
 
-        Assert.assertNotNull(result);
+        Map<String, Object> expectedResult = new HashMap<>();
+        expectedResult.put("output1", "was test1");
+
+        assertThat(result)
+            .containsExactly(expectedResult);
     }
 }

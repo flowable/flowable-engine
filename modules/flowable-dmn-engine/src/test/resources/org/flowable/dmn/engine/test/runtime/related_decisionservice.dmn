@@ -1,0 +1,62 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_c0e9d8ba-4b7f-11e7-8197-a26608126000" name="Risk Rating Decision Table"
+             namespace="http://www.flowable.org/dmn">
+    <decision id="decision1" name="Decision 1">
+        <informationRequirement id="infoRequirement1_1">
+            <requiredDecision href="#decision2" />
+        </informationRequirement>
+        <decisionTable id="decisionTable1">
+            <input>
+                <inputExpression id="inputExpression1" typeRef="string">
+                    <text>decisionOutput1</text>
+                </inputExpression>
+            </input>
+            <output id="output1" label="Output 1" name="output1" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry1">
+                    <text><![CDATA[== "test1"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1">
+                    <text>'was test1'</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2">
+                    <text><![CDATA[!= "test1"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2">
+                    <text>'was not test1'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision2" name="Decision 2">
+        <decisionTable id="decisionTable2">
+            <input>
+                <inputExpression id="inputExpression2_1" typeRef="string">
+                    <text>input1</text>
+                </inputExpression>
+            </input>
+            <output id="output2_1" label="Decision Output 1" name="decisionOutput1" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry2_1">
+                    <text><![CDATA[.startsWith('test')]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_1">
+                    <text>'test1'</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2_2">
+                    <text><![CDATA[.endsWith('test')]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2">
+                    <text>'test2'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decisionService id="decisionService1" name="Decision Service 1">
+        <outputDecision href="#decision1"/>
+        <encapsulatedDecision href="#decision2"/>
+    </decisionService>
+</definitions>

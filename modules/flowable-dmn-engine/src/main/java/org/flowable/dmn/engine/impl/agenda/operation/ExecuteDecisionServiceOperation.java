@@ -2,8 +2,8 @@ package org.flowable.dmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,12 +18,9 @@ import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.InformationRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ExecuteDecisionServiceOperation extends DmnOperation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteDecisionServiceOperation.class);
     protected final DecisionService decisionService;
     protected final ExecuteDecisionContext executeDecisionContext;
 
@@ -35,11 +32,10 @@ public class ExecuteDecisionServiceOperation extends DmnOperation {
 
     @Override
     public void run() {
-        LOGGER.debug("#### Executing decision service operation {}", decisionService.getId());
+        DecisionExecutionAuditContainer auditContainer = DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decisionService, executeDecisionContext);
+        executeDecisionContext.setDecisionExecution(auditContainer);
 
         planExecuteDecisionOperationsForDecisionService();
-
-        LOGGER.debug("#### Finished decision service operation {}", decisionService.getId());
     }
 
     protected void planExecuteDecisionOperationsForDecisionService() {
@@ -55,12 +51,7 @@ public class ExecuteDecisionServiceOperation extends DmnOperation {
 
         List<Decision> orderedOutputDecisions = determineDecisionExecutionOrder(encapsulatedDecisions, outputDecisions);
 
-        orderedOutputDecisions.forEach(decision -> {
-            ExecuteDecisionContext childExecuteDecisionContext = new ExecuteDecisionContext(decision, executeDecisionContext);
-
-            LOGGER.debug("#### Planning execute decision operation for decision {}", decision.getId());
-            CommandContextUtil.getAgenda(commandContext).planExecuteDecisionOperation(childExecuteDecisionContext, decision);
-        });
+        orderedOutputDecisions.forEach(decision -> CommandContextUtil.getAgenda(commandContext).planExecuteDecisionOperation(executeDecisionContext, decision));
     }
 
     protected List<Decision> determineDecisionExecutionOrder(List<Decision> encapsulatedDecisions, List<Decision> outputDecisions) {
@@ -71,23 +62,29 @@ public class ExecuteDecisionServiceOperation extends DmnOperation {
         return determineDecisionExecutionOrder(combinedDecisions);
     }
 
-    protected List<Decision> determineDecisionExecutionOrder(List<Decision> sortDecisions) {
+    protected List<Decision> determineDecisionExecutionOrder(List<Decision> allDecisions) {
         List<Decision> order = new ArrayList<>();
+        LinkedList<Decision> sortDecisions = new LinkedList<>();
 
         Map<String, Decision> decisionsById = new HashMap<>();
         Map<String, Boolean> visited = new HashMap<>();
 
-        for (Decision sortDecision : sortDecisions) {
+        for (Decision sortDecision : allDecisions) {
             decisionsById.put(sortDecision.getId(), sortDecision);
             visited.put(sortDecision.getId(), false);
+            if (sortDecision.getRequiredDecisions().isEmpty()) {
+                sortDecisions.addFirst(sortDecision);
+            } else {
+                sortDecisions.addLast(sortDecision);
+            }
         }
 
         for (Decision decision : sortDecisions) {
-            if (!visited.get(decision.getId()))
+            if (!visited.get(decision.getId())) {
                 executeSort(decisionsById, decision.getId(), visited, order);
+            }
         }
 
-        Collections.reverse(order);
         return order;
     }
 
