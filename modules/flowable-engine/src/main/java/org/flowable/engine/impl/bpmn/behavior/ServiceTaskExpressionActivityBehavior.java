@@ -88,7 +88,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
 
                 value = expression.getValue(execution);
                 if (resultVariable != null) {
-                    if(storeResultVariableAsTransient) {
+                    if (storeResultVariableAsTransient) {
                         if (useLocalScopeForResultVariable) {
                             execution.setTransientVariableLocal(resultVariable, value);
                         } else {

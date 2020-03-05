@@ -44,7 +44,7 @@ public class PlanItemExpressionActivityBehavior extends CoreCmmnActivityBehavior
             Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
             value = expressionObject.getValue(planItemInstanceEntity);
             if (resultVariable != null) {
-                if(storeResultVariableAsTransient) {
+                if (storeResultVariableAsTransient) {
                     planItemInstanceEntity.setTransientVariable(resultVariable, value);
                 } else {
                     planItemInstanceEntity.setVariable(resultVariable, value);
