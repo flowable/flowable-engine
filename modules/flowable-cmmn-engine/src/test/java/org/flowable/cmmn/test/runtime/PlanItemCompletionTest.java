@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Test;
@@ -113,6 +114,12 @@ public class PlanItemCompletionTest extends FlowableCmmnTestCase {
         // activate task and complete it the first time will complete the case as it will be ignored after first completion
         cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(userEventListenerInstance.getState()).isEqualTo(AVAILABLE);
+
+        cmmnRuntimeService.completeGenericEventListenerInstance(userEventListenerInstance.getId());
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
