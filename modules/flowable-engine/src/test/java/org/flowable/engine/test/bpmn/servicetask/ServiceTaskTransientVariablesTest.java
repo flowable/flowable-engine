@@ -36,7 +36,7 @@ public class ServiceTaskTransientVariablesTest extends PluggableFlowableTestCase
         Object persistentResult = runtimeService.getVariable(processInstance.getId(), "persistentResult");
 
         assertNull(transientResult);
-        assertEquals(persistentResult, "Result is: test");
+        assertEquals("Result is: test", persistentResult);
     }
 
     @Test
@@ -45,8 +45,8 @@ public class ServiceTaskTransientVariablesTest extends PluggableFlowableTestCase
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
         List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(variablesInstances.size(), 1);
-        assertEquals(variablesInstances.get(0).getValue(), "Result is: test");
+        assertEquals(1, variablesInstances.size());
+        assertEquals("Result is: test", variablesInstances.get(0).getValue());
     }
 
 
