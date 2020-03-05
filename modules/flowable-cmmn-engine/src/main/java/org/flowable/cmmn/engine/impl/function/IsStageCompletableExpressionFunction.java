@@ -57,9 +57,10 @@ public class IsStageCompletableExpressionFunction extends AbstractCmmnExpression
                 // as the completable only gets set at the end of the evaluation cycle.
 
                 PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-                if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())
-                        && planItemDefinition instanceof EventListener
+                if (planItemDefinition instanceof EventListener
+                        && (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState()) || PlanItemInstanceState.UNAVAILABLE.equals(planItemInstanceEntity.getState()))
                         && (StringUtils.isNotEmpty(((EventListener) planItemDefinition).getAvailableConditionExpression()))) {
+
                     return PlanItemInstanceContainerUtil.shouldPlanItemContainerComplete(stagePlanItemInstanceEntity,
                         Collections.singletonList(planItemInstanceEntity.getId()), true).isCompletable();
 
