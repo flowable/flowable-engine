@@ -155,7 +155,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
                 new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
                 new URL(WEBSERVICE_MOCK_ADDRESS));
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
         final ArrayNode values = mapper.createArrayNode();
         values.add(21);
         values.add(32);
@@ -182,7 +182,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
                 new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
                 new URL(WEBSERVICE_MOCK_ADDRESS));
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
         final ArrayNode values = mapper.createArrayNode();
         values.add(1);
         values.add(2);
@@ -209,7 +209,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
                 new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
                 new URL(WEBSERVICE_MOCK_ADDRESS));
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
         final ObjectNode valuesObj = mapper.createObjectNode();
         final ArrayNode values = valuesObj.putArray("values");
         values.add(12);
@@ -237,7 +237,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
                 new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
                 new URL(WEBSERVICE_MOCK_ADDRESS));
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
         final ObjectNode valuesObj = mapper.createObjectNode();
         final ArrayNode values = valuesObj.putArray("values");
         values.add(11);
@@ -265,7 +265,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
                 new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
                 new URL(WEBSERVICE_MOCK_ADDRESS));
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
         final ObjectNode valuesObj = mapper.createObjectNode();
         valuesObj.put("value1", 111);
         valuesObj.put("value2", 222);
@@ -292,7 +292,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
                 new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
                 new URL(WEBSERVICE_MOCK_ADDRESS));
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
         final ObjectNode argsObj = mapper.createObjectNode();
         final ObjectNode valuesObj = mapper.createObjectNode();
         valuesObj.put("arg1", 1111);

@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.impl.util.CommandContextUtil;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -77,12 +79,14 @@ public class FieldBaseStructureInstance implements StructureInstance {
             final ArrayNode fieldArrayNodeValueObject = (ArrayNode) fieldValueObject;
 
             final Class<?> fieldParameterType = this.structureDefinition.getFieldParameterTypeAt(index);
-            final Object value = new ObjectMapper().convertValue(fieldValueObject,
+            final ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
+            final Object value = objectMapper.convertValue(fieldValueObject,
                     Array.newInstance(fieldParameterType, fieldArrayNodeValueObject.size()).getClass());
 
             return Arrays.asList((Object[]) value);
         } else if (fieldValueObject instanceof ValueNode || fieldValueObject instanceof ObjectNode) {
-            return new ObjectMapper().convertValue(fieldValueObject, this.getFieldTypeAt(index));
+            final ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
+            return objectMapper.convertValue(fieldValueObject, this.getFieldTypeAt(index));
         } else {
             return fieldValueObject;
         }
