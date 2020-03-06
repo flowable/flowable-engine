@@ -630,6 +630,14 @@ public class CmmnRestResponseFactory {
         result.setOwner(taskInstance.getOwner());
         result.setParentTaskId(taskInstance.getParentTaskId());
         result.setPriority(taskInstance.getPriority());
+        result.setScopeDefinitionId(taskInstance.getScopeDefinitionId());
+        result.setScopeId(taskInstance.getScopeId());
+        result.setSubScopeId(taskInstance.getSubScopeId());
+        result.setScopeType(taskInstance.getScopeType());
+        result.setPropagatedStageInstanceId(taskInstance.getPropagatedStageInstanceId());
+        result.setExecutionId(taskInstance.getExecutionId());
+        result.setProcessInstanceId(taskInstance.getProcessInstanceId());
+        result.setProcessDefinitionId(taskInstance.getProcessDefinitionId());
         result.setTenantId(taskInstance.getTenantId());
         result.setCategory(taskInstance.getCategory());
         if (taskInstance.getScopeDefinitionId() != null && ScopeTypes.CMMN.equals(taskInstance.getScopeType())) {
