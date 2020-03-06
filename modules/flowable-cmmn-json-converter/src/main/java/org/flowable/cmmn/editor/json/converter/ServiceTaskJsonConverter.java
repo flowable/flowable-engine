@@ -115,6 +115,10 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
                 propertiesNode.put(PROPERTY_SERVICETASK_RESULT_VARIABLE, serviceTask.getResultVariableName());
             }
 
+            if (serviceTask.isStoreResultVariableAsTransient()) {
+                propertiesNode.put(PROPERTY_SERVICETASK_STORE_RESULT_AS_TRANSIENT, serviceTask.isStoreResultVariableAsTransient());
+            }
+
             addFieldExtensions(serviceTask.getFieldExtensions(), propertiesNode);
         }
     }
