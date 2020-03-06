@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.test.history;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,38 +33,38 @@ import org.junit.Test;
 public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
 
     @Test
-    @CmmnDeployment(resources="org/flowable/cmmn/test/one-human-task-model.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
     public void testDeleteSingleHistoricCaseInstance() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue");
         cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", 43);
-        
+
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
-            assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-            
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
             cmmnTaskService.complete(task.getId());
-                
+
             HistoricCaseInstanceQuery query = cmmnHistoryService.createHistoricCaseInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
             query.finishedBefore(cal.getTime());
-                    
+
             query.deleteWithRelatedData();
-            
-            assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-            assertEquals(0, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
-            assertEquals(0, cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-            assertEquals(0, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId()).size());
-            assertEquals(0, cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId()).size());
-            assertEquals(0, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count());
-            assertEquals(0, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId())).isEmpty();
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId())).isEmpty();
+            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
         }
     }
-    
+
     @Test
-    @CmmnDeployment(resources="org/flowable/cmmn/test/human-task-milestone-model.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/human-task-milestone-model.cmmn")
     public void testDeleteHistoricInstances() {
         List<String> caseInstanceIds = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -73,39 +73,41 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
         }
-        
+
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
-            
-            assertEquals(20, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
-            
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(20);
+
             for (int i = 0; i < 10; i++) {
                 Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
                 cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
                 cmmnTaskService.complete(task.getId());
             }
-                    
+
             HistoricCaseInstanceQuery query = cmmnHistoryService.createHistoricCaseInstanceQuery();
             Calendar cal = new GregorianCalendar();
             cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
             query.finishedBefore(cal.getTime());
             query.deleteWithRelatedData();
-            
-            assertEquals(10, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
-            assertEquals(20, cmmnHistoryService.createHistoricPlanItemInstanceQuery().count());
-            assertEquals(10, cmmnHistoryService.createHistoricTaskInstanceQuery().count());
-            
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(10);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().count()).isEqualTo(20);
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+
             for (int i = 0; i < 20; i++) {
                 if (i < 10) {
-                    assertEquals(0, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i)).size());
-                    assertEquals(0, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count());
-                    assertEquals(0, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count());
-                    assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count());
-                    
+                    assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).isEmpty();
+                    assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(0);
+                    assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(0);
+                    assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count())
+                            .isEqualTo(0);
+
                 } else {
-                    assertEquals(1, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i)).size());
-                    assertEquals(1, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count());
-                    assertEquals(2, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count());
-                    assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count());
+                    assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).hasSize(1);
+                    assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(1);
+                    assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(2);
+                    assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count())
+                            .isEqualTo(1);
                 }
             }
         }

@@ -69,4 +69,14 @@ class KafkaInboundChannelJsonConverterTest extends AbstractChannelConverterTest 
             });
     }
 
+    @Test
+    void convertSimpleModelToJson() {
+        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaInboundChannel2.json");
+        assertThat(channelModel)
+            .isInstanceOfSatisfying(KafkaInboundChannelModel.class, model -> {
+                assertThat(model.getTopics()).containsExactly("customer");
+            });
+
+    }
+
 }

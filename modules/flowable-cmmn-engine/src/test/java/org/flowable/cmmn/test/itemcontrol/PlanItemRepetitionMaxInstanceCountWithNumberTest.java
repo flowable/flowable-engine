@@ -12,11 +12,11 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("maxInstanceCountNumberTest").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -50,8 +50,9 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableTaskA", true);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(15, planItemInstances.size());
-        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, WAITING_FOR_REPETITION);
+        assertThat(planItemInstances).hasSize(15);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE,
+                WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task D", ENABLED);
@@ -64,7 +65,7 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("maxInstanceCountNumberTest").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -75,7 +76,7 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         startAndCompleteTaskMultipleTimes(caseInstance.getId(), "Task B", 4);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(8, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(8);
 
         assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
@@ -90,7 +91,7 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("maxInstanceCountNumberTest").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -104,7 +105,7 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         startAndCompleteTaskMultipleTimes(caseInstance.getId(), "Task D", 6);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
 
         assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
@@ -119,18 +120,17 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("maxInstanceCountNumberTest").start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task D", ENABLED);
         assertPlanItemInstanceState(planItemInstances, "Task E", AVAILABLE);
 
-
         // manually trigger Task E by completing Task D three times, but as E is not yet enabled, it must not yet be active
         startAndCompleteTaskMultipleTimes(caseInstance.getId(), "Task D", 3);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(5, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
@@ -141,7 +141,7 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableTaskE", true);
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(10, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(10);
 
         assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ENABLED);

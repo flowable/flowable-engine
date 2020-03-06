@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.test.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -50,19 +49,19 @@ public class CaseDefinitionCategoryTest extends FlowableCmmnTestCase {
     @Test
     public void testUpdateCategory() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).singleResult();
-        assertEquals("http://flowable.org/cmmn", caseDefinition.getCategory());
+        assertThat(caseDefinition.getCategory()).isEqualTo("http://flowable.org/cmmn");
         
         cmmnRepositoryService.setCaseDefinitionCategory(caseDefinition.getId(), "testCategory");
         caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).singleResult();
-        assertEquals("testCategory", caseDefinition.getCategory());
+        assertThat(caseDefinition.getCategory()).isEqualTo("testCategory");
         
         caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).caseDefinitionCategory("testCategory").singleResult();
-        assertNotNull(caseDefinition);
+        assertThat(caseDefinition).isNotNull();
     }
     
     @Test
     public void testDescriptionPersistency() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).singleResult();
-        assertEquals("This is a sample description", caseDefinition.getDescription());
+        assertThat(caseDefinition.getDescription()).isEqualTo("This is a sample description");
     }
 }

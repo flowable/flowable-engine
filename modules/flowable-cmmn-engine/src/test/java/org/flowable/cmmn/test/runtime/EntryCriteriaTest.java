@@ -13,9 +13,6 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +28,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -49,16 +45,17 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
                 .milestoneInstanceCaseInstanceId(caseInstance.getId())
                 .orderByMilestoneName().asc()
                 .list();
-        assertEquals(1, mileStones.size());
-        assertEquals("PlanItem Milestone One", mileStones.get(0).getName());
+        assertThat(mileStones)
+                .extracting(HistoricMilestoneInstance::getName)
+                .containsExactly("PlanItem Milestone One");
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .singleResult();
-        assertNotNull(historicCaseInstance);
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(historicCaseInstance).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
     @Test
@@ -66,14 +63,14 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     public void testThreeEntryCriteriaOnPartsForWaitStates() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
-        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
-        assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .list();
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
 
         for (PlanItemInstance planItemInstance : planItemInstances) {
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
@@ -82,37 +79,38 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         HistoricMilestoneInstance mileStone = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId())
                 .singleResult();
-        assertEquals("PlanItem Milestone One", mileStone.getName());
-        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertThat(mileStone.getName()).isEqualTo("PlanItem Milestone One");
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .singleResult();
-        assertNotNull(historicCaseInstance);
+        assertThat(historicCaseInstance).isNotNull();
     }
 
     @Test
     @CmmnDeployment
     public void testMultipleEntryCriteria() {
         // 3 sentries, each completion should trigger the milestone
-        for (int i=0; i<3; i++) {
+        for (int i = 0; i < 3; i++) {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
             List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
                     .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                     .orderByName().asc()
                     .list();
-            assertEquals(3, planItemInstances.size());
+            assertThat(planItemInstances).hasSize(3);
 
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(i).getId());
-            assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
             // Triggering the other two should not have additional effects
-            for (PlanItemInstance planItemInstance :cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).list()) {
+            for (PlanItemInstance planItemInstance : cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE).list()) {
                 cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
             }
 
-            assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
             assertCaseInstanceEnded(caseInstance);
         }
     }
@@ -127,16 +125,16 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
 
         // Triggering two plan items = 2 on parts satisfied
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
 
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
     @Test
@@ -144,12 +142,12 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     public void testNestedSentrySatisfiedInSameEvaluation() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("A", task.getName());
+        assertThat(task.getName()).isEqualTo("A");
 
         // Completing the task should trigger the outer stage and also the task in the nested stage in the same evaluation cycle
         cmmnTaskService.complete(task.getId());
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("B", task.getName());
+        assertThat(task.getName()).isEqualTo("B");
     }
 
     @Test
@@ -157,29 +155,29 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     public void testCrossBorderSentry() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCrossBorderSentry").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("A", task.getName());
+        assertThat(task.getName()).isEqualTo("A");
 
         PlanItemInstance stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage2PlanItemInstance.getState());
+        assertThat(stage2PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
-        assertEquals(PlanItemInstanceState.AVAILABLE, stage3PlanItemInstance.getState());
+        assertThat(stage3PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
-        assertNull(cmmnTaskService.createTaskQuery().taskName("B").singleResult());
-        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult());
+        assertThat(cmmnTaskService.createTaskQuery().taskName("B").singleResult()).isNull();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult()).isNull();
 
         // Completing A should activate B and it's stage (that has a sentry that isn't yet satisfied, but due to B's activation it gets activated too)
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("A").singleResult().getId());
 
         stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage2PlanItemInstance.getState());
+        assertThat(stage2PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage3PlanItemInstance.getState());
+        assertThat(stage3PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
-        assertNotNull(cmmnTaskService.createTaskQuery().taskName("B").singleResult());
-        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult());
-        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult());
+        assertThat(cmmnTaskService.createTaskQuery().taskName("B").singleResult()).isNotNull();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult()).isNotNull();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult()).isNull();
     }
 
     @Test
@@ -187,38 +185,41 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     public void testCrossBorderMultipleSentries() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCrossBorderSentry").start();
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
-        assertEquals(1, tasks.size());
-        assertEquals("A", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A");
 
         PlanItemInstance stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
-        assertEquals(PlanItemInstanceState.AVAILABLE, stage2PlanItemInstance.getState());
+        assertThat(stage2PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         PlanItemInstance stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
-        assertNull(stage3PlanItemInstance);
+        assertThat(stage3PlanItemInstance).isNull();
 
         PlanItemInstance stage4PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 4").singleResult();
-        assertEquals(PlanItemInstanceState.AVAILABLE, stage4PlanItemInstance.getState());
+        assertThat(stage4PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         PlanItemInstance stage5PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 5").singleResult();
-        assertNull(stage5PlanItemInstance);
+        assertThat(stage5PlanItemInstance).isNull();
 
         // Completing A should activate B,C,D an E
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("A").singleResult().getId());
 
         stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage2PlanItemInstance.getState());
+        assertThat(stage2PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage3PlanItemInstance.getState());
+        assertThat(stage3PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         stage4PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 4").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage4PlanItemInstance.getState());
+        assertThat(stage4PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         stage5PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 5").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage5PlanItemInstance.getState());
+        assertThat(stage5PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("B", "C", "D", "E");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("B", "C", "D", "E");
     }
 
     @Test
@@ -227,30 +228,32 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCrossBorderSentry").start();
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskName("A").singleResult().getId(), Collections.singletonMap("taskvar", 123));
 
-        assertNotNull(cmmnTaskService.createTaskQuery().taskName("B").singleResult());
+        assertThat(cmmnTaskService.createTaskQuery().taskName("B").singleResult()).isNotNull();
 
         PlanItemInstance stage2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 2").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage2PlanItemInstance.getState());
+        assertThat(stage2PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stage3PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage 3").singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stage3PlanItemInstance.getState());
+        assertThat(stage3PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
-        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult());
-        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult()).isNotNull();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult()).isNull();
     }
 
     @Test
     @CmmnDeployment
     public void testRepeatingCrossBoundary() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testRepeatingCrossBoundary")
-            .variable("goIntoB", true)
-            .variable("goIntoC", true)
-            .start();
+                .caseDefinitionKey("testRepeatingCrossBoundary")
+                .variable("goIntoB", true)
+                .variable("goIntoC", true)
+                .start();
 
         // Complete B once, will terminate Stage B and C
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B");
         cmmnTaskService.complete(tasks.get(1).getId());
 
         // Completing A should again reactivate task B and thus also Stage B and C
@@ -266,15 +269,19 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCrossBoundaryWithRepetition").start();
 
         // Completing A will make B active. Task A is repeating.
-        Task taskA =  cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         cmmnTaskService.complete(taskA.getId());
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "C");
 
         // Completing B should keep a plan item instance for B with 'repeating'
         cmmnTaskService.complete(tasks.get(1).getId());
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "C");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "C");
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
@@ -286,9 +293,12 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariables(caseInstance.getId(), vars);
 
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "C");
 
-        PlanItemInstance planItemInstanceB2 = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").planItemInstanceState(PlanItemInstanceState.WAITING_FOR_REPETITION).singleResult();
+        PlanItemInstance planItemInstanceB2 = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B")
+                .planItemInstanceState(PlanItemInstanceState.WAITING_FOR_REPETITION).singleResult();
         assertThat(planItemInstanceB.getId()).isNotEqualTo(planItemInstanceB2.getId());
         assertThat(planItemInstanceB2.getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
 
@@ -298,9 +308,12 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
             tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
         }
 
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "C"); // 9 + 1 already created before
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "C"); // 9 + 1 already created before
 
-        PlanItemInstance planItemInstanceB3 = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").planItemInstanceState(PlanItemInstanceState.WAITING_FOR_REPETITION).singleResult();
+        PlanItemInstance planItemInstanceB3 = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B")
+                .planItemInstanceState(PlanItemInstanceState.WAITING_FOR_REPETITION).singleResult();
         assertThat(planItemInstanceB.getId()).isNotEqualTo(planItemInstanceB3.getId());
         assertThat(planItemInstanceB2.getId()).isNotEqualTo(planItemInstanceB3.getId());
         assertThat(planItemInstanceB3.getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
@@ -310,12 +323,16 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
             cmmnTaskService.complete(tasks.get(i).getId());
         }
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A");
 
         // Completing A should again reactivate B and the parent stages
         cmmnTaskService.complete(tasks.get(0).getId());
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "C");
 
         PlanItemInstance planItemInstanceStageTwo = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage Two").singleResult();
         assertThat(planItemInstanceStageTwo.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
@@ -328,25 +345,25 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testRepeatingCrossBoundary3() {
         cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("myCase")
-            .variable("myVar", true)
-            .start();
+                .caseDefinitionKey("myCase")
+                .variable("myVar", true)
+                .start();
 
-        Task  task =  cmmnTaskService.createTaskQuery().singleResult();
+        Task task = cmmnTaskService.createTaskQuery().singleResult();
         cmmnTaskService.complete(task.getId());
 
         task = cmmnTaskService.createTaskQuery().singleResult();
-        Assert.assertEquals("Test 2",task.getName());
+        assertThat(task.getName()).isEqualTo("Test 2");
 
         for (int i = 0; i < 11; i++) {
             cmmnTaskService.complete(task.getId());
 
             task = cmmnTaskService.createTaskQuery().singleResult();
-            Assert.assertEquals("Test",task.getName());
+            assertThat(task.getName()).isEqualTo("Test");
             cmmnTaskService.complete(task.getId());
 
             task = cmmnTaskService.createTaskQuery().singleResult();
-            Assert.assertEquals("Test 2",task.getName());
+            assertThat(task.getName()).isEqualTo("Test 2");
 
         }
 

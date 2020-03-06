@@ -65,13 +65,13 @@ public class CmmnSpringJunitJupiterTest {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("junitJupiterCase").start();
 
         assertThat(flowableTestHelper.getDeploymentIdFromDeploymentAnnotation())
-            .isEqualTo(deploymentId)
-            .isNotNull();
+                .isEqualTo(deploymentId)
+                .isNotNull();
         assertThat(flowableTestHelper.getCmmnEngine())
-            .as("Spring injected process engine")
-            .isSameAs(cmmnEngine)
-            .as("Extension injected process engine")
-            .isSameAs(extensionCmmnEngine);
+                .as("Spring injected process engine")
+                .isSameAs(cmmnEngine)
+                .as("Extension injected process engine")
+                .isSameAs(extensionCmmnEngine);
 
         CaseDefinition deployedCaseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId).singleResult();
         assertThat(deployedCaseDefinition).isNotNull();

@@ -13,11 +13,8 @@
 package org.flowable.cmmn.test.itemcontrol;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -41,125 +38,124 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testOneRequiredHumanTask() {
-        
+
         // The required task is made active, the non-required not.
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testOneRequiredHumanTask")
                 .variable("required", true)
                 .start();
-        
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
-        assertEquals(2, planItemInstances.size());
-        assertEquals("Non-required task", planItemInstances.get(0).getName());
-        assertEquals(PlanItemInstanceState.AVAILABLE, planItemInstances.get(0).getState());
-        assertEquals("Required task", planItemInstances.get(1).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(1).getState());
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactly(
+                        tuple("Non-required task", PlanItemInstanceState.AVAILABLE),
+                        tuple("Required task", PlanItemInstanceState.ACTIVE)
+                );
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Required task", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Required task");
+
         // Completing the task should autocomplete the plan model, as the plan model is autoComplete enabled
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
-        
+
         // Both required and non-required task are made active.
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testOneRequiredHumanTask")
                 .variable("required", true)
                 .variable("nonRequired", true)
                 .start();
-        
+
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
-        assertEquals(2, planItemInstances.size());
-        assertEquals("Non-required task", planItemInstances.get(0).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(0).getState());
-        assertEquals("Required task", planItemInstances.get(1).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(1).getState());
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactly(
+                        tuple("Non-required task", PlanItemInstanceState.ACTIVE),
+                        tuple("Required task", PlanItemInstanceState.ACTIVE)
+                );
+
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("Non-required task", tasks.get(0).getName());
-        assertEquals("Required task", tasks.get(1).getName());
-        
-        // Completing the required task should not autocomplete the plan model 
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Non-required task", "Required task");
+
+        // Completing the required task should not autocomplete the plan model
         cmmnTaskService.complete(tasks.get(1).getId());
         assertCaseInstanceNotEnded(caseInstance);
-        
+
         cmmnTaskService.complete(tasks.get(0).getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testOneRequiredHumanTaskInStage() {
-        
+
         // The required task is made active, the non-required not.
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testOneRequiredHumanTaskInStage")
                 .variable("required", true)
                 .start();
-        
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
-        assertEquals(4, planItemInstances.size());
-        assertEquals("Non-required task", planItemInstances.get(0).getName());
-        assertEquals(PlanItemInstanceState.AVAILABLE, planItemInstances.get(0).getState());
-        assertEquals("Other task", planItemInstances.get(1).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(1).getState());
-        assertEquals("Required task", planItemInstances.get(2).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(2).getState());
-        assertEquals("The Stage", planItemInstances.get(3).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(3).getState());
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactly(
+                        tuple("Non-required task", PlanItemInstanceState.AVAILABLE),
+                        tuple("Other task", PlanItemInstanceState.ACTIVE),
+                        tuple("Required task", PlanItemInstanceState.ACTIVE),
+                        tuple("The Stage", PlanItemInstanceState.ACTIVE)
+                );
+
         Task task = cmmnTaskService.createTaskQuery().taskName("Required task").singleResult();
-        assertEquals("Required task", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Required task");
+
         // Completing the task should autocomplete the stage
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceNotEnded(caseInstance);
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
-        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
         assertCaseInstanceEnded(caseInstance);
-        
+
         // Both required and non-required task are made active.
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testOneRequiredHumanTaskInStage")
                 .variable("required", true)
                 .variable("nonRequired", true)
                 .start();
-        
+
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).orderByName().asc().list();
-        assertEquals(4, planItemInstances.size());
-        assertEquals("Non-required task", planItemInstances.get(0).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(0).getState());
-        assertEquals("Other task", planItemInstances.get(1).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(1).getState());
-        assertEquals("Required task", planItemInstances.get(2).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(2).getState());
-        assertEquals("The Stage", planItemInstances.get(3).getName());
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstances.get(3).getState());
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactly(
+                        tuple("Non-required task", PlanItemInstanceState.ACTIVE),
+                        tuple("Other task", PlanItemInstanceState.ACTIVE),
+                        tuple("Required task", PlanItemInstanceState.ACTIVE),
+                        tuple("The Stage", PlanItemInstanceState.ACTIVE)
+                );
+
         Task otherTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Other task").singleResult();
         cmmnTaskService.complete(otherTask.getId());
-        
+
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("Non-required task", tasks.get(0).getName());
-        assertEquals("Required task", tasks.get(1).getName());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Non-required task", "Required task");
+
         cmmnTaskService.complete(tasks.get(1).getId());
         assertCaseInstanceNotEnded(caseInstance);
-        
+
         cmmnTaskService.complete(tasks.get(0).getId());
         assertCaseInstanceEnded(caseInstance);
-        
     }
-    
+
     @Test
     @CmmnDeployment
     public void testNonAutoCompleteStageManualCompleteable() {
@@ -167,30 +163,31 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("testNonAutoCompleteStageManualCompleteable")
                 .variable("required", true)
                 .start();
-        
-        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE).singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stagePlanItemInstance.getState());
-        assertFalse(stagePlanItemInstance.isCompletable());
-        
+
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE)
+                .singleResult();
+        assertThat(stagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(stagePlanItemInstance.isCompletable()).isFalse();
+
         // Completing the one task should mark the stage as completeable 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Required task", task.getName());
+        assertThat(task.getName()).isEqualTo("Required task");
         cmmnTaskService.complete(task.getId());
-        
+
         stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(stagePlanItemInstance.getId()).singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stagePlanItemInstance.getState());
-        assertTrue(stagePlanItemInstance.isCompletable());
-        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+        assertThat(stagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(stagePlanItemInstance.isCompletable()).isTrue();
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+
         // Making the other task active, should disable the completeable flag again
         cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("nonRequired", true));
-        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
         stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(stagePlanItemInstance.getId()).singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stagePlanItemInstance.getState());
-        assertFalse(stagePlanItemInstance.isCompletable());
+        assertThat(stagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(stagePlanItemInstance.isCompletable()).isFalse();
     }
-    
+
     @Test
     @CmmnDeployment
     public void testCompleteStageManually() {
@@ -198,66 +195,64 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("testNonAutoCompleteStageManualCompleteable")
                 .variable("required", true)
                 .start();
-        
-        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE).singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stagePlanItemInstance.getState());
-        assertFalse(stagePlanItemInstance.isCompletable());
-        
-        try {
-            cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-            assertEquals("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).", e.getMessage());
-        }
-        
+
+        final PlanItemInstance stagePlanItemInstance1 = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE)
+                .singleResult();
+        assertThat(stagePlanItemInstance1.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(stagePlanItemInstance1.isCompletable()).isFalse();
+
+        assertThatThrownBy(() -> cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance1.getId()))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
+
         // Completing the one task should mark the stage as completeable 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Required task", task.getName());
+        assertThat(task.getName()).isEqualTo("Required task");
         cmmnTaskService.complete(task.getId());
-        
-        stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(stagePlanItemInstance.getId()).singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, stagePlanItemInstance.getState());
-        assertTrue(stagePlanItemInstance.isCompletable());
-        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
 
-        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceCompletable().singleResult());
-        cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
+        PlanItemInstance stagePlanItemInstance2 = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(stagePlanItemInstance1.getId())
+                .singleResult();
+        assertThat(stagePlanItemInstance2.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(stagePlanItemInstance2.isCompletable()).isTrue();
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceCompletable().singleResult()).isNotNull();
+        cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance2.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testCompleteCaseInstanceManually() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testCompleteCaseInstanceManually")
                 .variable("required", true)
                 .start();
-        
-        assertFalse(caseInstance.isCompletable());
-        assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
-        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateAvailable().count());
-        
-        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals("Other task", tasks.get(0).getName());
-        assertEquals("Required task", tasks.get(1).getName());
-        
-        // Case should not be completeale
-        try {
-            cmmnRuntimeService.completeCaseInstance(caseInstance.getId());
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-            assertEquals("Can only complete a case instance which is marked as completeable. Check if there are active plan item instances.", e.getMessage());
-        }
-        
+
+        assertThat(caseInstance1.isCompletable()).isFalse();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId()).planItemInstanceStateActive().count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId()).planItemInstanceStateAvailable().count())
+                .isEqualTo(1);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance1.getId()).orderByTaskName().asc().list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Other task", "Required task");
+
+        // Case should not be completeable
+        assertThatThrownBy(() -> cmmnRuntimeService.completeCaseInstance(caseInstance1.getId()))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Can only complete a case instance which is marked as completeable. Check if there are active plan item instances.");
+
         // Completing both tasks should not auto complete the case, as the plan model is not auto complete
         for (Task task : tasks) {
             cmmnTaskService.complete(task.getId());
         }
-        
-        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertTrue(caseInstance.isCompletable());
-        cmmnRuntimeService.completeCaseInstance(caseInstance.getId());
-        assertCaseInstanceEnded(caseInstance);
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).singleResult();
+        assertThat(caseInstance2.isCompletable()).isTrue();
+        cmmnRuntimeService.completeCaseInstance(caseInstance2.getId());
+        assertCaseInstanceEnded(caseInstance2);
     }
 
     @Test
@@ -268,34 +263,37 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
                 .variable("dRequired", false)
                 .variable("enableSubStage", true)
                 .start();
-        
+
         Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         cmmnTaskService.complete(taskA.getId());
-        
+
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(1, tasks.size());
-        assertEquals("D", tasks.get(0).getName());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("D");
+
         // D is required. So completing D will auto complete the stage
         cmmnTaskService.complete(tasks.get(0).getId());
-        assertEquals(2, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()); // M1 is never reached. M2 and M3 are
-        
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count())
+                .isEqualTo(2); // M1 is never reached. M2 and M3 are
+
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(1, tasks.size());
-        assertEquals("G", tasks.get(0).getName());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("G");
+
         // G is the only required task. Completing it should complete the stage and case instance
         cmmnTaskService.complete(tasks.get(0).getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testComplexCase02() {
-        
+
         // Same as testComplexCase, but now B and E are manually enabled
-        
+
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .variable("dRequired", false)
@@ -303,30 +301,31 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
                 .variable("booleanVar", true)
                 .variable("subStageRequired", false)
                 .start();
-        
+
         Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         cmmnTaskService.complete(taskA.getId());
-        
+
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
-        assertEquals(PlanItemInstanceState.ENABLED, planItemInstanceB.getState());
+        assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
         cmmnRuntimeService.startPlanItemInstance(planItemInstanceB.getId());
-        
+
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("B", tasks.get(0).getName());
-        assertEquals("D", tasks.get(1).getName());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("B", "D");
+
         // D is required. But B is still active
         cmmnTaskService.complete(tasks.get(1).getId());
-        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
         cmmnTaskService.complete(tasks.get(0).getId());
-        assertEquals(1, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
-        
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(1, tasks.size());
-        assertEquals("C", tasks.get(0).getName());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("C");
+
         // There are no active tasks in the second stage (as the nested stage is not active and not required).
         // Stage should autocomplete immediately after task completion
         cmmnTaskService.complete(tasks.get(0).getId());
@@ -356,5 +355,5 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
         // terminate instance since there is no other way to end it
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
     }
-      
+
 }
