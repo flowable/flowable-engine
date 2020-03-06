@@ -49,7 +49,9 @@ public class TaskResponse {
     protected String taskDefinitionKey;
     protected String scopeDefinitionId;
     protected String scopeId;
+    protected String subScopeId;
     protected String scopeType;
+    protected String propagatedStageInstanceId;
     protected String tenantId;
     protected String category;
     protected String formKey;
@@ -89,7 +91,9 @@ public class TaskResponse {
         setProcessDefinitionId(task.getProcessDefinitionId());
         setScopeDefinitionId(task.getScopeDefinitionId());
         setScopeId(task.getScopeId());
+        setSubScopeId(task.getSubScopeId());
         setScopeType(task.getScopeType());
+        setPropagatedStageInstanceId(task.getPropagatedStageInstanceId());
         setTenantId(task.getTenantId());
         setFormKey(task.getFormKey());
     }
@@ -329,6 +333,15 @@ public class TaskResponse {
         this.scopeId = scopeId;
     }
 
+    @ApiModelProperty(example = "15")
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
     @ApiModelProperty(example = "cmmn")
     public String getScopeType() {
         return scopeType;
@@ -336,6 +349,15 @@ public class TaskResponse {
 
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    @ApiModelProperty(example = "16")
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     @ApiModelProperty(example = "someTenantId")

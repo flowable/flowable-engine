@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -47,17 +48,26 @@ public class TaskResponse {
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date claimTime;
     protected String taskDefinitionKey;
+    protected String scopeDefinitionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String propagatedStageInstanceId;
     protected String tenantId;
     protected String category;
     protected String formKey;
 
-    // References to other resources
-    protected String parentTaskId;
-    protected String parentTaskUrl;
     protected String caseInstanceId;
     protected String caseInstanceUrl;
     protected String caseDefinitionId;
     protected String caseDefinitionUrl;
+
+    // References to other resources
+    protected String parentTaskId;
+    protected String parentTaskUrl;
+    protected String executionId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
 
     protected List<RestVariable> variables = new ArrayList<>();
 
@@ -76,12 +86,20 @@ public class TaskResponse {
         setTaskDefinitionKey(task.getTaskDefinitionKey());
         setParentTaskId(task.getParentTaskId());
         setCategory(task.getCategory());
-        if ("cmmn".equals(task.getScopeType())) {
+        if (ScopeTypes.CMMN.equals(task.getScopeType())) {
             setCaseInstanceId(task.getScopeId());
             setCaseDefinitionId(task.getScopeDefinitionId());
         }
+        setScopeDefinitionId(task.getScopeDefinitionId());
+        setScopeId(task.getScopeId());
+        setSubScopeId(task.getSubScopeId());
+        setScopeType(task.getScopeType());
+        setPropagatedStageInstanceId(task.getPropagatedStageInstanceId());
         setTenantId(task.getTenantId());
         setFormKey(task.getFormKey());
+        setExecutionId(task.getExecutionId());
+        setProcessInstanceId(task.getProcessInstanceId());
+        setProcessDefinitionId(task.getProcessDefinitionId());
     }
 
     protected String getDelegationStateString(DelegationState state) {
@@ -208,6 +226,42 @@ public class TaskResponse {
         this.taskDefinitionKey = taskDefinitionKey;
     }
 
+    @ApiModelProperty(example = "123")
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @ApiModelProperty(example = "cmmn")
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
     @ApiModelProperty(example = "null")
     public String getParentTaskId() {
         return parentTaskId;
@@ -299,4 +353,41 @@ public class TaskResponse {
     public void setFormKey(String formKey) {
         this.formKey = formKey;
     }
+
+    @ApiModelProperty(example = "123")
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
 }
