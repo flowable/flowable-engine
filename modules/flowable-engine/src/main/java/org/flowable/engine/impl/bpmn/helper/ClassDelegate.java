@@ -20,9 +20,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.Task;
+import org.flowable.common.engine.api.FlowableClassLoadingException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.interceptor.InstantiateErrorHandler;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
@@ -255,7 +257,15 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     }
 
     protected ActivityBehavior getActivityBehaviorInstance() {
-        Object delegateInstance = instantiateDelegate(className, fieldDeclarations);
+        Object delegateInstance = null;
+        try {
+            delegateInstance = instantiateDelegate(className, fieldDeclarations);
+        } catch (FlowableClassLoadingException e) {
+            InstantiateErrorHandler exceptionHandler = CommandContextUtil.getProcessEngineConfiguration().getExceptionHandler();
+            if (exceptionHandler != null) {
+                delegateInstance = exceptionHandler.handle(e, new Object[]{className, fieldDeclarations});
+            }
+        }
 
         if (delegateInstance instanceof ActivityBehavior) {
             return determineBehaviour((ActivityBehavior) delegateInstance);

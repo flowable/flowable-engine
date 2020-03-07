@@ -76,12 +76,7 @@ import org.flowable.common.engine.impl.el.function.VariableLowerThanExpressionFu
 import org.flowable.common.engine.impl.el.function.VariableLowerThanOrEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableNotEqualsExpressionFunction;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.interceptor.*;
 import org.flowable.common.engine.impl.logging.LoggingSession;
 import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
@@ -873,6 +868,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<>();
 
     protected DelegateInterceptor delegateInterceptor;
+
+    protected InstantiateErrorHandler instantiateErrorHandler;
 
     protected Map<String, EventHandler> eventHandlers;
     protected List<EventHandler> customEventHandlers;
@@ -3528,6 +3525,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public DelegateInterceptor getDelegateInterceptor() {
         return delegateInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setInstantiateErrorHandler(InstantiateErrorHandler instantiateErrorHandler) {
+        this.instantiateErrorHandler = instantiateErrorHandler;
+        return this;
+    }
+
+    public InstantiateErrorHandler getInstantiateErrorHandler() {
+        return instantiateErrorHandler;
     }
 
     public EventHandler getEventHandler(String eventType) {
