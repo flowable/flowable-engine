@@ -12,12 +12,10 @@
  */
 package org.flowable.engine.test.api.event;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.event.impl.FlowableProcessTerminatedEventImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.jupiter.api.Test;
@@ -35,13 +33,8 @@ public class FlowableProcessTerminatedEventImplTest {
         when(execution.isProcessInstanceType()).thenReturn(false);
 
         // Act
-        try {
-            new FlowableProcessTerminatedEventImpl(execution, null);
-            fail("Expected exception was not thrown.");
-        } catch(Exception e) {
-            // Assert
-            assertThat(e, instanceOf(RuntimeException.class));
-            assertThat(e.getMessage(), containsString("is not a processInstance"));
-        }
+        assertThatThrownBy(() -> new FlowableProcessTerminatedEventImpl(execution, null))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("is not a processInstance");
     }
 }
