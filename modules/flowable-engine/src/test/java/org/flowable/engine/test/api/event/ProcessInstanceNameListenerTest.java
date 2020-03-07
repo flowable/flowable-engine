@@ -12,8 +12,7 @@
  */
 package org.flowable.engine.test.api.event;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 
@@ -49,10 +48,10 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
                 name("oneTaskProcessInstanceName").
                 start();
 
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
-        assertThat("Process instance name must be initialized before PROCESS_CREATED event is fired.",
-                listener.getProcessName(), is("oneTaskProcessInstanceName"));
+        assertThat(listener.getProcessName()).isEqualTo("oneTaskProcessInstanceName")
+                .as("Process instance name must be initialized before PROCESS_CREATED event is fired.");
     }
 
     @Test
@@ -68,7 +67,8 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
                 processDefinitionKey("masterProcess").
                 start();
 
-        assertThat("SubProcessInstance PROCESS_CREATED event must have processDefinitionName set", listener.getProcessDefinitionName(), is("Child Process"));
+        assertThat(listener.getProcessDefinitionName()).isEqualTo("Child Process")
+                .as("SubProcessInstance PROCESS_CREATED event must have processDefinitionName set");
 
         repositoryService.deleteDeployment(masterDeployment.getId(), true);
         repositoryService.deleteDeployment(childDeployment.getId());
@@ -98,7 +98,7 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
             if (event instanceof FlowableEntityEvent && ProcessInstance.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
                 // check whether entity in the event is initialized before
                 // adding to the list.
-                assertNotNull(((FlowableEntityEvent) event).getEntity());
+                assertThat(((FlowableEntityEvent) event).getEntity()).isNotNull();
                 ProcessInstance processInstance = (ProcessInstance) ((FlowableEntityEvent) event).getEntity();
                 processName = processInstance.getName();
                 processDefinitionName = processInstance.getProcessDefinitionName();
