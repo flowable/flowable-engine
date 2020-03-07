@@ -263,22 +263,12 @@ public class DefaultProcessDiagramCanvas {
             throw new FlowableImageException("ProcessDiagramGenerator already closed");
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             ImageIO.write(processDiagram, imageType, out);
-
+            return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             throw new FlowableImageException("Error while generating process image", e);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ignore) {
-                // Exception is silently ignored
-            }
         }
-        return new ByteArrayInputStream(out.toByteArray());
     }
 
     /**
