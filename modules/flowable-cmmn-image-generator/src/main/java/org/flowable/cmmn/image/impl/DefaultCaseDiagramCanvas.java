@@ -220,22 +220,12 @@ public class DefaultCaseDiagramCanvas {
             throw new FlowableImageException("CaseDiagramGenerator already closed");
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             ImageIO.write(caseDiagram, imageType, out);
-
+            return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             throw new FlowableImageException("Error while generating case image", e);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ignore) {
-                // Exception is silently ignored
-            }
         }
-        return new ByteArrayInputStream(out.toByteArray());
     }
 
     /**
