@@ -210,6 +210,31 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testGetCmmnModelWithDelegateHelper() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        assertThat(TestJavaDelegate01.cmmnModel).isNotNull();
+        assertThat(TestJavaDelegate01.cmmnElement)
+                .asInstanceOf(InstanceOfAssertFactories.type(PlanItem.class))
+                .extracting(PlanItem::getName)
+                .isEqualTo("Task One");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCreateFieldExpressionWithDelegateHelper() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        Number variable = (Number) cmmnRuntimeService.getVariable(caseInstance.getId(), "delegateVariable");
+        assertThat(variable).isEqualTo(2L);
+    }
+
+    @Test
+    @CmmnDeployment
     public void testCreateFieldExpressionForLifecycleListenerWithDelegateHelper() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")

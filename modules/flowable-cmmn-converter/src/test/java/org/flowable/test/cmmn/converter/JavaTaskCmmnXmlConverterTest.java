@@ -72,7 +72,6 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
         assertThat(planItems).hasSize(3);
-
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
         PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
         assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
