@@ -177,7 +177,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     protected void assertProcessStartedEvents(ProcessInstance processInstance) {
         assertThat(listener.getEventsReceived()).hasSize(6);
         assertThat(FilteredStaticTestFlowableEventListener.getEventsReceived()).hasSize(6);
-        assertThat(listener.getEventsReceived().get(0) instanceof FlowableEngineEntityEvent).isTrue();
+        assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableEngineEntityEvent.class);
 
         // process instance create event
         FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
@@ -222,7 +222,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
         assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
-        assertThat(event instanceof FlowableProcessStartedEvent).isTrue();
+        assertThat(event).isInstanceOf(FlowableProcessStartedEvent.class);
         assertThat(((FlowableProcessStartedEvent) event).getNestedProcessDefinitionId()).isNull();
         assertThat(((FlowableProcessStartedEvent) event).getNestedProcessInstanceId()).isNull();
         assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(5));
@@ -241,7 +241,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         // Check create-event one main process the second one Scope execution, and the third one subprocess
         assertThat(listener.getEventsReceived()).hasSize(12);
-        assertThat(listener.getEventsReceived().get(0) instanceof FlowableEngineEntityEvent).isTrue();
+        assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableEngineEntityEvent.class);
 
         // process instance created event
         FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
@@ -284,7 +284,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
         assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
-        assertThat(event instanceof FlowableProcessStartedEvent).isTrue();
+        assertThat(event).isInstanceOf(FlowableProcessStartedEvent.class);
         assertThat(((FlowableProcessStartedEvent) event).getNestedProcessDefinitionId()).isNull();
         assertThat(((FlowableProcessStartedEvent) event).getNestedProcessInstanceId()).isNull();
 
@@ -329,7 +329,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
         assertThat(event.getProcessInstanceId()).isEqualTo(subProcessInstanceId);
         assertThat(event.getProcessDefinitionId()).isEqualTo(subProcessDefinitionId);
-        assertThat(event instanceof FlowableProcessStartedEvent).isTrue();
+        assertThat(event).isInstanceOf(FlowableProcessStartedEvent.class);
         assertThat(((FlowableProcessStartedEvent) event).getNestedProcessDefinitionId()).isEqualTo(processDefinitionId);
         assertThat(((FlowableProcessStartedEvent) event).getNestedProcessInstanceId()).isEqualTo(processInstance.getId());
 
@@ -423,8 +423,6 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         List<FlowableEvent> processCancelledEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
         assertThat(processCancelledEvents).as("ActivitiEventType.PROCESS_CANCELLED was expected 1 time.").hasSize(1);
         FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) processCancelledEvents.get(0);
-        assertThat(FlowableCancelledEvent.class.isAssignableFrom(processCancelledEvent.getClass()))
-                .as("The cause has to be the same as deleteProcessInstance method call").isTrue();
         assertThat(processCancelledEvent.getProcessInstanceId()).as("The process instance has to be the same as in deleteProcessInstance method call")
                 .isEqualTo(processInstance.getId());
         assertThat(processCancelledEvent.getExecutionId()).as("The execution instance has to be the same as in deleteProcessInstance method call")
@@ -434,8 +432,6 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         List<FlowableEvent> taskCancelledEvents = listener.filterEvents(FlowableEngineEventType.ACTIVITY_CANCELLED);
         assertThat(taskCancelledEvents).as("ActivitiEventType.ACTIVITY_CANCELLED was expected 1 time.").hasSize(1);
         FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) taskCancelledEvents.get(0);
-        assertThat(FlowableActivityCancelledEvent.class.isAssignableFrom(activityCancelledEvent.getClass()))
-                .as("The cause has to be the same as deleteProcessInstance method call").isTrue();
         assertThat(activityCancelledEvent.getProcessInstanceId()).as("The process instance has to be the same as in deleteProcessInstance method call")
                 .isEqualTo(processInstance.getId());
         assertThat(activityCancelledEvent.getCause()).as("The cause has to be the same as in deleteProcessInstance method call").isEqualTo("delete_test");
@@ -457,8 +453,6 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         List<FlowableEvent> processCancelledEvents = listener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED);
         assertThat(processCancelledEvents).as("ActivitiEventType.PROCESS_CANCELLED was expected 2 times.").hasSize(2);
         FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) processCancelledEvents.get(0);
-        assertThat(FlowableCancelledEvent.class.isAssignableFrom(processCancelledEvent.getClass()))
-                .as("The cause has to be the same as deleteProcessInstance method call").isTrue();
         assertThat(processCancelledEvent.getProcessInstanceId()).as("The process instance has to be the same as in deleteProcessInstance method call")
                 .isEqualTo(subProcess.getId());
         assertThat(processCancelledEvent.getExecutionId()).as("The execution instance has to be the same as in deleteProcessInstance method call")
@@ -466,8 +460,6 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(processCancelledEvent.getCause()).as("The cause has to be the same as in deleteProcessInstance method call").isEqualTo("delete_test");
 
         processCancelledEvent = (FlowableCancelledEvent) processCancelledEvents.get(1);
-        assertThat(FlowableCancelledEvent.class.isAssignableFrom(processCancelledEvent.getClass()))
-                .as("The cause has to be the same as deleteProcessInstance method call").isTrue();
         assertThat(processCancelledEvent.getProcessInstanceId()).as("The process instance has to be the same as in deleteProcessInstance method call")
                 .isEqualTo(processInstance.getId());
         assertThat(processCancelledEvent.getExecutionId()).as("The execution instance has to be the same as in deleteProcessInstance method call")
@@ -481,14 +473,10 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertThat(taskCancelledEvents).as("ActivitiEventType.ACTIVITY_CANCELLED was expected 2 times.").hasSize(2);
 
         FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) taskCancelledEvents.get(0);
-        assertThat(FlowableActivityCancelledEvent.class.isAssignableFrom(activityCancelledEvent.getClass()))
-                .as("The cause has to be the same as deleteProcessInstance method call").isTrue();
         assertThat(activityCancelledEvent.getProcessInstanceId()).as("The process instance has to point to the subprocess").isEqualTo(subProcess.getId());
         assertThat(activityCancelledEvent.getCause()).as("The cause has to be the same as in deleteProcessInstance method call").isEqualTo("delete_test");
 
         activityCancelledEvent = (FlowableActivityCancelledEvent) taskCancelledEvents.get(1);
-        assertThat(FlowableActivityCancelledEvent.class.isAssignableFrom(activityCancelledEvent.getClass()))
-                .as("The cause has to be the same as deleteProcessInstance method call").isTrue();
         assertThat(activityCancelledEvent.getProcessInstanceId()).as("The process instance has to point to the main process")
                 .isEqualTo(processInstance.getId());
         assertThat(activityCancelledEvent.getActivityType()).as("expect callActivity type").isEqualTo("callActivity");

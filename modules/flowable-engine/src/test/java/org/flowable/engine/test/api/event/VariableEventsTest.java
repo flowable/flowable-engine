@@ -111,7 +111,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
         // Delete nonexistent variable should not dispatch event
         runtimeService.removeVariable(processInstance.getId(), "unexistingVariable");
-        assertThat(listener.getEventsReceived().isEmpty()).isTrue();
+        assertThat(listener.getEventsReceived()).isEmpty();
     }
 
     @Test

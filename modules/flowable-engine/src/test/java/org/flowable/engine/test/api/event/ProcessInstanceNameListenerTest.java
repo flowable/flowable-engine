@@ -41,7 +41,7 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
     private TestInitializedEntityEventListener listener;
 
     @Test
-    @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessCreateProcessNameEvent() throws Exception {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().
                 processDefinitionKey("oneTaskProcess").
@@ -50,25 +50,29 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
 
         assertThat(processInstance).isNotNull();
 
-        assertThat(listener.getProcessName()).isEqualTo("oneTaskProcessInstanceName")
-                .as("Process instance name must be initialized before PROCESS_CREATED event is fired.");
+        assertThat(listener.getProcessName()).as("Process instance name must be initialized before PROCESS_CREATED event is fired.")
+                .isEqualTo("oneTaskProcessInstanceName");
     }
 
     @Test
     public void testCallActivityProcessCreatedDefinitionName() throws Exception {
-        BpmnModel mainBpmnModel = loadBPMNModel("org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_mainProcess.bpmn.xml");
-        BpmnModel childBpmnModel = loadBPMNModel("org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_childProcess.bpmn.xml");
+        BpmnModel mainBpmnModel = loadBPMNModel(
+                "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_mainProcess.bpmn.xml");
+        BpmnModel childBpmnModel = loadBPMNModel(
+                "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_childProcess.bpmn.xml");
 
-        org.flowable.engine.repository.Deployment childDeployment = processEngine.getRepositoryService().createDeployment().name("childProcessDeployment").addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+        org.flowable.engine.repository.Deployment childDeployment = processEngine.getRepositoryService().createDeployment().name("childProcessDeployment")
+                .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
 
-        org.flowable.engine.repository.Deployment masterDeployment = processEngine.getRepositoryService().createDeployment().name("masterProcessDeployment").addBpmnModel("masterProcess.bpmn20.xml", mainBpmnModel).deploy();
+        org.flowable.engine.repository.Deployment masterDeployment = processEngine.getRepositoryService().createDeployment().name("masterProcessDeployment")
+                .addBpmnModel("masterProcess.bpmn20.xml", mainBpmnModel).deploy();
 
         runtimeService.createProcessInstanceBuilder().
                 processDefinitionKey("masterProcess").
                 start();
 
-        assertThat(listener.getProcessDefinitionName()).isEqualTo("Child Process")
-                .as("SubProcessInstance PROCESS_CREATED event must have processDefinitionName set");
+        assertThat(listener.getProcessDefinitionName()).as("SubProcessInstance PROCESS_CREATED event must have processDefinitionName set")
+                .isEqualTo("Child Process");
 
         repositoryService.deleteDeployment(masterDeployment.getId(), true);
         repositoryService.deleteDeployment(childDeployment.getId());
