@@ -109,9 +109,13 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_INSTANCE_ID)).isNotNull();
-                assertThat(data.get(Fields.VALUE_STRING)).isNotNull();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.VALUE_STRING,
+                                Fields.TENANT_ID
+                        );
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
@@ -129,9 +133,12 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.TENANT_ID)).isNotNull();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.TENANT_ID
+                        );
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
 
                 Map<String, Object> variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
@@ -155,11 +162,15 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ACTIVITY_ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_INSTANCE_ID)).isNotNull();
-                assertThat(data.get(Fields.EXECUTION_ID)).isNotNull();
-                assertThat(data.get(Fields.ACTIVITY_TYPE)).isNotNull();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ACTIVITY_ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.ACTIVITY_TYPE,
+                                Fields.TENANT_ID
+                        );
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
@@ -177,14 +188,17 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ACTIVITY_ID)).isNotNull();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ACTIVITY_ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.ACTIVITY_TYPE,
+                                Fields.TENANT_ID
+                        );
                 assertThat(data.get(Fields.ACTIVITY_ID)).isEqualTo("startEvent1");
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_INSTANCE_ID)).isNotNull();
-                assertThat(data.get(Fields.EXECUTION_ID)).isNotNull();
-                assertThat(data.get(Fields.ACTIVITY_TYPE)).isNotNull();
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
-
             }
 
             // Sequence flow taken
@@ -200,10 +214,14 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ID)).isNotNull();
-                assertThat(data.get(Fields.SOURCE_ACTIVITY_ID)).isNotNull();
-                assertThat(data.get(Fields.SOURCE_ACTIVITY_NAME)).isNotNull();
-                assertThat(data.get(Fields.SOURCE_ACTIVITY_TYPE)).isNotNull();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.SOURCE_ACTIVITY_ID,
+                                Fields.SOURCE_ACTIVITY_TYPE,
+                                Fields.SOURCE_ACTIVITY_TYPE,
+                                Fields.TENANT_ID
+                        );
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
 
@@ -221,13 +239,15 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ACTIVITY_ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_INSTANCE_ID)).isNotNull();
-                assertThat(data.get(Fields.EXECUTION_ID)).isNotNull();
-                assertThat(data.get(Fields.ACTIVITY_TYPE)).isNotNull();
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
-
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ACTIVITY_ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.ACTIVITY_TYPE,
+                                Fields.TENANT_ID
+                        );
             }
 
             // Tasks
@@ -244,21 +264,26 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ID)).isNotNull();
-                assertThat(data.get(Fields.NAME)).isNotNull();
-                assertThat(data.get(Fields.ASSIGNEE)).isNotNull();
-                assertThat(data.get(Fields.CREATE_TIME)).isNotNull();
-                assertThat(data.get(Fields.PRIORITY)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.EXECUTION_ID)).isNotNull();
-                assertThat(data.get(Fields.TENANT_ID)).isNotNull();
-
-                assertThat(data.containsKey(Fields.DESCRIPTION)).isFalse();
-                assertThat(data.containsKey(Fields.CATEGORY)).isFalse();
-                assertThat(data.containsKey(Fields.OWNER)).isFalse();
-                assertThat(data.containsKey(Fields.DUE_DATE)).isFalse();
-                assertThat(data.containsKey(Fields.FORM_KEY)).isFalse();
-                assertThat(data.containsKey(Fields.USER_ID)).isFalse();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.NAME,
+                                Fields.ASSIGNEE,
+                                Fields.CREATE_TIME,
+                                Fields.PRIORITY,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data)
+                        .doesNotContainKeys(
+                                Fields.DESCRIPTION,
+                                Fields.CATEGORY,
+                                Fields.OWNER,
+                                Fields.DUE_DATE,
+                                Fields.FORM_KEY,
+                                Fields.USER_ID
+                        );
 
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
 
@@ -277,24 +302,28 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ID)).isNotNull();
-                assertThat(data.get(Fields.NAME)).isNotNull();
-                assertThat(data.get(Fields.ASSIGNEE)).isNotNull();
-                assertThat(data.get(Fields.CREATE_TIME)).isNotNull();
-                assertThat(data.get(Fields.PRIORITY)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.EXECUTION_ID)).isNotNull();
-                assertThat(data.get(Fields.TENANT_ID)).isNotNull();
-
-                assertThat(data.containsKey(Fields.DESCRIPTION)).isFalse();
-                assertThat(data.containsKey(Fields.CATEGORY)).isFalse();
-                assertThat(data.containsKey(Fields.OWNER)).isFalse();
-                assertThat(data.containsKey(Fields.DUE_DATE)).isFalse();
-                assertThat(data.containsKey(Fields.FORM_KEY)).isFalse();
-                assertThat(data.containsKey(Fields.USER_ID)).isFalse();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.NAME,
+                                Fields.ASSIGNEE,
+                                Fields.CREATE_TIME,
+                                Fields.PRIORITY,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data)
+                        .doesNotContainKeys(
+                                Fields.DESCRIPTION,
+                                Fields.CATEGORY,
+                                Fields.OWNER,
+                                Fields.DUE_DATE,
+                                Fields.FORM_KEY,
+                                Fields.USER_ID
+                        );
 
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
-
             }
 
             lastLogNr = entry.getLogNumber();
@@ -329,25 +358,31 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ID)).isNotNull();
-                assertThat(data.get(Fields.NAME)).isNotNull();
-                assertThat(data.get(Fields.ASSIGNEE)).isNotNull();
-                assertThat(data.get(Fields.CREATE_TIME)).isNotNull();
-                assertThat(data.get(Fields.PRIORITY)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.EXECUTION_ID)).isNotNull();
-                assertThat(data.get(Fields.TENANT_ID)).isNotNull();
-                assertThat(data.get(Fields.USER_ID)).isNotNull();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.NAME,
+                                Fields.ASSIGNEE,
+                                Fields.CREATE_TIME,
+                                Fields.PRIORITY,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.TENANT_ID,
+                                Fields.USER_ID
+                        );
 
                 Map<String, Object> variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
                 assertThat(variableMap).hasSize(1);
                 assertThat(variableMap.get("test")).isEqualTo("test");
 
-                assertThat(data.containsKey(Fields.DESCRIPTION)).isFalse();
-                assertThat(data.containsKey(Fields.CATEGORY)).isFalse();
-                assertThat(data.containsKey(Fields.OWNER)).isFalse();
-                assertThat(data.containsKey(Fields.DUE_DATE)).isFalse();
-                assertThat(data.containsKey(Fields.FORM_KEY)).isFalse();
+                assertThat(data)
+                        .doesNotContainKeys(
+                                Fields.DESCRIPTION,
+                                Fields.CATEGORY,
+                                Fields.OWNER,
+                                Fields.DUE_DATE,
+                                Fields.FORM_KEY
+                        );
 
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
 
@@ -366,12 +401,16 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ACTIVITY_ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_INSTANCE_ID)).isNotNull();
-                assertThat(data.get(Fields.EXECUTION_ID)).isNotNull();
-                assertThat(data.get(Fields.ACTIVITY_TYPE)).isNotNull();
-                assertThat(data.get(Fields.BEHAVIOR_CLASS)).isNotNull();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ACTIVITY_ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.PROCESS_INSTANCE_ID,
+                                Fields.EXECUTION_ID,
+                                Fields.ACTIVITY_TYPE,
+                                Fields.TENANT_ID,
+                                Fields.BEHAVIOR_CLASS
+                        );
 
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
 
@@ -400,13 +439,16 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ID)).isNotNull();
-                assertThat(data.get(Fields.SOURCE_ACTIVITY_ID)).isNotNull();
-                assertThat(data.get(Fields.SOURCE_ACTIVITY_TYPE)).isNotNull();
-                assertThat(data.get(Fields.SOURCE_ACTIVITY_BEHAVIOR_CLASS)).isNotNull();
-                assertThat(data.get(Fields.TARGET_ACTIVITY_ID)).isNotNull();
-                assertThat(data.get(Fields.TARGET_ACTIVITY_TYPE)).isNotNull();
-                assertThat(data.get(Fields.TARGET_ACTIVITY_BEHAVIOR_CLASS)).isNotNull();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.SOURCE_ACTIVITY_ID,
+                                Fields.SOURCE_ACTIVITY_TYPE,
+                                Fields.SOURCE_ACTIVITY_BEHAVIOR_CLASS,
+                                Fields.TARGET_ACTIVITY_ID,
+                                Fields.TARGET_ACTIVITY_TYPE,
+                                Fields.TARGET_ACTIVITY_BEHAVIOR_CLASS
+                        );
 
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }
@@ -433,12 +475,17 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.ID)).isNotNull();
-                assertThat(data.get(Fields.PROCESS_DEFINITION_ID)).isNotNull();
-                assertThat(data.get(Fields.TENANT_ID)).isNotNull();
-
-                assertThat(data.containsKey(Fields.NAME)).isFalse();
-                assertThat(data.containsKey(Fields.BUSINESS_KEY)).isFalse();
+                assertThat(data)
+                        .containsKeys(
+                                Fields.ID,
+                                Fields.PROCESS_DEFINITION_ID,
+                                Fields.TENANT_ID
+                        );
+                assertThat(data)
+                        .doesNotContainKeys(
+                                Fields.NAME,
+                                Fields.BUSINESS_KEY
+                        );
 
                 assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
             }

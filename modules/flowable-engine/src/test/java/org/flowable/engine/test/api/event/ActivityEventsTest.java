@@ -566,11 +566,14 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         // Check timeout has been dispatched
         assertThat(listener.getEventsReceived()).hasSize(1);
         FlowableEvent activitiEvent = listener.getEventsReceived().get(0);
-        assertThat(activitiEvent.getType()).as("ACTIVITY_CANCELLED event expected").isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(activitiEvent.getType()).as("ACTIVITY_CANCELLED event expected")
+                .isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
         FlowableActivityCancelledEvent cancelledEvent = (FlowableActivityCancelledEvent) activitiEvent;
-        assertThat(cancelledEvent.getCause()).isInstanceOf(BoundaryEvent.class).as("Boundary timer is the cause of the cancellation");
+        assertThat(cancelledEvent.getCause()).as("Boundary timer is the cause of the cancellation")
+                .isInstanceOf(BoundaryEvent.class);
         BoundaryEvent boundaryEvent = (BoundaryEvent) cancelledEvent.getCause();
-        assertThat(boundaryEvent.getEventDefinitions().get(0)).isInstanceOf(TimerEventDefinition.class).as("Boundary timer is the cause of the cancellation");
+        assertThat(boundaryEvent.getEventDefinitions().get(0)).as("Boundary timer is the cause of the cancellation")
+                .isInstanceOf(TimerEventDefinition.class);
     }
 
     @Test
@@ -592,11 +595,11 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         List<String> eventIdList = new ArrayList<>();
         for (FlowableEvent event : listener.getEventsReceived()) {
             assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
-            assertThat(((FlowableActivityCancelledEvent) event).getCause()).isInstanceOf(BoundaryEvent.class)
-                    .as("Boundary timer is the cause of the cancellation");
+            assertThat(((FlowableActivityCancelledEvent) event).getCause()).as("Boundary timer is the cause of the cancellation")
+                    .isInstanceOf(BoundaryEvent.class);
             assertThat(((BoundaryEvent) ((FlowableActivityCancelledEvent) event).getCause()).getEventDefinitions().get(0))
-                    .isInstanceOf(TimerEventDefinition.class)
-                    .as("Boundary timer is the cause of the cancellation");
+                    .as("Boundary timer is the cause of the cancellation")
+                    .isInstanceOf(TimerEventDefinition.class);
             eventIdList.add(((FlowableActivityEventImpl) event).getActivityId());
         }
         assertThat(eventIdList.indexOf("innerTask1")).isGreaterThanOrEqualTo(0);
@@ -624,16 +627,15 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         List<String> eventIdList = new ArrayList<>();
         for (FlowableEvent event : listener.getEventsReceived()) {
             assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
-            assertThat(((FlowableCancelledEvent) event).getCause()).isInstanceOf(BoundaryEvent.class).as("Boundary timer is the cause of the cancellation");
+            assertThat(((FlowableCancelledEvent) event).getCause()).as("Boundary timer is the cause of the cancellation")
+                    .isInstanceOf(BoundaryEvent.class);
             BoundaryEvent boundaryEvent = (BoundaryEvent) ((FlowableCancelledEvent) event).getCause();
-            assertThat(boundaryEvent.getEventDefinitions().get(0)).isInstanceOf(TimerEventDefinition.class)
-                    .as("Boundary timer is the cause of the cancellation");
+            assertThat(boundaryEvent.getEventDefinitions().get(0)).as("Boundary timer is the cause of the cancellation")
+                    .isInstanceOf(TimerEventDefinition.class);
             eventIdList.add(((FlowableActivityEventImpl) event).getActivityId());
         }
-        assertThat(eventIdList.contains("innerTask1")).isTrue();
-        assertThat(eventIdList.contains("innerTask2")).isTrue();
-        assertThat(eventIdList.contains("callActivity")).isTrue();
-        assertThat(eventIdList.contains("innerSubprocess")).isTrue();
+        assertThat(eventIdList)
+                .containsOnly("innerTask1", "innerTask2", "callActivity", "innerSubprocess");
     }
 
     /**
