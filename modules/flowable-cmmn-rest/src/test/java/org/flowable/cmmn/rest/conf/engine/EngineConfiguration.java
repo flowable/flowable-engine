@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -144,6 +145,11 @@ public class EngineConfiguration {
     @Bean
     public CmmnManagementService managementService(CmmnEngine cmmnEngine) {
         return cmmnEngine.getCmmnManagementService();
+    }
+
+    @Bean
+    public CmmnMigrationService cmmnMigrationService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnMigrationService();
     }
     
     @Bean

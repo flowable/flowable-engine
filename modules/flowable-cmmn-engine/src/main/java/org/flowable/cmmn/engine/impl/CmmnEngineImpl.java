@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -42,6 +43,7 @@ public class CmmnEngineImpl implements CmmnEngine {
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnHistoryService cmmnHistoryService;
+    protected CmmnMigrationService cmmnMigrationService;
     
     protected AsyncExecutor asyncExecutor;
     protected AsyncExecutor asyncHistoryExecutor;
@@ -55,6 +57,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
+        this.cmmnMigrationService = cmmnEngineConfiguration.getCmmnMigrationService();
         
         this.asyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
         this.asyncHistoryExecutor = cmmnEngineConfiguration.getAsyncHistoryExecutor();
@@ -183,5 +186,13 @@ public class CmmnEngineImpl implements CmmnEngine {
     public void setCmmnHistoryService(CmmnHistoryService cmmnHistoryService) {
         this.cmmnHistoryService = cmmnHistoryService;
     }
-    
+
+    @Override
+    public CmmnMigrationService getCmmnMigrationService() {
+        return cmmnMigrationService;
+    }
+
+    public void setCmmnMigrationService(CmmnMigrationService cmmnMigrationService) {
+        this.cmmnMigrationService = cmmnMigrationService;
+    }
 }

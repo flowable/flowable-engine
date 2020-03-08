@@ -35,7 +35,7 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     protected Map<String, Map<String, Object>> planItemLocalVariables = new HashMap<>();
 
     public static CaseInstanceMigrationDocument fromJson(String caseInstanceMigrationDocumentJson) {
-        throw new UnsupportedOperationException("not implemented"); // TODO
+        return CaseInstanceMigrationDocumentConverter.convertFromJson(caseInstanceMigrationDocumentJson);
     }
 
     public void setMigrateToCaseDefinitionId(String caseDefinitionId) {
@@ -99,6 +99,6 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
 
     @Override
     public String asJsonString() {
-        throw new UnsupportedOperationException("not implemented"); // TODO
+        return CaseInstanceMigrationDocumentConverter.convertToJsonString(this);
     }
 }

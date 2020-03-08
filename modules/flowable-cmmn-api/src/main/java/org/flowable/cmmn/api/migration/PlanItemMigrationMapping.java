@@ -27,6 +27,14 @@ public abstract class PlanItemMigrationMapping {
 
     public abstract List<String> getToPlanItemIds();
 
+    public static PlanItemMigrationMapping.OneToOneMapping createMappingFor(String fromPlanItemId, String toPlanItemId) {
+        return new OneToOneMapping(fromPlanItemId, toPlanItemId);
+    }
+
+    public static PlanItemMigrationMapping.ManyToOneMapping createMappingFor(List<String> fromPlanItemIds, String toPlanItemId) {
+        return new ManyToOneMapping(fromPlanItemIds, toPlanItemId);
+    }
+
     public static class OneToOneMapping extends PlanItemMigrationMapping implements PlanItemMigrationMappingOptions.SingleToPlanItemOptions<OneToOneMapping> {
 
         public String fromPlanItemId;
@@ -94,6 +102,11 @@ public abstract class PlanItemMigrationMapping {
         protected String withNewAssignee;
         protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
+        public ManyToOneMapping(List<String> fromPlanItemIds, String toPlanItemId) {
+            this.fromPlanItemIds = fromPlanItemIds;
+            this.toPlanItemId = toPlanItemId;
+        }
+
         @Override
         public List<String> getFromPlanItemIds() {
             return this.fromPlanItemIds;
@@ -102,6 +115,10 @@ public abstract class PlanItemMigrationMapping {
         @Override
         public List<String> getToPlanItemIds() {
             return Collections.singletonList(this.toPlanItemId);
+        }
+
+        public String getToPlanItemId() {
+            return toPlanItemId;
         }
 
         @Override

@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -49,4 +50,6 @@ public interface CmmnEngine extends Engine {
     CmmnHistoryService getCmmnHistoryService();
     
     CmmnEngineConfiguration getCmmnEngineConfiguration();
+
+    CmmnMigrationService getCmmnMigrationService();
 }
