@@ -385,7 +385,8 @@ public class JobEventsTest extends PluggableFlowableTestCase {
                 timerCancelledCount++;
             }
         }
-        assertThat(expectedCount).isEqualTo(timerCancelledCount).as(eventType.name() + " event was expected " + expectedCount + " times.");
+        assertThat(expectedCount).as(eventType.name() + " event was expected " + expectedCount + " times.")
+                .isEqualTo(timerCancelledCount);
     }
 
     private List<FlowableEngineEvent> filterEvents(FlowableEngineEventType eventType) {

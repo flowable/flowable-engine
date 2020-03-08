@@ -203,10 +203,10 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
             }
         }
 
-        assert (foundMultiExec1);
-        assert (foundMultiExec2);
-        assert (foundRootExec);
-        assert (foundBoundaryExec);
+        assertThat(foundMultiExec1).isTrue();
+        assertThat(foundMultiExec2).isTrue();
+        assertThat(foundRootExec).isTrue();
+        assertThat(foundBoundaryExec).isTrue();
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
 
