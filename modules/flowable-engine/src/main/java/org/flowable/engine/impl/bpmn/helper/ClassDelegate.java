@@ -261,7 +261,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         try {
             delegateInstance = instantiateDelegate(className, fieldDeclarations);
         } catch (FlowableClassLoadingException e) {
-            InstantiateErrorHandler exceptionHandler = CommandContextUtil.getProcessEngineConfiguration().getExceptionHandler();
+            InstantiateErrorHandler exceptionHandler = CommandContextUtil.getProcessEngineConfiguration().getInstantiateErrorHandler();
             if (exceptionHandler != null) {
                 delegateInstance = exceptionHandler.handle(e, new Object[]{className, fieldDeclarations});
             }
