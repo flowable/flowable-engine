@@ -41,7 +41,7 @@ public class TraceableObject<O, C> {
     }
 
     public void updateIfValueChanged() {
-        if (tracedObject == variableInstanceEntity.getCachedValue() && !variableInstanceEntity.isDeleted()) {
+        if (tracedObject == variableInstanceEntity.getCachedValue()) {
             if (type.updateValueIfChanged(tracedObject, tracedObjectOriginalValue, variableInstanceEntity)) {
                 variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(
                                 variableInstanceEntity, variableServiceConfiguration.getClock().getCurrentTime());
