@@ -39,11 +39,9 @@ public class DecisionServiceTest {
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("age", 18D);
-        inputVariables.put("input11", "testString");
-        inputVariables.put("input1", new Date());
-        inputVariables.put("inputVariable1", 5D);
-        inputVariables.put("riskcategory", "HIGH");
+        inputVariables.put("inputVar1", "val1");
+        inputVariables.put("inputVar2", "val2");
+        inputVariables.put("inputVar3", "val3");
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
             .decisionKey("decisionService1")
@@ -51,12 +49,16 @@ public class DecisionServiceTest {
             .executeWithAuditTrail();
 
         assertThat(result.getChildDecisionExecutions().keySet())
-            .containsExactly("decision3", "decision2", "decision1", "decision4");
+            .containsSequence("decision9", "decision7")
+            .containsSequence("decision6", "decision5",
+                "decision3", "decision4", "decision1", "decision2", "decision8")
+            .containsExactlyInAnyOrder("decision9", "decision7", "decision6", "decision5",
+                "decision3", "decision4", "decision1", "decision2", "decision8");
     }
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/related_decisionservice.dmn")
-    public void executeDecisionServiceWithoutDecisionOutcomes() {
+    public void executeDecisionServiceWithDecisionOutcomes() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
