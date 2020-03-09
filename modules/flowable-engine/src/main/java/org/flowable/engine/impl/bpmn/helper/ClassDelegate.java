@@ -51,7 +51,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Helper class for bpmn constructs that allow class delegation.
- * <p>
+ *
  * This class will lazily instantiate the referenced classes when needed at runtime.
  *
  * @author Joram Barrez
@@ -220,7 +220,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
         if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
             ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
-            if (triggerable) {
+            if(triggerable) {
                 leave(execution);
             }
         } else {
