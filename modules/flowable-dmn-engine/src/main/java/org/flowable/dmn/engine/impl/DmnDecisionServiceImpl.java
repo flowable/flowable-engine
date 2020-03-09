@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionCmd;
 import org.flowable.dmn.engine.impl.cmd.ExecuteDecisionWithAuditTrailCmd;
@@ -39,7 +40,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         return new ExecuteDecisionBuilderImpl(this);
     }
 
-    public List<Map<String, Object>> executeDecision(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
+    public List<Map<String, Object>> executeDecision(ExecuteDecisionBuilder executeDecisionBuilder) {
         ExecuteDecisionContext executeDecisionContext = execute(executeDecisionBuilder);
 
         List<Map<String, Object>> decisionResult = composeDecisionResult(executeDecisionContext);
@@ -47,7 +48,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         return decisionResult;
     }
     
-    public Map<String, Object> executeDecisionWithSingleResult(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
+    public Map<String, Object> executeDecisionWithSingleResult(ExecuteDecisionBuilder executeDecisionBuilder) {
         ExecuteDecisionContext executeDecisionContext = execute(executeDecisionBuilder);
 
         Map<String, Object> singleDecisionResult = null;
@@ -63,7 +64,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         return singleDecisionResult;
     }
 
-    public DecisionExecutionAuditContainer executeDecisionWithAuditTrail(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
+    public DecisionExecutionAuditContainer executeDecisionWithAuditTrail(ExecuteDecisionBuilder executeDecisionBuilder) {
         ExecuteDecisionContext executeDecisionContext = executeDecisionBuilder.buildExecuteDecisionContext();
 
         commandExecutor.execute(new ExecuteDecisionWithAuditTrailCmd(executeDecisionContext));
@@ -78,7 +79,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         return decisionExecution;
     }
 
-    protected ExecuteDecisionContext execute(ExecuteDecisionBuilderImpl executeDecisionBuilder) {
+    protected ExecuteDecisionContext execute(ExecuteDecisionBuilder executeDecisionBuilder) {
         ExecuteDecisionContext executeDecisionContext = executeDecisionBuilder.buildExecuteDecisionContext();
 
         commandExecutor.execute(new ExecuteDecisionCmd(executeDecisionContext));

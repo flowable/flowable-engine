@@ -13,11 +13,9 @@
 package org.flowable.dmn.engine.impl.agenda;
 
 import org.flowable.common.engine.impl.agenda.Agenda;
-import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
-import org.flowable.dmn.model.DmnDefinition;
 
 /**
  * @author Yvo Swillens

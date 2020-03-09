@@ -27,7 +27,7 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
-import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;

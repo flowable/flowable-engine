@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;

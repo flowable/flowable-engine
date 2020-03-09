@@ -92,4 +92,6 @@ public interface ExecuteDecisionBuilder {
      **/
     DecisionExecutionAuditContainer executeWithAuditTrail();
 
+
+    ExecuteDecisionContext buildExecuteDecisionContext();
 }

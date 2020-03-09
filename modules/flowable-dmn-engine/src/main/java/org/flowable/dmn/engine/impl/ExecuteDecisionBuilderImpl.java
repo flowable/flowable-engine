@@ -17,15 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
-import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 
 /**
  * @author Tijs Rademakers
  */
 public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
 
-    protected DmnDecisionServiceImpl decisionService;
+    protected DmnDecisionService decisionService;
 
     protected String decisionKey;
     protected String parentDeploymentId;
@@ -37,7 +38,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     protected Map<String, Object> variables;
     protected boolean fallbackToDefaultTenant;
 
-    public ExecuteDecisionBuilderImpl(DmnDecisionServiceImpl decisionService) {
+    public ExecuteDecisionBuilderImpl(DmnDecisionService decisionService) {
         this.decisionService = decisionService;
     }
 

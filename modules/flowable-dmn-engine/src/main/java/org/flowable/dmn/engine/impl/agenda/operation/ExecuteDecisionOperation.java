@@ -15,7 +15,7 @@ package org.flowable.dmn.engine.impl.agenda.operation;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.slf4j.Logger;

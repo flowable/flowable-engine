@@ -13,7 +13,7 @@
 package org.flowable.dmn.engine.impl.audit;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;

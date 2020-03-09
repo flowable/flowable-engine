@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;

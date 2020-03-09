@@ -12,6 +12,9 @@
  */
 package org.flowable.dmn.api;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Service for executing DMN decisions (decision tables)
  *
@@ -26,4 +29,10 @@ public interface DmnDecisionService {
      * @return the {@link ExecuteDecisionBuilder} build
      */
     ExecuteDecisionBuilder createExecuteDecisionBuilder();
+
+    List<Map<String, Object>> executeDecision(ExecuteDecisionBuilder builder);
+
+    Map<String, Object> executeDecisionWithSingleResult(ExecuteDecisionBuilder builder);
+
+    DecisionExecutionAuditContainer executeDecisionWithAuditTrail(ExecuteDecisionBuilder builder);
 }

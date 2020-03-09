@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.RuleEngineExecutor;
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;

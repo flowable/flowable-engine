@@ -16,11 +16,9 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.engine.impl.ExecuteDecisionContext;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.model.Decision;
-import org.flowable.dmn.model.DecisionService;
-import org.flowable.dmn.model.DmnDefinition;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
