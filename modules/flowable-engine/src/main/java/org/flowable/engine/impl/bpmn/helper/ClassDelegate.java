@@ -20,11 +20,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.Task;
-import org.flowable.common.engine.api.FlowableClassLoadingException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.impl.interceptor.InstantiateErrorHandler;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
@@ -46,6 +44,8 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
+import org.flowable.common.engine.api.FlowableClassLoadingException;
+import org.flowable.common.engine.impl.interceptor.InstantiateErrorHandler;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
