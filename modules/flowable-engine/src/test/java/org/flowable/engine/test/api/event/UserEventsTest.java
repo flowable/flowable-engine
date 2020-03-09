@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.engine.test.api.event;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
@@ -23,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to users.
- * 
+ *
  * @author Frederik Heremans
  */
 public class UserEventsTest extends PluggableFlowableTestCase {
@@ -42,38 +44,38 @@ public class UserEventsTest extends PluggableFlowableTestCase {
             user.setLastName("Heremans");
             identityService.saveUser(user);
 
-            assertEquals(2, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(2);
             FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.ENTITY_CREATED, event.getType());
-            assertTrue(event.getEntity() instanceof User);
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.ENTITY_CREATED);
+            assertThat(event.getEntity()).isInstanceOf(User.class);
             User userFromEvent = (User) event.getEntity();
-            assertEquals("fred", userFromEvent.getId());
+            assertThat(userFromEvent.getId()).isEqualTo("fred");
 
             event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableIdmEventType.ENTITY_INITIALIZED, event.getType());
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.ENTITY_INITIALIZED);
             listener.clearEventsReceived();
 
             // Update user
             user.setFirstName("Anna");
             identityService.saveUser(user);
-            assertEquals(1, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(1);
             event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.ENTITY_UPDATED, event.getType());
-            assertTrue(event.getEntity() instanceof User);
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.ENTITY_UPDATED);
+            assertThat(event.getEntity()).isInstanceOf(User.class);
             userFromEvent = (User) event.getEntity();
-            assertEquals("fred", userFromEvent.getId());
-            assertEquals("Anna", userFromEvent.getFirstName());
+            assertThat(userFromEvent.getId()).isEqualTo("fred");
+            assertThat(userFromEvent.getFirstName()).isEqualTo("Anna");
             listener.clearEventsReceived();
 
             // Delete user
             identityService.deleteUser(user.getId());
 
-            assertEquals(1, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(1);
             event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.ENTITY_DELETED, event.getType());
-            assertTrue(event.getEntity() instanceof User);
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.ENTITY_DELETED);
+            assertThat(event.getEntity()).isInstanceOf(User.class);
             userFromEvent = (User) event.getEntity();
-            assertEquals("fred", userFromEvent.getId());
+            assertThat(userFromEvent.getId()).isEqualTo("fred");
             listener.clearEventsReceived();
 
         } finally {

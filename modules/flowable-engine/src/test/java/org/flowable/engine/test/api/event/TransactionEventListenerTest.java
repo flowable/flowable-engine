@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
     @Test
     public void testRegularProcessExecution() {
 
-        assertEquals(0, TestTransactionEventListener.eventsReceived.size());
+        assertThat(TestTransactionEventListener.eventsReceived).isEmpty();
 
         // In a 'normal' process execution, the transaction dependent event listener should
         // be similar to the normal event listener dispatching.
@@ -68,22 +69,22 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         if (processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
             expectedCreatedEvents += 4;
         }
-        
+
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
             waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
         }
 
-        assertEquals(expectedCreatedEvents, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name()).size());
-        assertEquals(expectedCreatedEvents, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_INITIALIZED.name()).size());
-        assertEquals(1, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_STARTED.name()).size());
-        assertEquals(1, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_CREATED.name()).size());
+        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name())).hasSize(expectedCreatedEvents);
+        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_INITIALIZED.name())).hasSize(expectedCreatedEvents);
+        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_STARTED.name())).hasSize(1);
+        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_CREATED.name())).hasSize(1);
 
         TestTransactionEventListener.eventsReceived.clear();
 
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
-        assertEquals(1, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_COMPLETED.name()).size());
-        assertEquals(1, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_COMPLETED.name()).size());
-        
+        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.TASK_COMPLETED.name())).hasSize(1);
+        assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.PROCESS_COMPLETED.name())).hasSize(1);
+
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
             waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
         }
@@ -93,20 +94,21 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
     @Deployment
     public void testProcessExecutionWithRollback() {
 
-        assertEquals(0, TestTransactionEventListener.eventsReceived.size());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertThat(TestTransactionEventListener.eventsReceived).isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
 
         // Regular execution, no exception
         runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", false));
-        assertTrue(TestTransactionEventListener.eventsReceived.size() > 0);
-        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        assertThat(TestTransactionEventListener.eventsReceived.size() > 0).isTrue();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         TestTransactionEventListener.eventsReceived.clear();
 
         // When process execution rolls back, the events should not be thrown, as they are only thrown on commit.
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", true)));
-        assertEquals(0, TestTransactionEventListener.eventsReceived.size());
-        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        assertThatThrownBy(
+                () -> runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", true)));
+        assertThat(TestTransactionEventListener.eventsReceived).isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
     }
 
     @Test
@@ -117,9 +119,9 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getEventDispatcher().removeEventListener(onCommitListener);
         TestTransactionEventListener.eventsReceived.clear();
 
-        assertEquals(0, TestTransactionEventListener.eventsReceived.size());
+        assertThat(TestTransactionEventListener.eventsReceived).isEmpty();
         runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", false));
-        assertTrue(TestTransactionEventListener.eventsReceived.size() > 0);
+        assertThat(TestTransactionEventListener.eventsReceived.size()).isPositive();
     }
 
     public static class TestTransactionEventListener implements FlowableEventListener {
