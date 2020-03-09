@@ -148,7 +148,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         } catch (FlowableException e) {
 //            assertTrue(e.getMessage().contains("couldn't instantiate class org.flowable.BogusClass"));
             assertNotNull(e.getCause());
-            assertTrue(e.getCause() instanceof FlowableClassLoadingException);
+            assertTrue(e instanceof FlowableClassLoadingException);
         }
     }
 
