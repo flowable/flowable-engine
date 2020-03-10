@@ -82,7 +82,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
-import org.flowable.common.engine.impl.interceptor.InstantiateErrorHandler;
+import org.flowable.common.engine.impl.interceptor.InstantiateInterceptor;
 import org.flowable.common.engine.impl.logging.LoggingSession;
 import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
@@ -875,7 +875,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected DelegateInterceptor delegateInterceptor;
 
-    protected InstantiateErrorHandler instantiateErrorHandler;
+    protected InstantiateInterceptor instantiateInterceptor;
 
     protected Map<String, EventHandler> eventHandlers;
     protected List<EventHandler> customEventHandlers;
@@ -3533,13 +3533,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return delegateInterceptor;
     }
 
-    public ProcessEngineConfigurationImpl setInstantiateErrorHandler(InstantiateErrorHandler instantiateErrorHandler) {
-        this.instantiateErrorHandler = instantiateErrorHandler;
+    public ProcessEngineConfigurationImpl setInstantiateInterceptor(InstantiateInterceptor instantiateInterceptor) {
+        this.instantiateInterceptor = instantiateInterceptor;
         return this;
     }
 
-    public InstantiateErrorHandler getInstantiateErrorHandler() {
-        return instantiateErrorHandler;
+    public InstantiateInterceptor getInstantiateInterceptor() {
+        return instantiateInterceptor;
     }
 
     public EventHandler getEventHandler(String eventType) {

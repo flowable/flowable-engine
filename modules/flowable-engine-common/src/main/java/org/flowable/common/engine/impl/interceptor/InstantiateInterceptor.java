@@ -15,6 +15,6 @@ package org.flowable.common.engine.impl.interceptor;
 /**
  * @author wangxb
  */
-public interface InstantiateErrorHandler {
-    Object handle(Exception e, Object[] objects);
+public interface InstantiateInterceptor {
+    Object handle(String className);
 }

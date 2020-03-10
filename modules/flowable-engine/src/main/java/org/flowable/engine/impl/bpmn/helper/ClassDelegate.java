@@ -45,7 +45,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.common.engine.api.FlowableClassLoadingException;
-import org.flowable.common.engine.impl.interceptor.InstantiateErrorHandler;
+import org.flowable.common.engine.impl.interceptor.InstantiateInterceptor;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -261,11 +261,11 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         try {
             delegateInstance = instantiateDelegate(className, fieldDeclarations);
         } catch (FlowableClassLoadingException e) {
-            InstantiateErrorHandler exceptionHandler = CommandContextUtil.getProcessEngineConfiguration().getInstantiateErrorHandler();
-            if (exceptionHandler == null) {
+            InstantiateInterceptor instantiateIntercepter = CommandContextUtil.getProcessEngineConfiguration().getInstantiateInterceptor();
+            if (instantiateIntercepter == null) {
                 throw e;
             } else {
-                delegateInstance = exceptionHandler.handle(e, new Object[]{className, fieldDeclarations});
+                delegateInstance = instantiateIntercepter.handle(className);
             }
         }
 
