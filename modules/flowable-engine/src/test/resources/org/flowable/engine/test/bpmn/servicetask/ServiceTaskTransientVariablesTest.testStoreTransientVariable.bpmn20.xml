@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+  
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="storeTransientVariableService" />
+    
+    <serviceTask id="storeTransientVariableService" flowable:expression="${'test'}" flowable:resultVariable="transientResult" flowable:storeResultVariableAsTransient="true" flowable:useLocalScopeForResultVariable="true"/>
+    
+    <sequenceFlow id="flow2" sourceRef="storeTransientVariableService" targetRef="useTransientVariableService" />
+
+    <serviceTask id="useTransientVariableService" flowable:expression="Result is: ${transientResult}" flowable:resultVariable="persistentResult"/>
+
+    <sequenceFlow id="flow3" sourceRef="useTransientVariableService" targetRef="task1" />
+
+    <userTask id="task1" flowable:assignee="test" />
+
+    <sequenceFlow id="flow4" sourceRef="task1" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

@@ -98,7 +98,7 @@ public abstract class AbstractFlowableShortHandExpressionFunction implements Flo
     }
     
     protected Method findMethod() {
-        Method[] methods = this.getClass().getMethods();
+        Method[] methods = this.getClass().getDeclaredMethods();
         for (Method method : methods) {
             if (method.getName().equals(localName)) {
                 return method;

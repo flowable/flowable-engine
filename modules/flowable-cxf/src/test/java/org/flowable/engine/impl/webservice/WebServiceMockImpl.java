@@ -34,12 +34,12 @@ public class WebServiceMockImpl implements WebServiceMock {
     }
 
     @Override
-    public int getCount() {
+    public synchronized int getCount() {
         return this.count;
     }
 
     @Override
-    public void inc() throws MaxValueReachedFault {
+    public synchronized void inc() throws MaxValueReachedFault {
         if (this.count == 123456) {
             throw new RuntimeException("A runtime exception not expected in the processing of the web-service");
         } else if (this.count != Integer.MAX_VALUE) {
@@ -50,12 +50,36 @@ public class WebServiceMockImpl implements WebServiceMock {
     }
 
     @Override
+    public synchronized void add(int value) {
+        this.count += value;
+    }
+
+    @Override
+    public synchronized void addMulti(final int[] values) {
+        for (final int value : values) {
+            this.count += value;
+        }
+    }
+
+    @Override
+    public synchronized void addition(final int value1, final int value2) {
+        this.count += value1;
+        this.count += value2;
+    }
+
+    @Override
+    public synchronized void addOperands(final Operands args) {
+        this.count += args.getArg1();
+        this.count += args.getArg2();
+    }
+
+    @Override
     public void reset() {
         this.setTo(0);
     }
 
     @Override
-    public void setTo(int value) {
+    public synchronized void setTo(int value) {
         this.count = value;
     }
 

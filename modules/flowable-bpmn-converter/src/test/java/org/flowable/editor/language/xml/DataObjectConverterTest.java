@@ -59,7 +59,7 @@ public class DataObjectConverterTest extends AbstractConverterTest {
 
         // verify the main process data objects
         List<ValuedDataObject> dataObjects = model.getMainProcess().getDataObjects();
-        assertEquals(7, dataObjects.size());
+        assertEquals(8, dataObjects.size());
 
         Map<String, ValuedDataObject> objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
@@ -91,6 +91,10 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         assertEquals("LongTest", dataObj.getName());
         assertEquals("xsd:long", dataObj.getItemSubjectRef().getStructureRef());
 
+        dataObj = objectMap.get("dObjJson");
+        assertEquals("JsonTest", dataObj.getName());
+        assertEquals("xsd:json", dataObj.getItemSubjectRef().getStructureRef());
+
         dataObj = objectMap.get("dObjWithoutType");
         assertEquals("UnknownTypeTest", dataObj.getName());
         assertEquals("xsd:string", dataObj.getItemSubjectRef().getStructureRef());
@@ -107,11 +111,11 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         assertTrue(flowElement instanceof SubProcess);
         assertEquals("subprocess1", flowElement.getId());
         SubProcess subProcess = (SubProcess) flowElement;
-        assertEquals(11, subProcess.getFlowElements().size());
+        assertEquals(12, subProcess.getFlowElements().size());
 
         // verify the sub process data objects
         dataObjects = subProcess.getDataObjects();
-        assertEquals(6, dataObjects.size());
+        assertEquals(7, dataObjects.size());
 
         objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
@@ -147,5 +151,10 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         assertEquals("dObj12", dataObj.getId());
         assertEquals("LongSubTest", dataObj.getName());
         assertEquals("xsd:long", dataObj.getItemSubjectRef().getStructureRef());
+
+        dataObj = objectMap.get("dObjSubJson");
+        assertEquals("dObjSubJson", dataObj.getId());
+        assertEquals("JsonSubTest", dataObj.getName());
+        assertEquals("xsd:json", dataObj.getItemSubjectRef().getStructureRef());
     }
 }

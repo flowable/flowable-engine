@@ -243,9 +243,9 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         }
 
         if (inOrStatement) {
-            this.currentOrQueryObject.createdBefore = createdBefore;
+            this.currentOrQueryObject.createdBefore = beforeTime;
         } else {
-            this.createdBefore = createdBefore;
+            this.createdBefore = beforeTime;
         }
 
         return this;
@@ -258,9 +258,9 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         }
 
         if (inOrStatement) {
-            this.currentOrQueryObject.createdAfter = createdAfter;
+            this.currentOrQueryObject.createdAfter = afterTime;
         } else {
-            this.createdAfter = createdAfter;
+            this.createdAfter = afterTime;
         }
 
         return this;
@@ -392,6 +392,11 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     @Override
     public EventSubscriptionQuery orderByCreateDate() {
         return orderBy(EventSubscriptionQueryProperty.CREATED);
+    }
+
+    @Override
+    public EventSubscriptionQuery orderByEventName() {
+        return orderBy(EventSubscriptionQueryProperty.EVENT_NAME);
     }
 
     @Override

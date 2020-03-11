@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -56,6 +57,115 @@ public class JsonTest extends PluggableFlowableTestCase {
     public static final String BIG_JSON_OBJ = "bigJsonObj";
 
     protected ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
+    public void testCreateAndUpdateJsonValueDuringExecution() {
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+
+                ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
+                execution.setVariable("customer", objectMapper.createObjectNode());
+
+                Expression expression = expressionManager.createExpression("${customer.name}");
+                expression.setValue("Kermit", execution);
+
+                expression = expressionManager.createExpression("${customer.address}");
+                expression.setValue(objectMapper.createObjectNode(), execution);
+
+                expression = expressionManager.createExpression("${customer.address.street}");
+                expression.setValue("Sesame Street", execution);
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("updateJsonValue")
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
+
+        VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+        JsonNode customerVar = (JsonNode) customerVarInstance.getValue();
+        assertThatJson(customerVar)
+                .isEqualTo("{"
+                        + "  name: 'Kermit',"
+                        + "  address: {"
+                        + "    street: 'Sesame Street'"
+                        + "  }"
+                        + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("customer")
+                    .singleResult();
+            assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+            customerVar = (JsonNode) customerHistoricVarInstance.getValue();
+            assertThatJson(customerVar)
+                    .isEqualTo("{"
+                            + "  name: 'Kermit',"
+                            + "  address: {"
+                            + "    street: 'Sesame Street'"
+                            + "  }"
+                            + "}");
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testCreateAndUpdateJsonValueDuringExecutionWithoutWaitState() {
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+
+                ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
+                execution.setVariable("customer", objectMapper.createObjectNode());
+
+                Expression expression = expressionManager.createExpression("${customer.name}");
+                expression.setValue("Kermit", execution);
+
+                expression = expressionManager.createExpression("${customer.address}");
+                expression.setValue(objectMapper.createObjectNode(), execution);
+
+                expression = expressionManager.createExpression("${customer.address.street}");
+                expression.setValue("Sesame Street", execution);
+            }
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("updateJsonValue")
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
+
+        JsonNode customerVar = (JsonNode) processInstance.getProcessVariables().get("customer");
+        assertThatJson(customerVar)
+                .isEqualTo("{"
+                        + "  name: 'Kermit',"
+                        + "  address: {"
+                        + "    street: 'Sesame Street'"
+                        + "  }"
+                        + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance customerHistoricVarInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("customer")
+                    .singleResult();
+            assertThat(customerHistoricVarInstance.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+
+            customerVar = (JsonNode) customerHistoricVarInstance.getValue();
+            assertThatJson(customerVar)
+                    .isEqualTo("{"
+                            + "  name: 'Kermit',"
+                            + "  address: {"
+                            + "    street: 'Sesame Street'"
+                            + "  }"
+                            + "}");
+        }
+    }
 
     @Test
     @Deployment

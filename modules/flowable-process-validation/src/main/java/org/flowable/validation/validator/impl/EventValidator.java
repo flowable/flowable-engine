@@ -63,7 +63,7 @@ public class EventValidator extends ProcessLevelValidator {
 
             if (StringUtils.isEmpty(messageEventDefinition.getMessageExpression())) {
                 // message ref should be filled in
-                addError(errors, Problems.MESSAGE_EVENT_MISSING_MESSAGE_REF, process, event, "attribute 'messageRef' is required");
+                addError(errors, Problems.MESSAGE_EVENT_MISSING_MESSAGE_REF, process, event, "attribute 'messageRef' or 'messageExpression' is required");
             }
 
         } else if (!bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
@@ -78,7 +78,7 @@ public class EventValidator extends ProcessLevelValidator {
         if (StringUtils.isEmpty(signalEventDefinition.getSignalRef())) {
 
             if (StringUtils.isEmpty(signalEventDefinition.getSignalExpression())) {
-                addError(errors, Problems.SIGNAL_EVENT_MISSING_SIGNAL_REF, process, event, "signalEventDefinition does not have mandatory property 'signalRef'");
+                addError(errors, Problems.SIGNAL_EVENT_MISSING_SIGNAL_REF, process, event, "signalEventDefinition does not have a 'signalRef' or a 'signalExpression'");
             }
 
         } else if (!bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {

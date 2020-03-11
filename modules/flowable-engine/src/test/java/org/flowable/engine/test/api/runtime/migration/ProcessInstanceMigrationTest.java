@@ -2023,7 +2023,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         FlowableSignalEvent signalEvent = (FlowableSignalEvent) iterator.next();
         assertThat(signalEvent).extracting(FlowableSignalEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
         assertThat(signalEvent).extracting(FlowableSignalEvent::getActivityId).isEqualTo("intermediateCatchEvent");
-        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("mySignal");
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("someSignal");
 
         //Trigger the event
         runtimeService.signalEventReceived("someSignal");
@@ -2187,7 +2187,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         FlowableSignalEvent signalEvent = (FlowableSignalEvent) iterator.next();
         assertThat(signalEvent).extracting(FlowableSignalEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
         assertThat(signalEvent).extracting(FlowableSignalEvent::getActivityId).isEqualTo("newIntermediateCatchEvent");
-        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("myNewSignal");
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("someNewSignal");
 
         //Trigger the event
         runtimeService.signalEventReceived("someNewSignal");

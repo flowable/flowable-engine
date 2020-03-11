@@ -113,7 +113,13 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
     EventSubscriptionQuery orderByCreateDate();
 
     /**
+     * Order by event name (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    EventSubscriptionQuery orderByEventName();
+
+    /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     EventSubscriptionQuery orderByTenantId();
+
 }

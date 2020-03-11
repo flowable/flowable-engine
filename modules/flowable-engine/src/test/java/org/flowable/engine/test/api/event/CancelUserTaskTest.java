@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -63,7 +65,7 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/event/CancelUserTaskEventsTest.bpmn20.xml" })
     public void testUserTaskCancelledWhenFlowToTerminateEnd() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("cancelUserTaskEvents");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
         Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
@@ -71,38 +73,38 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
 
         int idx = 0;
         FlowableEvent flowableEvent = testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        assertThat(flowableEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
         ExecutionEntity executionEntity = (ExecutionEntity) ((FlowableProcessStartedEvent) flowableEvent).getEntity();
-        assertEquals(processInstance.getId(), executionEntity.getProcessInstanceId());
+        assertThat(executionEntity.getProcessInstanceId()).isEqualTo(processInstance.getId());
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("task1", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task1");
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         TaskEntity taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task1", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task1");
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("task2", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task2");
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task2", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         Task userTask1 = null;
         for (Task task : tasks) {
             if ("User Task1".equals(task.getName())) {
@@ -110,51 +112,51 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
                 break;
             }
         }
-        assertNotNull(userTask1);
+        assertThat(userTask1).isNotNull();
 
         // complete task1 so we flow to terminate end
         taskService.complete(userTask1.getId());
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_COMPLETED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task1", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task1");
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("task1", activityEvent.getActivityId());
-        assertEquals(task1Execution.getId(), activityEvent.getExecutionId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task1");
+        assertThat(activityEvent.getExecutionId()).isEqualTo(task1Execution.getId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("endEvent", activityEvent.getActivityType());
-        assertEquals("endEvent1", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("endEvent");
+        assertThat(activityEvent.getActivityId()).isEqualTo("endEvent1");
 
         for (int i = 0; i < 2; i++) {
             activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-            assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
+            assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
             FlowableActivityCancelledEvent cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
 
             if ("task2".equals(cancelledEvent.getActivityId())) {
-                assertEquals("task2", cancelledEvent.getActivityId());
-                assertEquals("userTask", cancelledEvent.getActivityType());
-                assertEquals("User Task2", cancelledEvent.getActivityName());
-                assertEquals(task2Execution.getId(), cancelledEvent.getExecutionId());
+                assertThat(cancelledEvent.getActivityId()).isEqualTo("task2");
+                assertThat(cancelledEvent.getActivityType()).isEqualTo("userTask");
+                assertThat(cancelledEvent.getActivityName()).isEqualTo("User Task2");
+                assertThat(cancelledEvent.getExecutionId()).isEqualTo(task2Execution.getId());
 
             } else if ("cancelBoundaryEvent1".equals(cancelledEvent.getActivityId())) {
-                assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
+                assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
                 cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
-                assertEquals("cancelBoundaryEvent1", cancelledEvent.getActivityId());
-                assertEquals(boundaryExecution.getId(), cancelledEvent.getExecutionId());
+                assertThat(cancelledEvent.getActivityId()).isEqualTo("cancelBoundaryEvent1");
+                assertThat(cancelledEvent.getExecutionId()).isEqualTo(boundaryExecution.getId());
             }
         }
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
 
-        assertEquals(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
 
-        assertEquals(13, idx);
-        assertEquals(13, testListener.getEventsReceived().size());
+        assertThat(idx).isEqualTo(13);
+        assertThat(testListener.getEventsReceived()).hasSize(13);
     }
 
     /**
@@ -164,7 +166,7 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/event/CancelUserTaskEventsTest.bpmn20.xml" })
     public void testUserTaskCancelledByMessageBoundaryEvent() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("cancelUserTaskEvents");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
         Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
@@ -172,72 +174,71 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
 
         int idx = 0;
         FlowableEvent flowableEvent = testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
+        assertThat(flowableEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_STARTED);
         ExecutionEntity executionEntity = (ExecutionEntity) ((FlowableProcessStartedEvent) flowableEvent).getEntity();
-        assertEquals(processInstance.getId(), executionEntity.getProcessInstanceId());
+        assertThat(executionEntity.getProcessInstanceId()).isEqualTo(processInstance.getId());
 
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("startEvent", activityEvent.getActivityType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityType()).isEqualTo("startEvent");
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("task1", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task1");
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         TaskEntity taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task1", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task1");
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("task2", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task2");
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         taskEntity = (TaskEntity) entityEvent.getEntity();
-        assertEquals("User Task2", taskEntity.getName());
+        assertThat(taskEntity.getName()).isEqualTo("User Task2");
 
-        Execution cancelMessageExecution = runtimeService.createExecutionQuery().messageEventSubscriptionName("cancel")
-                .singleResult();
-        assertNotNull(cancelMessageExecution);
-        assertEquals("cancelBoundaryEvent1", cancelMessageExecution.getActivityId());
+        Execution cancelMessageExecution = runtimeService.createExecutionQuery().messageEventSubscriptionName("cancel").singleResult();
+        assertThat(cancelMessageExecution).isNotNull();
+        assertThat(cancelMessageExecution.getActivityId()).isEqualTo("cancelBoundaryEvent1");
 
         // cancel the user task (task2)
         runtimeService.messageEventReceived("cancel", cancelMessageExecution.getId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
         FlowableActivityCancelledEvent cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
-        assertEquals("task2", cancelledEvent.getActivityId());
-        assertEquals("userTask", cancelledEvent.getActivityType());
-        assertEquals("User Task2", cancelledEvent.getActivityName());
-        assertEquals(task2Execution.getId(), cancelledEvent.getExecutionId());
+        assertThat(cancelledEvent.getActivityId()).isEqualTo("task2");
+        assertThat(cancelledEvent.getActivityType()).isEqualTo("userTask");
+        assertThat(cancelledEvent.getActivityName()).isEqualTo("User Task2");
+        assertThat(cancelledEvent.getExecutionId()).isEqualTo(task2Execution.getId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
-        assertEquals("cancelBoundaryEvent1", activityEvent.getActivityId());
-        assertEquals("boundaryEvent", activityEvent.getActivityType());
-        assertEquals(boundaryExecution.getId(), activityEvent.getExecutionId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_COMPLETED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("cancelBoundaryEvent1");
+        assertThat(activityEvent.getActivityType()).isEqualTo("boundaryEvent");
+        assertThat(activityEvent.getExecutionId()).isEqualTo(boundaryExecution.getId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
-        assertEquals("endEvent1", activityEvent.getActivityId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("endEvent1");
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-        assertEquals("task1", activityEvent.getActivityId());
-        assertEquals(task1Execution.getId(), activityEvent.getExecutionId());
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("task1");
+        assertThat(activityEvent.getExecutionId()).isEqualTo(task1Execution.getId());
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, entityEvent.getType());
+        assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
 
-        assertEquals(12, idx);
-        assertEquals(12, testListener.getEventsReceived().size());
+        assertThat(idx).isEqualTo(12);
+        assertThat(testListener.getEventsReceived()).hasSize(12);
     }
 
     class UserActivityEventListener extends AbstractFlowableEngineEventListener {

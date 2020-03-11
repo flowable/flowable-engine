@@ -13,8 +13,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
-		<spring.framework.version>5.2.2.RELEASE</spring.framework.version>
-		<spring.security.version>5.2.1.RELEASE</spring.security.version>
+		<spring.framework.version>5.2.4.RELEASE</spring.framework.version>
+		<spring.security.version>5.2.2.RELEASE</spring.security.version>
 		<spring.amqp.version>2.2.2.RELEASE</spring.amqp.version>
 		<spring.kafka.version>2.3.4.RELEASE</spring.kafka.version>
 		<jackson.version>2.10.2</jackson.version>
@@ -23,7 +23,7 @@
         <camel.version>2.25.0</camel.version>
 		<cxf.version>3.3.5</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<spring.boot.version>2.2.2.RELEASE</spring.boot.version>
+		<spring.boot.version>2.2.5.RELEASE</spring.boot.version>
 
 		<junit.version>4.13</junit.version>
 		<junit.jupiter.version>5.6.0</junit.jupiter.version>
@@ -771,7 +771,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-jsr223</artifactId>
-				<version>2.5.9</version>
+				<version>2.5.10</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>

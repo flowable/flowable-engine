@@ -108,7 +108,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     @Override
     public PlanItemExpressionActivityBehavior createPlanItemExpressionActivityBehavior(PlanItem planItem, ServiceTask task) {
-        return new PlanItemExpressionActivityBehavior(task.getImplementation(), task.getResultVariableName());
+        return new PlanItemExpressionActivityBehavior(task.getImplementation(), task.getResultVariableName(), task.isStoreResultVariableAsTransient());
     }
 
     @Override

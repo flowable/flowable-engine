@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -39,23 +41,25 @@ public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-            assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
+            assertThat(processInstance.getProcessDefinitionKey()).isEqualTo(PROCESS_DEFINITION_KEY);
 
             // Delete deployment and historic process instance remains.
             repositoryService.deleteDeployment(deploymentId, false);
 
-            HistoricProcessInstance processInstanceAfterDelete = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-            assertNull(processInstanceAfterDelete.getProcessDefinitionKey());
-            assertNull(processInstanceAfterDelete.getProcessDefinitionName());
-            assertNull(processInstanceAfterDelete.getProcessDefinitionVersion());
+            HistoricProcessInstance processInstanceAfterDelete = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId)
+                    .singleResult();
+            assertThat(processInstanceAfterDelete.getProcessDefinitionKey()).isNull();
+            assertThat(processInstanceAfterDelete.getProcessDefinitionName()).isNull();
+            assertThat(processInstanceAfterDelete.getProcessDefinitionVersion()).isNull();
 
-            assertTrue(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).count() > 0);
-            assertTrue(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count() > 0);
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).count()).isPositive();
+            assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count()).isPositive();
 
             // clean
             historyService.deleteHistoricProcessInstance(processInstanceId);
-            managementService.executeCommand( commandContext -> {
-                CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForProcessDefinition(processInstance.getProcessDefinitionId());
+            managementService.executeCommand(commandContext -> {
+                CommandContextUtil.getHistoricTaskService(commandContext)
+                        .deleteHistoricTaskLogEntriesForProcessDefinition(processInstance.getProcessDefinitionId());
                 return null;
             });
 

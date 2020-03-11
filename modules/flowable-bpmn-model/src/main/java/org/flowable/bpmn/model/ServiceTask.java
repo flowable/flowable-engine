@@ -37,6 +37,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
     protected String skipExpression;
     protected boolean useLocalScopeForResultVariable;
     protected boolean triggerable;
+    protected boolean storeResultVariableAsTransient;
 
     public String getImplementation() {
         return implementation;
@@ -122,6 +123,14 @@ public class ServiceTask extends TaskWithFieldExtensions {
         this.triggerable = triggerable;
     }
 
+    public boolean isStoreResultVariableAsTransient() {
+        return storeResultVariableAsTransient;
+    }
+
+    public void setStoreResultVariableAsTransient(boolean storeResultVariableAsTransient) {
+        this.storeResultVariableAsTransient = storeResultVariableAsTransient;
+    }
+
     @Override
     public ServiceTask clone() {
         ServiceTask clone = new ServiceTask();
@@ -140,6 +149,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
         setSkipExpression(otherElement.getSkipExpression());
         setUseLocalScopeForResultVariable(otherElement.isUseLocalScopeForResultVariable());
         setTriggerable(otherElement.isTriggerable());
+        setStoreResultVariableAsTransient(otherElement.isStoreResultVariableAsTransient());
 
         fieldExtensions = new ArrayList<>();
         if (otherElement.getFieldExtensions() != null && !otherElement.getFieldExtensions().isEmpty()) {

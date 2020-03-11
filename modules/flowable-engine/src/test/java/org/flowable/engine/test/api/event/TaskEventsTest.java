@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.engine.test.api.event;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -31,7 +33,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to tasks.
- * 
+ *
  * @author Frederik Heremans
  */
 public class TaskEventsTest extends PluggableFlowableTestCase {
@@ -45,39 +47,39 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testTaskEventsInProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // Check create event
-        assertEquals(3, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(3);
         FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         org.flowable.task.api.Task taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-        assertEquals(task.getId(), taskFromEvent.getId());
+        assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
         assertExecutionDetails(event, processInstance);
 
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
 
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.TASK_CREATED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-        assertEquals(task.getId(), taskFromEvent.getId());
+        assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
         assertExecutionDetails(event, processInstance);
 
         listener.clearEventsReceived();
 
         // Update duedate, owner and priority should trigger update-event
         taskService.setDueDate(task.getId(), new Date());
-        assertEquals(2, listener.getEventsReceived().size());
-        assertEquals(FlowableEngineEventType.TASK_DUEDATE_CHANGED, listener.getEventsReceived().get(0).getType());
+        assertThat(listener.getEventsReceived()).hasSize(2);
+        assertThat(listener.getEventsReceived().get(0).getType()).isEqualTo(FlowableEngineEventType.TASK_DUEDATE_CHANGED);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertExecutionDetails(event, processInstance);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
         listener.clearEventsReceived();
 
         // Update name, owner and priority should trigger update-event
@@ -85,26 +87,26 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
         task.setName("newName");
         taskService.saveTask(task);
-        assertEquals(2, listener.getEventsReceived().size());
-        assertEquals(FlowableEngineEventType.TASK_NAME_CHANGED, listener.getEventsReceived().get(0).getType());
+        assertThat(listener.getEventsReceived()).hasSize(2);
+        assertThat(listener.getEventsReceived().get(0).getType()).isEqualTo(FlowableEngineEventType.TASK_NAME_CHANGED);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertExecutionDetails(event, processInstance);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
         listener.clearEventsReceived();
 
         taskService.setPriority(task.getId(), 12);
-        assertEquals(2, listener.getEventsReceived().size());
-        assertEquals(FlowableEngineEventType.TASK_PRIORITY_CHANGED, listener.getEventsReceived().get(0).getType());
+        assertThat(listener.getEventsReceived()).hasSize(2);
+        assertThat(listener.getEventsReceived().get(0).getType()).isEqualTo(FlowableEngineEventType.TASK_PRIORITY_CHANGED);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
         assertExecutionDetails(event, processInstance);
         listener.clearEventsReceived();
 
         taskService.setOwner(task.getId(), "kermit");
-        assertEquals(2, listener.getEventsReceived().size());
-        assertEquals(FlowableEngineEventType.TASK_OWNER_CHANGED, listener.getEventsReceived().get(0).getType());
+        assertThat(listener.getEventsReceived()).hasSize(2);
+        assertThat(listener.getEventsReceived().get(0).getType()).isEqualTo(FlowableEngineEventType.TASK_OWNER_CHANGED);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
         assertExecutionDetails(event, processInstance);
         listener.clearEventsReceived();
 
@@ -115,26 +117,26 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         task.setOwner("john");
         taskService.saveTask(task);
 
-        assertEquals(3, listener.getEventsReceived().size());
-        assertEquals(FlowableEngineEventType.TASK_OWNER_CHANGED, listener.getEventsReceived().get(0).getType());
-        assertEquals(FlowableEngineEventType.TASK_DUEDATE_CHANGED, listener.getEventsReceived().get(1).getType());
+        assertThat(listener.getEventsReceived()).hasSize(3);
+        assertThat(listener.getEventsReceived().get(0).getType()).isEqualTo(FlowableEngineEventType.TASK_OWNER_CHANGED);
+        assertThat(listener.getEventsReceived().get(1).getType()).isEqualTo(FlowableEngineEventType.TASK_DUEDATE_CHANGED);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
         assertExecutionDetails(event, processInstance);
         listener.clearEventsReceived();
 
         // Check delete-event on complete
         taskService.complete(task.getId());
-        assertEquals(2, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(2);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.TASK_COMPLETED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
         assertExecutionDetails(event, processInstance);
         TaskEntity taskEntity = (TaskEntity) event.getEntity();
-        assertNotNull(taskEntity.getDueDate());
+        assertThat(taskEntity.getDueDate()).isNotNull();
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
         assertExecutionDetails(event, processInstance);
-        
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
@@ -142,26 +144,26 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testTaskAssignmentEventInProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         listener.clearEventsReceived();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // Set assignee through API
         taskService.setAssignee(task.getId(), "kermit");
-        assertEquals(2, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(2);
         FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         assertExecutionDetails(event, processInstance);
-        
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.TASK_ASSIGNED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_ASSIGNED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         org.flowable.task.api.Task taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-        assertEquals(task.getId(), taskFromEvent.getId());
-        assertEquals("kermit", taskFromEvent.getAssignee());
+        assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+        assertThat(taskFromEvent.getAssignee()).isEqualTo("kermit");
         assertExecutionDetails(event, processInstance);
 
         listener.clearEventsReceived();
@@ -171,35 +173,35 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         task.setAssignee("newAssignee");
         taskService.saveTask(task);
 
-        assertEquals(2, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(2);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         assertExecutionDetails(event, processInstance);
-        
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.TASK_ASSIGNED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_ASSIGNED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-        assertEquals(task.getId(), taskFromEvent.getId());
-        assertEquals("newAssignee", taskFromEvent.getAssignee());
+        assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+        assertThat(taskFromEvent.getAssignee()).isEqualTo("newAssignee");
         assertExecutionDetails(event, processInstance);
         listener.clearEventsReceived();
 
         // Unclaim
         taskService.unclaim(task.getId());
-        assertEquals(2, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(2);
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         assertExecutionDetails(event, processInstance);
-        
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-        assertEquals(FlowableEngineEventType.TASK_ASSIGNED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_ASSIGNED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-        assertEquals(task.getId(), taskFromEvent.getId());
-        assertNull(taskFromEvent.getAssignee());
+        assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+        assertThat(taskFromEvent.getAssignee()).isNull();
         assertExecutionDetails(event, processInstance);
 
         listener.clearEventsReceived();
@@ -212,21 +214,21 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testDeleteEventDoesNotDispathComplete() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         listener.clearEventsReceived();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // Delete process, should delete task as well, but not complete
         runtimeService.deleteProcessInstance(processInstance.getId(), "testing task delete events");
 
-        assertEquals(1, listener.getEventsReceived().size());
+        assertThat(listener.getEventsReceived()).hasSize(1);
         FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-        assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-        assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
+        assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
         org.flowable.task.api.Task taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-        assertEquals(task.getId(), taskFromEvent.getId());
+        assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
         assertExecutionDetails(event, processInstance);
 
         try {
@@ -239,15 +241,15 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
             // Delete standalone task, only a delete-event should be dispatched
             taskService.deleteTask(task.getId());
 
-            assertEquals(1, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(1);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
             taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-            assertEquals(task.getId(), taskFromEvent.getId());
-            assertNull(event.getProcessDefinitionId());
-            assertNull(event.getProcessInstanceId());
-            assertNull(event.getExecutionId());
+            assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+            assertThat(event.getProcessDefinitionId()).isNull();
+            assertThat(event.getProcessInstanceId()).isNull();
+            assertThat(event.getExecutionId()).isNull();
 
         } finally {
             if (task != null) {
@@ -290,22 +292,23 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
             taskService.complete(task.getId(), taskParams, true);
 
             FlowableEntityEvent event = (FlowableEntityEvent) tlistener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
 
             event = (FlowableEntityEvent) tlistener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
 
             event = (FlowableEntityEvent) tlistener.getEventsReceived().get(2);
-            assertEquals(FlowableEngineEventType.TASK_CREATED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
             org.flowable.task.api.Task taskFromEvent = tlistener.getTasks().get(2);
-            assertEquals(task.getId(), taskFromEvent.getId());
+            assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
 
             // verify script listener has done its job, on create before FlowableEntityEvent was fired
-            assertEquals("The ScriptTaskListener must set this value before the dispatchEvent fires.", "scriptedAssignee", taskFromEvent.getAssignee());
-            assertEquals("The ScriptTaskListener must set this value before the dispatchEvent fires.", 877, taskFromEvent.getPriority());
+            assertThat(taskFromEvent.getAssignee()).as("The ScriptTaskListener must set this value before the dispatchEvent fires.")
+                    .isEqualTo("scriptedAssignee");
+            assertThat(taskFromEvent.getPriority()).as("The ScriptTaskListener must set this value before the dispatchEvent fires.").isEqualTo(877);
 
             // Fetch second task
             taskService.createTaskQuery().singleResult();
@@ -328,81 +331,81 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
             task.setDescription("Description");
             taskService.saveTask(task);
 
-            assertEquals(3, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(3);
 
             FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
             org.flowable.task.api.Task taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-            assertEquals(task.getId(), taskFromEvent.getId());
-            assertNull(event.getProcessDefinitionId());
-            assertNull(event.getProcessInstanceId());
-            assertNull(event.getExecutionId());
+            assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+            assertThat(event.getProcessDefinitionId()).isNull();
+            assertThat(event.getProcessInstanceId()).isNull();
+            assertThat(event.getExecutionId()).isNull();
 
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
 
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(2);
-            assertEquals(FlowableEngineEventType.TASK_CREATED, event.getType());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
             listener.clearEventsReceived();
 
             // Update task
             taskService.setOwner(task.getId(), "owner");
-            assertEquals(2, listener.getEventsReceived().size());
-            assertEquals(FlowableEngineEventType.TASK_OWNER_CHANGED, listener.getEventsReceived().get(0).getType());
+            assertThat(listener.getEventsReceived()).hasSize(2);
+            assertThat(listener.getEventsReceived().get(0).getType()).isEqualTo(FlowableEngineEventType.TASK_OWNER_CHANGED);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
             taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-            assertEquals(task.getId(), taskFromEvent.getId());
-            assertEquals("owner", taskFromEvent.getOwner());
-            assertNull(event.getProcessDefinitionId());
-            assertNull(event.getProcessInstanceId());
-            assertNull(event.getExecutionId());
+            assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+            assertThat(taskFromEvent.getOwner()).isEqualTo("owner");
+            assertThat(event.getProcessDefinitionId()).isNull();
+            assertThat(event.getProcessInstanceId()).isNull();
+            assertThat(event.getExecutionId()).isNull();
             listener.clearEventsReceived();
 
             // Assign task
             taskService.setAssignee(task.getId(), "kermit");
-            assertEquals(2, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(2);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
             taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-            assertEquals(task.getId(), taskFromEvent.getId());
-            assertNull(event.getProcessDefinitionId());
-            assertNull(event.getProcessInstanceId());
-            assertNull(event.getExecutionId());
+            assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+            assertThat(event.getProcessDefinitionId()).isNull();
+            assertThat(event.getProcessInstanceId()).isNull();
+            assertThat(event.getExecutionId()).isNull();
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.TASK_ASSIGNED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_ASSIGNED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
             taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-            assertEquals(task.getId(), taskFromEvent.getId());
-            assertEquals("kermit", taskFromEvent.getAssignee());
-            assertNull(event.getProcessDefinitionId());
-            assertNull(event.getProcessInstanceId());
-            assertNull(event.getExecutionId());
+            assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+            assertThat(taskFromEvent.getAssignee()).isEqualTo("kermit");
+            assertThat(event.getProcessDefinitionId()).isNull();
+            assertThat(event.getProcessInstanceId()).isNull();
+            assertThat(event.getExecutionId()).isNull();
             listener.clearEventsReceived();
 
             // Complete task
             taskService.complete(task.getId());
-            assertEquals(2, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(2);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.TASK_COMPLETED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.TASK_COMPLETED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
             taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-            assertEquals(task.getId(), taskFromEvent.getId());
-            assertNull(event.getProcessDefinitionId());
-            assertNull(event.getProcessInstanceId());
-            assertNull(event.getExecutionId());
+            assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+            assertThat(event.getProcessDefinitionId()).isNull();
+            assertThat(event.getProcessInstanceId()).isNull();
+            assertThat(event.getExecutionId()).isNull();
 
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-            assertTrue(event.getEntity() instanceof org.flowable.task.api.Task);
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
+            assertThat(event.getEntity()).isInstanceOf(org.flowable.task.api.Task.class);
             taskFromEvent = (org.flowable.task.api.Task) event.getEntity();
-            assertEquals(task.getId(), taskFromEvent.getId());
-            assertNull(event.getProcessDefinitionId());
-            assertNull(event.getProcessInstanceId());
-            assertNull(event.getExecutionId());
+            assertThat(taskFromEvent.getId()).isEqualTo(task.getId());
+            assertThat(event.getProcessDefinitionId()).isNull();
+            assertThat(event.getProcessInstanceId()).isNull();
+            assertThat(event.getExecutionId()).isNull();
 
         } finally {
             if (task != null) {
@@ -423,9 +426,9 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
     }
 
     protected void assertExecutionDetails(FlowableEngineEntityEvent event, ProcessInstance processInstance) {
-        assertEquals(processInstance.getId(), event.getProcessInstanceId());
-        assertNotNull(event.getExecutionId());
-        assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(event.getExecutionId()).isNotNull();
+        assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
     }
 
     @BeforeEach

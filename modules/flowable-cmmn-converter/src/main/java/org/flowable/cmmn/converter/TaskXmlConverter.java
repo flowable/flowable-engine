@@ -103,6 +103,9 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         serviceTask.setResultVariableName(
             xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_RESULT_VARIABLE_NAME));
 
+        serviceTask.setStoreResultVariableAsTransient(
+            Boolean.parseBoolean(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_STORE_RESULT_AS_TRANSIENT)));
+
         return serviceTask;
     }
 

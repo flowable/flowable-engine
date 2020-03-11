@@ -13,8 +13,10 @@
 package org.flowable.engine.impl.webservice;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,11 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * An integration test for CXF based web services
@@ -136,6 +143,203 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
 
         assertEquals(0, webServiceMock.getCount());
         assertTrue(processInstance.isEnded());
+    }
+
+    @Test
+    @Deployment
+    public void testJsonArrayVariableMultiInstanceLoop() throws Exception {
+
+        assertEquals(-1, webServiceMock.getCount());
+
+        processEngineConfiguration.addWsEndpointAddress(
+                new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
+                new URL(WEBSERVICE_MOCK_ADDRESS));
+
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
+        final ArrayNode values = mapper.createArrayNode();
+        values.add(21);
+        values.add(32);
+        values.add(43);
+
+        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        initVariables.put("values", values);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("jsonArrayVariableMultiInstanceLoop",
+                initVariables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        // -1 (initial value of counter) + 21 + 32 + 43 = 95
+        assertEquals(95, webServiceMock.getCount());
+        assertTrue(processInstance.isEnded());
+    }
+
+    @Test
+    @Deployment
+    public void testJsonArrayVariableDirectInvocation() throws Exception {
+
+        assertEquals(-1, webServiceMock.getCount());
+
+        processEngineConfiguration.addWsEndpointAddress(
+                new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
+                new URL(WEBSERVICE_MOCK_ADDRESS));
+
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
+        final ArrayNode values = mapper.createArrayNode();
+        values.add(1);
+        values.add(2);
+        values.add(3);
+
+        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        initVariables.put("values", values);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("jsonArrayVariableDirectInvocation",
+                initVariables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        // -1 (initial value of counter) + 1 + 2 + 3 = 5
+        assertEquals(5, webServiceMock.getCount());
+        assertTrue(processInstance.isEnded());
+    }
+
+    @Test
+    @Deployment
+    public void testJsonBeanWithArrayVariableMultiInstanceLoop() throws Exception {
+
+        assertEquals(-1, webServiceMock.getCount());
+
+        processEngineConfiguration.addWsEndpointAddress(
+                new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
+                new URL(WEBSERVICE_MOCK_ADDRESS));
+
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
+        final ObjectNode valuesObj = mapper.createObjectNode();
+        final ArrayNode values = valuesObj.putArray("values");
+        values.add(12);
+        values.add(23);
+        values.add(34);
+
+        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        initVariables.put("bean", valuesObj);
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("jsonBeanWithArrayVariableMultiInstanceLoop", initVariables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        // -1 (initial value of counter) + 12 + 23 + 34 = 68
+        assertEquals(68, webServiceMock.getCount());
+        assertTrue(processInstance.isEnded());
+    }
+
+    @Test
+    @Deployment
+    public void testJsonBeanWithArrayVariableDirectInvocation() throws Exception {
+
+        assertEquals(-1, webServiceMock.getCount());
+
+        processEngineConfiguration.addWsEndpointAddress(
+                new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
+                new URL(WEBSERVICE_MOCK_ADDRESS));
+
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
+        final ObjectNode valuesObj = mapper.createObjectNode();
+        final ArrayNode values = valuesObj.putArray("values");
+        values.add(11);
+        values.add(22);
+        values.add(33);
+
+        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        initVariables.put("bean", valuesObj);
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("jsonBeanWithArrayVariableDirectInvocation", initVariables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        // -1 (initial value of counter) + 11 + 22 + 33 = 65
+        assertEquals(65, webServiceMock.getCount());
+        assertTrue(processInstance.isEnded());
+    }
+
+    @Test
+    @Deployment
+    public void testJsonBeanVariableInvocationByAttribute() throws Exception {
+
+        assertEquals(-1, webServiceMock.getCount());
+
+        processEngineConfiguration.addWsEndpointAddress(
+                new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
+                new URL(WEBSERVICE_MOCK_ADDRESS));
+
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
+        final ObjectNode valuesObj = mapper.createObjectNode();
+        valuesObj.put("value1", 111);
+        valuesObj.put("value2", 222);
+
+        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        initVariables.put("bean", valuesObj);
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("jsonBeanVariableInvocationByAttribute",
+                initVariables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        // -1 (initial value of counter) + 111 + 222 = 332
+        assertEquals(332, webServiceMock.getCount());
+        assertTrue(processInstance.isEnded());
+    }
+
+    @Test
+    @Deployment
+    public void testJsonBeanVariableDirectInvocation() throws Exception {
+
+        assertEquals(-1, webServiceMock.getCount());
+
+        processEngineConfiguration.addWsEndpointAddress(
+                new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
+                new URL(WEBSERVICE_MOCK_ADDRESS));
+
+        final ObjectMapper mapper = this.processEngineConfiguration.getObjectMapper();
+        final ObjectNode argsObj = mapper.createObjectNode();
+        final ObjectNode valuesObj = mapper.createObjectNode();
+        valuesObj.put("arg1", 1111);
+        valuesObj.put("arg2", 2222);
+        argsObj.set("args", valuesObj);
+
+        final Map<String, Object> initVariables = new HashMap<String, Object>();
+        initVariables.put("bean", argsObj);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("jsonBeanVariableDirectInvocation",
+                initVariables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        // -1 (initial value of counter) + 1111 + 2222 = 3332
+        assertEquals(3332, webServiceMock.getCount());
+        assertTrue(processInstance.isEnded());
+    }
+
+    /**
+     * Check the JSON conversion of a SOAP response XML part into JSon variable
+     */
+    @Test
+    @Deployment
+    public void testJsonDataObject() throws Exception {
+
+        final String myString = "my-string";
+        final GregorianCalendar myCalendar = new GregorianCalendar(2020, 1, 20, 0, 0, 0);
+        final Date myDate = myCalendar.getTime();
+        this.webServiceMock.setDataStructure(myString, myDate);
+
+        processEngineConfiguration.addWsEndpointAddress(
+                new QName("http://webservice.impl.engine.flowable.org/", "CounterImplPort"),
+                new URL(WEBSERVICE_MOCK_ADDRESS));
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("jsonDataObject");
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        assertTrue(processInstance.isEnded());
+
+        final HistoricProcessInstance histProcInst = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId()).includeProcessVariables().singleResult();
+        final Object currentStructure = histProcInst.getProcessVariables().get("currentStructure");
+        assertTrue(currentStructure instanceof JsonNode);
+        final JsonNode currentStructureJson = (JsonNode) currentStructure;
+        assertEquals(myString, currentStructureJson.findValue("eltString").asText());
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        final String myDateJson = currentStructureJson.findValue("eltDate").asText();
+        assertEquals(myDate, sdf.parse(myDateJson));
     }
 
 }

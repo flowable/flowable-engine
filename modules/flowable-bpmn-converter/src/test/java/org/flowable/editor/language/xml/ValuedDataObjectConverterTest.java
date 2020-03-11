@@ -17,8 +17,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,8 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @see {https://activiti.atlassian.net/browse/ACT-1847}.
@@ -55,7 +59,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         return "valueddataobjectmodel.bpmn";
     }
 
-    private void validateModel(BpmnModel model) {
+    private void validateModel(BpmnModel model) throws ParseException {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
         assertNotNull(flowElement);
         assertTrue(flowElement instanceof StartEvent);
@@ -63,7 +67,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
 
         // verify the main process data objects
         List<ValuedDataObject> dataObjects = model.getProcess(null).getDataObjects();
-        assertEquals(7, dataObjects.size());
+        assertEquals(8, dataObjects.size());
 
         Map<String, ValuedDataObject> objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
@@ -118,6 +122,17 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         assertEquals(1, testValues.size());
         assertEquals("testvalue", testValues.get(0).getName());
         assertEquals("test", testValues.get(0).getElementText());
+
+        dataObj = objectMap.get("dObjJson");
+        assertEquals("dObjJson", dataObj.getId());
+        assertEquals("JsonTest", dataObj.getName());
+        assertEquals("xsd:json", dataObj.getItemSubjectRef().getStructureRef());
+        assertTrue(dataObj.getValue() instanceof JsonNode);
+        assertEquals("my-string", ((JsonNode) dataObj.getValue()).get("eltString").asText());
+        final GregorianCalendar myCalendar = new GregorianCalendar(2020, 1, 21, 10, 25, 23);
+        final Date myDate = myCalendar.getTime();
+        final String myDateJson = ((JsonNode) dataObj.getValue()).get("eltDate").asText();
+        assertEquals(myDate, sdf.parse(myDateJson));
 
         dataObj = objectMap.get("NoData");
         assertEquals("NoData", dataObj.getId());
