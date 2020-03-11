@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="org.flowable.engine.impl.webservice"
+  xmlns:tns="org.flowable.engine.impl.webservice"
+  xmlns:webservice="http://webservice.flowable.org/">
+
+  <import importType="http://schemas.xmlsoap.org/wsdl/"
+          location="http://localhost:63081/webservicemock?wsdl"
+          namespace="http://webservice.flowable.org/" />
+
+   <process id="jsonDataObject">
+   
+      <dataObject id="currentStructure" name="Data current structure" itemSubjectRef="xsd:json" />
+
+      <startEvent id="theStart" />
+
+      <sequenceFlow id="flow1" sourceRef="theStart" targetRef="webService" />
+
+      <serviceTask id="webService" name="Web service invocation" implementation="##WebService"
+         operationRef="tns:getDataStructureOperation">
+         <ioSpecification>
+            <dataInput itemSubjectRef="tns:getDataStructureRequestItem" id="dataInputOfGetDataStructureRequest" />
+            <dataOutput itemSubjectRef="tns:getDataStructureResponseItem" id="dataOutputOfGetDataStructureResponse" />
+            <inputSet>
+               <dataInputRefs>dataInputOfGetDataStructureRequest</dataInputRefs>
+            </inputSet>
+            <outputSet>
+               <dataOutputRefs>dataOutputOfGetDataStructureResponse</dataOutputRefs>
+            </outputSet>
+         </ioSpecification>
+         <dataOutputAssociation>
+           <targetRef>currentStructure</targetRef>
+           <transformation>${dataOutputOfGetDataStructureResponse.currentStructure}</transformation>
+         </dataOutputAssociation>
+      </serviceTask>
+
+      <sequenceFlow id="flow2" sourceRef="webService" targetRef="theEnd" />
+
+      <endEvent id="theEnd" />
+
+   </process>
+
+   <itemDefinition id="getDataStructureRequestItem" structureRef="webservice:getDataStructure" />
+   <itemDefinition id="getDataStructureResponseItem" structureRef="webservice:getDataStructureResponse" />
+
+   <message id="getDataStructureRequestMessage" itemRef="tns:getDataStructureRequestItem" name="getDataStructureRequestMessage" />
+   <message id="getDataStructureResponseMessage" itemRef="tns:getDataStructureResponseItem" name="getDataStructureResponseMessage" />
+
+   <interface name="Webservice Interface">
+      <operation id="getDataStructureOperation" name="Addition Operation with two values as a bean" implementationRef="webservice:getDataStructure">
+         <inMessageRef>tns:getDataStructureRequestMessage</inMessageRef>
+         <outMessageRef>tns:getDataStructureResponseMessage</outMessageRef>
+      </operation>
+   </interface>
+
+</definitions>

@@ -29,6 +29,7 @@ import org.flowable.bpmn.model.DoubleDataObject;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.IntegerDataObject;
 import org.flowable.bpmn.model.ItemDefinition;
+import org.flowable.bpmn.model.JsonDataObject;
 import org.flowable.bpmn.model.LongDataObject;
 import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.ValuedDataObject;
@@ -74,6 +75,8 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
                 dataObject = new BooleanDataObject();
             } else if (dataType.equals("datetime")) {
                 dataObject = new DateDataObject();
+            } else if (dataType.equals("json")) {
+                dataObject = new JsonDataObject();
             } else {
                 LOGGER.error("Error converting {}, invalid data type: {}", xtr.getAttributeValue(null, ATTRIBUTE_DATA_NAME), dataType);
             }
