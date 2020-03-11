@@ -37,7 +37,8 @@ spec:
             - name: Authorization
               ### is using the default rest-admin:test
               ### generate new with; echo -n "<username:<passwd>" | base64
-              value: Basic cmVzdC1hZG1pbjp0ZXN0
+              #value: Basic cmVzdC1hZG1pbjp0ZXN0
+              value: Basic: {{-  printf "%s:%s" .Values.rest.admin.username .Values.rest.admin.password | b64enc }}
           initialDelaySeconds: 60
           timeoutSeconds: 5
         livenessProbe:
@@ -48,7 +49,8 @@ spec:
             - name: Authorization
               ### is using the default rest-admin:test
               ### generate new with; echo -n "<username:<passwd>" | base64
-              value: Basic cmVzdC1hZG1pbjp0ZXN0
+              #value: Basic cmVzdC1hZG1pbjp0ZXN0
+              value: Basic: {{-  printf "%s:%s" .Values.rest.admin.username .Values.rest.admin.password | b64enc }}
           initialDelaySeconds: 60
           timeoutSeconds: 10
           failureThreshold: 10
@@ -117,8 +119,8 @@ data:
   {{- end }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.database.username }}
   SPRING_DATASOURCE_PASSWORD: {{ .Values.database.password }}
-  FLOWABLE_REST_APP_ADMIN_USER-ID: rest-admin
-  FLOWABLE_REST_APP_ADMIN_PASSWORD: test
+  FLOWABLE_REST_APP_ADMIN_USER-ID: {{ .Values.rest.admin.username }}
+  FLOWABLE_REST_APP_ADMIN_PASSWORD: {{ .Values.rest.admin.password }}
   FLOWABLE_REST_APP_ADMIN_FIRST-NAME: Rest
   FLOWABLE_REST_APP_ADMIN_LAST-NAME: Admin
 {{- end }}

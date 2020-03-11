@@ -35,7 +35,7 @@ spec:
             port: 8080
             httpHeaders:
             - name: Authorization
-              value: Basic YWRtaW46dGVzdA==
+              value: Basic: {{-  printf "%s:%s" .Values.idm.admin.username .Values.idm.admin.password | b64enc }}
           initialDelaySeconds: 60
           timeoutSeconds: 5
         livenessProbe:
@@ -44,7 +44,7 @@ spec:
             port: 8080
             httpHeaders:
             - name: Authorization
-              value: Basic YWRtaW46dGVzdA==
+              value: Basic: {{-  printf "%s:%s" .Values.idm.admin.username .Values.idm.admin.password | b64enc }}
           initialDelaySeconds: 60
           timeoutSeconds: 10
           failureThreshold: 10
