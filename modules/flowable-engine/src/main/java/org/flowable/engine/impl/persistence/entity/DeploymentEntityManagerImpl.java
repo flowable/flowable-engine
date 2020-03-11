@@ -20,12 +20,12 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
-import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -33,6 +33,8 @@ import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
@@ -211,21 +213,19 @@ public class DeploymentEntityManagerImpl
     }
 
     protected void restoreSignalStartEvent(ProcessDefinition previousProcessDefinition, BpmnModel bpmnModel, StartEvent startEvent, EventDefinition eventDefinition) {
+        CommandContext commandContext = Context.getCommandContext();
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
-        SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionService().createSignalEventSubscription();
-        Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
-        if (signal != null) {
-            subscriptionEntity.setEventName(signal.getName());
-        } else {
-            subscriptionEntity.setEventName(signalEventDefinition.getSignalRef());
-        }
+        SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionService(commandContext).createSignalEventSubscription();
+
+        String eventName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+        subscriptionEntity.setEventName(eventName);
         subscriptionEntity.setActivityId(startEvent.getId());
         subscriptionEntity.setProcessDefinitionId(previousProcessDefinition.getId());
         if (previousProcessDefinition.getTenantId() != null) {
             subscriptionEntity.setTenantId(previousProcessDefinition.getTenantId());
         }
 
-        CommandContextUtil.getEventSubscriptionService().insertEventSubscription(subscriptionEntity);
+        CommandContextUtil.getEventSubscriptionService(commandContext).insertEventSubscription(subscriptionEntity);
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(subscriptionEntity);
     }
 

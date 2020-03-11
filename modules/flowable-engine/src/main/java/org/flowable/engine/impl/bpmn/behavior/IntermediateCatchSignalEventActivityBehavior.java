@@ -14,10 +14,8 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
@@ -25,9 +23,11 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
+import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
@@ -49,14 +49,8 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String signalName = null;
-        if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
-            signalName = signalEventDefinition.getSignalRef();
-        } else {
-            Expression signalExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager()
-                    .createExpression(signalEventDefinition.getSignalExpression());
-            signalName = signalExpression.getValue(execution).toString();
-        }
+        String signalName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition,
+            ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
                         .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
@@ -96,13 +90,8 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
     protected ExecutionEntity deleteSignalEventSubscription(DelegateExecution execution) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String eventName = null;
-        if (signal != null) {
-            eventName = signal.getName();
-        } else {
-            eventName = signalEventDefinition.getSignalRef();
-        }
-
+        String eventName = SignalEventDefinitionUtil.determineSignalName(Context.getCommandContext(), signalEventDefinition,
+            ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
         EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
         List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
         for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {

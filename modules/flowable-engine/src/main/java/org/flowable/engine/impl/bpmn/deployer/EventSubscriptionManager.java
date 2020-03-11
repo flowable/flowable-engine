@@ -20,7 +20,6 @@ import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
-import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableException;
@@ -29,6 +28,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.event.MessageEventHandler;
+import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -92,7 +92,7 @@ public class EventSubscriptionManager {
         }
     }
 
-    protected void addEventSubscriptions(CommandContext commandContext, ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
+    protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
         if (CollectionUtil.isNotEmpty(process.getFlowElements())) {
             for (FlowElement element : process.getFlowElements()) {
                 if (element instanceof StartEvent) {
@@ -125,12 +125,10 @@ public class EventSubscriptionManager {
     protected void insertSignalEvent(SignalEventDefinition signalEventDefinition, StartEvent startEvent, ProcessDefinitionEntity processDefinition, BpmnModel bpmnModel) {
         CommandContext commandContext = Context.getCommandContext();
         SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionService(commandContext).createSignalEventSubscription();
-        Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
-        if (signal != null) {
-            subscriptionEntity.setEventName(signal.getName());
-        } else {
-            subscriptionEntity.setEventName(signalEventDefinition.getSignalRef());
-        }
+
+        String signalName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel,null);
+        subscriptionEntity.setEventName(signalName);
+
         subscriptionEntity.setActivityId(startEvent.getId());
         subscriptionEntity.setProcessDefinitionId(processDefinition.getId());
         if (processDefinition.getTenantId() != null) {

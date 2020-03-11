@@ -46,6 +46,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -370,9 +371,11 @@ public class ProcessInstanceHelper {
                 signalExecution.setEventScope(true);
                 signalExecution.setActive(false);
 
+                String eventName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+
                 EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
                                 .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
-                                .eventName(signalEventDefinition.getSignalRef())
+                                .eventName(eventName)
                                 .signal(signal)
                                 .executionId(signalExecution.getId())
                                 .processInstanceId(signalExecution.getProcessInstanceId())

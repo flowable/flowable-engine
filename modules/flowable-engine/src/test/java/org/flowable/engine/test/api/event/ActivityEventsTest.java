@@ -245,7 +245,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertThat(signalEvent.getExecutionId()).isEqualTo(signalExecution.getId());
         assertThat(signalEvent.getProcessInstanceId()).isEqualTo(signalExecution.getProcessInstanceId());
         assertThat(signalEvent.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
-        assertThat(signalEvent.getSignalName()).isEqualTo("shipOrderSignal");
+        assertThat(signalEvent.getSignalName()).isEqualTo("alert");
         assertThat(signalEvent.getSignalData()).isNull();
 
         assertThat(listener.getEventsReceived().get(1)).isInstanceOf(FlowableSignalEvent.class);
@@ -301,7 +301,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertThat(signalEvent.getExecutionId()).isEqualTo(executionWithSignalEvent.getId());
         assertThat(signalEvent.getProcessInstanceId()).isEqualTo(executionWithSignalEvent.getProcessInstanceId());
         assertThat(signalEvent.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
-        assertThat(signalEvent.getSignalName()).isEqualTo("shipOrderSignal");
+        assertThat(signalEvent.getSignalName()).isEqualTo("alert");
         assertThat(signalEvent.getSignalData()).isNull();
 
         assertThat(listener.getEventsReceived().get(1)).isInstanceOf(FlowableSignalEvent.class);

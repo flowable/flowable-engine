@@ -15,11 +15,9 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.ThrowEvent;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
@@ -27,10 +25,12 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -43,21 +43,14 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
 
     private static final long serialVersionUID = 1L;
 
-    protected final SignalEventDefinition signalEventDefinition;
-    protected String signalEventName;
-    protected String signalExpression;
+    protected SignalEventDefinition signalEventDefinition;
     protected boolean processInstanceScope;
 
     public IntermediateThrowSignalEventActivityBehavior(ThrowEvent throwEvent, SignalEventDefinition signalEventDefinition, Signal signal) {
         if (signal != null) {
-            signalEventName = signal.getName();
             if (Signal.SCOPE_PROCESS_INSTANCE.equals(signal.getScope())) {
                 this.processInstanceScope = true;
             }
-        } else if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
-            signalEventName = signalEventDefinition.getSignalRef();
-        } else {
-            signalExpression = signalEventDefinition.getSignalExpression();
         }
 
         this.signalEventDefinition = signalEventDefinition;
@@ -68,13 +61,9 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
 
         CommandContext commandContext = Context.getCommandContext();
 
-        String eventSubscriptionName = null;
-        if (signalEventName != null) {
-            eventSubscriptionName = signalEventName;
-        } else {
-            Expression expressionObject = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(signalExpression);
-            eventSubscriptionName = expressionObject.getValue(execution).toString();
-        }
+        String eventSubscriptionName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition,
+            ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
+
 
         EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         List<SignalEventSubscriptionEntity> subscriptionEntities = null;

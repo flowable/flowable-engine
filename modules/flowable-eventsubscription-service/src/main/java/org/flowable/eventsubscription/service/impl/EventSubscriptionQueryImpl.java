@@ -395,6 +395,11 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     }
 
     @Override
+    public EventSubscriptionQuery orderByEventName() {
+        return orderBy(EventSubscriptionQueryProperty.EVENT_NAME);
+    }
+
+    @Override
     public EventSubscriptionQuery orderByTenantId() {
         return orderBy(EventSubscriptionQueryProperty.TENANT_ID);
     }

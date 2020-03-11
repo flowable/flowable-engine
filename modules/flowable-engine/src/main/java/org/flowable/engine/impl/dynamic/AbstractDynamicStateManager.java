@@ -60,6 +60,7 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer.FlowElementMoveEntry;
+import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
@@ -1027,9 +1028,12 @@ public abstract class AbstractDynamicStateManager {
                         signalExecution.setCurrentFlowElement(startEvent);
                         signalExecution.setEventScope(true);
                         signalExecution.setActive(false);
+
+                        String eventName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+
                         EventSubscriptionEntity signalSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
                                         .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
-                                        .eventName(signalEventDefinition.getSignalRef())
+                                        .eventName(eventName)
                                         .signal(signal)
                                         .executionId(signalExecution.getId())
                                         .processInstanceId(signalExecution.getProcessInstanceId())
