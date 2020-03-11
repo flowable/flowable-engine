@@ -23,7 +23,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
@@ -54,7 +54,7 @@ public class BoundarySignalEventActivityBehavior extends BoundaryEventActivityBe
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String signalName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition,
+        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
             ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
@@ -85,7 +85,7 @@ public class BoundarySignalEventActivityBehavior extends BoundaryEventActivityBe
         BoundaryEvent boundaryEvent = (BoundaryEvent) execution.getCurrentFlowElement();
 
         if (boundaryEvent.isCancelActivity()) {
-            String eventName = SignalEventDefinitionUtil.determineSignalName(Context.getCommandContext(), signalEventDefinition,
+            String eventName = EventDefinitionExpressionUtil.determineSignalName(Context.getCommandContext(), signalEventDefinition,
                 ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
             EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();

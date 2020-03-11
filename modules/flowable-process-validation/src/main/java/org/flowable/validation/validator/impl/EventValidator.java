@@ -63,7 +63,7 @@ public class EventValidator extends ProcessLevelValidator {
 
             if (StringUtils.isEmpty(messageEventDefinition.getMessageExpression())) {
                 // message ref should be filled in
-                addError(errors, Problems.MESSAGE_EVENT_MISSING_MESSAGE_REF, process, event, "attribute 'messageRef' is required");
+                addError(errors, Problems.MESSAGE_EVENT_MISSING_MESSAGE_REF, process, event, "attribute 'messageRef' or 'messageExpression' is required");
             }
 
         } else if (!bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {

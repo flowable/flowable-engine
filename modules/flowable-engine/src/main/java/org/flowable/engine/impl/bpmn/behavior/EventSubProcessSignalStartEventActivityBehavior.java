@@ -28,7 +28,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -75,7 +75,7 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String eventName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition,
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
             ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
         StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();

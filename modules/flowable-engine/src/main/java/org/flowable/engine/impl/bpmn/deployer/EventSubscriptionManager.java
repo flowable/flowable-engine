@@ -27,8 +27,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.event.MessageEventHandler;
-import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -126,7 +126,7 @@ public class EventSubscriptionManager {
         CommandContext commandContext = Context.getCommandContext();
         SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionService(commandContext).createSignalEventSubscription();
 
-        String signalName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel,null);
+        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel,null);
         subscriptionEntity.setEventName(signalName);
 
         subscriptionEntity.setActivityId(startEvent.getId());
@@ -144,21 +144,21 @@ public class EventSubscriptionManager {
 
         EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
         // look for subscriptions for the same name in db:
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
         List<EventSubscriptionEntity> subscriptionsForSameMessageName = eventSubscriptionService
-                .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageEventDefinition.getMessageRef(), processDefinition.getTenantId());
+                .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, processDefinition.getTenantId());
 
         for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsForSameMessageName) {
             // throw exception only if there's already a subscription as start event
-            if (eventSubscriptionEntity.getProcessInstanceId() == null || eventSubscriptionEntity.getProcessInstanceId().isEmpty()) { // processInstanceId != null or not empty -> it's a message
-                                                                                                                                      // related to an execution
+            if (eventSubscriptionEntity.getProcessInstanceId() == null || eventSubscriptionEntity.getProcessInstanceId().isEmpty()) { // processInstanceId != null or not empty -> it's a message related to an execution
                 // the event subscription has no instance-id, so it's a message start event
                 throw new FlowableException("Cannot deploy process definition '" + processDefinition.getResourceName()
-                        + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getMessageRef() + "'.");
+                        + "': there already is a message event subscription for the message with name '" + messageName + "'.");
             }
         }
 
         MessageEventSubscriptionEntity newSubscription = eventSubscriptionService.createMessageEventSubscription();
-        newSubscription.setEventName(messageEventDefinition.getMessageRef());
+        newSubscription.setEventName(messageName);
         newSubscription.setActivityId(startEvent.getId());
         newSubscription.setConfiguration(processDefinition.getId());
         newSubscription.setProcessDefinitionId(processDefinition.getId());

@@ -34,7 +34,7 @@ import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
@@ -217,7 +217,7 @@ public class DeploymentEntityManagerImpl
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
         SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionService(commandContext).createSignalEventSubscription();
 
-        String eventName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
         subscriptionEntity.setEventName(eventName);
         subscriptionEntity.setActivityId(startEvent.getId());
         subscriptionEntity.setProcessDefinitionId(previousProcessDefinition.getId());
@@ -236,8 +236,10 @@ public class DeploymentEntityManagerImpl
             messageEventDefinition.setMessageRef(message.getName());
         }
 
-        MessageEventSubscriptionEntity newSubscription = CommandContextUtil.getEventSubscriptionService().createMessageEventSubscription();
-        newSubscription.setEventName(messageEventDefinition.getMessageRef());
+        CommandContext commandContext = Context.getCommandContext();
+        MessageEventSubscriptionEntity newSubscription = CommandContextUtil.getEventSubscriptionService(commandContext).createMessageEventSubscription();
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+        newSubscription.setEventName(messageName);
         newSubscription.setActivityId(startEvent.getId());
         newSubscription.setConfiguration(previousProcessDefinition.getId());
         newSubscription.setProcessDefinitionId(previousProcessDefinition.getId());

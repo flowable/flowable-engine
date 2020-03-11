@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
@@ -46,7 +47,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -135,7 +136,8 @@ public class ProcessInstanceHelper {
                 if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
 
                     MessageEventDefinition messageEventDefinition = (MessageEventDefinition) startEvent.getEventDefinitions().get(0);
-                    if (messageEventDefinition.getMessageRef().equals(messageName)) {
+                    String actualMessageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+                    if (Objects.equals(actualMessageName, messageName)) {
                         initialFlowElement = flowElement;
                         break;
                     }
@@ -343,9 +345,10 @@ public class ProcessInstanceHelper {
                 messageExecution.setEventScope(true);
                 messageExecution.setActive(false);
 
+                String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, parentExecution);
                 EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
                                 .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
-                                .eventName(messageEventDefinition.getMessageRef())
+                                .eventName(messageName)
                                 .executionId(messageExecution.getId())
                                 .processInstanceId(messageExecution.getProcessInstanceId())
                                 .activityId(messageExecution.getCurrentActivityId())
@@ -371,7 +374,7 @@ public class ProcessInstanceHelper {
                 signalExecution.setEventScope(true);
                 signalExecution.setActive(false);
 
-                String eventName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+                String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
 
                 EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
                                 .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)

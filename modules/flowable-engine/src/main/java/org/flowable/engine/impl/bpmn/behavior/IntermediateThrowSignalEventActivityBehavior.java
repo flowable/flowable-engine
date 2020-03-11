@@ -25,7 +25,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.event.SignalEventDefinitionUtil;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
@@ -61,7 +61,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
 
         CommandContext commandContext = Context.getCommandContext();
 
-        String eventSubscriptionName = SignalEventDefinitionUtil.determineSignalName(commandContext, signalEventDefinition,
+        String eventSubscriptionName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
             ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
 
