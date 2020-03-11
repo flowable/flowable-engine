@@ -145,8 +145,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 assertThat(variableMap).hasSize(1);
                 assertThat(variableMap.get("testVar")).isEqualTo("helloWorld");
 
-                assertThat(data.containsKey(Fields.NAME)).isFalse();
-                assertThat(data.containsKey(Fields.BUSINESS_KEY)).isFalse();
+                assertThat(data).doesNotContainKey(Fields.NAME);
+                assertThat(data).doesNotContainKey(Fields.BUSINESS_KEY);
             }
 
             // Activity started

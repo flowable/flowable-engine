@@ -99,14 +99,15 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
 
         // Regular execution, no exception
         runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", false));
-        assertThat(TestTransactionEventListener.eventsReceived.size() > 0).isTrue();
+        assertThat(TestTransactionEventListener.eventsReceived.size()).isPositive();
         assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         TestTransactionEventListener.eventsReceived.clear();
 
         // When process execution rolls back, the events should not be thrown, as they are only thrown on commit.
         assertThatThrownBy(
-                () -> runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", true)));
+                () -> runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", true)))
+                .isInstanceOf(RuntimeException.class);
         assertThat(TestTransactionEventListener.eventsReceived).isEmpty();
         assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
     }
