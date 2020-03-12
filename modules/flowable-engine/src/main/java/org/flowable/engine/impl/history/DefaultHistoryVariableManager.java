@@ -15,7 +15,11 @@ package org.flowable.engine.impl.history;
 
 import java.util.Date;
 
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.history.async.AsyncHistorySession;
+import org.flowable.job.service.impl.history.async.AsyncHistorySessionCommandContextCloseListener;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -48,6 +52,15 @@ public class DefaultHistoryVariableManager implements InternalHistoryVariableMan
         getHistoryManager().recordVariableRemoved(variable);
         if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
             getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false, null, removeTime);
+        }
+    }
+    
+    @Override
+    public void initAsyncHistoryCommandContextCloseListener() {
+    	if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+    		CommandContext commandContext = CommandContextUtil.getCommandContext();
+        	commandContext.addCloseListener(new AsyncHistorySessionCommandContextCloseListener(
+        			commandContext.getSession(AsyncHistorySession.class), processEngineConfiguration.getAsyncHistoryListener()));
         }
     }
     

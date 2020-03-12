@@ -132,7 +132,32 @@ public class CommandContext {
         if (closeListeners == null) {
             closeListeners = new ArrayList<>();
         }
+        
+        for (CommandContextCloseListener closeListenerItem : closeListeners) {
+			if (closeListenerItem.getClass().equals(commandContextCloseListener.getClass())) {
+				return;
+			}
+		}
+        
         closeListeners.add(commandContextCloseListener);
+    }
+    
+    public void addCloseListenerAtIndex(CommandContextCloseListener commandContextCloseListener, int index) {
+        if (closeListeners == null) {
+            closeListeners = new ArrayList<>();
+        }
+        
+        for (CommandContextCloseListener closeListenerItem : closeListeners) {
+			if (closeListenerItem.getClass().equals(commandContextCloseListener.getClass())) {
+				return;
+			}
+		}
+        
+        if (closeListeners.size() > index) {
+        	closeListeners.add(index, commandContextCloseListener);
+        } else {
+        	closeListeners.add(commandContextCloseListener);
+        }
     }
 
     public List<CommandContextCloseListener> getCloseListeners() {
@@ -142,7 +167,8 @@ public class CommandContext {
     protected void executeCloseListenersClosing() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
+            	List<CommandContextCloseListener> localCloseListeners = new ArrayList<>(closeListeners);
+                for (CommandContextCloseListener listener : localCloseListeners) {
                     listener.closing(this);
                 }
             } catch (Throwable exception) {

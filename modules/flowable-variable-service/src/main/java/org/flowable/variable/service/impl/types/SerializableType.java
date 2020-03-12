@@ -94,9 +94,10 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
                     HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
                                     commandContext.getCurrentEngineConfiguration();
                     VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
-                    commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
+                    commandContext.addCloseListenerAtIndex(new TraceableVariablesCommandContextCloseListener(
                         new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields, variableServiceConfiguration)
-                    ));
+                    ), 0);
+                    variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
                 }
             }
         }
