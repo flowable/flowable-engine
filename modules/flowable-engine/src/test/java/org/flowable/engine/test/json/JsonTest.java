@@ -113,6 +113,35 @@ public class JsonTest extends PluggableFlowableTestCase {
                             + "}");
         }
     }
+    
+    @Test
+    @Deployment
+    public void testCreateJsonArrayDuringExecution() {
+        JavaDelegate javaDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+            	ArrayNode testArrayNode = objectMapper.createArrayNode();
+            	testArrayNode.addObject();
+            	execution.setVariable("jsonArrayTest", testArrayNode);
+                execution.setVariable("${jsonArrayTest[0].name}", "test");
+            }
+        };
+        
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("createJsonArray")
+                .transientVariable("jsonBean", javaDelegate)
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        	List<HistoricVariableInstance> varInstances = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
+        	assertThat(varInstances).hasSize(1);
+        	HistoricVariableInstance varInstance = varInstances.get(0);
+        	assertThatJson(varInstance.getValue()).isEqualTo("[{"
+                    + "  name: 'test'"
+                    + "}]");
+        }
+    }
 
     @Test
     @Deployment
@@ -666,8 +695,12 @@ public class JsonTest extends PluggableFlowableTestCase {
                 .variable("customer", objectMapper.createObjectNode())
                 .start();
 
-        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
-                .isEqualTo("{}");
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer")).isEqualTo("{}");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThatJson(historyService.createHistoricVariableInstanceQuery().variableName("customer").singleResult().getValue())
+                    .isEqualTo("{}");
+        }
+        
         managementService.executeCommand(commandContext -> {
             Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.creationDate}");
             expression.setValue(Instant.parse("2020-02-16T14:24:45.583Z"), CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
