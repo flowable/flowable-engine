@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+  <process id="testInclusiveGateway" name="Test Inclusive Gateway" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:language><![CDATA[English]]></design:language>
+    </extensionElements>
+    <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </startEvent>
+    <inclusiveGateway id="inclusiveGateway1">
+      <extensionElements>
+        <design:stencilid><![CDATA[InclusiveGateway]]></design:stencilid>
+      </extensionElements>
+    </inclusiveGateway>
+    <inclusiveGateway id="inclusiveGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[InclusiveGateway]]></design:stencilid>
+      </extensionElements>
+    </inclusiveGateway>
+    <userTask id="formTask1" name="Always" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+      <extensionElements>
+        <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        <design:name-run><![CDATA[Always]]></design:name-run>
+      </extensionElements>
+    </userTask>
+    <userTask id="formTask2" name="Always" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+      <extensionElements>
+        <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        <design:name-run><![CDATA[Always]]></design:name-run>
+      </extensionElements>
+    </userTask>
+    <userTask id="formTask3" name="Never" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+      <extensionElements>
+        <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        <design:name-run><![CDATA[Never]]></design:name-run>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="inclusiveGateway1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow2" sourceRef="inclusiveGateway1" targetRef="formTask2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:conditionexpression><![CDATA[${true}]]></design:conditionexpression>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow3" sourceRef="inclusiveGateway1" targetRef="formTask1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:conditionexpression><![CDATA[${true}]]></design:conditionexpression>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow4" sourceRef="inclusiveGateway1" targetRef="formTask3">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:conditionexpression><![CDATA[${false}]]></design:conditionexpression>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow5" sourceRef="formTask2" targetRef="inclusiveGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow6" sourceRef="formTask3" targetRef="inclusiveGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow7" sourceRef="formTask1" targetRef="inclusiveGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <endEvent id="endNoneEvent1">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="sequenceFlow8" sourceRef="inclusiveGateway2" targetRef="endNoneEvent1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testInclusiveGateway">
+    <bpmndi:BPMNPlane bpmnElement="testInclusiveGateway" id="BPMNPlane_testInclusiveGateway">
+      <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="117.0" y="261.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusiveGateway1" id="BPMNShape_inclusiveGateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="210.0" y="256.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusiveGateway2" id="BPMNShape_inclusiveGateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="555.0" y="256.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="formTask1" id="BPMNShape_formTask1">
+        <omgdc:Bounds height="80.0" width="100.0" x="361.0" y="136.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="formTask2" id="BPMNShape_formTask2">
+        <omgdc:Bounds height="80.0" width="100.0" x="361.0" y="236.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="formTask3" id="BPMNShape_formTask3">
+        <omgdc:Bounds height="80.0" width="100.0" x="361.0" y="330.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endNoneEvent1" id="BPMNShape_endNoneEvent1">
+        <omgdc:Bounds height="28.0" width="28.0" x="640.0" y="262.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow5" id="BPMNEdge_sequenceFlow5">
+        <omgdi:waypoint x="460.9499999999809" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow6" id="BPMNEdge_sequenceFlow6">
+        <omgdi:waypoint x="460.95000000000005" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="295.9105697550586"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow3" id="BPMNEdge_sequenceFlow3">
+        <omgdi:waypoint x="230.5" y="256.5"></omgdi:waypoint>
+        <omgdi:waypoint x="230.5" y="176.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.99999999994594" y="176.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow4" id="BPMNEdge_sequenceFlow4">
+        <omgdi:waypoint x="230.5" y="295.43987713675216"></omgdi:waypoint>
+        <omgdi:waypoint x="230.5" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="361.0" y="370.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow1" id="BPMNEdge_sequenceFlow1">
+        <omgdi:waypoint x="146.94999809772605" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow2" id="BPMNEdge_sequenceFlow2">
+        <omgdi:waypoint x="249.49734869515723" y="276.44722222222225"></omgdi:waypoint>
+        <omgdi:waypoint x="360.9999999999903" y="276.13836565096955"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow7" id="BPMNEdge_sequenceFlow7">
+        <omgdi:waypoint x="460.9499999999809" y="176.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="176.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="256.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow8" id="BPMNEdge_sequenceFlow8">
+        <omgdi:waypoint x="594.5591869398207" y="276.37820512820514"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0002755524882" y="276.08885188426405"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
