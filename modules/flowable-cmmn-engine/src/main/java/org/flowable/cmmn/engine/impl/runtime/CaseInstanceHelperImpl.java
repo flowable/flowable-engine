@@ -387,6 +387,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         caseInstanceEntity.setCaseDefinitionId(caseDefinition.getId());
+        caseInstanceEntity.setName(caseDefinition.getName());
+        caseInstanceEntity.setBusinessKey(caseDefinition.getKey());
         caseInstanceEntity.setStartTime(cmmnEngineConfiguration.getClock().getCurrentTime());
         caseInstanceEntity.setState(CaseInstanceState.ACTIVE);
         caseInstanceEntity.setTenantId(caseDefinition.getTenantId());
