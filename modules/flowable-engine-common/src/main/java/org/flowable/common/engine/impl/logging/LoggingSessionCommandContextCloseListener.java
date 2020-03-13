@@ -60,6 +60,16 @@ public class LoggingSessionCommandContextCloseListener implements CommandContext
     public void afterSessionsFlush(CommandContext commandContext) {
         // nothing to do
     }
+    
+    @Override
+    public Integer order() {
+        return 500;
+    }
+    
+    @Override
+    public boolean multipleAllowed() {
+        return false;
+    }
 
     public LoggingSession getLoggingSession() {
         return loggingSession;

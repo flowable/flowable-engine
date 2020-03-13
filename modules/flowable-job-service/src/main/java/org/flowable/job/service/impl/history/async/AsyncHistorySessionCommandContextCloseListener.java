@@ -129,6 +129,16 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
     public void afterSessionsFlush(CommandContext commandContext) {
     }
     
+    @Override
+    public Integer order() {
+        return 1000;
+    }
+    
+    @Override
+    public boolean multipleAllowed() {
+        return false;
+    }
+
     public AsyncHistorySession getAsyncHistorySession() {
         return asyncHistorySession;
     }
