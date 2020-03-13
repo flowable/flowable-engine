@@ -174,6 +174,15 @@ public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
 
         }
 
+        @Override
+        public Integer order() {
+            return 5;
+        }
+        
+        @Override
+        public boolean multipleAllowed() {
+            return false;
+        }
     }
 
 }

@@ -3278,6 +3278,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public AsyncHistoryListener getAsyncHistoryListener() {
+        if (asyncHistoryListener == null) {
+            asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
+        }
         return asyncHistoryListener;
     }
 

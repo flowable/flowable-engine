@@ -13,6 +13,8 @@
 package org.flowable.common.engine.impl.interceptor;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -133,31 +135,23 @@ public class CommandContext {
             closeListeners = new ArrayList<>();
         }
         
-        for (CommandContextCloseListener closeListenerItem : closeListeners) {
-			if (closeListenerItem.getClass().equals(commandContextCloseListener.getClass())) {
-				return;
-			}
-		}
+        if (!commandContextCloseListener.multipleAllowed()) {
+            for (CommandContextCloseListener closeListenerItem : closeListeners) {
+    			if (closeListenerItem.getClass().equals(commandContextCloseListener.getClass())) {
+    				return;
+    			}
+    		}
+        }
         
         closeListeners.add(commandContextCloseListener);
-    }
-    
-    public void addCloseListenerAtIndex(CommandContextCloseListener commandContextCloseListener, int index) {
-        if (closeListeners == null) {
-            closeListeners = new ArrayList<>();
-        }
         
-        for (CommandContextCloseListener closeListenerItem : closeListeners) {
-			if (closeListenerItem.getClass().equals(commandContextCloseListener.getClass())) {
-				return;
-			}
-		}
-        
-        if (closeListeners.size() > index) {
-        	closeListeners.add(index, commandContextCloseListener);
-        } else {
-        	closeListeners.add(commandContextCloseListener);
-        }
+        Collections.sort(closeListeners, new Comparator<CommandContextCloseListener>() {
+
+            @Override
+            public int compare(CommandContextCloseListener listener1, CommandContextCloseListener listener2) {
+                return listener1.order().compareTo(listener2.order());
+            }
+        });
     }
 
     public List<CommandContextCloseListener> getCloseListeners() {
@@ -167,8 +161,7 @@ public class CommandContext {
     protected void executeCloseListenersClosing() {
         if (closeListeners != null) {
             try {
-            	List<CommandContextCloseListener> localCloseListeners = new ArrayList<>(closeListeners);
-                for (CommandContextCloseListener listener : localCloseListeners) {
+            	for (CommandContextCloseListener listener : closeListeners) {
                     listener.closing(this);
                 }
             } catch (Throwable exception) {

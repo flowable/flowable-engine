@@ -52,5 +52,14 @@ public class DatabaseEventFlusher extends AbstractEventFlusher {
     public void closeFailure(CommandContext commandContext) {
 
     }
+    
+    @Override
+    public Integer order() {
+        return 100;
+    }
 
+    @Override
+    public boolean multipleAllowed() {
+        return false;
+    }
 }

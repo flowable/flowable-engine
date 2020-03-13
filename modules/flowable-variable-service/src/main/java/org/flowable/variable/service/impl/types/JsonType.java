@@ -149,9 +149,9 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
                     HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
                                     commandContext.getCurrentEngineConfiguration();
                     VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
-                    commandContext.addCloseListenerAtIndex(new TraceableVariablesCommandContextCloseListener(
+                    commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
                         new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields, variableServiceConfiguration)
-                    ), 0);
+                    ));
                     variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
                 }
             }

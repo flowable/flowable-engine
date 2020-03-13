@@ -52,5 +52,19 @@ public interface CommandContextCloseListener {
      * Note that throwing an exception here does *not* affect the transaction. The {@link CommandContext} will log the exception though.
      */
     void closeFailure(CommandContext commandContext);
+    
+    /**
+     * Determines the order in which the close listeners will be executed
+     * 
+     * @return order lowest number will be executed first
+     */
+    Integer order();
+    
+    /**
+     * Determines if there are multiple occurrences allowed of this close listener
+     * 
+     * @return multipleAllowed multiple occurrences allowed
+     */
+    boolean multipleAllowed();
 
 }

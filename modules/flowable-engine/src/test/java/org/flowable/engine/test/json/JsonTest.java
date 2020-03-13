@@ -125,6 +125,9 @@ public class JsonTest extends PluggableFlowableTestCase {
             	testArrayNode.addObject();
             	execution.setVariable("jsonArrayTest", testArrayNode);
                 execution.setVariable("${jsonArrayTest[0].name}", "test");
+                
+                execution.setVariable("jsonObjectTest", objectMapper.createObjectNode());
+                execution.setVariable("${jsonObjectTest.name}", "anotherTest");
             }
         };
         
@@ -134,12 +137,21 @@ public class JsonTest extends PluggableFlowableTestCase {
                 .start();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-        	List<HistoricVariableInstance> varInstances = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-        	assertThat(varInstances).hasSize(1);
+        	List<HistoricVariableInstance> varInstances = historyService.createHistoricVariableInstanceQuery()
+        	        .processInstanceId(processInstance.getId())
+        	        .orderByVariableName()
+        	        .asc()
+        	        .list();
+        	assertThat(varInstances).hasSize(2);
         	HistoricVariableInstance varInstance = varInstances.get(0);
         	assertThatJson(varInstance.getValue()).isEqualTo("[{"
                     + "  name: 'test'"
                     + "}]");
+        	
+        	varInstance = varInstances.get(1);
+            assertThatJson(varInstance.getValue()).isEqualTo("{"
+                    + "  name: 'anotherTest'"
+                    + "}");
         }
     }
 
