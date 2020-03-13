@@ -628,6 +628,23 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertEquals(0l, historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count());
     }
 
+    @Test
+    @Deployment
+    public void testInclusiveGatewayEndTimeSet() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testInclusiveGateway");
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("Always", "Always");
+
+        for (Task task : tasks) {
+            taskService.complete(task.getId());
+        }
+
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(historicProcessInstance.getEndTime()).isNotNull();
+
+    }
 
     protected Task startOneTaskprocess() {
         deployOneTaskTestProcess();
