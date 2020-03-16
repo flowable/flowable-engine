@@ -41,6 +41,20 @@ public class TestCacheTaskListener implements TaskListener {
     public static Map<String, Object> TASK_LOCAL_VARIABLES;
     public static Map<String, Object> HISTORIC_TASK_LOCAL_VARIABLES;
 
+    public static void reset() {
+        TASK_ID = null;
+        HISTORIC_TASK_ID = null;
+
+        PROCESS_VARIABLES = null;
+        HISTORIC_PROCESS_VARIABLES = null;
+
+        TASK_PROCESS_VARIABLES = null;
+        HISTORIC_TASK_PROCESS_VARIABLES = null;
+
+        TASK_LOCAL_VARIABLES = null;
+        HISTORIC_TASK_LOCAL_VARIABLES = null;
+    }
+
     @Override
     public void notify(DelegateTask delegateTask) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();

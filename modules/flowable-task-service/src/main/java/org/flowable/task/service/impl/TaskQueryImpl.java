@@ -20,8 +20,9 @@ import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -46,7 +47,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Falko Menge
  * @author Tijs Rademakers
  */
-public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> implements TaskQuery, QueryCacheValues {
+public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> implements TaskQuery, CacheAwareQuery<TaskEntity> {
 
     private static final long serialVersionUID = 1L;
 
@@ -1714,6 +1715,17 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
                 }
 
             }
+        }
+    }
+
+    @Override
+    public void enhanceCachedValue(TaskEntity task) {
+        if (includeProcessVariables) {
+            task.getQueryVariables().addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService()
+                    .findVariableInstancesByProcessInstanceId(task.getProcessInstanceId()));
+        } else if (includeTaskLocalVariables) {
+            task.getQueryVariables()
+                    .addAll(CommandContextUtil.getVariableServiceConfiguration().getVariableService().findVariableInstancesByTaskId(task.getId()));
         }
     }
 

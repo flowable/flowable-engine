@@ -13,11 +13,13 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -37,4 +39,6 @@ public interface CaseInstanceEntity extends Entity, EntityWithSentryPartInstance
     void setReferenceType(String referenceType);
     void setCompletable(boolean completable);
     void setTenantId(String tenantId);
+
+    List<VariableInstanceEntity> getQueryVariables();
 }

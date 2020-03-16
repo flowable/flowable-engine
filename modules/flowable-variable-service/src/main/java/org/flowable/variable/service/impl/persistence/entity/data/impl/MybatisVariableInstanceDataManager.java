@@ -26,6 +26,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByExecutionIdMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByProcessInstanceIdMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeMatcher;
@@ -41,6 +42,9 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
 
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByExecutionIdMatcher 
         = new VariableInstanceByExecutionIdMatcher();
+
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByProcessInstanceIdMatcher
+        = new VariableInstanceByProcessInstanceIdMatcher();
     
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByTaskIdMatcher
         = new VariableInstanceByTaskIdMatcher();
@@ -80,6 +84,11 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
     @SuppressWarnings("unchecked")
     public List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds) {
         return getDbSqlSession().selectList("selectVariablesByTaskIds", taskIds);
+    }
+
+    @Override
+    public List<VariableInstanceEntity> findVariableInstancesByProcessInstanceId(final String processInstanceIdId) {
+        return getList("selectVariablesByProcessInstanceId", processInstanceIdId, variableInstanceByProcessInstanceIdMatcher, true);
     }
 
     @Override

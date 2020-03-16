@@ -33,6 +33,8 @@ public interface VariableService {
 
     List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds);
 
+    List<VariableInstanceEntity> findVariableInstancesByProcessInstanceId(String processInstanceId);
+
     List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId);
 
     List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds);
