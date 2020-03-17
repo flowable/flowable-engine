@@ -1401,6 +1401,16 @@
             </dependencies>
         </profile>
 
+	   <profile>
+	      <id>hana</id>
+	       <activation>
+	         <property>
+	           <name>database</name>
+	           <value>hana</value>
+	         </property>
+	       </activation>
+	    </profile>
+
         <profile>
             <id>oraclewithschema</id>
             <activation>
@@ -1410,6 +1420,18 @@
                 </property>
             </activation>
             <dependencies>
+	            <dependency>
+			       <groupId>com.sap.db.jdbc</groupId>
+			       <artifactId>ngdbc</artifactId>
+			       <version>2.0.7</version>
+			       <scope>test</scope>
+			       <exclusions>
+			           <exclusion>
+			               <artifactId>mockito-all</artifactId>
+			               <groupId>org.mockito</groupId>
+			           </exclusion>
+			       </exclusions>
+		    	</dependency>
                 <dependency>
                     <groupId>com.oracle.jdbc</groupId>
                     <artifactId>${oracle.jdbc.artifact}</artifactId>

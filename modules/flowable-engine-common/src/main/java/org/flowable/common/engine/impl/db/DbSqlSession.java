@@ -23,7 +23,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
@@ -45,11 +48,13 @@ import org.slf4j.LoggerFactory;
 public class DbSqlSession implements Session {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DbSqlSession.class);
+    private static final int BATCH_SIZE = 100;
 
     public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
     protected EntityCache entityCache;
     protected SqlSession sqlSession;
+    protected SqlSession batchSqlSession;
     protected DbSqlSessionFactory dbSqlSessionFactory;
     protected String connectionMetadataDefaultCatalog;
     protected String connectionMetadataDefaultSchema;
@@ -63,12 +68,14 @@ public class DbSqlSession implements Session {
         this.dbSqlSessionFactory = dbSqlSessionFactory;
         this.entityCache = entityCache;
         this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession();
+        this.batchSqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(ExecutorType.BATCH);
     }
 
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache, Connection connection, String catalog, String schema) {
         this.dbSqlSessionFactory = dbSqlSessionFactory;
         this.entityCache = entityCache;
         this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(connection); // Note the use of connection param here, different from other constructor
+        this.batchSqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession(ExecutorType.BATCH);
         this.connectionMetadataDefaultCatalog = catalog;
         this.connectionMetadataDefaultSchema = schema;
     }
@@ -83,7 +90,7 @@ public class DbSqlSession implements Session {
             }
             entity.setId(id);
         }
-        
+
         Class<? extends Entity> clazz = entity.getClass();
         if (!insertedObjects.containsKey(clazz)) {
             insertedObjects.put(clazz, new LinkedHashMap<>()); // order of insert is important, hence LinkedHashMap
@@ -450,7 +457,7 @@ public class DbSqlSession implements Session {
     public boolean isEntityInserted(Entity entity) {
         return isEntityInserted(entity.getClass(), entity.getId());
     }
-    
+
     public boolean isEntityInserted(Class<?> entityClass, String entityId) {
         return insertedObjects.containsKey(entityClass)
                 && insertedObjects.get(entityClass).containsKey(entityId);
@@ -466,7 +473,7 @@ public class DbSqlSession implements Session {
         if (insertedObjects.size() == 0) {
             return;
         }
-        
+
         // Handle in entity dependency order
         for (Class<? extends Entity> entityClass : dbSqlSessionFactory.getInsertionOrder()) {
             if (insertedObjects.containsKey(entityClass)) {
@@ -515,6 +522,10 @@ public class DbSqlSession implements Session {
     }
 
     protected void flushBulkInsert(Collection<Entity> entities, Class<? extends Entity> clazz) {
+        if (dbSqlSessionFactory.isHana()) {
+            flushBatchInsertGroupEntitiesHana(entities);
+            return;
+        }
         String insertStatement = dbSqlSessionFactory.getBulkInsertStatement(clazz);
         insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
 
@@ -546,7 +557,32 @@ public class DbSqlSession implements Session {
                 incrementRevision(entityIterator.next());
             }
         }
+    }
 
+    private void flushBatchInsertGroupEntitiesHana(Collection<Entity> entities) {
+        List<Entity> entitiesList = new ArrayList<>(entities);
+        List<List<Entity>> entitiesForBatchInsertGroups = IntStream.range(0, entities.size())
+            .filter(element -> element % BATCH_SIZE == 0)
+            .mapToObj(elem -> entitiesList.subList(elem, Math.min(elem + BATCH_SIZE, entitiesList.size())))
+            .collect(Collectors.toList());
+        entitiesForBatchInsertGroups.stream()
+            .forEach(entitiesForBatchInsert -> flushBatchInsertHana(entitiesForBatchInsert));
+        batchSqlSession.commit();
+    }
+
+    private void flushBatchInsertHana(List<Entity> persistentObjectList) {
+        for (Entity entity : persistentObjectList) {
+            String insertStatement = dbSqlSessionFactory.getInsertStatement(entity);
+            insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
+
+            if (insertStatement == null) {
+                throw new FlowableException("no insert statement for " + entity.getClass() + " in the ibatis mapping files");
+            }
+
+            batchSqlSession.insert(insertStatement, entity);
+        }
+        batchSqlSession.flushStatements();
+        batchSqlSession.clearCache();
     }
 
     protected void incrementRevision(Entity insertedObject) {
@@ -646,6 +682,7 @@ public class DbSqlSession implements Session {
     @Override
     public void close() {
         sqlSession.close();
+        batchSqlSession.close();
     }
 
     public void commit() {
