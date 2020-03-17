@@ -12,35 +12,64 @@
  */
 package org.flowable.cmmn.engine.impl.function;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.el.CmmnVariableScopeELResolver;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
+import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstFunction;
+import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstParameters;
+import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
+import org.flowable.common.engine.impl.el.FlowableExpressionParser;
 
 /**
  * This function evaluates a stage to be completable, which is the case, if all required and active plan items are completed
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class IsStageCompletableExpressionFunction extends AbstractCmmnExpressionFunction {
+public class IsStageCompletableExpressionFunction implements FlowableFunctionDelegate, FlowableAstFunctionCreator {
 
-    public IsStageCompletableExpressionFunction() {
-        super("isStageCompletable");
+    @Override
+    public String prefix() {
+        return "cmmn";
     }
 
     @Override
-    protected boolean isMultiParameterFunction() {
-        return false;
+    public String localName() {
+        return "isStageCompletable";
     }
 
     @Override
-    protected boolean isNoParameterMethod() {
-        return true;
+    public Method functionMethod() {
+        try {
+            return IsStageCompletableExpressionFunction.class.getMethod("isStageCompletable", Object.class);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("Could not find isStageCompletable function", e);
+        }
+    }
+
+    @Override
+    public Collection<String> getFunctionNames() {
+        return Collections.singleton(prefix() + ":" + localName());
+    }
+
+    @Override
+    public AstFunction createFunction(String name, int index, AstParameters parameters, boolean varargs, FlowableExpressionParser parser) {
+        if (parameters.getCardinality() == 0) {
+            // If there are no parameters then we need to add the plan item instance identifier
+            AstParameters newParameters = new AstParameters(Collections.singletonList(parser.createIdentifier(CmmnVariableScopeELResolver.PLAN_ITEM_INSTANCE_KEY)));
+            return new AstFunction(name, index, newParameters, varargs);
+        }
+        return new AstFunction(name, index, parameters, varargs);
     }
 
     public static boolean isStageCompletable(Object object) {

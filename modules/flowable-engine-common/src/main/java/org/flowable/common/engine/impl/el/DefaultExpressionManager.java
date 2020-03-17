@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
@@ -45,7 +44,7 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
-    protected List<FlowableExpressionEnhancer> expressionEnhancers;
+    protected List<FlowableAstFunctionCreator> astFunctionCreators;
 
     protected ELContext parsingElContext;
     protected Map<Object, Object> beans;
@@ -79,11 +78,6 @@ public class DefaultExpressionManager implements ExpressionManager {
         }
 
         String expressionText = text.trim();
-        if (expressionEnhancers != null) {
-            for (FlowableExpressionEnhancer expressionEnhancer : expressionEnhancers) {
-                expressionText = expressionEnhancer.enhance(expressionText);
-            }
-        }
         
         ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expressionText, Object.class);
         Expression expression = createJuelExpression(text, valueExpression);
@@ -171,13 +165,16 @@ public class DefaultExpressionManager implements ExpressionManager {
     }
     
     @Override
-    public List<FlowableExpressionEnhancer> getExpressionEnhancers() {
-        return expressionEnhancers;
+    public List<FlowableAstFunctionCreator> getAstFunctionCreators() {
+        return astFunctionCreators;
     }
     
     @Override
-    public void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
-        this.expressionEnhancers = expressionEnhancers;
+    public void setAstFunctionCreators(List<FlowableAstFunctionCreator> astFunctionCreators) {
+        this.astFunctionCreators = astFunctionCreators;
+        if (expressionFactory instanceof FlowableExpressionFactory) {
+            ((FlowableExpressionFactory) expressionFactory).setAstFunctionCreators(astFunctionCreators);
+        }
     }
 
     public DeploymentCache<Expression> getExpressionCache() {

@@ -108,6 +108,7 @@ public class Scanner {
 	}
 
 	private static final HashMap<String, Token> KEYMAP = new HashMap<>();
+	private static final HashMap<String, Token> JAVA_KEYMAP = new HashMap<>();
 	private static final HashMap<Symbol, Token> FIXMAP = new HashMap<>();
 
 	private static void addFixToken(Token token) {
@@ -117,6 +118,10 @@ public class Scanner {
 	private static void addKeyToken(Token token) {
 		KEYMAP.put(token.getImage(), token);
 	}	
+
+	private static void addJavaKeyToken(Token token) {
+		JAVA_KEYMAP.put(token.getImage(), token);
+	}
 	
 	static {
 		addFixToken(new Token(Symbol.PLUS, "+"));
@@ -146,6 +151,11 @@ public class Scanner {
 		addFixToken(new Token(Symbol.END_EVAL, "}"));
 		addFixToken(new Token(Symbol.EOF, null, 0));
 		
+		addJavaKeyToken(new Token(Symbol.NULL, "null"));
+		addJavaKeyToken(new Token(Symbol.TRUE, "true"));
+		addJavaKeyToken(new Token(Symbol.FALSE, "false"));
+		addJavaKeyToken(new Token(Symbol.INSTANCEOF, "instanceof"));
+
 		addKeyToken(new Token(Symbol.NULL, "null"));
 		addKeyToken(new Token(Symbol.TRUE, "true"));
 		addKeyToken(new Token(Symbol.FALSE, "false"));
@@ -209,6 +219,14 @@ public class Scanner {
 	 */
 	protected Token keyword(String s) {
 		return KEYMAP.get(s);
+	}
+
+	/**
+	 * @param s name
+	 * @return token for the given keyword or <code>null</code>
+	 */
+	protected Token javaKeyword(String s) {
+		return JAVA_KEYMAP.get(s);
 	}
 	
 	/**
@@ -412,7 +430,14 @@ public class Scanner {
 				i++;
 			}
 			String name = input.substring(position, i);
-			Token keyword = keyword(name);
+			Token keyword;
+			switch (token.getSymbol()) {
+				case COLON:
+					keyword = javaKeyword(name);
+					break;
+				default:
+					keyword = keyword(name);
+			}
 			return keyword == null ? token(Symbol.IDENTIFIER, name, i - position) : keyword;
 		}
 
