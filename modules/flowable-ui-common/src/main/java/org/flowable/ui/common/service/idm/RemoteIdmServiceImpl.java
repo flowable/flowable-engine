@@ -60,7 +60,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         adminUser = properties.getIdmAdmin().getUser();
         Assert.hasText(adminUser, "Admin user must not be empty");
         adminPassword = properties.getIdmAdmin().getPassword();
-        Assert.hasText(adminUser, "Admin user password should not be empty");
+        Assert.hasText(adminPassword, "Admin user password should not be empty");
     }
 
     @Override

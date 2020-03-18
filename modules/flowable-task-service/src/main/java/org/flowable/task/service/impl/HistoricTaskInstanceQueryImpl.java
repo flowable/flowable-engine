@@ -21,7 +21,7 @@ import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -44,7 +44,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
  * @author Joram Barrez
  */
 public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricTaskInstanceQuery, HistoricTaskInstance> 
-        implements HistoricTaskInstanceQuery, QueryCacheValues {
+        implements HistoricTaskInstanceQuery, CacheAwareQuery<HistoricTaskInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
     protected String taskDefinitionId;
@@ -219,6 +219,17 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
                 }
 
             }
+        }
+    }
+
+    @Override
+    public void enhanceCachedValue(HistoricTaskInstanceEntity task) {
+        if (includeProcessVariables) {
+            task.getQueryVariables().addAll(CommandContextUtil.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                    .findHistoricalVariableInstancesByProcessInstanceId(task.getProcessInstanceId()));
+        } else if (includeTaskLocalVariables) {
+            task.getQueryVariables().addAll(CommandContextUtil.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                    .findHistoricalVariableInstancesByTaskId(task.getId()));
         }
     }
 

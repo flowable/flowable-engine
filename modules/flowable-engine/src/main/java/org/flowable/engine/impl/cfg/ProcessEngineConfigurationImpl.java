@@ -38,7 +38,6 @@ import org.apache.ibatis.type.JdbcType;
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.db.BatchDbSchemaManager;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
@@ -59,8 +58,8 @@ import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallba
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.common.engine.impl.el.function.FlowableShortHandExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableContainsAnyExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableContainsExpressionFunction;
@@ -780,9 +779,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // JUEL functions ///////////////////////////////////////////////////////////
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
-    protected List<FlowableExpressionEnhancer> expressionEnhancers;
-    protected List<FlowableExpressionEnhancer> customExpressionEnhancers;
-    protected List<FlowableShortHandExpressionFunction> shortHandExpressionFunctions;
+    protected List<FlowableAstFunctionCreator> astFunctionCreators;
 
     // BPMN PARSER //////////////////////////////////////////////////////////////
 
@@ -1000,9 +997,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         configuratorsBeforeInit();
         initProcessDiagramGenerator();
         initHistoryLevel();
-        initShortHandExpressionFunctions();
         initFunctionDelegates();
-        initExpressionEnhancers();
+        initAstFunctionCreators();
         initDelegateInterceptor();
         initExpressionManager();
         initAgendaFactory();
@@ -2421,7 +2417,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             expressionManager = processExpressionManager;
         }
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
-        expressionManager.setExpressionEnhancers(expressionEnhancers);
+        expressionManager.setAstFunctionCreators(astFunctionCreators);
     }
 
     public void initBusinessCalendarManager() {
@@ -2519,37 +2515,30 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public void initShortHandExpressionFunctions() {
-        if (shortHandExpressionFunctions == null) {
-            shortHandExpressionFunctions = new ArrayList<>();
-
-            shortHandExpressionFunctions.add(new VariableGetExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGetOrDefaultExpressionFunction());
-
-            shortHandExpressionFunctions.add(new VariableContainsAnyExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableContainsExpressionFunction());
-
-            shortHandExpressionFunctions.add(new VariableEqualsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableNotEqualsExpressionFunction());
-
-            shortHandExpressionFunctions.add(new VariableExistsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableIsEmptyExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableIsNotEmptyExpressionFunction());
-
-            shortHandExpressionFunctions.add(new VariableLowerThanExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableLowerThanOrEqualsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGreaterThanExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGreaterThanOrEqualsExpressionFunction());
-
-            shortHandExpressionFunctions.add(new VariableBase64ExpressionFunction());
-        }
-    }
-
     public void initFunctionDelegates() {
         if (this.flowableFunctionDelegates == null) {
             this.flowableFunctionDelegates = new ArrayList<>();
             this.flowableFunctionDelegates.add(new FlowableDateFunctionDelegate());
-            flowableFunctionDelegates.addAll(shortHandExpressionFunctions);
+
+            flowableFunctionDelegates.add(new VariableGetExpressionFunction());
+            flowableFunctionDelegates.add(new VariableGetOrDefaultExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableContainsAnyExpressionFunction());
+            flowableFunctionDelegates.add(new VariableContainsExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableEqualsExpressionFunction());
+            flowableFunctionDelegates.add(new VariableNotEqualsExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableExistsExpressionFunction());
+            flowableFunctionDelegates.add(new VariableIsEmptyExpressionFunction());
+            flowableFunctionDelegates.add(new VariableIsNotEmptyExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableLowerThanExpressionFunction());
+            flowableFunctionDelegates.add(new VariableLowerThanOrEqualsExpressionFunction());
+            flowableFunctionDelegates.add(new VariableGreaterThanExpressionFunction());
+            flowableFunctionDelegates.add(new VariableGreaterThanOrEqualsExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableBase64ExpressionFunction());
         }
 
         if (this.customFlowableFunctionDelegates != null) {
@@ -2557,15 +2546,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public void initExpressionEnhancers() {
-        if (expressionEnhancers == null) {
-            expressionEnhancers = new ArrayList<>();
-            expressionEnhancers.addAll(shortHandExpressionFunctions);
+    public void initAstFunctionCreators() {
+        List<FlowableAstFunctionCreator> astFunctionCreators = new ArrayList<>();
+        for (FlowableFunctionDelegate flowableFunctionDelegate : flowableFunctionDelegates) {
+            if (flowableFunctionDelegate instanceof FlowableAstFunctionCreator) {
+                astFunctionCreators.add((FlowableAstFunctionCreator) flowableFunctionDelegate);
+            }
         }
 
-        if (customExpressionEnhancers != null) {
-            expressionEnhancers.addAll(customExpressionEnhancers);
+        if (this.astFunctionCreators != null) {
+            astFunctionCreators.addAll(this.astFunctionCreators);
         }
+
+        this.astFunctionCreators = astFunctionCreators;
     }
 
     public void initDatabaseEventLogging() {
@@ -3739,31 +3732,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public List<FlowableExpressionEnhancer> getExpressionEnhancers() {
-        return expressionEnhancers;
+    public List<FlowableAstFunctionCreator> getAstFunctionCreators() {
+        return astFunctionCreators;
     }
 
-    public ProcessEngineConfigurationImpl setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
-        this.expressionEnhancers = expressionEnhancers;
-        return this;
-    }
-
-    public List<FlowableExpressionEnhancer> getCustomExpressionEnhancers() {
-        return customExpressionEnhancers;
-    }
-
-    public ProcessEngineConfigurationImpl setCustomExpressionEnhancers(List<FlowableExpressionEnhancer> customExpressionEnhancers) {
-        this.customExpressionEnhancers = customExpressionEnhancers;
-        return this;
-    }
-
-    public List<FlowableShortHandExpressionFunction> getShortHandExpressionFunctions() {
-        return shortHandExpressionFunctions;
-    }
-
-    public ProcessEngineConfigurationImpl setShortHandExpressionFunctions(List<FlowableShortHandExpressionFunction> shortHandExpressionFunctions) {
-        this.shortHandExpressionFunctions = shortHandExpressionFunctions;
-        return this;
+    public void setAstFunctionCreators(List<FlowableAstFunctionCreator> astFunctionCreators) {
+        this.astFunctionCreators = astFunctionCreators;
     }
 
     public boolean isEnableDatabaseEventLogging() {

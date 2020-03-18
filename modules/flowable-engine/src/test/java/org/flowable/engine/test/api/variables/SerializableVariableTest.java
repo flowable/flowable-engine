@@ -49,11 +49,12 @@ public class SerializableVariableTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         TestSerializableVariable testSerializableVariable = (TestSerializableVariable) runtimeService.getVariable(processInstance.getId(), "myVar");
-        assertEquals(2, testSerializableVariable.getNumber());
+        assertThat(testSerializableVariable.getNumber()).isEqualTo(2);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            testSerializableVariable = (TestSerializableVariable) managementService.executeCommand(commandContext -> historyService.createHistoricVariableInstanceQuery().variableName("myVar").singleResult().getValue());
-            assertEquals(2, testSerializableVariable.getNumber());
+            testSerializableVariable = (TestSerializableVariable) managementService
+                    .executeCommand(commandContext -> historyService.createHistoricVariableInstanceQuery().variableName("myVar").singleResult().getValue());
+            assertThat(testSerializableVariable.getNumber()).isEqualTo(2);
         }
     }
 

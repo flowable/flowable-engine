@@ -21,11 +21,12 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
@@ -41,7 +42,7 @@ import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
  * @author Daniel Meyer
  */
 public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessInstanceQuery, ProcessInstance> implements 
-        ProcessInstanceQuery, QueryCacheValues, Serializable {
+        ProcessInstanceQuery, CacheAwareQuery<ExecutionEntity>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected String executionId;
@@ -794,6 +795,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         }
 
         return processInstances;
+    }
+
+    @Override
+    public void enhanceCachedValue(ExecutionEntity processInstance) {
+        if (includeProcessVariables) {
+            processInstance.getQueryVariables()
+                    .addAll(CommandContextUtil.getVariableService().findVariableInstancesByProcessInstanceId(processInstance.getId()));
+        }
     }
 
     @Override

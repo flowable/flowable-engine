@@ -28,6 +28,11 @@ public class CacheTaskListener implements TaskListener {
     public static String taskId;
     public static String historicTaskId;
 
+    public static void reset() {
+        taskId = null;
+        historicTaskId = null;
+    }
+
     @Override
     public void notify(DelegateTask delegateTask) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();

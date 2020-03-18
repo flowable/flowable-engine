@@ -27,7 +27,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
@@ -42,7 +42,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
  * @author Tijs Rademakers
  */
 public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricCaseInstanceQuery, HistoricCaseInstance> 
-        implements HistoricCaseInstanceQuery, QueryCacheValues {
+        implements HistoricCaseInstanceQuery, CacheAwareQuery<HistoricCaseInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
     
@@ -514,6 +514,15 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
                 }
 
             }
+        }
+    }
+
+    @Override
+    public void enhanceCachedValue(HistoricCaseInstanceEntity caseInstance) {
+        if (isIncludeCaseVariables()) {
+            caseInstance.getQueryVariables()
+                    .addAll(CommandContextUtil.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                            .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
         }
     }
 

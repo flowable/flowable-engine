@@ -144,14 +144,8 @@ public class CommandContext {
         }
         
         closeListeners.add(commandContextCloseListener);
-        
-        Collections.sort(closeListeners, new Comparator<CommandContextCloseListener>() {
 
-            @Override
-            public int compare(CommandContextCloseListener listener1, CommandContextCloseListener listener2) {
-                return listener1.order().compareTo(listener2.order());
-            }
-        });
+        closeListeners.sort(Comparator.comparing(CommandContextCloseListener::order));
     }
 
     public List<CommandContextCloseListener> getCloseListeners() {

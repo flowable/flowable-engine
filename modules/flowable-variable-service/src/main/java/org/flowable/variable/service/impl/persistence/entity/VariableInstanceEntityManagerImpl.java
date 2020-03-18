@@ -62,6 +62,11 @@ public class VariableInstanceEntityManagerImpl
     }
 
     @Override
+    public List<VariableInstanceEntity> findVariableInstancesByProcessInstanceId(String processInstanceId) {
+        return dataManager.findVariableInstancesByProcessInstanceId(processInstanceId);
+    }
+
+    @Override
     public List<VariableInstanceEntity> findVariableInstancesByExecutionId(final String executionId) {
         return dataManager.findVariableInstancesByExecutionId(executionId);
     }

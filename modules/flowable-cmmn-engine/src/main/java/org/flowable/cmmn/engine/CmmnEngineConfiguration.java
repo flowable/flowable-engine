@@ -194,7 +194,6 @@ import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -214,8 +213,8 @@ import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.common.engine.impl.el.function.FlowableShortHandExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableContainsAnyExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableContainsExpressionFunction;
@@ -393,10 +392,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected ExpressionManager expressionManager;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
-    protected List<FlowableExpressionEnhancer> expressionEnhancers;
-    protected List<FlowableExpressionEnhancer> customExpressionEnhancers;
-    protected List<FlowableShortHandExpressionFunction> shortHandExpressionFunctions;
-    
+    protected List<FlowableAstFunctionCreator> astFunctionCreators;
+
     protected boolean isExpressionCacheEnabled = true;
     protected int expressionCacheSize = 4096;
     protected int expressionTextLengthCacheLimit = -1; // negative value to have no max length
@@ -827,9 +824,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
-        initShortHandExpressionFunctions();
         initFunctionDelegates();
-        initExpressionEnhancers();
+        initAstFunctionCreators();
         initExpressionManager();
         initCmmnEngineAgendaFactory();
 
@@ -969,38 +965,31 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
     
-    public void initShortHandExpressionFunctions() {
-        if (shortHandExpressionFunctions == null) {
-            shortHandExpressionFunctions = new ArrayList<>();
-            
-            shortHandExpressionFunctions.add(new VariableGetExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGetOrDefaultExpressionFunction());
-            
-            shortHandExpressionFunctions.add(new VariableContainsAnyExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableContainsExpressionFunction());
-            
-            shortHandExpressionFunctions.add(new VariableEqualsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableNotEqualsExpressionFunction());
-            
-            shortHandExpressionFunctions.add(new VariableExistsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableIsEmptyExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableIsNotEmptyExpressionFunction());
-            
-            shortHandExpressionFunctions.add(new VariableLowerThanExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableLowerThanOrEqualsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGreaterThanExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGreaterThanOrEqualsExpressionFunction());
-            
-            shortHandExpressionFunctions.add(new VariableBase64ExpressionFunction());
-
-            shortHandExpressionFunctions.add(new IsStageCompletableExpressionFunction());
-        }
-    }
-    
     public void initFunctionDelegates() {
         if (flowableFunctionDelegates == null) {
             flowableFunctionDelegates = new ArrayList<>();
-            flowableFunctionDelegates.addAll(shortHandExpressionFunctions);
+
+            flowableFunctionDelegates.add(new VariableGetExpressionFunction());
+            flowableFunctionDelegates.add(new VariableGetOrDefaultExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableContainsAnyExpressionFunction());
+            flowableFunctionDelegates.add(new VariableContainsExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableEqualsExpressionFunction());
+            flowableFunctionDelegates.add(new VariableNotEqualsExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableExistsExpressionFunction());
+            flowableFunctionDelegates.add(new VariableIsEmptyExpressionFunction());
+            flowableFunctionDelegates.add(new VariableIsNotEmptyExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableLowerThanExpressionFunction());
+            flowableFunctionDelegates.add(new VariableLowerThanOrEqualsExpressionFunction());
+            flowableFunctionDelegates.add(new VariableGreaterThanExpressionFunction());
+            flowableFunctionDelegates.add(new VariableGreaterThanOrEqualsExpressionFunction());
+
+            flowableFunctionDelegates.add(new VariableBase64ExpressionFunction());
+
+            flowableFunctionDelegates.add(new IsStageCompletableExpressionFunction());
         }
         
         if (customFlowableFunctionDelegates != null) {
@@ -1008,15 +997,19 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
     
-    public void initExpressionEnhancers() {
-        if (expressionEnhancers == null) {
-            expressionEnhancers = new ArrayList<>();
-            expressionEnhancers.addAll(shortHandExpressionFunctions);
+    public void initAstFunctionCreators() {
+        List<FlowableAstFunctionCreator> astFunctionCreators = new ArrayList<>();
+        for (FlowableFunctionDelegate flowableFunctionDelegate : flowableFunctionDelegates) {
+            if (flowableFunctionDelegate instanceof FlowableAstFunctionCreator) {
+                astFunctionCreators.add((FlowableAstFunctionCreator) flowableFunctionDelegate);
+            }
         }
         
-        if (customExpressionEnhancers != null) {
-            expressionEnhancers.addAll(customExpressionEnhancers);
+        if (this.astFunctionCreators != null) {
+            astFunctionCreators.addAll(this.astFunctionCreators);
         }
+
+        this.astFunctionCreators = astFunctionCreators;
     }
 
     public void initExpressionManager() {
@@ -1032,7 +1025,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
         
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
-        expressionManager.setExpressionEnhancers(expressionEnhancers);
+        expressionManager.setAstFunctionCreators(astFunctionCreators);
     }
 
     public void initCmmnEngineAgendaFactory() {
@@ -2553,31 +2546,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public List<FlowableExpressionEnhancer> getExpressionEnhancers() {
-        return expressionEnhancers;
+    public List<FlowableAstFunctionCreator> getAstFunctionCreators() {
+        return astFunctionCreators;
     }
 
-    public CmmnEngineConfiguration setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
-        this.expressionEnhancers = expressionEnhancers;
-        return this;
-    }
-
-    public List<FlowableExpressionEnhancer> getCustomExpressionEnhancers() {
-        return customExpressionEnhancers;
-    }
-
-    public CmmnEngineConfiguration setCustomExpressionEnhancers(List<FlowableExpressionEnhancer> customExpressionEnhancers) {
-        this.customExpressionEnhancers = customExpressionEnhancers;
-        return this;
-    }
-    
-    public List<FlowableShortHandExpressionFunction> getShortHandExpressionFunctions() {
-        return shortHandExpressionFunctions;
-    }
-
-    public CmmnEngineConfiguration setShortHandExpressionFunctions(List<FlowableShortHandExpressionFunction> shortHandExpressionFunctions) {
-        this.shortHandExpressionFunctions = shortHandExpressionFunctions;
-        return this;
+    public void setAstFunctionCreators(List<FlowableAstFunctionCreator> astFunctionCreators) {
+        this.astFunctionCreators = astFunctionCreators;
     }
 
     public SchemaManager getIdentityLinkSchemaManager() {

@@ -298,6 +298,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         return caseVariables;
     }
 
+    @Override
     public List<VariableInstanceEntity> getQueryVariables() {
         if (queryVariables == null && Context.getCommandContext() != null) {
             queryVariables = new VariableInitializingList();

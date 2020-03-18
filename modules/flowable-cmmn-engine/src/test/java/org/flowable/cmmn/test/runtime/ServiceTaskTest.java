@@ -273,7 +273,7 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         Object transientResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "transientResult");
         Object persistentResult = cmmnRuntimeService.getVariable(caseInstance.getId(), "persistentResult");
 
-        assertThat(transientResult).isNotNull();
+        assertThat(transientResult).isNull();
         assertThat(persistentResult).isEqualTo("Result is: test");
     }
 

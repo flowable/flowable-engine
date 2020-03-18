@@ -20,18 +20,20 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
 
 /**
  * @author Daniel Meyer
  */
-public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription> implements EventSubscriptionQuery, QueryCacheValues {
+public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription>
+        implements EventSubscriptionQuery, CacheAwareQuery<EventSubscriptionEntity> {
 
     private static final long serialVersionUID = 1L;
 

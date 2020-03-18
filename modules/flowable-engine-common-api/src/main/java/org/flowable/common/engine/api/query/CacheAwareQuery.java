@@ -13,7 +13,11 @@
 
 package org.flowable.common.engine.api.query;
 
-public interface QueryCacheValues {
+public interface CacheAwareQuery<T> {
 
     String getId();
+
+    default void enhanceCachedValue(T value) {
+        // By default there is nothing to enhance
+    }
 }
