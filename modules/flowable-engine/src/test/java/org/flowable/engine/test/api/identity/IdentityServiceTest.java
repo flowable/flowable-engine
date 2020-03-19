@@ -205,19 +205,22 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
     @Test
     public void testSaveGroupNullArgument() {
         assertThatThrownBy(() -> identityService.saveGroup(null))
-                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("group is null");
     }
 
     @Test
     public void testSaveUserNullArgument() {
         assertThatThrownBy(() -> identityService.saveUser(null))
-                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("user is null");
     }
 
     @Test
     public void testFindGroupByIdNullArgument() {
         assertThatThrownBy(() -> identityService.createGroupQuery().groupId(null).singleResult())
-                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("id is null");
     }
 
     @Test
