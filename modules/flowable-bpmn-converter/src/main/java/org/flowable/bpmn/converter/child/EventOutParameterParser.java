@@ -70,6 +70,11 @@ public class EventOutParameterParser extends BaseChildElementParser {
                 parameter.addAttribute(extensionAttribute);
             }
 
+            String transientString = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
+            if ("true".equalsIgnoreCase(transientString)) {
+                parameter.setTransient(true);
+            }
+
             ((SendEventServiceTask) parentElement).getEventOutParameters().add(parameter);
         }
     }
