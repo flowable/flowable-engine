@@ -137,12 +137,7 @@ public abstract class AbstractFlowableVariableExpressionFunction implements Flow
             if (methodParameterCount >= 1) {
                 // If the first parameter is an identifier we have to convert it to a text node
                 // We want to allow writing variables:get(varName) where varName is without quotes
-                AstNode variableParameter = parameters.getChild(0);
-                if (variableParameter instanceof AstIdentifier) {
-                    newParameters.add(new AstText(((AstIdentifier) variableParameter).getName()));
-                } else {
-                    newParameters.add(variableParameter);
-                }
+                newParameters.add(createVariableNameNode(parameters.getChild(0)));
                 for (int i = 1; i < parametersCardinality; i++) {
                     // the rest of the parameters should be treated as is
                     newParameters.add(parameters.getChild(i));
@@ -153,6 +148,14 @@ public abstract class AbstractFlowableVariableExpressionFunction implements Flow
         } else {
             // If the resolved parameters are of the same size as the current method then nothing to do
             return new AstFunction(name, index, parameters, varargs);
+        }
+    }
+
+    protected AstNode createVariableNameNode(AstNode variableNode) {
+        if (variableNode instanceof AstIdentifier) {
+            return new AstText(((AstIdentifier) variableNode).getName());
+        } else {
+            return variableNode;
         }
     }
 }

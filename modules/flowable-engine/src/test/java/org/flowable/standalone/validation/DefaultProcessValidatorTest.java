@@ -12,6 +12,9 @@
  */
 package org.flowable.standalone.validation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.flowable.engine.test.util.TestProcessUtil;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
@@ -60,7 +64,7 @@ public class DefaultProcessValidatorTest {
         Assert.assertNotNull(bpmnModel);
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-        Assert.assertEquals(70, allErrors.size());
+        Assert.assertEquals(71, allErrors.size());
 
         String setName = ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS; // shortening it a bit
 
@@ -183,6 +187,8 @@ public class DefaultProcessValidatorTest {
 
         // Event subprocesses
         problems = findErrors(allErrors, setName, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, 1);
+        assertCommonProblemFieldForActivity(problems.get(0));
+        problems = findErrors(allErrors, setName, Problems.EVENT_SUBPROCESS_BOUNDARY_EVENT, 1);
         assertCommonProblemFieldForActivity(problems.get(0));
 
         // Boundary events
@@ -325,6 +331,19 @@ public class DefaultProcessValidatorTest {
         }
     }
 
+    @Test
+    void testEventSubProcessWithBoundary() {
+        BpmnModel bpmnModel = readBpmnModelFromXml("org/flowable/standalone/validation/eventSubProcessWithBoundary.bpmn20.xml");
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
+                .containsExactlyInAnyOrder(
+                        tuple(Problems.EVENT_SUBPROCESS_BOUNDARY_EVENT, "event sub process cannot have attached boundary events", "errorEndEventSubProcess", true)
+                );
+    }
+
     protected void assertCommonProblemFieldForActivity(ValidationError error) {
         assertProcessElementError(error);
 
@@ -367,6 +386,11 @@ public class DefaultProcessValidatorTest {
             }
         }
         return results;
+    }
+
+    protected BpmnModel readBpmnModelFromXml(String resource) {
+        InputStreamProvider xmlStream = () -> DefaultProcessValidatorTest.class.getClassLoader().getResourceAsStream(resource);
+        return new BpmnXMLConverter().convertToBpmnModel(xmlStream, true, true);
     }
 
 }

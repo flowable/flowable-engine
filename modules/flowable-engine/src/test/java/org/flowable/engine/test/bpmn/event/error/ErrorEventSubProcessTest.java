@@ -183,6 +183,54 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
+    @Deployment
+    public void testRetriggerEventSubProcessError() {
+        runtimeService.startProcessInstanceByKey("retriggerEventSubProcess");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+                .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                        tuple("startEvent", "start"),
+                        tuple("sequenceFlow", "flow1"),
+                        tuple("subProcess", "subProcess"),
+                        tuple("startEvent", "subProcessStart"),
+                        tuple("sequenceFlow", "subProcessFlow1"),
+                        tuple("scriptTask", "scriptTask"),
+                        tuple("eventSubProcess", "eventSubProcess"),
+                        tuple("startEvent", "eventSubProcessStart"),
+                        tuple("sequenceFlow", "eventFlow1"),
+                        tuple("endEvent", "eventEnd"),
+                        tuple("boundaryEvent", "subProcessErrorBoundary"),
+                        tuple("sequenceFlow", "flow4"),
+                        tuple("userTask", "taskAfterBoundary")
+                );
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                    .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                    .containsExactlyInAnyOrder(
+                            tuple("startEvent", "start"),
+                            tuple("sequenceFlow", "flow1"),
+                            tuple("subProcess", "subProcess"),
+                            tuple("startEvent", "subProcessStart"),
+                            tuple("sequenceFlow", "subProcessFlow1"),
+                            tuple("scriptTask", "scriptTask"),
+                            tuple("eventSubProcess", "eventSubProcess"),
+                            tuple("startEvent", "eventSubProcessStart"),
+                            tuple("sequenceFlow", "eventFlow1"),
+                            tuple("endEvent", "eventEnd"),
+                            tuple("boundaryEvent", "subProcessErrorBoundary"),
+                            tuple("sequenceFlow", "flow4"),
+                            tuple("userTask", "taskAfterBoundary")
+                    );
+        }
+    }
+
     private void assertThatErrorHasBeenCaught(String procId) {
         // The process will throw an error event,
         // which is caught and escalated by a User org.flowable.task.service.Task

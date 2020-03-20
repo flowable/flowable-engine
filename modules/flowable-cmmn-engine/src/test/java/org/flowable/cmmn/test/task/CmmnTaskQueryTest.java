@@ -21,6 +21,8 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -89,6 +91,29 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryByAssignee() {
         assertThat(cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").list()).hasSize(NR_CASE_INSTANCES);
+        
+        List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").list();
+        assertThat(caseInstances.size()).isEqualTo(5);
+        
+        String caseInstanceId = caseInstances.get(0).getId();
+        
+        Task task = cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").caseInstanceId(caseInstanceId).singleResult();
+        assertThat(task.getAssignee()).isEqualTo("johnDoe");
+        assertThat(task.getScopeId()).isEqualTo(caseInstanceId);
+        assertThat(task.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(task.getScopeDefinitionId()).isEqualTo(caseInstances.get(0).getCaseDefinitionId());
+        
+        task = cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").caseInstanceId(caseInstanceId).includeTaskLocalVariables().singleResult();
+        assertThat(task.getAssignee()).isEqualTo("johnDoe");
+        assertThat(task.getScopeId()).isEqualTo(caseInstanceId);
+        assertThat(task.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(task.getScopeDefinitionId()).isEqualTo(caseInstances.get(0).getCaseDefinitionId());
+        
+        task = cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").caseInstanceId(caseInstanceId).includeProcessVariables().singleResult();
+        assertThat(task.getAssignee()).isEqualTo("johnDoe");
+        assertThat(task.getScopeId()).isEqualTo(caseInstanceId);
+        assertThat(task.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(task.getScopeDefinitionId()).isEqualTo(caseInstances.get(0).getCaseDefinitionId());
     }
 
     @Test

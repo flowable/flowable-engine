@@ -86,6 +86,7 @@ public interface Problems {
     String SUBPROCESS_START_EVENT_EVENT_DEFINITION_NOT_ALLOWED = "flowable-subprocess-start-event-event-definition-not-allowed";
 
     String EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION = "flowable-event-subprocess-invalid-start-event-definition";
+    String EVENT_SUBPROCESS_BOUNDARY_EVENT = "flowable-event-subprocess-boundary-event";
 
     String BOUNDARY_EVENT_NO_EVENT_DEFINITION = "flowable-boundary-event-no-event-definition";
     String BOUNDARY_EVENT_INVALID_EVENT_DEFINITION = "flowable-boundary-event-invalid-event-definition";

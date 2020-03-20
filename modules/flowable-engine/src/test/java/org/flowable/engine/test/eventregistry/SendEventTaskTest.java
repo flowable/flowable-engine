@@ -249,6 +249,32 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         assertThat(task).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
     }
+
+    @Test
+    @Deployment
+    public void testTriggerableSendEventTransientVariable() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
+        ObjectNode json = objectMapper.createObjectNode();
+        json.put("type", "myTriggerEvent");
+        json.put("customerId", "testId");
+        getEventRegistry().eventReceived(inboundChannel, objectMapper.writeValueAsString(json));
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "anotherVariable")).isNull(); // should not have been stored, as it's transient
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("testId");
+    }
     
     @Test
     @Deployment

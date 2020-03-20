@@ -72,6 +72,9 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
                 if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, serviceTask.getResultVariableName());
                 }
+                if (((ScriptServiceTask) serviceTask).isAutoStoreVariables()) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, "true");
+                }
                 break;
         }
     }
