@@ -389,7 +389,7 @@
             <id>oraclewithschemaevent</id>
             <activation>
                 <property>
-                    <name>oraclewithschemaevent</name>
+                    <name>databasewithschemaevent</name>
                     <value>oracle</value>
                 </property>
             </activation>
