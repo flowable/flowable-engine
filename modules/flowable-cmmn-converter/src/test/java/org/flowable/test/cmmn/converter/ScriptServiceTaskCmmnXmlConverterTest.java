@@ -63,12 +63,12 @@ public class ScriptServiceTaskCmmnXmlConverterTest extends AbstractConverterTest
 
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
-        assertThat(planItemDefinitions).hasSize(1);
-        assertThat(planModel.findPlanItemDefinitionsOfType(Task.class, false)).hasSize(1);
+        assertThat(planItemDefinitions).hasSize(2);
+        assertThat(planModel.findPlanItemDefinitionsOfType(Task.class, false)).hasSize(2);
 
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertThat(planItems).hasSize(1);
+        assertThat(planItems).hasSize(2);
 
         PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
         PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
@@ -86,6 +86,14 @@ public class ScriptServiceTaskCmmnXmlConverterTest extends AbstractConverterTest
         assertThat(scriptTask.getFieldExtensions())
                 .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
                 .containsExactly(tuple("script", "var a = 5;"));
+
+        PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
+        planItemDefinition = planItemTaskB.getPlanItemDefinition();
+        assertThat(planItemDefinition).isInstanceOfSatisfying(ScriptServiceTask.class, scriptServiceTask -> {
+            assertThat(scriptServiceTask.getScriptFormat()).isEqualTo("groovy");
+            assertThat(scriptServiceTask.getScript()).isEqualTo("var b = 5;");
+            assertThat(scriptServiceTask.isAutoStoreVariables()).isTrue();
+        });
     }
 
 }
