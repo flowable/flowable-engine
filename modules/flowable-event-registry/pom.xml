@@ -253,7 +253,7 @@
                                 <configuration>
                                     <tasks>
                                         <echo message="dropping schema in ${databaseevent}" />
-                                        <java classname="org.flowable.eventregistry.engine.impl.db.DbSchemaDrop"
+                                        <java classname="org.flowable.eventregistry.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
@@ -305,7 +305,7 @@
                                 <configuration>
                                     <tasks>
                                         <echo message="dropping schema in ${databasemssqlevent}" />
-                                        <java classname="org.flowable.eventregistry.engine.impl.db.DbSchemaDrop"
+                                        <java classname="org.flowable.eventregistry.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
@@ -357,7 +357,7 @@
                                 <configuration>
                                     <tasks>
                                         <echo message="dropping schema in ${databasewithschemaevent}" />
-                                        <java classname="org.flowable.eventregistry.engine.impl.db.DbSchemaDrop"
+                                        <java classname="org.flowable.eventregistry.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
