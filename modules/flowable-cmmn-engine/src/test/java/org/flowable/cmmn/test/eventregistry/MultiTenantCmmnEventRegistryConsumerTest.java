@@ -286,8 +286,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
     public void testStartCaseInstanceWithEventFromDefaultTenant() {
         deployCaseModel("startCaseInstanceDefaultTenant.cmmn", null);
 
-        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().singleResult())
-                .extracting(EventSubscription::getTenantId).isEqualTo(CmmnEngineConfiguration.NO_TENANT_ID);
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().singleResult().getTenantId()).isNullOrEmpty();
 
         InboundChannelModel defaultSharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedDefaultChannel");
         // The chanel has a tenant detector that will use the correct tenant to start the case instance
