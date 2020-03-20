@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -303,8 +304,8 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         // Both the process model and the event definition are part of the default tenant
         deployProcessModel("startProcessInstanceDefaultTenant.bpmn20.xml", null);
 
-        assertThat(runtimeService.createEventSubscriptionQuery().singleResult())
-            .extracting(EventSubscription::getTenantId).isEqualTo(ProcessEngineConfiguration.NO_TENANT_ID);
+        String tenantId = runtimeService.createEventSubscriptionQuery().singleResult().getTenantId();
+        assertThat(StringUtils.isEmpty(tenantId)).isTrue();
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(0L);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
