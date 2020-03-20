@@ -413,11 +413,6 @@ public class TenancyTest extends PluggableFlowableTestCase {
                 .processDefinitionId(processDefinitionIdWithTenant)
                 .singleResult()
                 .getDeploymentId();
-        
-        List<ProcessDefinition> processDefinitions = this.repositoryService.createProcessDefinitionQuery().list();
-        for (ProcessDefinition processDefinition : processDefinitions) {
-            System.out.println("!!!!!!!!!!process def " + processDefinition.getId() + " " + processDefinition.getVersion() + " " + processDefinition.getKey() + " '" + processDefinition.getTenantId() + "'");
-        }
 
         // Act
         repositoryService.changeDeploymentTenantId(deploymentId, "", MergeMode.AS_NEW);

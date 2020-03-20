@@ -610,8 +610,6 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertThat(entityEvents.get(lastIndex).getType()).isEqualTo(FlowableEngineEventType.PROCESS_CANCELLED);
         FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) entityEvents.get(lastIndex);
         assertThat(processCancelledEvent.getProcessInstanceId()).isEqualTo(processInstance.getId());
-
-        System.out.println("the end");
     }
 
     @Test
