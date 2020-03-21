@@ -130,6 +130,7 @@ public class EventRegistryRestResponseFactory {
         // Links to other resources
         response.setDeploymentId(eventDefinition.getDeploymentId());
         response.setDeploymentUrl(urlBuilder.buildUrl(EventRestUrls.URL_DEPLOYMENT, eventDefinition.getDeploymentId()));
+        response.setResourceName(eventDefinition.getResourceName());
         response.setResource(urlBuilder.buildUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE, eventDefinition.getDeploymentId(), eventDefinition.getResourceName()));
 
         return response;
@@ -162,6 +163,7 @@ public class EventRegistryRestResponseFactory {
 
         // Links to other resources
         response.setDeploymentId(channelDefinition.getDeploymentId());
+        response.setResourceName(channelDefinition.getResourceName());
         response.setDeploymentUrl(urlBuilder.buildUrl(EventRestUrls.URL_DEPLOYMENT, channelDefinition.getDeploymentId()));
         response.setResource(urlBuilder.buildUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCE, channelDefinition.getDeploymentId(), channelDefinition.getResourceName()));
 
