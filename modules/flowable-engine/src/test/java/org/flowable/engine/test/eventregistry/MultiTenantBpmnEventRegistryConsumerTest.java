@@ -303,8 +303,8 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         // Both the process model and the event definition are part of the default tenant
         deployProcessModel("startProcessInstanceDefaultTenant.bpmn20.xml", null);
 
-        assertThat(runtimeService.createEventSubscriptionQuery().singleResult())
-            .extracting(EventSubscription::getTenantId).isEqualTo(ProcessEngineConfiguration.NO_TENANT_ID);
+        String tenantId = runtimeService.createEventSubscriptionQuery().singleResult().getTenantId();
+        assertThat(tenantId).isNullOrEmpty();
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(0L);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);

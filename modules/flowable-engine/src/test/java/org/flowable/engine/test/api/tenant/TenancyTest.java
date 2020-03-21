@@ -409,7 +409,9 @@ public class TenancyTest extends PluggableFlowableTestCase {
     public void testChangeDeploymentTenantId_withMergingTwoTenantsAsANewDeployment_ensureDeploymentsOrderedCorrectly() {
         String processDefinitionIdWithTenant = deployTestProcessWithTestTenant("tenantA");
         deployOneTaskTestProcess();
-        String deploymentId = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdWithTenant).singleResult()
+        String deploymentId = this.repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(processDefinitionIdWithTenant)
+                .singleResult()
                 .getDeploymentId();
 
         // Act
@@ -465,7 +467,8 @@ public class TenancyTest extends PluggableFlowableTestCase {
         expectedOrderOfProcessDefinitionIds.add(processDefinitionIdWithTenant);
         expectedOrderOfProcessDefinitionIds.add(deployOneTaskTestProcess());
         expectedOrderOfProcessDefinitionIds.add(deployOneTaskTestProcess());
-        ProcessDefinition processDefinitionToBeMerged = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdWithTenant)
+        ProcessDefinition processDefinitionToBeMerged = this.repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(processDefinitionIdWithTenant)
                 .singleResult();
         String processDefinitionKey = processDefinitionToBeMerged.getKey();
         String deploymentId = processDefinitionToBeMerged.getDeploymentId();
@@ -477,7 +480,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
         // Since we are using the "by-date" merge strategy, the version number of the original one should be matches
         List<ProcessDefinition> allDeployedProcessDefinitions = this.repositoryService.createProcessDefinitionQuery()
                 .processDefinitionKey(processDefinitionKey)
-                .processDefinitionTenantId("")
+                .processDefinitionWithoutTenantId()
                 .orderByProcessDefinitionVersion()
                 .asc()
                 .list();
@@ -495,7 +498,10 @@ public class TenancyTest extends PluggableFlowableTestCase {
 
         // Deploying another version should just up the version
         String processDefinitionIdNoTenant2 = deployOneTaskTestProcess();
-        assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdNoTenant2).singleResult().getVersion())
+        assertThat(repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(processDefinitionIdNoTenant2)
+                .singleResult()
+                .getVersion())
                 .isEqualTo(6);
     }
 

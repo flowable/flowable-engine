@@ -32,8 +32,6 @@ public class FlowNodeConverterTest extends AbstractConverterTest {
         BpmnModel bpmnModel = readJsonFile();
         validateModel(bpmnModel);
         bpmnModel = convertToJsonAndBack(bpmnModel);
-        // System.out.println("xml " + new String(new
-        // BpmnXMLConverter().convertToXML(bpmnModel), "utf-8"));
         validateModel(bpmnModel);
     }
 
