@@ -14,7 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mysql: [5.7, 8]
+        # Not testing with latest 8 since they have a bug for exists sub query with order by in the outer
+        # See https://bugs.mysql.com/bug.php?id=99019
+        mysql: [5.7, 8.0.18]
     services:
       mysql:
         image: mysql:${{ matrix.mysql }}
@@ -53,7 +55,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mysql: [5.7, 8]
+        # Not testing with latest 8 since they have a bug for exists sub query with order by in the outer
+        # See https://bugs.mysql.com/bug.php?id=99019
+        mysql: [5.7, 8.0.18]
     services:
       mysql:
         image: mysql:${{ matrix.mysql }}
@@ -93,7 +97,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mysql: [5.7, 8]
+        # Not testing with latest 8 since they have a bug for exists sub query with order by in the outer
+        # See https://bugs.mysql.com/bug.php?id=99019
+        mysql: [5.7, 8.0.18]
     services:
       mysql:
         image: mysql:${{ matrix.mysql }}
