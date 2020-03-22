@@ -1135,6 +1135,10 @@ public class RestResponseFactory {
         response.setExecutionId(eventSubscription.getExecutionId());
         response.setProcessDefinitionId(eventSubscription.getProcessDefinitionId());
         response.setProcessInstanceId(eventSubscription.getProcessInstanceId());
+        response.setScopeId(eventSubscription.getScopeId());
+        response.setScopeType(eventSubscription.getScopeType());
+        response.setSubScopeId(eventSubscription.getSubScopeId());
+        response.setScopeDefinitionId(eventSubscription.getScopeDefinitionId());
         response.setConfiguration(eventSubscription.getConfiguration());
         response.setTenantId(eventSubscription.getTenantId());
 
