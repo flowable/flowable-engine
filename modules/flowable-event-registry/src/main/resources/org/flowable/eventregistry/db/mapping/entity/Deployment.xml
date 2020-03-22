@@ -86,8 +86,18 @@
     <include refid="selectEventDeploymentsByQueryCriteriaSql"/>
   </select>
   
+  <!-- We have to use left join for mysql since on 8 the DB crashes when using the exists and order by
+   see https://bugs.mysql.com/bug.php?id=99019 -->
   <sql id="selectEventDeploymentsByQueryCriteriaSql">  
     from ${prefix}FLW_EVENT_DEPLOYMENT RES
+    <if test="databaseType == 'mysql'">
+        <if test="(channelDefinitionKey != null || channelDefinitionKeyLike != null)">
+            left join ${prefix}FLW_CHANNEL_DEFINITION CHANNEL ON RES.ID_ = CHANNEL.DEPLOYMENT_ID_
+        </if>
+      <if test="(eventDefinitionKey != null || eventDefinitionKeyLike != null)">
+            left join ${prefix}FLW_EVENT_DEFINITION EVENT ON RES.ID_ = EVENT.DEPLOYMENT_ID_
+        </if>
+    </if>
     <where>
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
@@ -114,24 +124,32 @@
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
       <if test="eventDefinitionKey != null || eventDefinitionKeyLike != null">
+        <if test="databaseType != 'mysql'">
           and exists(select 1 from ${prefix}FLW_EVENT_DEFINITION EVENT where RES.ID_ = EVENT.DEPLOYMENT_ID_ 
+        </if>
         <if test="eventDefinitionKey != null">
           and EVENT.KEY_ = #{eventDefinitionKey}
         </if>
         <if test="eventDefinitionKeyLike != null">
           and EVENT.KEY_ like #{eventDefinitionKeyLike}
         </if>
+        <if test="databaseType != 'mysql'">
         )
+        </if>
       </if>
       <if test="channelDefinitionKey != null || channelDefinitionKeyLike != null">
+        <if test="databaseType != 'mysql'">
           and exists(select 1 from ${prefix}FLW_CHANNEL_DEFINITION CHANNEL where RES.ID_ = CHANNEL.DEPLOYMENT_ID_ 
+        </if>
         <if test="channelDefinitionKey != null">
           and CHANNEL.KEY_ = #{channelDefinitionKey}
         </if>
         <if test="channelDefinitionKeyLike != null">
           and CHANNEL.KEY_ like #{channelDefinitionKeyLike}
         </if>
+        <if test="databaseType != 'mysql'">
         )
+        </if>
       </if>
       <if test="parentDeploymentId != null">
         and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
