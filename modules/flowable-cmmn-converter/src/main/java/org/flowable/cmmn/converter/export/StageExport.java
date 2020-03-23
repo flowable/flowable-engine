@@ -85,7 +85,7 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         }
 
         for (Sentry sentry : stage.getSentries()) {
-            SentryExport.writeSentry(sentry, xtw);
+            SentryExport.writeSentry(model, sentry, xtw);
         }
 
         for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
