@@ -268,6 +268,47 @@ public class JsonTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
+    public void testUpdateFromSmallToLongJsonValue() {
+        // Set foo.bar to 'Sesame Street'
+        ObjectNode foo = objectMapper.createObjectNode();
+        foo.put("bar", "Sesame Street");
+        JavaDelegate javaDelegate = execution -> {};
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("updateJsonValue")
+            .variable("foo", foo)
+            .transientVariable("jsonBean", javaDelegate)
+            .start();
+
+        Object fooActual = runtimeService.getVariable(processInstance.getId(), "foo");
+        assertThat(fooActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(fooActual).inPath("bar").isEqualTo("Sesame Street");
+        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("foo").singleResult()
+            .getValue()).inPath("bar").isEqualTo("Sesame Street");
+
+        // Set foo.bar to long value
+        String randomLongValue = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
+        foo.put("bar", randomLongValue);
+        runtimeService.setVariable(processInstance.getId(), "foo", foo);
+
+        fooActual = runtimeService.getVariable(processInstance.getId(), "foo");
+        assertThat(fooActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(fooActual).inPath("bar").isEqualTo(randomLongValue);
+        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("foo").singleResult()
+            .getValue()).inPath("bar").isEqualTo(randomLongValue);
+
+        // Set foo.bar back to a small value
+        foo.put("bar", "Sesame Street 2");
+        runtimeService.setVariable(processInstance.getId(), "foo", foo);
+
+        fooActual = runtimeService.getVariable(processInstance.getId(), "foo");
+        assertThat(fooActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(fooActual).inPath("bar").isEqualTo("Sesame Street 2");
+        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("foo").singleResult()
+            .getValue()).inPath("bar").isEqualTo("Sesame Street 2");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
     public void testUpdateJsonValueToLongValueDuringExecution() {
         ObjectNode customer = objectMapper.createObjectNode();
         customer.put("name", "Kermit");

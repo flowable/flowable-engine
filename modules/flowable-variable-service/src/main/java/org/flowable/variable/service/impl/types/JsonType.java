@@ -114,8 +114,10 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             String textValue = value.toString();
             if (textValue.length() <= maxLength) {
                 valueFields.setTextValue(textValue);
+                valueFields.setBytes(null);
             } else {
                 valueFields.setBytes(textValue.getBytes(StandardCharsets.UTF_8));
+                valueFields.setTextValue(null);
             }
             valueFields.setCachedValue(jsonNode);
             traceValue(jsonNode, valueFields);
