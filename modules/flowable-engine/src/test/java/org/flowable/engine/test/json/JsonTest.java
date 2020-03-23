@@ -268,6 +268,47 @@ public class JsonTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
+    public void testUpdateFromSmallToLongJsonValue() {
+        // Set customer.street to 'Sesame Street'
+        ObjectNode customer = objectMapper.createObjectNode();
+        customer.put("street", "Sesame Street");
+        JavaDelegate javaDelegate = execution -> {};
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("updateJsonValue")
+            .variable("customer", customer)
+            .transientVariable("jsonBean", javaDelegate)
+            .start();
+
+        Object customerActual = runtimeService.getVariable(processInstance.getId(), "customer");
+        assertThat(customerActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerActual).inPath("street").isEqualTo("Sesame Street");
+        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("customer").singleResult()
+            .getValue()).inPath("street").isEqualTo("Sesame Street");
+
+        // Set customer.street to long value
+        String randomLongValue = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
+        customer.put("street", randomLongValue);
+        runtimeService.setVariable(processInstance.getId(), "customer", customer);
+
+        customerActual = runtimeService.getVariable(processInstance.getId(), "customer");
+        assertThat(customerActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerActual).inPath("street").isEqualTo(randomLongValue);
+        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("customer").singleResult()
+            .getValue()).inPath("street").isEqualTo(randomLongValue);
+
+        // Set customer.street back to a small value
+        customer.put("street", "Sesame Street 2");
+        runtimeService.setVariable(processInstance.getId(), "customer", customer);
+
+        customerActual = runtimeService.getVariable(processInstance.getId(), "customer");
+        assertThat(customerActual).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerActual).inPath("street").isEqualTo("Sesame Street 2");
+        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("customer").singleResult()
+            .getValue()).inPath("street").isEqualTo("Sesame Street 2");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
     public void testUpdateJsonValueToLongValueDuringExecution() {
         ObjectNode customer = objectMapper.createObjectNode();
         customer.put("name", "Kermit");
