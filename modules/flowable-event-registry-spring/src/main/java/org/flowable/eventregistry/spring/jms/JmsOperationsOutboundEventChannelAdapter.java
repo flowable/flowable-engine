@@ -22,15 +22,21 @@ public class JmsOperationsOutboundEventChannelAdapter implements OutboundEventCh
 
     protected JmsOperations jmsOperations;
     protected String destination;
+    protected JmsMessageCreator<String> messageCreator;
 
     public JmsOperationsOutboundEventChannelAdapter(JmsOperations jmsOperations, String destination) {
+        this(jmsOperations, destination, (event, session) -> session.createTextMessage(event));
+    }
+
+    public JmsOperationsOutboundEventChannelAdapter(JmsOperations jmsOperations, String destination, JmsMessageCreator<String> messageCreator) {
         this.jmsOperations = jmsOperations;
         this.destination = destination;
+        this.messageCreator = (event, session) -> session.createTextMessage(event);
     }
 
     @Override
     public void sendEvent(String rawEvent) {
-        jmsOperations.convertAndSend(destination, rawEvent);
+        jmsOperations.send(destination, session -> getMessageCreator().toMessage(rawEvent, session));
     }
 
     public JmsOperations getJmsOperations() {
@@ -47,5 +53,13 @@ public class JmsOperationsOutboundEventChannelAdapter implements OutboundEventCh
 
     public void setDestination(String destination) {
         this.destination = destination;
+    }
+
+    public JmsMessageCreator<String> getMessageCreator() {
+        return messageCreator;
+    }
+
+    public void setMessageCreator(JmsMessageCreator<String> messageCreator) {
+        this.messageCreator = messageCreator;
     }
 }
