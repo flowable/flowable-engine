@@ -224,4 +224,6 @@ public interface CmmnStencilConstants {
     String PROPERTY_EVENT_REGISTRY_CORRELATIONTYPE = "type";
     String PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE = "value";
 
+    String PROPERTY_MILESTONE_VARIABLE = "milestonevariable";
+
 }

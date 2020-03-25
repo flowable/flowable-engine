@@ -49,6 +49,11 @@ public class MilestoneXmlConverter extends PlanItemDefinitionXmlConverter {
         } else {
             mileStone.setIncludeInStageOverview("true");  // True by default
         }
+
+        String milestoneVariable = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_MILESTONE_VARIABLE);
+        if (StringUtils.isNotEmpty(milestoneVariable)) {
+            mileStone.setMilestoneVariable(milestoneVariable);
+        }
         
         return mileStone;
     }

@@ -39,5 +39,8 @@ public class MilestoneExport extends AbstractPlanItemDefinitionExport<Milestone>
         if (StringUtils.isNotEmpty(milestone.getIncludeInStageOverview()) && !"true".equalsIgnoreCase(milestone.getIncludeInStageOverview())) { // if it's missing, it's true by default
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW, milestone.getIncludeInStageOverview());
         }
+        if (StringUtils.isNotEmpty(milestone.getMilestoneVariable())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_MILESTONE_VARIABLE, milestone.getMilestoneVariable());
+        }
     }
 }
