@@ -28,6 +28,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -87,6 +89,56 @@ public class SerializableVariableTest extends PluggableFlowableTestCase {
                     .asInstanceOf(type(TestSerializableVariable.class))
                     .extracting(TestSerializableVariable::getNumber)
                     .isEqualTo(10);
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testSetSerializableValueToNull() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("var", new TestSerializableVariable(10))
+                .start();
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "var", TestSerializableVariable.class))
+                .extracting(TestSerializableVariable::getNumber)
+                .isEqualTo(10);
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "var");
+        assertThat(variableInstance).isNotNull();
+
+        assertThat(variableInstance.getValue())
+                .asInstanceOf(type(TestSerializableVariable.class))
+                .extracting(TestSerializableVariable::getNumber)
+                .isEqualTo(10);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                    .variableName("var")
+                    .singleResult();
+
+            assertThat(historicVariableInstance.getValue())
+                    .asInstanceOf(type(TestSerializableVariable.class))
+                    .extracting(TestSerializableVariable::getNumber)
+                    .isEqualTo(10);
+        }
+
+        runtimeService.setVariable(processInstance.getId(), "var", null);
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "var")).isNull();
+
+        variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "var");
+        assertThat(variableInstance).isNotNull();
+        assertThat(variableInstance.getValue()).isNull();
+        assertThat(((VariableInstanceEntity) variableInstance).getByteArrayRef()).isNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                    .variableName("var")
+                    .singleResult();
+
+            assertThat(historicVariableInstance.getValue()).isNull();
+            assertThat(((HistoricVariableInstanceEntity) historicVariableInstance).getByteArrayRef()).isNull();
         }
     }
 

@@ -38,6 +38,9 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.jupiter.api.Test;
 
@@ -279,32 +282,51 @@ public class JsonTest extends PluggableFlowableTestCase {
             .transientVariable("jsonBean", javaDelegate)
             .start();
 
-        Object customerActual = runtimeService.getVariable(processInstance.getId(), "customer");
+        VariableInstance customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNull();
+
+        Object customerActual = customerVariableInstance.getValue();
         assertThat(customerActual).isInstanceOf(ObjectNode.class);
         assertThatJson(customerActual).inPath("street").isEqualTo("Sesame Street");
-        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("customer").singleResult()
-            .getValue()).inPath("street").isEqualTo("Sesame Street");
+        HistoricVariableInstance customerHistoricVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("customer")
+                .singleResult();
+        assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo("Sesame Street");
+        assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNull();
 
         // Set customer.street to long value
         String randomLongValue = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
         customer.put("street", randomLongValue);
         runtimeService.setVariable(processInstance.getId(), "customer", customer);
 
-        customerActual = runtimeService.getVariable(processInstance.getId(), "customer");
+        customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        customerActual = customerVariableInstance.getValue();
         assertThat(customerActual).isInstanceOf(ObjectNode.class);
         assertThatJson(customerActual).inPath("street").isEqualTo(randomLongValue);
-        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("customer").singleResult()
-            .getValue()).inPath("street").isEqualTo(randomLongValue);
+        assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNotNull();
+
+        customerHistoricVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .variableName("customer")
+                .singleResult();
+        assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo(randomLongValue);
+        assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNotNull();
 
         // Set customer.street back to a small value
         customer.put("street", "Sesame Street 2");
         runtimeService.setVariable(processInstance.getId(), "customer", customer);
 
-        customerActual = runtimeService.getVariable(processInstance.getId(), "customer");
+        customerVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        customerActual = customerVariableInstance.getValue();
         assertThat(customerActual).isInstanceOf(ObjectNode.class);
         assertThatJson(customerActual).inPath("street").isEqualTo("Sesame Street 2");
-        assertThatJson(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("customer").singleResult()
-            .getValue()).inPath("street").isEqualTo("Sesame Street 2");
+        assertThat(((VariableInstanceEntity) customerVariableInstance).getByteArrayRef()).isNull();
+
+        customerHistoricVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                .variableName("customer").singleResult();
+        assertThatJson(customerHistoricVariableInstance.getValue()).inPath("street").isEqualTo("Sesame Street 2");
+        assertThat(((HistoricVariableInstanceEntity) customerHistoricVariableInstance).getByteArrayRef()).isNull();
     }
 
     @Test

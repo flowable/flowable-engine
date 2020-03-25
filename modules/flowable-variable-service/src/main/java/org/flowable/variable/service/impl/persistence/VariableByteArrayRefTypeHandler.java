@@ -48,18 +48,25 @@ public class VariableByteArrayRefTypeHandler extends TypeReference<VariableByteA
     @Override
     public VariableByteArrayRef getResult(ResultSet rs, String columnName) throws SQLException {
         String id = rs.getString(columnName);
-        return new VariableByteArrayRef(id, getCommandExecutor());
+        return createVariableByteArrayRef(id);
     }
 
     @Override
     public VariableByteArrayRef getResult(ResultSet rs, int columnIndex) throws SQLException {
         String id = rs.getString(columnIndex);
-        return new VariableByteArrayRef(id, getCommandExecutor());
+        return createVariableByteArrayRef(id);
     }
 
     @Override
     public VariableByteArrayRef getResult(CallableStatement cs, int columnIndex) throws SQLException {
         String id = cs.getString(columnIndex);
+        return createVariableByteArrayRef(id);
+    }
+
+    protected VariableByteArrayRef createVariableByteArrayRef(String id) {
+        if (id == null) {
+            return null;
+        }
         return new VariableByteArrayRef(id, getCommandExecutor());
     }
 
