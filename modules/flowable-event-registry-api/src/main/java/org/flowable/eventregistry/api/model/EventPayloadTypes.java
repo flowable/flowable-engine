@@ -19,7 +19,9 @@ public interface EventPayloadTypes {
 
     String STRING = "string";
     String INTEGER = "integer";
+    String LONG = "long";
     String DOUBLE = "double";
     String BOOLEAN = "boolean";
+    String JSON = "json";
 
 }

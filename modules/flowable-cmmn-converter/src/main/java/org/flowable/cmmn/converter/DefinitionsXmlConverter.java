@@ -63,6 +63,13 @@ public class DefinitionsXmlConverter extends BaseCmmnXmlConverter {
                 LOGGER.warn("Ignoring creationDate attribute: invalid date format", e);
             }
         }
+
+        for (int i = 0; i < xtr.getNamespaceCount(); i++) {
+            String prefix = xtr.getNamespacePrefix(i);
+            if (StringUtils.isNotEmpty(prefix)) {
+                model.addNamespace(prefix, xtr.getNamespaceURI(i));
+            }
+        }
         
         return null;
     }

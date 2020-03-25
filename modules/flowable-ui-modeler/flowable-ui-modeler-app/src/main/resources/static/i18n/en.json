@@ -1715,6 +1715,12 @@
             "DESCRIPTION": "Indicates if this stage should be considered for the stage overview"
           }
         },
+        "MILESTONEVARIABLEPACKAGE" : {
+          "MILESTONEVARIABLE": {
+            "TITLE": "Milestone variable",
+            "DESCRIPTION": "If set, a variable with this name and boolean value true will be created when this milestone is reached"
+          }
+        },
         "SCRIPTFORMATPACKAGE": {
           "SCRIPTFORMAT": {
             "TITLE": "Script format",

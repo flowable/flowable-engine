@@ -12,12 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -26,14 +28,26 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class MilestoneActivityBehavior extends CoreCmmnActivityBehavior {
     
     protected Expression milestoneNameExpression;
+    protected String milestoneVariable;
     
-    public MilestoneActivityBehavior(Expression milestoneNameExpression) {
+    public MilestoneActivityBehavior(Expression milestoneNameExpression, String milestoneVariable) {
         this.milestoneNameExpression = milestoneNameExpression;
+        this.milestoneVariable = milestoneVariable;
     }
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         MilestoneInstanceEntity milestoneInstanceEntity = createMilestoneInstance(planItemInstanceEntity, commandContext);
+
+        if (StringUtils.isNotEmpty(milestoneVariable)) {
+            ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
+            Expression milestoneVariableExpression = expressionManager.createExpression(milestoneVariable);
+            String actualMilestoneVariable = (String) milestoneVariableExpression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(actualMilestoneVariable)) {
+                planItemInstanceEntity.setVariable(actualMilestoneVariable, true);
+            }
+        }
+
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordMilestoneReached(milestoneInstanceEntity);
         CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
     }

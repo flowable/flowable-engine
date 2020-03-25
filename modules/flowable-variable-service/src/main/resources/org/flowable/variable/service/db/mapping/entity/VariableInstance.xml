@@ -99,7 +99,7 @@
             <if test="originalPersistentState.scopeType != scopeType">
                 SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
             </if>
-            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
+            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (byteArrayRef and  originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             </if>
             <if test="(originalPersistentState.typeName == null and type != null) or (originalPersistentState.typeName != null and type == null) or (originalPersistentState.typeName != type.typeName)">

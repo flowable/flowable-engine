@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
@@ -133,6 +134,10 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
     protected void validateFieldDeclarationsForSendEventTask(org.flowable.bpmn.model.Process process, SendEventServiceTask sendEventServiceTask, List<ValidationError> errors) {
         if (StringUtils.isEmpty(sendEventServiceTask.getEventType())) {
             addError(errors, Problems.SEND_EVENT_TASK_NO_EVENT_TYPE, process, sendEventServiceTask, "No event type is defined on the send event task");
+        }
+        List<ExtensionElement> channelKeyExtensionElements = sendEventServiceTask.getExtensionElements().get("channelKey");
+        if (channelKeyExtensionElements.isEmpty() || StringUtils.isEmpty(channelKeyExtensionElements.get(0).getElementText())) {
+            addError(errors, Problems.SEND_EVENT_TASK_NO_OUTBOUND_CHANNEL, process, sendEventServiceTask, "No outbound channel set on the send event task");
         }
     }
 }

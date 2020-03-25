@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.engine.DmnEngines;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -189,6 +190,7 @@ public class FlowableDmnRule implements TestRule {
     }
 
     protected void initializeDmnEngine() {
+        DmnEngines.destroy(); // Just to be sure we're not getting any previously cached version
         dmnEngine = DmnTestHelper.getDmnEngine(configurationResource);
     }
 

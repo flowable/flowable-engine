@@ -62,8 +62,8 @@ public class MailTaskJsonConverter extends BaseBpmnJsonConverter {
         addField(PROPERTY_MAILTASK_BCC, elementNode, task);
         addField(PROPERTY_MAILTASK_TEXT, elementNode, task);
         addField(PROPERTY_MAILTASK_HTML, elementNode, task);
-        addField(PROPERTY_MAILTASK_HTML_VAR, elementNode, task);
-        addField(PROPERTY_MAILTASK_TEXT_VAR, elementNode, task);
+        addField("htmlVar", PROPERTY_MAILTASK_HTML_VAR, elementNode, task);
+        addField("textVar", PROPERTY_MAILTASK_TEXT_VAR, elementNode, task);
         addField(PROPERTY_MAILTASK_CHARSET, elementNode, task);
 
         return task;

@@ -999,6 +999,16 @@
           "popular" : true
         }]
     },{
+      "name" : "milestonevariablepackage",
+      "properties" : [ {
+        "id" : "milestonevariable",
+        "type" : "String",
+        "title" : "CMMN.PROPERTYPACKAGES.MILESTONEVARIABLEPACKAGE.MILESTONEVARIABLE.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.MILESTONEVARIABLEPACKAGE.MILESTONEVARIABLE.DESCRIPTION",
+        "popular" : true
+      }]
+    },{
       "name" : "scriptformatpackage",
       "properties" : [ {
         "id" : "scriptformat",
@@ -1371,7 +1381,9 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "completionneutralrulepackage",
-        "planitemlifecyclelistenerspackage" ],
+        "planitemlifecyclelistenerspackage",
+        "milestonevariablepackage"
+      ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {

@@ -1714,6 +1714,11 @@
             "TITLE": "Incluir en visión general",
             "DESCRIPTION": "Indica si esta etapa debe ser considerada para la visión general"
           }
+        },"MILESTONEVARIABLEPACKAGE" : {
+          "MILESTONEVARIABLE": {
+            "TITLE": "Milestone variable",
+            "DESCRIPTION": "If set, a variable with this name and boolean value true will be created when this milestone is reached"
+          }
         },
         "SCRIPTFORMATPACKAGE": {
           "SCRIPTFORMAT": {
