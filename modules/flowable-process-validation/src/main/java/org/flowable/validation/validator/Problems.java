@@ -65,6 +65,7 @@ public interface Problems {
     String CASE_TASK_NO_CASE_DEFINITION_KEY = "flowable-casetask-no-case-definition-key";
     
     String SEND_EVENT_TASK_NO_EVENT_TYPE = "flowable-sendeventtask-no-event-type";
+    String SEND_EVENT_TASK_NO_OUTBOUND_CHANNEL = "flowable-sendeventtask-no-outbound-channel";
 
     String EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW = "flowable-exclusive-gateway-no-outgoing-seq-flow";
     String EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW = "flowable-exclusive-gateway-condition-not-allowed-on-single-seq-flow";
