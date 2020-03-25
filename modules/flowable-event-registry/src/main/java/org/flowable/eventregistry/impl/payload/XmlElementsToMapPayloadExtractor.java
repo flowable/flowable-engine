@@ -69,6 +69,9 @@ public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtr
             } else if (EventPayloadTypes.DOUBLE.equals(definitionType)) {
                 return Double.valueOf(textContent);
 
+            } else if (EventPayloadTypes.LONG.equals(definitionType)) {
+                return Long.valueOf(textContent);
+
             } else {
                 LOGGER.warn("Unsupported payload type: {} ", definitionType);
                 return textContent;
@@ -96,6 +99,37 @@ public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtr
         }
         return null;
     }
+
+    //
+    // Commented out for now: mapping xml to json when type is JSON
+    //
+//    protected ObjectNode xmlToJson(Node childNode) {
+//        ObjectMapper objectMapper = CommandContextUtil.getEventRegistryConfiguration().getObjectMapper();
+//        ObjectNode objectNode = objectMapper.createObjectNode();
+//        xmlToJson(childNode, objectMapper, objectNode);
+//        return objectNode;
+//    }
+//
+//    protected void xmlToJson(Node childNode, ObjectMapper objectMapper, ObjectNode objectNode) {
+//        NodeList childNodes = childNode.getChildNodes();
+//        List<Element> childElements = new ArrayList<>();
+//        for (int i = 0; i < childNodes.getLength(); i++) {
+//            Node item = childNodes.item(i);
+//            if (item instanceof Element) {
+//                childElements.add((Element) item);
+//            }
+//        }
+//
+//        if (!childElements.isEmpty()) {
+//            ObjectNode childObjectNode = objectNode.putObject(childNode.getLocalName());
+//            for (Element childElement : childElements) {
+//                xmlToJson(childElement, objectMapper, childObjectNode);
+//            }
+//        } else {
+//            objectNode.put(childNode.getLocalName(), childNode.getTextContent());
+//        }
+//
+//    }
 
 
 }
