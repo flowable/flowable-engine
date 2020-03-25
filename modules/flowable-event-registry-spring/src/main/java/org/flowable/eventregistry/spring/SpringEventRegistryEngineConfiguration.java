@@ -223,7 +223,7 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
     }
 
     protected void createAndInitEventRegistryChangeDetectionExecutor() {
-        if (eventRegistryChangeDetectionExecutor != null) {
+        if (enableEventRegistryChangeDetection && eventRegistryChangeDetectionExecutor != null) {
             eventRegistryChangeDetectionExecutor.setEventRegistryChangeDetectionManager(eventRegistryChangeDetectionManager);
             eventRegistryChangeDetectionExecutor.initialize();
         }
