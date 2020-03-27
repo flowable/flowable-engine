@@ -1,6 +1,6 @@
 name: Flowable 5 Build
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   test_jdk:
