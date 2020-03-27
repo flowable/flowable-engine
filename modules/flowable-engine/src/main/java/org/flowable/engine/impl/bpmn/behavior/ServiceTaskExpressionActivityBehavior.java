@@ -117,8 +117,8 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
                 if (cause instanceof BpmnError) {
                     error = (BpmnError) cause;
                     break;
-                } else if (cause instanceof RuntimeException) {
-                    if (ErrorPropagation.mapException((RuntimeException) cause, (ExecutionEntity) execution, mapExceptions)) {
+                } else if (cause instanceof Exception) {
+                    if (ErrorPropagation.mapException((Exception) cause, (ExecutionEntity) execution, mapExceptions)) {
                         return;
                     }
                 }
