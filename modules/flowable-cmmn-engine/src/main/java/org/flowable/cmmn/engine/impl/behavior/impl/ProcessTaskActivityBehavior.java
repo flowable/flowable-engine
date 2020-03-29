@@ -102,8 +102,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         planItemInstanceEntity.setReferenceId(processInstanceId);
 
         if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isEnableEntityLinks()) {
-            EntityLinkUtil.copyExistingEntityLinks(planItemInstanceEntity.getCaseInstanceId(), processInstanceId, ScopeTypes.BPMN);
-            EntityLinkUtil.createNewEntityLink(planItemInstanceEntity.getCaseInstanceId(), processInstanceId, ScopeTypes.BPMN);
+            EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), processInstanceId, ScopeTypes.BPMN);
         }
 
         String businessKey = getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, processTask);

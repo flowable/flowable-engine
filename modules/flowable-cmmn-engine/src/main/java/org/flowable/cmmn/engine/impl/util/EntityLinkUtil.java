@@ -12,10 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkService;
@@ -25,43 +26,69 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 
 /**
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class EntityLinkUtil {
 
-    public static void copyExistingEntityLinks(String scopeId, String referenceScopeId, String referenceScopeType) {
+    public static void createEntityLinks(String scopeId, String referenceScopeId, String referenceScopeType) {
+        // scopeId is the process instance in which this is being created
+        // referenceScopeId is CaseTask, HumanTask, etc.
+
         EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService();
-        List<EntityLink> entityLinks = entityLinkService.findEntityLinksByReferenceScopeIdAndType(scopeId, ScopeTypes.CMMN, EntityLinkType.CHILD);
-        List<String> parentIds = new ArrayList<>();
-        for (EntityLink entityLink : entityLinks) {
-            if (!parentIds.contains(entityLink.getScopeId())) {
-                EntityLinkEntity newEntityLink = (EntityLinkEntity) entityLinkService.createEntityLink();
-                newEntityLink.setLinkType(EntityLinkType.CHILD);
-                newEntityLink.setScopeId(entityLink.getScopeId());
-                newEntityLink.setScopeType(entityLink.getScopeType());
-                newEntityLink.setScopeDefinitionId(entityLink.getScopeDefinitionId());
-                newEntityLink.setReferenceScopeId(referenceScopeId);
-                newEntityLink.setReferenceScopeType(referenceScopeType);
-                if (HierarchyType.ROOT.equals(entityLink.getHierarchyType())) {
-                    newEntityLink.setHierarchyType(entityLink.getHierarchyType());
+        List<EntityLink> scopeParentEntityLinks = entityLinkService.findEntityLinksByReferenceScopeIdAndType(scopeId, ScopeTypes.CMMN, EntityLinkType.CHILD);
+
+        Set<String> parentIds = new HashSet<>();
+
+        CmmnHistoryManager historyManager = CommandContextUtil.getCmmnHistoryManager();
+        EntityLink scopeRootEntityLink = null;
+        // First copy existing links
+        for (EntityLink parentEntityLink : scopeParentEntityLinks) {
+            if (!parentIds.contains(parentEntityLink.getScopeId())) {
+                String newHierarchyType = null;
+                if (HierarchyType.ROOT.equals(parentEntityLink.getHierarchyType())) {
+                    scopeRootEntityLink = parentEntityLink;
+                    newHierarchyType = HierarchyType.ROOT;
+                } else if (HierarchyType.PARENT.equals(parentEntityLink.getHierarchyType())) {
+                    if (ScopeTypes.TASK.equals(referenceScopeType)) {
+                        // For tasks we need to create a Grand Parent link as well
+                        // The parent of the scope parent is the Task Grand Parent
+                        newHierarchyType = HierarchyType.GRAND_PARENT;
+                    }
                 }
-                entityLinkService.insertEntityLink(newEntityLink);
 
-                CommandContextUtil.getCmmnHistoryManager().recordEntityLinkCreated(newEntityLink);
+                copyAndCreateEntityLink(referenceScopeId, referenceScopeType, newHierarchyType, parentEntityLink, entityLinkService, historyManager);
 
-                parentIds.add(entityLink.getScopeId());
+
+                parentIds.add(parentEntityLink.getScopeId());
             }
         }
+
+        // Create new entity link
+        // If a root entity link exists then the entity link that we would create would be with parent hierarchy type
+        String hierarchyType = scopeRootEntityLink != null ? HierarchyType.PARENT : HierarchyType.ROOT;
+
+        createEntityLink(scopeId, referenceScopeId, referenceScopeType, hierarchyType, entityLinkService, historyManager);
+    }
+    protected static EntityLinkEntity copyAndCreateEntityLink(String referenceScopeId, String referenceScopeType, String hierarchyType,
+            EntityLink parentEntityLink, EntityLinkService entityLinkService, CmmnHistoryManager historyManager) {
+
+        EntityLinkEntity newEntityLink = (EntityLinkEntity) entityLinkService.createEntityLink();
+        newEntityLink.setLinkType(EntityLinkType.CHILD);
+        newEntityLink.setScopeId(parentEntityLink.getScopeId());
+        newEntityLink.setScopeType(parentEntityLink.getScopeType());
+        newEntityLink.setScopeDefinitionId(parentEntityLink.getScopeDefinitionId());
+        newEntityLink.setReferenceScopeId(referenceScopeId);
+        newEntityLink.setReferenceScopeType(referenceScopeType);
+        newEntityLink.setHierarchyType(hierarchyType);
+        entityLinkService.insertEntityLink(newEntityLink);
+
+        historyManager.recordEntityLinkCreated(newEntityLink);
+
+        return newEntityLink;
     }
 
-    public static void createNewEntityLink(String scopeId, String referenceScopeId, String referenceScopeType) {
-        EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService();
-
-        // Check if existing links already have root, if not, current is root
-        Optional<EntityLink> entityLinkWithRoot = entityLinkService
-            .findEntityLinksByReferenceScopeIdAndType(scopeId, ScopeTypes.CMMN, EntityLinkType.CHILD)
-            .stream()
-            .filter(e -> HierarchyType.ROOT.equals(e.getHierarchyType()))
-            .findFirst();
+    protected static EntityLinkEntity createEntityLink(String scopeId, String referenceScopeId, String referenceScopeType, String hierarchyType,
+            EntityLinkService entityLinkService, CmmnHistoryManager historyManager) {
 
         EntityLinkEntity newEntityLink = (EntityLinkEntity) entityLinkService.createEntityLink();
         newEntityLink.setLinkType(EntityLinkType.CHILD);
@@ -69,14 +96,12 @@ public class EntityLinkUtil {
         newEntityLink.setScopeType(ScopeTypes.CMMN);
         newEntityLink.setReferenceScopeId(referenceScopeId);
         newEntityLink.setReferenceScopeType(referenceScopeType);
-        if (!entityLinkWithRoot.isPresent()) {
-            newEntityLink.setHierarchyType(HierarchyType.ROOT);
-        } else {
-            newEntityLink.setHierarchyType(HierarchyType.PARENT);
-        }
+        newEntityLink.setHierarchyType(hierarchyType);
         entityLinkService.insertEntityLink(newEntityLink);
 
-        CommandContextUtil.getCmmnHistoryManager().recordEntityLinkCreated(newEntityLink);
+        historyManager.recordEntityLinkCreated(newEntityLink);
+
+        return newEntityLink;
     }
 
 }
