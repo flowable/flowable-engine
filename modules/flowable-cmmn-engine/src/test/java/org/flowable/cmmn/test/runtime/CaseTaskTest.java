@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
 import java.util.List;
@@ -1003,6 +1004,92 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
                 .singleResult();
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "test")).isEqualTo(subCase.getId());
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testThreeLevelRootCase.cmmn",
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testThreeLevelLevel1Case.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testThreeLevelCase() {
+        CaseInstance rootCase = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("rootCase")
+                .start();
+
+        String rootCaseId = rootCase.getId();
+
+        String level1CaseId = (String) rootCase.getCaseVariables().get("caseIdVariable");
+        String oneHumanTaskCaseId = (String) cmmnRuntimeService.getVariable(level1CaseId, "caseIdVariable");
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(rootCaseId).singleResult();
+        assertThat(task.getScopeId()).isEqualTo(oneHumanTaskCaseId);
+
+        List<EntityLink> entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(rootCaseId);
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                        EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(rootCaseId, ScopeTypes.CMMN, HierarchyType.ROOT, level1CaseId, ScopeTypes.CMMN, EntityLinkType.CHILD),
+                        tuple(rootCaseId, ScopeTypes.CMMN, HierarchyType.ROOT, oneHumanTaskCaseId, ScopeTypes.CMMN, EntityLinkType.CHILD),
+                        tuple(rootCaseId, ScopeTypes.CMMN, HierarchyType.ROOT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(level1CaseId);
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                        EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(level1CaseId, ScopeTypes.CMMN, HierarchyType.PARENT, oneHumanTaskCaseId, ScopeTypes.CMMN, EntityLinkType.CHILD),
+                        tuple(level1CaseId, ScopeTypes.CMMN, HierarchyType.GRAND_PARENT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(oneHumanTaskCaseId);
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                        EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(oneHumanTaskCaseId, ScopeTypes.CMMN, HierarchyType.PARENT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+        
+        List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(rootCaseId);
+
+        assertThat(historicEntityLinks)
+                .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType, HistoricEntityLink::getReferenceScopeId,
+                        HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(rootCaseId, ScopeTypes.CMMN, HierarchyType.ROOT, level1CaseId, ScopeTypes.CMMN, EntityLinkType.CHILD),
+                        tuple(rootCaseId, ScopeTypes.CMMN, HierarchyType.ROOT, oneHumanTaskCaseId, ScopeTypes.CMMN, EntityLinkType.CHILD),
+                        tuple(rootCaseId, ScopeTypes.CMMN, HierarchyType.ROOT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(level1CaseId);
+
+        assertThat(historicEntityLinks)
+                .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType, HistoricEntityLink::getReferenceScopeId,
+                        HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(level1CaseId, ScopeTypes.CMMN, HierarchyType.PARENT, oneHumanTaskCaseId, ScopeTypes.CMMN, EntityLinkType.CHILD),
+                        tuple(level1CaseId, ScopeTypes.CMMN, HierarchyType.GRAND_PARENT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(oneHumanTaskCaseId);
+
+        assertThat(historicEntityLinks)
+                .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType, HistoricEntityLink::getReferenceScopeId,
+                        HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                .containsExactlyInAnyOrder(
+                        tuple(oneHumanTaskCaseId, ScopeTypes.CMMN, HierarchyType.PARENT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
     }
 
 }

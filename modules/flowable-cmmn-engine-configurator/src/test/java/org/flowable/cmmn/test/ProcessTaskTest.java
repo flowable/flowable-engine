@@ -100,6 +100,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("myCase")
                     .start();
+            String caseInstanceId = caseInstance.getId();
 
             List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
@@ -213,6 +214,183 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertThat(historicTask.getId()).isEqualTo(processTask.getId());
 
             historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
+            assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
+        } finally {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedCallActivityProcessBlocking() {
+        Deployment deployment = processEngine.getRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml")
+                .addClasspathResource("org/flowable/cmmn/test/oneCallActivityProcess.bpmn20.xml")
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+            String caseInstanceId = caseInstance.getId();
+
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+
+            assertThat(planItemInstances).hasSize(1);
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+
+            Task processTask = processEngine.getTaskService().createTaskQuery().singleResult();
+            String oneTaskProcessId = processTask.getProcessInstanceId();
+
+            ProcessInstance oneTaskProcess = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(oneTaskProcessId).singleResult();
+            assertThat(oneTaskProcess.getProcessDefinitionKey()).isEqualTo("oneTask");
+
+            ProcessInstance callActivityProcess = processEngine.getRuntimeService().createProcessInstanceQuery().subProcessInstanceId(oneTaskProcessId).singleResult();
+            assertThat(callActivityProcess.getProcessDefinitionKey()).isEqualTo("oneCallActivity");
+            String callActivityProcessId = callActivityProcess.getId();
+
+            ProcessInstance nestedCallActivityProcess = processEngine.getRuntimeService().createProcessInstanceQuery().subProcessInstanceId(callActivityProcessId).singleResult();
+            assertThat(nestedCallActivityProcess.getProcessDefinitionKey()).isEqualTo("nestedCallActivity");
+            String nestedCallActivityProcessId = nestedCallActivityProcess.getId();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
+            assertThat(task.getId()).isEqualTo(processTask.getId());
+
+            task = cmmnTaskService.createTaskQuery().processInstanceIdWithChildren(nestedCallActivityProcessId).singleResult();
+            assertThat(task.getId()).isEqualTo(processTask.getId());
+
+            List<EntityLink> entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstanceId);
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, nestedCallActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, callActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            entityLinks = processEngineRuntimeService.getEntityLinkChildrenForProcessInstance(nestedCallActivityProcessId);
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(nestedCallActivityProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, callActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, ScopeTypes.BPMN, null, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, ScopeTypes.BPMN, null, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            entityLinks = processEngineRuntimeService.getEntityLinkChildrenForProcessInstance(callActivityProcessId);
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(callActivityProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(callActivityProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            entityLinks = processEngineRuntimeService.getEntityLinkChildrenForProcessInstance(oneTaskProcessId);
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(oneTaskProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            entityLinks = processEngineRuntimeService.getEntityLinkParentsForTask(processTask.getId());
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, ScopeTypes.BPMN, null, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(callActivityProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(oneTaskProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            processEngineTaskService.complete(processTask.getId());
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+
+            List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstanceId);
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, nestedCallActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, callActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+
+            historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkChildrenForProcessInstance(nestedCallActivityProcessId);
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(nestedCallActivityProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, callActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, ScopeTypes.BPMN, null, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, ScopeTypes.BPMN, null, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkChildrenForProcessInstance(callActivityProcessId);
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(callActivityProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(callActivityProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+
+            historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkChildrenForProcessInstance(oneTaskProcessId);
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(oneTaskProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkParentsForTask(processTask.getId());
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.ROOT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, ScopeTypes.BPMN, null, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(callActivityProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(oneTaskProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            HistoricTaskInstance historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery()
+                    .caseInstanceIdWithChildren(caseInstanceId)
+                    .singleResult();
+            assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
+            historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().processInstanceIdWithChildren(nestedCallActivityProcessId).singleResult();
+            assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
+            historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().processInstanceIdWithChildren(oneTaskProcessId).singleResult();
             assertThat(historicTask.getId()).isEqualTo(processTask.getId());
 
         } finally {
