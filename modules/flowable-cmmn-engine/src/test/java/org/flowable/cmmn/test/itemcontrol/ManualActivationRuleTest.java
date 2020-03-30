@@ -343,5 +343,45 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
 
     }
+
+    @Test
+    @CmmnDeployment
+    public void testManuallyActivateStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testManualActivatedStage").start();
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult();
+        assertThat(stagePlanItemInstance.getName()).isEqualTo("Stage one");
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(stagePlanItemInstance.getId()).start();
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testManuallyActivateStageWithQueryAndStartInOneTransaction() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testManualActivatedStage").start();
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult();
+        assertThat(stagePlanItemInstance.getName()).isEqualTo("Stage one");
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            @Override
+            public Void execute(CommandContext commandContext) {
+                PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().planItemDefinitionType(PlanItemDefinitionType.STAGE).singleResult();
+                assertThat(planItemInstance).isNotNull();
+                cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId());
+
+                return null;
+            }
+
+        });
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
     
 }
