@@ -412,6 +412,9 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
+        if (childPlanItemInstances == null && id != null) {
+            childPlanItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager().findByStagePlanItemInstanceId(id);
+        }
         return childPlanItemInstances;
     }
     
