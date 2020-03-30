@@ -201,6 +201,8 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
             }
             
         });
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
     }
     
     @Test
