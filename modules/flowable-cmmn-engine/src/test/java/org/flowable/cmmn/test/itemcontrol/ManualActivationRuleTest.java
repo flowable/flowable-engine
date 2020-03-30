@@ -28,7 +28,6 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.task.api.Task;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -403,12 +402,9 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
             .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateEnabled().count()).isEqualTo(1);
 
         // Manually complete the stage should throw an exception
-        try {
-            cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
-            Assert.fail();
-        } catch (Exception e) {
-            assertThat(e.getMessage()).containsIgnoringCase("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
-        }
+        assertThatThrownBy(() -> cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId()))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
     }
     
 }
