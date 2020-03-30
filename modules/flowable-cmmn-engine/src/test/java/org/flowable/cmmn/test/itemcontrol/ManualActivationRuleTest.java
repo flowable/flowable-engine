@@ -28,6 +28,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.task.api.Task;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -384,6 +385,30 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
 
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRequiredHumanTaskInManuallyActivatedStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("stageTest").start();
+
+        // Activate the manually activated stage
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage with blocking task").planItemInstanceStateEnabled().singleResult();
+        assertThat(stagePlanItemInstance.getName()).isEqualTo("Stage with blocking task");
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateEnabled().count()).isEqualTo(0);
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(stagePlanItemInstance.getId()).start();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateEnabled().count()).isEqualTo(1);
+
+        // Manually complete the stage should throw an exception
+        try {
+            cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
+            Assert.fail();
+        } catch (Exception e) {
+            assertThat(e.getMessage()).containsIgnoringCase("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
+        }
     }
     
 }
