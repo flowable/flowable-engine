@@ -113,6 +113,9 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                     // Cache
                     entityCache.put(planItemInstanceEntity, true);
 
+                    // Always add empty list, so no check is needed later and plan items
+                    // without children have a non-null value, not triggering the fetch
+                    currentPlanItemInstanceEntity.setChildPlanItemInstances(new ArrayList<>());
                 }
 
                 // plan items of case plan model
@@ -120,9 +123,6 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                     directPlanItemInstances.add(currentPlanItemInstanceEntity);
                 }
 
-                // Always add empty list, so no check is needed later and plan items
-                // without children have a non-null value, not triggering the fetch
-                currentPlanItemInstanceEntity.setChildPlanItemInstances(new ArrayList<>());
             }
 
             // Add to correct parent
