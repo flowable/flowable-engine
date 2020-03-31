@@ -64,10 +64,22 @@ public class EntityLinkUtil {
         }
 
         // Create new entity link
-        // If a root entity link exists then the entity link that we would create would be with parent hierarchy type
-        String hierarchyType = scopeRootEntityLink != null ? HierarchyType.PARENT : HierarchyType.ROOT;
+        String hierarchyType;
+        String rootScopeId;
+        String rootScopeType;
 
-        createEntityLink(scopeId, referenceScopeId, referenceScopeType, hierarchyType, entityLinkService, historyManager);
+        if (scopeRootEntityLink != null) {
+            // If a root entity link exists then the entity link that we would create would be with parent hierarchy type
+            hierarchyType = HierarchyType.PARENT;
+            rootScopeId = scopeRootEntityLink.getRootScopeId();
+            rootScopeType = scopeRootEntityLink.getRootScopeType();
+        } else {
+            hierarchyType = HierarchyType.ROOT;
+            rootScopeId = scopeId;
+            rootScopeType = ScopeTypes.CMMN;
+        }
+
+        createEntityLink(scopeId, referenceScopeId, referenceScopeType, hierarchyType, rootScopeId, rootScopeType, entityLinkService, historyManager);
     }
     protected static EntityLinkEntity copyAndCreateEntityLink(String referenceScopeId, String referenceScopeType, String hierarchyType,
             EntityLink parentEntityLink, EntityLinkService entityLinkService, CmmnHistoryManager historyManager) {
@@ -80,6 +92,8 @@ public class EntityLinkUtil {
         newEntityLink.setReferenceScopeId(referenceScopeId);
         newEntityLink.setReferenceScopeType(referenceScopeType);
         newEntityLink.setHierarchyType(hierarchyType);
+        newEntityLink.setRootScopeId(parentEntityLink.getRootScopeId());
+        newEntityLink.setRootScopeType(parentEntityLink.getRootScopeType());
         entityLinkService.insertEntityLink(newEntityLink);
 
         historyManager.recordEntityLinkCreated(newEntityLink);
@@ -88,6 +102,7 @@ public class EntityLinkUtil {
     }
 
     protected static EntityLinkEntity createEntityLink(String scopeId, String referenceScopeId, String referenceScopeType, String hierarchyType,
+            String rootScopeId, String rootScopeType,
             EntityLinkService entityLinkService, CmmnHistoryManager historyManager) {
 
         EntityLinkEntity newEntityLink = (EntityLinkEntity) entityLinkService.createEntityLink();
@@ -97,6 +112,8 @@ public class EntityLinkUtil {
         newEntityLink.setReferenceScopeId(referenceScopeId);
         newEntityLink.setReferenceScopeType(referenceScopeType);
         newEntityLink.setHierarchyType(hierarchyType);
+        newEntityLink.setRootScopeId(rootScopeId);
+        newEntityLink.setRootScopeType(rootScopeType);
         entityLinkService.insertEntityLink(newEntityLink);
 
         historyManager.recordEntityLinkCreated(newEntityLink);

@@ -158,6 +158,8 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_ID, entityLink.getReferenceScopeId());
         putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_TYPE, entityLink.getReferenceScopeType());
         putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_DEFINITION_ID, entityLink.getReferenceScopeDefinitionId());
+        putIfNotNull(data, HistoryJsonConstants.ROOT_SCOPE_ID, entityLink.getRootScopeId());
+        putIfNotNull(data, HistoryJsonConstants.ROOT_SCOPE_TYPE, entityLink.getRootScopeType());
         putIfNotNull(data, HistoryJsonConstants.HIERARCHY_TYPE, entityLink.getHierarchyType());
     }
 

@@ -383,6 +383,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                         tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskBeforeSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                 );
 
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
+                );
+
         entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(firstSubProcess.getProcessInstanceId());
         assertThat(entityLinks)
                 .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
@@ -395,6 +401,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                         tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, taskBeforeSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                 );
 
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
+                );
+
         entityLinks = runtimeService.getEntityLinkChildrenForProcessInstance(secondSubProcess.getProcessInstanceId());
         assertThat(entityLinks)
                 .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
@@ -402,6 +414,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
                 .containsExactlyInAnyOrder(
                         tuple(secondSubProcess.getId(), ScopeTypes.BPMN, HierarchyType.PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
                 );
 
         List<EntityLink> taskEntityLinks = runtimeService.getEntityLinkParentsForTask(taskInLastSubProcess.getId());
@@ -413,6 +431,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                         tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
                         tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
                         tuple(secondSubProcess.getId(), ScopeTypes.BPMN, HierarchyType.PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(taskEntityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
                 );
 
         childTask = taskService.createTaskQuery().processInstanceIdWithChildren(rootInstanceId).singleResult();
@@ -453,6 +477,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                         tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                 );
 
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootInstanceId, ScopeTypes.BPMN)
+                );
+
         // Completing this task end the process instance
         taskService.complete(taskAfterSubProcess.getId());
         assertProcessEnded(rootInstanceId);
@@ -476,6 +506,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                             tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
 
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
             historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(firstProcessId);
 
             assertThat(historicEntityLinks)
@@ -489,6 +525,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                             tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, taskAfterSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
 
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
             historicEntityLinks = historyService.getHistoricEntityLinkChildrenForProcessInstance(secondSubProcess.getId());
 
             assertThat(historicEntityLinks)
@@ -497,6 +539,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                     .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
                     .containsExactlyInAnyOrder(
                             tuple(secondSubProcess.getId(), ScopeTypes.BPMN, HierarchyType.PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
                     );
 
             List<HistoricEntityLink> taskHistoricEntityLinks = historyService.getHistoricEntityLinkParentsForTask(taskInLastSubProcess.getId());
@@ -511,6 +559,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                             tuple(secondSubProcess.getId(), ScopeTypes.BPMN, HierarchyType.PARENT, taskInLastSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
 
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
             taskHistoricEntityLinks = historyService.getHistoricEntityLinkParentsForTask(taskAfterSubProcessInSubProcess.getId());
 
             assertThat(taskHistoricEntityLinks)
@@ -522,6 +576,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                             tuple(firstProcessId, ScopeTypes.BPMN, HierarchyType.PARENT, taskAfterSubProcessInSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
 
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
+                    );
+
             taskHistoricEntityLinks = historyService.getHistoricEntityLinkParentsForTask(taskAfterSubProcess.getId());
 
             assertThat(taskHistoricEntityLinks)
@@ -530,6 +590,12 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                     .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
                     .containsExactlyInAnyOrder(
                             tuple(rootInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, taskAfterSubProcess.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(taskHistoricEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(rootInstanceId, ScopeTypes.BPMN)
                     );
         }
     }

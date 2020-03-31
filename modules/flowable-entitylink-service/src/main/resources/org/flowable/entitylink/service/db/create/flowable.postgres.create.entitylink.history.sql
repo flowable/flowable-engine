@@ -8,6 +8,8 @@ create table ACT_HI_ENTITYLINK (
     REF_SCOPE_ID_ varchar(255),
     REF_SCOPE_TYPE_ varchar(255),
     REF_SCOPE_DEFINITION_ID_ varchar(255),
+    ROOT_SCOPE_ID_ varchar(255),
+    ROOT_SCOPE_TYPE_ varchar(255),
     HIERARCHY_TYPE_ varchar(255),
     primary key (ID_)
 );

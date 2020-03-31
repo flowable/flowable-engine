@@ -544,6 +544,11 @@ public interface RuntimeService {
     List<EntityLink> getEntityLinkChildrenForProcessInstance(String instanceId);
 
     /**
+     * Retrieves all the {@link EntityLink}s associated with the same root as the given process instance.
+     */
+    List<EntityLink> getEntityLinkChildrenWithSameRootAsProcessInstance(String instanceId);
+
+    /**
      * Retrieves the {@link EntityLink}s associated with the given task.
      */
     List<EntityLink> getEntityLinkChildrenForTask(String taskId);

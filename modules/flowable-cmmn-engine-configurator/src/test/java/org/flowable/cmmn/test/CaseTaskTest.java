@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -111,7 +113,15 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                 .addClasspathResource("org/flowable/cmmn/test/oneCallActivityHumanTaskCaseProcess.bpmn20.xml")
                 .deploy();
 
+        // nestedCallActivityProcess
+        //   - oneCallActivity (CallActivity)
+        //    - oneHumanTaskCase (CaseTask)
+        //      - humanTask
+
         try {
+            // starting one extra process instance so that there are multiple entity links
+            processEngineRuntimeService.startProcessInstanceByKey("nestedCallActivity");
+
             ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("nestedCallActivity");
             String processInstanceId = processInstance.getId();
             Task caseTask = processEngineTaskService.createTaskQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
@@ -135,6 +145,12 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                             tuple(processInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, caseInstanceId, ScopeTypes.CMMN, EntityLinkType.CHILD),
                             tuple(processInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(processInstanceId, ScopeTypes.BPMN)
+                    );
             
             entityLinks = processEngineRuntimeService.getEntityLinkChildrenForProcessInstance(subProcessInstanceId);
 
@@ -146,6 +162,12 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                             tuple(subProcessInstanceId, ScopeTypes.BPMN, HierarchyType.PARENT, caseInstanceId, ScopeTypes.CMMN, EntityLinkType.CHILD),
                             tuple(subProcessInstanceId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(processInstanceId, ScopeTypes.BPMN)
+                    );
             
             entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstanceId);
 
@@ -155,6 +177,12 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                     .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
                     .containsExactlyInAnyOrder(
                             tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(processInstanceId, ScopeTypes.BPMN)
                     );
 
             entityLinks = processEngineRuntimeService.getEntityLinkParentsForTask(caseTask.getId());
@@ -168,7 +196,42 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                             tuple(subProcessInstanceId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
                             tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
-            
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(processInstanceId, ScopeTypes.BPMN)
+                    );
+
+            List<Tuple> sameRootEntityLinks = Arrays.asList(
+                    tuple(processInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, subProcessInstanceId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                    tuple(processInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, caseInstanceId, ScopeTypes.CMMN, EntityLinkType.CHILD),
+                    tuple(processInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+
+                    tuple(subProcessInstanceId, ScopeTypes.BPMN, HierarchyType.PARENT, caseInstanceId, ScopeTypes.CMMN, EntityLinkType.CHILD),
+                    tuple(subProcessInstanceId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+
+                    tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+            );
+
+            assertThat(processEngineRuntimeService.getEntityLinkChildrenWithSameRootAsProcessInstance(processInstanceId))
+                    .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrderElementsOf(sameRootEntityLinks);
+
+            assertThat(processEngineRuntimeService.getEntityLinkChildrenWithSameRootAsProcessInstance(subProcessInstanceId))
+                    .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrderElementsOf(sameRootEntityLinks);
+
+            assertThat(cmmnRuntimeService.getEntityLinkChildrenWithSameRootAsCaseInstance(caseInstanceId))
+                    .extracting(EntityLink::getScopeId, EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrderElementsOf(sameRootEntityLinks);
+
             cmmnTaskService.complete(caseTask.getId());
 
             assertCaseInstanceEnded(caseInstance);
@@ -185,6 +248,13 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                             tuple(processInstanceId, ScopeTypes.BPMN, HierarchyType.ROOT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
 
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(processInstanceId, ScopeTypes.BPMN)
+                    );
+
+
             historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkChildrenForProcessInstance(subProcessInstanceId);
 
             assertThat(historicEntityLinks)
@@ -196,6 +266,12 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                             tuple(subProcessInstanceId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
 
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(processInstanceId, ScopeTypes.BPMN)
+                    );
+
             historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstanceId);
 
             assertThat(historicEntityLinks)
@@ -204,6 +280,12 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                     .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
                     .containsExactlyInAnyOrder(
                             tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(processInstanceId, ScopeTypes.BPMN)
                     );
 
             historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkParentsForTask(caseTask.getId());
@@ -217,6 +299,30 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                             tuple(subProcessInstanceId, ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
                             tuple(caseInstanceId, ScopeTypes.CMMN, HierarchyType.PARENT, caseTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                     );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(processInstanceId, ScopeTypes.BPMN)
+                    );
+
+            assertThat(processEngineHistoryService.getHistoricEntityLinkChildrenWithSameRootAsProcessInstance(processInstanceId))
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType, HistoricEntityLink::getReferenceScopeId,
+                            HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrderElementsOf(sameRootEntityLinks);
+
+            assertThat(processEngineHistoryService.getHistoricEntityLinkChildrenWithSameRootAsProcessInstance(subProcessInstanceId))
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType, HistoricEntityLink::getReferenceScopeId,
+                            HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrderElementsOf(sameRootEntityLinks);
+
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenWithSameRootAsCaseInstance(caseInstanceId))
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType, HistoricEntityLink::getReferenceScopeId,
+                            HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrderElementsOf(sameRootEntityLinks);
 
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);

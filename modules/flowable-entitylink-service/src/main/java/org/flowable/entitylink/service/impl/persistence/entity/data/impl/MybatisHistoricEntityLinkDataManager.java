@@ -22,6 +22,7 @@ import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEntityLinkDataManager;
+import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricEntityLinksByScopeIdAndTypeMatcher;
 
 /**
@@ -30,6 +31,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachema
 public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<HistoricEntityLinkEntity> implements HistoricEntityLinkDataManager {
 
     protected CachedEntityMatcher<HistoricEntityLinkEntity> historicEntityLinksByScopeIdAndTypeMatcher = new HistoricEntityLinksByScopeIdAndTypeMatcher();
+    protected CachedEntityMatcher<HistoricEntityLinkEntity> entityLinksWithSameRootByScopeIdAndTypeMatcher = new EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<>();
 
     @Override
     public Class<? extends HistoricEntityLinkEntity> getManagedEntityClass() {
@@ -49,6 +51,16 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
         return (List) getList("selectHistoricEntityLinksByScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
+    }
+
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeId", scopeId);
+        parameters.put("scopeType", scopeType);
+        parameters.put("linkType", linkType);
+        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdAndType", parameters, entityLinksWithSameRootByScopeIdAndTypeMatcher, true);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

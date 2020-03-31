@@ -1037,6 +1037,12 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
                         tuple(rootCaseId, ScopeTypes.CMMN, HierarchyType.ROOT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                 );
 
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootCaseId, ScopeTypes.CMMN)
+                );
+
         entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(level1CaseId);
 
         assertThat(entityLinks)
@@ -1046,6 +1052,12 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
                 .containsExactlyInAnyOrder(
                         tuple(level1CaseId, ScopeTypes.CMMN, HierarchyType.PARENT, oneHumanTaskCaseId, ScopeTypes.CMMN, EntityLinkType.CHILD),
                         tuple(level1CaseId, ScopeTypes.CMMN, HierarchyType.GRAND_PARENT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(entityLinks)
+                .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootCaseId, ScopeTypes.CMMN)
                 );
 
         entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(oneHumanTaskCaseId);
@@ -1070,6 +1082,12 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
                         tuple(rootCaseId, ScopeTypes.CMMN, HierarchyType.ROOT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                 );
 
+        assertThat(historicEntityLinks)
+                .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootCaseId, ScopeTypes.CMMN)
+                );
+
         historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(level1CaseId);
 
         assertThat(historicEntityLinks)
@@ -1081,6 +1099,12 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
                         tuple(level1CaseId, ScopeTypes.CMMN, HierarchyType.GRAND_PARENT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
                 );
 
+        assertThat(historicEntityLinks)
+                .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootCaseId, ScopeTypes.CMMN)
+                );
+
         historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(oneHumanTaskCaseId);
 
         assertThat(historicEntityLinks)
@@ -1089,6 +1113,12 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
                 .as("scopeId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
                 .containsExactlyInAnyOrder(
                         tuple(oneHumanTaskCaseId, ScopeTypes.CMMN, HierarchyType.PARENT, task.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                );
+
+        assertThat(historicEntityLinks)
+                .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                .containsOnly(
+                        tuple(rootCaseId, ScopeTypes.CMMN)
                 );
     }
 
