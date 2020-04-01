@@ -214,6 +214,10 @@ public interface HistoryJsonConstants {
     
     String REF_SCOPE_DEFINITION_ID = "referenceScopeDefinitionId";
 
+    String ROOT_SCOPE_ID = "rootScopeId";
+
+    String ROOT_SCOPE_TYPE = "rootScopeType";
+
     String HIERARCHY_TYPE = "hierarchyType";
 
     String RUNTIME_ACTIVITY_INSTANCE_ID = "runtimeActivityInstanceId";

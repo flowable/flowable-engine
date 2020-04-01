@@ -139,6 +139,11 @@ public interface HistoryService {
     List<HistoricEntityLink> getHistoricEntityLinkChildrenForProcessInstance(String processInstanceId);
 
     /**
+     * Retrieves all the {@link HistoricEntityLink}s associated with same root as the given process instance.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenWithSameRootAsProcessInstance(String processInstanceId);
+
+    /**
      * Retrieves the {@link HistoricEntityLink}s associated with the given task.
      */
     List<HistoricEntityLink> getHistoricEntityLinkChildrenForTask(String taskId);

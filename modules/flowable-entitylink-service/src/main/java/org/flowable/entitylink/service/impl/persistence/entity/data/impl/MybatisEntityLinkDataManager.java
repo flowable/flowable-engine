@@ -24,6 +24,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityI
 import org.flowable.entitylink.service.impl.persistence.entity.data.EntityLinkDataManager;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksByReferenceScopeIdAndTypeMatcher;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksByScopeIdAndTypeMatcher;
+import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher;
 
 /**
  * @author Tijs Rademakers
@@ -31,6 +32,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachema
 public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLinkEntity> implements EntityLinkDataManager {
 
     protected CachedEntityMatcher<EntityLinkEntity> entityLinksByScopeIdAndTypeMatcher = new EntityLinksByScopeIdAndTypeMatcher();
+    protected CachedEntityMatcher<EntityLinkEntity> entityLinksWithSameRootByScopeIdAndTypeMatcher = new EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<>();
     protected CachedEntityMatcher<EntityLinkEntity> entityLinksByReferenceScopeIdAndTypeMatcher = new EntityLinksByReferenceScopeIdAndTypeMatcher();
 
     @Override
@@ -53,6 +55,16 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
         return (List) getList("selectEntityLinksByScopeIdAndType", parameters, entityLinksByScopeIdAndTypeMatcher, true);
     }
     
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeId", scopeId);
+        parameters.put("scopeType", scopeType);
+        parameters.put("linkType", linkType);
+        return (List) getList("selectEntityLinksWithSameRootScopeByScopeIdAndType", parameters, entityLinksWithSameRootByScopeIdAndTypeMatcher, true);
+    }
+
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {

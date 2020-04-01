@@ -290,6 +290,11 @@ public interface CmmnRuntimeService {
     List<EntityLink> getEntityLinkChildrenForCaseInstance(String instanceId);
 
     /**
+     * Retrieves all the {@link EntityLink}s associated with the same root as the given case instance.
+     */
+    List<EntityLink> getEntityLinkChildrenWithSameRootAsCaseInstance(String instanceId);
+
+    /**
      * Retrieves the {@link EntityLink}s where the given case instance is referenced.
      */
     List<EntityLink> getEntityLinkParentsForCaseInstance(String instanceId);

@@ -40,6 +40,7 @@ import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCaseVariableInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCaseVariableInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkChildrenForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkParentsForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForPlanItemInstanceCmd;
@@ -331,6 +332,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public List<EntityLink> getEntityLinkChildrenForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetEntityLinkChildrenForCaseInstanceCmd(caseInstanceId));
+    }
+
+    @Override
+    public List<EntityLink> getEntityLinkChildrenWithSameRootAsCaseInstance(String instanceId) {
+        return commandExecutor.execute(new GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd(instanceId));
     }
 
     @Override

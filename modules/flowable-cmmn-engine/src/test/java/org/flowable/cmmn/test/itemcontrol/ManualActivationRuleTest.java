@@ -385,5 +385,26 @@ public class ManualActivationRuleTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
         assertCaseInstanceEnded(caseInstance);
     }
+
+    @Test
+    @CmmnDeployment
+    public void testRequiredHumanTaskInManuallyActivatedStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("stageTest").start();
+
+        // Activate the manually activated stage
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Stage with blocking task").planItemInstanceStateEnabled().singleResult();
+        assertThat(stagePlanItemInstance.getName()).isEqualTo("Stage with blocking task");
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateEnabled().count()).isEqualTo(0);
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(stagePlanItemInstance.getId()).start();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateEnabled().count()).isEqualTo(1);
+
+        // Manually complete the stage should throw an exception
+        assertThatThrownBy(() -> cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId()))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
+    }
     
 }
