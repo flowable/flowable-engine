@@ -33,7 +33,7 @@ public class EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<EntityImp
         String scopeType = (String) params.get("scopeType");
         String linkType = (String) params.get("linkType");
 
-        if (entity.getLinkType() != null && entity.getLinkType().equals(linkType)) {
+        if (entity.getLinkType() != null && entity.getLinkType().equals(linkType) && entity.getRootScopeId() != null) {
             EntityImpl matchingEntityLink = getMatchingEntityLink(databaseEntities, cachedEntities, scopeId, scopeType);
             if (matchingEntityLink != null) {
                 return Objects.equals(matchingEntityLink.getRootScopeId(), entity.getRootScopeId())

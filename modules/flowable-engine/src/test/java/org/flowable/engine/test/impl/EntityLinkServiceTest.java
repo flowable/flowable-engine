@@ -119,6 +119,89 @@ public class EntityLinkServiceTest extends PluggableFlowableTestCase {
         });
     }
 
+    @Test
+    void testFindEntityLinksWithSameRootWithNullRootInSameContext() {
+        managementService.executeCommand(commandContext -> {
+            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            createEntityLinkWithoutRootScope("1", "2.1", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
+            createEntityLinkWithoutRootScope("1", "2.2", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
+            createEntityLinkWithoutRootScope("1", "3.1", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
+            createEntityLinkWithoutRootScope("1", "3.2", HierarchyType.ROOT, entityLinkService, historicEntityLinkService);
+            createEntityLinkWithoutRootScope("2.1", "3.1", HierarchyType.PARENT, entityLinkService, historicEntityLinkService);
+            createEntityLinkWithoutRootScope("2.1", "3.2", HierarchyType.PARENT, entityLinkService, historicEntityLinkService);
+
+            assertThat(findEntityLinksByScopeId("1"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .containsExactlyInAnyOrder(
+                            tuple("1", "2.1", HierarchyType.ROOT),
+                            tuple("1", "2.2", HierarchyType.ROOT),
+                            tuple("1", "3.1", HierarchyType.ROOT),
+                            tuple("1", "3.2", HierarchyType.ROOT)
+                    );
+
+            assertThat(findEntityLinksByScopeId("2.1"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .containsExactlyInAnyOrder(
+                            tuple("2.1", "3.1", HierarchyType.PARENT),
+                            tuple("2.1", "3.2", HierarchyType.PARENT)
+                    );
+
+            assertThat(findEntityLinksByScopeId("2.2"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .isEmpty();
+
+            assertThat(findEntityLinksWithSameRootByScopeId("1"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .isEmpty();
+
+            assertThat(findEntityLinksWithSameRootByScopeId("2.1"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .isEmpty();
+
+            assertThat(findHistoricEntityLinksByScopeId("1"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .containsExactlyInAnyOrder(
+                            tuple("1", "2.1", HierarchyType.ROOT),
+                            tuple("1", "2.2", HierarchyType.ROOT),
+                            tuple("1", "3.1", HierarchyType.ROOT),
+                            tuple("1", "3.2", HierarchyType.ROOT)
+                    );
+
+            assertThat(findHistoricEntityLinksByScopeId("2.1"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .containsExactlyInAnyOrder(
+                            tuple("2.1", "3.1", HierarchyType.PARENT),
+                            tuple("2.1", "3.2", HierarchyType.PARENT)
+                    );
+
+            assertThat(findHistoricEntityLinksByScopeId("2.2"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .isEmpty();
+
+            assertThat(findHistoricEntityLinksWithSameRootByScopeId("1"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .isEmpty();
+
+            assertThat(findHistoricEntityLinksWithSameRootByScopeId("2.1"))
+                    .extracting(EntityLinkInfo::getScopeId, EntityLinkInfo::getReferenceScopeId, EntityLinkInfo::getHierarchyType)
+                    .isEmpty();
+            return null;
+        });
+
+
+        managementService.executeCommand(commandContext -> {
+            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+            entityLinkService.deleteEntityLinksByScopeIdAndType("1", ScopeTypes.BPMN);
+            entityLinkService.deleteEntityLinksByScopeIdAndType("2.1", ScopeTypes.BPMN);
+
+            HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+            historicEntityLinkService.deleteHistoricEntityLinksByScopeIdAndScopeType("1", ScopeTypes.BPMN);
+            historicEntityLinkService.deleteHistoricEntityLinksByScopeIdAndScopeType("2.1", ScopeTypes.BPMN);
+            return null;
+        });
+    }
+
     protected List<EntityLink> findEntityLinksByScopeId(String scopeId) {
         return managementService.executeCommand(commandContext -> CommandContextUtil.getEntityLinkService(commandContext)
                 .findEntityLinksByScopeIdAndType(scopeId, ScopeTypes.BPMN, EntityLinkType.CHILD));
