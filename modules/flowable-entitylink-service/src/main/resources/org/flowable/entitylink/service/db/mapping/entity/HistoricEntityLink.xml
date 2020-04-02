@@ -136,7 +136,7 @@
     inner join (
                     select ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
                     from ${prefix}ACT_HI_ENTITYLINK
-                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
+                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
                     limit 1
                 ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
     where LINK_TYPE_ = #{parameter.linkType}
@@ -149,7 +149,7 @@
     inner join (
                     select ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
                     from ${prefix}ACT_HI_ENTITYLINK
-                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
+                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
                     and ROWNUM = 1
                 ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
     where LINK_TYPE_ = #{parameter.linkType}
@@ -163,7 +163,7 @@
                     select TOP(1)
                     ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
                     from ${prefix}ACT_HI_ENTITYLINK
-                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
+                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
                 ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
     where LINK_TYPE_ = #{parameter.linkType}
   </select>
