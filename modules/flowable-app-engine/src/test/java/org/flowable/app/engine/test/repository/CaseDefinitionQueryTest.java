@@ -167,7 +167,7 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         List<String> appDefinitionIdsDeployment1 = getAppDefinitionIds(deploymentId1);
         List<String> appDefinitionIdsDeployment2 = getAppDefinitionIds(deploymentId2);
 
-        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment1)).list()).hasSize(1);;
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment1)).list()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment1)).count()).isEqualTo(1);
 
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment2)).list()).hasSize(1);
