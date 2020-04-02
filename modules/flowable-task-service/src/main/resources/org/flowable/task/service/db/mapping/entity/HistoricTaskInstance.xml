@@ -214,7 +214,7 @@
 
   <update id="updateHistoricTaskInstance" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
     update ${prefix}ACT_HI_TASKINST
-      <set>
+        <trim prefix="set" suffixOverrides=",">
       	  REV_ = #{revisionNext, jdbcType=INTEGER},
 	      <if test="originalPersistentState.taskDefinitionId != taskDefinitionId">
 	      	TASK_DEF_ID_ = #{taskDefinitionId, jdbcType=VARCHAR},
@@ -283,9 +283,9 @@
 	      	CATEGORY_ = #{category, jdbcType=VARCHAR},
 	  	  </if>
 	  	  <if test="originalPersistentState.lastUpdateTime != lastUpdateTime">
-	      	LAST_UPDATED_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP}
+	      	LAST_UPDATED_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP},
 	      </if>
-  	  </set>
+  	  </trim>
     where ID_ = #{id}
     and REV_ = #{revision, jdbcType=INTEGER}
   </update>

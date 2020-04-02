@@ -146,7 +146,7 @@
 
   <update id="updateTask" parameterType="org.flowable.task.service.impl.persistence.entity.TaskEntityImpl">
     update ${prefix}ACT_RU_TASK
-    <set>
+    <trim prefix="set" suffixOverrides=",">
       REV_ = #{revisionNext, jdbcType=INTEGER},
       <if test="originalPersistentState.name != name">
           NAME_ = #{name, jdbcType=VARCHAR},
@@ -182,19 +182,19 @@
           TASK_DEF_KEY_ = #{taskDefinitionKey, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.scopeId != scopeId">
-          SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+          SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.subScopeId != subScopeId">
-          SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+          SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.scopeType != scopeType">
-          SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+          SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-          SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
+          SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
-          PROPAGATED_STAGE_INST_ID_ = ${propagatedStageInstanceId, jdbcType=VARCHAR}
+          PROPAGATED_STAGE_INST_ID_ = ${propagatedStageInstanceId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.description != description">
           DESCRIPTION_ = #{description, jdbcType=VARCHAR},
@@ -224,9 +224,9 @@
           ID_LINK_COUNT_ = #{identityLinkCount, jdbcType=INTEGER},
       </if>
       <if test="originalPersistentState.subTaskCount != subTaskCount">
-          SUB_TASK_COUNT_ = #{subTaskCount, jdbcType=INTEGER}
+          SUB_TASK_COUNT_ = #{subTaskCount, jdbcType=INTEGER},
       </if>
-    </set>
+    </trim>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
