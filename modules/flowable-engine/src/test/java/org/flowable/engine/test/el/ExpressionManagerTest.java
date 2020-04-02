@@ -26,7 +26,6 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.Test;
 

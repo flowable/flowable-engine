@@ -38,7 +38,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.JsonType;

@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.test.bpmn.gateway;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,11 +23,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
