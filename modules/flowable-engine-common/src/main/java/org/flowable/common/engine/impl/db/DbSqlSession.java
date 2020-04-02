@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.common.engine.api.FlowableException;
