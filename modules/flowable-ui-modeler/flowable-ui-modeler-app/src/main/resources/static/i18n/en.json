@@ -1625,6 +1625,12 @@
             "DESCRIPTION": "Set the decision reference"
           }
         },
+        "DECISIONTASKDECISIONREFERENCEPACKAGE": {
+          "DECISIONTASKDECISIONREFERENCE": {
+            "TITLE": "Decision reference",
+            "DESCRIPTION": "Set the decision reference"
+          }
+        },
         "IFPARTCONDITIONPACKAGE": {
           "IFPARTCONDITION": {
             "TITLE": "Condition",
@@ -1932,6 +1938,7 @@
         "TITLE": "Decision Tables",
         "SEARCH-PLACEHOLDER": "Search",
         "ACTION": {
+            "CREATE-DECISION-SERVICE": "Create Decision Service",
             "CREATE": "Create Decision Table",
             "IMPORT": "Import Decision Table",
             "CREATE-INLINE": "Create a new decision table now!",
@@ -1944,7 +1951,11 @@
             "DECISION-TABLES-ONE": "There is one decision table",
             "DECISION-TABLES-EMPTY": "There are no decision tables. To add one, click Create Decision Table.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
-            "FILTER-TEXT-EMPTY": "There are no decision table matching \"{{filterText}}\""
+            "FILTER-TEXT-EMPTY": "There are no decision table matching \"{{filterText}}\"",
+            "DECISION-SERVICES": "Decision services",
+            "DECISION-SERVICES-COUNT": "There are {{total}} decision services",
+            "DECISION-SERVICES-ONE": "There is one decision service",
+            "DECISION-SERVICES-EMPTY": "There are no decision services. To add one, click Create Decision Service."
         },
 
         "SORT": {
@@ -2167,7 +2178,15 @@
           "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}"
         }
     },
-
+    "DECISION-SERVICE": {
+      "NAME": "Decision service name",
+      "KEY": "Decision service key",
+      "DESCRIPTION": "Description",
+      "POPUP": {
+        "CREATE-TITLE": "Create a new decision service",
+        "CREATE-DESCRIPTION": "You need to give a name for the new decision service and you may want to add a description at the same time."
+      }
+    },
     "DECISION-TABLE": {
         "NAME": "Decision Table name",
         "KEY": "Decision Table key",

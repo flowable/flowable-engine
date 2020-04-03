@@ -130,6 +130,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-write-template.html"
     },
+    "oryx-decisiondecisiontablereference-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-write-template.html"
+    },
     "oryx-casetaskcasereference-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/case-reference-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/case-reference-write-template.html"

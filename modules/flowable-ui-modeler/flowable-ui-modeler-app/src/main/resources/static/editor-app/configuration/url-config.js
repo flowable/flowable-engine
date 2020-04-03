@@ -26,6 +26,11 @@ FLOWABLE.URL = {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/cmmneditor?version=' + Date.now();
     },
 
+    getDmnStencilSet: function() {
+        return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/dmneditor?version=' + Date.now();
+    },
+
+
     putModel: function(modelId) {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/editor/json';
     },

@@ -127,7 +127,11 @@ flowableModeler
         .when('/app-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/app-definition-builder.html',
             controller: 'AppDefinitionBuilderController'
-        });
+        })
+        .when('/decision-service-editor/:modelId', {
+            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            controller: 'EditorController'
+        })
 
         if (FLOWABLE.CONFIG.appDefaultRoute) {
             $routeProvider.when('/', {

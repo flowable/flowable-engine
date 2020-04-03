@@ -263,6 +263,40 @@ public class ModelServiceImpl implements ModelService {
             stencilNode.put("id", "CasePlanModel");
             json = editorNode.toString();
 
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_DRD).equals(model.getModelType())) {
+            ObjectNode editorNode = objectMapper.createObjectNode();
+            editorNode.put("id", "canvas");
+            editorNode.put("resourceId", "canvas");
+            ObjectNode stencilSetNode = objectMapper.createObjectNode();
+            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/dmn1.2#");
+            editorNode.set("stencilset", stencilSetNode);
+
+            ArrayNode childShapeArray = objectMapper.createArrayNode();
+            editorNode.set("childShapes", childShapeArray);
+            ObjectNode childNode = objectMapper.createObjectNode();
+            childShapeArray.add(childNode);
+            ObjectNode boundsNode = objectMapper.createObjectNode();
+            childNode.set("bounds", boundsNode);
+            ObjectNode lowerRightNode = objectMapper.createObjectNode();
+            boundsNode.set("lowerRight", lowerRightNode);
+            lowerRightNode.put("x", 758);
+            lowerRightNode.put("y", 554);
+            ObjectNode upperLeftNode = objectMapper.createObjectNode();
+            boundsNode.set("upperLeft", upperLeftNode);
+            upperLeftNode.put("x", 40);
+            upperLeftNode.put("y", 40);
+
+            childNode.set("childShapes", objectMapper.createArrayNode());
+            childNode.set("dockers", objectMapper.createArrayNode());
+            childNode.set("outgoing", objectMapper.createArrayNode());
+            childNode.put("resourceId", "expandedDecisionService");
+
+            ObjectNode stencilNode = objectMapper.createObjectNode();
+            childNode.set("stencil", stencilNode);
+            stencilNode.put("id", "ExpandedDecisionService");
+
+            json = editorNode.toString();
+
         } else {
             ObjectNode editorNode = objectMapper.createObjectNode();
             editorNode.put("id", "canvas");
@@ -710,7 +744,8 @@ public class ModelServiceImpl implements ModelService {
                 handleCmmnProcessModelRelations(model, jsonNode);
 
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_FORM ||
-                    model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_TABLE) {
+                    model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_TABLE ||
+                    model.getModelType().intValue() == Model.MODEL_TYPE_DRD) {
 
                 jsonNode.put("name", model.getName());
                 jsonNode.put("key", model.getKey());

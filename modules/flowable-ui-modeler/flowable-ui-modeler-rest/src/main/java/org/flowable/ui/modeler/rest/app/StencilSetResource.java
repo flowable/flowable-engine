@@ -48,8 +48,19 @@ public class StencilSetResource {
             JsonNode stencilNode = objectMapper.readTree(this.getClass().getClassLoader().getResourceAsStream("stencilset_cmmn.json"));
             return stencilNode;
         } catch (Exception e) {
-            LOGGER.error("Error reading bpmn stencil set json", e);
-            throw new InternalServerErrorException("Error reading bpmn stencil set json");
+            LOGGER.error("Error reading cmmn stencil set json", e);
+            throw new InternalServerErrorException("Error reading cmmn stencil set json");
+        }
+    }
+
+    @GetMapping(value = "/rest/stencil-sets/dmneditor", produces = "application/json")
+    public JsonNode getDmnStencilSetForEditor() {
+        try {
+            JsonNode stencilNode = objectMapper.readTree(this.getClass().getClassLoader().getResourceAsStream("stencilset_dmn.json"));
+            return stencilNode;
+        } catch (Exception e) {
+            LOGGER.error("Error reading dmn stencil set json", e);
+            throw new InternalServerErrorException("Error reading dmn stencil set json");
         }
     }
 }
