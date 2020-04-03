@@ -130,12 +130,10 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
 
         }
 
-        if (eventSubscriptions.isEmpty()) {
-            leave(execution);
-        } else {
+        if (!eventSubscriptions.isEmpty()) {
             // TODO: implement async (waitForCompletion=false in bpmn)
             ScopeUtil.throwCompensationEvent(eventSubscriptions, execution, false);
-            leave(execution);
         }
+        leave(execution);
     }
 }

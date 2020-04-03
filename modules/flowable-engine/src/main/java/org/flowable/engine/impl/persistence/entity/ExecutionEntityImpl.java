@@ -676,7 +676,6 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
                 VariableInstanceEntity variable = getSpecificVariable(variableName);
                 if (variable != null) {
                     updateVariableInstance(variable, value, sourceExecution);
-                    usedVariablesCache.put(variableName, variable);
                 } else {
 
                     VariableScopeImpl parent = getParentVariableScope();
@@ -690,8 +689,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
                     }
 
                     variable = createVariableInstance(variableName, value, sourceExecution);
-                    usedVariablesCache.put(variableName, variable);
                 }
+                usedVariablesCache.put(variableName, variable);
 
             }
 
@@ -726,8 +725,6 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
                 updateVariableInstance(variableInstance, value, sourceExecution);
             }
 
-            return null;
-
         } else {
 
             if (usedVariablesCache.containsKey(variableName)) {
@@ -746,9 +743,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
             }
 
-            return null;
-
         }
+        return null;
     }
     
     @Override
