@@ -291,9 +291,9 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         // Combined with criteria
         TokenQuery query = idmIdentityService.createTokenQuery().userAgentLike("%firefox%").orderByTokenDate().asc();
         List<Token> tokens = query.list();
-        assertThat(tokens).hasSize(2);
-        assertThat(tokens.get(0).getUserAgent()).isEqualTo("firefox");
-        assertThat(tokens.get(1).getUserAgent()).isEqualTo("firefox2");
+        assertThat(tokens)
+                .extracting(Token::getUserAgent)
+                .containsExactly("firefox", "firefox2");
     }
 
     @Test

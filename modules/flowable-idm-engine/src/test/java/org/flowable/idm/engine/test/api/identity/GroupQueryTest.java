@@ -165,16 +165,15 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
         query = query.orderByGroupId().asc();
         List<Group> groups = query.list();
-        assertThat(groups).hasSize(3);
-        assertThat(groups.get(0).getId()).isEqualTo("admin");
-        assertThat(groups.get(1).getId()).isEqualTo("frogs");
-        assertThat(groups.get(2).getId()).isEqualTo("muppets");
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("admin", "frogs", "muppets");
 
         query = query.groupType("user");
         groups = query.list();
-        assertThat(groups).hasSize(2);
-        assertThat(groups.get(0).getId()).isEqualTo("frogs");
-        assertThat(groups.get(1).getId()).isEqualTo("muppets");
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("frogs", "muppets");
     }
 
     @Test
@@ -189,21 +188,19 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
     @Test
     public void testQueryByGroupMembers() {
         List<Group> groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("kermit", "fozzie")).orderByGroupId().asc().list();
-        assertThat(groups).hasSize(4);
-        assertThat(groups.get(0).getId()).isEqualTo("admin");
-        assertThat(groups.get(1).getId()).isEqualTo("frogs");
-        assertThat(groups.get(2).getId()).isEqualTo("mammals");
-        assertThat(groups.get(3).getId()).isEqualTo("muppets");
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("admin", "frogs", "mammals", "muppets");
 
         groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("fozzie")).orderByGroupId().asc().list();
-        assertThat(groups).hasSize(2);
-        assertThat(groups.get(0).getId()).isEqualTo("mammals");
-        assertThat(groups.get(1).getId()).isEqualTo("muppets");
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("mammals", "muppets");
 
         groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("kermit", "fozzie")).orderByGroupId().asc().listPage(1, 2);
-        assertThat(groups).hasSize(2);
-        assertThat(groups.get(0).getId()).isEqualTo("frogs");
-        assertThat(groups.get(1).getId()).isEqualTo("mammals");
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("frogs", "mammals");
     }
 
     @Test
@@ -230,17 +227,13 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         // Multiple sortings
         GroupQuery query = idmIdentityService.createGroupQuery().orderByGroupType().asc().orderByGroupName().desc();
         List<Group> groups = query.list();
-        assertThat(query.count()).isEqualTo(4);
+        assertThat(groups)
+                .extracting(Group::getType)
+                .containsExactly("security", "user", "user", "user");
 
-        assertThat(groups.get(0).getType()).isEqualTo("security");
-        assertThat(groups.get(1).getType()).isEqualTo("user");
-        assertThat(groups.get(2).getType()).isEqualTo("user");
-        assertThat(groups.get(3).getType()).isEqualTo("user");
-
-        assertThat(groups.get(0).getId()).isEqualTo("admin");
-        assertThat(groups.get(1).getId()).isEqualTo("muppets");
-        assertThat(groups.get(2).getId()).isEqualTo("mammals");
-        assertThat(groups.get(3).getId()).isEqualTo("frogs");
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("admin", "muppets", "mammals", "frogs");
     }
 
     @Test

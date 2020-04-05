@@ -82,8 +82,9 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
     public void testGetUsers() {
         String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName("access admin application").singleResult().getId();
         List<User> users = idmIdentityService.getUsersWithPrivilege(privilegeId);
-        assertThat(users).hasSize(1);
-        assertThat(users.get(0).getId()).isEqualTo("mispiggy");
+        assertThat(users)
+                .extracting(User::getId)
+                .containsExactly("mispiggy");
 
         assertThat(idmIdentityService.getUsersWithPrivilege("does not exist")).isEmpty();
 
@@ -95,9 +96,9 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
     public void testGetGroups() {
         String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult().getId();
         List<Group> groups = idmIdentityService.getGroupsWithPrivilege(privilegeId);
-        assertThat(groups).hasSize(2);
-        assertThat(groups.get(0).getId()).isEqualTo("admins");
-        assertThat(groups.get(1).getId()).isEqualTo("engineering");
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("admins", "engineering");
 
         assertThat(idmIdentityService.getGroupsWithPrivilege("does not exist")).isEmpty();
 

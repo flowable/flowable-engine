@@ -301,9 +301,9 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         // Combined with criteria
         UserQuery query = idmIdentityService.createUserQuery().userLastNameLike("%ea%").orderByUserFirstName().asc();
         List<User> users = query.list();
-        assertThat(users).hasSize(2);
-        assertThat(users.get(0).getFirstName()).isEqualTo("Fozzie");
-        assertThat(users.get(1).getFirstName()).isEqualTo("Gonzo");
+        assertThat(users)
+                .extracting(User::getFirstName)
+                .containsExactly("Fozzie", "Gonzo");
     }
 
     @Test

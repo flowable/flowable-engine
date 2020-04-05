@@ -113,7 +113,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         PasswordEncoder passwordEncoder = idmEngineConfiguration.getPasswordEncoder();
         idmEngineConfiguration.setPasswordEncoder(new CustomPasswordEncoder());
         PasswordEncoder customPasswordEncoder = idmEngineConfiguration.getPasswordEncoder();
-        assertThat(customPasswordEncoder instanceof CustomPasswordEncoder).isTrue();
+        assertThat(customPasswordEncoder).isInstanceOf(CustomPasswordEncoder.class);
 
         idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
