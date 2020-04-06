@@ -12,10 +12,7 @@
  */
 package org.flowable.editor.language;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -24,7 +21,7 @@ import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ThrowEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by alireza on 06/11/2016.
@@ -46,16 +43,16 @@ public class ThrowCompensationEventTest extends AbstractConverterTest {
         modelShouldHaveAThrowEventContainingCompensationEventDefinition(convertToJsonAndBack(readJsonFile()));
     }
 
-    private void modelShouldHaveAThrowEventContainingCompensationEventDefinition(BpmnModel model){
+    private void modelShouldHaveAThrowEventContainingCompensationEventDefinition(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("throwCompensationEvent");
-        assertNotNull(flowElement);
-        assertThat(flowElement, instanceOf(ThrowEvent.class));
-        ThrowEvent throwEvent = (ThrowEvent)flowElement;
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(ThrowEvent.class);
+        ThrowEvent throwEvent = (ThrowEvent) flowElement;
 
         final List<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
-        assertNotNull(eventDefinitions);
-        assertEquals(1, eventDefinitions.size());
-        assertThat(eventDefinitions.get(0), instanceOf(CompensateEventDefinition.class));
-        assertEquals("activity_ref", ((CompensateEventDefinition)eventDefinitions.get(0)).getActivityRef());
+        assertThat(eventDefinitions).isNotNull();
+        assertThat(eventDefinitions).hasSize(1);
+        assertThat(eventDefinitions.get(0)).isInstanceOf(CompensateEventDefinition.class);
+        assertThat(((CompensateEventDefinition) eventDefinitions.get(0)).getActivityRef()).isEqualTo("activity_ref");
     }
 }

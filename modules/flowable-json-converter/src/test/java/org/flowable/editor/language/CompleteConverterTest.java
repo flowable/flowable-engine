@@ -12,9 +12,9 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Arrays;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -23,9 +23,7 @@ import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
-
-import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 
 public class CompleteConverterTest extends AbstractConverterTest {
 
@@ -49,32 +47,32 @@ public class CompleteConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("userTask1", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        assertEquals("userTask1", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(UserTask.class);
+        assertThat(flowElement.getId()).isEqualTo("userTask1");
 
         flowElement = model.getMainProcess().getFlowElement("catchsignal", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof IntermediateCatchEvent);
-        assertEquals("catchsignal", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(IntermediateCatchEvent.class);
+        assertThat(flowElement.getId()).isEqualTo("catchsignal");
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
-        assertEquals(1, catchEvent.getEventDefinitions().size());
-        assertTrue(catchEvent.getEventDefinitions().get(0) instanceof SignalEventDefinition);
+        assertThat(catchEvent.getEventDefinitions()).hasSize(1);
+        assertThat(catchEvent.getEventDefinitions().get(0)).isInstanceOf(SignalEventDefinition.class);
         SignalEventDefinition signalEvent = (SignalEventDefinition) catchEvent.getEventDefinitions().get(0);
-        assertEquals("testSignal", signalEvent.getSignalRef());
+        assertThat(signalEvent.getSignalRef()).isEqualTo("testSignal");
 
         flowElement = model.getMainProcess().getFlowElement("subprocess", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
-        assertEquals("subprocess", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(SubProcess.class);
+        assertThat(flowElement.getId()).isEqualTo("subprocess");
         SubProcess subProcess = (SubProcess) flowElement;
 
         flowElement = subProcess.getFlowElement("receiveTask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ReceiveTask);
-        assertEquals("receiveTask", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(ReceiveTask.class);
+        assertThat(flowElement.getId()).isEqualTo("receiveTask");
 
-        assertEquals(Arrays.asList("user1","user2"), model.getMainProcess().getCandidateStarterUsers());
-        assertEquals(Arrays.asList("group1","group2"), model.getMainProcess().getCandidateStarterGroups());
+        assertThat(model.getMainProcess().getCandidateStarterUsers()).isEqualTo(Arrays.asList("user1", "user2"));
+        assertThat(model.getMainProcess().getCandidateStarterGroups()).isEqualTo(Arrays.asList("group1", "group2"));
     }
 }

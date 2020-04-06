@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,8 +12,8 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PoolDataObjectTest extends AbstractConverterTest {
 
@@ -49,24 +49,19 @@ public class PoolDataObjectTest extends AbstractConverterTest {
         String idPool = "pool1";
         String idProcess = "process_pool1";
 
-        assertEquals(1, model.getPools().size());
-
-        Pool pool = model.getPool(idPool);
-        assertEquals(idPool, pool.getId());
-        assertEquals(idProcess, pool.getProcessRef());
-        assertTrue(pool.isExecutable());
+        assertThat(model.getPools())
+                .extracting(Pool::getId, Pool::getProcessRef, Pool::isExecutable)
+                .containsExactly(tuple(idPool, idProcess, true));
 
         Process process = model.getProcess(idPool);
-        assertEquals(idProcess, process.getId());
-        assertTrue(process.isExecutable());
+        assertThat(process.getId()).isEqualTo(idProcess);
+        assertThat(process.isExecutable()).isTrue();
         List<ValuedDataObject> dataObjects = process.getDataObjects();
-        assertEquals(1,dataObjects.size());
+        assertThat(dataObjects).hasSize(1);
 
         List<FlowableListener> executionListeners = process.getExecutionListeners();
-        assertEquals(1,executionListeners.size());
-        assertEquals("shareniu_signal",model.getSignal("shareniu_signal").getId());
+        assertThat(executionListeners).hasSize(1);
+        assertThat(model.getSignal("shareniu_signal").getId()).isEqualTo("shareniu_signal");
     }
-
-
 
 }

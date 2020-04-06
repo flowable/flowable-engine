@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -23,7 +21,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ScopedConverterTest extends AbstractConverterTest {
 
@@ -47,33 +45,33 @@ public class ScopedConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("outerSubProcess", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
-        assertEquals("outerSubProcess", flowElement.getId());
+        assertThat(flowElement).isNotNull();
+        assertThat(flowElement).isInstanceOf(SubProcess.class);
+        assertThat(flowElement.getId()).isEqualTo("outerSubProcess");
         SubProcess outerSubProcess = (SubProcess) flowElement;
         List<BoundaryEvent> eventList = outerSubProcess.getBoundaryEvents();
-        assertEquals(1, eventList.size());
-        BoundaryEvent boundaryEvent = eventList.get(0);
-        assertEquals("outerBoundaryEvent", boundaryEvent.getId());
+        assertThat(eventList)
+                .extracting(BoundaryEvent::getId)
+                .containsExactly("outerBoundaryEvent");
 
         FlowElement subElement = outerSubProcess.getFlowElement("innerSubProcess");
-        assertNotNull(subElement);
-        assertTrue(subElement instanceof SubProcess);
-        assertEquals("innerSubProcess", subElement.getId());
+        assertThat(subElement).isNotNull();
+        assertThat(subElement).isInstanceOf(SubProcess.class);
+        assertThat(subElement.getId()).isEqualTo("innerSubProcess");
         SubProcess innerSubProcess = (SubProcess) subElement;
         eventList = innerSubProcess.getBoundaryEvents();
-        assertEquals(1, eventList.size());
-        boundaryEvent = eventList.get(0);
-        assertEquals("innerBoundaryEvent", boundaryEvent.getId());
+        assertThat(eventList)
+                .extracting(BoundaryEvent::getId)
+                .containsExactly("innerBoundaryEvent");
 
         FlowElement taskElement = innerSubProcess.getFlowElement("usertask");
-        assertNotNull(taskElement);
-        assertTrue(taskElement instanceof UserTask);
+        assertThat(taskElement).isNotNull();
+        assertThat(taskElement).isInstanceOf(UserTask.class);
         UserTask userTask = (UserTask) taskElement;
-        assertEquals("usertask", userTask.getId());
+        assertThat(userTask.getId()).isEqualTo("usertask");
         eventList = userTask.getBoundaryEvents();
-        assertEquals(1, eventList.size());
-        boundaryEvent = eventList.get(0);
-        assertEquals("taskBoundaryEvent", boundaryEvent.getId());
+        assertThat(eventList)
+                .extracting(BoundaryEvent::getId)
+                .containsExactly("taskBoundaryEvent");
     }
 }
