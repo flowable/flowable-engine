@@ -12,16 +12,14 @@
  */
 package org.flowable.idm.engine.test.api.identity;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Arkadiy Gornovoy
- *
  */
 public class UserEntityTest {
 
@@ -31,15 +29,15 @@ public class UserEntityTest {
         Picture picture = new Picture(null, null);
         // even though parameters were null, picture object is not null
         userEntity.setPicture(picture);
-        assertTrue(userEntity.getHasSavePictureBeenCalled());
-        assertFalse(userEntity.getHasDeletePictureBeenCalled());
+        assertThat(userEntity.getHasSavePictureBeenCalled()).isTrue();
+        assertThat(userEntity.getHasDeletePictureBeenCalled()).isFalse();
     }
 
     @Test
     public void testSetPicture_pictureShouldBeDeletedWhenNull() {
         TestableUserEntity userEntity = new TestableUserEntity();
         userEntity.setPicture(null);
-        assertTrue(userEntity.getHasDeletePictureBeenCalled());
+        assertThat(userEntity.getHasDeletePictureBeenCalled()).isTrue();
     }
 
     @SuppressWarnings("serial")
