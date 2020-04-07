@@ -20,7 +20,7 @@ The various tutorials below start by introducing how to set up and use this core
 
 -   The [section on the Flowable REST API](getting-started-with-the-flowable-rest-api) shows how to run and use the same API through REST.
 
--   The [section on the Flowable App](ch14-Applications.md#flowable-ui-applications-configurations), will guide you through the basics of using the out-of-the-box example Flowable user interfaces.yyy
+-   The [section on the Flowable App](ch14-Applications.md#flowable-ui-applications-configurations), will guide you through the basics of using the out-of-the-box example Flowable user interfaces.
 
 ## Flowable and Activiti
 
