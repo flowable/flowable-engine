@@ -318,7 +318,8 @@ angular.module('flowableModeler')
                 var isCollectionOperator = false;
                 if (isOperatorCell(operatorCellMeta)) {
                     var operatorValue = hotDecisionTableEditorInstance.getDataAtCell(row, operatorCol);
-                    if (operatorValue === "IN" || operatorValue === "NOT IN" || operatorValue === "ANY" || operatorValue === "NOT ANY") {
+                    if (operatorValue === "ANY OF" || operatorValue === "NONE OF" || operatorValue === "ALL OF" || operatorValue === "NOT ALL OF"
+                        || operatorValue === "IS IN" || operatorValue === "IS NOT IN") {
                         isCollectionOperator = true;
                     }
                 }
