@@ -60,6 +60,7 @@ import org.flowable.rest.service.api.runtime.process.ExecutionQueryRequest;
 import org.flowable.rest.service.api.runtime.process.InjectActivityRequest;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceCreateRequest;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceQueryRequest;
+import org.flowable.rest.service.api.runtime.process.ProcessInstanceUpdateRequest;
 import org.flowable.rest.service.api.runtime.process.SignalEventReceivedRequest;
 import org.flowable.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.rest.service.api.runtime.task.TaskQueryRequest;
@@ -97,7 +98,9 @@ public interface BpmnRestApiInterceptor {
     void accessProcessInstanceInfoWithQuery(ProcessInstanceQuery processInstanceQuery, ProcessInstanceQueryRequest request);
     
     void createProcessInstance(ProcessInstanceBuilder processInstanceBuilder, ProcessInstanceCreateRequest request);
-    
+
+    void updateProcessInstance(ProcessInstance processInstance, ProcessInstanceUpdateRequest updateRequest);
+
     void deleteProcessInstance(ProcessInstance processInstance);
     
     void sendSignal(SignalEventReceivedRequest signalEventReceivedRequest);

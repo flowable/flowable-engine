@@ -272,7 +272,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         assertTrue(responseNode.get("caseDefinitionUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId())));
         runtimeService.terminateCaseInstance(caseInstance.getId());
 
-        // Start using process definition id and business key
+        // Start using case definition id and business key
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseDefinitionId", repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult().getId());
         requestNode.put("businessKey", "myBusinessKey");
@@ -283,6 +283,19 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         assertNotNull(responseNode);
         assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
+
+
+        // Start using case definition id and case name
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionId", repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult().getId());
+        requestNode.put("name", "My test name");
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertNotNull(responseNode);
+        assertEquals("My test name", responseNode.get("name").textValue());
     }
 
     /**
