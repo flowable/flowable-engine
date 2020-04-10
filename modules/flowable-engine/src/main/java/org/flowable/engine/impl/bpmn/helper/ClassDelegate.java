@@ -263,7 +263,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         } catch (FlowableClassLoadingException e) {
             InstantiateInterceptor instantiateIntercepter = CommandContextUtil.getProcessEngineConfiguration().getInstantiateInterceptor();
             if (instantiateIntercepter == null) {
-                throw e;
+                throw new FlowableException("couldn't instantiate class " + className, e);
             } else {
                 delegateInstance = instantiateIntercepter.handle(className);
             }
