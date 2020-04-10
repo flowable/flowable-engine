@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.content.engine.impl.storage.db.entity.StorageItemEntityImpl">
+  
+  <!-- DATA INSERT -->
+
+  <insert id="insertStorageItem" parameterType="org.flowable.content.engine.impl.storage.db.entity.StorageItemEntityImpl">
+    insert into ${prefix}ACT_CO_STORAGE_ITEM(ID_, DATA_BYTES_)
+    values (#{id, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}})  
+  </insert>
+  
+  <!-- DATA UPDATE -->
+
+  <update id="updateStorageItem" parameterType="org.flowable.content.engine.impl.storage.db.entity.StorageItemEntityImpl">
+    update ${prefix}ACT_CO_STORAGE_ITEM
+    set
+      DATA_BYTES_ = #{bytes, jdbcType=${blobType}}
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
+  <!-- DATA DELETE -->
+  
+  <delete id="deleteStorageItem" parameterType="string">
+    delete from ${prefix}ACT_CO_STORAGE_ITEM where ID_ = #{id}
+  </delete>
+  
+  <!-- DATA RESULTMAP -->
+
+  <resultMap id="StorageItemResultMap" type="org.flowable.content.engine.impl.storage.db.entity.StorageItemEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="bytes" column="DATA_BYTES_" jdbcType="${blobType}"/>
+  </resultMap>
+  
+  <!-- DATA SELECT -->
+
+  <select id="selectStorageItem" parameterType="string" resultMap="StorageItemResultMap">
+    select * from ${prefix}ACT_CO_STORAGE_ITEM where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+</mapper>

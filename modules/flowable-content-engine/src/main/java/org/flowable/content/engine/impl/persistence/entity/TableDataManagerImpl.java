@@ -32,6 +32,7 @@ import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.TablePageQueryImpl;
 import org.flowable.content.engine.impl.persistence.AbstractManager;
+import org.flowable.content.engine.impl.storage.db.entity.StorageItemEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +51,8 @@ public class TableDataManagerImpl extends AbstractManager implements TableDataMa
     public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<>();
 
     static {
-
         entityToTableNameMap.put(ContentItemEntity.class, "ACT_CO_CONTENT_ITEM");
+        entityToTableNameMap.put(StorageItemEntity.class, "ACT_CO_STORAGE_ITEM");
     }
 
     protected DbSqlSession getDbSqlSession() {

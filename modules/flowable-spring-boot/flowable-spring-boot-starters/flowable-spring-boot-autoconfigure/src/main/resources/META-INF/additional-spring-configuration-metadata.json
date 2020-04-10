@@ -186,7 +186,7 @@
       "deprecation": {
         "level": "error",
         "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.content.storage.root-folder"
+        "replacement": "flowable.content.storage.file.root-folder"
       }
     },
     {
@@ -195,7 +195,25 @@
       "deprecation": {
         "level": "error",
         "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.content.storage.create-root"
+        "replacement": "flowable.content.storage.file.create-root"
+      }
+    },
+    {
+      "name": "flowable.content.storage.root-folder",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.content.storage.file.root-folder"
+      }
+    },
+    {
+      "name": "flowable.content.storage.create-root",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.content.storage.file.create-root"
       }
     },
     {

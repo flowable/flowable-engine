@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.content.engine.impl.fs;
+package org.flowable.content.engine.impl.storage.fs;
 
 import com.fasterxml.uuid.EthernetAddress;
 import com.fasterxml.uuid.Generators;
@@ -58,6 +58,8 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     public static final String PROCESS_INSTANCE_PREFIX = "proc";
     public static final String CASE_PREFIX = "case";
     public static final String UNCATEGORIZED_PREFIX = "uncategorized";
+
+    public static final String STORE_NAME = "file";
 
     protected File contentFolderRoot;
     protected File taskFolder;
@@ -244,7 +246,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
 
     @Override
     public String getContentStoreName() {
-        return "file";
+        return STORE_NAME;
     }
 
     protected File getContentFile(Map<String, Object> metaData, String contentId) {

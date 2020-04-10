@@ -63,5 +63,24 @@
             <column name="SCOPE_TYPE_"/>
         </createIndex>
     </changeSet>
+    
+    <changeSet id="3" author="flowable">
+        <createTable tableName="ACT_CO_STORAGE_ITEM">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="DATA_BYTES_" type="longblob">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        
+        <addUniqueConstraint columnNames="CONTENT_STORE_ID_" tableName="ACT_CO_CONTENT_ITEM"/>
+        
+        <addForeignKeyConstraint constraintName="ACT_FK_CO_COIT_STIT" 
+            referencedTableName="ACT_CO_CONTENT_ITEM"
+            referencedColumnNames="CONTENT_STORE_ID_" 
+            baseTableName="ACT_CO_STORAGE_ITEM"
+            baseColumnNames="ID_" />
+    </changeSet>
 
 </databaseChangeLog>
