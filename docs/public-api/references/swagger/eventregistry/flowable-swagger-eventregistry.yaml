@@ -291,11 +291,6 @@ paths:
         description: "Only return deployments with the given tenantId."
         required: false
         type: "string"
-      - name: "tenantIdLike"
-        in: "query"
-        description: "Only return deployments with a tenantId like the given value."
-        required: false
-        type: "string"
       - name: "withoutTenantId"
         in: "query"
         description: "If true, only returns deployments without a tenantId set. If\
@@ -733,6 +728,9 @@ definitions:
       deploymentUrl:
         type: "string"
         example: "http://localhost:8182/event-registry-repository/deployments/2"
+      resourceName:
+        type: "string"
+        example: "oneChannel.channel"
       resource:
         type: "string"
         example: "http://localhost:8182/event-registry-repository/deployments/2/resources/oneChannel.channel"
@@ -901,6 +899,9 @@ definitions:
       deploymentUrl:
         type: "string"
         example: "http://localhost:8182/event-registry-repository/deployments/2"
+      resourceName:
+        type: "string"
+        example: "oneEvent.event"
       resource:
         type: "string"
         example: "http://localhost:8182/event-registry-repository/deployments/2/resources/oneEvent.event"
@@ -941,13 +942,19 @@ definitions:
       eventDefinitionKey:
         type: "string"
         example: "oneEvent"
+      channelDefinitionId:
+        type: "string"
+        example: "myChannel:1:123"
+      channelDefinitionKey:
+        type: "string"
+        example: "myChannel"
       eventPayload:
         $ref: "#/definitions/ObjectNode"
       tenantId:
         type: "string"
         example: "tenant1"
-    description: "Only one of eventDefinitionId or eventDefinitionKey can be used\
-      \ in the request body"
+    description: "Data for creating an event instance. Only one of eventDefinitionId\
+      \ or eventDefinitionKey can be used in the request body. Same applies to channelDefinitionId/Key"
   EventModel:
     type: "object"
     properties:
@@ -955,14 +962,6 @@ definitions:
         type: "string"
       name:
         type: "string"
-      inboundChannelKeys:
-        type: "array"
-        items:
-          type: "string"
-      outboundChannelKeys:
-        type: "array"
-        items:
-          type: "string"
       correlationParameters:
         type: "array"
         items:
@@ -971,8 +970,6 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/EventPayload"
-      tenantId:
-        type: "string"
   EventPayload:
     type: "object"
     properties:
@@ -1006,21 +1003,13 @@ definitions:
         type: "boolean"
       null:
         type: "boolean"
-      object:
+      float:
         type: "boolean"
-      valueNode:
-        type: "boolean"
-      containerNode:
-        type: "boolean"
-      missingNode:
-        type: "boolean"
-      pojo:
+      number:
         type: "boolean"
       integralNumber:
         type: "boolean"
       floatingPointNumber:
-        type: "boolean"
-      short:
         type: "boolean"
       int:
         type: "boolean"
@@ -1036,9 +1025,17 @@ definitions:
         type: "boolean"
       boolean:
         type: "boolean"
+      valueNode:
+        type: "boolean"
+      containerNode:
+        type: "boolean"
+      missingNode:
+        type: "boolean"
+      object:
+        type: "boolean"
       binary:
         type: "boolean"
-      number:
+      pojo:
         type: "boolean"
-      float:
+      short:
         type: "boolean"
