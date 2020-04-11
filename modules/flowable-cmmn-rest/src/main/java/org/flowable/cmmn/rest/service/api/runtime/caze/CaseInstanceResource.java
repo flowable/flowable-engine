@@ -18,6 +18,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -71,39 +72,57 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
         return caseInstanceResponse;
     }
     
-    @ApiOperation(value = "Execute an action on a case instance", tags = { "Plan Item Instances" }, notes = "")
+    @ApiOperation(value = "Update case instance properties or execute an action on a case instance (body needs to contain an 'action' property for the latter).", tags = { "Plan Item Instances" }, notes = "")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the case instance was found and the action is performed."),
-            @ApiResponse(code = 204, message = "Indicates the case was found, the action was performed and the action caused the case instance to end."),
-            @ApiResponse(code = 400, message = "Indicates an illegal action was requested, required parameters are missing in the request body or illegal variables are passed in. Status description contains additional information about the error."),
+            @ApiResponse(code = 200, message = "Indicates the case instance was found and the action/update is performed."),
+            @ApiResponse(code = 204, message = "Indicates the case was found, the change was performed and it caused the case instance to end."),
+            @ApiResponse(code = 400, message = "Indicates an illegal parameter was passed, required parameters are missing in the request body or illegal variables are passed in. Status description contains additional information about the error."),
             @ApiResponse(code = 404, message = "Indicates the case instance was not found.")
     })
     @PutMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}", produces = "application/json")
-    public CaseInstanceResponse performCaseInstanceAction(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, 
-                    @RequestBody RestActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
+    public CaseInstanceResponse updateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
+                    @RequestBody CaseInstanceUpdateRequest updateRequest, HttpServletRequest request, HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doCaseInstanceAction(caseInstance, actionRequest);
+
+        if (StringUtils.isNotEmpty(updateRequest.getAction())) {
+
+            if (restApiInterceptor != null) {
+                restApiInterceptor.doCaseInstanceAction(caseInstance, updateRequest);
+            }
+
+            if (RestActionRequest.EVALUATE_CRITERIA.equals(updateRequest.getAction())) {
+                runtimeService.evaluateCriteria(caseInstance.getId());
+
+            } else {
+                throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
+            }
+
+        } else { // regular update
+
+            if (restApiInterceptor != null) {
+                restApiInterceptor.updateCaseInstance(caseInstance, updateRequest);
+            }
+
+            if (StringUtils.isNotEmpty(updateRequest.getName())) {
+                runtimeService.setCaseInstanceName(caseInstanceId, updateRequest.getName());
+            }
+            if (StringUtils.isNotEmpty(updateRequest.getBusinessKey())) {
+                runtimeService.updateBusinessKey(caseInstanceId, updateRequest.getBusinessKey());
+            }
+
         }
 
-        if (RestActionRequest.EVALUATE_CRITERIA.equals(actionRequest.getAction())) {
-            runtimeService.evaluateCriteria(caseInstance.getId());
-            
-        } else {
-            throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
-        }
-
-        // Re-fetch the execution, could have changed due to action or even completed
+        // Re-fetch the case instance, could have changed due to action or even completed
         caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         if (caseInstance == null) {
-            // Execution is finished, return empty body to inform user
+            // Case instance is finished, return empty body to inform user
             response.setStatus(HttpStatus.NO_CONTENT.value());
             return null;
         } else {
             return restResponseFactory.createCaseInstanceResponse(caseInstance);
         }
+
     }
 
     @ApiOperation(value = "Delete a case instance", tags = { "Case Instances" }, nickname = "deleteCaseInstance")

@@ -12,39 +12,39 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Iveta Champoeva
  */
 public class ServiceTaskFailedJobRetryTimeCycleConverterTest extends AbstractConverterTest {
 
-	@Test
-	public void convertJsonToModel() throws Exception {
-		BpmnModel bpmnModel = readJsonFile();
-		validateModel(bpmnModel);
-	}
+    @Test
+    public void convertJsonToModel() throws Exception {
+        BpmnModel bpmnModel = readJsonFile();
+        validateModel(bpmnModel);
+    }
 
-	@Test
-	public void doubleConversionValidation() throws Exception {
-		BpmnModel bpmnModel = readJsonFile();
-		bpmnModel = convertToJsonAndBack(bpmnModel);
-		validateModel(bpmnModel);
-	}
+    @Test
+    public void doubleConversionValidation() throws Exception {
+        BpmnModel bpmnModel = readJsonFile();
+        bpmnModel = convertToJsonAndBack(bpmnModel);
+        validateModel(bpmnModel);
+    }
 
-	@Override
-	protected String getResource() {
-		return "test.servicetaskfailedjobretrytimecyclemodel.json";
-	}
+    @Override
+    protected String getResource() {
+        return "test.servicetaskfailedjobretrytimecyclemodel.json";
+    }
 
-	private void validateModel(BpmnModel model) {
-		FlowElement flowElement = model.getMainProcess().getFlowElement("shareniuservice", true);
-		ServiceTask serviceTask = (ServiceTask) flowElement;
-		assertEquals("R0/PT0M", serviceTask.getFailedJobRetryTimeCycleValue());
-	}
+    private void validateModel(BpmnModel model) {
+        FlowElement flowElement = model.getMainProcess().getFlowElement("shareniuservice", true);
+        ServiceTask serviceTask = (ServiceTask) flowElement;
+        assertThat(serviceTask.getFailedJobRetryTimeCycleValue()).isEqualTo("R0/PT0M");
+    }
 }

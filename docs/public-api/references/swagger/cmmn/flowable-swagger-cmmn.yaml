@@ -2627,11 +2627,6 @@ paths:
         description: "Only return deployments with the given tenantId."
         required: false
         type: "string"
-      - name: "tenantIdLike"
-        in: "query"
-        description: "Only return deployments with a tenantId like the given value."
-        required: false
-        type: "string"
       - name: "withoutTenantId"
         in: "query"
         description: "If true, only returns deployments without a tenantId set. If\
@@ -3613,15 +3608,15 @@ paths:
           \ type."
         required: false
         type: "string"
-      - name: "startedBefore"
+      - name: "createdBefore"
         in: "query"
-        description: "Only return plan item instances which are started before the\
+        description: "Only return plan item instances which are created before the\
           \ given date."
         required: false
         type: "date"
-      - name: "startedAfter"
+      - name: "createdAfter"
         in: "query"
-        description: "Only return plan item instances which are started after the\
+        description: "Only return plan item instances which are created after the\
           \ given date."
         required: false
         type: "date"
@@ -3633,13 +3628,13 @@ paths:
         type: "string"
       - name: "tenantId"
         in: "query"
-        description: "Only return process instances with the given tenantId."
+        description: "Only return plan item instances with the given tenantId."
         required: false
         type: "string"
       - name: "withoutTenantId"
         in: "query"
-        description: "If true, only returns process instances without a tenantId set.\
-          \ If false, the withoutTenantId parameter is ignored."
+        description: "If true, only returns plan item instances without a tenantId\
+          \ set. If false, the withoutTenantId parameter is ignored."
         required: false
         type: "boolean"
       - name: "sort"
@@ -3648,10 +3643,9 @@ paths:
         required: false
         type: "string"
         enum:
-        - "processInstanceId"
-        - "processDefinitionId"
-        - "processDefinitionKey"
-        - "tenantId"
+        - "name"
+        - "createTime"
+        - "startTime"
       responses:
         200:
           description: "Indicates request was successful and the executions are returned"
@@ -3902,11 +3896,6 @@ paths:
       - name: "includeTaskLocalVariables"
         in: "query"
         description: "Indication to include task local variables in the result."
-        required: false
-        type: "boolean"
-      - name: "includeProcessVariables"
-        in: "query"
-        description: "Indication to include process variables in the result."
         required: false
         type: "boolean"
       - name: "tenantId"
@@ -5474,10 +5463,6 @@ definitions:
         type: "string"
       id:
         type: "string"
-      description:
-        type: "string"
-      resourceName:
-        type: "string"
       version:
         type: "integer"
         format: "int32"
@@ -5486,6 +5471,10 @@ definitions:
       deploymentId:
         type: "string"
       tenantId:
+        type: "string"
+      resourceName:
+        type: "string"
+      description:
         type: "string"
   ExtensionAttribute:
     type: "object"
@@ -5616,10 +5605,6 @@ definitions:
         type: "string"
       id:
         type: "string"
-      description:
-        type: "string"
-      resourceName:
-        type: "string"
       version:
         type: "integer"
         format: "int32"
@@ -5628,6 +5613,10 @@ definitions:
       deploymentId:
         type: "string"
       tenantId:
+        type: "string"
+      resourceName:
+        type: "string"
+      description:
         type: "string"
   FormDefinitionResponse:
     type: "object"
@@ -6014,12 +6003,17 @@ definitions:
       caseDefinitionId:
         type: "string"
         example: "myCaseId%3A1%3A4"
+      derivedCaseDefinitionId:
+        type: "string"
       caseInstanceId:
         type: "string"
         example: "12345"
       stageInstanceId:
         type: "string"
         example: "stageId"
+      stage:
+        type: "boolean"
+        example: true
       elementId:
         type: "string"
         example: "someElementId"
@@ -6073,6 +6067,9 @@ definitions:
         type: "string"
         format: "date-time"
         example: "2013-04-17T10:17:43.902+0000"
+      lastUpdatedTime:
+        type: "string"
+        format: "date-time"
       startUserId:
         type: "string"
         example: "kermit"
@@ -6082,21 +6079,32 @@ definitions:
       referenceType:
         type: "string"
         example: "referenceType"
+      entryCriterionId:
+        type: "string"
+      exitCriterionId:
+        type: "string"
+      formKey:
+        type: "string"
+      extraValue:
+        type: "string"
+      showInOverview:
+        type: "boolean"
       tenantId:
         type: "string"
         example: "null"
       url:
         type: "string"
         example: "http://localhost:8182/cmmn-history/historic-planitem-instances/5"
-      historicCaseInstanceUrl:
+      caseInstanceUrl:
         type: "string"
         example: "http://localhost:8182/cmmn-history/historic-case-instances/12345"
       caseDefinitionUrl:
         type: "string"
         example: "http://localhost:8182/cmmn-repository/case-definitions/myCaseId%3A1%3A4"
-      stage:
-        type: "boolean"
-        example: true
+      derivedCaseDefinitionUrl:
+        type: "string"
+      stageInstanceUrl:
+        type: "string"
   HistoricTaskInstanceQueryRequest:
     type: "object"
     properties:
@@ -6263,6 +6271,22 @@ definitions:
       caseDefinitionId:
         type: "string"
       caseDefinitionUrl:
+        type: "string"
+      scopeDefinitionId:
+        type: "string"
+      scopeId:
+        type: "string"
+      subScopeId:
+        type: "string"
+      scopeType:
+        type: "string"
+      propagatedStageInstanceId:
+        type: "string"
+      executionId:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processDefinitionId:
         type: "string"
   HistoricVariableInstanceQueryRequest:
     type: "object"
@@ -6705,6 +6729,8 @@ definitions:
       url:
         type: "string"
         example: "http://localhost:8182/runtime/executions/5"
+      name:
+        type: "string"
       caseInstanceId:
         type: "string"
       caseInstanceUrl:
@@ -6712,6 +6738,10 @@ definitions:
       caseDefinitionId:
         type: "string"
       caseDefinitionUrl:
+        type: "string"
+      derivedCaseDefinitionId:
+        type: "string"
+      derivedCaseDefinitionUrl:
         type: "string"
       stageInstanceId:
         type: "string"
@@ -6730,14 +6760,52 @@ definitions:
       createTime:
         type: "string"
         format: "date-time"
+      lastAvailableTime:
+        type: "string"
+        format: "date-time"
+      lastEnabledTime:
+        type: "string"
+        format: "date-time"
+      lastDisabledTime:
+        type: "string"
+        format: "date-time"
+      lastStartedTime:
+        type: "string"
+        format: "date-time"
+      lastSuspendedTime:
+        type: "string"
+        format: "date-time"
+      completedTime:
+        type: "string"
+        format: "date-time"
+      occurredTime:
+        type: "string"
+        format: "date-time"
+      terminatedTime:
+        type: "string"
+        format: "date-time"
+      exitTime:
+        type: "string"
+        format: "date-time"
+      endedTime:
+        type: "string"
+        format: "date-time"
       startUserId:
         type: "string"
       referenceId:
         type: "string"
       referenceType:
         type: "string"
-      completeable:
+      completable:
         type: "boolean"
+      entryCriterionId:
+        type: "string"
+      exitCriterionId:
+        type: "string"
+      formKey:
+        type: "string"
+      extraValue:
+        type: "string"
       tenantId:
         type: "string"
         example: "null"
@@ -6955,9 +7023,9 @@ definitions:
           $ref: "#/definitions/SentryOnPart"
       sentryIfPart:
         $ref: "#/definitions/SentryIfPart"
-      defaultTriggerMode:
-        type: "boolean"
       onEventTriggerMode:
+        type: "boolean"
+      defaultTriggerMode:
         type: "boolean"
       parentStage:
         $ref: "#/definitions/Stage"
@@ -7084,6 +7152,8 @@ definitions:
         type: "string"
       formKey:
         type: "string"
+      sameDeployment:
+        type: "boolean"
       validateFormFields:
         type: "string"
       displayOrder:
@@ -7095,12 +7165,12 @@ definitions:
         type: "object"
         additionalProperties:
           $ref: "#/definitions/PlanItemDefinition"
-      planModel:
-        type: "boolean"
       planItemDefinitions:
         type: "array"
         items:
           $ref: "#/definitions/PlanItemDefinition"
+      planModel:
+        type: "boolean"
       case:
         $ref: "#/definitions/Case"
       planItems:
@@ -7353,6 +7423,21 @@ definitions:
       taskDefinitionKey:
         type: "string"
         example: "theTask"
+      scopeDefinitionId:
+        type: "string"
+        example: "123"
+      scopeId:
+        type: "string"
+        example: "123"
+      subScopeId:
+        type: "string"
+        example: "123"
+      scopeType:
+        type: "string"
+        example: "cmmn"
+      propagatedStageInstanceId:
+        type: "string"
+        example: "123"
       tenantId:
         type: "string"
         example: "null"
@@ -7361,12 +7446,6 @@ definitions:
         example: "ExampleCategory"
       formKey:
         type: "string"
-      parentTaskId:
-        type: "string"
-        example: "null"
-      parentTaskUrl:
-        type: "string"
-        example: "null"
       caseInstanceId:
         type: "string"
         example: "5"
@@ -7379,6 +7458,21 @@ definitions:
       caseDefinitionUrl:
         type: "string"
         example: "http://localhost:8182/cmmn-runtime/case-definitions/oneTaskCase%3A1%3A4"
+      parentTaskId:
+        type: "string"
+        example: "null"
+      parentTaskUrl:
+        type: "string"
+        example: "null"
+      executionId:
+        type: "string"
+        example: "123"
+      processInstanceId:
+        type: "string"
+        example: "123"
+      processDefinitionId:
+        type: "string"
+        example: "123"
       variables:
         type: "array"
         items:

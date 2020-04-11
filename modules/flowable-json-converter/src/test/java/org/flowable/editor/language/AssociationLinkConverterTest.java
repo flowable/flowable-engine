@@ -12,8 +12,7 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -22,9 +21,10 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AssociationLinkConverterTest extends AbstractConverterTest {
+
     @Override
     protected String getResource() {
         return "test.association.json";
@@ -35,12 +35,12 @@ public class AssociationLinkConverterTest extends AbstractConverterTest {
         final BpmnModel bpmnModel = readJsonFile();
         final List<BoundaryEvent> boundaryEvents =
                 bpmnModel.getMainProcess().findFlowElementsOfType(BoundaryEvent.class);
-        assertEquals(1, boundaryEvents.size());
+        assertThat(boundaryEvents).hasSize(1);
         final List<EventDefinition> eventDefinitions = boundaryEvents.get(0).getEventDefinitions();
-        assertEquals(1, eventDefinitions.size());
-        assertTrue(eventDefinitions.get(0) instanceof CompensateEventDefinition);
+        assertThat(eventDefinitions).hasSize(1);
+        assertThat(eventDefinitions.get(0)).isInstanceOf(CompensateEventDefinition.class);
         final List<Association> associations =
                 bpmnModel.getMainProcess().findAssociationsWithSourceRefRecursive("userTask1");
-        assertEquals(1, associations.size());
+        assertThat(associations).hasSize(1);
     }
 }

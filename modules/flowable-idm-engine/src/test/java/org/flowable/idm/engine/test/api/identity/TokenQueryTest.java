@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,10 +13,8 @@
 
 package org.flowable.idm.engine.test.api.identity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -89,11 +87,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenId("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().tokenId(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().tokenId(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -102,7 +97,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
 
         Token result = query.singleResult();
-        assertEquals("aaaa", result.getTokenValue());
+        assertThat(result.getTokenValue()).isEqualTo("aaaa");
     }
 
     @Test
@@ -110,11 +105,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenValue("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().tokenValue(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().tokenValue(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -126,8 +118,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         Token result = query.singleResult();
         Calendar tokenCal = new GregorianCalendar();
         tokenCal.setTime(result.getTokenDate());
-        assertEquals(2015, tokenCal.get(Calendar.YEAR));
-        assertEquals(1, tokenCal.get(Calendar.MONTH));
+        assertThat(tokenCal.get(Calendar.YEAR)).isEqualTo(2015);
+        assertThat(tokenCal.get(Calendar.MONTH)).isEqualTo(1);
     }
 
     @Test
@@ -139,8 +131,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         Token result = query.singleResult();
         Calendar tokenCal = new GregorianCalendar();
         tokenCal.setTime(result.getTokenDate());
-        assertEquals(2017, tokenCal.get(Calendar.YEAR));
-        assertEquals(1, tokenCal.get(Calendar.MONTH));
+        assertThat(tokenCal.get(Calendar.YEAR)).isEqualTo(2017);
+        assertThat(tokenCal.get(Calendar.MONTH)).isEqualTo(1);
     }
 
     @Test
@@ -149,7 +141,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
 
         Token result = query.singleResult();
-        assertEquals("127.0.0.1", result.getIpAddress());
+        assertThat(result.getIpAddress()).isEqualTo("127.0.0.1");
     }
 
     @Test
@@ -157,11 +149,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().ipAddress("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().ipAddress(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().ipAddress(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -178,11 +167,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().ipAddressLike("%invalid%");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().ipAddressLike(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().ipAddressLike(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -191,7 +177,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
 
         Token result = query.singleResult();
-        assertEquals("chrome", result.getUserAgent());
+        assertThat(result.getUserAgent()).isEqualTo("chrome");
     }
 
     @Test
@@ -199,11 +185,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().userAgent("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().userAgent(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().userAgent(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -220,11 +203,9 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().userAgentLike("%invalid%");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().userAgentLike(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().userAgentLike(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
     }
 
     @Test
@@ -233,7 +214,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
 
         Token result = query.singleResult();
-        assertEquals("user1", result.getUserId());
+        assertThat(result.getUserId()).isEqualTo("user1");
     }
 
     @Test
@@ -241,11 +222,9 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().userId("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().userId(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().userId(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
     }
 
     @Test
@@ -262,11 +241,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().userIdLike("%invalid%");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().userIdLike(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().userIdLike(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -275,7 +251,7 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
 
         Token result = query.singleResult();
-        assertEquals("test", result.getTokenData());
+        assertThat(result.getTokenData()).isEqualTo("test");
     }
 
     @Test
@@ -283,11 +259,8 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenData("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().tokenData(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().tokenData(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -301,82 +274,71 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenDataLike("%invalid%");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createTokenQuery().tokenDataLike(null).singleResult();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().tokenDataLike(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQuerySorting() {
         // asc
-        assertEquals(3, idmIdentityService.createTokenQuery().orderByTokenId().asc().count());
-        assertEquals(3, idmIdentityService.createTokenQuery().orderByTokenDate().asc().count());
+        assertThat(idmIdentityService.createTokenQuery().orderByTokenId().asc().count()).isEqualTo(3);
+        assertThat(idmIdentityService.createTokenQuery().orderByTokenDate().asc().count()).isEqualTo(3);
 
         // desc
-        assertEquals(3, idmIdentityService.createTokenQuery().orderByTokenId().desc().count());
-        assertEquals(3, idmIdentityService.createTokenQuery().orderByTokenDate().desc().count());
+        assertThat(idmIdentityService.createTokenQuery().orderByTokenId().desc().count()).isEqualTo(3);
+        assertThat(idmIdentityService.createTokenQuery().orderByTokenDate().desc().count()).isEqualTo(3);
 
         // Combined with criteria
         TokenQuery query = idmIdentityService.createTokenQuery().userAgentLike("%firefox%").orderByTokenDate().asc();
         List<Token> tokens = query.list();
-        assertEquals(2, tokens.size());
-        assertEquals("firefox", tokens.get(0).getUserAgent());
-        assertEquals("firefox2", tokens.get(1).getUserAgent());
+        assertThat(tokens)
+                .extracting(Token::getUserAgent)
+                .containsExactly("firefox", "firefox2");
     }
 
     @Test
     public void testQueryInvalidSortingUsage() {
-        try {
-            idmIdentityService.createTokenQuery().orderByTokenId().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().orderByTokenId().list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        try {
-            idmIdentityService.createTokenQuery().orderByTokenId().orderByTokenDate().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().orderByTokenId().orderByTokenDate().list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     private void verifyQueryResults(TokenQuery query, int countExpected) {
-        assertEquals(countExpected, query.list().size());
-        assertEquals(countExpected, query.count());
+        assertThat(query.list()).hasSize(countExpected);
+        assertThat(query.count()).isEqualTo(countExpected);
 
         if (countExpected == 1) {
-            assertNotNull(query.singleResult());
+            assertThat(query.singleResult()).isNotNull();
         } else if (countExpected > 1) {
             verifySingleResultFails(query);
         } else if (countExpected == 0) {
-            assertNull(query.singleResult());
+            assertThat(query.singleResult()).isNull();
         }
     }
 
     private void verifySingleResultFails(TokenQuery query) {
-        try {
-            query.singleResult();
-            fail();
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> query.singleResult())
+                .isExactlyInstanceOf(FlowableException.class);
     }
 
     @Test
     public void testNativeQuery() {
-        assertEquals("ACT_ID_TOKEN", idmManagementService.getTableName(Token.class));
-        assertEquals("ACT_ID_TOKEN", idmManagementService.getTableName(TokenEntity.class));
+        assertThat(idmManagementService.getTableName(Token.class)).isEqualTo("ACT_ID_TOKEN");
+        assertThat(idmManagementService.getTableName(TokenEntity.class)).isEqualTo("ACT_ID_TOKEN");
         String tableName = idmManagementService.getTableName(Token.class);
         String baseQuerySql = "SELECT * FROM " + tableName;
 
-        assertEquals(3, idmIdentityService.createNativeUserQuery().sql(baseQuerySql).list().size());
+        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql).list()).hasSize(3);
 
-        assertEquals(1, idmIdentityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "1111").list().size());
+        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "1111").list()).hasSize(1);
 
         // paging
-        assertEquals(2, idmIdentityService.createNativeUserQuery().sql(baseQuerySql).listPage(0, 2).size());
-        assertEquals(2, idmIdentityService.createNativeUserQuery().sql(baseQuerySql).listPage(1, 3).size());
-        assertEquals(1, idmIdentityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "1111").listPage(0, 1).size());
+        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql).listPage(0, 2)).hasSize(2);
+        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql).listPage(1, 3)).hasSize(2);
+        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "1111").listPage(0, 1).size())
+                .isEqualTo(1);
     }
 
 }

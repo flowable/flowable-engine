@@ -102,14 +102,16 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     /** Only select historic process instance that are not deleted. */
     HistoricProcessInstanceQuery notDeleted();
 
-    /**
-     * Only select the historic process instances with which the user with the given id is involved.
-     */
+    /** Only select the historic process instances with which the user with the given id is involved. */
     HistoricProcessInstanceQuery involvedUser(String userId);
+    
+    /** Only select the historic process instances with which the user with the given id and link type is involved. */
+    HistoricProcessInstanceQuery involvedUser(String userId, String identityLinkType);
+    
+    /** Only select the historic process instances with which the group with the given id and link type is involved. */
+    HistoricProcessInstanceQuery involvedGroup(String groupId, String identityLinkType);
 
-    /**
-     * Only select the historic process instances with which the group with the given ids are involved.
-     */
+    /** Only select the historic process instances with which the group with the given ids are involved. */
     HistoricProcessInstanceQuery involvedGroups(Set<String> groups);
 
     /**
