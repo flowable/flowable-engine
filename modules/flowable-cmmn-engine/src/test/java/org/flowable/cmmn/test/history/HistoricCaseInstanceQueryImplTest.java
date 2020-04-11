@@ -747,6 +747,46 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .singleResult().getId())
                 .isEqualTo(caseInstance.getId());
     }
+    
+    @Test
+    public void getCaseInstanceByInvolvedUserIdentityLink() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+        cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", "specialLink");
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "specialLink").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "specialLink").list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "specialLink").singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+        
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedUser("kermit", "wrongType").count()).isEqualTo(0L);
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .involvedUser("kermit", "specialLink")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count())
+                .isEqualTo(1L);
+        
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .involvedUser("kermit", "specialLink")
+                .caseDefinitionKey("oneTaskCase")
+                .endOr()
+                .count())
+                .isEqualTo(1L);
+        
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .involvedUser("kermit", "wrongType")
+                .caseDefinitionKey("wrongKey")
+                .endOr()
+                .count())
+                .isEqualTo(0L);
+    }
 
     @Test
     public void getCaseInstanceByInvolvedGroup() {
@@ -783,6 +823,47 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .endOr()
                 .singleResult().getId())
                 .isEqualTo(caseInstance.getId());
+    }
+    
+    @Test
+    public void getCaseInstanceByInvolvedGroupIdentityLink() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", "specialLink");
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup2", "extraLink");
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup", "specialLink").count()).isEqualTo(1L);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup", "specialLink").list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup", "specialLink").singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+        
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroup("testGroup2", "wrongType").count()).isEqualTo(0L);
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .involvedGroup("testGroup", "specialLink")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count())
+                .isEqualTo(1L);
+        
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .involvedGroup("testGroup2", "extraLink")
+                .caseDefinitionKey("oneTaskCase")
+                .endOr()
+                .count())
+                .isEqualTo(1L);
+        
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .involvedGroup("testGroup2", "wrongType")
+                .caseDefinitionKey("wrongKey")
+                .endOr()
+                .count())
+                .isEqualTo(0L);
     }
 
     @Test

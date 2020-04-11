@@ -668,6 +668,39 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .endOr()
                 .singleResult().getId()).isEqualTo(caseInstance.getId());
     }
+    
+    @Test
+    public void getCaseInstanceByInvolvedUserIdentityLink() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+        cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", "specialLink");
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit", "specialLink").count()).isEqualTo(1L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit", "specialLink").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit", "specialLink").singleResult().getId()).isEqualTo(caseInstance.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit", "wrongType").count()).isEqualTo(0L);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .involvedUser("kermit", "specialLink")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count()).isEqualTo(1L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .involvedUser("kermit", "specialLink")
+                .caseDefinitionKey("oneTaskCase")
+                .endOr()
+                .count()).isEqualTo(1L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .involvedUser("kermit", "wrongType")
+                .caseDefinitionKey("undefined")
+                .endOr()
+                .count()).isEqualTo(0L);
+    }
 
     @Test
     public void getCaseInstanceByInvolvedGroup() {
@@ -701,6 +734,47 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionId("undefined")
                 .endOr()
                 .singleResult().getId()).isEqualTo(caseInstance.getId());
+    }
+    
+    @Test
+    public void getCaseInstanceByInvolvedGroupIdentityLink() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", "specialLink");
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup2", "extraLink");
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroup("testGroup", "specialLink").count()).isEqualTo(1L);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroup("testGroup", "specialLink").list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroup("testGroup", "specialLink").singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroup("testGroup2", "wrongType").count()).isEqualTo(0L);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .involvedGroup("testGroup", "specialLink")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count())
+                .isEqualTo(1L);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .involvedGroup("testGroup2", "extraLink")
+                .caseDefinitionKey("oneTaskCase")
+                .endOr()
+                .count())
+                .isEqualTo(1L);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .involvedGroup("testGroup2", "wrongType")
+                .caseDefinitionKey("wrongKey")
+                .endOr()
+                .count())
+                .isEqualTo(0L);
     }
 
     @Test

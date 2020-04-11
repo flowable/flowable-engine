@@ -866,17 +866,17 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     }
 
     protected Date getInsertDate() {
-        Calendar cal = new GregorianCalendar(2020, 3, 10);
+        Calendar cal = new GregorianCalendar(2019, 3, 10);
         return cal.getTime();
     }
 
     protected Date getCompareBeforeDate() {
-        Calendar cal = new GregorianCalendar(2020, 3, 9);
+        Calendar cal = new GregorianCalendar(2019, 3, 9);
         return cal.getTime();
     }
 
     protected Date getCompareAfterDate() {
-        Calendar cal = new GregorianCalendar(2020, 3, 11);
+        Calendar cal = new GregorianCalendar(2019, 3, 11);
         return cal.getTime();
     }
 }

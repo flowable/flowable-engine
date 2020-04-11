@@ -1005,6 +1005,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public void setInvolvedUser(String involvedUser) {
         this.involvedUser = involvedUser;
     }
+    
+    public IdentityLinkQueryObject getInvolvedUserIdentityLink() {
+        return null;
+    }
+
+    public IdentityLinkQueryObject getInvolvedGroupIdentityLink() {
+        return null;
+    }
 
     public Set<String> getInvolvedGroups() {
         return involvedGroups;

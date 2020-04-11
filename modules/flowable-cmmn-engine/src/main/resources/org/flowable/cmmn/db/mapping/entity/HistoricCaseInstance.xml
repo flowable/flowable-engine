@@ -635,8 +635,11 @@
             and (${queryTablePrefix}TENANT_ID_ is null or ${queryTablePrefix}TENANT_ID_ = '')
         </if>
         <if test="involvedUser != null">
-            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
-            #{involvedUser})
+            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ = #{involvedUser})
+        </if>
+        <if test="involvedUserIdentityLink != null">
+            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            I.USER_ID_ = #{involvedUserIdentityLink.userId} and I.TYPE_ = #{involvedUserIdentityLink.type})
         </if>
         <if test="involvedGroups != null">
             and EXISTS(
@@ -645,6 +648,10 @@
                     #{involvedGroup}
                 </foreach>
             )
+        </if>
+        <if test="involvedGroupIdentityLink != null">
+            and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId} and I.TYPE_ = #{involvedGroupIdentityLink.type})
         </if>
     </sql>
     
@@ -717,6 +724,10 @@
             or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
             #{orQueryObject.involvedUser})
         </if>
+        <if test="orQueryObject.involvedUserIdentityLink != null">
+            or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type})
+        </if>
         <if test="orQueryObject.involvedGroups != null">
             or EXISTS(
             select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
@@ -724,6 +735,10 @@
                 #{involvedGroup}
             </foreach>
             )
+        </if>
+        <if test="orQueryObject.involvedGroupIdentityLink != null">
+            or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type})
         </if>
     </sql>
 
