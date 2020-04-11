@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,6 +55,8 @@ public class CollectionsContainsTest {
         List inputVariable4 = Arrays.asList(5L, 10L, 20L, 50L);
         List inputVariable5 = Arrays.asList("test3", "test5");
         List inputVariable6 = Arrays.asList("tes,t6", "te,st5");
+        List inputVariable7 = Arrays.asList(BigInteger.valueOf(100), BigInteger.valueOf(101));
+        List inputVariable8 = Arrays.asList("100", "101");
 
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
         ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
@@ -68,12 +71,15 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collection4", inputVariable4);
         processVariablesInput.put("collection5", inputVariable5);
         processVariablesInput.put("collection6", inputVariable6);
+        processVariablesInput.put("collection7", inputVariable7);
+        processVariablesInput.put("collection8", inputVariable8);
         processVariablesInput.put("arrayNode1", arrayNode1);
         processVariablesInput.put("arrayNode2", arrayNode2);
         processVariablesInput.put("arrayNode3", arrayNode3);
         processVariablesInput.put("arrayNode4", arrayNode4);
         processVariablesInput.put("arrayNode5", arrayNode5);
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
+        processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -98,6 +104,15 @@ public class CollectionsContainsTest {
         Assert.assertTrue(result.getRuleExecutions().get(17).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(18).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(19).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(20).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(21).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(22).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(24).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(25).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(26).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(27).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(28).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(29).isValid());
     }
 
     @Test
@@ -111,6 +126,8 @@ public class CollectionsContainsTest {
         List inputVariable4 = Arrays.asList(5L, 10L, 20L, 50L);
         List inputVariable5 = Arrays.asList("test3", "test5");
         List inputVariable6 = Arrays.asList("tes,t6", "te,st5");
+        List inputVariable7 = Arrays.asList(BigInteger.valueOf(100), BigInteger.valueOf(101));
+        List inputVariable8 = Arrays.asList("100", "101");
 
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
         ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
@@ -125,12 +142,15 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collection4", inputVariable4);
         processVariablesInput.put("collection5", inputVariable5);
         processVariablesInput.put("collection6", inputVariable6);
+        processVariablesInput.put("collection7", inputVariable7);
+        processVariablesInput.put("collection8", inputVariable8);
         processVariablesInput.put("arrayNode1", arrayNode1);
         processVariablesInput.put("arrayNode2", arrayNode2);
         processVariablesInput.put("arrayNode3", arrayNode3);
         processVariablesInput.put("arrayNode4", arrayNode4);
         processVariablesInput.put("arrayNode5", arrayNode5);
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
+        processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();

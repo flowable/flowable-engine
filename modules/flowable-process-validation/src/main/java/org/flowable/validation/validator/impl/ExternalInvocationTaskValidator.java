@@ -136,7 +136,7 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             addError(errors, Problems.SEND_EVENT_TASK_NO_EVENT_TYPE, process, sendEventServiceTask, "No event type is defined on the send event task");
         }
         List<ExtensionElement> channelKeyExtensionElements = sendEventServiceTask.getExtensionElements().get("channelKey");
-        if (channelKeyExtensionElements.isEmpty() || StringUtils.isEmpty(channelKeyExtensionElements.get(0).getElementText())) {
+        if (channelKeyExtensionElements == null || channelKeyExtensionElements.isEmpty() || StringUtils.isEmpty(channelKeyExtensionElements.get(0).getElementText())) {
             addError(errors, Problems.SEND_EVENT_TASK_NO_OUTBOUND_CHANNEL, process, sendEventServiceTask, "No outbound channel set on the send event task");
         }
     }

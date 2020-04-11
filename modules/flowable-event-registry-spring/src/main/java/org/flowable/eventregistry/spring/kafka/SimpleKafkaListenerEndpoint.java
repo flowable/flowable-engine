@@ -17,9 +17,11 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.config.AbstractKafkaListenerEndpoint;
 import org.springframework.kafka.config.KafkaListenerEndpoint;
 import org.springframework.kafka.listener.GenericMessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
+import org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter;
 import org.springframework.kafka.support.TopicPartitionOffset;
 import org.springframework.kafka.support.converter.MessageConverter;
 import org.springframework.util.Assert;
@@ -36,6 +38,7 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint 
     protected String clientIdPrefix;
     protected Integer concurrency;
     protected Properties consumerProperties;
+    protected boolean splitIterables = true;
 
     protected GenericMessageListener<ConsumerRecord<K, V>> messageListener;
 
@@ -130,6 +133,15 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint 
         GenericMessageListener<ConsumerRecord<K, V>> messageListener = getMessageListener();
         Assert.state(messageListener != null, () -> "Endpoint [" + this + "] must provide a non null message listener");
         listenerContainer.setupMessageListener(messageListener);
+    }
+
+    @Override
+    public boolean isSplitIterables() {
+        return splitIterables;
+    }
+
+    public void setSplitIterables(boolean splitIterables) {
+        this.splitIterables = splitIterables;
     }
 
     @Override

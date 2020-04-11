@@ -323,6 +323,41 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
     }
 
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
+    public void testUpdateCaseInstance() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneHumanTaskCase")
+            .start();
+
+        assertNull(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+        assertNull(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+
+        // Triggering the evaluation twice will satisfy the entry criterion for B
+        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"test name one\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("test name one", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+        assertNull(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+
+        httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"businessKey\": \"test business key\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("test name one", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+        assertEquals("test business key", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+
+        httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"test name two\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertEquals("test name two", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName());
+        assertEquals("test business key", runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey());
+    }
+
+
 
     protected ArrayNode getStageOverviewResponse(CaseInstance caseInstance) throws IOException {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(

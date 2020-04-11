@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.StartEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EventProcessConverterTest extends AbstractConverterTest {
 
@@ -45,25 +45,25 @@ public class EventProcessConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         List<StartEvent> startEvents = model.getMainProcess().findFlowElementsOfType(StartEvent.class);
-        assertEquals(1, startEvents.size());
-        assertEquals(0, startEvents.get(0).getEventDefinitions().size());
+        assertThat(startEvents).hasSize(1);
+        assertThat(startEvents.get(0).getEventDefinitions()).isEmpty();
         Map<String, List<ExtensionElement>> extensionMap = startEvents.get(0).getExtensionElements();
-        assertEquals("myEvent", extensionMap.get("eventType").get(0).getElementText());
-        assertEquals("My event name", extensionMap.get("eventName").get(0).getElementText());
-        assertEquals("testChannel", extensionMap.get("channelKey").get(0).getElementText());
-        assertEquals("My test channel", extensionMap.get("channelName").get(0).getElementText());
-        assertEquals("jms", extensionMap.get("channelType").get(0).getElementText());
-        assertEquals("testQueue", extensionMap.get("channelDestination").get(0).getElementText());
-        
+        assertThat(extensionMap.get("eventType").get(0).getElementText()).isEqualTo("myEvent");
+        assertThat(extensionMap.get("eventName").get(0).getElementText()).isEqualTo("My event name");
+        assertThat(extensionMap.get("channelKey").get(0).getElementText()).isEqualTo("testChannel");
+        assertThat(extensionMap.get("channelName").get(0).getElementText()).isEqualTo("My test channel");
+        assertThat(extensionMap.get("channelType").get(0).getElementText()).isEqualTo("jms");
+        assertThat(extensionMap.get("channelDestination").get(0).getElementText()).isEqualTo("testQueue");
+
         List<BoundaryEvent> boundaryEvents = model.getMainProcess().findFlowElementsOfType(BoundaryEvent.class);
-        assertEquals(1, boundaryEvents.size());
-        assertEquals(0, boundaryEvents.get(0).getEventDefinitions().size());
+        assertThat(boundaryEvents).hasSize(1);
+        assertThat(boundaryEvents.get(0).getEventDefinitions()).isEmpty();
         extensionMap = boundaryEvents.get(0).getExtensionElements();
-        assertEquals("boundaryEvent", extensionMap.get("eventType").get(0).getElementText());
-        assertEquals("Boundary event", extensionMap.get("eventName").get(0).getElementText());
-        assertEquals("boundaryChannel", extensionMap.get("channelKey").get(0).getElementText());
-        assertEquals("Boundary channel", extensionMap.get("channelName").get(0).getElementText());
-        assertEquals("jms", extensionMap.get("channelType").get(0).getElementText());
-        assertEquals("boundaryQueue", extensionMap.get("channelDestination").get(0).getElementText());
+        assertThat(extensionMap.get("eventType").get(0).getElementText()).isEqualTo("boundaryEvent");
+        assertThat(extensionMap.get("eventName").get(0).getElementText()).isEqualTo("Boundary event");
+        assertThat(extensionMap.get("channelKey").get(0).getElementText()).isEqualTo("boundaryChannel");
+        assertThat(extensionMap.get("channelName").get(0).getElementText()).isEqualTo("Boundary channel");
+        assertThat(extensionMap.get("channelType").get(0).getElementText()).isEqualTo("jms");
+        assertThat(extensionMap.get("channelDestination").get(0).getElementText()).isEqualTo("boundaryQueue");
     }
 }

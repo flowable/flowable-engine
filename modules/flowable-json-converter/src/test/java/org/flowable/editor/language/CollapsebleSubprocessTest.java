@@ -12,10 +12,8 @@
  */
 package org.flowable.editor.language;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.Offset.offset;
 
 import java.util.List;
 
@@ -25,7 +23,7 @@ import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by Pardo David on 6/01/2017.
@@ -43,19 +41,19 @@ public class CollapsebleSubprocessTest extends AbstractConverterTest {
     private static final double PRECISION = 0.1d;
 
     @Test
-    public void testItShouldBePossibleToConvertModelerJsonToJava() throws Exception{
+    public void testItShouldBePossibleToConvertModelerJsonToJava() throws Exception {
         BpmnModel bpmnModel = readJsonFile();
         validateModel(bpmnModel);
     }
 
     @Test
-    public void itShouldBePossibleToConvertJavaToJson() throws Exception{
+    public void itShouldBePossibleToConvertJavaToJson() throws Exception {
         BpmnModel bpmnModel = readJsonFile();
         bpmnModel = convertToJsonAndBack(bpmnModel);
         validateModel(bpmnModel);
     }
 
-    private void validateModel(BpmnModel bpmnModel){
+    private void validateModel(BpmnModel bpmnModel) {
         //temp vars
         GraphicInfo gi = null;
         GraphicInfo start = null;
@@ -64,76 +62,75 @@ public class CollapsebleSubprocessTest extends AbstractConverterTest {
 
         //validate parent
         gi = bpmnModel.getGraphicInfo(START_EVENT);
-        assertThat(gi.getX(),is(73.0));
-        assertThat(gi.getY(),is(96.0));
-        assertThat(gi.getWidth(),is(30.0));
-        assertThat(gi.getHeight(),is(30.0));
+        assertThat(gi.getX()).isEqualTo(73.0);
+        assertThat(gi.getY()).isEqualTo(96.0);
+        assertThat(gi.getWidth()).isEqualTo(30.0);
+        assertThat(gi.getHeight()).isEqualTo(30.0);
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(SEQUENCEFLOW_TO_COLLAPSEDSUBPROCESS);
-        assertThat(flowLocationGraphicInfo.size(),is(2));
+        assertThat(flowLocationGraphicInfo).hasSize(2);
 
         gi = bpmnModel.getGraphicInfo(COLLAPSEDSUBPROCESS);
-        assertThat(gi.getExpanded(),is(false));
+        assertThat(gi.getExpanded()).isFalse();
 
         //the intersection points are not full values so its a strange double here...
         start = flowLocationGraphicInfo.get(0);
-        assertEquals(102.99814034216989, start.getX(), PRECISION);
-        assertEquals(111.23619118649086, start.getY(), PRECISION);
+        assertThat(start.getX()).isCloseTo(102.99814034216989, offset(PRECISION));
+        assertThat(start.getY()).isCloseTo(111.23619118649086, offset(PRECISION));
 
         end = flowLocationGraphicInfo.get(1);
-        assertEquals(165.0, end.getX(),PRECISION);
-        assertEquals(112.21259842519686, end.getY(), PRECISION);
+        assertThat(end.getX()).isCloseTo(165.0, offset(PRECISION));
+        assertThat(end.getY()).isCloseTo(112.21259842519686, offset(PRECISION));
 
         //validate graphic infos
         FlowElement flowElement = bpmnModel.getFlowElement(IN_CSB_START_EVENT);
-        assertThat(flowElement,instanceOf(StartEvent.class));
+        assertThat(flowElement).isInstanceOf(StartEvent.class);
 
         gi = bpmnModel.getGraphicInfo(IN_CSB_START_EVENT);
-        assertThat(gi.getX(),is(90.0));
-        assertThat(gi.getY(),is(135.0));
-        assertThat(gi.getWidth(),is(30.0));
-        assertThat(gi.getHeight(),is(30.0));
-
+        assertThat(gi.getX()).isEqualTo(90.0);
+        assertThat(gi.getY()).isEqualTo(135.0);
+        assertThat(gi.getWidth()).isEqualTo(30.0);
+        assertThat(gi.getHeight()).isEqualTo(30.0);
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_SEQUENCEFLOW_TO_USERTASK);
-        assertThat(flowElement,instanceOf(SequenceFlow.class));
-        assertThat(flowElement.getName(),is("to ut"));
+        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
+        assertThat(flowElement.getName()).isEqualTo("to ut");
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(IN_CSB_SEQUENCEFLOW_TO_USERTASK);
-        assertThat(flowLocationGraphicInfo.size(),is(2));
+        assertThat(flowLocationGraphicInfo).hasSize(2);
 
         start = flowLocationGraphicInfo.get(0);
-        assertEquals(120.0, start.getX(), PRECISION);
-        assertEquals(150.0, start.getY(), PRECISION);
+        assertThat(start.getX()).isCloseTo(120.0, offset(PRECISION));
+        assertThat(start.getY()).isCloseTo(150.0, offset(PRECISION));
 
         end = flowLocationGraphicInfo.get(1);
-        assertEquals(232.0, end.getX(), PRECISION);
-        assertThat(end.getY(),is(150.0));
+        assertThat(end.getX()).isCloseTo(232.0, offset(PRECISION));
+        assertThat(end.getY()).isEqualTo(150.0);
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_USERTASK);
-        assertThat(flowElement,instanceOf(UserTask.class));
-        assertThat(flowElement.getName(),is("User task 1"));
+        assertThat(flowElement).isInstanceOf(UserTask.class);
+        assertThat(flowElement.getName()).isEqualTo("User task 1");
 
         gi = bpmnModel.getGraphicInfo(IN_CSB_USERTASK);
-        assertThat(gi.getX(),is(232.0));
-        assertThat(gi.getY(),is(110.0));
-        assertThat(gi.getWidth(),is(100.0));
-        assertThat(gi.getHeight(),is(80.0));
+        assertThat(gi.getX()).isEqualTo(232.0);
+        assertThat(gi.getY()).isEqualTo(110.0);
+        assertThat(gi.getWidth()).isEqualTo(100.0);
+        assertThat(gi.getHeight()).isEqualTo(80.0);
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_SEQUENCEFLOW_TO_END);
-        assertThat(flowElement,instanceOf(SequenceFlow.class));
-        assertThat(flowElement.getName(),is("to end"));
+        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
+        assertThat(flowElement.getName()).isEqualTo("to end");
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(IN_CSB_SEQUENCEFLOW_TO_END);
-        assertThat(flowLocationGraphicInfo.size() , is(2));
+        assertThat(flowLocationGraphicInfo).hasSize(2);
 
         start = flowLocationGraphicInfo.get(0);
-        assertEquals(332.0, start.getX(), PRECISION);
-        assertEquals(150.0, start.getY(), PRECISION);
+        assertThat(start.getX()).isCloseTo(332.0, offset(PRECISION));
+        assertThat(start.getY()).isCloseTo(150.0, offset(PRECISION));
 
         end = flowLocationGraphicInfo.get(1);
-        assertThat(end.getX(),is(435.0));
-        assertThat(end.getY(),is(150.0));
+        assertThat(end.getX()).isEqualTo(435.0);
+        assertThat(end.getY()).isEqualTo(150.0);
     }
 
     @Override

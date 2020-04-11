@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
+import org.flowable.cmmn.engine.impl.IdentityLinkQueryObject;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd;
@@ -76,7 +77,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean includeCaseVariables;
     protected Integer caseVariablesLimit;
     protected String involvedUser;
+    protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
+    protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected List<HistoricCaseInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricCaseInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
@@ -571,14 +574,46 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
+    
+    @Override
+    public HistoricCaseInstanceQuery involvedUser(String userId, String identityLinkType) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        } else {
+            this.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQuery involvedGroup(String groupId, String identityLinkType) {
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("groupId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        } else {
+            this.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        }
+        return this;
+    }
 
     @Override
     public HistoricCaseInstanceQuery involvedGroups(Set<String> groupIds) {
         if (groupIds == null) {
-            throw new FlowableIllegalArgumentException("involvedGroups are null");
+            throw new FlowableIllegalArgumentException("groupIds are null");
         }
         if (groupIds.isEmpty()) {
-            throw new FlowableIllegalArgumentException("involvedGroups are empty");
+            throw new FlowableIllegalArgumentException("groupIds are empty");
         }
         if (inOrStatement) {
             this.currentOrQueryObject.involvedGroups = groupIds;
@@ -857,8 +892,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return involvedUser;
     }
 
+    public IdentityLinkQueryObject getInvolvedUserIdentityLink() {
+        return involvedUserIdentityLink;
+    }
+
     public Set<String> getInvolvedGroups() {
         return involvedGroups;
+    }
+    
+    public IdentityLinkQueryObject getInvolvedGroupIdentityLink() {
+        return involvedGroupIdentityLink;
     }
 
     public boolean isIncludeCaseVariables() {
