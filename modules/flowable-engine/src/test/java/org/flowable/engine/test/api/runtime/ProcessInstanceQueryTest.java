@@ -536,6 +536,62 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/superProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml" })
+    public void testQueryByInvolvedUser() {
+        ProcessInstance superProcessInstance = runtimeService.startProcessInstanceByKey("subProcessQueryTest");
+        runtimeService.addUserIdentityLink(superProcessInstance.getId(), "kermit", "specialLink");
+
+        ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().superProcessInstanceId(superProcessInstance.getId());
+        ProcessInstance subProcessInstance = query.singleResult();
+        assertNotNull(subProcessInstance);
+        runtimeService.addUserIdentityLink(subProcessInstance.getId(), "kermit", "anotherLink");
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedUser("kermit", "specialLink").count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().involvedUser("kermit", "specialLink").singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedUser("kermit", "anotherLink").count());
+        assertEquals(subProcessInstance.getId(), runtimeService.createProcessInstanceQuery().involvedUser("kermit", "anotherLink").singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().involvedUser("kermit", "undefined").count());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("undefined").endOr().count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("undefined").endOr().singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().or().involvedUser("kermit", "undefined").processDefinitionKey("undefined").endOr().count());
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/superProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml" })
+    public void testQueryByInvolvedGroup() {
+        ProcessInstance superProcessInstance = runtimeService.startProcessInstanceByKey("subProcessQueryTest");
+        runtimeService.addGroupIdentityLink(superProcessInstance.getId(), "sales", "specialLink");
+
+        ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().superProcessInstanceId(superProcessInstance.getId());
+        ProcessInstance subProcessInstance = query.singleResult();
+        assertNotNull(subProcessInstance);
+        runtimeService.addGroupIdentityLink(subProcessInstance.getId(), "sales", "anotherLink");
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedGroup("sales", "specialLink").count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroup("sales", "specialLink").singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().involvedGroup("sales", "anotherLink").count());
+        assertEquals(subProcessInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroup("sales", "anotherLink").singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().involvedGroup("sales", "undefined").count());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("undefined").endOr().count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("undefined").endOr().singleResult().getId());
+        
+        assertEquals(1, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().count());
+        assertEquals(superProcessInstance.getId(), runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "specialLink").processDefinitionKey("subProcessQueryTest").endOr().singleResult().getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().or().involvedGroup("sales", "undefined").processDefinitionKey("undefined").endOr().count());
+    }
 
     @Test
     public void testQueryByInvalidSuperProcessInstanceId() {

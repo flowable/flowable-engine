@@ -448,6 +448,10 @@
             <if test="involvedUser != null">
                 and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ = #{involvedUser})
             </if>
+            <if test="involvedUserIdentityLink != null">
+            	and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+            	I.USER_ID_ = #{involvedUserIdentityLink.userId} and I.TYPE_ = #{involvedUserIdentityLink.type})
+        	</if>
             <if test="involvedGroups != null">
                 and EXISTS(
                 select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
@@ -456,6 +460,10 @@
                 </foreach>
                 )
             </if>
+            <if test="involvedGroupIdentityLink != null">
+	            and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+	            I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId} and I.TYPE_ = #{involvedGroupIdentityLink.type})
+	        </if>
             <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
                 <choose>
                     <when test="queryVariableValue.operator.equals('EXISTS')">
@@ -527,7 +535,7 @@
                 </choose>
             </foreach>
 
-        <!-- or queries -->
+        	<!-- or queries -->
             <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
                 and
                 <trim prefix="(" prefixOverrides="OR" suffix=")">
@@ -611,6 +619,10 @@
                         or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
                         #{orQueryObject.involvedUser})
                     </if>
+                    <if test="orQueryObject.involvedUserIdentityLink != null">
+			            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+			            I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type})
+			        </if>
                     <if test="orQueryObject.involvedGroups != null">
                         or EXISTS(
                         select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
@@ -619,7 +631,10 @@
                         </foreach>
                         )
                     </if>
-
+					<if test="orQueryObject.involvedGroupIdentityLink != null">
+			            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
+			            I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type})
+			        </if>
                     <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
                         or
                         <trim prefix="(" prefixOverrides="AND" suffix=")">
