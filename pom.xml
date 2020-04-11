@@ -27,7 +27,7 @@
 		<slf4j.version>1.7.30</slf4j.version>
 
 		<junit.version>4.13</junit.version>
-		<junit.jupiter.version>5.6.0</junit.jupiter.version>
+		<junit.jupiter.version>5.6.1</junit.jupiter.version>
 		<hikari.version>3.4.2</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
