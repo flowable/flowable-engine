@@ -305,22 +305,18 @@ public class FileSystemContentStorage implements ContentStorage {
                 if (newFolder.mkdirs()) {
                     return newFolder;
                 }
-
-                // File already existed, repeat the process again to find the next
-                // available folder
-                LOGGER.debug("Next folder already created, retrying...");
-                return getFirstAvailableFolder(--maxRetries);
             } else {
                 File newFolder = new File(currentMaxFolder.getParentFile(), String.valueOf(lastIndex + 1));
                 if (newFolder.mkdir()) {
                     return newFolder;
                 }
 
-                // File already existed, repeat the process again to find the next
-                // available folder
-                LOGGER.debug("Next folder already created, retrying...");
-                return getFirstAvailableFolder(--maxRetries);
             }
+
+            // File already existed, repeat the process again to find the next
+            // available folder
+            LOGGER.debug("Next folder already created, retrying...");
+            return getFirstAvailableFolder(--maxRetries);
         }
     }
 
