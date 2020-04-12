@@ -16,5 +16,5 @@ package org.flowable.common.engine.impl.interceptor;
  * @author wangxb
  */
 public interface InstantiateInterceptor {
-    Object handle(String className);
+    Object instantiate(String className);
 }

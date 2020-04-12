@@ -265,7 +265,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
             if (instantiateIntercepter == null) {
                 throw new FlowableException("couldn't instantiate class " + className, e);
             } else {
-                delegateInstance = instantiateIntercepter.handle(className);
+                delegateInstance = instantiateIntercepter.instantiate(className);
             }
         }
 
