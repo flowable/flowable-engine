@@ -108,14 +108,14 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
     public void getCaseInstanceWithNullInvolvedGroups() {
         assertThatThrownBy(() -> cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(null))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessage("involvedGroups are null");
+                .hasMessage("groupIds are null");
     }
 
     @Test
     public void getCaseInstanceWithEmptyInvolvedGroups() {
         assertThatThrownBy(() -> cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(Collections.emptySet()))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
-                .hasMessage("involvedGroups are empty");
+                .hasMessage("groupIds are empty");
     }
 
     @Test
