@@ -7,9 +7,6 @@ Flowable (V6)
 [Docker Images:  
     ![Docker Hub](https://images.microbadger.com/badges/version/flowable/flowable-rest.svg)](https://hub.docker.com/u/flowable/)
 
-[Travis CI:  
-	![build status badge](https://travis-ci.org/flowable/flowable-engine.svg?branch=master)](https://travis-ci.org/flowable/flowable-engine)
-
 [License:  
 	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)
 
