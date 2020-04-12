@@ -403,12 +403,10 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 }
             }
 
-            processMessageFlows(model, shapesArrayNode);
-
         } else {
             processFlowElements(model.getMainProcess(), model, shapesArrayNode, formKeyMap, decisionTableKeyMap, 0.0, 0.0);
-            processMessageFlows(model, shapesArrayNode);
         }
+        processMessageFlows(model, shapesArrayNode);
 
         modelNode.set(EDITOR_CHILD_SHAPES, shapesArrayNode);
         return modelNode;
