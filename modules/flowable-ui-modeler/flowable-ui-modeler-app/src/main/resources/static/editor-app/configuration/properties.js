@@ -146,6 +146,14 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/out-parameters-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/out-parameters-write-template.html"
     },
+    "oryx-casetaskinparameters-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/in-parameters-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/in-parameters-write-template.html"
+    },
+    "oryx-casetaskoutparameters-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/out-parameters-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/out-parameters-write-template.html"
+    },
     "oryx-planitemlifecyclelisteners-multiplecomplex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/plan-item-lifecycle-listeners-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/plan-item-lifecycle-listeners-write-template.html"

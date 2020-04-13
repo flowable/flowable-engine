@@ -800,6 +800,26 @@
         "popular" : true
       } ]
     }, {
+      "name" : "casetaskinparameterspackage",
+      "properties" : [ {
+        "id" : "casetaskinparameters",
+        "type" : "Complex",
+        "title" : "CMMN.PROPERTYPACKAGES.CASETASKINPARAMETERSPACKAGE.CASETASKINPARAMETERS.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.CASETASKINPARAMETERSPACKAGE.CASETASKINPARAMETERS.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "casetaskoutparameterspackage",
+      "properties" : [ {
+        "id" : "casetaskoutparameters",
+        "type" : "Complex",
+        "title" : "CMMN.PROPERTYPACKAGES.CASETASKOUTPARAMETERSPACKAGE.CASETASKOUTPARAMETERS.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.CASETASKOUTPARAMETERSPACKAGE.CASETASKOUTPARAMETERS.DESCRIPTION",
+        "popular" : true
+      } ]
+    },{
       "name" : "idVariableNamepackage",
       "properties" : [ {
         "id" : "idVariableName",
@@ -1400,6 +1420,8 @@
         "documentationpackage",
         "blockingpackage",
         "casetaskcasereferencepackage",
+        "casetaskinparameterspackage",
+        "casetaskoutparameterspackage",
         "fallbacktodefaulttenantpackage",
         "idVariableNamepackage",
         "asyncpackage",
