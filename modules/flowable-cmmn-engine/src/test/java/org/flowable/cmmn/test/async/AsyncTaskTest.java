@@ -13,7 +13,7 @@
 package org.flowable.cmmn.test.async;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
@@ -103,13 +103,9 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
             Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertThat(job.getCategory()).isEqualTo("cmmnCategory");
     
-            try {
-                CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 4000L, 200L, true);
-                fail("expected that job is still there");
-            } catch (Exception e) {
-                // expected
-            }
-            
+            assertThatThrownBy(() -> CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 4000L, 200L, true))
+                    .isInstanceOf(Exception.class);
+
             cmmnEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("cmmnCategory");
             
             waitForJobExecutorToProcessAllJobs();
