@@ -7,7 +7,7 @@ on:
       - 'flowable-release-*'
 
 jobs:
-  test_jdk14:
+  test_jdkea:
     name: Linux (OpenJDK EA)
     runs-on: ubuntu-latest
     steps:
